@@ -26,9 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ExifMetaManager extends AJXP_Plugin
+class ExifMetaManager extends AJXP_AbstractMetaSource
 {
-    protected $accessDriver;
     protected $metaDefinitions;
 
     public function init($options)
@@ -45,7 +44,7 @@ class ExifMetaManager extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         if(!function_exists("exif_read_data")) return ;
         //$messages = ConfService::getMessages();
         $def = $this->getMetaDefinition();
@@ -53,15 +52,15 @@ class ExifMetaManager extends AJXP_Plugin
             return ;
         }
         $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.exif.1]</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
-        $cdataFoot = '</table></div>';
+                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="user_meta_change" title="AJXP_MESSAGE[meta.exif.1]">AJXP_MESSAGE[meta.exif.2]</span>AJXP_MESSAGE[meta.exif.1]</div>
+                        <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
+        $cdataFoot = '</div></div>';
         $cdataParts = "";
         $even = false;
         foreach ($def as $key=>$label) {
             $trClass = ($even?" class=\"even\"":"");
             $even = !$even;
-            $cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
+            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
@@ -103,11 +102,12 @@ class ExifMetaManager extends AJXP_Plugin
     {
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $urlBase = $wrapperData["protocol"]."://".$repo->getId();
-        $decoded = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $selection = new UserSelection($repo, $httpVars);
+        $decoded = $selection->getUniqueFile();
         $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
         AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
@@ -116,7 +116,7 @@ class ExifMetaManager extends AJXP_Plugin
             $exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
         }
         $excludeTags = array("componentsconfiguration", "filesource", "scenetype", "makernote");
-        AJXP_XMLWriter::header("metadata", array("file" => $httpVars["file"], "type" => "EXIF"));
+        AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
         foreach ($exifData as $section => $data) {
             print("<exifSection name='$section'>");
             foreach ($data as $key => $value) {

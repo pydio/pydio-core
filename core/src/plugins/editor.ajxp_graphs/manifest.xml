@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.ajxp_graphs" openable="true" order="10" text="graphs_viewer.1"
+        title="graphs_viewer.2" iconClass="icon-bar-chart" icon="edit.png" className="GraphsViewer"
+        mimes="ajxp_graphs" formId="graph_viewer_box" label="CONF_MESSAGE[Graphs Viewer]"
+        description="CONF_MESSAGE[Plugin Editor]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings>
+        <resources>
+            <js file="plugins/editor.ajxp_graphs/res/js/d3.min.js" className="d3" />
+            <js file="plugins/editor.ajxp_graphs/res/js/dimple.v2.1.0.min.js" className="dimple" />
+            <js file="plugins/editor.ajxp_graphs/class.GraphsViewer.js" className="GraphsViewer"/>
+            <css file="plugins/editor.ajxp_role/rolesEditor.css" />
+            <css file="plugins/editor.ajxp_graphs/res/css/graphsViewer.css" />
+            <i18n namespace="graphs_viewer" path="plugins/editor.ajxp_graphs/res/i18n"/>
+            <img_library alias="graphs_viewer" path="plugins/editor.ajxp_graphs/res/icons"/>
+        </resources>
+	</client_settings>
+	<clientForm id="graph_viewer_box"><![CDATA[
+		<div id="graph_viewer_box" class="tabbed_editor" style="background-color:#f8f8f8; overflow-y: scroll; border-radius:0 4px 0 0;" box_resize="true" box_padding="0">
+		    <div id="graph_viewer_loader" style="text-align:center; padding-top: 40px;"> Loading analytics data ... </div>
+		    <div id="graph_viewer_container"></div>
+		</div>
+	]]></clientForm>
+	<dependencies>
+		<activePlugin pluginName="access.ajxp_conf"/>
+		<activePlugin pluginName="log.sql"/>
+    <activePlugin pluginName="action.rpt_computer"/>
+	</dependencies>
+</editor>

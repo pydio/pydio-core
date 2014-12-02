@@ -21,7 +21,7 @@
 /**
  * Container for location components, go to parent, refresh.
  */
-Class.create("Breadcrumb", {
+Class.create("Breadcrumb", AjxpPane, {
 	__implements : ["IAjxpWidget"],
     currentPath : "",
 	/**
@@ -29,12 +29,14 @@ Class.create("Breadcrumb", {
 	 * @param oElement HTMLElement
 	 * @param options Object
 	 */
-	initialize : function(oElement, options){
+	initialize : function($super, oElement, options){
+        $super(oElement, options);
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
         this.options = options || {};
         this.element.update('Files');
         this.observerFunc = function(event){
+            if(!this.element) return;
             var newNode = event.memo;
             var parts = $H();
             if(Object.isString(newNode)){
@@ -58,7 +60,7 @@ Class.create("Breadcrumb", {
                     parts.set(parent.getPath(), parent.getLabel());
                     parent = parent.getParent();
                 }
-                if(parts.size() > 1){
+                if(parts.size() > 1 && !this.options['always_show_root']){
                     parts.unset(lastChild.getPath());
                 }
                 var keys = parts.keys().reverse();
@@ -67,26 +69,54 @@ Class.create("Breadcrumb", {
                 parts = tmpParts;
             }
 
-            var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
-            var lastValue = parts.values().last();
+            var chevron = "<span class='icon-chevron-right'></span>";
+            var clickPath = '';
+            if(!this.options['hide_home_icon']){
+                clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
+                if(this.options["use_ul"]){
+                    clickPath = "<li>"+clickPath+"</li>";
+                }
+            }
+            var pos = 0;
+            var length = parts.keys().length;
             parts.each(function(pair){
                 var refresh = '';
-                if(pair.value == lastValue){
-                    refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
+                if(this.options["use_ul"]){
+                    if(pos == length-1){
+                        refresh = '<i class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></i>';
+                    }
+                    var first = pos == 0 ? ' first-bread':'';
+                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+pair.key+"'><em>"+pair.value+"</em></span></li>";
+                    if(refresh){
+                        clickPath += "<li><i class='ajxp-goto' data-goTo='"+pair.key+"'>"+refresh+"</i></li>";
+                    }
+                }else{
+                    if(pos == length-1){
+                        refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
+                    }
+                    clickPath += (pair.value != pos == 0 || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
                 }
-                clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
-            });
-            this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
+                pos ++;
+            }.bind(this));
+            if(this.options['use_ul']){
+                this.element.update("<div class='inner_bread'><ul>" + clickPath + "</ul></div>");
+                this.resizeUls();
+            }else{
+                this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
+            }
 
             this.element.select("span.ajxp-goto").invoke("observe", "click", function(event){
                 "use strict";
-                var target = event.target.getAttribute("data-goTo");
+                var target = Event.findElement(event, "span[data-goTo]").getAttribute("data-goTo");// event.target.getAttribute("data-goTo");
                 event.target.setAttribute("title", "Go to " + target);
-                if(event.target.down('span.ajxp-goto-refresh')){
+                if(event.target.hasClassName('ajxp-goto-refresh') || event.target.down('span.ajxp-goto-refresh')){
                     window.ajaxplorer.fireContextRefresh();
                 }else{
                     window.ajaxplorer.goTo(target);
                 }
+            });
+            this.element.select("i.ajxp-goto").invoke("observe", "click", function(event){
+                window.ajaxplorer.fireContextRefresh();
             });
 
         }.bind(this);
@@ -96,32 +126,33 @@ Class.create("Breadcrumb", {
 	/**
 	 * Resize widget
 	 */
-	resize : function(){
+	resize : function($super){
         if(!this.element) return;
-		if(this.options.flexTo){
-			var parentWidth = $(this.options.flexTo).getWidth();
-			var siblingWidth = 0;
-			this.element.siblings().each(function(s){
-				if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
-					siblingWidth+=s.ajxpPaneObject.getActualWidth();
-				}else{
-					siblingWidth+=s.getWidth();
-				}
-			});
-            var buttonsWidth = 0;
-            this.element.select("div.inlineBarButton,div.inlineBarButtonLeft,div.inlineBarButtonRight").each(function(el){
-                buttonsWidth += el.getWidth();
-            });
-			var newWidth = (parentWidth-siblingWidth-30);
-			if(newWidth < 5){
-				this.element.hide();
-			}else{
-				this.element.show();
-				this.element.setStyle({width:newWidth + 'px'});
-			}
-		}
+        $super();
+        if(this.options["use_ul"]){
+            this.resizeUls();
+        }
+        document.fire("ajaxplorer:resize-Breadcrumb-" + this.element.id, this.element.getDimensions());
 	},
-	
+
+    resizeUls: function(){
+        var available = parseInt(this.element.getWidth());
+        var lastOverlaps = function(){
+            var last = this.element.down('li:last');
+            return (last && last.positionedOffset()['left'] + last.getWidth() ) > available
+        }.bind(this);
+        var i=0;
+        var spans = this.element.select('li > span');
+        spans.invoke("removeClassName", "reduced");
+        while ( lastOverlaps() && i < spans.length - 2){
+            i++;
+            spans[i].addClassName("reduced");
+        }
+        if(lastOverlaps() && spans.length){
+            spans[0].addClassName("reduced");
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */	

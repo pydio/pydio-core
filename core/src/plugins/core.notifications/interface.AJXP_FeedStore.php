@@ -43,14 +43,15 @@ interface AJXP_FeedStore
     /**
      * @abstract
      * @param array $filterByRepositories
-     * @param string $userId
+     * @param $filterByPath
      * @param string $userGroup
      * @param integer $offset
      * @param integer $limit
      * @param boolean $enlargeToOwned
+     * @param string $userId
      * @return AJXP_Notification[]
      */
-    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true);
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId);
 
     /**
      * @abstract
@@ -63,7 +64,7 @@ interface AJXP_FeedStore
      * @abstract
      * @param $userId
      * @param null $repositoryIdFilter
-     * @return mixed
+     * @return AJXP_Notification[]
      */
     public function loadAlerts($userId, $repositoryIdFilter = null);
 

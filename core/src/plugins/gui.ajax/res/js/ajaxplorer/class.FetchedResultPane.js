@@ -45,59 +45,101 @@ Class.create("FetchedResultPane", FilesList, {
             ],
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
-            defaultSortTypes:["String", "String", "String"],
+            defaultSortTypes:["String", "String", "String", "MyDate"],
             columnsTemplate:"search_results",
+            defaultSortColumn:2,
+            defaultSortDescending:false,
             selectable: true,
             draggable: false,
+            droppable: false,
+            noContextualMenu:true,
+            containerDroppableAction:null,
+            emptyChildrenMessage:'',
             replaceScroller:true,
+            forceClearOnRepoSwitch:false,
             fit:'height',
             detailThumbSize:22,
-            updateGlobalContext:false
+            updateGlobalContext:false,
+            selectionChangeCallback:function(){
+                if(!this._dataLoaded) return;
+                var selectedNode = this._dataModel.getSelectedNodes()[0];
+                if(selectedNode) ajaxplorer.goTo(selectedNode);
+            }.bind(this)
         }, ajxpOptions));
 
         if(this.options.updateGlobalContext){
-            dataModel.observe("selection_changed", function(){
+            this._registerObserver(dataModel, "selection_changed", function(){
                 if(!this._dataLoaded) return;
                 var selectedNodes = this._dataModel.getSelectedNodes();
                 if(selectedNodes){
                     ajaxplorer.getContextHolder().setSelectedNodes(selectedNodes, this);
                 }
-            }.bind(this));
-        }else{
-            dataModel.observe("selection_changed", function(){
-                if(!this._dataLoaded) return;
-                var selectedNode = this._dataModel.getSelectedNodes()[0];
-                if(selectedNode) ajaxplorer.goTo(selectedNode);
-            }.bind(this));
+            }.bind(this), true);
+        }else if(this.options.selectionChangeCallback){
+            this._registerObserver(dataModel, "selection_changed", this.options.selectionChangeCallback, true);
         }
 
-        document.observe("ajaxplorer:repository_list_refreshed", function(){
-            this._rootNode.clear();
-            this._dataLoaded = false;
-            if(this.htmlElement && this.htmlElement.visible()){
-                this.showElement(true);
-            }
-        }.bind(this));
+        if(this.options.forceClearOnRepoSwitch){
+            var repoSwitchObserver = function(){
+                this._rootNode.clear();
+                this._dataLoaded = false;
+                if(this.htmlElement && this.htmlElement.visible()){
+                    this.showElement(true);
+                }
+            }.bind(this);
+            this._registerObserver(document, "ajaxplorer:repository_list_refreshed", repoSwitchObserver);
+        }
 
         this.hiddenColumns.push("is_file");
-        this._sortableTable.sort(2, false);
+        if(this.options.defaultSortColumn != undefined){
+            this._sortableTable.sort(this.options.defaultSortColumn , this.options.defaultSortDescending);
+        }
 
         mainElementName.addClassName('class-FetchedResultPane');
 
         if(ajxpOptions.reloadOnServerMessage){
-            ajaxplorer.observe("server_message", function(event){
+            this._registerObserver(ajaxplorer, "server_message", function(event){
                 var newValue = XPathSelectSingleNode(event, ajxpOptions.reloadOnServerMessage);
                 if(newValue) this.reloadDataModel();
-            }.bind(this));
+            }.bind(this), true);
+            this._registerObserver(ajaxplorer, "server_message:" + ajxpOptions.reloadOnServerMessage, function(){
+                this.reloadDataModel();
+            }.bind(this), true);
+        }
+
+        if(ajxpOptions.containerDroppableAction){
+
+            Droppables.add(this.htmlElement, {
+                hoverclass:'droppableZone',
+                accept:'ajxp_draggable',
+                onDrop:function(draggable, droppable, event)
+                {
+                    if(draggable.getAttribute('user_selection')){
+                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction);
+                    }else if(draggable.ajxpNode){
+                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction, draggable.ajxpNode);
+                    }
+                }
+            });
+
         }
 
         //ajaxplorer.registerFocusable(this);
 
     },
 
+    destroy:function($super){
+        $super();
+        if(this.options.containerDroppableAction){
+            Droppables.remove(this.htmlElement);
+        }
+    },
+
     reloadDataModel: function(){
         if(this._dataLoaded){
-            this._rootNode.clear();
+            if(!this.options.silentLoading){
+                this._rootNode.clear();
+            }
             this._dataLoaded = false;
             if(this.htmlElement && this.htmlElement.visible()){
                 this._dataModel.requireContextChange(this._rootNode, true);
@@ -109,7 +151,7 @@ Class.create("FetchedResultPane", FilesList, {
     /**
      * Can be overriden by the children.
      * @param ajxpOptions
-     * @returns {AjxpDataModel}
+     * @returns AjxpDataModel
      */
     initDataModel: function(ajxpOptions){
 
@@ -117,8 +159,18 @@ Class.create("FetchedResultPane", FilesList, {
         var rNodeProvider = new RemoteNodeProvider();
         dataModel.setAjxpNodeProvider(rNodeProvider);
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
-        this._rootNode = new AjxpNode("/", false, "Results", "folder.png", rNodeProvider);
+        this._rootNode = new AjxpNode("/", false, ajxpOptions.rootNodeLabel?ajxpOptions.rootNodeLabel:"Results", "folder.png", rNodeProvider);
         dataModel.setRootNode(this._rootNode);
+        if(ajxpOptions.emptyChildrenMessage){
+            var emptyMessage = MessageHash[ajxpOptions.emptyChildrenMessage]?MessageHash[ajxpOptions.emptyChildrenMessage]:ajxpOptions.emptyChildrenMessage;
+            this._rootNode.observe("loaded", function(){
+                this.htmlElement.select('div.no-results-found').invoke('remove');
+                if(!this._rootNode.getChildren().length){
+                    this.htmlElement.insert({bottom:'<div class="no-results-found">'+emptyMessage+'</div>'});
+                }
+            }.bind(this));
+        }
+
         return dataModel;
 
     },
@@ -147,7 +199,7 @@ Class.create("FetchedResultPane", FilesList, {
 	},
 
     getActions : function(){
-
+        return $H();
     }
 
 });

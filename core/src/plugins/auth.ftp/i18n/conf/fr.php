@@ -19,14 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"FTP Authentification" => "Authentification FTP",
-"Authenticate user directly to an FTP server, and connect him to this server." => "Interrogation d'un serveur FTP pour valider une identification",
-"FTP Login Screen" => "Ecran de login FTP",
-"Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Remplace l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur d'entrer les informations de connexions au serveur FTP (serveur, port, etc).",
-"Repository" => "Dépôt",
-"Id of the repository to use for testing connexion" => "Id du dépot à utiliser pour récupérer les informations de connexion FTP.",
-"Admin user" => "Utilisateur admin",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID d'un utilisateur admin récupéré dans conf.serial.",
-"Test Connexion" => "Test Connexion",
-"Test connexion to the FTP server" => "Test connexion to the FTP server",
+"FTP authentication" => "Authentification FTP",
+"Authenticate users by validating their credentials against an FTP server." => "Interrogation d'un serveur FTP pour valider une identification.",
+"FTP login screen" => "Ecran de login FTP",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Remplacer l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur de saisir ses propres informations de connexion au serveur FTP (serveur, port, ...).",
+"Workspace" => "Dépôt",
+"ID of the workspace used to validate credentials" => "ID du dépôt à utiliser pour valider les identifiants de connexion.",
+"Admin user" => "Utilisateur administrateur",
+"The ID of an existing admin for Pydio (using conf.serial)" => "ID d'un administrateur Pydio existant (utilise conf.serial)",
+"Test connection" => "Tester la connexion",
+"Test connection to the FTP server" => "Tester la connexion vers le serveur FTP",
 );

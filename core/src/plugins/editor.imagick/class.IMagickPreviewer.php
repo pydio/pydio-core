@@ -61,14 +61,16 @@ class IMagickPreviewer extends AJXP_Plugin
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
+        $selection = new UserSelection($repository);
+        $selection->initFromHttpVars($httpVars);
 
         if ($action == "imagick_data_proxy") {
             $this->extractAll = false;
             if(isSet($httpVars["all"])) $this->extractAll = true;
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
 
             if (($size = filesize($destStreamURL.$file)) === false) {
-                return ;
+                return false;
             } else {
                 if($size > $flyThreshold) $this->useOnTheFly = true;
                 else $this->useOnTheFly = false;
@@ -85,17 +87,17 @@ class IMagickPreviewer extends AJXP_Plugin
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
-                $files = $this->listExtractedJpg($prefix);
+                $files = $this->listExtractedJpg($destStreamURL.$file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
-                return;
+                return false;
             } else if ($this->extractAll) { // on the fly extract mode
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
                 $files = $this->listPreviewFiles($destStreamURL.$file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
-                return;
+                return false;
             } else {
                 header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
                 header("Content-Length: ".strlen($cacheData));
@@ -104,13 +106,17 @@ class IMagickPreviewer extends AJXP_Plugin
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
                 header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
                 print($cacheData);
-                return;
+                return false;
             }
 
         } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
             $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = AJXP_Utils::decodeSecureMagic($httpVars["src_file"]);
+                if($repository->hasContentFilter()){
+                    $contentFilter = $repository->getContentFilter();
+                    $srcfile = $contentFilter->filterExternalPath($srcfile);
+                }
                 $size = filesize($destStreamURL."/".$srcfile);
                 if($size > $flyThreshold) $this->useOnTheFly = true;
                 else $this->useOnTheFly = false;
@@ -119,13 +125,13 @@ class IMagickPreviewer extends AJXP_Plugin
                 $this->generateJpegsCallback($destStreamURL.$srcfile, $file);
 
             }
-            if(!is_file($file)) return ;
+            if(!is_file($file)) return false;
             header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
             header("Content-Length: ".filesize($file));
             header('Cache-Control: public');
             readfile($file);
             exit(1);
-        } else if ($action == "delete_imagick_data" && isSet($httpVars["file"])) {
+        } else if ($action == "delete_imagick_data" && !$selection->isEmpty()) {
             /*
             $files = $this->listExtractedJpg(AJXP_CACHE_DIR."/".$httpVars["file"]);
             foreach ($files as $file) {
@@ -151,27 +157,39 @@ class IMagickPreviewer extends AJXP_Plugin
             AJXP_Cache::clearItem("imagick_thumb", $oldFile);
             $cache = AJXP_Cache::getItem("imagick_full", $oldFile, false);
             $prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());
-            $files = $this->listExtractedJpg($prefix);
+            $files = $this->listExtractedJpg($oldFile, $prefix);
             foreach ($files as $file) {
                 if(is_file((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/".$file["file"])) unlink(AJXP_CACHE_DIR."/".$file["file"]);
             }
         }
     }
 
-    protected function listExtractedJpg($prefix)
+    protected function listExtractedJpg($file, $prefix)
     {
+        $n = new AJXP_Node($file);
+        $path = $n->getPath();
         $files = array();
         $index = 0;
         while (is_file($prefix."-".$index.".jpg")) {
             $extract = $prefix."-".$index.".jpg";
             list($width, $height, $type, $attr) = @getimagesize($extract);
-            $files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+            $files[] = array(
+                "file" => basename($extract),
+                "width"=>$width,
+                "height"=>$height,
+                "rest"  => "/get_extracted_page/".basename($extract).str_replace("%2F", "/", urlencode($path))
+            );
             $index ++;
         }
         if (is_file($prefix.".jpg")) {
             $extract = $prefix.".jpg";
             list($width, $height, $type, $attr) = @getimagesize($extract);
-            $files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+            $files[] = array(
+                "file" => basename($extract),
+                "width"=>$width,
+                "height"=>$height,
+                "rest"  => "/get_extracted_page/".basename($extract).str_replace("%2F", "/", urlencode($path))
+            );
         }
         return $files;
     }
@@ -190,16 +208,29 @@ class IMagickPreviewer extends AJXP_Plugin
             }
         }
         $count = $this->countPages($file);
+        $n = new AJXP_Node($file);
+        $path = $n->getPath();
+
         while ($index < $count) {
             $extract = $prefix."-".$index.".jpg";
             list($width, $height, $type, $attr) = @getimagesize($extract);
-            $files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+            $files[] = array(
+                "file" => basename($extract),
+                "width"=>$width,
+                "height"=>$height,
+                "rest"  => "/get_extracted_page/".basename($extract).str_replace("%2F", "/", urlencode($path))
+            );
             $index ++;
         }
         if (is_file($prefix.".jpg")) {
             $extract = $prefix.".jpg";
             list($width, $height, $type, $attr) = @getimagesize($extract);
-            $files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+            $files[] = array(
+                "file" => basename($extract),
+                "width"=>$width,
+                "height"=>$height,
+                "rest"  => "/get_extracted_page/".basename($extract).str_replace("%2F", "/", urlencode($path))
+            );
         }
         return $files;
     }

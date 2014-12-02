@@ -19,5 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $OVERRIDE_SESSION = true;
-session_name("AjaXplorer_Shared");
+$h = '';
+if(isSet($_GET['minisite_session'])){
+    $h = $_GET['minisite_session'];
+}
+
+session_name("AjaXplorer_Shared".$h);
 include("index.php");

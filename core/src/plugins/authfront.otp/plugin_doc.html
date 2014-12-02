@@ -1,0 +1,100 @@
+<h1>Authfront OTP plugin for Pydio</h1>
+
+<p>With authfront.otp, you can cooperate with any backend auth like ldap, mysql...</p>
+
+<p>Based on the google authenticator reference implementation + yubikey demo php implementation. With this plugin you can authenticate users 4 different ways:</p>
+
+<ul>
+	<li>Password authentication: it works as the auth.serial</li>
+	<li>Password + Google Authenticator: to the password field write the password first, then the six digits from Google Authenticator</li>
+	<li>Password + YubiKey: to the password filed write your password then press yubikey</li>
+	<li>Password + (YubiKey OR Google Authenticator): if both method enabled for a user, the plugin can recognize whether YubiKey or Google Authenticator is used. (it is simple, Google Authenticator uses numbers, YubiKey uses letters)</li>
+</ul>
+
+<p>The authentication method can be set up per users, so it is possible that someone authenticate with password, other user authenticate with YubiKey, and someone else authenticate with both YubiKey and Google Authenticator.<br />
+&nbsp;</p>
+
+<h2>Installation yubico package</h2>
+
+<p>You need to install php-yubico from <a href="http://code.google.com/p/php-yubico/">http://code.google.com/p/php-yubico/</a></p>
+
+<pre>
+wget http://php-yubico.googlecode.com/files/Auth_Yubico-2.4.tgz
+pear install Auth_Yubico-2.4.tgz
+</pre>
+
+<p><br />
+Do not forget to install or enable php-curl for Auth_Yubico.</p>
+
+<ul>
+	<li>Copy the auth.serial_otp modul to the plugin directory</li>
+	<li>Clear the cache</li>
+</ul>
+
+<h2>Configuration</h2>
+
+<ul>
+	<li>Backup your Pydio instance just for sure</li>
+	<li>Enable the Authfront One-Time-Password (authfront.otp) modul in <em>Global configurations &gt;&gt; Extensions importantes &gt;&gt; AuthFront &gt;&gt; Authentication One-Time-Password</em>
+	<ul>
+		<li>
+		<p>Enabled: <strong>Yes</strong></p>
+		</li>
+		<li>
+		<p>Order:<strong>default is 13 (</strong>don&#39;t change it<strong>)</strong></p>
+		</li>
+		<li>
+		<p>Protocol type: Sessions only</p>
+		</li>
+		<li>
+		<p>Yubico secret KEY</p>
+		</li>
+		<li>
+		<p>Yubico Client Id: your Yubico Client Id generated at <a href="http://api.yubico.com/get-api-key/">http://api.yubico.com/get-api-key/</a> or blank when you don&#39;t plan to use YubiKey</p>
+		</li>
+		<li>
+		<p>Modify login page: <strong>Yes (</strong>There is a line added into login page &quot;* OTP enabled&quot;<strong>)</strong></p>
+		</li>
+	</ul>
+	</li>
+</ul>
+
+<h2>Per user configuration</h2>
+
+<h3>Google authenticator</h3>
+
+<p>in Users &amp; Groups, select user to configuration</p>
+
+<p>In the tab bar: Account info |||&nbsp; ACL ||| Actions ||| Parameters&nbsp;&nbsp;&nbsp; =&gt; select Parameters</p>
+
+<ul>
+	<li>plugin identifier: authfront.otp</li>
+	<li>parameter name: google (Google Authenticator)</li>
+	<li>repository scope: All</li>
+</ul>
+
+<p>then click Add parameter</p>
+
+<ul>
+	<li>plugin identifier: authfront.otp (ex: AAAABBBBCCCCDDDD)</li>
+	<li>parameter name: google_last</li>
+	<li>repository scope: All</li>
+</ul>
+
+<p>then click Add parameter</p>
+
+<p>In the same window, session &quot;All workspaces&quot;</p>
+
+<ul>
+	<li>open authfront.otp</li>
+	<li>input the google secret</li>
+	<li>Don&#39;t touch the &quot;Google Authenticator Last&quot; field, it is updating automatically. It is used internally for the defense against replay attack.</li>
+</ul>
+
+<p>then click save</p>
+
+<p><strong>!!! DO NOT USE THE SAME SECRET AS YOUR GOOGLE ACCOUNT !!</strong></p>
+
+<h3>Do the same to add YubiKey parameters</h3>
+
+<p>Use your in the YubiKey 1 or the YubiKey 2 field. Maximum two YubiKeys can be assigned to one user.</p>

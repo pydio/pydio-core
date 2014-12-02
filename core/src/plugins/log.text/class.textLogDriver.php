@@ -256,8 +256,14 @@ class textLogDriver extends AbstractLogDriver
         $lines = file($fName);
         foreach ($lines as $line) {
             $line = AJXP_Utils::xmlEntities($line);
-            $matches = explode("\t",$line,6);
-            if (count($matches) == 6) {
+            $matches = explode("\t",$line,7);
+            if (count($matches) == 6){
+                $matches[6] = $matches[5];
+                $matches[5] = $matches[4];
+                $matches[4] = $matches[3];
+                $matches[3] = "";
+            }
+            if (count($matches) == 7) {
                 $fileName = $parentDir."/".$matches[0];
                 foreach ($matches as $key => $match) {
                     $match = AJXP_Utils::xmlEntities($match);
@@ -269,7 +275,7 @@ class textLogDriver extends AbstractLogDriver
                 $date = $matches[0];
                 list($m,$d,$Y,$h,$i,$s) = sscanf($date, "%i-%i-%i %i:%i:%i");
                 $tStamp = mktime($h,$i,$s,$m,$d,$Y);
-                print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" action=\"$matches[4]\" params=\"$matches[5]\" icon=\"toggle_log.png\" />", false));
+                print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" source=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
             }
         }
         return ;

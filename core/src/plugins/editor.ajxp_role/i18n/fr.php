@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Editeur de Role",
-"2" => "Editeur de Role",
+"1" => "Editeur de rôle",
+"2" => "Editeur de rôle",
 "3" => "Info du compte",
 "4" => "Accès",
 "5" => "Actions",
@@ -42,10 +42,10 @@ $mess=array(
 "16" => "Utilisez les sélecteurs ci-dessous pour choisir les paramètres que vous voulez personnaliser pour le rôle. La valeur pour s'appliquer dépôt par dépôt ou pour tous les dépôts, mais ceci peut aussi dépendre des paramètres choisis.",
 "17" => "Nom du paramètre",
 "18" => "Ajouter le paramètre",
-"19" => "Il y a des changements non pris en compte, êtes-vous sûr de vouloir fermer?",
+"19" => "Il y a des changements non pris en compte, êtes-vous sûr de vouloir fermer ?",
 "20" => "Le rôle a été mis à jour",
 "21" => "ID utilisateur",
-"22" => "Profil Spécifique",
+"22" => "Profil spécifique",
 "23" => "Dépôt par défaut",
 "24" => "Rôles (utiliser les touches Ctrl/Cmd pour en sélectionner plusieurs)",
 "25" => "Changer de mot de passe",
@@ -66,4 +66,5 @@ $mess=array(
 "40" => "Activer",
 "41" => "Supprimer",
 "42" => "Données du rôle",
+"43" => "Selectionner un ou plusieurs",
 );

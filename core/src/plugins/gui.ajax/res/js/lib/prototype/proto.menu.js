@@ -382,11 +382,13 @@ Proto.Menu = Class.create({
 		var vpHeight = getViewPortHeight()-10;
         if(this.options.menuMaxHeight){
             vpHeight = Math.min(this.options.menuMaxHeight, vpHeight);
+        }else if(this.options.menuFitHeight){
+            vpHeight = getViewPortHeight();
         }
 		var vpOff = document.viewport.getScrollOffsets();
 		var elDim = this.container.getDimensions();
 		var y = parseInt(offsetTop);
-		if((y - vpOff.top + elDim.height) >= vpHeight){
+		if((y - vpOff.top + elDim.height) >= vpHeight || this.options.menuFitHeight){
 			this.container.setStyle({height:(vpHeight-(y - vpOff.top))+'px',overflowY:'scroll'}); 
 			if(!this.containerShrinked) this.container.setStyle({width:elDim.width+16+'px'});
 			this.containerShrinked = true;
@@ -401,24 +403,24 @@ Proto.Menu = Class.create({
 			y = Event.pointer(e).y,
 			vpDim = document.viewport.getDimensions(),
 			vpOff = document.viewport.getScrollOffsets(),
-			elDim = this.container.getDimensions(),
-			elOff = {
+			elDim = this.container.getDimensions();
+			return {
 				left: ((x + elDim.width + this.options.pageOffset) > vpDim.width 
 					? (vpDim.width - elDim.width - this.options.pageOffset) : x) + 'px',
 				top: ((y - vpOff.top + elDim.height) > vpDim.height && (y - vpOff.top) > elDim.height 
 					? (y - elDim.height) : y) + 'px'
 			};
-		return elOff;	
 	},
 	
 	computeAnchorOffset: function(){
 		//if(this.anchorOffset) return this.anchorOffset;
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
 		var anchorScroll = this.options.anchor.cumulativeScrollOffset();
-		
+		var topPos, leftPos;
+
 		if(this.options.position == 'bottom' || this.options.position == 'bottom right' || this.options.position == 'bottom middle'){
-			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset - anchorScroll[1];
-			var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
+			topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset - anchorScroll[1];
+			leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
 			if(this.options.position == 'bottom right'){
 				leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
 				leftPos -= this.container.getWidth();
@@ -428,8 +430,8 @@ Proto.Menu = Class.create({
 			}
 		}else if(this.options.position == 'right'){
 			var vpDim = document.viewport.getDimensions();
-			var topPos = anchorPosition[1] + this.options.topOffset - anchorScroll[1];
-			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
+			topPos = anchorPosition[1] + this.options.topOffset - anchorScroll[1];
+			leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
 			if(leftPos + this.container.getDimensions().width > vpDim.width){
 				leftPos = anchorPosition[0] - (this.container.getDimensions().width);
 			}

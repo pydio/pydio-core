@@ -51,11 +51,16 @@ Ultreia many fixes
 	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
 	Modernizr 	http://modernizr.com (BSD / MIT)
 	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
+	Chosen selector by Patrick Filler for Harvest (MIT): https://github.com/harvesthq/chosen
 
-[Images]
+[Images and Fonts]
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
 	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
-	
+	Open Sans by Steve Matteson : http://www.opensans.com/ (Apache Licence v2)
+	Background Photos : from http://unsplash.com/,
+	Embedded photos credits: http://www.gratisography.com/, Nick West, Martin Staněk, Sonja Langford
+	Folders & Files icons in Orbit Theme, by Ionic : http://ionicons.com/ (MIT License)
+
 [Core PHP Classes]
 	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
 	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)

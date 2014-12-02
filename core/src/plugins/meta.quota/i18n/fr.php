@@ -19,7 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Quota (en cours...)",
-"2" => "Cliquer pour recharger l'utilisation du quota",
+"1" => "Utilisation du quota (en cours...)",
+"2" => "Cliquez pour recharger l'utilisation du quota",
 "3" => "Vous dépassez votre quota",
+"4" => "Quota utilisé",
 );

@@ -47,11 +47,13 @@
 
         }
 		this.createMenu();
-		document.observe("ajaxplorer:registry_loaded", function(event){
-			this.parseXml(event.memo);
-		}.bind(this) );
+        this.regObserver = function(event){
+            this.parseXml(event.memo);
+        }.bind(this);
+        document.observe("ajaxplorer:registry_loaded", this.regObserver);
 		document.observeOnce("ajaxplorer:actions_loaded", function(){
 			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+            if(!bmAction) return;
 			this.addBookmarkObject = {
 				name:bmAction.getKeyedText(),
 				alt:bmAction.options.title,
@@ -61,15 +63,22 @@
 				}.bind(this)
 			};		
 		}.bind(this));
-		document.observe("ajaxplorer:add_bookmark", function(){
-			var node = ajaxplorer.getUserSelection().getUniqueNode();
+        this.bmObserver = function(){
+            var node = ajaxplorer.getUserSelection().getUniqueNode();
             if(node.getMetadata().get('ajxp_bookmarked') && node.getMetadata().get('ajxp_bookmarked') == 'true'){
                 this.removeBookmark(node.getPath(), function(){ajaxplorer.fireNodeRefresh(node);});
             }else{
                 this.addBookmark(node.getPath(), node.getLabel(),function(){ajaxplorer.fireNodeRefresh(node);});
             }
-		}.bind(this) );
+        }.bind(this);
+		document.observe("ajaxplorer:add_bookmark", this.bmObserver );
 	},
+
+     destroy:function(){
+         document.stopObserving("ajaxplorer:add_bookmark", this.bmObserver);
+         document.stopObserving("ajaxplorer:registry_loaded", this.regObserver);
+         if(this.bmMenu) this.bmMenu.destroy();
+     },
 	/**
 	 * Parses the registry to find the bookmarks definition
 	 * @param registry XMLDocument
@@ -157,7 +166,7 @@
 		
 			
 			
-		return new Array(renameAction, removeAction);
+		return $A([renameAction, removeAction]);
 	},
 	
 	/**
@@ -178,11 +187,13 @@
 	 	}.bind(this);
 		modal.showDialogForm('Rename', 'rename_bookmark', onLoad, onComplete);
 	},
-	
-	/**
-	 * Reload the bookmarks via the registry loading
-	 * @param actionsParameters Hash
-	 */
+
+     /**
+      * Reload the bookmarks via the registry loading
+      * @param actionsParameters Hash
+      * @param silently
+      * @param onComplete
+      */
 	load: function(actionsParameters, silently, onComplete){
         if(!ajaxplorer || !ajaxplorer.user) return;
 		var connexion = new Connexion();
@@ -190,7 +201,10 @@
 		actionsParameters.set('get_action', 'get_bookmarks');
 		connexion.setParameters(actionsParameters);
         if(onComplete){
-            connexion.onComplete = onComplete;
+            connexion.onComplete = function(transport){
+                onComplete();
+                ajaxplorer.notify('server_message:tree/reload_bookmarks');
+            };
         }else{
             connexion.onComplete = function(transport){
                 document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
@@ -202,16 +216,19 @@
                     this.bmMenu.refreshList();
                     if(!silently) this.bmMenu.show();
                 }
+                ajaxplorer.notify('server_message:tree/reload_bookmarks');
             }.bind(this);
         }
+
 		connexion.sendAsync();
 	},
-	
-	/**
-	 * Add a bookmark
-	 * @param path String
-	 * @param title String
-	 */
+
+     /**
+      * Add a bookmark
+      * @param path String
+      * @param title String
+      * @param onComplete
+      */
 	addBookmark: function(path,title, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'add_bookmark');
@@ -221,11 +238,12 @@
 		}
 		this.load(parameters, false, onComplete);
 	},
-	
-	/**
-	 * Remove a bookmark
-	 * @param path String
-	 */
+
+     /**
+      * Remove a bookmark
+      * @param path String
+      * @param onComplete
+      */
 	removeBookmark: function(path, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'delete_bookmark');

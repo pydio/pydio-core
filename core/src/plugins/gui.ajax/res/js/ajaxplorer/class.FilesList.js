@@ -73,7 +73,9 @@ Class.create("FilesList", SelectableElements, {
                 this._instanciatedToolbars = $A();
             }
 		}
-        //this.options.replaceScroller = false;
+        if(this.options.fit && this.options.fit == "content"){
+            this.options.replaceScroller = false;
+        }
         if(!FilesList.staticIndex) {
             FilesList.staticIndex = 1;
         }else{
@@ -82,8 +84,8 @@ Class.create("FilesList", SelectableElements, {
         this.__currentInstanceIndex = FilesList.staticIndex;
 
         var userLoggedObserver = function(){
-			if(!ajaxplorer || !ajaxplorer.user) return;
-			disp = ajaxplorer.user.getPreference("display");
+			if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
+			var disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
 			}
@@ -124,6 +126,7 @@ Class.create("FilesList", SelectableElements, {
 
 		}.bind(this);
         var componentConfigObserver = function(event){
+            if(!this.htmlElement) return;
 			if(event.memo.className == "FilesList"){
 				var refresh = this.parseComponentConfig(event.memo.classConfig.get('all'));
 				if(refresh){
@@ -154,10 +157,13 @@ Class.create("FilesList", SelectableElements, {
 
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
+        if(this.options.fixedThumbSize){
+            this._fixedThumbSize = this.options.fixedThumbSize;
+        }
 	
 		this._pendingFile = null;
-		this.allDraggables = new Array();
-		this.allDroppables = new Array();		
+		this.allDraggables = $A();
+		this.allDroppables = $A();
 		
 		// List mode style : file list or tableur mode ?
 		this.gridStyle = "file";
@@ -189,12 +195,18 @@ Class.create("FilesList", SelectableElements, {
 		this._registerObserver(document, "keydown", keydownObserver);
         if(!this._dataModel){
             this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
+        }else{
+            document.fire("ajaxplorer:datamodel-loaded-"+this.htmlElement.id);
         }
         if(this.options.messageBoxReference && ajaxplorer){
             ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
         }
 
 	},
+
+    getDataModel: function(){
+        return this._dataModel;
+    },
 
     _registerObserver:function(object, eventName, handler, objectEvent){
         if(objectEvent){
@@ -236,11 +248,33 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
-	destroy : function(){
+	destroy : function($super){
+        this.empty(true);
+        $super();
         this._clearObservers();
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
         }
+        if(this.boundSizeEvents){
+            this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(this.resizeEvents){
+            this.resizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
+        }
+        if(this.slider) this.slider.destroy();
+        if(this.headerMenu) this.headerMenu.destroy();
 		this.htmlElement = null;
 	},
 	
@@ -263,8 +297,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	getVisibleSortTypes : function(){
 		var visible = $A([]);
-		var index = 0;
-		for(var i=0;i<this.columnsDef.length;i++){			
+		for(var i=0;i<this.columnsDef.length;i++){
 			if(!this.hiddenColumns.include(this.columnsDef[i].attributeName)) visible.push(this.columnsDef[i].sortType);
 		}
 		return visible;		
@@ -312,7 +345,9 @@ Class.create("FilesList", SelectableElements, {
         if(!base){
             try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
         }
-        this.htmlElement.fire("editor:updateTitle", base);
+        if(!this.options.muteUpdateTitleEvent){
+            this.htmlElement.fire("editor:updateTitle", base);
+        }
         this.empty();
 		this.fill(this.crtContext);
 		this.removeOnLoad();
@@ -332,7 +367,9 @@ Class.create("FilesList", SelectableElements, {
 	
 	applyComponentConfig : function(config){
 		for(var key in config){
-			this[key] = config[key].value;
+            if(config.hasOwnProperty(key)) {
+                this[key] = config[key].value;
+            }
 		}
 	},
 	
@@ -374,22 +411,23 @@ Class.create("FilesList", SelectableElements, {
 			// COLUMNS INFO
 			var columns = XPathSelectNodes(columnsNode, "column");
 			var addColumns = XPathSelectNodes(columnsNode, "additional_column");
+            var newCols, sortTypes;
 			if(columns.length){
-				var newCols = $A([]);
-				var sortTypes = $A([]);
+				newCols = $A([]);
+				sortTypes = $A([]);
 				columns.concat(addColumns);
 			}else{
-				var newCols = this.columnsDef;
-				var sortTypes = this._oSortTypes;
+				newCols = this.columnsDef;
+				sortTypes = this._oSortTypes;
 				columns = addColumns;
 			}
 			columns.each(function(col){
 				var obj = {};
 				$A(col.attributes).each(function(att){
-					obj[att.nodeName]=att.nodeValue;
+					obj[att.nodeName]=att.value;
 					if(att.nodeName == "sortType"){
-						sortTypes.push(att.nodeValue);
-					}else if(att.nodeName == "defaultVisibilty" && att.nodeValue == "hidden"){
+						sortTypes.push(att.value);
+					}else if(att.nodeName == "defaultVisibilty" && att.value == "hidden"){
                         this.hiddenColumns.push(col.getAttribute("attributeName"));
                     }
 				}.bind(this));
@@ -432,8 +470,10 @@ Class.create("FilesList", SelectableElements, {
 	getActions : function(){
 		// function may be bound to another context
 		var oThis = this;
+        var oThisId = this.htmlElement.id;
+
 		var options1 = {
-			name:'multi_display',
+			name:oThisId+'-multi_display',
 			src:'view_icon.png',
             icon_class:'icon-th-large',
 			text_id:150,
@@ -474,7 +514,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false			
 			};
@@ -489,7 +529,7 @@ Class.create("FilesList", SelectableElements, {
 		var multiAction = new Action(options1, context1, {}, {}, subMenuItems1);
 
         var options2 = {
-			name:'thumb_size',
+			name:oThisId+'-thumb_size',
 			src:'view_icon.png',
             icon_class:'icon-resize-full',
 			text_id:452,
@@ -500,18 +540,18 @@ Class.create("FilesList", SelectableElements, {
 			subMenu:false,
 			subMenuUpdateImage:false,
 			callback: function(){
-                oThis.slider.show($('thumb_size_button'));
+                oThis.slider.show($(oThisId+'-thumb_size_button'));
 			},
 			listeners : {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
-                        else actBar.getActionByName("thumb_size").enable();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName(oThisId+'-thumb_size').disable();
+                        else actBar.getActionByName(oThisId+'-thumb_size').enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
-                        else actBar.getActionByName("thumb_size").enable();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName(oThisId+'-thumb_size').disable();
+                        else actBar.getActionByName(oThisId+'-thumb_size').enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -520,7 +560,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -528,7 +568,7 @@ Class.create("FilesList", SelectableElements, {
 		var thumbsizeAction = new Action(options2, context2, {}, {});
 
         var options3 = {
-			name:'thumbs_sortby',
+			name:oThisId+'-thumbs_sortby',
 			src:'view_icon.png',
             icon_class:'icon-sort',
 			text_id:450,
@@ -545,12 +585,12 @@ Class.create("FilesList", SelectableElements, {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
-                        else actBar.getActionByName("thumbs_sortby").enable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThisId+'-thumbs_sortby').disable();
+                        else actBar.getActionByName(oThisId+'-thumbs_sortby').enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
-                        else actBar.getActionByName("thumbs_sortby").enable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThisId+'-thumbs_sortby').disable();
+                        else actBar.getActionByName(oThisId+'-thumbs_sortby').enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -559,7 +599,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -592,7 +632,11 @@ Class.create("FilesList", SelectableElements, {
 		// Create an action from these options!
 		var thumbSortAction = new Action(options3, context3, {}, {}, submenuItems3);
 
-		return $H({thumb_size:thumbsizeAction, thumb_sort:thumbSortAction, multi_display:multiAction});
+        var butts = $H();
+        butts.set(oThisId+'-thumb_size', thumbsizeAction);
+        butts.set(oThisId+'-thumb_sort', thumbSortAction);
+        butts.set(oThisId+'-multi_display', multiAction);
+        return butts;
 	},
 	
 	/**
@@ -609,11 +653,19 @@ Class.create("FilesList", SelectableElements, {
         if(this.slider){
             this.slider.destroy();
         }
+        $A(['list', 'thumb', 'detail']).each(function(f){
+            if(this._displayMode == f){
+                this.htmlElement.addClassName('fl-displayMode-' + f);
+            } else {
+                this.htmlElement.removeClassName('fl-displayMode-' + f);
+            }
+        }.bind(this));
+        var scrollElement, buffer;
 		if(this._displayMode == "list")
 		{
-			var buffer = '';
+            var data;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
-				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
+				data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
 				if(data.get(ajaxplorer.user.getActiveRepository())){
 					this.hiddenColumns = $A(data.get(ajaxplorer.user.getActiveRepository()));
 				}else{
@@ -623,7 +675,7 @@ Class.create("FilesList", SelectableElements, {
 			var visibleColumns = this.getVisibleColumns();			
 			var userPref;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
-				var data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
+				data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
 				if(this.columnsTemplate && data.get(this.columnsTemplate)){
 					userPref = new Hash(data.get(this.columnsTemplate));
 				}else if(data.get(ajaxplorer.user.getActiveRepository())){
@@ -667,13 +719,20 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 }
             );
-			attachMobileScroll(contentContainer, "vertical");
-            var scrollElement = contentContainer;
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(contentContainer, "vertical");
+            }
+            scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
 				contentContainer.insert({before:this.createPaginator()});
-			}
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
 
             if(this.options.selectable == undefined || this.options.selectable === true){
                 this.initSelectableItems(oElement, true, contentContainer, true);
@@ -703,6 +762,7 @@ Class.create("FilesList", SelectableElements, {
 				}.bind(this), 2000);				
 			}.bind(this) );
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
+            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
 				var ctxt = this.getCurrentContextNode();
@@ -720,12 +780,11 @@ Class.create("FilesList", SelectableElements, {
                     this.getCurrentContextNode().reload();
 				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
-			this.disableTextSelection(contentContainer, true);
+
 			this.observer = function(e){
-				fitHeightToBottom(contentContainer, this.htmlElement);
+                if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
-                    if(contentContainer) this._headerResizer.resize(contentContainer.getWidth());
+					this._headerResizer.resize(contentContainer.getWidth());
 				}else{
                     var width = this.htmlElement.getWidth();
                     width -= parseInt(this.htmlElement.getStyle("borderLeftWidth")) + parseInt(this.htmlElement.getStyle("borderRightWidth"));
@@ -733,33 +792,35 @@ Class.create("FilesList", SelectableElements, {
 				}
 			}.bind(this);
 			this.observe("resize", this.observer);
-		
-			if(this.headerMenu){
-				this.headerMenu.destroy();
-				delete this.headerMenu;
-			}
-			this.headerMenu = new Proto.Menu({
-			  selector: '#selectable_div_header-'+this.__currentInstanceIndex,
-			  className: 'menu desktop',
-			  menuItems: [],
-			  fade:true,
-			  zIndex:2000,
-			  beforeShow : function(){
-			  	var items = $A([]);
-			  	this.columnsDef.each(function(column){
-					var isVisible = !this.hiddenColumns.include(column.attributeName);
-					items.push({
-						name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-						isDefault:false,
-						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
-					});
-				}.bind(this) );		
-				this.headerMenu.options.menuItems = items;
-				this.headerMenu.refreshList();
-			  }.bind(this)
-			});
+
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#selectable_div_header-'+this.__currentInstanceIndex,
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        this.columnsDef.each(function(column){
+                            var isVisible = !this.hiddenColumns.include(column.attributeName);
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
+                            });
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
+            }
 		}
 		else if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
@@ -767,18 +828,29 @@ Class.create("FilesList", SelectableElements, {
 				this.headerMenu.destroy();
 				delete this.headerMenu;
 			}
-			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
+			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
-			attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
+            }
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
-			}
-            var scrollElement = this.htmlElement.down(".selectable_div");
-			this.observer = function(e){
-				fitHeightToBottom.defer(scrollElement, this.htmlElement);
-			}.bind(this);
-			this.observe("resize", this.observer);
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
+            scrollElement = this.htmlElement.down(".selectable_div");
+            if(this.options.horizontalScroll){
+                scrollElement.setStyle({width:'100000px'});
+                this.htmlElement.setStyle({overflowX:'auto'});
+            }
+            this.observer = function(e){
+                if(this.options.fit && this.options.fit == 'height') fitHeightToBottom.defer(scrollElement, this.htmlElement);
+            }.bind(this);
+            this.observe("resize", this.observer);
 			
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
 				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
@@ -789,65 +861,73 @@ Class.create("FilesList", SelectableElements, {
 
             this._sortableTable = new AjxpSortable(scrollElement, null, null);
             this._sortableTable.setMetaSortType(this.columnsDef);
+            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
             this._sortableTable.onsort = function(){
                 var ctxt = this.getCurrentContextNode();
                 ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
                 ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
             }.bind(this);
-            if(this.headerMenu){
-                this.headerMenu.destroy();
-                delete this.headerMenu;
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#content_pane div.panelHeader',
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        var index = 0;
+                        this.columnsDef.each(function(column){
+                            var isSorted = this._sortableTable.sortColumn == index;
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){
+                                    var clickIndex = this.columnsDef.indexOf(column);
+                                    var sorted = (this._sortableTable.sortColumn == clickIndex);
+                                    if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
+                                    this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                                }.bind(this)
+                            });
+                            index++;
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
             }
-            this.headerMenu = new Proto.Menu({
-                selector: '#content_pane div.panelHeader',
-                className: 'menu desktop',
-                menuItems: [],
-                fade:true,
-                zIndex:2000,
-                beforeShow : function(){
-                    var items = $A([]);
-                    var index = 0;
-                    this.columnsDef.each(function(column){
-                        var isSorted = this._sortableTable.sortColumn == index;
-                        items.push({
-                            name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-                            isDefault:false,
-                            callback:function(e){
-                                var clickIndex = this.columnsDef.indexOf(column);
-                                var sorted = (this._sortableTable.sortColumn == clickIndex);
-                                if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
-                                this._sortableTable.sort(clickIndex, this._sortableTable.descending);
-                            }.bind(this)
-                        });
-                        index++;
-                    }.bind(this) );
-                    this.headerMenu.options.menuItems = items;
-                    this.headerMenu.refreshList();
-                }.bind(this)
-            });
 
-			this.slider = new SliderInput($("slider-input-1"), {
-				range : $R(30, 250),
-				sliderValue : this._thumbSize,
-				leftOffset:0,
-				onSlide : function(value)
-				{
-					this._thumbSize = value;
-					this.resizeThumbnails();
-				}.bind(this),
-				onChange : function(value){
-                    if(this.options.replaceScroller){
-                        this.notify("resize");
-                    }
-					if(!ajaxplorer || !ajaxplorer.user) return;
-					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-					ajaxplorer.user.savePreference("thumb_size");								
-				}.bind(this)
-			});
+            if(this._displayMode == 'thumb'){
+                if(this.slider){
+                    this.slider.destroy();
+                }
+                this.slider = new SliderInput($("slider-input-1"), {
+                    range : $R(30, 250),
+                    sliderValue : this._thumbSize,
+                    leftOffset:0,
+                    onSlide : function(value)
+                    {
+                        this._thumbSize = value;
+                        this.resizeThumbnails();
+                    }.bind(this),
+                    onChange : function(value){
+                        if(this.options.replaceScroller){
+                            this.notify("resize");
+                        }
+                        if(!ajaxplorer || !ajaxplorer.user) return;
+                        ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
+                        ajaxplorer.user.savePreference("thumb_size");
+                    }.bind(this)
+                });
+            }
 
-			this.disableTextSelection(scrollElement, true);
+			//this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){
 			    this.initSelectableItems(scrollElement, true, scrollElement, true);
             }else{
@@ -879,9 +959,9 @@ Class.create("FilesList", SelectableElements, {
             this.scrollSizeObserver = function(){
                 window.setTimeout(function(){
                     if(!this.htmlElement || !this.scrollbar) return;
-                    if(this._displayMode == "list"){
-                        fitHeightToBottom(contentContainer, this.htmlElement);
-                        if(Prototype.Browser.IE && contentContainer){
+                    if(this._displayMode == "list" && contentContainer){
+                        if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
+                        if(Prototype.Browser.IE){
                             this._headerResizer.resize(contentContainer.getWidth());
                         }else{
                             var width = this.htmlElement.getWidth();
@@ -889,7 +969,7 @@ Class.create("FilesList", SelectableElements, {
                             this._headerResizer.resize(width);
                         }
                     }else{
-                        fitHeightToBottom(scrollElement, this.htmlElement);
+                        if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(scrollElement, this.htmlElement);
                     }
                     this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
                     this.scrollbar.recalculateLayout();
@@ -925,11 +1005,12 @@ Class.create("FilesList", SelectableElements, {
 				div.insert({bottom:this.createPaginatorLink(total, '<b>&gt;&gt;</b>', 'Last')});
 			}
 		}
-		currentInput.observe("focus", function(){this.blockNavigation = true;}.bind(this));
-		currentInput.observe("blur", function(){this.blockNavigation = false;}.bind(this));
+		currentInput.observe("focus", function(){ajaxplorer.disableAllKeyBindings();}.bind(this));
+		currentInput.observe("blur", function(){ajaxplorer.enableAllKeyBindings();}.bind(this));
 		currentInput.observe("keydown", function(event){
 			if(event.keyCode == Event.KEY_RETURN){
 				Event.stop(event);
+                currentInput.blur();
 				var new_page = parseInt(currentInput.getValue());
 				if(new_page == current) return; 
 				if(new_page < 1 || new_page > total){
@@ -939,7 +1020,8 @@ Class.create("FilesList", SelectableElements, {
 				}
 				var node = this.getCurrentContextNode();
 				node.getMetadata().get("paginationData").set("new_page", new_page);
-				ajaxplorer.updateContextData(node);
+                if(this._dataModel) this._dataModel.requireContextChange(node);
+                else ajaxplorer.updateContextData(node);
 			}
 		}.bind(this) );
 		return div;
@@ -956,7 +1038,8 @@ Class.create("FilesList", SelectableElements, {
 		var node = this.getCurrentContextNode();
 		return new Element('a', {href:'#', style:'font-size:12px;padding:0 7px;', title:title}).update(text).observe('click', function(e){
 			node.getMetadata().get("paginationData").set("new_page", page);
-			ajaxplorer.updateContextData(node);
+            if(this._dataModel) this._dataModel.requireContextChange(node);
+			else ajaxplorer.updateContextData(node);
 			Event.stop(e);
 		}.bind(this));		
 	},
@@ -1004,14 +1087,19 @@ Class.create("FilesList", SelectableElements, {
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
-    	}		
+    	}else if(this.options.fit && this.options.fit == 'content' && this.options.horizontalScroll){
+            this.htmlElement.setStyle({height:(this._thumbSize + 60) + 'px'});
+        }
     	if(this.htmlElement.down('.table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
+        if(this._displayMode == 'thumb'){
+            this.resizeThumbnails(null, true);
+        }
 		this.notify("resize");
         document.fire("ajaxplorer:resize-FilesList-" + this.htmlElement.id, this.htmlElement.getDimensions());
     },
-	
+
 	/**
 	 * Link focusing to ajaxplorer main
 	 */
@@ -1071,6 +1159,7 @@ Class.create("FilesList", SelectableElements, {
 			ajaxplorer.user.setPreference("display", this._displayMode);
 			ajaxplorer.user.savePreference("display");
 		}
+        document.fire("ajaxplorer:switchDisplayMode-FilesList-" + this.htmlElement.id);
 		return this._displayMode;
 	},
 	
@@ -1102,26 +1191,34 @@ Class.create("FilesList", SelectableElements, {
 		// Disable text select on elements
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
-			this.resizeThumbnails();		
-			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+			var adjusted = this.resizeThumbnails();
+			if(this.protoMenu) {
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+            }
 			window.setTimeout(function(){
-                this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
+                if(adjusted) this._previewFactory.setThumbSize(adjusted);
+                else this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
                 this._previewFactory.loadNextImage();
             }.bind(this),10);
 		}
 		else
 		{
-			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+			if(this.protoMenu){
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
 			if(this._headerResizer){
 				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}
 		}
-		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
+        /*
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
 			this.disableTextSelection.bind(this).defer(allItems[i], true);
 		}
+		*/
         this.notify("resize");
         this.notify("rows:didInitialize");
 	},
@@ -1137,19 +1234,17 @@ Class.create("FilesList", SelectableElements, {
 			this.fill(this.getCurrentContextNode());
 		}
 	},
-	/**
-	 * Attach a pending selection that will be applied after rows are populated
-	 * @param pendingFilesToSelect $A()
-	setPendingSelection: function(pendingFilesToSelect){
-		this._pendingFile = pendingFilesToSelect;
-	},
-     */
 
     empty : function(skipFireChange){
         this._previewFactory.clear();
         if(this.protoMenu){
-            this.protoMenu.removeElements('.ajxp_draggable');
-            this.protoMenu.removeElements('.selectable_div');
+            if(this._displayMode == "thumb" || this._displayMode == "detail"){
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex);
+            }else{
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
         }
         for(var i = 0; i< AllAjxpDroppables.length;i++){
             var el = AllAjxpDroppables[i];
@@ -1158,25 +1253,25 @@ Class.create("FilesList", SelectableElements, {
                 delete(AllAjxpDroppables[i]);
             }
         }
-        for(i = 0;i< AllAjxpDraggables.length;i++){
-            if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
-                  if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
+        for(i = 0;i< window.AllAjxpDraggables.length;i++){
+            if(window.AllAjxpDraggables[i] && window.AllAjxpDraggables[i].element && this.isItem(window.AllAjxpDraggables[i].element)){
+                  if(window.AllAjxpDraggables[i].element.IMAGE_ELEMENT){
                       try{
-                          if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
-                              AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
+                          if(window.AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
+                              window.AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
                           }
-                          AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
-                          delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
+                          window.AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
+                          delete window.AllAjxpDraggables[i].element.IMAGE_ELEMENT;
                       }catch(e){}
                   }
-                Element.remove(AllAjxpDraggables[i].element);
+                Element.remove(window.AllAjxpDraggables[i].element);
             }
         }
-        AllAjxpDraggables = $A([]);
+        window.AllAjxpDraggables = $A([]);
 
         var items = this.getSelectedItems();
         var setItemSelected = this.setItemSelected.bind(this);
-        for(var i=0; i<items.length; i++)
+        for(i=0; i<items.length; i++)
         {
             setItemSelected(items[i], false);
         }
@@ -1197,6 +1292,8 @@ Class.create("FilesList", SelectableElements, {
                 item.insert({before: newItem});
                 item.remove();
                 newItem.ajxpNode = ajxpNode;
+                newItem.addClassName("ajxpNodeProvider");
+                if(ajxpNode.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
                 this.initRows();
                 item.ajxpNode = null;
                 delete item;
@@ -1273,6 +1370,7 @@ Class.create("FilesList", SelectableElements, {
         newItem = renderer(child);
         newItem.ajxpNode = child;
         newItem.addClassName("ajxpNodeProvider");
+        if(child.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
         newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
         newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
         child.observe("node_replaced", newItem.REPLACE_OBS);
@@ -1356,7 +1454,7 @@ Class.create("FilesList", SelectableElements, {
 		// NOW PARSE LINES
 		this.clearParsingCache();
 		var children = contextNode.getChildren();
-        var renderer = this.getRenderer();// (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
+        var renderer = this.getRenderer();
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
@@ -1364,6 +1462,7 @@ Class.create("FilesList", SelectableElements, {
             newItem = renderer(child);
 			newItem.ajxpNode = child;
             newItem.addClassName("ajxpNodeProvider");
+            if(child.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
             newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
             newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
             child.observe("node_replaced", newItem.REPLACE_OBS);
@@ -1376,7 +1475,16 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){
+        if(this.options.fixedSortColumn && this.options.fixedSortDirection){
+            var col = this.columnsDef.detect(function(c){
+                return c.attributeName == this.options.fixedSortColumn;
+            }.bind(this));
+            if(col){
+                var index = this.columnsDef.indexOf(col);
+                this._sortableTable.sort(index, (this.options.fixedSortDirection=="desc"));
+                this._sortableTable.updateHeaderArrows();
+            }
+        }else if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){
 			var sortColumn = parseInt(contextNode.getMetadata().get("filesList.sortColumn"));
 			var descending = contextNode.getMetadata().get("filesList.descending");
 			this._sortableTable.sort(sortColumn, descending);
@@ -1411,21 +1519,22 @@ Class.create("FilesList", SelectableElements, {
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
         var addStyle = {fontSize: '12px'};
+        var span, posSpan;
         if(this._displayMode == "list"){
-            var span = item.select('span.text_label')[0];
-            var posSpan = item.select('span.list_selectable_span')[0];
+            span = item.select('span.text_label')[0];
+            posSpan = item.select('span.list_selectable_span')[0];
             offset.top=-3;
             offset.left=25;
             scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
         }else if(this._displayMode == "thumb"){
-            var span = item.select('div.thumbLabel')[0];
-            var posSpan = span;
+            span = item.select('div.thumbLabel')[0];
+            posSpan = span;
             offset.top=-2;
             offset.left=3;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
         }else if(this._displayMode == "detail"){
-            var span = item.select('div.thumbLabel')[0];
-            var posSpan = span;
+            span = item.select('div.thumbLabel')[0];
+            posSpan = span;
             offset.top=0;
             offset.left= 0;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
@@ -1653,7 +1762,7 @@ Class.create("FilesList", SelectableElements, {
                         if(!this.htmlElement) return;// can be destroyed.
                         if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
                             if(!this.htmlElement) return;
-                            var newDrag = new AjxpDraggable(
+                            new AjxpDraggable(
                                 innerSpan,
                                 {
                                     revert:true,
@@ -1666,7 +1775,7 @@ Class.create("FilesList", SelectableElements, {
                             );
                             if(this.protoMenu) this.protoMenu.addElements(innerSpan);
                         }
-                        if(!ajxpNode.isLeaf())
+                        if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
                         {
                             AjxpDroppables.add(innerSpan, ajxpNode);
                         }
@@ -1677,12 +1786,12 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.update('<span class="text_label'+fullview+'">' + formatDate(date) + '</span>');
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + formatDate(date) + '</span>';
 			}
 			else
 			{
 				var metaValue = metaData.get(s) || "";
-				tableCell.update('<span class="text_label'+fullview+'">' + metaValue  + "</span>");
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + metaValue  + "</span>";
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
@@ -1735,8 +1844,7 @@ Class.create("FilesList", SelectableElements, {
 		var newRow = new Element('div', {
             className:"thumbnail_selectable_cell",
             id:"item-"+slugString(ajxpNode.getPath())});
-		var metadata = ajxpNode.getMetadata();
-				
+
 		var innerSpan = new Element('span', {style:"cursor:default;"});
 
         var img = this._previewFactory.generateBasePreview(ajxpNode);
@@ -1744,7 +1852,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 		
 		innerSpan.insert({"bottom":img});
@@ -1800,7 +1908,7 @@ Class.create("FilesList", SelectableElements, {
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
                 if(!this.htmlElement) return;
-				var newDrag = new AjxpDraggable(newRow, {
+				new AjxpDraggable(newRow, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),
@@ -1808,7 +1916,7 @@ Class.create("FilesList", SelectableElements, {
 				}, this, 'filesList');
 			}.bind(this), 500);
 		}
-		if(!ajxpNode.isLeaf())
+		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
 		{
 			AjxpDroppables.add(newRow, ajxpNode);
 		}
@@ -1841,7 +1949,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 
 		innerSpan.insert({"bottom":img});
@@ -1889,40 +1997,44 @@ Class.create("FilesList", SelectableElements, {
         largeRow.insert(label);
         largeRow.insert(metadataDiv);
 
-        var attributeList = this.getFromCache('visibleColumns');
-
-        var first = false;
-        var attKeys = attributeList.keys();
         var addedCell = 0;
-        for(var i = 0; i<attKeys.length;i++ ){
-            var s = attKeys[i];
-            var cell = new Element("span", {className:'metadata_chunk'});
-            if(s == "ajxp_label")
-            {
-                continue;
-            }else if(s=="ajxp_modiftime"){
-                var date = new Date();
-                date.setTime(parseInt(metaData.get(s))*1000);
-                newRow.ajxp_modiftime = date;
-                cell.update('<span class="text_label">' + formatDate(date) + '</span>');
-            }else if(s == "filesize" && metaData.get(s) == "-"){
+        if(metaData.get("ajxp_description")){
+            addedCell ++;
+            metadataDiv.insert(new Element("span", {className:'metadata_chunk'}).update(metaData.get("ajxp_description")));
+        }else{
+            var attributeList = this.getFromCache('visibleColumns');
+            var first = false;
+            var attKeys = attributeList.keys();
+            for(var i = 0; i<attKeys.length;i++ ){
+                var s = attKeys[i];
+                var cell = new Element("span", {className:'metadata_chunk'});
+                if(s == "ajxp_label")
+                {
+                    continue;
+                }else if(s=="ajxp_modiftime"){
+                    var date = new Date();
+                    date.setTime(parseInt(metaData.get(s))*1000);
+                    newRow.ajxp_modiftime = date;
+                    cell.update('<span class="text_label">' + formatDate(date) + '</span>');
+                }else if(s == "filesize" && metaData.get(s) == "-"){
 
-                continue;
+                    continue;
 
-            }else
-            {
-                var metaValue = metaData.get(s) || "";
-                if(!metaValue) continue;
-                cell.update('<span class="text_label">' + metaValue  + "</span>");
-            }
-            if(!first){
-                metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
-            }
-            metadataDiv.insert(cell);
-            addedCell++;
-            first = false;
-            if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                }else
+                {
+                    var metaValue = metaData.get(s) || "";
+                    if(!metaValue) continue;
+                    cell.update('<span class="text_label">' + metaValue  + "</span>");
+                }
+                if(!first){
+                    metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
+                }
+                metadataDiv.insert(cell);
+                addedCell++;
+                first = false;
+                if(attributeList.get(s).modifierFunc){
+                    attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                }
             }
         }
         if(!addedCell){
@@ -1933,7 +2045,7 @@ Class.create("FilesList", SelectableElements, {
 
         this.getFromCache("columns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(newRow, ajxpNode, 'detail', pair.value);
+                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value);
             }
         });
 
@@ -1944,7 +2056,7 @@ Class.create("FilesList", SelectableElements, {
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
                 if(!this.htmlElement) return;
-                var newDrag = new AjxpDraggable(largeRow, {
+                new AjxpDraggable(largeRow, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),
@@ -1952,7 +2064,7 @@ Class.create("FilesList", SelectableElements, {
 				}, this, 'filesList');
 			}.bind(this), 500);
 		}
-		if(!ajxpNode.isLeaf())
+		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
 		{
 			AjxpDroppables.add(largeRow, ajxpNode);
 		}
@@ -1984,7 +2096,7 @@ Class.create("FilesList", SelectableElements, {
                         Event.stop(event);
                         dm.setSelectedNodes([ajxpNode]);
                         window.setTimeout(function(){
-                            button.ACTION.apply();
+                            button.ACTION.apply([ajxpNode]);
                         }, 20);
                     });
                 });
@@ -1995,7 +2107,7 @@ Class.create("FilesList", SelectableElements, {
 
 	partSizeCellRenderer : function(element, ajxpNode, type, metadataDef){
         if(!element) return;
-        if(type == 'row'){
+        if(type == "row"){
             element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
         }else{
             element.setAttribute("data-"+metadataDef['attributeName']+"-sorter_value", ajxpNode.getMetadata().get("bytesize"));
@@ -2004,7 +2116,7 @@ Class.create("FilesList", SelectableElements, {
 			return;
 		}
 		var percent = parseInt( parseInt(ajxpNode.getMetadata().get("bytesize")) / parseInt(ajxpNode.getMetadata().get("target_bytesize")) * 100  );
-		var uuid = 'ajxp_'+(new Date()).getTime();		
+		var uuid = "ajxp_"+(new Date()).getTime();
 		var div = new Element('div', {style:'padding-left:3px;', className:'text_label'}).update('<span class="percent_text" style="line-height:19px;padding-left:5px;">'+percent+'%</span>');
 		var span = new Element('span', {id:uuid}).update('0%');		
 		var options = {
@@ -2016,7 +2128,11 @@ Class.create("FilesList", SelectableElements, {
 			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
             visualStyle : 'position:relative;'
 		};
-		element.update(div);
+        if(type == "detail" && element.down(".thumbnail_cell_metadata")){
+            element.down(".thumbnail_cell_metadata").update(div);
+        }else{
+    		element.update(div);
+        }
 		div.insert({top:span});
 		if(ajxpNode.getMetadata().get("process_stoppable")){
 			var stopButton = new Element('a', {className:'pg_cancel_button'}).update("X");
@@ -2037,7 +2153,7 @@ Class.create("FilesList", SelectableElements, {
 					}
 				};
 				conn.sendAsync();
-			});
+            }.bind(this));
 			div.insert({bottom:stopButton});			
 		}
 		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
@@ -2049,6 +2165,7 @@ Class.create("FilesList", SelectableElements, {
 					return;
 				}
 				var conn = new Connexion();
+                conn.discrete = true;
 				conn.setParameters({
 					action: 'update_dl_data',
 					file : ajxpNode.getPath()
@@ -2073,7 +2190,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Resize the thumbnails
 	 * @param one_element HTMLElement Optionnal, if empty all thumbnails are resized.
 	 */
-	resizeThumbnails: function(one_element){
+	resizeThumbnails: function(one_element, skipResize){
 			
 		var elList;
 		if(one_element) elList = [one_element]; 
@@ -2082,9 +2199,9 @@ Class.create("FilesList", SelectableElements, {
             elList = this._htmlElement.select('div.thumbnail_selectable_cell.detailed');
         }
         var ellipsisDetected;
+        var tSize=0;
 		elList.each(function(element){
-            //if(element.up('div.thumbnail_selectable_cell.detailed')) return;
-			var node = element.ajxpNode;
+
             try{
                 var image_element = element.IMAGE_ELEMENT || element.down('img');
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
@@ -2092,11 +2209,19 @@ Class.create("FilesList", SelectableElements, {
                 return;
             }
             var elementsAreSiblings = (label_element && (label_element.siblings().indexOf(image_element) !== -1));
-            var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
+            tSize = this.getAdjustedThumbSize(element);
+
+            element.removeClassName('fl-displayMode-thumbsize-small');
+            element.removeClassName('fl-displayMode-thumbsize-medium');
+            element.removeClassName('fl-displayMode-thumbsize-large');
+            if(tSize < 80) element.addClassName('fl-displayMode-thumbsize-small');
+            else if(tSize < 150) element.addClassName('fl-displayMode-thumbsize-medium');
+            else element.addClassName('fl-displayMode-thumbsize-large');
+
             if(element.down('div.thumbnail_selectable_cell')){
                 element.down('div.thumbnail_selectable_cell').setStyle({width:tSize+5+'px', height:tSize+10 +'px'});
             }else{
-                element.setStyle({width:tSize+25+'px', height:tSize+ 30 +'px'});
+                element.setStyle({width:tSize+25+'px', height:tSize + 10 + 'px'});
             }
             this._previewFactory.setThumbSize(tSize);
             if(image_element){
@@ -2110,14 +2235,38 @@ Class.create("FilesList", SelectableElements, {
                 var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
                 var charRatio = 6;
                 var nbChar = parseInt(el_width/charRatio);
-                var label = new String(label_element.getAttribute('title'));
+                var label = String(label_element.getAttribute('title'));
                 //alert(element.getAttribute('text'));
                 label_element.innerHTML = label.truncate(nbChar, '...');
             }
 
 		}.bind(this));
-		
-	},
+
+        if(this.options.horizontalScroll){
+            var scrollElement = this.htmlElement.down(".selectable_div");
+            scrollElement.setStyle({width:(elList.length * (this._thumbSize + 46)) + 'px'});
+        }
+        if(this.options.fit && this.options.fit == 'content' && !skipResize){
+            this.resize();
+        }
+        return tSize;
+    },
+
+    getAdjustedThumbSize:function(referenceElement){
+        var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
+        if(this._displayMode == 'thumb' && !this._fixedThumbSize){
+            // Readjust tSize
+            var w = this._htmlElement.getWidth();
+            var margin = parseInt(referenceElement.getStyle('marginLeft')) + parseInt(referenceElement.getStyle('marginRight'));
+            var realBlockSize = tSize + 25 + margin;
+            var number = Math.ceil(w / realBlockSize);
+            var blockSize = w / number;
+            tSize = blockSize - 25 - margin;
+        }
+        return tSize;
+    },
+
+
 	/**
 	 * For list mode, recompute alternate BG distribution
 	 * Should use CSS3 when possible!
@@ -2176,6 +2325,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Add a "loading" image on top of the component
 	 */
 	setOnLoad: function()	{
+        if(this.options.silentLoading){
+            this.loading = true;
+            return;
+        }
 		if(this.loading) return;
         this.htmlElement.setStyle({position:'relative'});
         var element = this.htmlElement; // this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
@@ -2192,6 +2345,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
+        if(this.options.silentLoading){
+            this.loading = false;
+            return;
+        }
         if(this.htmlElement) removeLightboxFromElement(this.htmlElement);
 		this.loading = false;
 	},
@@ -2219,7 +2376,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return; // DO NOTHING IN RECYCLE BIN
 		}
-		selRaw = this.getSelectedItems();
+		var selRaw = this.getSelectedItems();
 		if(!selRaw || !selRaw.length)
 		{
 			return; // Prevent from double clicking header!
@@ -2264,7 +2421,6 @@ Class.create("FilesList", SelectableElements, {
 				this.setItemSelected(allItems[i], false);
 			}
 		}
-		return;
 	},
 	
 	/**
@@ -2297,7 +2453,7 @@ Class.create("FilesList", SelectableElements, {
 		$(target).addClassName("no_select_bg");
 		if(deep){
 			$(target).select("td,img,div,span").each(function(td){
-				this.disableTextSelection(td);
+				this.disableTextSelection(td, false);
 			}.bind(this));
 		}
 	},
@@ -2335,17 +2491,18 @@ Class.create("FilesList", SelectableElements, {
 		
 		
 		Event.stop(event);
-		var nextItem;
+		var nextItem, nextItemIndex;
 		var currentItem;
 		var shiftKey = event['shiftKey'];
 		currentItem = items[items.length-1];
 		var allItems = this.getItems();
 		var currentItemIndex = this.getItemIndex(currentItem);
 		var selectLine = false;
+        var i;
 		//ENTER
 		if(event.keyCode == Event.KEY_RETURN)
 		{
-			for(var i=0; i<items.length; i++)
+			for(i=0; i<items.length; i++)
 			{
 				this.setItemSelected(items[i], false);
 			}
@@ -2404,7 +2561,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		if(!shiftKey || !this._multiple) // Unselect everything
 		{ 
-			for(var i=0; i<items.length; i++)
+			for(i=0; i<items.length; i++)
 			{
 				this.setItemSelected(items[i], false);
 			}		
@@ -2413,9 +2570,9 @@ Class.create("FilesList", SelectableElements, {
 		{
 			if(nextItemIndex >= currentItemIndex)
 			{
-				for(var i=currentItemIndex+1; i<nextItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+				for(i=currentItemIndex+1; i<nextItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
 			}else{
-				for(var i=nextItemIndex+1; i<currentItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+				for(i=nextItemIndex+1; i<currentItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
 			}
 		}
 		this.setItemSelected(nextItem, !nextItem._selected);
@@ -2425,7 +2582,7 @@ Class.create("FilesList", SelectableElements, {
 		var found;
 		var changed = selectedBefore.length != this._selectedItems.length;
 		if (!changed) {
-			for (var i = 0; i < selectedBefore.length; i++) {
+			for (i = 0; i < selectedBefore.length; i++) {
 				found = false;
 				for (var j = 0; j < this._selectedItems.length; j++) {
 					if (selectedBefore[i] == this._selectedItems[j]) {
@@ -2463,9 +2620,10 @@ Class.create("FilesList", SelectableElements, {
 		var pos = Position.cumulativeOffset(element);
 		var dims = Element.getDimensions(element);
 		var searchingPosX = pos[0] + parseInt(dims.width/2);
+        var searchingPosY, i;
 		if(bDown){
-			var searchingPosY = pos[1] + parseInt(dims.height*3/2);
-			for(var i=currentItemIndex+1; i<allItems.length;i++){
+			searchingPosY = pos[1] + parseInt(dims.height*3/2);
+			for(i=currentItemIndex+1; i<allItems.length;i++){
 				if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
 				{
 					return i;
@@ -2473,8 +2631,8 @@ Class.create("FilesList", SelectableElements, {
 			}
 			return null;
 		}else{
-			var searchingPosY = pos[1] - parseInt(dims.height/2);
-			for(var i=currentItemIndex-1; i>-1; i--){
+			searchingPosY = pos[1] - parseInt(dims.height/2);
+			for(i=currentItemIndex-1; i>-1; i--){
 				if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
 				{
 					return i;
@@ -2511,7 +2669,7 @@ Class.create("FilesList", SelectableElements, {
 	getItems: function () {
 		if(this._displayMode == "list")
 		{
-			return this._htmlElement.rows;
+			return this._htmlElement.rows || [];
 		}
 		else
 		{

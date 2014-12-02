@@ -97,10 +97,11 @@ if (AuthService::usersEnabled()) {
     AuthService::logUser(null, null);
     // Check that current user can access current repository, try to switch otherwise.
     $loggedUser = AuthService::getLoggedUser();
-    if ($loggedUser == null) {
+    if ($loggedUser == null || $loggedUser->getId() == "guest") {
         // Try prelogging user if the session expired but the logging data is in fact still present
         // For example, for basic_http auth.
-        AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
+        AJXP_PluginsService::getInstance()->initActivePlugins();
+        AuthService::preLogUser($httpVars);
         $loggedUser = AuthService::getLoggedUser();
         if($loggedUser == null) $requireAuth = true;
     }
@@ -138,7 +139,11 @@ $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
     $confDriver = ConfService::getConfStorageImpl();
-    $Driver = ConfService::loadRepositoryDriver();
+    try{
+        $Driver = ConfService::loadRepositoryDriver();
+    }catch(Exception $e){
+        //AuthService::disconnect();
+    }
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");

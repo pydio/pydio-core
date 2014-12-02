@@ -146,7 +146,7 @@ Class.create("AjxpDataModel", {
 		}
 	},
 
-    requireNodeReload: function(nodeOrPath){
+    requireNodeReload: function(nodeOrPath, completeCallback){
         if(Object.isString(nodeOrPath)){
             nodeOrPath = new AjxpNode(nodeOrPath);
         }
@@ -164,6 +164,7 @@ Class.create("AjxpDataModel", {
                     this._selectedNodes.push(newNode);
                     this._selectionSource = {};
                     this.publish("selection_changed", this);
+                    if(completeCallback) completeCallback(newNode);
                 }.bind(this);
             }
         }
@@ -362,7 +363,7 @@ Class.create("AjxpDataModel", {
 		this._bFile = this._bDir = this._isRecycle = false;
 		if(!this._bEmpty)
 		{
-			this._bUnique = ((ajxpDataNodes.length == 1)?true:false);
+			this._bUnique = (ajxpDataNodes.length == 1);
 			for(var i=0; i<ajxpDataNodes.length; i++)
 			{
 				var selectedNode = ajxpDataNodes[i];
@@ -472,20 +473,11 @@ Class.create("AjxpDataModel", {
 	},
 	
 	/**
-	 * DEPRECATED. Should use getCurrentNode().getPath() instead.
-	 * @returns String
-	 */
-	getCurrentRep : function (){
-		return this._currentRep;
-	},
-	
-	/**
 	 * Whether the selection has more than one node selected
 	 * @returns Boolean
 	 */
 	isMultiple : function(){
-		if(this._selectedNodes && this._selectedNodes.length > 1) return true;
-		return false;
+		return this._selectedNodes && this._selectedNodes.length > 1;
 	},
 	
 	/**
@@ -508,7 +500,7 @@ Class.create("AjxpDataModel", {
 	/**
 	 * Get all selected filenames as an array.
 	 * @param separator String Is a separator, will return a string joined
-	 * @returns Array|String
+	 * @returns Array|String|bool
 	 */
 	getFileNames : function(separator){
 		if(!this._selectedNodes.length)
@@ -517,7 +509,7 @@ Class.create("AjxpDataModel", {
 			return false;
 		}
 		var tmp = new Array(this._selectedNodes.length);
-		for(i=0;i<this._selectedNodes.length;i++)
+		for(var i=0;i<this._selectedNodes.length;i++)
 		{
 			tmp[i] = this._selectedNodes[i].getPath();
 		}
@@ -531,7 +523,7 @@ Class.create("AjxpDataModel", {
 	/**
 	 * Get all the filenames of the current context node children
 	 * @param separator String If passed, will join the array as a string
-	 * @return Array|String
+	 * @return Array|String|bool
 	 */
 	getContextFileNames : function(separator){
 		var allItems = this._contextNode.getChildren();
@@ -540,7 +532,7 @@ Class.create("AjxpDataModel", {
 			return false;
 		}
 		var names = $A([]);
-		for(i=0;i<allItems.length;i++)
+		for(var i=0;i<allItems.length;i++)
 		{
 			names.push(getBaseName(allItems[i].getPath()));
 		}
@@ -550,12 +542,14 @@ Class.create("AjxpDataModel", {
 			return names;
 		}
 	},
-	
-	/**
-	 * Whether the context node has a child with this basename
-	 * @param newFileName String The name to check
-	 * @returns Boolean
-	 */
+
+    /**
+     * Whether the context node has a child with this basename
+     * @param newFileName String The name to check
+     * @returns Boolean
+     * @param local
+     * @param contextNode
+     */
 	fileNameExists: function(newFileName, local, contextNode)
 	{
         if(!contextNode){
@@ -591,7 +585,7 @@ Class.create("AjxpDataModel", {
         };
         conn.sendSync();
         if(result === false){
-            throw new Error("Check failed" + error);
+            throw new Error("Check failed" + result);
         }
     },
 	
@@ -614,21 +608,7 @@ Class.create("AjxpDataModel", {
 		}
 		return null;
 	},
-	
-	/**
-	 * DEPRECATED
-	 */
-	getUniqueItem : function(){
-		throw new Error("getUniqueItem is deprecated, use getUniqueNode instead!");
-	},
 
-	/**
-	 * DEPRECATED
-	 */
-    getItem : function(i) {
-        throw new Error("getItem is deprecated, use getNode instead!");
-    },
-	
     /**
      * Gets a node from the current selection
      * @param i Integer the node index

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:ajxp>
+	<head>
+		<title>AJXP_APPLICATION_TITLE</title>
+        AJXP_REBASE
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" type="text/css" href="AJXP_THEME_FOLDER/css/allz.css?v=AJXP_CURRENT_VERSION">
+        AJXP_ADDITIONAL_JS_FRAMEWORKS
+        <script language="javascript" type="text/javascript" src="AJXP_CLIENT_RESOURCES_FOLDER/js/ajaxplorer_boot.js?v=AJXP_CURRENT_VERSION"></script>
+        <link rel="icon" type="image/x-png" href="AJXP_THEME_FOLDER/images/html-folder.png">
+    </head>
+	<body style="overflow: hidden;">
+		<script type="text/javascript">
+        window.ajxpNoNotifLoader = true;
+        window.ajxpThemeSkipLoaderProgress = true;
+		// Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is 
+		// dynamically replaced by the application!
+		var ajaxplorer, startParameters = {}, MessageHash={};
+		//AJXP_JSON_START_PARAMETERS
+        document.observe("ajaxplorer:before_gui_load", function(e){
+            ajaxplorer.currentThemeUsesIconFonts = true;
+            document.documentElement.className += " ajxp_theme_orbit";
+        });
+        window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+        //window.onbeforeunload = function(){return "Do you want to quit?";};
+		</script>
+		<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
+		<div id="all_forms">
+			<div id="generic_dialog_box" class="dialogBox form-login_form"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
+			<div id="hidden_frames" style="display:none;"></div>
+			<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
+			
+			<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
+            <form id="login_form" style="display:none;" box_width="320" box_padding="0" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}'>
+				<input type="hidden" name="get_action" value="login">
+				<input type="hidden" name="login_seed" id="login_seed" value="">
+		 	   	<a style="float:right;font-size: 16px;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
+				<div class="dialogLegend" style="margin-bottom: 3px;margin-top: 4px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
+				<div style="width:100%;">
+					<div class="SF_element">
+						<div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
+						<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus" placeholder="AJXP_MESSAGE[181]"></div>
+					</div>
+					<div class="SF_element">
+						<div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
+						<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;" placeholder="AJXP_MESSAGE[182]"></div>
+					</div>
+					<div class="SF_element">
+						<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
+					</div>
+				</div>
+			</form>
+		</div>
+    </body>
+</html>

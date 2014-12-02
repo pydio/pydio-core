@@ -26,20 +26,14 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ChangesTracker extends AJXP_Plugin
+class ChangesTracker extends AJXP_AbstractMetaSource
 {
-    protected $accessDriver;
     private $sqlDriver;
 
     public function init($options)
     {
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
         parent::init($options);
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
     }
 
     public function switchActions($actionName, $httpVars, $fileVars)
@@ -49,6 +43,9 @@ class ChangesTracker extends AJXP_Plugin
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $filter = null;
+        $currentRepo = $this->accessDriver->repository;
+        $recycle = $currentRepo->getOption("RECYCLE_BIN");
+        $recycle = (!empty($recycle)?$recycle:false);
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
         if(isSet($httpVars["filter"])){
@@ -60,7 +57,7 @@ class ChangesTracker extends AJXP_Plugin
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier(ConfService::getRepository()), rtrim($filter, "/")."/", rtrim($filter, "/")."/", AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), rtrim($filter, "/")."/", rtrim($filter, "/")."/", AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }else{
             $res = dibi::query("SELECT
                 [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
@@ -69,10 +66,12 @@ class ChangesTracker extends AJXP_Plugin
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }
 
-        echo '{"changes":[';
+        $stream = isSet($httpVars["stream"]);
+        $separator = $stream ? "\n" : ",";
+        if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
@@ -84,42 +83,85 @@ class ChangesTracker extends AJXP_Plugin
                 $row->node[$att] = $row->$att;
                 unset($row->$att);
             }
-            if ($row->node_id == $previousNodeId) {
-                $previousRow->target = $row->target;
-                $previousRow->seq = $row->seq;
-                if ($order[$row->type] > $order[$previousRow->type]) {
-                    $previousRow->type = $row->type;
-                }
-            } else {
-                if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
-                    if($this->filterRow($previousRow, $filter)){
-                        $previousRow = $row;
-                        $previousNodeId = $row->node_id;
-                        $lastSeq = $row->seq;
-                        continue;
+            if(!empty($recycle)) $this->cancelRecycleNodes($row, $recycle);
+            if(!isSet($httpVars["flatten"]) || $httpVars["flatten"] == "false"){
+
+                if(!$this->filterRow($row, $filter)){
+                    if ($valuesSent) {
+                        echo $separator;
                     }
-                    if($valuesSent) echo ",";
-                    echo json_encode($previousRow);
+                    echo json_encode($row);
                     $valuesSent = true;
                 }
-                $previousRow = $row;
-                $previousNodeId = $row->node_id;
+
+            }else{
+
+                if ($row->node_id == $previousNodeId) {
+                    $previousRow->target = $row->target;
+                    $previousRow->seq = $row->seq;
+                    if ($order[$row->type] > $order[$previousRow->type]) {
+                        $previousRow->type = $row->type;
+                    }
+                } else {
+                    if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
+                        if($this->filterRow($previousRow, $filter)){
+                            $previousRow = $row;
+                            $previousNodeId = $row->node_id;
+                            $lastSeq = $row->seq;
+                            continue;
+                        }
+                        if($valuesSent) echo $separator;
+                        echo json_encode($previousRow);
+                        $valuesSent = true;
+                    }
+                    $previousRow = $row;
+                    $previousNodeId = $row->node_id;
+                }
+                $lastSeq = $row->seq;
+                flush();
             }
-            $lastSeq = $row->seq;
-            flush();
+	    //CODES HERE HAVE BEEN MOVE OUT OF THE LOOP
         }
-        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
-            if($valuesSent) echo ",";
+
+        /**********RETURN TO SENDER************/
+        // is 'not NULL' included in isSet()?
+        if ($previousRow && isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+            if($valuesSent) echo $separator;
             echo json_encode($previousRow);
+            if ($previousRow->seq > $lastSeq){
+                $lastSeq = $previousRow->seq;
+            }
+            $valuesSent = true;
         }
+        /*************************************/
+
         if (isSet($lastSeq)) {
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         } else {
             $lastSeq = dibi::query("SELECT MAX([seq]) FROM [ajxp_changes]")->fetchSingle();
             if(empty($lastSeq)) $lastSeq = 1;
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         }
 
+    }
+
+    protected function cancelRecycleNodes(&$row, $recycle){
+        if($row->type != 'path') return;
+        if(strpos($row->source, '/'.$recycle) === 0){
+            $row->source = 'NULL';
+            $row->type  = 'create';
+        }else if(strpos($row->target, '/'.$recycle) === 0){
+            $row->target = 'NULL';
+            $row->type   = 'delete';
+        }
     }
 
     protected function filterRow(&$previousRow, $filter = null){
@@ -168,6 +210,16 @@ class ChangesTracker extends AJXP_Plugin
     }
 
     /**
+     * @param Repository $repository
+     * @return float
+     */
+    public function getRepositorySpaceUsage($repository){
+        $id = $this->computeIdentifier($repository);
+        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s", $id);
+        return floatval($res->fetchSingle());
+    }
+
+    /**
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param bool $copy
@@ -177,11 +229,21 @@ class ChangesTracker extends AJXP_Plugin
 
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         try {
+            if ($newNode != null && $this->excludeNode($newNode)) {
+                // CREATE
+                if($oldNode == null) {
+                    AJXP_Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
+                    return;
+                }else{
+                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
+                    $newNode = null;
+                }
+            }
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository());
                 // DELETE
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
-            } else if ($oldNode == null) {
+            } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
                 $res = dibi::query("INSERT INTO [ajxp_index]", array(
@@ -223,6 +285,36 @@ class ChangesTracker extends AJXP_Plugin
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
 
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    protected function excludeNode($node){
+        // DO NOT EXCLUDE RECYCLE INDEXATION, OTHERWISE RESTORED DATA IS NOT DETECTED!
+        //$repo = $node->getRepository();
+        //$recycle = $repo->getOption("RECYCLE_BIN");
+        //if(!empty($recycle) && strpos($node->getPath(), "/".trim($recycle, "/")) === 0) return true;
+
+        // Other exclusions conditions here?
+        return false;
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function indexNode($node){
+        // Create
+        $this->updateNodesIndex(null, $node, false);
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function clearIndexForNode($node){
+        // Delete
+        $this->updateNodesIndex($node, null, false);
     }
 
     public function installSQLTables($param)

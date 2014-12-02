@@ -23,7 +23,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	{
 		$super(oFormObject, options);
 		this.actions.get("downloadFileButton").observe('click', function(){
-			if(!this.currentFile) return;		
+			if(!this.currentFile) return false;
 			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
@@ -68,7 +68,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			this.parseXmlStructure(transp);
 			this.updateTitle(getBaseName(fileName));
 		}.bind(this);
-		connexion2 = new Connexion();
+		var connexion2 = new Connexion();
 		connexion2.addParameter('get_action', 'eml_get_bodies');
 		connexion2.addParameter('file', fileName);	
 		connexion2.onComplete = function(transp){
@@ -101,7 +101,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		var user = ajaxplorer.user;
 		if(user) var activeRepository = user.getActiveRepository();
 		if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
-			var firstKey ;
+			var firstKey = '';
 			var reposList = new Hash();
 			user.getCrossRepositories().each(function(pair){
 				if(!firstKey) firstKey = pair.key;
@@ -122,7 +122,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 			this.treeSelector.setFilterSelectedIndex(0);
 			this.treeSelector.setFilterChangeCallback(function(e){
-				externalRepo = this.filterSelector.getValue();
+				var externalRepo = this.filterSelector.getValue();
 				var nodeProvider = new RemoteNodeProvider();
 				nodeProvider.initProvider({tmp_repository_id:externalRepo});
 				this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
@@ -150,7 +150,6 @@ Class.create("EmlViewer", AbstractEditor, {
 		container.down("#eml_cp_ok").observeOnce("click", function(e){
 			Event.stop(e);
 			var selectedNode = this.treeSelector.getSelectedNode();
-			var actionValue = "eml_cp_attachment";
 			var crossCopy = false;
 			var crtRepoType = ajaxplorer.user.repositories.get(ajaxplorer.user.activeRepository).accessType;
 			if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
@@ -225,7 +224,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		var hContainer = this.element.down("#emlHeaderContainer");
 		// PARSE HEADERS
 		var headers = XPathSelectNodes(xmlDoc, "email/header");
-		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Cc":"editor.eml.12", "Date":"editor.eml.4", "Subject":"editor.eml.3"};;
+		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Cc":"editor.eml.12", "Date":"editor.eml.4", "Subject":"editor.eml.3"};
 		var searchedHeaders = {"From":[], "To":[], "Cc":[], "Date":[], "Subject":[]};
 		headers.each(function(el){
 			var hName = XPathGetSingleNodeText(el, "headername");
@@ -272,7 +271,6 @@ Class.create("EmlViewer", AbstractEditor, {
 			allHeaders.each(function(h){
 				if(h.parentNode != mimepart) return;
 				var siblingName = XPathGetSingleNodeText(h, "headername");
-				var siblingValue = XPathGetSingleNodeText(h, "headervalue");
 				if(siblingName == "X-Attachment-Id"){
 					id = XPathGetSingleNodeText(h, "headervalue");
 					foundId = true;
@@ -287,6 +285,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			var attachCont = new Element('div', {id:"attachments_container", className:"emlAttachCont", style:"height:"+($('emlHeaderContainer').getHeight()-14)+"px"});
 			hContainer.insert({top:attachCont});
 			for(var key in attachments){
+                if(!attachments.hasOwnProperty(key)) continue;
 				var att = new Element("div", {className:"emlAttachment"});
 				att.__ATTACHMENT_ID = key;
 				att.insert(attachments[key]);

@@ -1,0 +1,10 @@
+1. Implement a proxied service: samba
+CAS/Client.php
+2. add:    public function serviceSamba($serviceUrl, &$err_code)
+3. modify:	public function getProxiedService ($type)
+4. modify: private function getCallbackURL()
+4. modify: public function getURL()
+
+CAS.php
+6. add define("PHPCAS_PROXIED_SERVICE_IMAP", 'CAS_ProxiedService_Samba');
+5. add public static function serviceSMB($url, $err_code)

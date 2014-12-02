@@ -75,6 +75,7 @@
             <xs:attribute name="infoPanel" type="xs:boolean"/>
             <xs:attribute name="recycle" use="required" type="xs:NCName"/>
             <xs:attribute name="selection" use="required" type="xs:boolean"/>
+            <xs:attribute name="allowedMimes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="selectionContext">
@@ -321,6 +322,7 @@
                     <xs:attribute name="className" type="xs:NCName"/>
                     <xs:attribute name="text" use="required" type="xs:integer"/>
                     <xs:attribute name="title" use="required" type="xs:integer"/>
+                    <xs:attribute name="order" type="xs:integer"/>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -468,6 +470,8 @@
             </xs:sequence>
             <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
+            <xs:attribute name="theme" type="xs:NCName"/>
+            <xs:attribute name="primary" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template">
@@ -476,6 +480,7 @@
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="position" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
+            <xs:attribute name="label" type="xs:all"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template_part">
@@ -535,7 +540,8 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="dialogOnCancel">
-        <xs:complexType/>
+        <xs:complexType mixed="true">
+        </xs:complexType>
     </xs:element>
     <xs:element name="dialogOnComplete">
         <xs:complexType mixed="true">
@@ -694,12 +700,12 @@
     </xs:element>
     <xs:element name="input_param">
         <xs:complexType>
-            <xs:attribute name="choices"/>
-            <xs:attribute name="default"/>
-            <xs:attribute name="description" use="required"/>
-            <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:all"/>
             <xs:attribute name="type" use="required" type="xs:all"/>
+            <xs:attribute name="description" use="required"/>
+            <xs:attribute name="choices"/>
+            <xs:attribute name="default"/>
+            <xs:attribute name="mandatory" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="output">

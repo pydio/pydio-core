@@ -1,0 +1,77 @@
+div.cumulated_figure {
+    float: left;
+    width: 16%;
+    background-color: #77b8e2;
+    margin: 6px 0.3%;
+    border-radius: 4px;
+}
+
+div.cumulated_figure:nth-child(2),
+div.cumulated_figure:nth-child(7),
+div.cumulated_figure:nth-child(12)
+{
+    background-color: #77b8e2;
+}
+
+div.cumulated_figure:nth-child(3),
+div.cumulated_figure:nth-child(8),
+div.cumulated_figure:nth-child(13)
+{
+    background-color: #e35d52;
+}
+
+div.cumulated_figure:nth-child(4),
+div.cumulated_figure:nth-child(9)
+{
+    background-color: #d7a76A;
+}
+
+div.cumulated_figure:nth-child(5),
+div.cumulated_figure:nth-child(10)
+{
+    background-color: rgb(78,167,165);
+}
+
+div.cumulated_figure:nth-child(6),
+div.cumulated_figure:nth-child(11)
+{
+    background-color: #156FAF;
+}
+
+div.cumulated_figure div.innerTitle {
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.53);
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+    margin: 3px 5px 7px !important;
+    padding-bottom: 10px !important;
+}
+
+div.cumulated_figure div.figure {
+    font-size: 30px;
+    text-align: center;
+    color: white;
+    padding: 2px 0 11px;
+    letter-spacing: 1px;
+}
+
+svg text {
+    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif !important;
+}
+
+.tabbed_editor table.innerTitle {
+    border-bottom: 1px solid #6F7B88;
+    text-align: left;
+    color: #4C555F;
+    font-size: 15px;
+    margin: 10px !important;
+    padding: 8px !important;
+    letter-spacing: 1px;
+    width: 94%;
+}
+
+.tabbed_editor table.innerTitle td.chart_links{
+    letter-spacing: 0;
+    font-size: 13px;
+}

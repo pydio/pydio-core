@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Bit.ly URL Shortener" => "Liens Bit.ly",
-"Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Raccourcir les liens de téléchargement en utilisant le webservice Bitly. Nécessite un compte bitly.",
-"User Name" => "Identifiant",
-"Bit.ly account user name" => "Identifiant Bit.ly",
-"API Key" => "Clé API",
-"Bit.ly account API Key" => "Clé d'API Bit.ly",
+"Bit.ly URL Shortener" => "Raccourcisseur d'URL Bit.ly",
+"Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Raccourcir les liens de téléchargement avant de les renvoyer à l'utilisateur. Nécessite un compte Bit.ly.",
+"User Name" => "Nom d'utilisateur",
+"Bit.ly account user name" => "Nom d'utilisateur Bit.ly",
+"API Key" => "Clef API",
+"Bit.ly account API Key" => "Clef d'API Bit.ly",
 );

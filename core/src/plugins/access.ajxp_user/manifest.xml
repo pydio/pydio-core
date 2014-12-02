@@ -4,23 +4,14 @@
 		<resources>
 			<i18n namespace="user_dash" path="plugins/access.ajxp_user/i18n" />
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
-            <js className="UserDashboardHome" file="plugins/access.ajxp_user/class.UserDashboardHome.js" autoload="true"/>
             <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js" autoload="true"/>
             <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js" autoload="true"/>
             <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
+        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
-        <global_param name="ENABLE_GETTING_STARTED" type="boolean"
-                      label="Enable Getting Started" description="Enable addition tabulation to access getting started videos" default="true" expose="true"/>
-        <global_param name="URL_APP_IOSAPPSTORE" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="https://itunes.apple.com/us/app/pydio/id709275884?mt=8"/>
-        <global_param name="URL_APP_ANDROID" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="https://play.google.com/store/apps/details?id=com.pydio.android.Client"/>
-        <global_param name="URL_APP_SYNC_WIN" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
-        <global_param name="URL_APP_SYNC_MAC" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
+        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="Disable Address Book" description="Do not display address book in user account panel."/>
     </server_settings>
 	<registry_contributions>
 		<client_configs>
@@ -28,7 +19,7 @@
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
                 <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
             ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
+            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
                 <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
                 #workspace_toolbar, #global_toolbar{display:none;}
@@ -82,40 +73,16 @@
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="vision"><![CDATA[
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
-                    <div id="home_account_pane" ajxpClass="UserDashboardHome">
-                        <div id="welcome"></div>
-                        <div id="notifications_center">
-                            <span class="icon-rss" id="close-icon"></span>
-                            <h1>AJXP_MESSAGE[user_dash.38]</h1>
-                        </div>
-                        <div id="workspaces_center">
-                            <div id="logo_div"><img src="plugins/gui.ajax/PydioLogo250.png"></div>
-                            <h1>AJXP_MESSAGE[user_dash.39]</h1>
-                            <ul id="workspaces_list" style="height: 100px;"></ul>
-                            <div id="workspaces_button">
-                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_dash.41]</label>
-                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_dash.42]" class="disabled">
-                            </div>
-                        </div>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane"}]}'>
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"userdashboard_main_tab", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>
-                    <div id="files_list_pane" ajxpClass="AjxpPane">
-                        <div id="userdashboard_addressbook_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "my-users","tabInfos" : [{"id":"my-users","label":"user_dash.48", "title":"user_dash.49","iconClass":"icon-user", "element":"my-users-pane"}]}'>
-                            <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"userdashboard_main_tab", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                            </div>
+                    <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor">
+                        <div class="action_bar">
+                            <div class="toolbarGroup"></div>
                         </div>
-                    </div>
-                    <div id="parameters_pane" ajxpClass="AjxpPane">
-                        <div id="userdashboard_parameters_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "account","tabInfos" : [{"id":"account","label":"user_dash.44", "title":"user_dash.45","iconClass":"icon-reorder", "element":"account_pane"}]}'>
-                            <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor">
-                                <div class="action_bar">
-                                    <div class="toolbarGroup"></div>
-                                </div>
-                                <div id="user_profile_form"></div>
-                            </div>
-                        </div>
+                        <div id="user_profile_form"></div>
                     </div>
                 </div>
                 <script>
@@ -129,46 +96,73 @@
                     }, 100);
                 </script>
 			]]></template_part>
+            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="orbit"><![CDATA[
+                <style>
+                div.flat_tabulator span.toggleHeader{
+                    background-color: #fb725c;
+                }
+                .largeButton, .SF_input.SF_inlineButton{
+                    background-color: #fb725c;
+                }
+                .action_bar{
+                    background-color: #EAEAEA;
+                    padding: 14px;
+                    min-height: 33px;
+                }
+                #account_pane .action_bar{
+                    text-align: right;
+                }
+                .action_bar a{
+                    background-color: #ffffff;
+                    margin-top:3px;
+                    cursor: pointer;
+                    color: #555;
+                }
+                div.class-FetchedResultPane{
+                    background-color: #f8f8f8;
+                }
+                #buttons_bar{
+                    padding:14px;
+                    text-align: right;
+                }
+                #buttons_bar a {
+                    padding-bottom: 0;
+                    height: 26px;
+                }
+                .action_bar span.actionbar_button_label{
+                    font-size: 11px;
+                }
+                .flat_tabulator div.panelHeader.tabulatorContainer{
+                    background-color: #30383A;
+                    padding-top: 10px;
+                }
+                #global_toolbar{
+                    display: block;
+                    background-color: #345E79;
+                }
+                </style>
+                <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
+                    <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
+                    <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
+                </div>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
+                    <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
+                        <div class="action_bar">
+                            <div class="toolbarGroup"></div>
+                        </div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.43]</h3>
+                        <div id="user_profile_form"></div>
+                    </div>
+                </div>
+			]]></template_part>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
-                <additional_tab id="tutorials_pane"
-                                tabInfo='{"id":"tutorials","label":"user_dash.53", "title":"user_dash.54","iconClass":"icon-play", "element":"tutorials_pane", "dontFocus":true}'
+                <additional_tab id="my-users-pane"
+                                tabInfo='{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="tutorials_pane" ajxpClass="AjxpPane" ajxpOptions='{"replaceScroller":true}' style="overflow-y: scroll;">
-                        <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_dash.56]</div>
-                        <div id="tutorial_dl_apps_pane">
-                            <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">
-                                <div style="float: left;margin: 44px 60px;font-size: 21px;" id="dl_pydio_for">AJXP_MESSAGE[user_dash.57]</div>
-                                <div style="width: 81px; float:left;">
-                                    <a href="URL_APP_ANDROID" target="_blank" class="icon-mobile-phone" style="font-size: 96px;"></a><a href="URL_APP_ANDROID" target="_blank"  class="icon-android" style="font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);"></a><div style="font-size: 11px;top: -15px;position: relative;left: -13px;">AJXP_MESSAGE[user_dash.58]</div>
-                                </div>
-                                <div style="width: 91px; float:left;">
-                                    <a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-tablet" style="font-size: 96px;"></a><a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);"></a><div style="font-size: 11px;top: -15px;position: relative;left: 2px;">AJXP_MESSAGE[user_dash.59]</div>
-                                </div>                                <div style="width: 110px; float:left;padding-top: 14px;">
-                                    <a href="URL_APP_SYNC_MAC" target="_blank" class="icon-desktop" style="font-size: 74px;"></a><a href="URL_APP_SYNC_MAC" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);"></a><div style="font-size: 11px;top: -6px;position: relative;left: 6px;">AJXP_MESSAGE[user_dash.60]</div>
-                                </div>
-                                <div style="width: 100px; float:left;padding-top: 8px;">
-                                    <a href="URL_APP_SYNC_WIN" target="_blank" class="icon-laptop" style="font-size: 87px;"></a><a href="URL_APP_SYNC_WIN" target="_blank" class="icon-windows" style="font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);"></a><div style="font-size: 11px;top: -40px;position: relative;left: 12px;">AJXP_MESSAGE[user_dash.61]</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tutorial_legend">
-                            AJXP_MESSAGE[user_dash.62]
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/C6L_9QT0lDE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div class="tutorial_legend">
-                        AJXP_MESSAGE[user_dash.63]
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/Nj3d0AXfJXI?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div class="tutorial_legend">
-                        AJXP_MESSAGE[user_dash.64]
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div class="tutorial_legend">
-                        AJXP_MESSAGE[user_dash.66]
-                        </div>
-                        <iframe width="640" height="360" class="tutorial_video" src="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5" frameborder="0" allowfullscreen></iframe>
-                        <div style="clear:left; text-align:center;">
-                            <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_dash.65]</a></div>
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>
                 ]]></additional_tab>
             </component_config>
@@ -203,88 +197,14 @@
 							ajaxplorer.updateContextData(path);
 						}
 						]]></clientCallback>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="stat">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
-
-			<action name="copyUrl">
-				<gui text="user_dash.18" title="user_dash.19" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
-					<context selection="true" dir="" recycle="false"
-						actionBar="true" contextMenu="true" infoPanel="true"
-						actionBarGroup="public_links" inZip="false">
-					</context>
-					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file" behaviour="disabled"/></gui>
-				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-						var onLoad = function(oForm){
-							var userSelection =  ajaxplorer.getUserSelection();
-							var firstNode = userSelection.getUniqueNode();
-			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
-			   		    	copyDiv.setValue(firstNode.getMetadata().get('download_url').stripTags());
-			   		    	copyDiv.select();
-						};
-						modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
-							hideLightBox(true);
-							return false;
-						},null,true);
-						]]></clientCallback>
-					<clientForm id="copy_as_text"><![CDATA[
-					<div id="copy_as_text" action="copy" box_width="280">
-						<input id="text_copy" style="width:260px;" class="dialogFocus"/>
-					</div>
-					]]></clientForm>
-					<serverCallback methodName="switchAction"/>
-					</processing>
-			</action>
-			<action name="reset_download_counter">
-				<gui text="user_dash.32" title="user_dash.33" iconClass="icon-undo" src="eraser.png" accessKey="" hasAccessKey="false">
-					<context selection="true" dir="" recycle="false"
-						actionBar="true" contextMenu="true" infoPanel="true"
-						actionBarGroup="public_links" inZip="false">
-					</context>
-					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file" behaviour="disabled"/></gui>
-				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-						var baseUrl = ajxpServerAccessPath + "&get_action=reset_download_counter";
-						baseUrl = ajaxplorer.getUserSelection().updateFormOrUrl(null, baseUrl);
-						var conn = new Connexion(baseUrl);
-						conn.addParameter("get_action", "reset_download_counter");
-						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-						};
-						conn.sendAsync();
-						]]></clientCallback>
-					<serverCallback methodName="switchAction"/>
-					</processing>
-			</action>
-			<action name="clear_expired">
-				<gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
-					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
-						actionBar="true" contextMenu="true" infoPanel="false"
-						actionBarGroup="public_links" inZip="false">
-					</context>
-					<selectionContext dir="false" file="true" recycle="false" behaviour="disabled" unique="true" allowedMimes="shared_file"/></gui>
-				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-						var conn = new Connexion();
-						conn.addParameter("get_action", "clear_expired");
-						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-						};
-						conn.sendAsync();
-					]]></clientCallback>
-					<serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
-					</processing>
-			</action>
-
 			<action name="delete">
 				<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 					<context selection="true" dir="" recycle="false"
@@ -318,7 +238,7 @@
 					<span id="delete_message"></span>
 					<input type="hidden" name="ajxp_mime" value="">
 					</div>				]]></clientForm>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 					</processing>
 			</action>
 		</actions>

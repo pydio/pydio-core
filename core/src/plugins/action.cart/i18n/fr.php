@@ -21,7 +21,7 @@
 
 $mess = array(
 
-    "1" => "Ajouter le panier",
+    "1" => "Ajouter au panier",
     "2" => "Ajouter les éléments sélectionnés au panier",
     "3" => "Vider",
     "4" => "Vider le panier courant",
@@ -32,8 +32,8 @@ $mess = array(
     "9" => "Mon Panier",
     "10"=> "Paniers",
     "11"=> "Compresser et partager",
-    "12"=> "Créer une archive et la partager",
-    "13"=> "Changer le libellé de ce panier de sélection",
-    "14"=> "Une archive va être créée avec tous les fichiers dedans. Entrez un nom pour cette archive :",
-    "15"=> "Déposer des éléments dans le panier pour les utiliser plus tard.",
+    "12"=> "Créer une archive à partir de la selection, puis la partager",
+    "13"=> "Changer le libellé de ce panier",
+    "14"=> "Une archive va être créée, contenant tous les fichiers. Entrez un nom pour cette archive : ",
+    "15"=> "Déposer des éléments dans le panier pour les télécharger ou les partager ultérieurement.",
 );

@@ -22,31 +22,38 @@ Class.create("BrowserOpener", AbstractEditor, {
 	initialize: function($super, oFormObject, options){
         this.editorOptions = options;
         this.element = oFormObject;
+        var configs = ajaxplorer.getPluginConfigs("editor.browser");
+        this.alwaysOpenLinksInBrowser = configs.get('OPEN_LINK_IN_TAB') == "browser";
+        this.alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') == "browser";
     },
 	
 	open : function($super, node){
-        if(node.getAjxpMime() == "url"){
+        if(node.getAjxpMime() == "url" || node.getAjxpMime() == "website"){
         	this.openURL(node.getPath());
         	return;
         } 
         var repo = ajaxplorer.user.getActiveRepository();
-        var loc = document.location.href;
-        if(loc.indexOf("?") !== -1) loc = loc.substring(0, loc.indexOf("?"));
+        var loc = document.location.href.split('?').shift().split('#').shift();
         var url = loc.substring(0, loc.lastIndexOf('/'));
         if($$('base').length){
             url = $$("base")[0].getAttribute("href");
             if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
         }
-        var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
-        var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
+        //var nonSecureAccessPath = window.ajxpServerAccessPath.substring(0, window.ajxpServerAccessPath.lastIndexOf('?'));
+        var open_file_url = url + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
 
         if(this.editorOptions.context.__className == 'Modal'){
-            var myRef = window.open(open_file_url);
+            window.open(open_file_url);
             if(!Modernizr.boxshadow){
                 window.setTimeout('hideLightBox()', 1500);
             }else{
                 hideLightBox();
             }
+        }else if(this.alwaysOpenDocsInBrowser){
+            window.open(open_file_url);
+            window.setTimeout(function(){
+                this.editorOptions.context.closeTab("editor.browser:/" + node.getPath());
+            }.bind(this), 500);
         }else{
             this.element.fire("editor:updateTitle", node.getLabel());
             this.contentMainContainer = new Element('iframe', {
@@ -63,12 +70,23 @@ Class.create("BrowserOpener", AbstractEditor, {
 	openURL : function(fileName){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_content');
-		connexion.addParameter('file', fileName);	
+		connexion.addParameter('file', fileName);
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
+            if(url.indexOf('URL=') !== -1){
+                url = url.split('URL=')[1];
+                if(url.indexOf('\n') !== -1){
+                    url = url.split('\n')[0];
+                }
+            }
             if(this.editorOptions.context.__className == 'Modal'){
-                myRef = window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
+                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
                 hideLightBox();
+            }else if(this.alwaysOpenLinksInBrowser){
+                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
+                window.setTimeout(function(){
+                    this.editorOptions.context.closeTab("editor.browser:/" + fileName);
+                }.bind(this), 500);
             }else{
                 this.element.fire("editor:updateTitle", url);
                 this.contentMainContainer = new Element('iframe', {

@@ -39,7 +39,7 @@ class PowerFSController extends AJXP_Plugin
         if(!isSet($this->actions[$action])) return;
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
-        $dir = AJXP_Utils::securePath($dir);
+        $dir = AJXP_Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
@@ -73,6 +73,10 @@ class PowerFSController extends AJXP_Plugin
                     } else {
                         $archiveName =  $httpVars["archive_name"];
                         $jsCode = "
+                            var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+                            val = window.ajxpServerAccessPath.replace(regex, \"\$1\");
+                            var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
+
                             $('download_form').action = window.ajxpServerAccessPath;
                             $('download_form').secure_token.value = window.Connexion.SECURE_TOKEN;
                             $('download_form').select('input').each(function(input){
@@ -81,6 +85,7 @@ class PowerFSController extends AJXP_Plugin
                             $('download_form').insert(new Element('input', {type:'hidden', name:'ope_id', value:'".$httpVars["ope_id"]."'}));
                             $('download_form').insert(new Element('input', {type:'hidden', name:'archive_name', value:'".$archiveName."'}));
                             $('download_form').insert(new Element('input', {type:'hidden', name:'get_action', value:'postcompress_download'}));
+                            if(minisite_session) $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
                             $('download_form').submit();
                             $('download_form').get_action.value = 'download';
                         ";

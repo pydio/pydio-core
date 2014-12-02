@@ -30,9 +30,14 @@ if (function_exists("xdebug_disable")) {
 //setlocale(LC_ALL, '');
 @libxml_disable_entity_loader(false);
 
-list($vNmber,$vDate) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
-define("AJXP_VERSION", $vNmber);
-define("AJXP_VERSION_DATE", $vDate);
+@include_once("VERSION.php");
+if(!defined("AJXP_VERSION")){
+    list($vNmber,$vDate,$vRevision,$vDbVersion) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
+    define("AJXP_VERSION", $vNmber);
+    define("AJXP_VERSION_DATE", $vDate);
+    if(!empty($vRevision)) define("AJXP_VERSION_REV", $vRevision);
+    if(!empty($vDbVersion)) define("AJXP_VERSION_DB", intval($vDbVersion));
+}
 
 define("AJXP_EXEC", true);
 
@@ -53,7 +58,6 @@ define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n"
 define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
-define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 // Startup admin password (used at first creation). Once
 // The admin password is created and his password is changed,
 // this config has no more impact.
@@ -121,6 +125,11 @@ if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
         foreach($AJXP_INISET as $key => $value) AJXP_Utils::safeIniSet($key, $value);
     }
     if (defined('AJXP_LOCALE')) {
-        setlocale(LC_ALL, AJXP_LOCALE);
+        setlocale(LC_CTYPE, AJXP_LOCALE);
+    }else if(file_exists(AJXP_DATA_PATH."/plugins/boot.conf/encoding.php")){
+        require_once(AJXP_DATA_PATH."/plugins/boot.conf/encoding.php");
+        if(isSet($ROOT_ENCODING)){
+            setlocale(LC_CTYPE, $ROOT_ENCODING);
+        }
     }
 }

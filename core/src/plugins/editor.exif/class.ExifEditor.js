@@ -103,8 +103,8 @@ Class.create("ExifEditor", AbstractEditor, {
 			this.contentMainContainer.insert(div);
 			var sectionName = sections[i].getAttribute("name");
 			div.insert('<div class="panelHeader infoPanelGroup">'+sectionName+'</div>');
-			div.insert('<table class="infoPanelTable" '+(Prototype.Browser.IE?'style="width:97%;"':'')+' cellspacing="0" ><tbody></tbody></table>');
-			var tBody = div.down('tbody');
+			div.insert('<div class="infoPanelTable"></div>');
+			var tBody = div.down('div.infoPanelTable');
 			var even = false;
 			this.itemsCount ++;
 			for(var j=0;j<tags.length;j++){
@@ -117,7 +117,7 @@ Class.create("ExifEditor", AbstractEditor, {
 						this.gpsData[tagName] = split[1];
 						tagValue = split[0];
 					}
-					tBody.insert('<tr'+(even?' class="even"':'')+'><td class="infoPanelLabel">'+tagName+'</td><td class="infoPanelValue">'+tagValue+'</td></tr>');
+					tBody.insert('<div'+(even?' class="even"':'')+'><div class="infoPanelLabel">'+tagName+'</div><div class="infoPanelValue">'+tagValue+'</div></div>');
 					even = !even;
 					this.itemsCount ++;
 				}catch(e){}

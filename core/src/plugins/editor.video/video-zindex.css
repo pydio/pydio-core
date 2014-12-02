@@ -1,0 +1,9 @@
+/* Fullscreen styles for main elements */
+.video-js-box.vjs-fullscreen { z-index: 1020; }
+.video-js-box.vjs-fullscreen video.video-js,
+.video-js-box.vjs-fullscreen .vjs-flash-fallback { z-index: 1020; }
+.video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1021; }
+.video-js-box.vjs-fullscreen .vjs-spinner { z-index: 1021; }
+.video-js-box.vjs-fullscreen .vjs-controls { z-index: 1023; }
+.video-js-box.vjs-fullscreen .vjs-big-play-button { z-index: 1024; }
+.video-js-box.vjs-fullscreen .vjs-subtitles { z-index: 1024; }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="custom_db" label="CONF_MESSAGE[Custom DB Auth Backend]"
+            description="CONF_MESSAGE[Authenticate users agains your custom DB and table definition.]"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+            mixins="dibidriver_third_provider,authdriver_commons"
+        >
+	<server_settings>
+		<param name="SQL_CUSTOM_DRIVER" type="group_switch:dibi_provider" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+        <param name="SQL_CUSTOM_TABLE" type="string" label="CONF_MESSAGE[Custom Table Name]" description="CONF_MESSAGE[Name of the custom SQL table]" mandatory="true"/>
+        <param name="SQL_CUSTOM_TABLE_USER_FIELD" type="string" label="CONF_MESSAGE[Table User Field]" description="CONF_MESSAGE[Name of the field to be used as users identifier]" mandatory="true"/>
+        <param name="SQL_CUSTOM_TABLE_PWD_FIELD" type="string" label="CONF_MESSAGE[Table Password Field]" description="CONF_MESSAGE[Name of the field containing the password]" mandatory="true"/>
+        <param name="SQL_CUSTOM_TABLE_PWD_HASH" type="select" label="CONF_MESSAGE[Table Password Hashing]" description="CONF_MESSAGE[How the password is minimaly hashed in the table]" choices="clear|Clear,md5|MD5,pbkdf2|PBKFD2 (native)" default="pbkdf2" mandatory="true"/>
+        <param name="SQL_CUSTOM_TABLE_TEST_USER" type="string" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use an existing user ID and click on Test Connexion to verify it is correctly found]" mandatory="true" />
+        <param type="button" name="TEST_SQL" choices="run_plugin_action:auth.custom_db:testSQLConnexion" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Test the SQL connexion]" mandatory="false"/>
+    </server_settings>
+	<class_definition filename="plugins/auth.custom_db/class.customDbAuthDriver.php" classname="customDbAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</authdriver>

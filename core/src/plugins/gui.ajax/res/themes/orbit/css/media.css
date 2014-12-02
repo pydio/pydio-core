@@ -1,0 +1,185 @@
+@media only screen
+and (max-width : 800px) {
+    .custom_top_title{
+        width: 23%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
+@media only screen
+and (max-width : 1000px) {
+    #display_toolbar span.actionbar_button_label,
+    #display_toolbar span.icon-caret-down.ajxp_icon_arrow
+    {
+        display: none !important;
+    }
+    #display_toolbar span.ajxp_icon_span{
+        display: inline-block !important;
+    }
+}
+
+@media only screen
+and (max-width : 720px) {
+    .ws-label{
+        display: none !important;
+    }
+    span.actionbar_button_label,
+    .action_bar span.actionbar_button_label,
+    #get_my_feed_button_label,
+    #logging_string i,
+    #logging_string *[ajxp_message_id],
+    #global_toolbar span.icon-caret-down,
+    #search_form a
+    {
+        display: none !important;
+    }
+    div.toolbarGroup span.ajxp_icon_span
+    {
+        display: inline-block !important;
+        padding: 5px 1px 4px;
+    }
+
+    div.toolbarGroup a{
+        padding-bottom: 2px !important;
+    }
+
+    div.toolbarGroup a span.ajxp_icon_span{
+        display: inline-block !important;
+
+    }
+
+    #group_more_action_button{
+        padding-top: 6px !important;
+        padding-bottom: 4px !important;
+    }
+
+    #simple_repository_label{
+        font-size: 16px;
+        width: 100px !important;
+    }
+    #simple_repository_label div.repository_legend{
+        visibility: hidden;
+    }
+    #workspace_toolbar {
+        padding-top: 0;
+    }
+    .user_widget_label.withImage i{
+        width: 30px;
+        overflow: hidden;
+    }
+    .thumbnail_selectable_cell > div > div.overlay_icon_div{
+        top: 32px !important;
+    }
+    #topPane{
+        width: 200px;
+    }
+
+    .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
+        width: 121px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    div#dl_toolbar {
+        margin: 220px auto !important;
+        width: 300px !important;
+    }
+    #ajxp_unique_dl a#share_current_page_button{
+        padding: 10px 10px !important;
+    }
+}
+
+@media only screen
+and (max-width : 420px){
+
+    #topPane{
+        width: 0;
+        display: none;
+    }
+
+    #simple_repository_label{
+        display:none;
+        font-size: 12px;
+        width: 100% !important;
+        padding:0 20px;
+        height:auto;
+    }
+    
+    div.repository_legend{
+        display:none;
+    }
+    #search_engine_cont{
+        /*width:100% !important;*/
+    }
+    #buttons_bar_cont{
+        margin-left: 0;
+    }
+    #workspace_toolbar{
+        padding-top:0;
+    }
+
+    #buttons_bar, #buttons_bar_top{
+
+    }
+
+    #buttons_bar a, #buttons_bar_top a{
+        padding: 1px 8px;
+        border-radius: 19px;
+    }
+
+    .tabulatorContainer.panelHeader.icons_only {
+        width: 37px;
+    }
+
+    #userdashboard_myparams_title{
+        display: none;
+    }
+
+    #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+        width: 40px !important;
+    }
+
+    div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+        padding-top: 0;
+    }
+
+    div#userdashboard_main_tab.horizontal_tabulator span.toggleHeader {
+        text-align: left;
+        padding: 8px 12px;
+        color: #ffffff !important;
+        border: 0;
+        display: block;
+        font-size: 20px;
+        font-weight: lighter;
+        text-transform: uppercase;
+        margin: 0px 0;
+    }
+
+    div#background-imager{
+        background-image: url(../images/hires-photos/03-mobile.jpg) !important;
+        background-position: 50% 50%;
+        background-repeat: repeat repeat;
+    }
+
+    div.dialogBox{
+        min-width: 99%;
+    }
+
+    div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent {
+        height: 100%;
+        padding-top: 20%!important;
+    }
+
+    #login_form, #login_form_dynamic {
+        margin: 0;
+    }
+
+    div.dialogContent div.SF_element {
+        margin: 0 10px;
+    }
+
+    #global_toolbar{
+        z-index: 1000;
+    }
+}

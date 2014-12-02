@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uploader text="51" title="132" order="10" id="uploader.http" label="CONF_MESSAGE[Remote Download]" description="CONF_MESSAGE[Async downloader to load a file from another source]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/uploader.http/class.HttpDownloader.php" classname="HttpDownloader"/>
+	<client_settings>
+		<resources>
+	        <i18n namespace="httpdownloader" path="plugins/uploader.http/resources/i18n" />
+	        <img_library alias="httpdownloader_images" path="plugins/uploader.http/resources/images" />
+            <css file="plugins/uploader.http/resources/downloader.css" autoload="true"/>
+		</resources>
+	</client_settings>
+	<registry_contributions>
+        <extensions>
+            <extension mime="download" messageId="httpdownloader.17" icon="httpdownloader_images/ICON_SIZE/kget_list.png"/>
+            <extension mime="dlpart" messageId="httpdownloader.18" icon="exe.png"/>
+        </extensions>
+		<actions>
+            <action name="external_download">
+				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="true">
+					<context selection="false" dir="true" recycle="hidden"
+						actionBar="false" contextMenu="false" infoPanel="false"
+						actionBarGroup="put" inZip="false">
+					</context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+            <action name="external_download_file">
+				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/kget_list.png" accessKey="httpdownloader.3" hasAccessKey="false">
+					<context selection="true" dir="true" recycle="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="get" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="download" behaviour="hidden" />
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback><![CDATA[
+						fileName = ajaxplorer.getUserSelection().getUniqueFileName();
+						var crtDir = ajaxplorer.getContextNode().getPath();
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("external_download", new Hash({dlfile:fileName, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
+						bgManager.next();
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="generate_dl_bookmarklet">
+				<gui text="httpdownloader.9" title="httpdownloader.9" iconClass="icon-bookmark" src="httpdownloader_images/ICON_SIZE/add_bookmarklet.png" accessKey="httpdownloader.3" hasAccessKey="false">
+					<context selection="false" dir="true" recycle="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="remote" inZip="false">
+					</context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true" dialogOpenForm="dynamic_bookmarklet">
+						<dialogOnOpen><![CDATA[
+						    var rm =new ResourcesManager();
+						    rm.loadCSSResource('plugins/uploader.http/resources/downloader.css');
+							var root = document.location.href;
+							root = root.substring(0,root.lastIndexOf("/") + 1);
+							var repository = ajaxplorer.user.getActiveRepository();
+							var folder = ajaxplorer.getContextNode().getPath();
+							var bmletValue = "javascript:(function(){window.ajxp_bm_target='"+root+"',window.ajxp_bm_repository_id='"+repository+"', window.ajxp_bm_folder='"+folder+"'; var d=document,s=d.createElement('scr'+'ipt'),b=d.body,l=d.location;s.setAttribute('src','"+root+"plugins/uploader.http/bookmarklet/ajxp.js?t='+(new Date().getTime()));b.appendChild(s)})();";
+							$('bookmarklet_link').setAttribute("href", bmletValue);
+							var basename = getBaseName(folder);
+							if(basename == ""){
+                                $('bookmarklet_link_a').hide();
+                                $('bookmarklet_link_d').hide();
+                                $('bookmarklet_link_c').hide();
+							}else{
+                                $('bookmarklet_link_a').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_a').insert(MessageHash['httpdownloader.10a'].replace("%s", basename));
+
+                                $('bookmarklet_link_c').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_c').insert(MessageHash['httpdownloader.10c'].replace("%s", basename));
+
+                                $('bookmarklet_link_d').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_d').insert(MessageHash['httpdownloader.10d'].replace("%s", basename));
+                            }
+
+                            $('bookmarklet_link_b').setAttribute("href", bmletValue);
+                            $('bookmarklet_link_b').insert(MessageHash['httpdownloader.10b'].replace("%s", ajaxplorer.user.repositories.get(repository).getLabel()));
+                            $('bookmarklet_links_container').select('a').each(function(link){
+                                link.observe('click', function(e){Event.stop(e);alert(MessageHash['httpdownloader.16']);});
+                            });
+
+							$('bookmarklet_textarea').setValue(bmletValue);
+							$('bookmarklet_textarea').observe("focus", function(){$('bookmarklet_textarea').select();});
+
+						]]></dialogOnOpen>
+					</clientCallback>
+					<clientForm id="dynamic_bookmarklet"><![CDATA[
+					<div id="dynamic_bookmarklet" box_width="400">
+					    <div>AJXP_MESSAGE[httpdownloader.11]</div>
+					    <div id="bookmarklet_links_container" style="width:400px;">
+                            <a href="" id="bookmarklet_link" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]">AJXP_MESSAGE[httpdownloader.10]</a>
+                            <a href="" id="bookmarklet_link_a" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_b" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_c" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_d" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+						</div>
+						<div style="clear:left;">AJXP_MESSAGE[httpdownloader.15]</div>
+						<textarea id="bookmarklet_textarea" style="width: 100%;margin-top: 4px;height: 140px;"></textarea>
+					</div>
+					]]></clientForm>
+				</processing>
+			</action>
+			<action name="update_dl_data">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="stop_dl">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+            <action name="get_xml_registry">
+                <post_processing>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </post_processing>
+            </action>
+		</actions>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>
+		</hooks>
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>
+    <processing>
+        <clientForm id="external_download"><![CDATA[
+            <div id="external_download" action="external_download" box_width="500" box_padding="0">
+                <div style="padding:10px;">
+                    <span class="dialoglegend">AJXP_MESSAGE[httpdownloader.4]</span>
+                    <div>
+                        AJXP_MESSAGE[httpdownloader.5] 1 : <input type="text" name="url" style="width:407px;" class="dialogFocus"><br/>
+                        AJXP_MESSAGE[httpdownloader.5] 2 : <input type="text" name="url2" style="width:407px;margin-top:5px;"><br/>
+                        AJXP_MESSAGE[httpdownloader.5] 3 : <input type="text" name="url3" style="width:407px;margin-top:5px;"><br/>
+                        AJXP_MESSAGE[httpdownloader.5] 4 : <input type="text" name="url4" style="width:407px;margin-top:5px;"><br/>
+                        AJXP_MESSAGE[httpdownloader.5] 5 : <input type="text" name="url5" style="width:407px;margin-top:5px;">
+                    </div>
+                </div>
+            </div>
+        ]]></clientForm>
+        <dialogOnOpen><![CDATA[
+             modal.addSubmitCancel(modal.getForm());
+             modal.getForm().down('input[name="ok"]').observe("click", function(e){
+                Event.stop(e);
+                oForm = modal.getForm();
+                var dlFile = oForm.down('[name="url"]').getValue();
+                var crtDir = ajaxplorer.getContextNode().getPath();
+                var bgManager = ajaxplorer.actionBar.bgManager;
+                bgManager.queueAction("external_download", new Hash({file:dlFile, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(dlFile)+" " + MessageHash["httpdownloader.7"]);
+                for(var i=2;i<6;i++){
+                    var file = oForm.down('[name="url'+i+'"]').getValue();
+                    if(file){
+                        bgManager.queueAction("external_download", new Hash({file:file, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(file)+" " + MessageHash["httpdownloader.7"]);
+                    }
+                }
+                bgManager.next();
+                hideLightBox(true);
+             });
+        ]]></dialogOnOpen>
+        <serverCallback methodName="switchAction"></serverCallback>
+    </processing>
+</uploader>

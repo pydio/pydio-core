@@ -5,8 +5,7 @@
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key" iconClass="icon-folder-open-alt">
 				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
-				</context>
+					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false"/>
 				<selectionContext dir="true" file="false" recycle="false"
 					unique="true" allowedMimes="*">
 				</selectionContext>
@@ -30,7 +29,9 @@
 						ajaxplorer.updateContextData(path);
 					}
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/dir+/"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/dir+" developerComment="List the content of the config. Depending on the path, will return users, workspaces, roles, etc..">
+                    <input_param name="dir" type="path" description="Path to config data to list. See URIs in webapp to guess the correct path."/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="admin_search">
@@ -75,19 +76,27 @@
         </action>
         <action name="generate_api_docs">
             <processing>
-                <serverCallback methodName="switchAction" developerComment="Generate API docs"/>
+                <serverCallback methodName="switchAction" restParams="/version" developerComment="Generate API docs">
+                    <input_param name="version" type="string" description="A two-digits version string, like 5.4, 6.2"/>
+                </serverCallback>
             </processing>
         </action>
 		<action name="get_plugin_manifest">
 			<processing>
-				<serverCallback methodName="switchAction" restParams="/plugin_id">
+				<serverCallback methodName="switchAction" restParams="/plugin_id" developerComment="Send a plugin Manifest file.">
                     <input_param description="Plugin identifier (like type.name)" name="plugin_id" type="string"/>
+                    <output type="XML" description="Manifest content"/>
 				</serverCallback>
 			</processing>
 		</action>
 		<action name="run_plugin_action">
 			<processing>
-				<serverCallback methodName="switchAction" developerComment="Execute a class method on a plugin. Used for testing connexions."/>
+				<serverCallback methodName="switchAction" restParams="/action_plugin_id/action_plugin_method" developerComment="Execute a class method on a plugin. Used for example for testing a DB connexion.">
+                    <input_param name="action_plugin_id" type="string" description="A plugin id, in the form type.name"/>
+                    <input_param name="action_plugin_method" type="string" description="A plugin method"/>
+                    <input_param name="form_data" type="FORM_DATA"
+                                 description="A set of parameters complying to the standard form parser"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="create_user">
@@ -261,7 +270,7 @@
 						</div>
 					</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction" restParams="/json_data">
+				<serverCallback methodName="switchAction" restParams="/json_data" developerComment="Create a workspace ( = repository, it's the same ) by passing a structured JSON object.">
                     <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
 				</serverCallback>
 				</processing>
@@ -351,14 +360,15 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable,ajxp_plugin" behaviour="disable"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="disable"/>
+            </gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
                     ajaxplorer.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
-                <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
+                <serverCallback methodName="switchAction" restParams="/sub_action" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>
         </action>
         <action name="edit_repository_label">
@@ -367,8 +377,9 @@
                          actionBar="true" contextMenu="true" infoPanel="false"
                          actionBarGroup="get" inZip="false">
                 </context>
-                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"></selectionContext></gui>
-            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"/>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
 					var callback = function(node, newValue){
@@ -385,7 +396,7 @@
 
 					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
 					]]></clientCallback>
-                <serverCallback methodName="switchAction" restParams="/repository_id/newLabel">
+                <serverCallback methodName="switchAction" restParams="/repository_id/newLabel" developerComment="Update a workspace label">
                     <input_param description="Repository Identifier" name="repository_id" type="string"/>
                     <input_param description="New Label" name="newLabel" type="string"/>
                 </serverCallback>
@@ -434,7 +445,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role,group" image="false" editable="false"/></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -447,15 +458,11 @@
 						fieldName = "user_id";
 						fieldValue = getBaseName(meta.get("filename"));
 					}else if(meta.get("ajxp_mime") == "role"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
+						deleteMessage = MessageHash['ajxp_conf.126'];
 						fieldName = "role_id";
 						fieldValue = getBaseName(meta.get("filename"));
-					}else if(meta.get("ajxp_mime") == "shared_file"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
-						fieldName = "shared_file";
-						fieldValue = meta.get("filename");
 					}else if(meta.get("ajxp_mime") == "group"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
+						deleteMessage = MessageHash['ajxp_conf.126'];
 						fieldName = "group";
 						fieldValue = meta.get("filename");
 					}else{
@@ -482,8 +489,6 @@
                                   var value;
                                   if(meta.get("ajxp_mime") == "user_editable"){
                                   	value = meta.get("text");
-                                  }else if(meta.get("ajxp_mime") == "shared_file"){
-                                  	value = meta.get("filename");
                                   }else{
                                   	value = meta.get("text");
                                   }
@@ -506,8 +511,8 @@
 					<input type="hidden" name="" value=""/>
 				</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction" restParams="/data_type/data_id+">
-                    <input_param description="Type of the data to delete. Can be : user, group, role, repository, shared_file" name="date_type" type="String"/>
+				<serverCallback methodName="switchAction" restParams="/data_type/data_id+" developerComment="Generic delete action for config driver, used to delete users, workspaces, roles, etc.">
+                    <input_param description="Type of the data to delete. Can be : user, group, role, repository" name="data_type" type="String"/>
                     <input_param description="Id of the data to delete. For groups, full group path." name="data_id"
                                  type="string"/>
 				</serverCallback>
@@ -556,7 +561,7 @@
 		</action>
 	    <action name="user_update_right">
             <processing>
-                <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true">
+                <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true" developerComment="Update a user access right on a given workspace.">
                     <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
                     <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
                     <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
@@ -565,7 +570,7 @@
         </action>
 	    <action name="role_update_right">
             <processing>
-                <serverCallback methodName="switchAction" restParams="/repository/role_id/right" checkParams="true">
+                <serverCallback methodName="switchAction" restParams="/repository/role_id/right" checkParams="true" developerComment="Update a role access right on a given workspace.">
                     <input_param name="role_id" type="AJXP_ROLE" mandatory="true" description="ID of the role"/>
                     <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
                     <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
@@ -574,17 +579,22 @@
         </action>
         <action name="get_bookmarks">
             <pre_processing>
-                <serverCallback methodName="preProcessBookmarkAction"></serverCallback>
+                <serverCallback methodName="preProcessBookmarkAction"/>
             </pre_processing>
         </action>
         <action name="pydio-go-pro">
             <gui src="gopro" text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-rocket">
-                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="user"/>
+                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="admin"/>
             </gui>
             <processing>
                 <clientCallback><![CDATA[
                     var win = window.open('https://pydio.com/?referrer=settings');
                 ]]></clientCallback>
+            </processing>
+        </action>
+        <action name="cli_update_user_list">
+            <processing>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
 	</actions>

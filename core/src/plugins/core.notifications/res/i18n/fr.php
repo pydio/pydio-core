@@ -20,10 +20,14 @@
 */
 $mess=array(
 "1" => "Notifications",
-"2" => "Flux",
+"2" => "Flux de notifications",
 "3" => "Alertes",
 "4" => "Notifications",
 "5" => "Tous les événements",
-"6" => "Aller à ...",
+"6" => "Aller à...",
 "7" => "Supprimer",
+"8" => "Pas d'alerte",
+"9" => "Activité du dépôt",
+"10" => "Activité du dossier",
+"11" => "Activité du fichier",
 );

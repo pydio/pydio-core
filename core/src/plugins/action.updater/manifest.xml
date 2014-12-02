@@ -17,13 +17,17 @@
 	<registry_contributions>
         <actions>
             <action name="get_upgrade_path">
-                <processing><serverCallback methodName="switchAction"/></processing>
+                <processing>
+                    <serverCallback methodName="switchAction" restParams="/" developerComment="Check if there are packages available for upgrade.">
+                        <output type="JSON" description="A list of packages that can be applied sequentially to move from current to latest version, plus latest version HTML release note."/>
+                    </serverCallback>
+                </processing>
             </action>
             <action name="perform_upgrade">
                 <gui text="updater.1" title="updater.2" iconClass="icon-lightbulb" src="download_manager.png" hasAccessKey="false">
                     <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
                         actionBar="true" contextMenu="false" infoPanel="false"
-                        actionBarGroup="user" inZip="false">
+                        actionBarGroup="admin" inZip="false">
                     </context>
                 </gui>
                 <processing>
@@ -32,6 +36,7 @@
                             var conn = new Connexion();
                             $(oForm).down('div[id="upgrade_checking"]').show();
                             $(oForm).down('div[id="upgrade_checking"]').update('Checking for available upgrades');
+                            fitHeightToBottom($(oForm), null, 40);
                             conn.addParameter("get_action", "get_upgrade_path");
                             conn.onComplete = function(transport){
                                 var response = transport.responseJSON;
@@ -42,11 +47,12 @@
                                     var pList = response.packages.join(" ");
                                     $(oForm).down('div[id="upgrade_status"]').show();
                                     $(oForm).down('div[id="upgrade_status"]').insert({top:'The following packages will be downloaded and installed : <ul style="margin-top:4px;">'+ pList+'</ul> <br>'});
+                                    var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
+                                    fitHeightToBottom(stepsContainer, null, 40);
                                     if(response.latest_note){
-                                        $(oForm).down('iframe[id="upgrade_steps"]').src = response.latest_note;
+                                        stepsContainer.src = response.latest_note;
                                     }
                                     var startButton = $(oForm).down('div[id="start_upgrade_button"]');
-                                    var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
                                     startButton.observe("click", function(){
                                         if(window.confirm('Are you sure you want to perform the upgrade?')){
                                             var conn = new Connexion();
@@ -69,7 +75,7 @@
                         <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="upgrade_form"><![CDATA[
-                        <div id="upgrade_form" action="perform_upgrade" box_width="500">
+                        <div id="upgrade_form" action="perform_upgrade" box_width="70%" box_height="85%" box_resize="true">
                             <div id="upgrade_checking"></div>
                             <div id="upgrade_status" style="display:none;">
                                 <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;"> AJXP_MESSAGE[updater.4] </div>AJXP_MESSAGE[updater.3]</p>
@@ -92,50 +98,7 @@
                                 conn.sendAsync();
                             }, 5000);
                     ]]></clientListener>
-                    <serverCallback methodName="switchAction"/>
-                </processing>
-            </action>
-            <action name="import_from_324">
-                <gui text="updater.5" title="updater.6" src="download_manager.png" hasAccessKey="false">
-                    <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
-                        actionBar="true" contextMenu="false" infoPanel="false"
-                        actionBarGroup="user" inZip="false">
-                    </context>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="import_324_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                        <dialogOnOpen><![CDATA[
-                            var startButton = $(oForm).down('div[id="start_upgrade_button"]');
-                            startButton.observe("click", function(){
-                                var conn = new Connexion();
-                                conn.addParameter("get_action", "import_from_324");
-                                conn.addParameter("previous_location", $(oForm).down('input[name="previous_location"]').value);
-                                if($(oForm).down('div[id="start_upgrade_button"]').RUN_NOW){
-                                    conn.addParameter("real_run", "true");
-                                }
-                                conn.onComplete = function(transport){
-                                    $(oForm).down('div[id="upgrade_steps"]').update(transport.responseText);
-                                    $(oForm).down('div[id="start_upgrade_button"]').update(MessageHash['updater.9']);
-                                    $(oForm).down('div[id="start_upgrade_button"]').RUN_NOW = true;
-                                };
-                                conn.sendAsync();
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete hideDialog="true"><![CDATA[
-                            $(oForm).down('div[id="start_upgrade_button"]').stopObserving("click");
-                        ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
-                    </clientCallback>
-                    <clientForm id="import_324_form"><![CDATA[
-                        <div id="import_324_form" action="import_from_324" box_width="500">
-                            <div id="upgrade_status">
-                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 80px;text-align: center;margin-bottom:10px;"> AJXP_MESSAGE[updater.7] </div>
-                                AJXP_MESSAGE[updater.8] <input name="previous_location" placeholder="Your previous install location"></p>
-                                <div id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></div>
-                            </div>
-                        </div>
-                    ]]></clientForm>
-                    <serverCallback methodName="switchAction"/>
+                    <serverCallback methodName="switchAction" restParams="/" developerComment="Apply the update following available upgrade path."/>
                 </processing>
             </action>
             <action name="migrate_metaserial">

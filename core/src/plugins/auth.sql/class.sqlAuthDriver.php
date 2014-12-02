@@ -48,7 +48,7 @@ class sqlAuthDriver extends AbstractAuthDriver
         if(!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
-            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 
@@ -58,35 +58,53 @@ class sqlAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
+        $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
+        if($recursive){
+            $groupPathCondition = "[groupPath] LIKE %like~";
+        }else{
+            $groupPathCondition = "[groupPath] = %s";
+        }
         if ($regexp != null) {
-            $like = self::regexpToLike($regexp);
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] ".$like." AND [groupPath] LIKE %like~ ORDER BY [login] ASC", $regexp, $baseGroup) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
         } else if ($offset != -1 || $limit != -1) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
-           return $pairs;
+        return $pairs;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){
+
+        $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
+        $count = $res->fetchSingle();
+        return ceil(($count - $offset) / $usersPerPage) - 1;
+
+    }
+
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         // WITH PARENT
-        // SELECT * FROM ajxp_users INNER JOIN ajxp_user_rights ON ajxp_user_rights.login=ajxp_users.login WHERE ajxp_users.groupPath LIKE '/%' AND ajxp_user_rights.repo_uuid = 'ajxp.parent_user'
+        // SELECT COUNT(*) FROM ajxp_users AS u, ajxp_user_rights AS r WHERE u.groupPath LIKE '/%' AND r.login=u.login AND r.repo_uuid = 'ajxp.parent_user'
         // WITH SPECIFIC PARENT 'username'
-        // SELECT * FROM ajxp_users INNER JOIN ajxp_user_rights ON ajxp_user_rights.login=ajxp_users.login WHERE ajxp_users.groupPath LIKE '/%' AND ajxp_user_rights.repo_uuid = 'ajxp.parent_user' AND  ajxp_user_rights.rights = 'username'
+        // SELECT COUNT(*) FROM ajxp_users AS u, ajxp_user_rights AS r WHERE u.groupPath LIKE '/%' AND r.login=u.login AND r.repo_uuid = 'ajxp.parent_user' AND r.rights = 'username'
         // WITHOUT PARENT
-        // SELECT * FROM ajxp_users WHERE NOT EXISTS (SELECT rid FROM ajxp_user_rights WHERE ajxp_user_rights.login=ajxp_users.login AND ajxp_user_rights.repo_uuid='ajxp.parent_user')
-        $select = "SELECT COUNT(*) FROM [ajxp_users]";
-        $inner = "INNER JOIN [ajxp_user_rights] ON [ajxp_user_rights].[login]=[ajxp_users].[login]";
+        // SELECT COUNT(*) FROM ajxp_users AS u WHERE NOT EXISTS (SELECT * FROM ajxp_user_rights AS c WHERE c.login=u.login AND c.repo_uuid='ajxp.parent_user')
+        $ands = array();
+        $select = "SELECT COUNT(*) FROM [ajxp_users] AS u WHERE %and";
 
-        $wheres = array();
         if(!empty($regexp)){
-            $wheres[] = "[ajxp_users].[login] ". self::regexpToLike($regexp);
+            $ands[] = array("[u.login] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanRegexp($regexp));
         }
-        $wheres[] = "[ajxp_users].[groupPath] LIKE %like~";
+        if($recursive){
+            $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        }else{
+            $ands[] = array("[u.groupPath] = %s", $baseGroup);
+        }
+        $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')");
 
         if($filterProperty !== null && $filterValue !== null){
             if($filterProperty == "parent"){
@@ -95,63 +113,28 @@ class sqlAuthDriver extends AbstractAuthDriver
                 $filterProperty = "ajxp.admin";
             }
             if($filterValue == AJXP_FILTER_EMPTY){
-                $wheres[] = "NOT EXISTS (SELECT rid FROM [ajxp_user_rights] WHERE [ajxp_user_rights].[login]=[ajxp_users].login AND [ajxp_user_rights].[repo_uuid]='$filterProperty')";
-                $userCond = implode(" AND ", $wheres);
-                $q = $select." WHERE ".$userCond;
+                $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = %s)",$filterProperty);
             }else if($filterValue == AJXP_FILTER_NOT_EMPTY){
-                $wheres[] = "[ajxp_user_rights].[repo_uuid] = '$filterProperty'";
-                $userCond = implode(" AND ", $wheres);
-                $q = $select." ".$inner." WHERE ".$userCond;
+                $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
+                $ands[] = array("[r.login]=[u.login]");
+                $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
             }else{
-                $wheres[] = "[ajxp_user_rights].[repo_uuid] = '$filterProperty'";
-                if(strpos($filterValue, "%")!= false){
-                    $wheres[] = "[ajxp_user_rights].[rights] LIKE '$filterValue'";
-                }else{
-                    $wheres[] = "[ajxp_user_rights].[rights] = '$filterValue'";
-                }
-                $userCond = implode(" AND ", $wheres);
-                $q = $select." ".$inner." WHERE ".$userCond;
+                $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
+                $ands[] = array("[r.login]=[u.login]");
+                $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
+                $ands[] = array("[r.rights] ".AJXP_Utils::likeToLike($filterValue), AJXP_Utils::cleanLike($filterValue));
             }
-        }else{
-            $userCond = implode(" AND ", $wheres);
-            $q = $select." WHERE ".$userCond;
         }
 
-
-        if (!empty($regexp)) {
-            $res = dibi::query($q, $regexp, $baseGroup);
-            //$like = self::regexpToLike($regexp);
-            //$res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] ".$like." AND [groupPath] LIKE %like~", $regexp, $baseGroup) ;
-        } else {
-            $res = dibi::query($q, $baseGroup);
-            //$res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [groupPath] LIKE %like~", $baseGroup);
-        }
+        $res = dibi::query($select, $ands);
         return $res->fetchSingle();
-    }
-
-    private static function regexpToLike(&$regexp)
-    {
-        $left = "~";
-        $right = "~";
-        if ($regexp[0]=="^") {
-            $regexp = ltrim($regexp, "^");
-            $left = "";
-        }
-        if ($regexp[strlen($regexp)-1] == "$") {
-            $regexp = rtrim($regexp, "$");
-            $right = "";
-        }
-        $regexp = stripslashes($regexp);
-        if ($left == "" && $right == "") {
-            return "= %s";
-        }
-        return "LIKE %".$left."like".$right;
     }
 
     public function listUsers($baseGroup="/")
     {
         $pairs = array();
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
+        $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
+        $res = dibi::query("SELECT * FROM [ajxp_users] as u WHERE [u.groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [u.login] ASC", $baseGroup);
         $rows = $res->fetchAll();
         foreach ($rows as $row) {
             $grp = $row["groupPath"];
@@ -164,7 +147,7 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function userExists($login)
     {
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login]=%s", $login);
-        return ($res->fetchSingle() > 0);
+        return (intval($res->fetchSingle()) > 0);
     }
 
     public function checkPassword($login, $pass, $seed)

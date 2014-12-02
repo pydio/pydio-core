@@ -357,7 +357,13 @@ class AJXP_SqlUser extends AbstractAjxpUser
         if (isSet($this->rights["ajxp.parent_user"])) {
             $this->setParent($this->rights["ajxp.parent_user"]);
         }
+        if (isSet($this->rights["ajxp.hidden"])){
+            $this->setHidden(true);
+        }
 
+        if ("postgre" == $this->storage->sqlDriver["driver"]) {
+            dibi::nativeQuery('SET bytea_output = escape');
+        }
         $result_prefs = dibi::query('SELECT [name], [val] FROM [ajxp_user_prefs] WHERE [login] = %s', $this->getId());
         $this->prefs = $result_prefs->fetchPairs('name', 'val');
 
@@ -456,6 +462,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
         $this->rights["ajxp.admin"] = ($this->isAdmin() ? "1" : "0");
         if ($this->hasParent()) {
             $this->rights["ajxp.parent_user"] = $this->parentUser;
+        }
+        if($this->isHidden()){
+            $this->rights["ajxp.hidden"] = 'true';
         }
 
         // UPDATE TABLE

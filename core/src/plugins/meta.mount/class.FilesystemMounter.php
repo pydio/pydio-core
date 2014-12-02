@@ -27,20 +27,32 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Meta
  *
  */
-class FilesystemMounter extends AJXP_Plugin
+class FilesystemMounter extends AJXP_AbstractMetaSource
 {
-    protected $accessDriver;
+    /**
+     * @var Repository
+     */
+    protected $repository;
 
-    public function beforeInitMeta($accessDriver)
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     * @param Repository $repository
+     */
+    public function beforeInitMeta($accessDriver, $repository)
     {
         $this->accessDriver = $accessDriver;
+        $this->repository = $repository;
         if($this->isAlreadyMounted()) return;
         $this->mountFS();
     }
 
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     */
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
+        $this->repository = $this->accessDriver->repository;
         /*
         if($this->isAlreadyMounted()) return;
         $this->mountFS();
@@ -78,7 +90,7 @@ class FilesystemMounter extends AJXP_Plugin
         $opt = str_replace("AJXP_SERVER_UID", posix_getuid(), $opt);
         $opt = str_replace("AJXP_SERVER_GID", posix_getgid(), $opt);
         if (stristr($opt, "AJXP_REPOSITORY_PATH") !== false) {
-            $repo = ConfService::getRepository();
+            $repo = $this->repository;
             $path = $repo->getOption("PATH");
             $opt = str_replace("AJXP_REPOSITORY_PATH", $path, $opt);
         }
@@ -97,7 +109,7 @@ class FilesystemMounter extends AJXP_Plugin
     {
         list($user, $password) = $this->getCredentials();
         $this->logDebug("FSMounter::mountFS Should mount" . $user);
-        $repo = ConfService::getRepository();
+        $repo = $this->repository;
 
         $MOUNT_TYPE = $this->options["FILESYSTEM_TYPE"];
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
@@ -138,7 +150,7 @@ class FilesystemMounter extends AJXP_Plugin
             $output = shell_exec($cmd1);
             $success = !empty($output);
         }else{
-            $success = ($res == 0);
+            $success = ($res == 0 || $res == 32);
         }
         if (!$success) {
             throw new Exception("Error while mounting file system!");

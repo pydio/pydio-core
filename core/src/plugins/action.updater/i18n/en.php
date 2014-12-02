@@ -23,9 +23,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
     "1" => "Upgrade",
-    "2" => "Automatic version upgrade",
-    "3" => "Click on the button to start automatic upgrade procedure. Please check that the application folder is writeable before launching upgrade.",
-    "4" => "Start Upgrade",
+    "2" => "Automatic Software Upgrade",
+    "3" => "Click on the button to start upgrading. Please make sure that the software folder is installed before starting. If you have a 'Linux Package' warning, it means that update cannot be performed in-app but that you must use your server yum/apt-get command.",
+    "4" => "Start update",
     "5" => "From 3.2.4",
     "6" => "Import configuration data from 3.2.4",
     "7" => "Simulate the data import",

@@ -58,11 +58,102 @@ Class.create("AjxpPane", {
 
             }
         }
+        if(this.options.resize_events){
+            this.resizeEvents = $H();
+            this.options.resize_events.each(function(eventName){
+                var binder = this.resize.bind(this);
+                this.resizeEvents.set("ajaxplorer:" + eventName, binder);
+                document.observe("ajaxplorer:" + eventName, binder);
+            }.bind(this) );
+        }
+
         if(this.options.messageBoxReference && ajaxplorer){
             ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
         }
 
+        if(this.options.imageBackgroundFromConfigs){
+            this.buildImageBackgroundFromConfigs(this.options.imageBackgroundFromConfigs);
+        }
+
+        this.configObserver = function(event){
+            if(event.memo.className == "AjxpPane::"+htmlElement.id){
+                this.parseComponentConfig(event.memo.classConfig.get("all"));
+            }
+        }.bind(this);
+        document.observe("ajaxplorer:component_config_changed", this.configObserver);
+
+        if(this.options.replaceScroller){
+            this.scroller = new Element('div', {
+                id:'scroller_'+this.htmlElement.id,
+                className:'scroller_track'
+            });
+            this.scroller.insert(new Element('div', {
+                id:'scrollbar_handle_'+this.htmlElement.id,
+                className:'scroller_handle'
+            }));
+            this.htmlElement.insert(this.scroller);
+            this.htmlElement.setStyle({overflow:"hidden"});
+            this.scroller.setStyle({
+                height:this.htmlElement.getHeight() + 'px'
+            });
+            this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
+        }
+
+        var cPref = this.getUserPreference('rootElementClassPreference');
+        if(cPref){
+            if(Object.isString(cPref))cPref= {className:cPref};
+            var cName = cPref['className'];
+            if(cName){
+                if(cName[0] == '!'){
+                    cName = cName.substring(1);
+                    this.htmlElement.removeClassName(cName);
+                }else{
+                    this.htmlElement.addClassName(cName);
+                }
+                if(cPref['externalButtonId'] && $(cPref['externalButtonId'])){
+                    $(cPref['externalButtonId']).toggleClassName(cPref['externalButtonClassName'])
+                }
+            }
+        }
+
     },
+
+    parseComponentConfig: function(domNode){
+        var change = false;
+        XPathSelectNodes(domNode, "additional_content").each(function(addNode){
+            var cdataContent = addNode.firstChild.nodeValue;
+            var anchor = this.htmlElement;
+            if(cdataContent && anchor){
+                if(!anchor.down('#'+addNode.getAttribute("id"))){
+                    anchor.insert(cdataContent);
+                    var compReg = $A();
+                    ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                    if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                    change = true;
+                }
+            }
+        }.bind(this));
+        if(change){
+            this.scanChildrenPanes(this.htmlElement, true);
+            this.resize();
+            this.reorderContents();
+        }
+    },
+
+    reorderContents: function(){
+        var pos = {};
+        this.htmlElement.select('> div[ajxp_position]').each(function(d){
+            pos[parseInt(d.readAttribute('ajxp_position'))] = d;
+        });
+        var keys = $H(pos).keys();
+        if(keys.length){
+            keys.sort();
+            keys.each(function(k){
+                this.htmlElement.insert(pos[k]);
+            }.bind(this));
+        }
+    },
+
 
     resizeBound : function(event){
         "use strict";
@@ -92,7 +183,7 @@ Class.create("AjxpPane", {
 
     filterWidthFromSiblings : function(original){
         "use strict";
-        if(!this.htmlElement || !this.htmlElement.parentNode) return;
+        if(!this.htmlElement || !this.htmlElement.parentNode) return null;
         var parentWidth = this.htmlElement.parentNode.getWidth();
         var siblingWidth = 0;
         this.htmlElement.siblings().each(function(s){
@@ -118,8 +209,52 @@ Class.create("AjxpPane", {
     			var expr = this.options.fitMarginBottom;
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
-    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), marginBottom);
+            var minOffsetTop = 0;
+            if(this.options.fitMinOffsetTop){
+                var expr2 = this.options.fitMinOffsetTop;
+                try{minOffsetTop = parseInt(eval(expr2));}catch(e){}
+            }
+    		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom, false, minOffsetTop);
+            if(this.scrollbar){
+                this.scroller.setStyle({
+                    height:this.htmlElement.getHeight() + 'px'
+                });
+                this.scrollbar.recalculateLayout();
+            }
     	}
+        if(this.options.flexTo){
+            var parentWidth = $(this.options.flexTo).getWidth();
+            var siblingWidth = 0;
+            this.htmlElement.siblings().each(function(s){
+                if(s.hasClassName('skipSibling')) return;
+                if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
+                    siblingWidth+=s.ajxpPaneObject.getActualWidth();
+                }else{
+                    siblingWidth+=s.getWidth();
+                }
+            });
+            var buttonsWidth = 0;
+            this.htmlElement.select("div.inlineBarButton,div.inlineBarButtonLeft,div.inlineBarButtonRight").each(function(el){
+                buttonsWidth += el.getWidth();
+            });
+            var newWidth = (parentWidth-siblingWidth);
+            if(this.options.flexToMargin) newWidth = newWidth - this.options.flexToMargin;
+            if(newWidth < 5){
+                this.htmlElement.hide();
+            }else{
+                this.htmlElement.show();
+                this.htmlElement.setStyle({width:newWidth + 'px'});
+            }
+        }
+
+        if(this.options.imageBackgroundFromConfigs && this.htmlElement.getHeight()){
+            var ratio = this.htmlElement.getWidth() / this.htmlElement.getHeight();
+            if(ratio < 1){
+                this.htmlElement.addClassName('fit_background_height');
+            }else{
+                this.htmlElement.removeClassName('fit_background_height');
+            }
+        }
     	this.childrenPanes.invoke('resize');
 	},
 	
@@ -148,12 +283,29 @@ Class.create("AjxpPane", {
                 document.stopObserving(pair.key, pair.value);
             });
         }
+        if(this.resizeEvents){
+            this.resizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
+        }
+        if(this.configObserver){
+            document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
+        }
 	},
-	
-	/**
-	 * Find and reference direct children IAjxpWidget
-	 * @param element HTMLElement
-	 */
+
+    /**
+     * Find and reference direct children IAjxpWidget
+     * @param element HTMLElement
+     * @param reset Clear existing children
+     */
 	scanChildrenPanes : function(element, reset){
         if(!element.childNodes) return;
         if(reset) this.childrenPanes = $A();
@@ -191,13 +343,14 @@ Class.create("AjxpPane", {
 	addPaneHeader : function(headerLabel, headerIcon){
         var label = new Element('span', {ajxp_message_id:headerLabel}).update(MessageHash[headerLabel]);
         var header = new Element('div', {className:'panelHeader'}).update(label);
+        var ic;
         if(headerIcon){
-            var ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
             header.insert({top: new Element("img", {src:ic, className:'panelHeaderIcon'})});
             header.addClassName('panelHeaderWithIcon');
         }
         if(this.options.headerClose){
-            var ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
             var img = new Element("img", {src:ic, className:'panelHeaderCloseIcon', title:MessageHash[this.options.headerClose.title]});
             header.insert({top: img});
             var sp = this.options.headerClose.splitter;
@@ -211,7 +364,7 @@ Class.create("AjxpPane", {
         if(this.options.headerToolbarOptions){
             var tbD = new Element('div', {id:"display_toolbar"});
             header.insert({top:tbD});
-            var tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
+            new ActionsToolbar(tbD, this.options.headerToolbarOptions);
         }
 
 
@@ -226,12 +379,34 @@ Class.create("AjxpPane", {
 		}.bind(this));
 	},
 
+    toggleClassNameSavingPref:function(className, externalButtonId, externalButtonClassName){
+        var invert = false;
+        if(className[0] == '!') {
+            className = className.substring(1);
+            invert = true;
+        }
+        this.htmlElement.toggleClassName(className);
+        if(externalButtonId){
+            $(externalButtonId).toggleClassName(externalButtonClassName);
+        }
+        var pref = {
+            externalButtonId:externalButtonId,
+            externalButtonClassName: externalButtonClassName
+        };
+        if(invert){
+            pref['className'] = this.htmlElement.hasClassName(className)?'':'!'+className;
+        }else{
+            pref['className'] = this.htmlElement.hasClassName(className)?className:'';
+
+        }
+        this.setUserPreference('rootElementClassPreference', pref)
+    },
 
     getUserPreference : function(prefName){
-        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
+        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return null;
         var gui_pref = ajaxplorer.user.getPreference("gui_preferences", true);
         var classkey = this.htmlElement.id+"_"+this.__className;
-        if(!gui_pref || !gui_pref[classkey]) return;
+        if(!gui_pref || !gui_pref[classkey]) return null;
         if(ajaxplorer.user.activeRepository && gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository]){
             return gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository][prefName];
         }
@@ -240,6 +415,7 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
+        //if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;
@@ -259,6 +435,61 @@ Class.create("AjxpPane", {
         }
         ajaxplorer.user.setPreference("gui_preferences", guiPref, true);
         ajaxplorer.user.savePreference("gui_preferences");
+    },
+
+
+    buildImageBackgroundFromConfigs:function(configName, forceConfigs){
+        var bgrounds,paramPrefix,bStyles,index, i;
+        if(forceConfigs){
+            bgrounds = forceConfigs;
+            paramPrefix = configName;
+            bStyles = [];
+            index = 1;
+            while(bgrounds[paramPrefix+index]){
+                bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
+                index++;
+            }
+            if (bStyles.length) {
+                i = Math.floor( Math.random() * bStyles.length);
+                this.htmlElement.setAttribute("style", bStyles[i]);
+            }
+            return;
+        }
+
+        var exp = configName.split("/");
+        var plugin = exp[0];
+        paramPrefix = exp[1];
+        var registry = ajaxplorer.getXmlRegistry();
+        var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
+
+
+        bgrounds = {};
+        configs.each(function(c){
+            bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
+        });
+        defaults.each(function(d){
+            if(!d.getAttribute('defaultImage')) return;
+            var n = d.getAttribute("name");
+            if(!bgrounds[n]){
+                bgrounds[n] = d.getAttribute("defaultImage");
+            }else{
+                if(getBaseName(bgrounds[n]) == bgrounds[n]){
+                    bgrounds[n] = window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
+                }
+            }
+        });
+        bStyles = [];
+        index = 1;
+        while(bgrounds[paramPrefix+index]){
+            bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
+            index++;
+        }
+        if (bStyles.length) {
+            i = Math.floor( Math.random() * bStyles.length);
+            this.htmlElement.setAttribute("style", bStyles[i]);
+        }
+
     }
 
 });

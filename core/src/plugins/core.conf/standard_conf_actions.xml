@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
+        <action name="get_xml_registry">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="state">
+            <processing>
+                <serverCallback methodName="switchAction" restParams="/xPath+" sdkMethodName="getAccountData" developerComment="REST equivalent of the get_xml_registry query, to load some non-workspace-specific data based on a registry xPath. Output format can be sent back in JSON (XML by default).">
+                    <input_param name="xPath" type="string" description="Optional xPath to search in registry"/>
+                    <input_param name="format" type="string" description="Optional format parameter, xml by default, can be forced to json"/>
+                    <output type="JSON|XML" description="Return XML or JSON depending on the format parameter."/>
+                </serverCallback>
+            </processing>
+        </action>
 		<action name="switch_repository">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
+			</processing>
+		</action>
+		<action name="load_repository_info">
+			<processing>
+				<serverCallback methodName="switchAction" restParams="/" developerComment="Retrieve some plugins-contributed info about the workspace (e.g. Quota, Sharing status, etc).">
+                    <output type="JSON" description="Array of plugins informations"/>
+				</serverCallback>
 			</processing>
 		</action>
         <action name="user_create_repository">
@@ -24,7 +45,7 @@
                             Event.stop(e);
                             new Effect.Parallel([
                                 new Effect.Morph('user_templates_selector', {style:'left:0px;'}),
-                                new Effect.Morph('user_template_parameters', {style:'left:250px;'}),
+                                new Effect.Morph('user_template_parameters', {style:'left:420px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+conn.ORIGINAL_HEIGHT+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:1.0,to:0}),
                                 new Effect.Opacity(backButton, {sync:true,from:1.0,to:0})
@@ -54,9 +75,9 @@
                             var elements = $('user_tpl_params_parameters').select("div.SF_element");
                             $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
                             var targetHeight = parseInt($('user_template_parameters').getHeight());
-                             if(!targetHeight) targetHeight = params.length * 40 + 80;
+                             if(!targetHeight) targetHeight = params.length * 44 + 80;
                             new Effect.Parallel([
-                                new Effect.Morph('user_templates_selector', {style:'left:-250px;'}),
+                                new Effect.Morph('user_templates_selector', {style:'left:-420px;'}),
                                 new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
@@ -66,7 +87,7 @@
                        conn.onComplete = function(transport){
                             conn.TPL_XML = transport.responseXML;
                             var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*31+25);
+                            conn.ORIGINAL_HEIGHT = (templates.length*39+25);
                             $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                             $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
                             for(var i=0;i<templates.length;i++){
@@ -74,13 +95,12 @@
                                 var tplId = templates[i].getAttribute('repository_id');
                                 var labelDiv = new Element('div').update(label);
                                 labelDiv.setStyle({
-                                    padding:'6px',
-                                    paddingLeft:'32px',
+                                    padding:'12px 6px 12px 35px',
                                     fontSize:'1.3em',
                                     cursor:'pointer',
                                     borderBottom:'1px solid #EEE',
                                     backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: '5px 5px',
+                                    backgroundPosition: '5px 10px',
                                     backgroundImage:'url('+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=big)'
                                 });
                                 var tplDiv = new Element('div', {"data-templateId":tplId,"data-templateLabel":label}).update(labelDiv);
@@ -112,10 +132,10 @@
 					]]></dialogOnComplete>
 				</clientCallback>
 				<clientForm id="user_create_repository_form"><![CDATA[
-					<div id="user_create_repository_form" action="user_create_repository" box_width="270">
-					    <div id="user_tpl_container" style="position:relative;width:248px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
-						<div id="user_templates_selector" style="position:absolute;width:250px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
-						<div id="user_template_parameters" style="position:absolute;left:250px;width:250px;">
+					<div id="user_create_repository_form" action="user_create_repository" box_width="420" box_padding="0">
+					    <div id="user_tpl_container" style="position:relative;width:418px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
+						<div id="user_templates_selector" style="position:absolute;width:420px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
+						<div id="user_template_parameters" style="position:absolute;left:420px;width:420px;">
 						    <div id="user_tpl_params_title" class="panelHeader panelHeaderWithIcon"></div>
 						    <div style="padding:5px;">
 						        <div class="dialogLegend" style="clear:left;">AJXP_MESSAGE[422]</div>
@@ -125,27 +145,27 @@
 						</div>
 					</div>
 				]]></clientForm>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
 		<action name="get_user_templates_definition">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_user_template_logo">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="user_delete_repository">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="user_delete_user">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_bookmarks">
@@ -160,7 +180,7 @@
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
                     if(!$('get_bookmarks_button')) {
-                        ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
+                        if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
@@ -187,32 +207,37 @@
                     bmBar.load($H(), true);
                 }, 500);
                 ]]></clientListener>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="save_user_pref">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_binary_param" skipSecureToken="true">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_global_binary_param" skipSecureToken="true">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="store_binary_temp">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
         <action name="user_list_authorized_users">
             <processing>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction" restParams="/value" developerComment="List users that are visible to the currently logged users">
+                    <input_param name="value" type="string" description="Search string: users will be searched starting with this value. Can be empty."/>
+                    <input_param name="users_only" type="boolean" description="Whether to return users only or users, groups and roles"/>
+                    <input_param name="existing_only" type="boolean" description="If false and value is a non-existing user, will return a Create User ... entry in the list"/>
+                    <output type="HTML" description="an UL/LI HTML list of users, groups, roles"/>
+                </serverCallback>
             </processing>
         </action>
         <action name="custom_data_edit">
@@ -255,6 +280,83 @@
                 <serverCallback methodName="switchAction"></serverCallback>
             </processing>
         </action>
+        <action name="user_update_user">
+            <gui text="519" title="520" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
+                <context selection="true" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_user"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+
+                        var user = window.actionManager.getDataModel().getUniqueNode();
+                        if(user && user.getAjxpMime() == "shared_user"){
+                            var user_id = getBaseName(user.getPath());
+                            var conn = new Connexion();
+                            conn.setParameters({
+                                get_action:'user_update_user',
+                                user_id:user_id
+                            });
+                            conn.onComplete = function(transport){
+                                var values = $H(transport.responseJSON);
+                                values.set("existing_user_id", user_id);
+
+                                var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                                for(var i=0;i<params.length;i++){
+                                    params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
+                                }
+                                var f = new FormManager();
+                                var def1 = $A();
+                                def1.push($H({
+                                    description: MessageHash[522],
+                                    editable: "true",
+                                    expose: "true",
+                                    label: MessageHash[522],
+                                    name: "existing_user_id",
+                                    scope: "user",
+                                    type: "hidden"
+                                }),$H({
+                                    description: MessageHash[524],
+                                    editable: "true",
+                                    expose: "true",
+                                    label: MessageHash[524],
+                                    name: "new_password",
+                                    scope: "user",
+                                    type: "password-create"
+                                }));
+                                var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                                definitions.each(function(el){ def1.push(el); });
+                                f.createParametersInputs(oForm.down('#user_create_user'), def1, true, values, false, true);
+                                modal.refreshDialogPosition();
+
+                            };
+                            conn.sendAsync();
+                        }
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[
+                        var params = $H();
+                        var f = new FormManager();
+                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
+                          var conn = new Connexion();
+                          params.set("get_action", "user_create_user");
+                          conn.setParameters(params);
+                          conn.setMethod("POST");
+                          conn.onComplete = function(transport){
+                                if(transport.responseText == "SUCCESS"){
+                                   if($("address_book")){
+                                        $("address_book").ajxpPaneObject.reloadDataModel();
+                                  }
+                                  ajaxplorer.displayMessage("SUCCESS", MessageHash[521]);
+                                }
+                          };
+                          conn.sendAsync();
+                    ]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                </clientCallback>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
         <action name="user_create_user">
       			<gui text="484" title="485" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
       				<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
@@ -270,18 +372,18 @@
                         var f = new FormManager();
                         var def1 = $A();
                         def1.push($H({
-                            description: "User ID",
+                            description: MessageHash[522],
                             editable: "true",
                             expose: "true",
-                            label: "User ID",
+                            label: MessageHash[522],
                             name: "new_user_id",
                             scope: "user",
                             type: "string"
                         }),$H({
-                            description: "New user password",
+                            description: MessageHash[523],
                             editable: "true",
                             expose: "true",
-                            label: "Password",
+                            label: MessageHash[523],
                             name: "new_password",
                             scope: "user",
                             type: "password-create"
@@ -506,24 +608,63 @@
         </action>
 	</actions>
     <client_configs>
-        <component_config className="AjxpTabulator::userdashboard_parameters_tab">
+        <component_config className="AjxpTabulator::userdashboard_main_tab">
             <additional_tab id="webdav_pane"
                             tabInfo='{"id":"my-webdav-data","iconClass":"icon-cog","element":"webdav_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":3}'
                             paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" class="tabbed_editor">
-                    <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
-                    <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
-                    <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
-                        <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px !important;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+                    <div class="action_bar" style="height: 33px;">&nbsp;</div>
+                    <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
+                    <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
+                        <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
+                        <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
+                        <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
+                            <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px !important;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+                        </div>
+                        <div class="dialogLegend" style="margin: 10px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
+                        <input type="text" style="width: 95% !important;" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
+                        <div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
+                        <span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
+                        <div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto; margin: 10px;"></div>
+                        <input type="hidden" name="get_action" value="webdav_preferences">
                     </div>
-                    <div class="dialogLegend" style="margin: 10px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
-                    <input type="text" style="width: 95% !important;" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
-                    <div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
-                    <span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
-                    <div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto; margin: 10px;"></div>
-                    <input type="hidden" name="get_action" value="webdav_preferences">
                 </div>
                 ]]></additional_tab>
+        </component_config>
+        <component_config className="InfoPanel">
+            <infoPanelExtension mime="ajxp_root_node" attributes="">
+                <messages>
+                    <message key="shared_string" id="527"/>
+                    <message key="internal_string" id="528"/>
+                    <message key="external_string" id="530"/>
+                </messages>
+                <html><![CDATA[
+                    <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
+                        <div class="panelHeader">#{shared_string}</div>
+                        <div id="ajxp_workspace_info_panel_content"></div>
+                        <script>
+                            bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+                                if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
+                                    return;
+                                }
+                                if(!ajaxplorer.user) return;
+                                var conn = new Connexion();
+                                conn.setParameters({get_action:'load_repository_info'});
+                                conn.onComplete = function(transport){
+                                    if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
+                                        var data = transport.responseJSON;
+                                        if(!data['core.users']['external']){
+                                            data['core.users']['external'] = 0;
+                                        }
+                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
+                                    }
+                                };
+                                conn.sendAsync();
+                            });
+                        </script>
+                    </div>
+                ]]></html>
+            </infoPanelExtension>
         </component_config>
     </client_configs>
 </registry_contributions>

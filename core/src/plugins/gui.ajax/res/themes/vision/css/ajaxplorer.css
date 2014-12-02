@@ -98,6 +98,24 @@ textarea{
     border: 1px solid #5E7C90;
 }
 
+kbd {
+    padding: .1em .6em;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    font-family: Arial,Helvetica,sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 0 .1em;
+    text-shadow: 0 1px 0 #fff;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
 .tooltipped
 {
     background-color: #ffffc0;
@@ -276,6 +294,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     background-position: 5px 4px;
     color: rgb(80, 82, 83);
     letter-spacing: 1px;
+    background-size: 16px;
 }
 
 .overlay_icon_div{
@@ -356,6 +375,7 @@ div.shadow_class
     padding: 0;
     -moz-border-radius:5px;
     border-radius: 3px;
+    min-width: 260px;
 }
 
 .editBox
@@ -1027,7 +1047,7 @@ input.SF_input.SF_number{
 .SF_horizontal_labelRow div.SF_label{
     float:left;
     text-align: left;
-    padding: 0 5px 0 3px;
+    padding: 8px 5px 0 3px;
     margin-right: 5px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1128,6 +1148,10 @@ input.SF_input.SF_number{
     padding: 7px !important;
 }
 
+.ajxp_password_auth div.SF_element:first-of-type{
+    display: none !important;
+}
+
 /***************/
 /*ACTION BAR   */
 /***************/
@@ -1137,9 +1161,7 @@ input.SF_input.SF_number{
 #global_toolbar{
     background-color: #474E50;
     height: 30px;
-    padding: 9px 0 0 5px;
-    background-image: url("../images/white_logo.png");
-    background-repeat: no-repeat;
+    padding: 12px 0 4px 5px !important;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
@@ -2231,6 +2253,43 @@ div#upload_files_list, div#multiple_download_container
     background-color: #c3d9ff !important;
 }
 
+#uploader_chooser{
+    width: 100%;
+}
+
+#uploader_chooser ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: block;
+    position: relative;
+    border-bottom: 1px solid #77b8e2;
+}
+
+#uploader_chooser li {
+    display: inline-block;
+    padding: 12px 14px;
+    border-radius: 4px 4px 0 0;
+    margin: 8px 2px;
+    margin-bottom: 0;
+    border-bottom: 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#uploader_chooser li:hover {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #f5f5f5;
+}
+#uploader_chooser li.current:hover {
+}
+#uploader_chooser li.current {
+    font-weight: bold;
+    cursor: default;
+    border-bottom: 2px solid #77b8e2;
+}
+
+
 #content_pane.dropareaHover {
     border-color: #D96252 !important;
     border-style: dashed;
@@ -2630,7 +2689,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     float: right;
     text-align: right;
     padding-right: 11px;
-    height: 35px;
+    height: 34px;
     overflow: hidden;
 }
 #search_form a
@@ -3093,6 +3152,22 @@ td.infoPanelLabel {
     vertical-align: top;
 }
 
+div.infoPanelLabel, div.infoPanelValue{
+    font-size: 12px;
+    padding: 7px 6px;
+    float: left;
+}
+div.infoPanelLabel{
+    color: #555;
+    text-align: right;
+    width: 32%;
+}
+div.infoPanelValue{
+    width: 55%;
+    color: rgb(111, 121, 131);
+    min-height: 22px;
+}
+
 .infoPanelGroup
 {
     border-radius: 0;
@@ -3105,15 +3180,11 @@ td.infoPanelLabel {
     padding: 6px 7px;
     background-color: rgba(138, 149, 160, 0.65) !important;
     border-bottom: 0 !important;
-
+    clear: left;
 }
 
 .panelContent.scrolling div.panelHeader{
     padding-right: 13px;
-}
-
-tr td.infoPanelLabel
-{
 }
 
 .infoPanelImagePreview
@@ -3699,6 +3770,225 @@ div.autocomplete_readonly span.delete_user_entry{
     color: #555555;
 }
 
+/***********************/
+/* SHARE DIALOG & BUTTONS
+/***********************/
+#share-folder-minisite-public_button.disabled,
+#share-file-minisite_button.disabled{
+    display: none;
+}
+
+input.share_info_panel_link{
+    width: 98% !important;
+    margin-left: 0;
+    font-size: 16px;
+    height: 16px;
+    padding: 5px 2px;
+}
+
+#ajxp_shared_info_panel > div.infoPanelTable{
+    margin: 3%;
+    width: 94%;
+}
+
+#share_folder_form div.SF_element > div.SF_label {
+    float: none;
+    text-align: left;
+    padding: 0;
+}
+
+#share_folder_form div.dialogContentMainTitle {
+    margin: 20px 0 0;
+}
+
+#share_folder_form div.SF_element > input.SF_input,
+select.minisite_layout_selector
+{
+    width: 96% !important;
+}
+
+div#share-folder-type-chooser {
+    font-size: 13px;
+    margin: 0 6px;
+    line-height: 25px;
+}
+
+.share_leaf div.no_share_leaf,
+.share_leaf span.no_share_leaf,
+div.only_share_leaf,
+span.only_share_leaf
+{
+    display: none !important;
+}
+
+.share_leaf div.only_share_leaf{
+    display: block !important;
+}
+
+.share_leaf span.only_share_leaf{
+    display: inline !important;
+}
+
+input#shared_user{
+    width: 370px !important;
+}
+
+div#target_repository_toggle{
+    display: none !important;
+}
+
+.share_edit div#target_repository_toggle{
+    display: block !important;
+    width: 400px;
+}
+
+.share_edit div#target_repository_toggle span{
+    display: inline;
+}
+
+.share_edit div#target_repository_toggle div.SF_horizontal_actions{
+    text-align: right;
+    margin-top: 5px;
+    margin-bottom: -20px;
+    padding-right: 0;
+}
+
+.share_edit div#target_repository,
+.share_edit div#share-folder-type-chooser,
+.share_edit div#share-folder-type-leaf
+{
+    display: none !important;
+}
+
+.share_edit.edit_parameters div#target_repository,
+.share_edit.type-ws div#target_repository
+{
+    display: block !important;
+}
+
+#target_repository_toggle a {
+    border-bottom: 1px solid #555;
+    cursor: pointer;
+}
+#share_generate{
+    height: 40px;
+}
+
+#share_generate div.largeButton{
+    background-color: #4aCEB0;
+}
+
+#shareDialogButtons{
+    padding-top: 30px;
+    text-align: center;
+}
+
+div#share_update{
+    text-align: center;
+    display: none !important;
+}
+
+div#share_result div.non_macos,
+div#share_result div.macos_only
+{
+    font-size:13px;
+    padding:10px 0 0;
+    text-align:center;
+}
+
+.edit_parameters div#shareDialogButtons,
+.edit_parameters div#share_result
+{
+    display: none;
+}
+
+.edit_parameters div#share_update{
+    display: block !important;
+}
+
+#target_repository_toggle span.params_hide,
+.edit_parameters div#target_repository_toggle span.params_view
+{
+    display: none !important;
+}
+.edit_parameters div#target_repository_toggle span.params_hide{
+    display: inline !important;
+}
+
+.share_edit.type-ws span.params_hide, .share_edit.type-ws span.params_view{
+    display: none !important;
+}
+
+#shareDialogButtons div.largeButton,
+#share_update div.largeButton
+{
+    padding: 5px 15px 7px !important;
+    display: inline-block;
+    float: none;
+}
+
+.share_edit.type-ws div#shareDialogButtons{
+    padding-top: 10px;
+}
+.share_edit.type-ws div#shareDialogButtons div.largeButton,
+.share_edit.type-ws div#share_update div.largeButton
+{
+    display: block;
+    margin: 8px 80px;
+}
+
+#shareDialogButtons div.largeButton.destruct{
+    background-color: #A00;
+}
+
+.share_dialog_toggler{
+    cursor: pointer;
+}
+
+.share_dialog_toggler span.toggler_arrow{
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    transform:rotate(270deg);
+}
+
+.share_dialog_toggler_closed span.toggler_arrow{
+    transform:rotate(0deg);
+}
+
+.share_dialog_toggled{
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
+.share_dialog_toggled_closed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+#editable_hash_link{
+    margin:4px 10px;
+    font-size:13px;
+}
+
+#description_parameters{
+    margin: 5px 0;
+}
+
+#editable_hash_parameters{
+    margin: 5px;
+}
+
+#ws_shared_users_parameters{
+    margin: 0 5px;
+    position: relative;
+}
+
+#share_folder_form{
+    max-width: 400px;
+}
+
+
 div.user_entry span.cbContainer{
 
 }
@@ -3756,6 +4046,7 @@ textarea.editor
 div.icons_only.diaporama_toolbar{
     height: 33px !important;
     width: 470px;
+    max-width:80%;
 }
 div.diaporama_toolbar div#diaporama_legend{
     display: none;
@@ -4808,6 +5099,25 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     color: white;
 }
 
+span.letter_badge {
+    display: inline-block;
+    float: left;
+    width: 32px;
+    background-color: rgb(78, 167, 165);
+    border-radius: 34px;
+    color: white;
+    text-align: center;
+    padding: 7px 0;
+    font-size: 0.8em;
+    font-family: "Open Sans Regular";
+}
+
+.rootDirChooser span.letter_badge{
+    display: none;
+}
+
+
+
 #action_instance_user_create_repository {
     font-size: 14px;
     line-height: 21px;
@@ -4968,4 +5278,43 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
           transform: scale(1.0);
           -webkit-transform: scale(1.0);
       }
+}
+
+#ajxp_workspace_info_panel{
+    margin: 0 !important;
+}
+
+#ajxp_workspace_info_panel_content,
+#ajxp_quota_panel_content
+{
+    color: rgb(111, 121, 131);
+    padding: 10px !important;
+}
+
+tr[data-groupByValue],
+div[data-groupByValue]
+{
+    clear: left;
+    max-height: 480px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+tr[data-groupByValue]:first-child,
+div[data-groupByValue]:first-child
+{
+    margin-top: 10px;
+}
+
+div[data-groupByValue] h3,
+tr[data-groupByValue] h3
+{
+    font-size: 16px;
+    margin: 10px 0 10px 14px;
+    color: rgb(111, 121, 131);
+    font-weight: normal;
+}
+
+h3.dashboard_panel_title{
+    display: none;
 }

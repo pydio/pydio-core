@@ -15,10 +15,10 @@
 			<div id="roleTabulator">
                 <div class="action_bar"><a href="#" onclick="return false;" class="disabled icon-save" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a></div>
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-infos"><span>AJXP_MESSAGE[ajxp_role_editor.3]</span></li>
-                    <li class="" data-PaneID="pane-acls"><span>AJXP_MESSAGE[ajxp_role_editor.4]</span></li>
-                    <li class="" data-PaneID="pane-actions"><span>AJXP_MESSAGE[ajxp_role_editor.5]</span></li>
-                    <li class="" data-PaneID="pane-parameters"><span>AJXP_MESSAGE[ajxp_role_editor.6]</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><i class="icon-info-sign"></i> <span>AJXP_MESSAGE[ajxp_role_editor.3]</span></li>
+                    <li class="" data-PaneID="pane-acls"><i class="icon-lock"></i> <span>AJXP_MESSAGE[ajxp_role_editor.4]</span></li>
+                    <li class="" data-PaneID="pane-actions"><i class="icon-reorder"></i> <span>AJXP_MESSAGE[ajxp_role_editor.5]</span></li>
+                    <li class="" data-PaneID="pane-parameters"><i class="icon-cog"></i> <span>AJXP_MESSAGE[ajxp_role_editor.6]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
@@ -30,10 +30,12 @@
                     <div id="account_custom"></div>
 	            </div>
                 <div id="pane-acls">
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.45]</div>
                     <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.9]</div>
-                    <div id="acls-selected"></div>
+                    <div id="acls-selected" class="innerContainer"></div>
                 </div>
                 <div id="pane-actions">
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.46]</div>
                     <div id="actions-selector">
                         <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.10]</div>
                         <div class="SF_element">
@@ -51,9 +53,10 @@
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div id="actions-selected"></div>
+                    <div id="actions-selected" class="innerContainer"></div>
                 </div>
                 <div id="pane-parameters">
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.44]</div>
                     <div id="parameters-selector">
                         <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.16]</div>
                         <div class="SF_element">
@@ -71,7 +74,7 @@
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div id="parameters-selected"></div>
+                    <div id="parameters-selected" class="innerContainer"></div>
                 </div>
 			</div>
 		</div>

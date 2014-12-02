@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"HTML Uploader" => "HTML Uploader",
+"HTML Uploader" => "Standard",
 "Auto-switching HTML5 or IFrame uploader." => "Auto-switching HTML5 or IFrame uploader.",
 "Default Behaviour" => "Default Behaviour",
 "Existing Files" => "Existing Files",

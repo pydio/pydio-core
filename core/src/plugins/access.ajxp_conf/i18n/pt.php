@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
- */
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*/
 $mess=array(
 "1" => "Dados de Configuração",
 "2" => "Utilizadores e Grupos",
@@ -140,10 +140,12 @@ $mess=array(
 "118" => "Novo Grupo",
 "group_access" => "G",
 "119" => "Definir grupo do utilizador",
-    "120" => "Go Pro",
-    "121" => "Get professional support for your install",
-    "122" => "All Settings",
-    "123" => "Other plugins",
-    "124" => "Group successfully created",
-    "125" => "Group successfully deleted"
+"120" => "Go Pro",
+"121" => "Get professional support for your install",
+"122" => "All Settings",
+"123" => "Other plugins",
+"124" => "Source",
+"125" => "Alias",
+"126" => "Are you sure that you want to delete the selected element(s)?",
+"127" => "Warning, please do not use special characters, user would be created with login id '%s'",
 );

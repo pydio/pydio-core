@@ -21,7 +21,7 @@
 $mess=array(
     "1" => "Password Reset",
     "2" => "Set your new password",
-    "3" => "Enter your user ID",
+    "3" => "Please enter your login, a reset password will be sent to you by email.",
     "4" => "Your identifier",
     "5" => "A reset password request has been sent to the email registered with your account. Click on the link in the email to recreate a password.",
     "6" => "Thank you, you can now log in!",

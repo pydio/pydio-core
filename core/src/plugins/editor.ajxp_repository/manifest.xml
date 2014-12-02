@@ -20,18 +20,26 @@
 			<div id="repositoryTabulator">
                 <div class="action_bar"><a href="#" onclick="return false;" class="icon-save disabled" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a></div>
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-infos"><span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
-                    <li class="" data-PaneID="pane-metas"><span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><i class="icon-cogs"></i> <span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
+                    <li class="" data-PaneID="pane-metas"><i class="icon-puzzle-piece"></i> <span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
+                    <li class="" data-PaneID="pane-shares"><i class="icon-share"></i> <span ajxp_message_id="ajxp_repository_editor.4">Shares</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
 	            <div id="pane-infos">
 	            </div>
-                <div id="pane-metas" style="padding:10px 0;">
+                <div id="pane-metas">
+                    <div class="innerTitle" tabindex="0">Workspace additional features</div>
+                    <div class="dialogLegend" style="padding: 0 20px;"></div>
                     <div id="metaTabulator" style="clear:both;">
-                        <ul class="tabrow"></ul>
-                        <div class="tabpanes"></div>
+                        <ul class="tabrow innerTabRow"></ul>
+                        <div class="tabpanes innerContainer" style="margin: 3px 10px;padding: 3px;"></div>
                     </div>
+                </div>
+                <div id="pane-shares">
+                    <div id="shares-toolbar" style="float: right;margin: 4px 20px;"></div>
+                    <div class="innerTitle" tabindex="0">Shared Files and Folders from this workspace</div>
+                    <div id="shares-list" class="innerContainer"></div>
                 </div>
 			</div>
 		</div>

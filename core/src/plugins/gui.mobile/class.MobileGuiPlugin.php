@@ -33,4 +33,35 @@ class MobileGuiPlugin extends AJXP_Plugin
         if(!AJXP_Utils::userAgentIsMobile()) throw new Exception("no");
     }
 
+    public function parseSpecificContributions(&$contribNode){
+
+        if($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive()){
+            // remove template_part for orbit_content
+            $xPath=new DOMXPath($contribNode->ownerDocument);
+            $tplNodeList = $xPath->query('template_part[@ajxpId="orbit_content"]', $contribNode);
+            if(!$tplNodeList->length) return ;
+            $contribNode->removeChild($tplNodeList->item(0));
+        }
+
+    }
+
+    private function orbitExtensionActive(){
+        $confs = ConfService::getConfStorageImpl()->loadPluginConfig("gui", "ajax");
+        if(!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
+        if($confs["GUI_THEME"] == "orbit"){
+            $pServ = AJXP_PluginsService::getInstance();
+            $activePlugs    = $pServ->getActivePlugins();
+            $streamWrappers = $pServ->getStreamWrapperPlugins();
+            $streamActive   = false;
+            foreach($streamWrappers as $sW){
+                if((array_key_exists($sW, $activePlugs) && $activePlugs[$sW] === true)){
+                    $streamActive = true;
+                    break;
+                }
+            }
+            return $streamActive;
+        }
+        return false;
+    }
+
 }

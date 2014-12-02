@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "1" => "Réinitialisation",
-    "2" => "Mot de passe perdu",
-    "3" => "Entrez votre identifiant utilisateur",
-    "4" => "Identifiant",
-    "5" => "Un email contenant une demande de réinitialisation du mot de passe a été envoyé à l'adresse enregistrée avec votre compte. Cliquez sur le lien du mail pour créer un nouveau mot de passe.",
+    "1" => "Réinitialisation du mot de passe",
+    "2" => "Définissez votre nouveau mot de passe",
+    "3" => "Entrez votre identifiant utilisateur, une demande de réinitialisation vous sera envoyée par courriel.",
+    "4" => "Votre identifiant",
+    "5" => "Un courriel contenant une demande de réinitialisation du mot de passe a été envoyé à l'adresse courriel enregistrée dans votre compte. Cliquez sur le lien du courriel pour créer un nouveau mot de passe.",
     "6" => "Merci, vous pouvez à présent vous connecter avec ce nouveau mot de passe!",
-    "7" => "Une demande de réinitialisation de mot de passe a été demandée pour le compte associé à cet email. Si vous n'en êtes pas l'auteur, vous pouvez ignorer cet email. Sinon cliquez sur le lien suivant:",
+    "7" => "Une demande de réinitialisation de mot de passe a été demandée pour le compte associé à ce courriel. Si vous n'en êtes pas l'auteur, vous pouvez ignorer ce courriel. Sinon cliquez sur le lien suivant :",
 );

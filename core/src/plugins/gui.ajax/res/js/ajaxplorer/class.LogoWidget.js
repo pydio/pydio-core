@@ -19,9 +19,17 @@
  */
 Class.create("LogoWidget", AjxpPane, {
 
+    _imageParameter:null,
+    _imagePlugin:null,
+
     initialize : function($super, element, options){
         $super(element, options);
-        var configs = ajaxplorer.getPluginConfigs("guidriver");
+        var paramLocation = options.imageParameter || "gui.ajax/CUSTOM_TOP_LOGO";
+        var parts = paramLocation.split("/");
+        this._imagePlugin = parts[0];
+        this._imageParameter = parts[1];
+
+        var configs = ajaxplorer.getPluginConfigs(this._imagePlugin);
         this.updateConfig(configs);
         if(options.link){
             var linkTitle;
@@ -29,28 +37,39 @@ Class.create("LogoWidget", AjxpPane, {
                 if(MessageHash[options.linkTitle]) linkTitle = MessageHash[options.linkTitle];
                 else linkTitle = options.linkTitle;
             }
+            var clickObs = function(){
+                if(options.link.startsWith('triggerRepositoryChange:')){
+                    ajaxplorer.triggerRepositoryChange(options.link.replace('triggerRepositoryChange:',''));
+                }else{
+                    if(options.linkTarget && options.linkTarget == 'new'){
+                        window.open(options.link);
+                    }else{
+                        document.location.href = options.link;
+                    }
+                }
+            };
+            var observeElement;
             if(this.image){
-                if(linkTitle) this.image.writeAttribute("title", linkTitle);
-                this.image.observe("click", function(){
-                    if(options.linkTarget && options.linkTarget == 'new'){
-                        window.open(options.link);
-                    }else{
-                        document.location.href = options.link;
-                    }
+                observeElement = this.image;
+            }else if(this.titleDiv){
+                observeElement = this.titleDiv;
+            }else{
+                var clickable = new Element('div', {title:linkTitle});
+                clickable.setStyle({
+                    cursor:'pointer',
+                    height:element.getHeight() + 'px',
+                    position:'absolute',
+                    top:0,
+                    left:0,
+                    width:'180px'
                 });
-                this.image.addClassName("linked");
+                element.insert({top:clickable});
+                observeElement = clickable;
             }
-            if(this.titleDiv){
-                if(linkTitle) this.titleDiv.writeAttribute("title", linkTitle);
-                this.titleDiv.observe("click", function(){
-                    if(options.linkTarget && options.linkTarget == 'new'){
-                        window.open(options.link);
-                    }else{
-                        document.location.href = options.link;
-                    }
-                });
-                this.titleDiv.addClassName("linked");
-            }
+            if(linkTitle) observeElement.writeAttribute("title", linkTitle);
+            observeElement.observe("click", clickObs);
+            observeElement.addClassName("linked");
+
         }
 
     },
@@ -64,9 +83,9 @@ Class.create("LogoWidget", AjxpPane, {
             }else{
                 this.titleDiv.update(configs.get("CUSTOM_TOP_TITLE"));
             }
-            if(!configs.get("CUSTOM_TOP_LOGO") || configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original'){
+            if(!configs.get(this._imageParameter) || configs.get(this._imageParameter) == 'ajxp-remove-original'){
                 if(this.image){
-                    this.image.remove();
+                    if(this.image.parentNode) this.image.remove();
                     this.image = null;
                 }
                 this.resizeImage(configs, true);
@@ -75,19 +94,32 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.remove();
             this.titleDiv = null;
         }
-
-        if(configs.get("CUSTOM_TOP_LOGO") && configs.get("CUSTOM_TOP_LOGO") != 'ajxp-remove-original'){
+        var defaultImage = ajaxplorer.getDefaultImageFromParameters(this._imagePlugin, this._imageParameter);
+        if((configs.get(this._imageParameter) || defaultImage) && configs.get(this._imageParameter) != 'ajxp-remove-original'){
             var parameter = 'binary_id';
-            if(configs.get("CUSTOM_TOP_LOGO_ISTMP")){
+            if(configs.get( this._imageParameter + "_ISTMP")){
                 parameter = 'tmp_file';
             }
-            var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get("CUSTOM_TOP_LOGO");
-            if(configs.get("CUSTOM_TOP_LOGO").indexOf('plugins/') === 0){
-                // It's not a binary but directly an image.
-                url = configs.get("CUSTOM_TOP_LOGO");
+            var url;
+            if(configs.get(this._imageParameter)){
+                url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get(this._imageParameter);
+                if(configs.get(this._imageParameter).indexOf('plugins/') === 0){
+                    // It's not a binary but directly an image.
+                    url = configs.get(this._imageParameter);
+                }
+            }else{
+                url = defaultImage;
+                this.imageIsDefault = true;
+                // Get parameters defaults
+                $A([this._imageParameter + "_H", this._imageParameter + "_W",this._imageParameter + "_L", this._imageParameter + "_T"]).each(function(param){
+                    var v = XPathGetSingleNodeText(ajaxplorer.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default");
+                    if(!v) v = 0;
+                    configs.set(param, parseInt(v));
+                });
             }
             if(!this.image){
                 this.image  = new Image();
+                this.image.addClassName('custom_logo_image');
                 this.image.src = url;
                 this.image.onload = function(){
                     this.resizeImage(configs, true);
@@ -98,8 +130,8 @@ Class.create("LogoWidget", AjxpPane, {
                     this.resizeImage(configs, false);
                 }.bind(this);
             }
-        }else if(configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original' && this.image){
-            this.image.remove();
+        }else if(configs.get(this._imageParameter) == 'ajxp-remove-original' && this.image){
+            if(this.image.parentNode) this.image.remove();
             this.image = null;
             this.htmlElement.setAttribute('style', '');
         }
@@ -113,56 +145,71 @@ Class.create("LogoWidget", AjxpPane, {
         if(this.image){
             var w = this.image.width;
             var h = this.image.height;
-            if(configs.get("CUSTOM_TOP_LOGO_H")){
-                imgH = parseInt(configs.get("CUSTOM_TOP_LOGO_H")) || h;
+            if(configs.get(this._imageParameter + "_H")){
+                imgH = parseInt(configs.get(this._imageParameter + "_H")) || h;
                 imgW = parseInt(imgH * w / h);
-            }else if(configs.get("CUSTOM_TOP_LOGO_W")){
-                imgW = parseInt(configs.get("CUSTOM_TOP_LOGO_W"));
+            }else if(configs.get(this._imageParameter + "_W")){
+                imgW = parseInt(configs.get(this._imageParameter + "_W"));
                 imgH = parseInt(imgW * h / w);
             }
             if(!imgW){
                 imgW = w;
                 imgH = h;
             }
-            var imgTop = parseInt(configs.get("CUSTOM_TOP_LOGO_T")) || 0;
-            var imgLeft = parseInt(configs.get("CUSTOM_TOP_LOGO_L")) || 0;
+            var imgTop = parseInt(configs.get(this._imageParameter + "_T")) || 0;
+            var imgLeft = parseInt(configs.get(this._imageParameter + "_L")) || 0;
             this.image.setStyle({
                 position    : 'absolute',
                 height      : imgH + 'px',
-                width       : imgW + 'px',
+                /*width       : imgW + 'px',*/
                 top         : imgTop + 'px',
                 left        : imgLeft + 'px'
             });
+            this.image.writeAttribute('width', '');
+            this.image.writeAttribute('height', '');
         }else{
             imgW = -3;
             imgH = 0;
         }
         // Reset height
-        this.htmlElement.setStyle({paddingTop:'9px'});
+        this.htmlElement.setStyle({paddingTop:(ajxpBootstrap.parameters.get("theme") == 'orbit' ? 0: '9px')});
         if(imgH > parseInt(this.htmlElement.getHeight())){
             var elPadding = parseInt(this.htmlElement.getStyle('paddingTop')) + (imgH - parseInt(this.htmlElement.getHeight()));
+            if(ajxpBootstrap.parameters.get("theme") == 'orbit'){
+                elPadding += 9;
+            }
             this.htmlElement.setStyle({paddingTop: elPadding + 'px'});
         }
         var htHeight = parseInt(this.htmlElement.getHeight());
 
-        if(!configs.get('SKIP_BY_LOGO')){
+        var has_by = false;
+        if(!configs.get('SKIP_BY_LOGO') && !this.imageIsDefault){
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
-                backgroundPosition : (imgW+10) + 'px '+ (htHeight - 16) +'px'
+                backgroundPosition : (imgW+16) + 'px '+ (htHeight - 18) +'px'
+            });
+            has_by = true;
+        }else{
+            this.htmlElement.setStyle({
+                backgroundImage : 'none'
             });
         }
         if(this.titleDiv){
             this.titleDiv.setStyle({
                 position:'absolute',
-                left : (imgW + 8) + 'px',
-                top : (htHeight - 37) + 'px',
+                left : (imgW + 16) + 'px',
+                top : (htHeight - (has_by?42:39)) + 'px',
                 fontSize : '19px'
             });
         }
 
-        if(insert){
+        if(!(this.htmlElement.down('img.custom_logo_image'))){
             this.htmlElement.insert(this.image);
+        }
+
+        if(this.htmlElement.down('div.linked')){
+            this.htmlElement.down('div.linked').setStyle({height:htHeight+'px'});
         }
 
     }

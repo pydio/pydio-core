@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin enabled="true" id="action.cart" label="CONF_MESSAGE[Selection Cart]" description="CONF_MESSAGE[Select files to a cart and download/share all at once]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin enabled="false" id="action.cart" label="CONF_MESSAGE[Selection Cart]" description="CONF_MESSAGE[Select files to a cart and download/share all at once]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 
     <plugin_info>
         <core_relation packaged="true" tested_version="follow_core"/>
@@ -15,7 +15,7 @@
     </client_settings>
 
     <dependencies>
-        <activePlugin pluginName="action.share"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
     </dependencies>
 
     <registry_contributions>
@@ -30,6 +30,68 @@
                         </div>
                     </div>
                 ]]></additional_tab>
+            </component_config>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="action_cart"><![CDATA[
+                        <div ajxp_position="9" id="action_cart">
+                            <h3 style="color:#E2DECB;" ajxp_message_id="action.cart.10">AJXP_MESSAGE[action.cart.10]</h3>
+                            <div id="cart-manager-header" class="innerTabulator" style="height: 200px;" ajxpClass="AjxpTabulator" ajxpOptions='{"saveState":true, "defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                                <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"fit":"content", "nodeProviderProperties":{}}'></div>
+                            </div>
+                        </div>
+                        <style>
+                        #action_cart{
+                            position: relative;
+                        }
+                        #action_cart #display_toolbar{
+                            position: absolute;
+                            display: block;
+                            top: 12px;
+                            right: 10px;
+                        }
+                        #action_cart div.tabulatorContainer.panelHeader{
+                            margin: 0 15px;
+                            border-radius: 5px;
+                            padding: 3px 2px;
+                            background-color: transparent;
+                        }
+                        #action_cart div.tabulatorContainer.panelHeader div.toolbarGroup a{
+                            color: #ccc !important;
+                        }
+                        div[ajxpClass="CartManager"]{
+                            height: auto !important;
+                            min-height: 180px;
+                        }
+                        #action_cart .innerTabulator span.toggleHeader{
+                            background-color: #E2DECB;
+                            border: 1px solid #E2DECB;
+                            color: #555;
+                            border-radius: 16px;
+                            margin-right: 4px;
+                            padding: 2px 6px;
+                        }
+                        #action_cart .innerTabulator span.toggleHeader.toggleInactive{
+                            background-color: transparent;
+                            color: #ccc;
+                        }
+                        #search_panel div#display_toolbar {
+                            margin-right: 40px;
+                            margin-top: 5px;
+                        }
+                        a#create-cart-from-search_button{
+                            color: #999 !important;
+                            font-size: 1.4em;
+                        }
+                        #action_cart div.class-FetchedResultPane{
+                            border-radius: 15px;
+                            margin: 0px 15px 10px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                        }
+                        #action_cart div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+                            padding: 2px 0px;
+                        }
+                        </style>
+                ]]></additional_content>
             </component_config>
         </client_configs>
         <actions>
@@ -74,7 +136,7 @@
             </action>
             <action name="send-selection-to-cart">
                 <gui src="" text="action.cart.1" title="action.cart.2" iconClass="icon-suitcase">
-                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="change"/>
+                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="more"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>

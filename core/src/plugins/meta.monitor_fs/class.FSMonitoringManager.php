@@ -26,13 +26,17 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class FSMonitoringManager extends AJXP_Plugin
+class FSMonitoringManager extends AJXP_AbstractMetaSource
 {
     private $repoBase;
 
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     */
     public function initMeta($accessDriver)
     {
-        $repo = ConfService::getRepository();
+        parent::initMeta($accessDriver);
+        $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
     }
 

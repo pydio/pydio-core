@@ -21,8 +21,8 @@
 $mess=array(
 "DB Storage" => "DB Storage",
 "Stores the Authentication data in an SQL database." => "Stores the Authentication data in an SQL database.",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
+"Connexion" => "Connection",
+"The Database Connexion" => "The Database Connection",
 "DB Auth Storage" => "DB Auth Storage",
 "SQL Tables" => "SQL Tables",
 "Install SQL Tables" => "Install SQL Tables",

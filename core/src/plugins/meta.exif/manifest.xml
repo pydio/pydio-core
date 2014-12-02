@@ -13,7 +13,7 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"/>
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">
@@ -25,7 +25,10 @@
 		<actions>
 			<action name="extract_exif">
 				<processing>
-					<serverCallback methodName="extractExif"/>
+					<serverCallback methodName="extractExif" restParams="/file+" developerComment="Extract all exif data from a compatible image (JPG).">
+                        <input_param name="file" type="path" description="Path to the file to analyze"/>
+                        <output type="XML" description="An XML structure containing all Exif tags"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>

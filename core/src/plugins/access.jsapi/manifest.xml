@@ -91,6 +91,7 @@
 				</columns>
 			</component_config>
 		</client_configs>
+        <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 	</registry_contributions>
 	<dependencies>
 		<pluginResources pluginName="gui.ajax"/>

@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Classes and Interfaces",
-"2" => "Properties and Methods",
-"3" => "Source File",
+"1" => "Classes et Interfaces",
+"2" => "Propriétés et Méthodes",
+"3" => "Fichier source",
 );

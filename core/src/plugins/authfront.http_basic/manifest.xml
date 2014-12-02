@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="authfront.http_basic" enabled="true" label="CONF_MESSAGE[Basic Http FrontEnd]" description="CONF_MESSAGE[Send a basic http request to the user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/authfront.http_basic/class.BasicHttpAuthFrontend.php" classname="BasicHttpAuthFrontend"/>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="10"/>
+        <global_param name="PROTOCOL_TYPE" type="select"
+                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="no_session"/>
+    </server_settings>
+</ajxpcore>

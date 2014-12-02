@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin label="CONF_MESSAGE[]" description="CONF_MESSAGE[]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ajxp_plugin label="CONF_MESSAGE[Bootstrap Loader]" description="CONF_MESSAGE[Core plugin for loading the framework. Do NOT disable this plugin!]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_provider" id="boot.conf">
     <class_definition classname="BootConfLoader" filename="plugins/boot.conf/class.BootConfLoader.php" />
     <client_settings>
@@ -14,6 +14,8 @@
         <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_PASS" type="password" label="CONF_MESSAGE[Admin Password]" description="CONF_MESSAGE[Use a strong password (more than 8 characters, complicated ones.]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" description="CONF_MESSAGE[Confirm password]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Global options]" name="sysLegend" type="legend" label="" description="CONF_MESSAGE[Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.]"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="ENCODING" type="string" label="CONF_MESSAGE[Detected Encoding]" description="CONF_MESSAGE[Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8]" default="" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="SERVER_URI" type="string" label="CONF_MESSAGE[Detected Server Path]" description="CONF_MESSAGE[Make sure this is correct, as it's used to rewrite the htaccess file]" default="/" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_TITLE" type="string" label="CONF_MESSAGE[Application Title]" description="CONF_MESSAGE[Your system title]" default="Pydio" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_WELCOME" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additional message displayed at startup, on the splash screen and the login screen.]" default="Welcome to Pydio" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_LANGUAGE" type="select" choices="AJXP_AVAILABLE_LANGUAGES" label="CONF_MESSAGE[Default Language]" description="CONF_MESSAGE[Select a language activated by default( users will still be able to switch)]" default="en" mandatory="true"/>
@@ -23,17 +25,17 @@
         <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_SYSTEM" type="select" label="CONF_MESSAGE[Php Mailer]" description="CONF_MESSAGE[Set up the correct value to send emails]" choices="mail|Mail,sendmail|Sendmail" default="mail" mandatory="true"/>
         <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_ADMIN" type="string" label="CONF_MESSAGE[Administrator Email]" description="CONF_MESSAGE[Default 'From' email used to send emails.]" mandatory="true"/>
         <global_param group_switch_name="mailer" group_switch_label="yes" group_switch_value="yes" type="button" name="TEST_MAILER" choices="boot_test_mailer" label="CONF_MESSAGE[Test Mailer]" description="CONF_MESSAGE[Try sending an email with the configured data]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Configurations storage]" name="StorageLegend" type="legend" label="" description="CONF_MESSAGE[How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connexion.]"/>
+        <global_param group="CONF_MESSAGE[Configurations storage]" name="StorageLegend" type="legend" label="" description="CONF_MESSAGE[How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection.]"/>
         <global_param group="CONF_MESSAGE[Configurations storage]" name="STORAGE_TYPE" type="group_switch:storage_type" label="CONF_MESSAGE[Storage Type]" description="CONF_MESSAGE[Select how the configurations will be stored]" default="" mandatory="false"/>
-        <global_param group_switch_name="storage_type" group_switch_label="CONF_MESSAGE[Database (Requires MySQL, PostgreSQL or SQLite)]" group_switch_value="db" name="type" default="db" label="Database" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="CONF_MESSAGE[Database system (production environments, requires a DBMS supported by APPLICATION_TITLE)]" group_switch_value="db" name="type" default="db" label="Database" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
         <global_param group_switch_name="storage_type" group_switch_label="CONF_MESSAGE[No Database (Quick Start)]" group_switch_value="serial" name="type" default="serial" label="No Database" description="h" type="hidden" mandatory="true"/>
         <global_param group_switch_name="storage_type" group_switch_label="Enable Notifications" group_switch_value="db" name="notifications" default="true" label="CONF_MESSAGE[Enable Notifications]" description="CONF_MESSAGE[Log all events and alerts]" type="boolean" mandatory="false"/>
         <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" name="db_type" default="mysql" label="Database" description="Driver type (do not touch)" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
-        <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connexion]" description="CONF_MESSAGE[Try connecting to the database]" mandatory="false"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connection]" description="CONF_MESSAGE[Try connecting to the database]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="usersLegend" type="legend" label="" description="CONF_MESSAGE[Create users for your organization right now. You can do this later by going to the Settings workspace.]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_LOGIN" type="string" label="CONF_MESSAGE[Login]" replicationGroup="users" description="CONF_MESSAGE[Alphanumeric login]"/>
-        <global_param group="CONF_MESSAGE[Add some users]" name="USER_MAIL" type="string" label="CONF_MESSAGE[User Email]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
-        <global_param group="CONF_MESSAGE[Add some users]" name="USER_NAME" type="string" label="CONF_MESSAGE[User Name]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_MAIL" type="string" label="CONF_MESSAGE[User Email]" replicationGroup="users" description="CONF_MESSAGE[Mail address of the user]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_NAME" type="string" label="CONF_MESSAGE[Display name]" replicationGroup="users" description="CONF_MESSAGE[Name that users will see]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS" type="password" label="CONF_MESSAGE[Password]" replicationGroup="users" description="CONF_MESSAGE[Password]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" replicationGroup="users" description="CONF_MESSAGE[Confirm password]"/>
     </server_settings>
@@ -67,7 +69,7 @@
                         ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="installer_form"><![CDATA[
-                        <div id="installer_form" box_padding="0" box_resize="true" box_width="560" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 10px; overflow:auto; background-color: white;">
+                        <div id="installer_form" box_padding="0" box_resize="true" box_width="500" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 10px; overflow:auto; background-color: white;">
                             <img class="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:0 auto;">
                             <div style="text-align:center" class="dialogLegend installerLang"><select id="installer_lang"></select></div>
                             <div class="dialogLegend installerWelcome">
@@ -91,7 +93,7 @@
                                 clear: left;
                                 width: 220px !important;
                                 padding: 5px !important;
-                                margin: 5px 174px !important;
+                                margin: 5px 126px !important;
                             }
                             #installer_form #save_button.disabled{
                                 color: rgba(255,255,255,0.5);

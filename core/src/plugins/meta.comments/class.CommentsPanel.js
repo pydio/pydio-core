@@ -35,9 +35,11 @@
             var _results;
             _results = [];
             for (k in option) {
-                v = option[k];
-                if (k !== 'callback') {
-                    _results.push(" " + k + "='" + v + "'");
+                if(option.hasOwnProperty(k)){
+                    v = option[k];
+                    if (k !== 'callback') {
+                        _results.push(" " + k + "='" + v + "'");
+                    }
                 }
             }
             return _results;
@@ -56,6 +58,8 @@
 
 Class.create("CommentsPanel", {
 
+    loaderTimer: null,
+
     // Warning, method is called statically, there is no "this"
     loadInfoPanel : function(container, node){
 
@@ -68,6 +72,9 @@ Class.create("CommentsPanel", {
         });
 
         if(node.getMetadata().get("ajxp_has_comments_feed")){
+
+            var timer = CommentsPanel.prototype.loaderTimer;
+            if(timer) window.clearTimeout(timer);
 
             var loader = function(pe){
 
@@ -101,9 +108,13 @@ Class.create("CommentsPanel", {
 
                 conn.sendAsync();
 
-            }
-            loader();
-            var pe = new PeriodicalExecuter(loader, 5);
+            };
+
+            CommentsPanel.prototype.loaderTimer = window.setTimeout(function(){
+                loader();
+            }, 0.3);
+
+            new PeriodicalExecuter(loader, 5);
 
         }
 

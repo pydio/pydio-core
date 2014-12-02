@@ -69,6 +69,7 @@ class ftpAccessDriver extends fsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
+        //AJXP_PromptException::testOrPromptForCredentials("ftp_ws_credentials", $this->repository->getId());
     }
 
     public function uploadActions($action, $httpVars, $filesVars)
@@ -265,8 +266,7 @@ class ftpAccessDriver extends fsAccessDriver
         $this->logDebug("Saving user temporary data", array($fileData));
         $files[] = $fileData;
         $user->saveTemporaryData("tmp_upload", $files);
-        if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
-            || strpos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false){
+        if(AJXP_Utils::userAgentIsNativePydioApp()){
             $this->logInfo("Up from",$_SERVER["HTTP_USER_AGENT"]." - direct triger of next to remote");
             $this->uploadActions("next_to_remote", array(), array());
         }

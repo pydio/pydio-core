@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<guidriver id="gui.ajax" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="vision"/>
-        <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Start Up Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
-        <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Start Up Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
+        <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[List of pathes to JS files that must be loaded BEFORE the main Pydio framework is loaded, comma separated. The preferred way should be using plugins resources declaration, but in some cases one may want to load some JS at the very start up of the page.]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
+        <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
+        <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Login Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="plugins/gui.ajax/LoginBoxLogo.png"
+                    defaultImage="AJXP_THEME_FOLDER/images/LoginBoxLogo.png"
                     mandatory="false"
+                    expose="true"
                 />
-        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="plugins/gui.ajax/LoginBoxLogo.png" mandatory="false"/>
-        <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
-        <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
-        <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Start Up Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
+        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_THEME_FOLDER/images/LoginBoxLogo.png" mandatory="false" expose="true"/>
+        <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
+        <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
+        <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
+        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
+        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Welcome Page]"  label="CONF_MESSAGE[Logo]" description="CONF_MESSAGE[Replace the logo displayed in the welcome page]"  type="image"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="AJXP_THEME_FOLDER/images/PydioLogo250.png"
+                      expose="true"
+                />
         <global_param name="CUSTOM_TOP_TITLE" group="CONF_MESSAGE[Top Toolbar]" type="string" label="CONF_MESSAGE[Title]" description="CONF_MESSAGE[Append a title to the image logo]" mandatory="false" default="" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO" group="CONF_MESSAGE[Top Toolbar]"  label="CONF_MESSAGE[Logo]" description="CONF_MESSAGE[Replace the top left logo in the top toolbar]"  type="image"
                       editable="true"
@@ -30,20 +39,127 @@
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_W" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Width]" description="CONF_MESSAGE[Manually set a logo width]" mandatory="false" default="" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="0" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="0" expose="true"/>
-        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Dashboard]"  label="CONF_MESSAGE[Dashboard Logo]" description="CONF_MESSAGE[Replace the logo displayed in the user dashboard. Use 250 X 131 png image]"  type="image"
+        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="4" expose="true"/>
+        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="6" expose="true"/>
+        <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
+		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
+		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics Domain]" description="CONF_MESSAGE[Set the domain for your analytics reports (not mandatory!)]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Google Analytics]" type="boolean" label="CONF_MESSAGE[Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in Pydio]" mandatory="false" default="false"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_1" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/01.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_2" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_3" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_4" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (4)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/04.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(4)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_5" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (5)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(5)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_6" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (6)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/06.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(6)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_2" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_3" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+
+
+        <global_param name="CUSTOM_MINISITE_LOGO" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Minisite Logo]" description="CONF_MESSAGE[Top-right logo displayed on minisite page]" mandatory="false"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
                       defaultImage="plugins/gui.ajax/PydioLogo250.png"
                       expose="true"
                 />
-        <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
-		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
-		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
-		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics Domain]" description="CONF_MESSAGE[Set the domain for yuor analytics reports (not mandatory!)]" mandatory="false"/>
-		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Google Analytics]" type="boolean" label="CONF_MESSAGE[Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in Pydio]" mandatory="false" default="false"/>
+
 	</server_settings>
 	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
 	<registry_contributions>
@@ -120,9 +236,9 @@
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
 				<div id="toolbars" ajxpClass="AjxpPane">
-					<div id="global_toolbar" ajxpClass="LogoWidget">
+					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\" ajxp_message_id=\"455\">AJXP_MESSAGE[455]</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
 					<div id="workspace_toolbar" ajxpClass="AjxpPane">
@@ -137,18 +253,18 @@
 					</div>
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":26,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
+					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":26,"fit":"height","fitParent":"browser", "minSize":26, "foldingButton":"B", "invisibleBar": true}'>
     					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "autoFoldOnEvent":"ajaxplorer:context_changed", "initA": "50%", "minA":26, "maxA":450, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A", "invisibleBar": true}'>
     					    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-close","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark-empty","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                                 <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
     					    </div>
 							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                                <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
+                                <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":true,"events":{"ajaxplorer:context_changed":"this.switchToFirstIfPathDiffers(arguments[0]);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
                                     <div id="files_list_pane" ajxpClass="AjxpPane">
                                         <div id="files_list_header" ajxpClass="AjxpPane">
-                                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs"}'></div>
+                                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs","flexToMargin":20}'></div>
                                         </div>
                                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
                                     </div>
@@ -158,6 +274,15 @@
                         <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true,"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'></div>
                     </div>
 				</div>
+			]]></template>
+            <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
+                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
+                    <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
+                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    </div>
+                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
+                </div>
 			]]></template>
             <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
@@ -183,25 +308,502 @@
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="cpane_header" class="panelHeader">
                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                         </div>
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     </div>
 				</div>
 			]]></template>
-            <template name="minisite_vision" element="ajxp_shared_folder" position="top" theme="vision"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_shared_folder"}'>
+            <template name="minisite_vision" element="ajxp_shared_folder" position="top" label="Standard" theme="vision"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div class="widget_logo"></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
       			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="cpane_header" class="panelHeader">
                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header","flexToMargin":30}'></div>
                         </div>
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     </div>
 				</div>
+			]]></template>
+            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153" theme="orbit"><![CDATA[
+                <style>
+                    div#overlay.form-login_form_dynamic {
+                        opacity: 1;
+                        background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
+                        background-position: 50% 50%;
+                    }
+                    #browser{
+                        background-color: #345E79;
+                    }
+                    #widget_title{
+                        font-size: 30px;
+                        padding: 10px 0 0 5px;
+                        color: #fff;
+                        line-height: 25px;
+                        background-color: #345E79;
+                    }
+                    #cpane_container{
+                        float: none;
+                    }
+                    div#breadcrumb {
+                        font-size: 16px;
+                        padding: 12px 10px 8px;
+                        color: white;
+                    }
+                    span.icon-chevron-right,
+                    span.icon-refresh.ajxp-goto-refresh
+                    {
+                        padding: 0 5px;
+                        font-size: 13px;
+                    }
+                    .action_bar {
+                        background-color: transparent;
+                        height: auto !important
+                    }
+                    .action_bar > .toolbarGroup{
+                        height: auto;
+                    }
+                    #display_toolbar a{
+                        color: #555;
+                        font-size: 11px;
+                    }
+                    div.separator{
+                        border-left-width: 0;
+                    }
+                    #display_toolbar{
+                        margin-top: 0;
+                        margin-right: 0;
+                        padding: 9px 9px 8px;
+                    }
+                    @media only screen and (max-width : 720px) {
+                        #display_toolbar{
+                            padding: 8px 9px 6px;
+                        }
+                    }
+                    img.custom_logo_image{
+                        height:90px !important;
+                        width: auto;
+                        right: 0;
+                        top: 5px !important;
+                        left: inherit !important;
+                    }
+                </style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
+                    <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
+                    <div id="files_list_header">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    </div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    </div>
+				</div>
+                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+			]]></template>
+            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154" theme="orbit"><![CDATA[
+				<style type="text/css">
+                div#overlay.form-login_form_dynamic {
+                    opacity: 1;
+                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
+                    background-position: 50% 50%;
+                }
+				#browser{
+				    -webkit-font-smoothing: antialiased;
+				}
+                #widget_title{
+                    font-size: 30px;
+                    padding: 10px 0 0 5px;
+                    color: #fff;
+                    line-height: 25px;
+                    margin-right: 0;
+                    background-color: #222;
+                }
+                .widget_logo{
+                    background-size:120px;
+                }
+				#cpane_container{
+				    float: none;
+				}
+                div#breadcrumb {
+                    color: white;
+                    font-size: 16px;
+                    padding: 2px 10px;
+                }
+                span.ajxp-goto {
+                    cursor: pointer;
+                }
+                span.icon-chevron-right,
+                span.icon-refresh.ajxp-goto-refresh
+                {
+                    padding: 0 5px;
+                    font-size: 13px;
+                }
+				#cpane_header{
+				    padding-bottom: 7px;
+                    height: 19px;
+                    background-color: #222;
+                    border-bottom: 0;
+                    padding-top: 10px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                }
+                #cpane_tabs div#imageContainer {
+                    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.5);
+                    background-color: rgb(74, 74, 74) !important;
+                }
+                div#content_pane{
+                    position: fixed !important;
+                    bottom: 0;
+                    width: 100%;
+                    background-color: #222;
+                    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+                    padding-top: 3px;
+                    padding-left: 3px;
+                    height: 80px !important;
+                }
+                .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel {
+                    color: #555;
+                    background-color: transparent;
+                }
+                .fl-displayMode-thumb div.thumbnail_selectable_cell{
+                    margin: 2px 2px;
+                }
+                div.thumbnail_selectable_cell{
+                    background-color: transparent;
+                    color: white !important;
+                }
+                div.thumbnail_selectable_cell.ajxpNodeLeaf, div.thumbnail_selectable_cell.ajxpNodeLeaf > span{
+                    cursor: pointer !important;
+                }
+                #cpane_tabs>div.tabulatorContainer{
+                    height:0;
+                    border-bottom-width: 0;
+                }
+                #cpane_container{
+                    background-color: rgb(85, 85, 85);
+                }
+                #loading_overlay{
+                    display:none !important;
+                }
+                #diaporama_box{
+                    position:relative;
+                }
+                img.custom_logo_image{
+                    right: 0px !important;
+                    left: inherit !important;
+                    height: 65px !important;
+                    width: auto;
+                }
+                @media only screen and (max-width : 720px) {
+                    #display_toolbar{
+                        margin-top: -2px;
+                    }
+                }
+                .fl-displayMode-thumb div.thumbnail_selectable_cell{
+                    background-color: transparent;
+                }
+				</style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "fitMarginBottom":80}'>
+                        <div id="cpane_header" class="panelHeader">
+                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":50, "resize_events":["actions_refreshed"]}'></div>
+                        </div>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":60,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
+                    </div>
+				</div>
+                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<script>
+                    document.observe("ajaxplorer:selection_changed", function(e){
+                        try{
+                            var dm = ajaxplorer.getContextHolder();
+                            var nodes = dm.getSelectedNodes();
+                            if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
+                                window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                            }
+                        }catch(e){}
+                    });
+                    var p;
+				    document.observe("ajaxplorer:user_logged", function(){
+                        if(p) return;
+                        try{
+                            p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){}
+                    });
+				</script>
+			]]></template>
+            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
+				<style type="text/css">
+                div#overlay.form-login_form_dynamic {
+                    opacity: 1;
+                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
+                    background-position: 50% 50%;
+                }
+                #browser{
+                    background-color: #345E79;
+                    -webkit-font-smoothing: antialiased;
+                }
+                #widget_title {
+                    font-size: 30px;
+                    color: #fff;
+                    margin-right: 0;
+                    background-color: #333;
+                    height: 69px;
+                    padding: 7px 10px !important;
+                }
+                #widget_title div.repository_description {
+                    font-size: 12px;
+                }
+                .widget_logo{
+                    background-size:120px;
+                    height: 58px;
+                    top: 5px;
+                }
+                img.custom_logo_image{
+                    right: 0 !important;
+                    left: inherit !important;
+                    height: 72px !important;
+                    width: auto;
+                }
+				#cpane_container{
+				    float: none;
+				}
+				#cpane_header{
+				    padding-bottom: 7px;
+                    height: 48px;
+                    background-color: #222;
+                    border-bottom: 0;
+                    padding-top: 10px;
+                }
+                div#content_pane{
+                    background-color: #222;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                    margin-bottom:5px;
+                }
+                div.thumbnail_selectable_cell{
+                    background-color: transparent;
+                    color: white !important;
+                }
+                #cpane_tabs>div.tabulatorContainer{
+                    height:0;
+                    border-bottom-width: 0;
+                }
+                #cpane_container{
+                    background-color: rgb(85, 85, 85);
+                }
+                #loading_overlay{
+                    display:none !important;
+                }
+                #diaporama_box{
+                    position:relative;
+                }
+                #display_toolbar {
+                    position: absolute;
+                    top: 55px;
+                    font-size: 12px;
+                }
+                #display_toolbar span.actionbar_button_label {
+                    display: inline-block !important;
+                    margin-left: 4px !important;
+                }
+                #display_toolbar a {
+                    padding: 0 7px;
+                }
+                #cpane_tabs div#imageContainer {
+                    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.5);
+                    background-color: rgb(74, 74, 74) !important;
+                }
+				</style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+                    <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    <div id="widget_title" style="padding: 28px 0 22px 20px;" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
+                    </div>
+				</div>
+                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<script>
+				    document.observe("ajaxplorer:user_logged", function(){
+                        try{
+
+                            var p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
+                                    var first = root.getChildren().first();
+                                    if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
+                                        return;
+                                    }
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){
+                            if (console) console.log(e);
+                        }
+                    });
+				</script>
+			]]></template>
+            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
+				<style type="text/css">
+                div#overlay.form-login_form_dynamic {
+                    opacity: 1;
+                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
+                    background-position: 50% 50%;
+                }
+				#browser{
+				    background-color: #000;
+				    width:102%;
+                    -webkit-font-smoothing: antialiased;
+				}
+				#cpane_container{
+				    float:none;
+				    position: absolute;
+                    width: 100%;
+                    top:0;
+                }
+                body{ overflow: hidden; }
+                u{ text-decoration: none; }
+                #background_container{
+				    position: absolute;
+                    width: 102%;
+                    top:-5px;
+                    left:-5px;
+                    bottom:-5px;
+                    right:-5px;
+                }
+                div#dl_toolbar {
+                    margin: 27% auto;
+                    display: block;
+                    width: 400px;
+                    font-size: 52px;
+                    text-align: center;
+                }
+                div.widget_logo{
+                    height: 90px;
+                    background-position: 86px 76px;
+                }
+                div#widget_title{
+                    color: rgba(255,255,255,0.8);
+                    position: absolute;
+                    margin-top: 0px;
+                    padding: 23px 30px 20px;
+                    width: 100%;
+                    background-color: rgba(0,0,0,0.7);
+                    position: absolute;
+                }
+                div#inline_toolbar a{
+                    display:none;
+                }
+                a#download_button, a#share_current_page_button{
+                    display:block !important;
+                    text-align: center;
+                    color: rgba(255,255,255,0.8);
+                    background-color: rgba(0,0,0,0.5);
+                    padding: 20px 10px;
+                    border-radius: 5px;
+                }
+                a#download_button span.ajxp_icon{
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                div#share_toolbar{
+                    position: absolute;
+                    right: 48px;
+                    bottom: 37px;
+                    font-size: 21px;
+                }
+                img.custom_logo_image{
+                    right: 6px !important;
+                    left: inherit !important;
+                    height: 90px !important;
+                    width: auto;
+                }
+                </style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
+                        </div>
+                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
+                        <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
+                    </div>
+				</div>
+                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<script>
+				    document.observe("ajaxplorer:user_logged", function(){
+                        try{
+
+                            var p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){
+                            if (console) console.log(e);
+                        }
+                    });
+				</script>
+			]]></template>
+            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["navigation", "minisite", "inline", "content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
+                    </div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; }</style>
+			]]></template>
+            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
+                    </div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>

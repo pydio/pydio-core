@@ -41,6 +41,8 @@ class ImagePreviewer extends AJXP_Plugin
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
+        $selection = new UserSelection($repository);
+        $selection->initFromHttpVars($httpVars);
 
 
         $streamData = $repository->streamData;
@@ -48,14 +50,14 @@ class ImagePreviewer extends AJXP_Plugin
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
 
         if ($action == "preview_data_proxy") {
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
             if (!file_exists($destStreamURL.$file)) {
                 header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;
             }
 
-            if (isSet($httpVars["get_thumb"]) && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())) {
+            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;
@@ -122,7 +124,7 @@ class ImagePreviewer extends AJXP_Plugin
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"));
+        $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = $this->streamData["classname"];
             //$this->logDebug("Will fit thumbnail");
@@ -176,6 +178,23 @@ class ImagePreviewer extends AJXP_Plugin
             } else {
                 $realFile = $ajxpNode->getRealFile();
                 list($width, $height, $type, $attr) = @getimagesize($realFile);
+
+                if($this->getFilteredOption("EXIF_ROTATION")){
+                    require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
+                    $pThumb = new PThumb($this->getFilteredOption["THUMBNAIL_QUALITY"],$this->getFilteredOption("EXIF_ROTATION"));
+                    $orientation = $pThumb->exiforientation($realFile, false);
+                    if ($pThumb->rotationsupported($orientation))
+                    {
+                        $ajxpNode->image_exif_orientation = $orientation;
+                        if ($orientation>4)
+                        {
+                            $tmp=$height;
+                            $height=$width;
+                            $width=$tmp;
+                        }
+                    }
+                }
+
                 $ajxpNode->image_type = image_type_to_mime_type($type);
                 $ajxpNode->image_width = $width;
                 $ajxpNode->image_height = $height;

@@ -16,7 +16,7 @@ var Prototype = {
     return {
       IE:             !!window.attachEvent && !isOpera,
       IE10:           ua.indexOf('MSIE 10') > -1,
-      IE10plus:       ua.indexOf('MSIE 10') > -1 || ua.indexOf('MSIE 11') > -1 || ua.indexOf('MSIE 12') > -1 || ua.indexOf('MSIE 13') > -1,
+      IE10plus:       ua.indexOf('MSIE 10') > -1 || ua.indexOf('MSIE 11') > -1 || ua.indexOf('MSIE 12') > -1 || ua.indexOf('MSIE 13') > -1 || ua.indexOf('.NET4.0') > -1 ,
       Opera:          isOpera,
       WebKit:         ua.indexOf('AppleWebKit/') > -1,
       Gecko:          ua.indexOf('Gecko') > -1 && ua.indexOf('KHTML') === -1,
@@ -2390,12 +2390,16 @@ Element.Methods = {
       return styles.include('opacity') ?
         element.setOpacity(styles.match(/opacity:\s*(\d?\.?\d*)/)[1]) : element;
     }
-    for (var property in styles)
-      if (property == 'opacity') element.setOpacity(styles[property]);
-      else
-        elementStyle[(property == 'float' || property == 'cssFloat') ?
-          (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') :
-            property] = styles[property];
+      try{
+        for (var property in styles)
+          if (property == 'opacity') element.setOpacity(styles[property]);
+          else
+            elementStyle[(property == 'float' || property == 'cssFloat') ?
+              (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') :
+                property] = styles[property];
+      }catch(invalid){
+          if(console) console.log('Invalid Styles', styles, element);
+      }
 
     return element;
   },
@@ -5752,7 +5756,9 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     if (document.createEvent)
       element.dispatchEvent(event);
     else
-      element.fireEvent(event.eventType, event);
+        try{
+          element.fireEvent(event.eventType, event);
+        }catch(unspec){}
 
     return Event.extend(event);
   }

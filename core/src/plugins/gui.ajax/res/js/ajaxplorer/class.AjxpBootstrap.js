@@ -105,6 +105,9 @@ Class.create("AjxpBootstrap", {
             }else{
                 this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
             }
+            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
+                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
+            }
             this.refreshContextVariablesAndInit(new Connexion());
             return;
         }
@@ -147,6 +150,9 @@ Class.create("AjxpBootstrap", {
 			}else{
 				this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
 			}
+            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
+                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
+            }
 			
 			this.refreshContextVariablesAndInit(connexion);
 			
@@ -169,12 +175,9 @@ Class.create("AjxpBootstrap", {
 			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder') + "/themes/" + this.parameters.get("theme");
 		}
 		if(this.parameters.get('additional_js_resource')){
-			connexion.loadLibrary(this.parameters.get('additional_js_resource?v='+this.parameters.get("ajxpVersion")));
+			connexion.loadLibrary(this.parameters.get('additional_js_resource?v='+this.parameters.get("ajxpVersion")), null, true);
 		}
 		this.insertLoaderProgress();
-		if(!this.parameters.get("debugMode")){
-			connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"));
-		}
 		window.MessageHash = this.parameters.get("i18nMessages");
         if(!Object.keys(MessageHash).length){
             alert('Ooups, this should not happen, your message file is empty!');
@@ -184,14 +187,22 @@ Class.create("AjxpBootstrap", {
 		}
 		window.zipEnabled = this.parameters.get("zipEnabled");
 		window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
-		document.fire("ajaxplorer:boot_loaded");
-		window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
-		if(this.parameters.get("currentLanguage")){
-			window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
-		}
-		$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
-		window.ajaxplorer.init();		
-	},
+        var masterClassLoaded = function(){
+            document.fire("ajaxplorer:boot_loaded");
+            window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
+            if(this.parameters.get("currentLanguage")){
+                window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
+            }
+            $('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
+            window.ajaxplorer.init();
+        }.bind(this);
+        if(!this.parameters.get("debugMode")){
+            connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"), masterClassLoaded, true);
+        }else{
+            masterClassLoaded();
+        }
+
+    },
 	
 	/**
 	 * Detect the base path of the javascripts based on the script tags
@@ -272,7 +283,7 @@ Class.create("AjxpBootstrap", {
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>Build your own box! <span id="version_span"></span></div>';
 			}
-			html+='	Copyright C. du Jeu 2008-2013 - AGPL License';
+			html+='	Copyright C. du Jeu 2008-2014 - AGPL License';
             html+='<div id="progressState" style="float:left; display: none;">Booting...</div>';
 			html+='	<div id="progressBarContainer" style="margin-top:3px; margin-left: 126px;display: none;"><span id="loaderProgress"></span></div>';
             html+= '<div id="progressBarHeighter" style="height:10px;display: none;"></div>';
@@ -291,29 +302,45 @@ Class.create("AjxpBootstrap", {
             left:parseInt(Math.max((viewPort.width-progressBox.getWidth())/2,0))+"px",
             top:parseInt(Math.max((viewPort.height-progressBox.getHeight())/3,0))+"px"
         });
-		var options = {
-			animate		: true,										// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-			barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
-			onTick		: function(pbObj) {
-				if(pbObj.getPercentage() >= 80){
-                    new Effect.Parallel([
-                            new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.6}),
-                            new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.6})
-                        ],
-                        {afterFinish : function(){
-                            $('loading_overlay').remove();
-                            $('progressBox').hide();
-                        }});
-					return false;
-				}
-				return true ;
-			}
-		};
-		window.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options); 
+        var loaderEndCallback = function(){
+            document.stopObserving('ajaxplorer:loader_state_update');
+            new Effect.Parallel([
+                new Effect.Opacity($('loading_overlay'),{sync:true, from:1.0, to:0.0, duration:0.5}),
+                new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.5}),
+                new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.5})
+            ],
+                {afterFinish : function(){
+                    if($('loading_overlay')) $('loading_overlay').remove();
+                    if($('progressBox')) $('progressBox').hide();
+                }});
+        };
+        if(!window.ajxpThemeSkipLoaderProgress){
+            var options = {
+                animate		: false,										// Animate the progress? - default: true
+                showText	: false,									// show text with percentage in next to the progressbar? - default : true
+                width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
+                boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
+                barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+                height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
+                onTick		: function(pbObj) {
+                    if(pbObj.getPercentage() >= 80){
+                        loaderEndCallback();
+                        return false;
+                    }
+                    return true ;
+                }
+            };
+            this.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options);
+        }
+        document.observe('ajaxplorer:loader_state_update', function(e){
+            var p = e.memo.percent;
+            if(this.loaderProgress){
+                this.loaderProgress.setPercentage(p*100);
+            }else if(p >= 0.8){
+                loaderEndCallback();
+            }
+        }.bind(this));
+
 	},
 	/**
 	 * Inserts Google Analytics Code
@@ -351,11 +378,11 @@ Class.create("AjxpBootstrap", {
 	 * @param desktopNode String The id of the node to attach
 	 */
 	insertBasicSkeleton : function(desktopNode){
-        var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: Arial;font-size: 11px;text-align: right;padding: 3px; padding-right: 10px;"});
+        var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #7a7a7a;text-align: right;padding: 4px; padding-right: 10px;font-size: 12px;border-radius: 3px 0 0 0;"});
         if(document.viewport.getWidth() < 500){
             elem.update('Pydio Community &copy; C. du Jeu 2008-2013');
         }else{
-            elem.update('Pydio Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://pyd.io/">http://pyd.io/</a>');
+            elem.update('Pydio, open source file sharing - Free / Non supported edition - <a target="_blank" style="color: #7a7a7a;" href="https://pyd.io/">https://pyd.io/</a>');
         }
         $(desktopNode).insert({after:elem});
         disableTextSelection(elem);

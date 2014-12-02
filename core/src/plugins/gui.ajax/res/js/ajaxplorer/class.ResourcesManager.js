@@ -113,21 +113,22 @@ Class.create("ResourcesManager", {
 	 * Load a javascript file
 	 * @param fileName String
 	 * @param className String
+     * @param callback Function
+     * @param aSync Boolean
 	 */
-	loadJSResource : function(fileName, className){
-		try{
-			eval('window.testTemporaryObject = '+className);
-			delete(window.testTemporaryObject);
-		}catch(e){
+	loadJSResource : function(fileName, className, callback, aSync){
+		if(!window[className]){
 			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
 				var conn = new Connexion();
 				conn._libUrl = false;
 				if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
 					conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
 				}
-				conn.loadLibrary(fileName);
+				conn.loadLibrary(fileName, callback, aSync);
 			}
-		}
+		}else if(callback){
+            callback();
+        }
 	},
 	/**
 	 * Load a CSS file
@@ -167,8 +168,9 @@ Class.create("ResourcesManager", {
 	 */
 	loadFromXmlNode : function(node){
         var clForm = {};
+        var k;
 		if(node.nodeName == "resources"){
-			for(var k=0;k<node.childNodes.length;k++){
+			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
 					this.addJSResource(node.childNodes[k].getAttribute('file'), node.childNodes[k].getAttribute('className'));
 				}else if(node.childNodes[k].nodeName == 'css'){
@@ -178,7 +180,7 @@ Class.create("ResourcesManager", {
 				}
 			}		
 		}else if(node.nodeName == "dependencies"){
-			for(var k=0;k<node.childNodes.length;k++){
+			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == "pluginResources"){
 					this.addDependency(node.childNodes[k].getAttribute("pluginName"));
 				}
@@ -197,17 +199,17 @@ Class.create("ResourcesManager", {
 	 * @param registry DOMDocument XML Registry
 	 */
 	loadAutoLoadResources : function(registry){
-		var jsNodes = XPathSelectNodes(registry, '//client_settings/resources/js[@autoload="true"]');
+		var jsNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js[@autoload="true"]');
 		if(jsNodes.length){
 			jsNodes.each(function(node){
 				this.loadJSResource(node.getAttribute('file'), node.getAttribute('className'));
 			}.bind(this));
 		}
-		var imgNodes = XPathSelectNodes(registry, '//client_settings/resources/img_library');
+		var imgNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
 		imgNodes.each(function(node){
 			addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
 		}.bind(this));		
-		var cssNodes = XPathSelectNodes(registry, '//client_settings/resources/css[@autoload="true"]');
+		var cssNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
 		cssNodes.each(function(node){
 			this.loadCSSResource(node.getAttribute("file"));
 		}.bind(this));

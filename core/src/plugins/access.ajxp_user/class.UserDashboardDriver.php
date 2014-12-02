@@ -35,25 +35,15 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
-        if($contribNode->nodeName == "client_configs"){
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $gettingStartedList = $actionXpath->query('component_config/additional_tab[@id="tutorials_pane"]', $contribNode);
-            if(!$gettingStartedList->length) return ;
-            if($this->getFilteredOption("ENABLE_GETTING_STARTED") === false){
-                $compConfig = $gettingStartedList->item(0)->parentNode;
-                $contribNode->removeChild($compConfig);
-            }else{
-                $cdata = $gettingStartedList->item(0)->firstChild;
-                $keys = array("URL_APP_IOSAPPSTORE", "URL_APP_ANDROID", "URL_APP_SYNC_WIN", "URL_APP_SYNC_MAC");
-                $values = array();
-                foreach($keys as $k) $values[] = $this->getFilteredOption($k);
-                $newData = str_replace($keys, $values, $cdata->nodeValue);
-                $newCData = $contribNode->ownerDocument->createCDATASection($newData);
-                $gettingStartedList->item(0)->appendChild($newCData);
-                $gettingStartedList->item(0)->replaceChild($newCData, $cdata);
-            }
+        $disableAddressBook = $this->getFilteredOption("DASH_DISABLE_ADDRESS_BOOK") === true;
+        if($contribNode->nodeName == "client_configs" && $disableAddressBook){
+            // remove template_part for orbit_content
+            $xPath=new DOMXPath($contribNode->ownerDocument);
+            $tplNodeList = $xPath->query('component_config[@className="AjxpTabulator::userdashboard_main_tab"]', $contribNode);
+            if(!$tplNodeList->length) return ;
+            $contribNode->removeChild($tplNodeList->item(0));
         }
+        parent::parseSpecificContributions($contribNode);
     }
 
     public function switchAction($action, $httpVars, $fileVars)
@@ -153,6 +143,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $files = $selection->getFiles();
                 AJXP_XMLWriter::header();
                 $minisites = $this->listSharedFiles("minisites");
+                $shareCenter = AJXP_PluginsService::findPluginById("action.share");
                 foreach ($files as $index => $element) {
                     $element = basename($element);
                     $ar = explode("shared_", $mime);
@@ -161,7 +152,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $mime = "minisite";
                         $element = $minisites[$element];
                     }
-                    ShareCenter::deleteSharedElement($mime, $element, $loggedUser);
+                    $shareCenter->deleteSharedElement($mime, $element, $loggedUser);
                     if($mime == "repository" || $mime == "minisite") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
                     else if($mime == "file") $out = $mess["user_dash.13"];
@@ -173,7 +164,8 @@ class UserDashboardDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
-                $deleted = $this->clearExpiredFiles();
+                $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
+                $deleted = $shareCenter->clearExpiredFiles(true);
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["user_dash.23"], count($deleted).""), null);
@@ -222,27 +214,17 @@ class UserDashboardDriver extends AbstractAccessDriver
                 <column messageId="user_dash.7" attributeName="expiration" sortType="String" width="5%"/>
             </columns>');
         }
-        $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if(!is_dir($dlFolder)) return ;
-        $files = glob($dlFolder."/*.php");
-        if(!is_array($files))return;
+
         $mess = ConfService::getMessages();
         $loggedUser = AuthService::getLoggedUser();
         $userId = $loggedUser->getId();
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if ($dlURL!= "") {
-            $downloadBase = rtrim($dlURL, "/");
-        } else {
-            $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-            $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
-        }
+
+        $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
+        $downloadBase = $shareCenter->buildPublicDlURL();
+        $publicLets = $shareCenter->listShares(true, null);
+
         $minisites = array();
-        foreach ($files as $file) {
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            if($ar[0] != "php") continue;
-            //if(strlen($id) != 32) continue;
-            $publicletData = ShareCenter::loadPublicletData($id);
+        foreach ($publicLets as $hash => $publicletData) {
             if($mode == "files"){
                 if(isSet($publicletData["AJXP_APPLICATION_BASE"]) || isSet($publicletData["TRAVEL_PATH_TO_ROOT"])
                     ||  (isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId)
@@ -252,48 +234,23 @@ class UserDashboardDriver extends AbstractAccessDriver
                 }
                 $expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
                 if(!is_a($publicletData["REPOSITORY"], "Repository")) continue;
-                AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
+                AJXP_XMLWriter::renderNode($hash, "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
                         "icon"		=> "html.png",
                         "password" => ($publicletData["PASSWORD"]!=""?$this->metaIcon("key").$publicletData["PASSWORD"]:""),
                         "expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?$this->metaIcon("time"):"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):""),
                         "download_count" => !empty($publicletData["DOWNLOAD_COUNT"])?$this->metaIcon("download-alt").$publicletData["DOWNLOAD_COUNT"]:"",
                         "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "" : $this->metaIcon("cloud-download").$publicletData["DOWNLOAD_LIMIT"] ),
-                        "integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["user_dash.15"]:$mess["user_dash.16"]),
-                        "download_url" => $this->metaIcon("link").$downloadBase . "/".basename($file),
+                        "download_url" => $this->metaIcon("link").$downloadBase . "/".$hash,
                         "ajxp_mime" => "shared_file")
                 );
             }else if($mode == "minisites"){
                 if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;
-                $minisites[$publicletData["REPOSITORY"]] = $id;
+                $minisites[$publicletData["REPOSITORY"]] = $hash;
             }
         }
         if($mode == "minisites"){
             return $minisites;
         }
-    }
-
-    public function clearExpiredFiles()
-    {
-        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
-        $loggedUser = AuthService::getLoggedUser();
-        $userId = $loggedUser->getId();
-        $deleted = array();
-        foreach ($files as $file) {
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            if(strlen($id) != 32) continue;
-            $publicletData = ShareCenter::loadPublicletData($id);
-            if (!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId) {
-                continue;
-            }
-            if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                            (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
-                unlink($file);
-                $deleted[] = basename($file);
-                PublicletCounter::delete(str_replace(".php", "", basename($file)));
-            }
-        }
-        return $deleted;
     }
 
     private function metaIcon($metaIcon)
@@ -305,7 +262,7 @@ class UserDashboardDriver extends AbstractAccessDriver
     {
         $conf = ConfService::getConfStorageImpl();
         if(!method_exists($conf, "listUserTeams")) return;
-        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" switchGridMode="filelist">
             <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
             <column messageId="user_dash.10" attributeName="users" sortType="String"/>
         </columns>');
@@ -315,7 +272,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
                     "icon"      => "users-folder.png",
                     "ajxp_mime" => "ajxp_team",
-                    "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"]))
+                    "users"     => "<span class='icon-groups'></span> ".implode(", ", array_values($team["USERS"]))
                 ), true, true);
         }
     }
@@ -327,7 +284,9 @@ class UserDashboardDriver extends AbstractAccessDriver
         $loggedUser = AuthService::getLoggedUser();
         $users = ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()); // AuthService::listUsers();
         $mess = ConfService::getMessages();
-        $repoList = ConfService::getRepositoriesList("all");
+        $repoList = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+            "owner_user_id" => $loggedUser->getId()
+        ));
         $userArray = array();
         foreach ($users as $userIndex => $userObject) {
             $label = $userObject->getId();
@@ -368,10 +327,12 @@ class UserDashboardDriver extends AbstractAccessDriver
 
     public function listRepositories()
     {
-        $repos = ConfService::getRepositoriesList("all");
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.9" attributeName="parent_label" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
         $repoArray = array();
         $loggedUser = AuthService::getLoggedUser();
+        $repos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+            "owner_user_id" => $loggedUser->getId()
+        ));
 
         $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
         $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");

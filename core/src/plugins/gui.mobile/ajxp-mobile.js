@@ -71,9 +71,9 @@ function initAjxpMobileActions(){
 		if(items && items.length){
 			var item = items[0];
 			//itemPos = item.cumulativeOffset();
-			itemPos = item.positionedOffset();
-			itemDim = item.getDimensions();
-			itemScroll = item.cumulativeScrollOffset();
+			var itemPos = item.positionedOffset();
+			var itemDim = item.getDimensions();
+			var itemScroll = item.cumulativeScrollOffset();
 			var listDisp = list._displayMode;
 			mobileActions.show();
 			var left;

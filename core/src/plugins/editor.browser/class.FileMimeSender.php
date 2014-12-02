@@ -52,9 +52,10 @@ class FileMimeSender extends AJXP_Plugin
 
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"] . "://" . $repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
 
         if ($action == "open_file") {
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
             if (!file_exists($destStreamURL . $file)) {
                 echo("File does not exist");
                 return false;

@@ -19,9 +19,9 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Choose other...",
-"2" => "Choose another editor",
-"3" => "Select another editor to open this file",
-"4" => "Warning, these editors do not declare to be supporting this file type, their behaviour maybe unpredictable!",
-"5" => "Clear existing associations",
+"1" => "Choisissez un autre...",
+"2" => "Choisissez un autre éditeur",
+"3" => "Choisissez un autre éditeur pour ouvrir ce fichier",
+"4" => "Attention, ces éditeurs ne déclarent pas supporter ce type de fichier. Leur comportement peut-être imprévisible !",
+"5" => "Effacer les associations existantes",
 );

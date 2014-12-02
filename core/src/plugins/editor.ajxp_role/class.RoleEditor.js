@@ -166,7 +166,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(this.roleData.USER)response.USER = this.roleData.USER;
                 if(this.roleData.GROUP)response.GROUP = this.roleData.GROUP;
                 this.initJSONResponse(response);
-                ajaxplorer.fireNodeRefresh(this.node);
+                ajaxplorer.fireContextRefresh();
                 this.setClean();
             }else{
                 ajaxplorer.displayMessage("ERROR", response.ERROR);
@@ -303,15 +303,18 @@ Class.create("RoleEditor", AbstractEditor, {
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
             f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
             var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
+            var updateRoleButton = new Element('span', {id:'user_roles_update_button'}).update('<span class="icon-save"></span> UPDATE');
+            rolesSelect.insert({after:updateRoleButton});
+            updateRoleButton.hide();
             rolesSelect.observe("change", function(){
                 this.setDirty();
-                if(this.updateRoleAccumulator){
-                    window.clearTimeout(this.updateRoleAccumulator);
-                }
-                this.updateRoleAccumulator = window.setTimeout(function(){
-                    this.updateRoles(rolesSelect.getValue());
-                }.bind(this) , 500);
+                updateRoleButton.show();
             }.bind(this) );
+            updateRoleButton.observe("click", function(){
+                this.updateRoles(rolesSelect.getValue());
+                updateRoleButton.hide();
+            }.bind(this));
+            new Chosen(rolesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
@@ -319,7 +322,7 @@ Class.create("RoleEditor", AbstractEditor, {
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
-                var pane = new Element("div", {style:"width:300px;"});
+                var pane = new Element("div", {style:"width:400px;"});
                 pane.insert(new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_role_editor.29"]));
                 var passEl1 = new Element("div", {className:"SF_element"});
                 passEl1.insert(new Element("div",{className:"SF_label"}).update(MessageHash[182]+": "));
@@ -411,6 +414,7 @@ Class.create("RoleEditor", AbstractEditor, {
             appliesSelect.observe("change", function(){
                 this.roleWrite.APPLIES = appliesSelect.getValue();
             }.bind(this) );
+            new Chosen(appliesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
         }else if(scope == "group"){
             // MAIN INFO
@@ -671,7 +675,7 @@ Class.create("RoleEditor", AbstractEditor, {
         if(!Object.keys(actionsData).length){
             parametersPane.update("");
             parametersPane.removeClassName("nonempty");
-            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+            parametersPane.insert(new Element("ul", {className:"tabrow innerTabRow"}));
             return;
         }
         var conn = new Connexion();
@@ -684,7 +688,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             parametersPane.update("");
             parametersPane.removeClassName("non_empty");
-            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+            parametersPane.insert(new Element("ul", {className:"tabrow innerTabRow"}));
 
             // Parse result as a standard form
             var xml = transport.responseXML;
@@ -734,6 +738,7 @@ Class.create("RoleEditor", AbstractEditor, {
             pane.select("div.accordion_content").invoke("setStyle", {display:"block"});
             new AjxpSimpleTabs(parametersPane);
             parametersPane.addClassName("non_empty");
+            parametersPane.down(".tabpanes").addClassName("innerContainer").setStyle({margin:'3px 10px'});
 
             // UPDATE FORMS ELEMENTS
             parametersPane.select("div.SF_element").each(function(element){

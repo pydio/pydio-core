@@ -22,6 +22,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     tabulatorData: null,
     tabsConfigs: null,
+    _eventPath: null,
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -52,14 +53,16 @@ Class.create("AjxpTabulator", AjxpPane, {
 		// Add drop shadow here, otherwise the negative value gets stuck in the CSS compilation...
 		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
 		$(this.htmlElement).insert({top:div});
-		this.tabulatorData.each(function(tabInfo){
+        var shortener = this.shortenLabel;
+
+        this.tabulatorData.each(function(tabInfo){
             var tab = this._renderTab(tabInfo);
 			div.insert(tab);
 			this.selectedTabInfo = tabInfo; // select last one by default
             var paneObject = this.getAndSetAjxpObject(tabInfo);
             if(!tabInfo.label && paneObject){
                 paneObject.getDomNode().observe("editor:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 paneObject.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
@@ -67,7 +70,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             if($(tabInfo.element)){
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
             }
             if(this.options.saveState){
@@ -95,9 +98,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	},
 
     _renderTab:function(tabInfo){
-
+        var td;
         if(tabInfo.ajxpClass && tabInfo.ajxpOptions){
-            var td = new Element('span', {className:'toggleHeader'});
+            td = new Element('span', {className:'toggleHeader'});
             var klass = Class.getByName(tabInfo.ajxpClass);
             new klass(td, tabInfo.ajxpOptions);
             tabInfo.headerElement = td;
@@ -116,9 +119,16 @@ Class.create("AjxpTabulator", AjxpPane, {
             var title = MessageHash[tabInfo.title] || label.stripTags();
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
-            var td = new Element('span', options);
-            if(this.options.tabsTips){
-                modal.simpleTooltip(td, title, this.options.tabsTips, "down_arrow_tip", "element");
+            td = new Element('span', options);
+            var short = this.shortenLabel(label);
+            if(this.options.tabsTips || short!=label){
+                var horizontal = this.htmlElement.hasClassName('left_tabulator');
+                modal.simpleTooltip(
+                    td,
+                    horizontal?'<div class="simple_tooltip_title">' + label+'</div>'+title:title,
+                    this.options.tabsTips,
+                    horizontal?"left_arrow_tip":"down_arrow_tip",
+                    "element");
             }
             if(tabInfo.icon){
                 td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
@@ -126,7 +136,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.iconClass){
                 td.insert(new Element('span', {className:tabInfo.iconClass}));
             }
-            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+label+'</span>');
+            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+short+'</span>');
             td.observe('click', function(){
                 this.switchTabulator(tabInfo.id);
             }.bind(this) );
@@ -143,7 +153,45 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     },
 
+    shortenLabel: function(label){
+        if(label && label.innerHTML){
+            if(label.down('.filenameSpan')){
+                var cont = label.down('.filenameSpan').innerHTML;
+                if(cont.length > 25){
+                    cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
+                    label.down('.filenameSpan').update(cont);
+                }
+            }
+            return label;
+        }
+        if(label.stripTags() != label) return label;
+        if(!label || !label.length) return '';
+        if(label.length > 25){
+            return label.substr(0,7)+"[...]"+label.substr(-13);
+        }
+        return label;
+    },
+
     openEditorForNode:function(ajxpNode, editorData){
+        if(this.options.uniqueTab){
+            // Unique Tab: close anyway
+            var editorId = 'unique-editor';
+            var existing = this.tabulatorData.detect(function(internalInfo){return internalInfo.id == editorId;});
+            if(existing && existing.ajxpObject) {
+                this.closeTab(editorId, true);
+            }
+            this.addTab({
+                id:editorId,
+                label:editorData.text,
+                iconClass:editorData.icon_class,
+                closeable:true
+            }, {
+                type:"editor",
+                editorData:editorData,
+                node:ajxpNode
+            });
+            return;
+        }
         this.addTab({
             id:editorData.id + ":/" + ajxpNode.getPath(),
             label:editorData.text,
@@ -217,6 +265,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
         $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
         fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element), null, this.options.fitMarginBottom);
+        var shortener = this.shortenLabel;
 
         if(paneInfo.type == 'editor' && paneInfo.node && paneInfo.node.getPath){
             var editorData;
@@ -242,7 +291,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 };
                 var editor = eval ( 'new '+editorData.editorClass+'(oForm, editorOptions)' );
                 editor.getDomNode().observe("editor:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 editor.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
@@ -268,7 +317,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(paneInfo.widgetClass && paneInfo.widgetOptions){
                 var widgetInstance = new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 // SERIALIZE CONFIG
                 if(confPaneInfo){
@@ -287,6 +336,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
         this.resize();
         if(!skipStateSave) this.saveState();
+        if(this.htmlElement) {
+            this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
+        }
     },
 
     /**
@@ -331,6 +383,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 
             this.resize();
             if(!skipSaveState) this.saveState();
+            if(this.htmlElement) {
+                this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
+            }
         }
     },
 
@@ -339,7 +394,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 * @param tabId String The id of the target tab
 	 */
 	switchTabulator:function(tabId){
-        if(this.crtTabId && this.crtTabId == tabId) return;
+        if(this.crtTabId && this.crtTabId == tabId && !this.options.uniqueTab) return;
 		var toShow ;
         var toShowElement;
 		this.tabulatorData.each(function(tabInfo){
@@ -371,7 +426,6 @@ Class.create("AjxpTabulator", AjxpPane, {
                 fitHeightToBottom($(toShowElement), null, this.options.fitMarginBottom);
                 toShow.showElement(true);
             }
-            var reFold = false;
             if(this.htmlElement && this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
                 if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
@@ -392,20 +446,34 @@ Class.create("AjxpTabulator", AjxpPane, {
 
 	},
 
+    switchToFirstIfPathDiffers: function(event){
+        var cNode = event.memo;
+        if(this._eventPath && cNode.getPath() != this._eventPath){
+            this.switchTabulator(this.tabulatorData.first().id);
+        }
+        this._eventPath = cNode.getPath();
+    },
+
 	/**
 	 * Resizes the widget
 	 */
-	resize : function(){
+	resize : function(size, loop){
 		if(!this.selectedTabInfo || !this.htmlElement) return;
+        if(this.options.fit && this.options.fit == 'height'){
+            fitHeightToBottom(this.htmlElement, this.options.fitParent);
+        }
         if(this.htmlElement.hasClassName('horizontal_tabulator')){
-            fitHeightToBottom(this.htmlElement.down('div.tabulatorContainer'), null, this.options.fitMarginBottom);
+            var tabContainer = this.htmlElement.down('div.tabulatorContainer');
+            fitHeightToBottom(tabContainer, null, this.options.fitMarginBottom);
+            var pWidth = this.htmlElement.getWidth() - tabContainer.getWidth();
+            this.htmlElement.select('> div:not(.tabulatorContainer)').invoke('setStyle', {width:pWidth+'px'});
         }
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
-		if(ajxpObject){
+		if(ajxpObject && !ajxpObject.fullScreenMode){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
-            fitHeightToBottom(nodeElement, null, this.options.fitMarginBottom);
+            fitHeightToBottom(nodeElement, this.htmlElement, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
-            var left ;
+            var left = 0 ;
             var total = 0;
             var cont = this.htmlElement.down('div.tabulatorContainer');
             var innerWidth = parseInt(this.htmlElement.getWidth()) - parseInt(cont.getStyle('paddingLeft')) - parseInt(cont.getStyle('paddingRight'));
@@ -443,6 +511,11 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
         }
         document.fire("ajaxplorer:resize-AjxpTabulator-" + this.htmlElement.id, this.htmlElement.getDimensions());
+        if(this.options.refireResize && !loop){
+            window.setTimeout(function(){
+                this.resize(size, true);
+            }.bind(this), this.options.refireResize * 1000);
+        }
 	},
 
     showElement: function($super, show){
@@ -523,6 +596,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.id == tabId) return tabInfo;
         });
         if(theInfo) return this.getAndSetAjxpObject(theInfo);
+        return null;
     },
 
     __stateLoaded : false,
@@ -566,6 +640,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 if(pair.value.TAB && pair.value.PANE){
                     pair.value.TAB.dontFocus = true;
                     window.setTimeout(function(){
+                        if(!$(this.htmlElement)) return;
                         this.addTab(pair.value.TAB, pair.value.PANE, true);
                     }.bind(this), index * 2000);
                     index ++;

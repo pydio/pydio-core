@@ -20,7 +20,7 @@
 */
 $mess=array(
 "FTP Server" => "FTP Server",
-"This driver can access a remote FTP server" => "Mit diesem Modul kann auf einen FTP-Server zugegriffen werden",
+"This driver can access a remote FTP server" => "Mit diesem Modul kann man auf FTP-Server zugreifen.",
 "Connexion" => "Verbindung",
 "Host" => "Host",
 "Ftp Host to connect to" => "FTP-Server mit dem Verbunden wird",
@@ -28,7 +28,7 @@ $mess=array(
 "Ftp Host port" => "FTP-Server Port",
 "Path" => "Pfad",
 "Real path to the root folder on the server" => "Realer Pfad zum Root-Verzeichnis auf dem Server",
-"Secure" => "Sicherheit",
+"Secure" => "Sichere Verbindung",
 "Whether to use ftp or ftps protocol" => "ftp- oder ftps-Protokoll verwenden",
 "Active" => "Aktiv",
 "Whether to use active or passive" => "Aktiv oder Passiv verwenden",

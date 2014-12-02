@@ -21,5 +21,6 @@
  */
 Interface.create("IAjxpNodeProvider", {
 	initProvider : function(properties){},
-	loadNode : function(nodePath, nodeCallback, childCallback){}
+	loadNode : function(nodePath, nodeCallback, childCallback){},
+    loadLeafNodeSync: function(node, callback){}
 });

@@ -47,6 +47,7 @@
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AUTOCREATE_AJXPUSER" type="boolean" label="MIXIN_MESSAGE[Auto Create User]" description="MIXIN_MESSAGE[When set to true, the user object is created automatically if the authentication succeed. Used by remote authentication systems.]" mandatory="false" default="false"/>
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="LOGIN_REDIRECT" type="string" label="MIXIN_MESSAGE[Login Redirect]" description="MIXIN_MESSAGE[If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL.]" mandatory="false"/>
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AJXP_ADMIN_LOGIN" type="string" label="MIXIN_MESSAGE[Admin Login]" description="MIXIN_MESSAGE[For exotic auth drivers, an user ID that must be considered as admin by default.]" mandatory="false"/>
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AUTO_APPLY_ROLE" type="string" label="MIXIN_MESSAGE[Auto apply role]" description="MIXIN_MESSAGE[For multiple authentication, apply this role to users authenticated via this driver]" mandatory="false"/>
         </server_settings>
     </authdriver_commons>
     <dibidriver_consumer>
@@ -72,4 +73,31 @@
             <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
         </server_settings>
     </dibidriver_provider>
+    <dibidriver_third_provider>
+        <server_settings uuidAttr="name">
+            <global_param group_switch_name="dibi_provider" group_switch_label="PDO" group_switch_value="pdo" name="pdo_driver" default="pdo" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PDO" group_switch_value="pdo" name="pdo_dsn" default="mysql:host=localhost;dbname=db" label="DSN" description="Data Source Name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PDO" group_switch_value="pdo" name="pdo_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PDO" group_switch_value="pdo" name="pdo_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_driver" default="mysql" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_host" default="localhost" label="Host" description="Database server" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_database" default="pydio" label="Database" description="Database name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_driver" default="sqlite3" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_formatDate" default="'Y-m-d'" label="formatDate" description="formatDate (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_formatDateTime" default="'Y-m-d H:i:s'" label="formatDateTime" description="formatDateTime (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_database" default="AJXP_DATA_PATH/plugins/conf.sql/pydio.db" label="File" description="Database file" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_driver" default="postgre" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_host" default="localhost" label="Host" description="Database server" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_database" default="pydio" label="Database" description="Database name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="PostgreSQL" group_switch_value="postgre" name="postgre_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MS SQLServer (via mssql extension)" group_switch_value="mssql" name="mssql_driver" default="mssql" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MS SQLServer (via mssql extension)" group_switch_value="mssql" name="mssql_host" default="localhost" label="Host" description="Database server" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MS SQLServer (via mssql extension)" group_switch_value="mssql" name="mssql_database" default="pydio" label="Database" description="Database name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MS SQLServer (via mssql extension)" group_switch_value="mssql" name="mssql_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="MS SQLServer (via mssql extension)" group_switch_value="mssql" name="mssql_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+        </server_settings>
+    </dibidriver_third_provider>
 </ajxp_mixins>

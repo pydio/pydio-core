@@ -23,12 +23,13 @@
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
-"1" => "Datei Metadaten",
-"2" => "Kein Label",
+"1" => "Metadaten",
+"2" => "Keine Beschreibung",
 "3" => "Bewertung entfernen",
 "4" => "Niedrig",
 "5" => "Todo",
 "6" => "Persönlich",
 "7" => "Arbeit",
-"8" => "Wichtig"
+"8" => "Wichtig",
+"9" => "Keine Werte",
 );

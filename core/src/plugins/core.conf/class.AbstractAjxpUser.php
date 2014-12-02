@@ -41,6 +41,26 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public $version;
     public $parentUser;
     public $resolveAsParent = false;
+    /**
+     * @var bool
+     */
+    private $hidden;
+
+    /**
+     * @param bool $hidden
+     */
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
 
     public $groupPath = "/";
     /**
@@ -187,20 +207,27 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function setLock($lockAction)
     {
-        $this->rights["ajxp.lock"] = $lockAction;
+        //$this->rights["ajxp.lock"] = $lockAction;
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', $lockAction);
+        $this->recomputeMergedRole();
     }
 
     public function removeLock()
     {
-        $this->rights["ajxp.lock"] = false;
+        if(isSet($this->rights['ajxp.lock'])){
+            $this->rights["ajxp.lock"] = false;
+        }
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_VALUE_CLEAR);
+        $this->recomputeMergedRole();
     }
 
     public function getLock()
     {
+        if($this->isAdmin() && $this->getGroupPath() == "/") return false;
         if (!empty($this->rights["ajxp.lock"])) {
             return $this->rights["ajxp.lock"];
         }
-        return false;
+        return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
     }
 
     public function isAdmin()
@@ -230,13 +257,13 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function canRead($rootDirId)
     {
-        if(!empty($this->rights["ajxp.lock"])) return false;
+        if($this->getLock() != false) return false;
         return $this->mergedRole->canRead($rootDirId);
     }
 
     public function canWrite($rootDirId)
     {
-        if(!empty($this->rights["ajxp.lock"])) return false;
+        if($this->getLock() != false) return false;
         return $this->mergedRole->canWrite($rootDirId);
     }
 
@@ -250,7 +277,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     {
         $repositoryObject = ConfService::getRepositoryById($repositoryId);
         if($repositoryObject == null) return false;
-        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, false);
+        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, true);
         /*
         if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
         if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
@@ -386,7 +413,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             throw new Exception("Empty role, this is not normal");
         }
         uksort($this->roles, array($this, "orderRoles"));
-        $this->mergedRole =  $this->roles[array_shift(array_keys($this->roles))];
+        $this->mergedRole =  clone $this->roles[array_shift(array_keys($this->roles))];
         if (count($this->roles) > 1) {
             $this->parentRole = $this->mergedRole;
         }
@@ -404,10 +431,14 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             //... but we want the parent user's role, filtered with inheritable properties only.
             $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
-                $this->parentRole = $this->parentRole->override($stretchedParentUserRole);
+                $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
+                // REAPPLY SPECIFIC "SHARED" ROLES
+                foreach ($this->roles as $role) {
+                    if(! $role->autoAppliesTo("shared")) continue;
+                    $this->parentRole = $role->override($this->parentRole);
+                }
             }
-
-            $this->mergedRole = $this->parentRole->override($this->personalRole);
+            $this->mergedRole = $this->personalRole->override($this->parentRole);  // $this->parentRole->override($this->personalRole);
         }
     }
 

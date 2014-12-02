@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.html" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<uploader id="uploader.html" order="0" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
     <server_settings>
         <global_param expose="true" name="DEFAULT_EXISTING" group="CONF_MESSAGE[Default Behaviour]" type="select" choices="overwrite|Always Override,rename|Auto Rename File,alert|Prompt user" label="CONF_MESSAGE[Existing Files]" description="CONF_MESSAGE[Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)]" mandatory="false" default="rename"/>
@@ -70,23 +70,49 @@
 		]]></clientForm>
         <clientForm id="originalUploadForm" theme="vision"><![CDATA[
 			<!-- UPLOAD FORM -->
-			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="420">
-			<div id="fileInputContainer">
-			    <div id="uploaderTextActions">
-                    <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
-                    <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
-                    <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
-			    </div>
-                <div id="fileInputContainerDiv">
-                        <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
-                        <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
+			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="500" box_padding="0">
+			<div style="padding:10px;">
+                <div id="fileInputContainer">
+                    <div id="uploaderTextActions">
+                        <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
+                        <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
+                        <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
+                    </div>
+                    <div id="fileInputContainerDiv">
+                            <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
+                            <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
+                    </div>
                 </div>
-            </div>
-			<div id="uploader_options_pane"></div>
-            <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
-            <div id="total_files_list"></div>
-			<input type="hidden" name="get_action" value="upload">
-			<input type="hidden" name="simple_uploader" value="true">
+                <div id="uploader_options_pane"></div>
+                <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
+                <div id="total_files_list"></div>
+                <input type="hidden" name="get_action" value="upload">
+                <input type="hidden" name="simple_uploader" value="true">
+			</div>
+			</form>
+			<script language="javascript">$('originalUploadForm').hide();</script>
+		]]></clientForm>
+        <clientForm id="originalUploadForm" theme="orbit"><![CDATA[
+			<!-- UPLOAD FORM -->
+			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="60%" box_padding="0">
+			<div style="padding:10px;">
+                <div id="fileInputContainer">
+                    <div id="uploaderTextActions">
+                        <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
+                        <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
+                        <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
+                    </div>
+                    <div id="fileInputContainerDiv">
+                            <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
+                            <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
+                    </div>
+                </div>
+                <div id="uploader_options_pane"></div>
+                <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
+                <div id="total_files_list"></div>
+                <input type="hidden" name="get_action" value="upload">
+                <input type="hidden" name="simple_uploader" value="true">
+			<div>
 			</form>
 			<script language="javascript">$('originalUploadForm').hide();</script>
 		]]></clientForm>
@@ -102,7 +128,10 @@
 			}
 		]]></dialogOnOpen>
 		<extensionOnInit><![CDATA[
-		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) ){
+		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"
+		       && 'draggable' in new Element('span') && (window.FileReader || window.FormData)
+		       && ajaxplorer && ajaxplorer.user && ajaxplorer.user.write
+	    	){
 			var dropzone = $$('[ajxpClass="FilesList"]')[0];
 			dropzone.addClassName('droparea');
 			var selector = '#content_pane,div.webfx-tree-item,.ajxpNodeProvider';

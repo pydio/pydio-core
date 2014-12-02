@@ -143,11 +143,13 @@ $mess=array(
 "118" => "New group",
 "group_access" => "g",
 "119" => "Set user group",
-    "120" => "Go Pro",
-    "121" => "Get professional support for your install",
-    "122" => "All Settings",
-    "123" => "Other plugins",
-    "124" => "Group successfully created",
-    "125" => "Group successfully deleted"
+"120" => "Go Pro",
+"121" => "Get professional support for your install",
+"122" => "All Settings",
+"123" => "Other plugins",
+"124" => "Source",
+"125" => "Alias",
+"126" => "Are you sure that you want to delete the selected element(s)?",
+"127" => "Warning, please do not use special characters, user would be created with login id '%s'",
 /* END SENTENCE */
 );

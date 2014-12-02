@@ -21,8 +21,8 @@
 $mess=array(
 "DB Storage" => "DB Storage",
 "Stores the logs in an SQL database." => "Stores the logs in an SQL database.",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
+"Connexion" => "Connection",
+"The Database Connexion" => "The Database Connection",
 "SQL Tables" => "SQL Tables",
 "Install SQL Tables" => "Install SQL Tables",
 );

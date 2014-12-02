@@ -103,3 +103,120 @@ a.m-2.disabled {
 #browser{
     background-image: url('../gui.ajax/res/themes/vision/images/grid_t.png');
 }
+
+.ajxp_theme_orbit div#background-imager{
+    background-image: url(../gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg) !important;
+    background-position: 50% 50%;
+    background-repeat: repeat repeat;
+}
+
+#uploadBrowseButton{
+    display: none !important;
+}
+
+#fileInputPos,
+#fileInputContainerDiv
+{
+    width: 280px;
+}
+
+#fileInputContainer input{
+    opacity: 1;
+    font-size: 12px;
+    height: 40px;
+}
+
+div#userdashboard_main_tab h3.dashboard_panel_title{
+    display: none;
+}
+
+/* UPDATE MINISITE TEMPlATES */
+#ajxp_shared_folder div#breadcrumb,
+#ajxp_embed_template div#breadcrumb
+{
+    display:none;
+}
+#ajxp_shared_folder #open_with_unique_button,
+#ajxp_embed_template #open_with_unique_button
+{
+    display: inline;
+}
+
+#ajxp_shared_folder img.custom_logo_image,
+#ajxp_embed_template img.custom_logo_image
+{
+    width: auto;
+    height: 70px !important;
+    top: inherit !important;
+    bottom: 6px;
+    right: 0;
+    left: inherit !important;
+}
+#ajxp_shared_folder .widget_logo,
+#ajxp_embed_template .widget_logo
+{
+    top: inherit;
+    bottom: 0;
+}
+#ajxp_shared_folder .thumbnail_selectable_cell.detailed.selected div.thumbLabel,
+#ajxp_embed_template .thumbnail_selectable_cell.detailed.selected div.thumbLabel
+{
+    padding-top: 12px;
+}
+#ajxp_shared_folder .selectable_div,
+#ajxp_embed_template .selectable_div
+{
+    padding-bottom: 90px !important;
+}
+#ajxp_shared_folder #widget_title,
+#ajxp_embed_template #widget_title
+{
+    color: white;
+}
+
+#ajxp_shared_folder #display_toolbar
+{
+    padding: 8px 9px 4px;
+    height: 25px;
+}
+
+div.detailed div.FL-inlineToolbar {
+    margin-left: 5px;
+    margin-bottom: 7px;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.selected div.FL-inlineToolbar a {
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+
+div.detailed .FL-inlineToolbar a#ls_inline_button {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+    border: 0;
+    padding: 4px 11px !important;
+    background-color: rgba(255, 255, 255, 0);
+    border-radius: 30px;
+}
+
+div.detailed .FL-inlineToolbar a#ls_inline_button > span.ajxp_icon_span{
+    font-size: 25px !important;
+}
+
+div.detailed .FL-inlineToolbar a#ls_inline_button > span.actionbar_button_label{
+    display: none !important;
+}
+#widget_title{
+    margin-right: 0;
+}
+#buttons_bar #inline_toolbar,
+#cpane_header #inline_toolbar
+{
+    display: none;
+}

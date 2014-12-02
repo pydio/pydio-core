@@ -21,7 +21,7 @@
 $mess=array(
 "1" => "Lien externe",
 "2" => "Lien ajouté par le plugin action.skeleton",
-"3" => "Etes vous sûr de vouloir ouvrir %s dans une nouvelle fenêtre?",
+"3" => "Êtes-vous sûr de vouloir ouvrir %s dans une nouvelle fenêtre ?",
 "4" => "Lien modal",
 "5" => "Ouverture du lien dans une fenêtre modale",
 "6" => "Contenu dynamique",

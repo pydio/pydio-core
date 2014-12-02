@@ -29,7 +29,7 @@
  * @package PThumb
  */
 class PThumb{
-    /**#@+
+    /**#@
 	     * PThumb Configuration Section
 	     */
 
@@ -124,14 +124,17 @@ class PThumb{
     var $file_ext = array();
     
     var $thumb_quality = 3;
+
+    var $exif_rotation = true;
     
     /**#@-*/
     /**
 	     * The class constructor.
 	     * @access public
 	     */
-    function PThumb($quality){
+    function PThumb($quality,$exifrotation){
     	$this->thumb_quality = $quality;
+    	$this->exif_rotation = $exifrotation;
 		$this -> error_array["fatal"] = array();
 		$this -> error_array["warning"] = array();
         if (!function_exists("gd_info")){
@@ -344,9 +347,12 @@ class PThumb{
                 $transformed = $image;
                 $hash = sha1($image_data);
             }
-            
             //Check if a version exists
-            $cache_file = $this -> cache_dir.sha1($transformed).".".$width.".".$height.".".$hash.".".$this->file_ext[$format];
+            if ($this -> exif_rotation)
+              $cache_file = $this -> cache_dir.sha1($transformed).".".$width.".".$height.".rotated.".$hash.".".$this->file_ext[$format];
+            else
+              $cache_file = $this -> cache_dir.sha1($transformed).".".$width.".".$height.".".$hash.".".$this->file_ext[$format];
+
             if (file_exists($cache_file)){   
                 if ($return_img == false){
             		//AJXP_Logger::debug("Using Cache");
@@ -381,7 +387,12 @@ class PThumb{
             	$handle = @opendir($this -> cache_dir);
                 if ($handle !== FALSE) {
                      while (false !== ($file = readdir($handle))) { 
-                          if (preg_match("/^".preg_quote(sha1($transformed))."\.[0-9]+\.[0-9]+\.([0-9a-z]{40})\.(.+?)$/i",$file,$matches)) { 
+                          if ($this -> exif_rotation)
+                            $rotated = "\.rotated";
+                          else
+                            $rotated = "";
+
+                          if (preg_match("/^".preg_quote(sha1($transformed))."\.[0-9]+\.[0-9]+".$rotated."\.([0-9a-z]{40})\.(.+?)$/i",$file,$matches)) {
                               //Hash is in [1]
                               //Check to see if the file data is the same. If it is, then don't delete it.
                               if ($matches[1] != $hash){
@@ -411,6 +422,15 @@ class PThumb{
             return $this -> set_error("Method print_thumbnail: Unsupported Image '$image' type");
         }
 		
+        //Exif Orientation patch
+        $orientation = $this -> exiforientation($image, true);
+        if ($this -> rotationsupported($orientation) and $orientation>4)
+        {
+          $width2 = $width;
+          $width = $height;
+          $height = $width2;
+        }
+
         //Now lets resize it
         //First lets create a new image handler which will be the thumbnailed image
         $thumbnail = imagecreatetruecolor($width,$height);
@@ -436,6 +456,45 @@ class PThumb{
         if (!$this->fastimagecopyresampled($thumbnail,$handle,0,0,0,0,$width,$height,ImageSX($handle),ImageSY($handle), $this->thumb_quality)){
             return $this -> set_error("Method print_thumbnail: Failed resizing image '$image'.");  
         }
+
+        // Rotate if JPEG and Exif Information is available
+        $orientation = $this -> exiforientation($image, true);
+        if ($this -> rotationsupported($orientation))
+        {
+          switch($orientation)
+          {
+            case 2: // mirror horizontal
+            @imageflip($thumbnail, IMG_FLIP_HORIZONTAL);
+            break;
+          
+            case 3: // rotate 180
+            $thumbnail = @imagerotate($thumbnail, 180, imagecolorallocate($thumbnail, 255, 255, 255));
+            break;
+
+            case 4: // mirror vertical
+            @imageflip($thumbnail, IMG_FLIP_VERTICAL);
+            break;
+
+            case 5: // mirror horizontal, 90 rotate left
+            @imageflip($thumbnail, IMG_FLIP_HORIZONTAL);
+            $thumbnail = @imagerotate($thumbnail, 90, imagecolorallocate($thumbnail, 255, 255, 255));
+            break;
+   
+            case 6: // 90 rotate right
+            $thumbnail = @imagerotate($thumbnail, -90, imagecolorallocate($thumbnail, 255, 255, 255));
+            break;
+
+            case 7: // mirror horizontal, 90 rotate right
+            @imageflip($thumbnail, IMG_FLIP_HORIZONTAL);
+            $thumbnail = @imagerotate($thumbnail, -90, imagecolorallocate($thumbnail, 255, 255, 255));
+            break;
+
+            case 8:    // 90 rotate left
+            $thumbnail = @imagerotate($thumbnail, 90, imagecolorallocate($thumbnail, 255, 255, 255));
+            break;
+          }
+        }
+
         //Cache it
         if ($this -> is_cacheable()){
             switch ($format){
@@ -522,7 +581,7 @@ class PThumb{
                         $outputed = @imagegif($thumbnail);
                         break;
                     case 2:
-                        $outputed = @imageJPEG($thumbnail,'',100);
+                        $outputed = @imageJPEG($thumbnail,null,100);
                         break;
                     case 3:
                         $outputed = @imagepng($thumbnail);
@@ -779,6 +838,16 @@ class PThumb{
             $width = $owidth;
             $height = $oheight;
         }
+
+        //if ($format == 2){
+        $orientation = $this -> exiforientation($image, true);
+        if ($this -> rotationsupported($orientation) and $orientation>4) 
+        {
+           $width2 = $width;
+           $width = $height;
+           $height = $width2;
+        }
+
         if ($return == false){
             return $this -> print_thumbnail($image,$width,$height);
         }
@@ -1014,7 +1083,43 @@ class PThumb{
 			imagecopyresampled ($dst_image, $temp, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $dst_w * $quality, $dst_h * $quality);
 			imagedestroy ($temp);
 		} else imagecopyresampled ($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
+
 		return true;
 	}
+
+    function exiforientation($image, $fetch)
+    {
+        if (!$this -> exif_rotation || !function_exists('exif_read_data'))
+            return false;
+
+        if ($fetch)
+        {
+            $image_data = $this -> retrieve_remote_file($image,true, false, 1);
+            $exif = @exif_read_data("data://image/jpeg;base64,".@base64_encode($image_data),'IFD0');
+        } else
+        {
+            $exif = @exif_read_data($image);
+        }
+        if ($exif!=FALSE)
+        {
+            return $exif['Orientation'];
+        }
+    }
+
+    function rotationsupported($exif_orientation)
+    {
+        if (!$exif_orientation)
+            return FALSE;
+
+        if (!$this -> exif_rotation)
+            return FALSE;
+
+        if (function_exists("imageflip"))
+            return TRUE;
+
+        if ($exif_orientation!=2 and $exif_orientation!=4 and $exif_orientation!=5 and $exif_orientation!=7)
+            return TRUE;
+
+        return FALSE;
+    }
 }
-?>

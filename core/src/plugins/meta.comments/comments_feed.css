@@ -119,3 +119,7 @@ div.double #comments_form textarea, div.triple #comments_form textarea{
 .foldedPanel_tooltip .comment_content:nth-child(even) .comment_text {
     text-align: left;
 }
+
+.ajxp_theme_orbit #comments_form textarea{
+    border-width: 1px 1px;
+}

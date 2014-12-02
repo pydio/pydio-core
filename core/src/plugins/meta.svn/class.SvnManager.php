@@ -29,13 +29,11 @@ if (SVNLIB_PATH != "") {
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class SvnManager extends AJXP_Plugin
+class SvnManager extends AJXP_AbstractMetaSource
 {
     private static $svnListDir;
     private static $svnListCache;
     private $commitMessageParams;
-
-    protected $accessDriver;
 
     public function init($options)
     {
@@ -46,17 +44,15 @@ class SvnManager extends AJXP_Plugin
     public function initMeta($accessDriver)
     {
         require_once("svn_lib.inc.php");
-
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         parent::init($this->options);
-
     }
 
     protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $urlBase = $wrapperData["protocol"]."://".$repo->getId();
@@ -117,7 +113,7 @@ class SvnManager extends AJXP_Plugin
      */
     public function commitFile($file, $ajxpNode = null)
     {
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $file);

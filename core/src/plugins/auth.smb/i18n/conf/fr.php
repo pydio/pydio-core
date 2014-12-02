@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentification" => "Authentification Samba",
-"Authenticate user by directly connecting to an SMB share" => "Négociation avec un serveur Samba",
+"SMB Authentification" => "Authentification SMB",
+"Authenticate user by directly connecting to an SMB share" => "Authentifier les utilisateurs en se connectant directement à un partage SMB",
 "Repository" => "Dépôt",
-"Id of the repository to use for testing connexion" => "Id du dépôt définissant les informations de connexion samba",
-"Admin user" => "Utilisateur admin",
-"The ID of an existing admin for Pydio (using conf.serial)" => "Id d'un utilisateur ayant les droits d'administration.",
+"Id of the repository to use for testing connexion" => "Id du dépôt à utiliser pour tester la connexion",
+"Admin user" => "Utilisateur administrateur",
+"The ID of an existing admin for Pydio (using conf.serial)" => "Id d'un utilisateur ayant les droits d'administration sur Pydio (utilisation de conf.serial).",
 );

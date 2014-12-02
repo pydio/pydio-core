@@ -1,3 +1,4 @@
 themes/umbra/css/xtree.css
 themes/umbra/css/screen.css
 themes/umbra/css/ajaxplorer.css
+themes/orbit/css/chosen.css#NO_MINI

@@ -104,6 +104,15 @@ Class.create("Repository", {
 		this.label = label;
 	},
 
+    getHtmlBadge : function(){
+        if(!this.label) return '';
+        if(!this.badge){
+            var letters = this.label.split(" ").map(function(word){return word.substr(0,1)}).join("");
+            this.badge = "<span class='letter_badge'>"+ letters +"</span>";
+        }
+        return this.badge;
+    },
+
     /**
      * @return String
      */
@@ -118,7 +127,7 @@ Class.create("Repository", {
 		return this.icon;
 	},
 	/**
-	 * @param label String
+	 * @param icon String
 	 */
 	setIcon : function(icon){
 		this.icon = icon;
@@ -138,7 +147,7 @@ Class.create("Repository", {
 		return this.accessType;
 	},
 	/**
-	 * @param label String
+	 * @param access String
 	 */
 	setAccessType : function(access){
 		this.accessType = access;

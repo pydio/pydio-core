@@ -1,43 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxpclient">
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
-	<!--
-		<action name="get_boot_conf" skipSecureToken="true">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
-	-->
-		<action name="get_xml_registry">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
 		<action name="get_template">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_i18n_messages">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/" developerComment="Load the list of translation strings">
+                    <output type="json" description="A JSON table of all strings contributed by all plugins."/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="get_editors_registry">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="display_doc">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/doc_file" developerComment="Load a doc file">
+                    <input_param name="doc_file" type="string" description="Text file base name (without extension) located inside the doc folder."/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-up" hasAccessKey="true"
+			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-left" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
-					actionBar="false" contextMenu="true" infoPanel="false" actionBarGroup="default">
+					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="navigation">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -51,7 +43,7 @@
 			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false">
+					actionBar="false" actionBarGroup="navigation" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -176,4 +168,4 @@
 			</processing>
 		</action>
 	</actions>
-</guidriver>
+</registry_contributions>

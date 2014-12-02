@@ -19,9 +19,9 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Flash uploader" => "Uploader Flash",
-"Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Alternative à l'upload HTML5. Pour forcer l'utilisation de cet uploader, désactiver les autres, et commenter la partie activeCondition dans le manifest de ce plugin.",
+"Flash uploader" => "Programme d'envoi Flash",
+"Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Alternative à l'envoi via HTML5. Pour forcer l'utilisation de ce programme d'envoi, désactivez 'uploader.html' et supprimez le tag 'activeCondition' du fichier de manifest 'uploader.flex'",
 "Miscalleneous" => "Divers",
-"HTTPS Policy" => "HTTPS Policy",
-"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Fichier 'HTTPS Policy' pour résoudre les problèmes https, utiliser un chemin relative du serveur web.",
+"HTTPS Policy" => "Politique HTTPS",
+"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Un fichier de politique HTTPS peut-être utilisé pour résoudre les problème d'envoi de Flash lors de l'utilisation d'HTTPS. Utilisez un chemin relatif à la racine web.",
 );

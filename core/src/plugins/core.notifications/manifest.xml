@@ -14,7 +14,7 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="activate_notifications" scope="user" description="Activate desktop notifications" label="Desktop Notifications" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
+        <param name="activate_notifications" scope="user" description="CONF_MESSAGE[Activate desktop notifications]" label="CONF_MESSAGE[Desktop Notifications]" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
         <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
@@ -29,7 +29,9 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
+                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
+                            NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
+                        });
                     ]]></dynamicBuilder>
                 </subMenu>
                 <processing>
@@ -39,15 +41,59 @@
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
                         </div>
                     ]]></clientForm>
-                    <clientListener name="init"><![CDATA[
-                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
-                        NotificationLoader.getInstance();
+                    <clientListener name="contextChange"><![CDATA[
+                        if(!window.NotificationLoader && ajaxplorer.user){
+                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
+                        }
                     ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>
+            <action name="feed">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <processing>
+                    <serverCallback methodName="loadUserFeed" restParams="/feed_type/path+" developerComment="Load an activity feed for the given node. Filtered by what the current user is authorized to see">
+                        <input_param name="path" type="path" description="Optional filter to get activity on a file or a folder"/>
+                        <input_param name="format" type="string" description="html, json, xml, array (internal value)"/>
+                        <input_param name="feed_type" type="string" description="notif, alert or all"/>
+                        <input_param name="offset" type="integer" description="Offset for pagination"/>
+                        <input_param name="limit" type="integer" description="Limit for pagination"/>
+                        <input_param name="merge_description" type="boolean" description="Wether to merge notification title and description in text"/>
+                        <input_param name="merge_description_as_label" type="boolean" description="Wether to merge notification title and description in title"/>
+                        <input_param name="current_repository" type="boolean"
+                                     description="Wether to get activity from current repository (true), or compute all from authorized repositories for user (false)"/>
+                    </serverCallback>
+                </processing>
+            </action>
             <action name="dismiss_user_alert">
-                <processing><serverCallback methodName="dismissUserAlert"/></processing>
+                <gui text="notification_center.7" title="notification_center.7" iconClass="icon-remove-sign" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="inline-notifications" contextMenu="false" infoPanel="false"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                    var selection = window.actionArguments[0];
+                    if(selection && selection.getMetadata && selection.getMetadata().get("alert_id")){
+                        var elMeta = selection.getMetadata();
+                        var conn = new Connexion();
+                        conn.onComplete = function(){
+                            ajaxplorer.notify("server_message:tree/reload_user_feed");
+                        };
+                        var params = {
+                            get_action:'dismiss_user_alert',
+                            alert_id:elMeta.get('alert_id')
+                        };
+                        if(elMeta.get("event_occurence")){
+                            params.occurrences = elMeta.get("event_occurence");
+                        }
+                        conn.setParameters(params);
+                        conn.sendAsync();
+                    }
+                    ]]></clientCallback>
+                    <serverCallback methodName="dismissUserAlert" restParams="/alert_id/occurences" developerComment="Dismiss one or more occurences of alerts">
+                        <input_param name="alert_id" type="integer" description="Id passed in /feed action list"/>
+                        <input_param name="occurences" type="integer" description="1 or more"/>
+                    </serverCallback>
+                </processing>
             </action>
             <action name="activateDesktopNotifications">
                 <gui src="" iconClass="icon-rss" text="notification_center.1" title="notification_title.2">
@@ -70,7 +116,29 @@
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
+            <serverCallback methodName="loadRepositoryInfo" hookName="repository.load_info"/>
         </hooks>
+        <client_configs>
+            <component_config className="InfoPanel">
+                <infoPanelExtension mime="ajxp_root_node,generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
+                    <messages>
+                        <message key="type_string" id="share_center.50"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div id="ajxp_activity_panel" data-infoPanelPosition="last">
+                        </div>
+                    ]]></html>
+                </infoPanelExtension>
+            </component_config>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="navigation_alerts"><![CDATA[
+                <div id="navigation_alerts" ajxp_position="0">
+                    <h3 class="colorcode-alert" ajxp_message_id="notification_center.3">AJXP_MESSAGE[notification_center.3] <span class="alerts_number_badge" id="alerts_number" ajxpClass="DataModelProperty" ajxpOptions='{"dmID":"notif_pane","property":"metadata","metadata_sum":"event_occurence"}'></span><small id="alerts_toggler"  class="simple-toggler-hide" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"notif_pane"}'>AJXP_MESSAGE[514]</small></h3>
+                    <div id="notif_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"forceClearOnRepoSwitch":true, "inlineToolbarOptions":{"toolbarsList":["inline-notifications"]}, "fit":"content", "columnsDef":[{"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},{"attributeName":"event_description", "messageString":"Description", "sortType":"String"}], "reloadOnServerMessage":"tree/reload_user_feed", "silentLoading":true, "fixedSortColumn":"event_time", "fixedSortDirection":"desc","nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"true"}, "emptyChildrenMessage":"notification_center.8"}'></div>
+                </div>
+                ]]></additional_content>
+            </component_config>
+        </client_configs>
     </registry_contributions>
     <dependencies>
         <activePlugin pluginName="core.conf"/>

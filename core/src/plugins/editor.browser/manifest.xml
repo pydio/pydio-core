@@ -3,6 +3,14 @@
 		title="openbrowser.2" icon="openbrowser_images/actions/ICON_SIZE/project-open.png" iconClass="icon-laptop"
 		className="BrowserOpener" mimes="*" formId="open_box" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <server_settings>
+        <global_param name="OPEN_DOCS_IN_TAB" type="select" label="CONF_MESSAGE[Open documents in...]"
+                      description="CONF_MESSAGE[Choose where the documents are opened]"
+                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+        <global_param name="OPEN_LINK_IN_TAB" type="select" label="CONF_MESSAGE[Open link in...]"
+                      description="CONF_MESSAGE[Choose where the http links are opened]"
+                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+    </server_settings>
     <client_settings>
         <resources>
             <js file="plugins/editor.browser/class.BrowserOpener.js" className="BrowserOpener"/>
@@ -10,8 +18,9 @@
             <img_library alias="openbrowser_images" path="plugins/editor.browser/resources/images" />
         </resources>
     </client_settings>
+    
 	<clientForm id="open_box"><![CDATA[
-		<div id="open_box" action="editer" box_width="185">
+		<div id="open_box" action="editer" box_width="185" class="editor_container">
 		AJXP_MESSAGE[openbrowser.3]
 		</div>
 	]]></clientForm>
@@ -28,6 +37,48 @@
     				<serverCallback methodName="switchAction"/>
     			</processing>
     		</action>
+            <action name="mklink">
+                <gui text="openbrowser.4" title="openbrowser.4" src="filenew.png" accessKey="file_access_key" iconClass="icon-file-alt" hasAccessKey="false">
+                    <context selection="false" dir="true" recycle="hidden" actionBar="false"
+                             contextMenu="false" infoPanel="false" actionBarGroup="create" inZip="false"/>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                    modal.showDialogForm('Create', 'mklink_form', null, function(){
+
+                        var oForm = modal.getForm();
+                        oForm.down("#filename").setValue(oForm.down("#filename").getValue()+ '.url');
+                        ajaxplorer.actionBar.submitForm(oForm);
+                        hideLightBox(true);
+                        return false;
+
+                    });
+                ]]></clientCallback>
+                <clientForm id="mklink_form"><![CDATA[
+                    <div id="mklink_form" action="mkfile">
+                        <div class="dialogLegend" ajxp_message_id="openbrowser.6">AJXP_MESSAGE[openbrowser.6]</div>
+                        <input type="text" id="content" style="width:390px;" name="content" placeholder="http[s]://" class="dialogFocus">
+                        <div class="dialogLegend" ajxp_message_id="openbrowser.8">AJXP_MESSAGE[openbrowser.8]</div>
+                        <input type="text" id="filename" style="width:390px;" name="filename" value="">
+                    </div>
+                ]]></clientForm>
+                <clientListener name="init"><![CDATA[
+                    document.observe("ajaxplorer:afterApply-mkdir", function(){
+                        if(modal.getForm().down("#alt_mklink")) return;
+                        var link = '<div class="dialogLegend" style="padding-top:20px;" id="alt_mklink"><span class="icon-chevron-right"></span> '+MessageHash["openbrowser.5"]+'</div>';
+                        modal.getForm().down("div.dialogButtons").insert({before:link});
+                        modal.getForm().down("#alt_mklink").down("a").addClassName("create_file_alt_link").observe("click", function(){
+                            ajaxplorer.actionBar.fireAction("mklink");
+                        });
+                    });
+                ]]></clientListener>
+                </processing>
+            </action>
     	</actions>
+        <extensions>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="url"/>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="website"/>
+        </extensions>
     </registry_contributions>
 </editor>

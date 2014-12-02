@@ -45,27 +45,18 @@ class ftpAuthDriver extends AbstractAuthDriver
         if($contribNode->nodeName != "actions") return ;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false) {
-            // Remove "ftp_login" && "ftp_set_data" actions
-            $nodeList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
+            // Remove "login" && "ftp_set_data" actions
+            $nodeList = $actionXpath->query('action[@name="login"]', $contribNode);
             if(!$nodeList->length) return ;
-            unset($this->actions["dynamic_login"]);
-            $contribNode->removeChild($nodeList->item(0));
-
+            foreach($nodeList as $nodeChild){
+                $contribNode->removeChild($nodeChild);
+            }
             $nodeList = $actionXpath->query('action[@name="ftp_set_data"]', $contribNode);
             if(!$nodeList->length) return ;
             unset($this->actions["ftp_set_data"]);
             $contribNode->removeChild($node = $nodeList->item(0));
         } else {
-            // Replace "login" by "dynamic_login"
-            $loginList = $actionXpath->query('action[@name="login"]', $contribNode);
-            if ($loginList->length && $loginList->item(0)->getAttribute("auth_ftp_impl") == null) {
-                $contribNode->removeChild($loginList->item(0));
-            }
-            $dynaLoginList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
-            if ($dynaLoginList->length) {
-                $dynaLoginList->item(0)->setAttribute("name", "login");
-                $dynaLoginList->item(0)->setAttribute("auth_ftp_impl", "true");
-            }
+            // Local "login" will replace standard one.
         }
     }
 

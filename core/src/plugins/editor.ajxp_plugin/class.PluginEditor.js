@@ -164,7 +164,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 docDiv.select('img').each(function(img){
                     img.setStyle({width:'220px'});
                     img.setAttribute('src', 'plugins/'+ this.pluginId+'/'+img.getAttribute('src'));
-                });
+                }.bind(this));
                 this.docPane.insert({bottom:docDiv});
 
                 var pluginfo = docDiv.down("ul.pluginfo_list");
@@ -246,7 +246,8 @@ Class.create("PluginEditor", AbstractEditor, {
 
     mergeObjectsRecursive : function(source, destination){
         var newObject = {};
-        for (var property in source) {
+        var property;
+        for (property in source) {
             if (source.hasOwnProperty(property)) {
                 if( source[property] === null ) continue;
                 if( destination.hasOwnProperty(property)){
@@ -264,7 +265,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 }
             }
         }
-        for (var property in destination){
+        for (property in destination){
             if(destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) && destination[property]!==null){
                 if(destination[property] instanceof Object) {
                     newObject[property] = this.mergeObjectsRecursive(destination[property], {});

@@ -125,6 +125,23 @@ class serialConfDriver extends AbstractConfDriver
         return $all;
     }
 
+    /**
+     * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param Array $criteria
+     * @return Array
+     */
+    public function listRepositoriesWithCriteria($criteria){
+
+        $all = AJXP_Utils::loadSerialFile($this->repoSerialFile);
+        if ($criteria != null) {
+            return ConfService::filterRepositoryListWithCriteria($all, $criteria);
+        }else{
+            return $all;
+        }
+
+    }
+
+
     public function listRoles($roleIds = array(), $excludeReserved = false)
     {
         $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
@@ -350,6 +367,28 @@ class serialConfDriver extends AbstractConfDriver
             }
         }
         return $result;
+    }
+
+    /**
+     * @abstract
+     * @param string $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return array()
+     */
+    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
+        return array();
+    }
+
+    /**
+     * @param string $repositoryId
+     * @param boolean $details
+     * @return array('internal' => count, 'external' => count)
+     */
+    public function countUsersForRepository($repositoryId, $details = false){
+        $c = count($this->getUsersForRepository($repositoryId));
+        if($details) return array("internal" => $c);
+        else return $c;
     }
 
 

@@ -109,8 +109,8 @@ Class.create("TreeSelector", {
 	 */
 	getFilterActive : function(refValue){
 		if(!this.filterSelector.visible()) return false;
-		if(refValue && this.filterSelector.getValue() == refValue) return false;
-		return true;
+		return !(refValue && this.filterSelector.getValue() == refValue);
+
 	},
 	/**
 	 * Add an option to the filter

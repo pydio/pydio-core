@@ -43,7 +43,7 @@ Class.create("FormManager", {
         var collectCdata = false;
         for(var i=0; i<paramsAtts.length; i++){
             var attName = paramsAtts.item(i).nodeName;
-            var value = paramsAtts.item(i).nodeValue;
+            var value = paramsAtts.item(i).value;
             if( (attName == "label" || attName == "description" || attName == "group" || attName.indexOf("group_switch_") === 0) && MessageHash[value] ){
                 value = MessageHash[value];
             }
@@ -54,7 +54,7 @@ Class.create("FormManager", {
 			paramsHash.set(attName, value);
 		}
         if(collectCdata){
-            paramsHash.set("value", paramNode.firstChild.nodeValue);
+            paramsHash.set("value", paramNode.firstChild.value);
         }
         paramsHash.set("xmlNode", paramNode);
 		return paramsHash;
@@ -75,6 +75,8 @@ Class.create("FormManager", {
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
+            var conn = new Connexion();
+
             // deduplicate
             if(form.down('[name="'+name+'"]')) return;
 
@@ -123,7 +125,6 @@ Class.create("FormManager", {
                     }
                     testValues.set('get_action', firstPart);
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
-                    var conn = new Connexion();
 
                     if(choicesValue.length > 1){
                         testValues.set("action_plugin_id", choicesValue.shift());
@@ -155,7 +156,6 @@ Class.create("FormManager", {
                     element.addClassName('SF_inlineMonitoringWorking');
                     var testValues = $H();
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
-                    var conn = new Connexion();
 
                     var choicesValue = param.get("choices").split(":");
                     testValues.set('get_action', choicesValue.shift());
@@ -205,16 +205,21 @@ Class.create("FormManager", {
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-false"  '+(selectFalse?'checked':'')+' value="false"'+disabledString+'><label for="'+name+'-false">'+MessageHash[441] + '</label>';
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select'){
-                var choices, json_list;
+                var choices, json_list, json_file;
                 if(Object.isString(param.get("choices"))){
                     if(param.get("choices").startsWith("json_list:")){
                         choices = ["loading|"+MessageHash[466]+"..."];
                         json_list = param.get("choices").split(":")[1];
+                    }else if(param.get("choices").startsWith("json_file:")){
+                        choices = ["loading|"+MessageHash[466]+"..."];
+                        json_file = param.get("choices").split(":")[1];
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
                         var object = window.ajxpBootstrap.parameters.get("availableLanguages");
                         choices = [];
-                        for(var key in object){
-                            choices.push(key + "|" + object[key]);
+                        for(key in object){
+                            if(object.hasOwnProperty(key)){
+                                choices.push(key + "|" + object[key]);
+                            }
                         }
                     }else if(param.get("choices") == "AJXP_AVAILABLE_REPOSITORIES"){
                         choices = [];
@@ -252,7 +257,6 @@ Class.create("FormManager", {
                 element += '</select>';
             }else if(type == "image" && param.get("uploadAction")){
                 if(defaultValue){
-                    var conn = new Connexion();
                     var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
                     if(param.get("binary_context")){
                         imgSrc += "&" + param.get("binary_context");
@@ -361,8 +365,8 @@ Class.create("FormManager", {
                 div.insert(new Element('div', {className:"SF_label"}).update('<span>'+label+(mandatory?'*':'')+'</span>'));
                 // INSERT CHECKBOX
                 if(addFieldCheckbox){
-                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValueExists?'checked':'')+'/>';
-                    cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
+                    //var cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValueExists?'checked':'')+'/>';
+                    var cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
                     cBox.checked = defaultValueExists;
                     div.insert(cBox);
                 }
@@ -401,10 +405,15 @@ Class.create("FormManager", {
                 element.observe('blur', fObs);
             }
 			if(desc && type != "legend"){
-				modal.simpleTooltip(div.down('.SF_label').down('span'), '<div class="simple_tooltip_title">'+label+'</div>'+desc, 'middle left', "right_arrow_tip", "element");
+                var ttSpan = div.down('.SF_label').down('span');
+				modal.simpleTooltip(ttSpan, '<div class="simple_tooltip_title">'+label+'</div>'+desc,
+                    'middle left', "right_arrow_tip", "element");
+                ttSpan.writeAttribute('data-tooltipLabel', label);
+                ttSpan.writeAttribute('data-tooltipDescription', desc);
 			}
+            var key;
+            var conn = new Connexion();
             if(json_list){
-                var conn = new Connexion();
                 element = div.down("select");
                 if(defaultValue) element.defaultValue = defaultValue;
                 conn.setParameters({get_action:json_list});
@@ -412,23 +421,41 @@ Class.create("FormManager", {
                     var json = transport.responseJSON;
                     element.down("option").update(json.LEGEND ? json.LEGEND : "Select...");
                     if(json.HAS_GROUPS){
-                        for(var key in json.LIST){
-                            var opt = new Element("OPTGROUP", {label:key});
-                            element.insert(opt);
-                            for (var index=0;index<json.LIST[key].length;index++){
-                                var option = new Element("OPTION").update(json.LIST[key][index].action);
-                                element.insert(option);
+                        for(key in json.LIST){
+                            if(json.LIST.hasOwnProperty(key)){
+                                var opt = new Element("OPTGROUP", {label:key});
+                                element.insert(opt);
+                                for (var index=0;index<json.LIST[key].length;index++){
+                                    element.insert(new Element("OPTION").update(json.LIST[key][index].action));
+                                }
                             }
                         }
                     }else{
-                        for (var key in json.LIST){
-                            var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
-                            if(key == defaultValue) option.setAttribute("selected", "true");
-                            element.insert(option);
+                        for (key in json.LIST){
+                            if(json.LIST.hasOwnProperty(key)){
+                                var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
+                                if(key == defaultValue) option.setAttribute("selected", "true");
+                                element.insert(option);
+                            }
                         }
                     }
+                    element.fire("chosen:updated");
                 };
                 conn.sendAsync();
+            }else if(json_file){
+                var req = new Connexion(json_file);
+                req.onComplete = function(transport){
+                    element = div.down("select");
+                    if(defaultValue) element.defaultValue = defaultValue;
+                    element.down('option[value="loading"]').remove();
+                    $A(transport.responseJSON).each(function(entry){
+                        var option = new Element('OPTION', {value:entry.key}).update(entry.label);
+                        if(entry.key == defaultValue) option.setAttribute("selected", "true");
+                        element.insert(option);
+                    });
+                    element.fire("chosen:updated");
+                };
+                req.sendAsync();
             }
 
             if(param.get('replicationGroup')){
@@ -452,7 +479,7 @@ Class.create("FormManager", {
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 if(ref > (Prototype.Browser.IE?40:0)){
                     var lab = div.down('.SF_label');
-                    if(lab){
+                    if(lab && lab.getStyle('float') == 'left'){
                         var fontSize = lab.getStyle('fontSize');
                         lab.setStyle({fontSize:fontSize});
                         lab.setStyle({width:parseInt(39*ref/100)+'px'});
@@ -494,7 +521,6 @@ Class.create("FormManager", {
             }.bind(this));
         }
         if(!groupDivs.size()) return;
-        var firstGroup = true;
         groupDivs.each(function(pair){
             var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(pair.key);
             title.observe('focus', function(){
@@ -554,7 +580,6 @@ Class.create("FormManager", {
         if(!$("formManager_hidden_iframe")){
             $('hidden_frames').insert(new Element("iframe", {id:"formManager_hidden_iframe", name:"formManager_hidden_iframe"}));
         }
-        var paramName = param.get("name");
         var pane = new Element("div");
         pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
             "<div class='dialogLegend'>Select an image on your computer</div> " +
@@ -660,7 +685,7 @@ Class.create("FormManager", {
 			}
 			else if(el.type=="radio" && el.checked){
 				parametersHash.set(prefix+el.name, el.value)
-			};
+			}
 			if(el.getAttribute('data-ajxp_type')){
 				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('data-ajxp_type'));
 			}
@@ -770,6 +795,7 @@ Class.create("FormManager", {
 			var inputs = tr.select('input', 'select', 'textarea');
 			inputs.each(function(input){
 				var newName = input.getAttribute('name')+'_'+repIndex;
+                input.writeAttribute('data-originalName', input.getAttribute('name'));
 				input.setAttribute('name', newName);
 				if(form && Prototype.Browser.IE){form[newName] = input;}
                 if(values && values.get(newName)){
@@ -787,6 +813,12 @@ Class.create("FormManager", {
                     tr.insert(templateRow.select('.SF_replication_Add')[0]);
                 }
             }
+            tr.select(".simple_tooltip_observer[data-toolTipLabel]").each(function(sT){
+                var label = sT.readAttribute('data-tooltipLabel');
+                var desc = sT.readAttribute('data-tooltipDescription');
+                modal.simpleTooltip(sT, '<div class="simple_tooltip_title">'+label+'</div>'+desc,
+                    'middle left', "right_arrow_tip", "element");
+            });
             var removeButton = new Element('a', {className:'SF_replication_Remove', title:'Remove this group'})
                 .update('&nbsp;')
                 .observe('click', function(){
@@ -819,6 +851,7 @@ Class.create("FormManager", {
 	fetchValueToForm : function(form, fields, value, suffix){
 		$A(fields).each(function(fieldName){
 			if(!value[fieldName]) return;
+            var realFieldName;
 			if(suffix != null){
 				realFieldName = fieldName+'_'+suffix;
 			}else{

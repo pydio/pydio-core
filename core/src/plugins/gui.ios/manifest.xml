@@ -33,6 +33,28 @@
 					<a id="skipios-redir" class="m-2" style="width:70%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">I don't care, let me use <br/>the web version of Pydio!</a><br>
 				</div>
 			]]></template>
+			<template name="orbit_style" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
+                    <style>
+                    #browser{
+                        position:absolute;
+                        z-index:10000;
+                    }
+                    a.m-2{
+                        width: 80%;
+                        padding: 20px;
+                        margin: 10px auto;
+                        font-size: 1em;
+                        color: #555;
+                        font-family: "Open Sans Regular";
+                        border: 1px solid #666;
+                    }
+                    #message-id-1{
+                        color: #555;
+                        font-family: "Open Sans Regular";
+                        margin: 30px auto !important;
+                    }
+                    </style>
+			]]></template>
 		</client_configs>
 	<actions>
 	<!-- Override a simple action -->

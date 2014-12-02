@@ -1,0 +1,421 @@
+
+#team_pane, #parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
+    /* background-color: #f8f8f8; */
+}
+
+#workspaces_center{
+    width: 100%;
+    margin-top: 0;
+    transition:margin 0.5s ease;
+}
+
+#list_cont{
+    overflow-y: auto;
+}
+
+#workspaces_list{
+    list-style: none;
+    padding-left: 0;
+}
+
+#workspaces_list span.letter_badge {
+    margin: 9px 13px 2px 50px;
+}
+
+#home_left_bar{
+    width: 420px;
+    background-color: rgba(34, 34, 34, 0.5);
+    float: left;
+}
+
+#home_center_panel{
+    float: left;
+}
+
+.repoInfoBadge {
+    display: inline-block;
+    font-size: 25px;
+    min-width: 210px;
+    max-width: 300px;
+    line-height: 30px;
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 8px;
+    margin: 10px 16px;
+    min-height: 106px;
+    font-family: "Open sans Regular", Arial, sans-serif;
+    vertical-align: top;
+    padding: 13px 8px;
+    text-align: left;
+}
+
+.repoInfoTitle {
+    text-transform: uppercase;
+    font-family: "Open sans Light", Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 9px;
+}
+
+.repoInfoBadge span {
+    display: block;
+    font-size: 50px;
+    float: left;
+    margin: 6px 16px 0 14px;
+    opacity: 0.9;
+}
+
+#home_account_pane #close-icon{
+    position: absolute;
+    margin-left: 2px;
+    margin-top: 1px;
+    cursor: pointer;
+    transition:margin 0.5s ease;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+#workspaces_list h3{
+    padding: 16px 12px 14px 10px;
+    font-weight: normal;
+    font-size: 19px;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+#workspaces_list h4{
+    margin: 0;
+    padding: 0 10px 11px;
+    font-weight: normal;
+    font-size: 12px;
+    opacity: 0.4;
+    letter-spacing: 1px;
+    margin-left:60px;
+    display: none;
+}
+
+#workspaces_list li {
+    cursor: pointer;
+    padding: 5px 9px;
+    clear: left;
+    font-weight: normal;
+}
+
+#workspaces_list li.ws_selector_title{
+    cursor: default;
+}
+
+#workspaces_list li:hover {
+    background-color: rgba(255,255,255,0.3);
+}
+
+#workspaces_list li.ws_selector_title:hover {
+    background-color: transparent;
+}
+
+#workspaces_list li.ws_selector_title h3{
+    font-size: 23px;
+    padding: 20px 43px;
+    text-transform: uppercase;
+}
+
+#workspaces_list li.selected{
+    background-color: rgba(227, 93, 82, 0.7) !important;
+    color: white;
+}
+
+#workspaces_list li:last-of-type {
+    border-bottom: 0;
+}
+
+#home_account_pane #notifications_center {
+    float: right;
+    width: 29%;
+    height: 96%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #ebedf0;
+    color: rgb(111,123,136);
+    margin-top: 2px;
+    transition: width 1s ease;
+    border-radius: 6px 0 0 0;
+}
+
+#home_account_pane .notif_event_container{
+    width: 56%;
+}
+
+#home_account_pane .notif_event_container > div {
+    padding:0;
+    line-height: 15px;
+    color: rgba(92, 92, 92, 0.55);
+}
+
+#home_account_pane .notif_event_container > div.notif_event_label {
+    color: rgb(111,123,136);
+    line-height: 25px;
+    overflow: hidden;
+}
+
+#home_account_pane .imagePreviewOverlay{
+    display: none !important;
+}
+
+#home_account_pane #notifications_center img {
+    float: left;
+    height: 64px;
+    width: 64px;
+    margin: 0 20px;
+}
+
+#home_account_pane #notifications_center div[data-is_loaded] {
+    display: block !important;
+    float: left;
+    width: 104px !important;
+    text-align: center;
+}
+
+#home_account_pane #notifications_center div[data-is_loaded] img {
+    float: none!important;
+}
+
+#home_account_pane{
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+}
+
+#home_account_pane h1{
+    margin-top: 0;
+    padding-top: 44px;
+    font-size: 21px;
+    text-align: center;
+    font-weight: normal;
+}
+
+#home_account_pane div#ws_legend{
+    text-align: center;
+    font-size: 2.5em;
+    color: white;
+    margin: 8% 20px;
+    line-height: 55px;
+}
+
+#logo_div{
+    text-align: center;
+    padding-top: 20px;
+    margin: 25% 20px;
+    transition: margin 0.5s ease;
+}
+
+div.legend_visible div#logo_div{
+    margin: 0 20px;
+}
+
+#home_account_pane div#ws_legend > small {
+    display: block;
+    font-size: 0.6em;
+    line-height: 1em;
+    visibility: hidden;
+}
+
+#home_account_pane div#ws_legend > small.show_description {
+    line-height: 1.9em;
+    visibility: visible;
+}
+
+#home_account_pane div#ws_legend a{
+    font-size: 0.5em;
+}
+
+#home_account_pane #welcome{
+    text-align: left;
+    padding: 32px 0;
+    margin: 0 30px;
+    border-bottom: 1px solid #ddd;
+    font-size: 1.3em;
+    font-weight: normal;
+}
+#home_account_pane a{
+    cursor: pointer;
+    text-decoration: underline;
+}
+#home_account_pane a:hover{
+    color: #fff;
+}
+
+#home_account_pane #welcome small{
+    padding-top: 30px;
+    display: block;
+    font-size: 0.8em;
+    line-height: 1.4em;
+}
+
+#workspaces_button {
+    padding: 38px 30px;
+    width: 340px;
+    text-align: center;
+}
+
+#workspaces_button input[type="button"] {
+    float: right;
+    padding: 7px 30px;
+    color: white;
+    border: 0;
+    cursor: pointer;
+    margin-top: 0;
+    background-color: #e35d52;
+    display: none;
+}
+
+#workspaces_button input[type="button"].disabled{
+    /* opacity: 0.5; */
+    cursor: default;
+}
+
+#get_started_link,
+#disconnect_link span{
+    cursor: pointer;
+    color: white;
+}
+
+#userdashboard_main_tab #content_pane.droparea{
+    background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
+    background-position: 50%;
+    border: 5px dashed #5c5c5c !important;
+    border-radius: 5px !important;
+    margin: 5px !important;
+}
+
+#userdashboard_main_tab #content_pane.dropareaHover{
+    border-color: #e35d52 !important;
+}
+
+#videos_pane {
+    color: rgb(64, 68, 71);
+    background-color: rgba(255, 255, 255, 0.74);
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 70%;
+    height: 100%;
+    border-radius: 0;
+    overflow: auto;
+    opacity: 1;
+    box-shadow: -5px -8px 9px rgba(0, 0, 0, 0.36);
+    display: none;
+    max-width: 930px;
+    -webkit-font-smoothing: antialiased;
+}
+
+#tutorials_pane h2{
+    font-weight: normal;
+    font-size: 25px;
+}
+
+#tutorial_dl_apps_pane{
+    height: 107px;
+    background-color: #ebedf0;
+    border-top: 1px solid rgb(111,123,136);
+    border-bottom: 1px solid rgb(111,123,136);
+}
+
+.tutorial_legend{
+    clear: left;
+    float: left;
+    width: 40%;
+    margin-left: 5%;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.tutorial_video{
+    width: 49%;
+    height: 300px;
+    margin-top: 20px;
+    margin-right: 5%;
+    margin-bottom: 20px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #eee;
+}
+
+div.tutorial_load_button {
+    background-color: #666;
+    display: inline-block;
+    color: white;
+    padding: 3px 11px;
+    border-radius: 6px;
+    margin-right: 15px;
+    float: right;
+    cursor: pointer;
+}
+
+@media only screen
+and (max-width : 980px){
+    #notifications_center div.notif_event_container{
+        width: 100px;
+    }
+}
+
+@media only screen
+and (max-width : 800px){
+
+    #logo_div img{
+        width: 210px;
+    }
+
+    .tutorial_legend{
+        clear: left;
+        width: 97%;
+    }
+
+    .tutorial_video{
+        width: 94%;
+        height: 300px;
+        margin-right: 3%;
+        margin-left: 3%;
+    }
+    #dl_pydio_cont{
+        width: 400px !important;
+    }
+    #dl_pydio_for{
+        display: none;
+    }
+
+    #home_left_bar{
+        width: 380px;
+    }
+
+    #home_account_pane #welcome{
+        font-size: 1em;
+        padding-top: 30px;
+        padding-bottom: 10px;
+        border-bottom-color: #555;
+    }
+
+    #home_account_pane #welcome small{
+        padding-top: 10px;
+    }
+
+    #workspaces_list li.ws_selector_title h3{
+        padding: 0 30px;
+    }
+
+
+
+}
+
+@media only screen
+and (max-width : 400px){
+    #home_left_bar{
+        width: 100%;
+        position: absolute;
+        top:0;
+    }
+    #workspaces_button {
+        padding: 38px 0;
+        width: 100%;
+    }
+}

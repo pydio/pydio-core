@@ -58,6 +58,9 @@ Class.create("RepositorySelect", {
 	destroy : function(){
 		this.element = null;
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
+        if(this.repoMenu){
+            this.repoMenu.destroy();
+        }
 	},
 	
 	/**
@@ -124,19 +127,23 @@ Class.create("RepositorySelect", {
 			repositoryList.each(function(pair){
 				var repoObject = pair.value;
 				var key = pair.key;
-				var selected = (key == repositoryId ? true:false);
+				var selected = (key == repositoryId);
 
                 if(repoObject.getAccessType().startsWith('ajxp_')){
                     return;
                 }
 
-                var label = '<span class="menu_label">' + repoObject.getLabel() + '</span>';
+                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + repoObject.getLabel() + '</span>';
+                var alt = repoObject.getLabel();
                 if(repoObject.getDescription()){
                     label += '<span class="menu_description">' + repoObject.getDescription() + '</span>';
+                    alt += '-' + repoObject.getDescription();
+                }else{
+                    alt += (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":"");
                 }
                 var actionData = {
 					name:label,
-					alt:repoObject.getLabel() + (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":""),
+					alt:alt,
 					image:repoObject.getIcon(),
                     icon_class:"icon-hdd",
                     overlay:repoObject.getOverlay(),
@@ -197,33 +204,33 @@ Class.create("RepositorySelect", {
             return;
         }
 
-        var menuItems = $A();
-        if(!this.loadedOnce) {
-            ajaxplorer.actionBar.loadActionsFromRegistry(ajaxplorer.getXmlRegistry());
-            this.loadedOnce = true;
-        }
-        var otherActions = ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
-            menuItems.push({
-                name:otherAction.getKeyedText(),
-                alt:otherAction.options.title,
-                action_id:otherAction.options.name,
-                icon_class:otherAction.options.icon_class,
-                className:"edit",
-                image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
-                callback:function(e){this.apply();}.bind(otherAction)
+        var menuActionsLoader = function(){
+            var menuItems = $A();
+            ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
+                menuItems.push({
+                    name:otherAction.getKeyedText(),
+                    alt:otherAction.options.title,
+                    action_id:otherAction.options.name,
+                    icon_class:otherAction.options.icon_class,
+                    className:"edit",
+                    image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
+                    callback:function(e){this.apply();}.bind(otherAction)
+                });
             });
-        });
-        if(menuItems.length){
-            actions.push({separator:true});
-            actions = actions.concat(menuItems);
-        }
+            if(menuItems.length){
+                actions.push({separator:true});
+                actions = actions.concat(menuItems);
+            }
+            this.repoMenu.options.menuItems = actions;
+            this.repoMenu.refreshList();
+        }.bind(this);
 
 		if(this.repoMenu){
 			this.repoMenu.options.menuItems = actions;
 			this.repoMenu.refreshList();
 		}else{
 			this.repoMenu = new Proto.Menu({			
-				className: 'menu rootDirChooser menuDetails',
+				className: 'menu rootDirChooser menuDetails workspacesMenu',
 				mouseClick:(this.options.menuEvent? this.options.menuEvent : 'left'),
 				anchor:button,
                 position: (this.options.menuPosition? this.options.menuPosition : 'bottom'),
@@ -236,7 +243,9 @@ Class.create("RepositorySelect", {
 				menuTitle:MessageHash[468],
 				menuItems: actions,
                 menuMaxHeight:this.options.menuMaxHeight,
+                menuFitHeight:this.options.menuFitHeight,
 				fade:true,
+                beforeShow:menuActionsLoader,
 				zIndex:1500
 			});
 			this.notify("createMenu");
@@ -263,11 +272,10 @@ Class.create("RepositorySelect", {
 		}
 	},
 
-	/**
-	 * Gets the bookmark actions for a bookmark
-	 * @param bmPath String
-	 * @param bmTitle String
-	 */
+    /**
+     * Gets the bookmark actions for a bookmark
+     * @param repositoryId
+     */
 	getContextActions: function(repositoryId){
 
 		var removeAction = {

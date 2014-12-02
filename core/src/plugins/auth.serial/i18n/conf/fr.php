@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Serialized authentication storage" => "Fichiers sérialisés",
-"Stores the Authentication data as serialized PHP values on the filesystem." => "Stockage des informations dans des fichiers PHP sérialisés.",
+"Serialized authentication storage" => "Stockage des identifiants dans des fichiers sérialisés",
+"Stores the Authentication data as serialized PHP values on the filesystem." => "Stockage des identifiants d'authentification dans des fichiers PHP sérialisés sur le système de fichier.",
 "Users" => "Utilisateurs",
 "The users list" => "Liste des utilisateurs.",
-"Users File" => "Users File",
-"Fast Checks" => "Fast Checks",
-"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks",
+"Users File" => "Fichier des utilisateurs",
+"Fast Checks" => "Vérifications rapides",
+"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "Lors de l'utilisation d'un wrapper personnalisé pour lire les fichiers, cela peut améliorer les performances en ignorant des vérifications de type 'is_file,is_dir'",
 );

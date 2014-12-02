@@ -71,9 +71,9 @@ $(function() {
 		runtimes : 'silverlight,flash,html5,html4',
 		url : uploadUrl,
         //max_file_size : maxFileSize, //Uncomment this line and comment the following to use php.ini max file size for maximum filesize
-		max_file_size : '2048mb',
-		//chunk_size : chunkSize, //Uncomment this line to use php.ini maxsize-1 for chunk size
-		chunk_size : '2mb',
+		max_file_size : '4096mb',
+		chunk_size : chunkSize, //Uncomment this line to use php.ini maxsize-1 for chunk size
+		//chunk_size : '2mb',
 		unique_names : false,
         multiple_queues : true,
 		multipart : true,

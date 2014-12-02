@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="authfront.keystore" label="CONF_MESSAGE[API Keystore]" enabled="true" description="CONF_MESSAGE[Store API keys/token to simplify REST connection]"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/authfront.keystore/class.KeystoreAuthFrontend.php" classname="KeystoreAuthFrontend"/>
+    <client_settings>
+        <resources>
+            <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js" autoload="true"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order"
+                      description="Order this plugin with other auth frontends" default="2"/>
+        <global_param name="PROTOCOL_TYPE" type="select"
+                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="no_session"/>
+    </server_settings>
+    <registry_contributions>
+        <client_configs>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="apikeys_pane"
+                                tabInfo='{"id":"my-api-data","iconClass":"icon-cog","element":"apikeys_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":2}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="apikeys_pane" ajxpClass="ApikeysPane" class="tabbed_editor">
+                        <div id="generate_token_button">Generate new tokens!</div>
+                        <div id="token_results"></div>
+                        <div id="revoke_tokens_button">Revoke existing token!</div>
+                    </div>
+                    ]]></additional_tab>
+            </component_config>
+        </client_configs>
+        <actions>
+            <action name="keystore_generate_auth_token">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken" developerComment="Generate and store a authentication key that can be used by the currently logged user. Used by SDKs talking to REST API to avoid renegociating basic auth on each query.">
+                        <input_param name="device" type="string"
+                                     description="A unique ID identifying the client connecting."/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="keystore_revoke_tokens">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="revokeAuthToken" developerComment="Revoke current tokens for logged user."/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+</ajxpcore>

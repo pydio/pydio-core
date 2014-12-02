@@ -13,53 +13,9 @@ And the lightbox gone wild by ParticleTree at http://particletree.com/features/l
 */
 
 /*-------------------------------GLOBAL VARIABLES------------------------------------*/
-
-var detect = navigator.userAgent.toLowerCase();
-var OS,browser,version,total,thestring;
 var currentLightBox, currentDraggable;
-
-/*-----------------------------------------------------------------------------------------------*/
-
-//Browser detect script origionally created by Peter Paul Koch at http://www.quirksmode.org/
-
-function getBrowserInfo() {
-	if (checkIt('konqueror')) {
-		browser = "Konqueror";
-		OS = "Linux";
-	}
-	else if (checkIt('safari')) browser 	= "Safari" ;
-	else if (checkIt('omniweb')) browser 	= "OmniWeb" ;
-	else if (checkIt('opera')) browser 		= "Opera" ;
-	else if (checkIt('webtv')) browser 		= "WebTV";
-	else if (checkIt('icab')) browser 		= "iCab" ;
-	else if (checkIt('msie')) browser 		= "Internet Explorer" ;
-	else if (!checkIt('compatible')) {
-		browser = "Netscape Navigator" ;
-		version = detect.charAt(8);
-	}
-	else browser = "An unknown browser";
-
-	if (!version) version = detect.charAt(place + thestring.length);
-
-	if (!OS) {
-		if (checkIt('linux')) OS 		= "Linux";
-		else if (checkIt('x11')) OS 	= "Unix";
-		else if (checkIt('mac')) OS 	= "Mac" ;
-		else if (checkIt('win')) OS 	= "Windows" ;
-		else OS 		= "an unknown operating system";
-	}
-}
-
-function checkIt(string) {
-	place = detect.indexOf(string) + 1;
-	thestring = string;
-	return place;
-}
-
-/*-----------------------------------------------------------------------------------------------*/
-
-Event.observe(window, 'load', initialize, false);
-Event.observe(window, 'load', getBrowserInfo, false);
+/*-----------------------------------------------------------------------------------*/
+Event.observe(window, 'load', initializeLightbox, false);
 
 var lightbox = Class.create();
 
@@ -80,34 +36,14 @@ lightbox.prototype = {
 	
 	// Turn everything on - mainly the IE fixes
 	activate: function(){
-		if (browser == 'Internet Explorer'){
+		if (Prototype.Browser.IE){
 			this.getScroll();
-			//this.prepareIE('100%', 'hidden');
 			this.setScroll(0,0);
-			//this.hideSelects('hidden');
 		}
 		this.displayLightbox("block");
 	},
 	
-	// Ie requires height to 100% and overflow hidden or else you can scroll down past the lightbox
-	prepareIE: function(height, overflow){
-		bod = document.getElementsByTagName('body')[0];
-		bod.style.overflow = overflow;
-		bod.style.height = height;
-  
-		htm = document.getElementsByTagName('html')[0];
-		htm.style.overflow = overflow; 
-		htm.style.height = height;
-	},
-	
-	// In IE, select elements hover on top of the lightbox
-	hideSelects: function(visibility){
-		selects = document.getElementsByTagName('select');
-		for(i = 0; i < selects.length; i++) {
-			selects[i].style.visibility = visibility;
-		}
-	},
-	
+
 	// Taken from lightbox implementation found at http://www.huddletogether.com/projects/lightbox/
 	getScroll: function(){
 		if (self.pageYOffset) {
@@ -169,9 +105,9 @@ lightbox.prototype = {
 	// WARNING : QUITE LONG IN I.E.
 	actions: function(){
 		
-		lbActions = document.getElementsByClassName('lbAction');
+		var lbActions = document.getElementsByClassName('lbAction');
 
-		for(i = 0; i < lbActions.length; i++) {
+		for(var i = 0; i < lbActions.length; i++) {
 			Event.observe(lbActions[i], 'click', this[lbActions[i].rel].bindAsEventListener(this), false);
 			lbActions[i].onclick = function(){return false;};
 		}
@@ -180,12 +116,9 @@ lightbox.prototype = {
 	
 	// Example of creating your own functionality once lightbox is initiated
 	deactivate: function(){
-		if (browser == "Internet Explorer"){
+		if (Prototype.Browser.IE){
 			this.setScroll(0,this.yPos);
-			//this.prepareIE("auto", "hidden");
-			//this.hideSelects("visible");
 		}
-		
 		this.displayLightbox("none");
 	}
 };
@@ -193,7 +126,7 @@ lightbox.prototype = {
 /*-----------------------------------------------------------------------------------------------*/
 
 // Onload, make all links that need to trigger a lightbox active
-function initialize(){
+function initializeLightbox(){
 	addLightboxMarkup();
 	/*
 	lbox = document.getElementsByClassName('lbOn');
@@ -227,7 +160,7 @@ function initialize(){
 
 function displayLightBoxById(id, overlayStyle, overlayClass)
 {
-	valid = new lightbox(id);
+	var valid = new lightbox(id);
     if(overlayStyle) valid.overlayStyle = overlayStyle;
     if(overlayClass) valid.overlayClass = overlayClass;
 	valid.activate();
@@ -243,7 +176,7 @@ function hideLightBox(onFormSubmit)
 	if(modal.closeValidation){
 		var res = modal.closeValidation();
 		if(res === false){
-			return;
+			return false;
 		}
 		modal.closeValidation = null;
 	}
@@ -265,6 +198,7 @@ function hideLightBox(onFormSubmit)
 		modal.closeFunction();
 		modal.closeFunction = null;
 	}
+    return true;
 }
 
 function setOverlay()
@@ -287,15 +221,15 @@ function hideOverlay()
 // Lightbox is the centered square that the content is put into.
 function addLightboxMarkup() {
 
-	bod 				= document.getElementsByTagName('body')[0];
-	overlay 			= document.createElement('div');
-	overlay.id			= 'overlay';
+	var bod 				= document.getElementsByTagName('body')[0];
+	var overlay 			= document.createElement('div');
+	overlay.id			    = 'overlay';
 	bod.appendChild(overlay);
 }
 
 function addLightboxMarkupToElement(element, skipElement) 
 {
-	overlay 			= document.createElement('div');
+	var overlay 		= document.createElement('div');
 	overlay.id			= 'element_overlay';
 	var top, left, height, width;
 	if (Prototype.Browser.IE){
@@ -336,8 +270,5 @@ function addLightboxMarkupToElement(element, skipElement)
 
 function removeLightboxFromElement(element)
 {
-	var  tmp = $(element).select('#element_overlay');
-	if(tmp.length){
-		tmp[0].remove();
-	}
+	$(element).select('#element_overlay').invoke('remove');
 }

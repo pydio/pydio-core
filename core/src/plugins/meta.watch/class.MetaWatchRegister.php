@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class MetaWatchRegister extends AJXP_Plugin
+class MetaWatchRegister extends AJXP_AbstractMetaSource
 {
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";
     public static $META_WATCH_READ = "META_WATCH_READ";
@@ -43,18 +43,13 @@ class MetaWatchRegister extends AJXP_Plugin
     protected $metaStore;
 
     /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
-
-    /**
      * @var AJXP_NotificationCenter
      */
     protected $notificationCenter;
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $this->notificationCenter = AJXP_PluginsService::findPluginById("core.notifications");
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
@@ -214,26 +209,85 @@ class MetaWatchRegister extends AJXP_Plugin
 
     }
 
-    public function getWatchesOnNode($node, $watchType)
+    /**
+     * @param AJXP_Node $node
+     * @param String $watchType
+     * @return array
+     */
+    public function collectWatches($node, $watchType)
     {
-        $IDS = array();
         $currentUserId = "shared";
         if (AuthService::getLoggedUser() != null) {
             $currentUserId = AuthService::getLoggedUser()->getId();
         }
-        $meta = $this->metaStore->retrieveMetadata(
-            $node,
+        $result = array();
+        $result["node"] = $this->getWatchesOnNode($node, $watchType, $currentUserId);
+
+        $ancestors = array();
+        $node->collectMetadatasInParents(
+            array(self::$META_WATCH_NAMESPACE,self::$META_WATCH_USERS_NAMESPACE),
+            false,
+            AJXP_METADATA_SCOPE_REPOSITORY,
+            false,
+            $ancestors
+        );
+
+        $result["ancestors"] = array();
+        foreach($ancestors as $nodeMeta){
+            $source = $nodeMeta["SOURCE_NODE"];
+            $watchMeta = isSet($nodeMeta[self::$META_WATCH_NAMESPACE]) ? $nodeMeta[self::$META_WATCH_NAMESPACE] : false;
+            $usersMeta = isSet($nodeMeta[self::$META_WATCH_USERS_NAMESPACE]) ? $nodeMeta[self::$META_WATCH_USERS_NAMESPACE] : false;
+            $ids = $this->loadWatchesFromMeta($watchType, $currentUserId, $source, $watchMeta, $usersMeta);
+            foreach($ids as $id){
+                $result["ancestors"][] = array("node" => $source, "id" => $id);
+            }
+        }
+
+        return $result;
+    }
+    /**
+     * @param AJXP_Node $node
+     * @param String $watchType
+     * @param String $userId
+     * @return array
+     */
+    public function getWatchesOnNode($node, $watchType, $userId = null)
+    {
+        if($userId == null){
+            $currentUserId = "shared";
+            if (AuthService::getLoggedUser() != null) {
+                $currentUserId = AuthService::getLoggedUser()->getId();
+            }
+        }else{
+            $currentUserId = $userId;
+        }
+        $meta = $node->retrieveMetadata(
             self::$META_WATCH_NAMESPACE,
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        if (AuthService::getLoggedUser() != null) {
-            $usersMeta = $this->metaStore->retrieveMetadata(
-                $node,
+        $usersMeta = false;
+        if ($currentUserId != 'shared') {
+            $usersMeta = $node->retrieveMetadata(
                 self::$META_WATCH_USERS_NAMESPACE,
                 false,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
+        }
+        return $this->loadWatchesFromMeta($watchType, $currentUserId, $node, $meta, $usersMeta);
+    }
+
+    /**
+     * @param String $watchType
+     * @param String $currentUserId
+     * @param AJXP_Node $node
+     * @param array|bool $watchMeta
+     * @param array|bool $usersMeta
+     * @return array
+     */
+    private function loadWatchesFromMeta($watchType, $currentUserId, $node, $watchMeta = false, $usersMeta = false){
+        $IDS = array();
+        if($usersMeta !== false){
             if ($watchType == self::$META_WATCH_CHANGE && isSet($usersMeta[self::$META_WATCH_USERS_CHANGE])) {
                 $usersMeta = $usersMeta[self::$META_WATCH_USERS_CHANGE];
             } else if ($watchType == self::$META_WATCH_READ && isSet($usersMeta[self::$META_WATCH_USERS_READ])) {
@@ -242,14 +296,15 @@ class MetaWatchRegister extends AJXP_Plugin
                 $usersMeta = null;
             }
         }
-        if (isSet($meta) && is_array($meta)) {
-            foreach ($meta as $id => $type) {
+
+        if (!empty($watchMeta) && is_array($watchMeta)) {
+            foreach ($watchMeta as $id => $type) {
                 if ($type == $watchType || $type == self::$META_WATCH_BOTH) {
                     $IDS[] = $id;
                 }
             }
         }
-        if (isSet($usersMeta) && is_array($usersMeta)) {
+        if (!empty($usersMeta) && is_array($usersMeta)) {
             foreach ($usersMeta as $id => $targetUsers) {
                 if (in_array($currentUserId, $targetUsers)) {
                     $IDS[] = $id;
@@ -266,22 +321,20 @@ class MetaWatchRegister extends AJXP_Plugin
                 }
                 if (!AuthService::userExists($id)) {
                     $changes = true;
-                    unset($meta[$id]);
+                    unset($watchMeta[$id]);
                     unset($IDS[$index]);
                 }
             }
             if ($changes) {
-                $this->metaStore->setMetadata(
-                    $node,
+                $node->setMetadata(
                     self::$META_WATCH_NAMESPACE,
-                    $meta,
+                    $watchMeta,
                     false,
                     AJXP_METADATA_SCOPE_REPOSITORY
                 );
             }
         }
         return $IDS;
-
     }
 
     public function switchActions($actionName, $httpVars, $fileVars)
@@ -349,46 +402,12 @@ class MetaWatchRegister extends AJXP_Plugin
     {
         $newNotif = $this->notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "new");
         if ($newNotif !== false && $newNotif->getNode() !== false) {
-            $ids = $this->getWatchesOnNode($newNode, self::$META_WATCH_CHANGE);
-            if (count($ids)) {
-                foreach($ids as $id) $this->notificationCenter->postNotification($newNotif, $id);
-            }
-            if (!$newNode->isRoot()) {
-                $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
-                $parentNode->setLeaf(false);
-                $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
-                if (count($ids)) {
-                    // POST NOW : PARENT FOLDER IS AFFECTED
-                    $parentNotif = new AJXP_Notification();
-                    $parentNotif->setNode($parentNode);
-                    $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                    $this->notificationCenter->prepareNotification($newNotif);
-                    $parentNotif->addRelatedNotification($newNotif);
-                    foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
-                }
-            }
+            $this->processActiveHook($newNotif, self::$META_WATCH_CHANGE, AJXP_NOTIF_NODE_CHANGE);
         }
         if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()) return;
         $oldNotif =  $this->notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "old");
         if ($oldNotif !== false && $oldNotif->getNode() !== false) {
-            $ids = $this->getWatchesOnNode($oldNode, self::$META_WATCH_CHANGE);
-            if (count($ids)) {
-                foreach($ids as $id) $this->notificationCenter->postNotification($oldNotif, $id);
-            }
-            if (!$oldNode->isRoot()) {
-                $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
-                $parentNode->setLeaf(false);
-                $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
-                if (count($ids)) {
-                    // POST NOW : PARENT FOLDER IS AFFECTED
-                    $parentNotif = new AJXP_Notification();
-                    $parentNotif->setNode($parentNode);
-                    $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                    $this->notificationCenter->prepareNotification($oldNotif);
-                    $parentNotif->addRelatedNotification($oldNotif);
-                    foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
-                }
-            }
+            $this->processActiveHook($oldNotif, self::$META_WATCH_CHANGE, AJXP_NOTIF_NODE_CHANGE);
         }
 
         $this->updateMetaLocation($oldNode, $newNode, $copy);
@@ -397,28 +416,32 @@ class MetaWatchRegister extends AJXP_Plugin
 
     public function processReadHook(AJXP_Node $node)
     {
-        $ids = $this->getWatchesOnNode($node, self::$META_WATCH_READ);
-        $notif = new AJXP_Notification();
-        $notif->setAction(AJXP_NOTIF_NODE_VIEW);
-        $notif->setNode($node);
-        if (count($ids)) {
-            foreach($ids as $id) $this->notificationCenter->postNotification($notif, $id);
-        }
-        if (!$node->isRoot()) {
-            $parentNode = new AJXP_Node(dirname($node->getUrl()));
-            $parentNode->setLeaf(false);
-            $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_READ);
-            if (count($ids)) {
-                // POST NOW : PARENT FOLDER IS AFFECTED
-                $parentNotif = new AJXP_Notification();
-                $parentNotif->setNode($parentNode);
-                $parentNotif->setAction(AJXP_NOTIF_NODE_VIEW);
-                $this->notificationCenter->prepareNotification($notif);
-                $parentNotif->addRelatedNotification($notif);
-                foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
-            }
-        }
+        $notification = new AJXP_Notification();
+        $notification->setAction(AJXP_NOTIF_NODE_VIEW);
+        $notification->setNode($node);
+        $this->processActiveHook($notification, self::$META_WATCH_READ);
 
+    }
+
+    private function processActiveHook(AJXP_Notification $notification, $namespace, $parentActionType = null){
+        $node = $notification->getNode();
+        $all = $this->collectWatches($node, $namespace);
+        foreach($all["node"] as $id) {
+            $this->notificationCenter->postNotification($notification, $id);
+        }
+        foreach($all["ancestors"] as $pair){
+            $parentNotification = new AJXP_Notification();
+            $parentNotification->setNode($pair["node"]);
+            $parentNotification->getNode()->setLeaf(false);
+            if($parentActionType == null){
+                $parentNotification->setAction($notification->getAction());
+            }else{
+                $parentNotification->setAction($parentActionType);
+            }
+            $this->notificationCenter->prepareNotification($notification);
+            $parentNotification->addRelatedNotification($notification);
+            $this->notificationCenter->postNotification($parentNotification, $pair["id"]);
+        }
     }
 
     /**

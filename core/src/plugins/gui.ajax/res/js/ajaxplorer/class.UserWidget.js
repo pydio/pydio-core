@@ -24,10 +24,11 @@
 Class.create("UserWidget", {
 	__implements : ["IAjxpWidget"],
     options : {},
-	/**
-	 * Constructor
-	 * @param element HTMLElement
-	 */
+    /**
+     * Constructor
+     * @param element HTMLElement
+     * @param options Object
+     */
 	initialize: function(element, options){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
@@ -65,29 +66,32 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-                var label = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id +' </i>';
+                var displayName = oUser.id;
                 if(oUser.getPreference('USER_DISPLAY_NAME')){
-                    var img = '';
-					var imgSrc = '';
-					var conn = new Connexion();
-                    if(oUser.getPreference("avatar")){
-                        imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
-                    } else if(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")) {
-                        // Get avatar from avatar plugins
-						conn.addParameter('get_action', 'get_avatar_url');
-						conn.addParameter('userid', oUser.id);
-						conn.onComplete = function(transport){
-							imgSrc = transport.responseText;
-						};
-						conn.sendSync();
-                    }
-
-                    if (imgSrc != '') {
-                        img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
-                    }
-                    label = '<i ajxp_message_title_id="189" title="'+MessageHash[189]+'">' + img + oUser.getPreference('USER_DISPLAY_NAME') + '</i>';
+                    displayName = oUser.getPreference('USER_DISPLAY_NAME');
                 }
-				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="icon-reorder"></span> '+label+' <span class="icon-caret-down ajxp_icon_arrow"></span></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+                //var label = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i>'+ oUser.id +' </i>';
+                var label = '<i>'+ displayName +' </i> <span class="icon-caret-down ajxp_icon_arrow"></span>';
+                var img = '';
+                var imgSrc = '';
+                var conn = new Connexion();
+                if(oUser.getPreference("avatar")){
+                    imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+                } else if(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")) {
+                    // Get avatar from avatar plugins
+                    conn.addParameter('get_action', 'get_avatar_url');
+                    conn.addParameter('userid', oUser.id);
+                    conn.onComplete = function(transport){
+                        imgSrc = transport.responseText;
+                    };
+                    conn.sendSync();
+                }
+
+                if (imgSrc != '') {
+                    img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
+                    label = '<i>' + img + displayName + '</i>';
+                }
+				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="icon-reorder"></span> '+label+' </div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0 5px 5px 0;border-radius: 0 5px 5px 0;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');
 				if(!oUser.lock && oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
@@ -135,7 +139,9 @@ Class.create("UserWidget", {
 			});
 		});
         for(var key in groups){
-            menuItems = menuItems.concat(groups[key], {separator:true});
+            if(groups.hasOwnProperty(key)){
+                menuItems = menuItems.concat(groups[key], {separator:true});
+            }
         }
         menuItems.pop();
 		
@@ -149,8 +155,8 @@ Class.create("UserWidget", {
 				position: 'bottom right',
 				anchor:this.element,
 				createAnchor:false,
-				topOffset:2,
-				leftOffset:-3,
+				topOffset: (this.options.menuOffsetTop ? this.options.menuOffsetTop  : 2),
+				leftOffset:(this.options.menuOffsetLeft? this.options.menuOffsetLeft :-3),
 				menuItems: menuItems,
                 menuTitle: MessageHash[511].replace('%s', ajaxplorer.getPluginConfigs("ajaxplorer").get("APPLICATION_TITLE")),
                 detailedItems: true,
@@ -202,7 +208,10 @@ Class.create("UserWidget", {
 		document.stopObserving("ajaxplorer:actions_loaded", this.actLoaded );		
 		if(Prototype.Browser.IE) {
 			document.stopObserving("ajaxplorer:actions_refreshed", this.actLoaded );
-		}		
+		}
+        if(this.menu){
+            this.menu.destroy();
+        }
 		this.element = null;
 	}
 	

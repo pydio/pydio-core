@@ -8,8 +8,8 @@ ul.notification_list{
     letter-spacing: 1px;
     padding: 0px;
     border-radius: 2px;
-    width:250px !important;
-    max-height: 350px !important;
+    width:350px !important;
+    max-height: 550px !important;
     overflow-y: auto !important;
 }
 
@@ -49,8 +49,8 @@ width: 150px;
 
 #feed_content img {
     float: left;
-    height: 22px;
-    width: 22px;
+    height: 44px;
+    width: 44px;
     margin: 4px 14px 3px 6px;
 }
 

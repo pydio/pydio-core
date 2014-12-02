@@ -95,7 +95,6 @@ Class.create("ConfigEditor",{
 			dragged.ajxp_dropped = true;
 			dropped.insert(dragged);
 			dragged.setStyle({top:0,left:0});
-			var action = "edit";
 			var sub_action;
 			if(dragged.hasClassName('user_role')){
 				dragged.removeClassName('user_role');
@@ -205,7 +204,7 @@ Class.create("ConfigEditor",{
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.40']);
 			return;
 		}
-		parameters = new Hash();
+		var parameters = new Hash();
 		parameters.set('user_id', this.userId);
 		this.submitForm("edit_user", 'delete_user', parameters, null);
 		chck.checked = false;
@@ -234,8 +233,7 @@ Class.create("ConfigEditor",{
 		parameters.set('new_pwd', pass.value);
 		this.submitForm("edit_user", 'create_user', parameters, null);
 		login.value = pass.value = passConf.value = '';
-		return;
-		
+
 	},
 
     encodePassword : function(password){
@@ -294,8 +292,8 @@ Class.create("ConfigEditor",{
 				driverDef.set('label', driverLabel);
 				driverDef.set('description', XPathGetSingleNodeText(driver, "@description"));
 				driverDef.set('name', driverName);
-				var driverParamsArray = new Array();
-				for(j=0;j<driverParams.length;j++){
+				var driverParamsArray = $A();
+				for(var j=0;j<driverParams.length;j++){
 					var paramNode = driverParams[j];
 					if(this.currentCreateRepoType == "template" && paramNode.getAttribute('no_templates') == 'true'){
 						continue;
@@ -369,12 +367,12 @@ Class.create("ConfigEditor",{
 			this.createDriverForm(dName, (this.currentCreateRepoType == "template"?true:false) );
 		}
 		if(dName != "0"){
-			var height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
+			height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
             var addscroll = false;
 			if(height > 425) {
                 height=425;
                 addscroll = true;
-            };
+            }
 		}
 		new Effect.Morph(this.driverForm.up('div'),{
 			style:'height:'+height + 'px' + (addscroll?'overflow-x:scroll':'overflow-x:auto;'),
@@ -535,7 +533,7 @@ Class.create("ConfigEditor",{
 	
 	
 	parseXmlMessage: function(xmlResponse){
-		if(xmlResponse == null || xmlResponse.documentElement == null) return;
+		if(xmlResponse == null || xmlResponse.documentElement == null) return false;
 		var childs = xmlResponse.documentElement.childNodes;	
 		var repList = false;
 
@@ -543,7 +541,6 @@ Class.create("ConfigEditor",{
 		{
             if(childs[i].nodeName == "update_checkboxes")
 			{
-				var userId = childs[i].getAttribute('user_id');
 				var repositoryId = childs[i].getAttribute('repository_id');
 				var read = childs[i].getAttribute('read');
 				var write = childs[i].getAttribute('write');

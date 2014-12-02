@@ -20,7 +20,7 @@
                             actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+                <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="false"><![CDATA[
                         clearRememberData();
@@ -34,7 +34,7 @@
                         };
                         connexion.sendAsync();
                         ]]></clientCallback>
-                    <serverCallback methodName="switchAction"></serverCallback>
+                    <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
         </actions>

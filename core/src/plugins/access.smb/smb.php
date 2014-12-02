@@ -105,7 +105,7 @@ class smb
                 }
             }
         }
-        AJXP_Logger::debug($str, $array);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
     }
 
 
@@ -249,7 +249,7 @@ class smb
                         $i = ($mode == 'servers') ? array ($name, "server") : array ($name, "workgroup", $master);
                         break;
                     case 'files':
-                        list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R]+)$/", trim ($regs[1]), $regs2)
+                        list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R|N]+)$/", trim ($regs[1]), $regs2)
                             ? array (trim ($regs2[2]), trim ($regs2[1]))
                             : array ('', trim ($regs[1]));
                         list ($his, $im) = array (
@@ -450,7 +450,10 @@ class smb
             trigger_error('rename(): error in URL', E_USER_ERROR);
         }
         smb::clearstatcache ($url_from);
-        return smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
+        $res = smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
+        if(empty($res)) return true;
+        AJXP_Logger::info(__CLASS__, "SmbClient rename error: ".$res);
+        return false;
     }
 
     public function mkdir ($url, $mode, $options)
@@ -642,6 +645,7 @@ class smb_stream_wrapper extends smb
             case 'r+':
             case 'rb':
             case 'a':
+            case 'ab':
             case 'a+':
                 // REFERENCE STREAM BUT DO NOT OPEN IT UNTIL READING IS REALLY NECESSARY!
                 /*

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="swift" enabled="false" label="CONF_MESSAGE[Open Stack (Swift)]" description="CONF_MESSAGE[Access Open Stack Object Storage via Swift API]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.swift/class.swiftAccessDriver.php" classname="swiftAccessDriver"/>
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="swift_access" path="plugins/access.swift/i18n"/>
+        </resources>
+    </client_settings>
+
+	<server_settings>
+		<param name="USERNAME" type="string" label="CONF_MESSAGE[Username]" description="CONF_MESSAGE[User email as you enter it to log to the console]" mandatory="true" default=""/>
+		<param name="PASSWORD" type="password" label="CONF_MESSAGE[Console Password]" description="CONF_MESSAGE[Console password]" mandatory="true"/>
+		<param name="TENANT_ID" type="string" label="CONF_MESSAGE[Tenant ID]" description="CONF_MESSAGE[Tenant ID (see API Keys page)]" mandatory="true"/>
+		<param name="ENDPOINT" type="string" label="CONF_MESSAGE[Endpoint]" description="CONF_MESSAGE[Endpoint (see API Keys page, Identity endpoint)]" mandatory="true"/>
+		<param name="REGION" type="string" label="CONF_MESSAGE[Region]" description="CONF_MESSAGE[Your region identifier]" mandatory="true"/>
+        <param name="CONTAINER" type="string" label="CONF_MESSAGE[Container]" description="CONF_MESSAGE[Base Container]" mandatory="true"/>
+    </server_settings>
+	<registry_contributions>
+        <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/access.swift/class.swiftAccessWrapper.php" classname="swiftAccessWrapper" protocol="ajxp.swift"/>
+</ajxpdriver>

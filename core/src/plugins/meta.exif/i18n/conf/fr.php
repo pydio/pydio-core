@@ -20,9 +20,9 @@
 */
 $mess=array(
 "Exif Metadata" => "Métadonnées EXIF",
-"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extraction des données EXIF des images JPG.",
-"Info Panel Fields" => "Champs InfoPanel",
-"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Liste des champs à afficher dans le panneau de détail, utiliser la syntaxe 'EXIF_SECTION.ExifName'.",
-"Info Panel Labels" => "Libellés InfoPanel",
+"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extraction des données EXIF des images JPG. Utilisation en conjonction avec 'editor.exif'",
+"Info Panel Fields" => "Champs du panneau d'info.",
+"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Liste, séparée par des virgules, des champs, utilisez la syntaxe 'EXIF_SECTION.ExifName'.",
+"Info Panel Labels" => "Libellés du panneau d'info.",
 "Associated list of labels, be sure to define as many as fields!" => "Libellés associés à la liste des champs précédente.",
 );

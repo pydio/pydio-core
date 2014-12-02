@@ -20,17 +20,17 @@
 */
 $mess=array(
 "Mysql Database" => "Base de données MySQL",
-"This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin." => "Ce driver permet de visualiser et de modifier des tables et leurs enregistrements dans une base de données MySQL",
-"Host" => "Serveur",
+"This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin." => "Ce pilote permet de visualiser et de modifier des tables et leurs enregistrements d'une base de données MySQL, de manière similaire à phpMyAdmin.",
+"Host" => "Hôte",
 "Host to the MySQL Server" => "Adresse du serveur MySQL",
-"Database" => "Base",
+"Database" => "Base de données",
 "Database name" => "Nom de la base de données",
 "User" => "Utilisateur",
-"User name (must have privileges to access this db)" => "Utilisateur qui a les privilèges pour cette base",
+"User name (must have privileges to access this db)" => "Utilisateur (doit avoir des privilèges d'accès sur la bdd)",
 "Password" => "Mot de passe",
-"User password" => "Mot de passe utilisateur",
+"User password" => "Mot de passe de l'utilisateur",
 "Pattern" => "Préfixe",
 "If not empty, only tables beginning with such a prefix will be displayed." => "Si non-vide, seules les tables commençant par ce préfixe seront affichées.",
 "Repository Commons" => "Options du dépôt",
-"Default Rights" => "Default Rights",
+"Default Rights" => "Droits par défaut",
 );

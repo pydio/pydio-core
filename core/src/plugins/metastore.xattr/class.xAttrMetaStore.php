@@ -26,12 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
+class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 {
-    /**
-     * @var fsAccessDriver
-     */
-    protected $accessDriver;
     protected $rootPath;
 
     public function performChecks()
@@ -39,12 +35,6 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         if (!function_exists("xattr_list")) {
             throw new Exception("The PHP Xattr Extension does not seem to be loaded");
         }
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
-        //$this->rootPath = ConfService::getRepository()->getOption("PATH");
     }
 
     private function getMetaKey($namespace, $scope, $user)
@@ -61,9 +51,15 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         return true;
     }
 
-    protected function getUserId($private)
+    /**
+     * @param bool $private
+     * @param AJXP_Node $node
+     * @return string
+     */
+    protected function getUserId($private, $node)
     {
         if(!$private) return AJXP_METADATA_SHAREDUSER;
+        if($node->hasUser()) return $node->getUser();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
@@ -80,7 +76,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             throw new Exception("Filesystem does not support Extended Attributes!");
         }
@@ -100,7 +96,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             throw new Exception("Filesystem does not support Extended Attributes!");
         }
@@ -118,7 +114,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return array();
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             //throw new Exception("Filesystem does not support Extended Attributes!");
             return array();

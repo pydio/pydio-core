@@ -22,44 +22,106 @@
  * Singleton class that manages all actions. Can be called directly using ajaxplorer.actionBar.
  */
 Class.create("ActionsManager", {
-	
-	/**
-	 * Standard constructor
-	 * @param bUsersEnabled Boolen Whether users management is enabled or not
-	 */
-	initialize: function(bUsersEnabled)
+
+    /**
+     * Standard constructor
+     * @param bUsersEnabled Boolen Whether users management is enabled or not
+     * @param dataModelElementId
+     */
+	initialize: function(bUsersEnabled, dataModelElementId)
 	{
 		this._registeredKeys = new Hash();
-		this._actions = new Hash();
 		this.usersEnabled = bUsersEnabled;
 		
 		this.bgManager = new BackgroundManager(this);		
 		this.subMenus = [];				
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
-		this.toolbars = new Hash();		
-		document.observe("ajaxplorer:context_changed", function(event){
-			window.setTimeout(function(){
-				this.fireContextChange();
-			}.bind(this), 0);			
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:selection_changed", function(event){
-			window.setTimeout(function(){
-				this.fireSelectionChange();
-			}.bind(this), 0);
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:user_logged", function(event){
-			if(event.memo && event.memo.getPreference){
-				this.setUser(event.memo);
-			}else{
-				this.setUser(null);
-			}
-		}.bind(this));
-		
-	},	
-	
+		this.toolbars = new Hash();
+
+        this.contextChangedObs = function(event){
+            window.setTimeout(function(){
+                this.fireContextChange();
+            }.bind(this), 0);
+        }.bind(this);
+        this.selectionChangedObs = function(event){
+            window.setTimeout(function(){
+                this.fireSelectionChange();
+            }.bind(this), 0);
+        }.bind(this);
+
+        if(dataModelElementId){
+            this.localDataModel = true;
+            try{
+                this._dataModel = $(dataModelElementId).ajxpPaneObject.getDataModel();
+            }catch(e){}
+            if(this._dataModel) {
+                this._connectDataModel();
+            }else{
+                document.observeOnce("ajaxplorer:datamodel-loaded-" + dataModelElementId, function(){
+                    this._dataModel = $(dataModelElementId).ajxpPaneObject.getDataModel();
+                    this._connectDataModel();
+                }.bind(this));
+            }
+        }else{
+            this.localDataModel = false;
+            this._connectDataModel();
+        }
+
+        /*
+        if(this._dataModel){
+            this._dataModel.observe("context_changed", this.contextChangedObs);
+            this._dataModel.observe("selection_changed", this.selectionChangedObs);
+            this.localDataModel = true;
+        }else{
+            document.observe("ajaxplorer:context_changed", this.contextChangedObs);
+            document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
+            this._dataModel = ajaxplorer.getContextHolder();
+            this.localDataModel = false;
+        }
+        */
+
+        if(this.usersEnabled){
+            document.observe("ajaxplorer:user_logged", function(event){
+                if(event.memo && event.memo.getPreference){
+                    this.setUser(event.memo);
+                }else{
+                    this.setUser(null);
+                }
+            }.bind(this));
+            if(ajaxplorer.user) {
+                this.setUser(ajaxplorer.user);
+            }
+        }
+
+	},
+
+    _connectDataModel: function(){
+        if(this.localDataModel){
+            this._dataModel.observe("context_changed", this.contextChangedObs);
+            this._dataModel.observe("selection_changed", this.selectionChangedObs);
+            this.loadActionsFromRegistry();
+            document.observe("ajaxplorer:registry_loaded", function(event){
+                this.loadActionsFromRegistry(event.memo);
+            }.bind(this));
+        }else{
+            document.observe("ajaxplorer:context_changed", this.contextChangedObs);
+            document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
+            this._dataModel = ajaxplorer.getContextHolder();
+        }
+    },
+
+    getDataModel:function(){
+        return this._dataModel;
+    },
+
+    destroy: function(){
+        if(this.localDataModel && this._dataModel){
+            this._dataModel.stopObserving("context_changed", this.contextChangedObs);
+            this._dataModel.stopObserving("selection_changed", this.selectionChangedObs);
+        }
+    },
+
 	/**
 	 * Stores the currently logged user object
 	 * @param oUser User User instance
@@ -68,7 +130,7 @@ Class.create("ActionsManager", {
 	{	
 		this.oUser = oUser;
 		if(oUser != null && ajaxplorer  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
-			&& oUser.getPreference('lang') != "" 
+			&& oUser.getPreference('lang') != ""
 			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage
             && !oUser.lock
             )
@@ -94,7 +156,7 @@ Class.create("ActionsManager", {
 		//{
 		//	actionsSelectorAtt = 'directoryContext';
 		//}
-		var contextActions = new Array();
+		var contextActions = $A();
 		var defaultGroup;
         var contextActionsGroup = {};
 		this.actions.each(function(pair){
@@ -112,7 +174,7 @@ Class.create("ActionsManager", {
             var isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
-				var userSelection = ajaxplorer.getUserSelection();
+				var userSelection = this._dataModel;
 				if(!userSelection.isEmpty()){
 					var defaultAction = 'file';
 					if(userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(['ajxp_browsable_archive']))){
@@ -226,7 +288,6 @@ Class.create("ActionsManager", {
 			var args = $A(arguments);
 			args.shift();
 			action.apply(args);
-			return;
 		}
 	},
 	
@@ -267,7 +328,6 @@ Class.create("ActionsManager", {
 			}
 			Event.stop(event);
 		}
-		return;
 	},
 	
 	/**
@@ -283,7 +343,8 @@ Class.create("ActionsManager", {
 			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
-		if(fileName == null) fileNames = ajaxplorer.getUserSelection().getFileNames();
+        var fileNames;
+		if(fileName == null) fileNames = this._dataModel.getFileNames();
 		else fileNames = [fileName];
 		if(destNodeName != null)
 		{
@@ -302,7 +363,7 @@ Class.create("ActionsManager", {
             }
         }
         // Check that dest is not the direct parent of source, ie current rep!
-        if(destDir == ajaxplorer.getContextNode().getPath()){
+        if(destDir == this._dataModel.getContextNode().getPath()){
             if(destNodeName != null) ajaxplorer.displayMessage('ERROR', MessageHash[203]);
             return;
         }
@@ -314,7 +375,7 @@ Class.create("ActionsManager", {
 		}
         connexion.addParameter('nodes[]', fileNames);
 		connexion.addParameter('dest', destDir);
-		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());		
+		connexion.addParameter('dir', this._dataModel.getContextNode().getPath());
 		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
 		connexion.sendAsync();
 	},
@@ -374,8 +435,8 @@ Class.create("ActionsManager", {
 			if(fElement.type == 'radio' && !fElement.checked) return;
 			connexion.addParameter(fElement.name, fValue);
 		});
-		if(ajaxplorer.getContextNode()){
-			connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
+		if(this._dataModel.getContextNode()){
+			connexion.addParameter('dir', this._dataModel.getContextNode().getPath());
 		}
 		if(completeCallback){
 			connexion.onComplete = completeCallback;
@@ -402,12 +463,50 @@ Class.create("ActionsManager", {
 		{
 			if(childs[i].tagName == "message")
 			{
+
 				var messageTxt = "No message";
 				if(childs[i].firstChild) messageTxt = childs[i].firstChild.nodeValue;
 				ajaxplorer.displayMessage(childs[i].getAttribute('type'), messageTxt);
                 if(childs[i].getAttribute('type') == 'ERROR') error = true;
-			}
-			else if(childs[i].tagName == "reload_instruction")
+
+			}else if(childs[i].tagName == "prompt"){
+
+                var message = XPathSelectSingleNode(childs[i], "message").firstChild.nodeValue;
+                var jsonData = XPathSelectSingleNode(childs[i], "data").firstChild.nodeValue;
+                var json = jsonData.evalJSON();
+                var dialogContent = new Element('div').update(json["DIALOG"]);
+                modal.showSimpleModal(modal.messageBox?modal.messageBox:document.body, dialogContent, function(){
+                    // ok callback;
+                    if(json["OK"]["GET_FIELDS"]){
+                        var params = $H();
+                        $A(json["OK"]["GET_FIELDS"]).each(function(fName){
+                            params.set(fName, dialogContent.down('input[name="'+fName+'"]').getValue());
+                        });
+                        var conn = new Connexion();
+                        conn.setParameters(params);
+                        if(json["OK"]["EVAL"]){
+                            conn.onComplete = function(){
+                                eval(json["OK"]["EVAL"]);
+                            };
+                        }
+                        conn.sendAsync();
+                    }else{
+                        if(json["OK"]["EVAL"]){
+                            eval(json["OK"]["EVAL"]);
+                        }
+                    }
+                    return true;
+                }, function(){
+                    // cancel callback
+                    if(json["CANCEL"]["EVAL"]){
+                        eval(json["CANCEL"]["EVAL"]);
+                    }
+                    return true;
+                });
+                throw new Error();
+
+            }
+            else if(childs[i].tagName == "reload_instruction")
 			{
 				var obName = childs[i].getAttribute('object');
 				if(obName == 'data')
@@ -418,9 +517,9 @@ Class.create("ActionsManager", {
 					}else{
 						var file = childs[i].getAttribute('file');
 						if(file){
-							ajaxplorer.getContextHolder().setPendingSelection(file);
+							this._dataModel.setPendingSelection(file);
 						}
-						reloadNodes.push(ajaxplorer.getContextNode());
+						reloadNodes.push(this._dataModel.getContextNode());
 					}
 				}
 				else if(obName == 'repository_list')
@@ -429,7 +528,7 @@ Class.create("ActionsManager", {
 				}
 			}
             else if(childs[i].nodeName == 'nodes_diff'){
-                var dm = ajaxplorer.getContextHolder();
+                var dm = this._dataModel;
                 var removes = XPathSelectNodes(childs[i], "remove/tree");
                 var adds = XPathSelectNodes(childs[i], "add/tree");
                 var updates = XPathSelectNodes(childs[i], "update/tree");
@@ -451,7 +550,7 @@ Class.create("ActionsManager", {
                         if(!parent && getRepName(newNode.getPath()) == "") parent = dm.getRootNode();
                         if(parent){
                             parent.addChild(newNode);
-                            if(dm.getContextNode() == parent){
+                            if(dm.getContextNode() == parent && !window.currentLightBox){
                                 dm.setSelectedNodes([newNode], {});
                             }
                         }
@@ -461,11 +560,12 @@ Class.create("ActionsManager", {
                     updates.each(function(tree){
                         var newNode = dm.getAjxpNodeProvider().parseAjxpNode(tree);
                         var original = newNode.getMetadata().get("original_path");
+                        var fake, n;
                         if(original && original != newNode.getPath()
                             && getRepName(original) != getRepName(newNode.getPath())){
                             // Node was really moved to another folder
-                            var fake = new AjxpNode(original);
-                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            fake = new AjxpNode(original);
+                            n = fake.findInArbo(dm.getRootNode(), undefined);
                             if(n){
                                 n.getParent().removeChild(n);
                             }
@@ -477,12 +577,12 @@ Class.create("ActionsManager", {
                                 parent.addChild(newNode);
                             }
                         }else{
-                            var fake = new AjxpNode(original);
-                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            fake = new AjxpNode(original);
+                            n = fake.findInArbo(dm.getRootNode(), undefined);
                             if(n){
                                 newNode._isLoaded = n._isLoaded;
                                 n.replaceBy(newNode, "override");
-                                dm.setSelectedNodes([n], {});
+                                if(!window.currentLightBox) dm.setSelectedNodes([n], {});
                             }
                         }
                     });
@@ -491,9 +591,14 @@ Class.create("ActionsManager", {
 			else if(childs[i].tagName == "logging_result")
 			{
 				if(childs[i].getAttribute("secure_token")){
+                    var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+                    var val = window.ajxpServerAccessPath.replace(regex, "$1");
+                    var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
+
 					Connexion.SECURE_TOKEN = childs[i].getAttribute("secure_token");
 					var parts = window.ajxpServerAccessPath.split("?secure_token");
 					window.ajxpServerAccessPath = parts[0] + "?secure_token=" + Connexion.SECURE_TOKEN;
+                    if(minisite_session) window.ajxpServerAccessPath += "&minisite_session=" + minisite_session;
 					ajxpBootstrap.parameters.set('ajxpServerAccess', window.ajxpServerAccessPath);
 				}
                 if($("generic_dialog_box") && $("generic_dialog_box").down(".ajxp_login_error")){
@@ -503,18 +608,22 @@ Class.create("ActionsManager", {
                 var errorId = false;
 				if(result == '1')
 				{
-                    modal.setCloseValidation(null);
-					hideLightBox(true);
-					if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
-						var login = childs[i].getAttribute('remember_login');
-						var pass = childs[i].getAttribute('remember_pass');
-						storeRememberData(login, pass);
-					}
+                    try{
+                        modal.setCloseValidation(null);
+                        hideLightBox(true);
+                        if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
+                            var login = childs[i].getAttribute('remember_login');
+                            var pass = childs[i].getAttribute('remember_pass');
+                            storeRememberData(login, pass);
+                        }
+                    }catch(e){
+                        if(console) console.log('Error after login, could prevent registry loading!', e);
+                    }
 					ajaxplorer.loadXmlRegistry();
 				}
 				else if(result == '0' || result == '-1')
 				{
-                    var errorId = 285;
+                    errorId = 285;
 				}
 				else if(result == '2')
 				{					
@@ -522,21 +631,21 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '-2')
 				{
-                    var errorId = 285;
+                    errorId = 285;
 				}
 				else if(result == '-3')
 				{
-                    var errorId = 366;
+                    errorId = 366;
 				}
 				else if(result == '-4')
 				{
-                    var errorId = 386;
+                    errorId = 386;
 				}
                 if(errorId){
                     error = true;
                     if($("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down("div.dialogLegend")){
                         $("generic_dialog_box").down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
-                        $("generic_dialog_box").shake();
+                        Effect.ErrorShake($("generic_dialog_box").down('.ajxp_login_error'));
                     }else{
                         alert(MessageHash[errorId]);
                     }
@@ -558,7 +667,7 @@ Class.create("ActionsManager", {
 
 		}
 		if(reloadNodes.length){
-			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
+			this._dataModel.multipleNodesReload(reloadNodes);
 		}
         return !error;
 	},
@@ -569,14 +678,16 @@ Class.create("ActionsManager", {
 	 */
 	fireSelectionChange: function(){
 		var userSelection = null;
-		if (ajaxplorer && ajaxplorer.getUserSelection()){
-			userSelection = ajaxplorer.getUserSelection();
-			if(userSelection.isEmpty()) userSelection = null;
-		} 
+        userSelection = this._dataModel;
+        if(userSelection.isEmpty()) userSelection = null;
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
-		});		
-		document.fire("ajaxplorer:actions_refreshed");
+		});
+        if(this.localDataModel){
+            this.notify("actions_refreshed");
+        }else{
+            document.fire("ajaxplorer:actions_refreshed");
+        }
 	},
 	
 	/**
@@ -584,16 +695,17 @@ Class.create("ActionsManager", {
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireContextChange: function(){
-		var crtNode;
-		if(ajaxplorer && ajaxplorer.getContextNode()){ 
-			var crtNode = ajaxplorer.getContextNode();
-		}
-		this.actions.each(function(pair){			
+        var crtNode = this._dataModel.getContextNode();
+		this.actions.each(function(pair){
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 									 
 									 crtNode);
 		}.bind(this));
-		document.fire("ajaxplorer:actions_refreshed");
+        if(this.localDataModel){
+            this.notify("actions_refreshed");
+        }else{
+            document.fire("ajaxplorer:actions_refreshed");
+        }
 	},
 			
 	/**
@@ -612,6 +724,9 @@ Class.create("ActionsManager", {
 	 * @param registry DOMDocument
 	 */
 	loadActionsFromRegistry : function(registry){
+        if(!registry){
+            registry = ajaxplorer.getXmlRegistry();
+        }
 		this.removeActions();		
 		this.parseActions(registry);
 		if(ajaxplorer && ajaxplorer.guiActions){
@@ -620,7 +735,11 @@ Class.create("ActionsManager", {
 				this.registerAction(act);
 			}.bind(this));
 		}
-		document.fire("ajaxplorer:actions_loaded", this.actions);
+        if(this.localDataModel){
+            this.notify("actions_loaded");
+        }else{
+            document.fire("ajaxplorer:actions_loaded", this.actions);
+        }
 		this.fireContextChange();
 		this.fireSelectionChange();		
 	},
@@ -649,7 +768,7 @@ Class.create("ActionsManager", {
 	 * @param documentElement DOMNode The node to parse
 	 */
 	parseActions: function(documentElement){		
-		actions = XPathSelectNodes(documentElement, "actions/action");
+		var actions = XPathSelectNodes(documentElement, "actions/action");
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;

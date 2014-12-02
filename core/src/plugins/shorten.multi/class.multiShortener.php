@@ -18,7 +18,7 @@ class multiShortener extends AJXP_Plugin
         $type = $this->getFilteredOption("SHORTEN_TYPE");
         if(empty($type)) return;
         $jsonData = json_decode($params["ob_output"], true);
-        $elementId = "";
+        $elementId = -1;
         if ($jsonData != false) {
             $url = $jsonData["publiclet_link"] ;
             $elementId = $jsonData["element_id"];
@@ -120,7 +120,6 @@ class multiShortener extends AJXP_Plugin
                 break;
 
             case 4:
-                $url = $params["ob_output"];
                 if (!isSet($type["YOURLS_DOMAIN"])) {
                     print($url);
                     $this->logError("Config", "yourls Shortener : you must set the domain name");
@@ -176,7 +175,12 @@ class multiShortener extends AJXP_Plugin
                 }
                 $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
             } else {
-                $metadata['short_form_url'] = $shortUrl;
+                if(isSet($metadata["shares"])){
+                    $key = array_pop(array_keys($metadata["shares"]));
+                    $metadata["shares"][$key]["short_form_url"] = $shortUrl;
+                }else{
+                    $metadata['short_form_url'] = $shortUrl;
+                }
             }
             $node->setMetadata(
                 "ajxp_shared",

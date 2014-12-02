@@ -49,7 +49,11 @@ class s3AccessWrapper extends fsAccessWrapper
             self::$lastException = $e;
             throw $e;
         }
+        $basePath = $repoObject->getOption("PATH");
         $baseContainer = $repoObject->getOption("CONTAINER");
+        if(!empty($basePath)){
+            $baseContainer.=rtrim($basePath, "/");
+        }
         $p = "s3://".$baseContainer.str_replace("//", "/", $url["path"]);
         return $p;
     }
@@ -98,10 +102,11 @@ class s3AccessWrapper extends fsAccessWrapper
         if ($stat["mode"] == 0666) {
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
+
         $parsed = parse_url($path);
         if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
-            return null;
+            //return null;
         }
         return $stat;
 
@@ -173,7 +178,7 @@ class s3AccessWrapper extends fsAccessWrapper
 
     public static function copyFileInStream($path, $stream)
     {
-        AJXP_Logger::debug("Should load ".$path);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Should load ".$path);
         $fp = fopen($path, "r");
         while (!feof($fp)) {
             $data = fread($fp, 4096);

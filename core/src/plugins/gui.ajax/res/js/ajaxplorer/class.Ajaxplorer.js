@@ -36,16 +36,12 @@ Class.create("Ajaxplorer", {
 	initialize: function(loadRep, usersEnabled, loggedUser)
 	{	
 		this._initLoadRep = loadRep;
-		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
-		this._initLoggedUser = loggedUser;
 		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		this._focusables = [];
 		this._registry = null;
 		this._resourcesRegistry = {};
-		this._initDefaultDisp = 'list';
-		this.histCount=0;
 		this._guiComponentsConfigs = new Hash();
 		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "Pydio";
 	},
@@ -57,7 +53,7 @@ Class.create("Ajaxplorer", {
 	init:function(){
 		document.observe("ajaxplorer:registry_loaded", function(){
             this.refreshExtensionsRegistry();
-			this.logXmlUser(this._registry);
+			this.logXmlUser(this._registry, false);
             if(this.user){
                 var repId = this.user.getActiveRepository();
                 var repList = this.user.getRepositoriesList();
@@ -76,6 +72,14 @@ Class.create("Ajaxplorer", {
 				}.bind(this));
 			}
             this.loadActiveRepository();
+            if(ajxpBootstrap.parameters.get("USER_GUI_ACTION")){
+                var a= ajxpBootstrap.parameters.get("USER_GUI_ACTION");
+                ajxpBootstrap.parameters.unset("USER_GUI_ACTION");
+                var aBar = this.actionBar;
+                window.setTimeout(function(){
+                    aBar.fireAction(a);
+                }, 2000);
+            }
 		}.bind(this));
 
 		modal.setLoadingStepCounts(5);
@@ -88,10 +92,102 @@ Class.create("Ajaxplorer", {
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
-		window.setTimeout(function(){
-			document.fire('ajaxplorer:loaded');
-		}, 200);		
+        window.setTimeout(function(){
+            document.fire('ajaxplorer:loaded');
+        }, 200);
+
+        this.initRouter();
+
 	},
+
+    initRouter : function(){
+
+        if(!window.Backbone || !window.Backbone.Router) return;
+
+        var WorkspaceRouter = Backbone.Router.extend({
+            routes: {
+                ":workspace/*path":"switchToWorkspace"
+            },
+            switchToWorkspace: function(workspace, path) {
+                if(!ajaxplorer.user) {return;}
+                if(path) path = '/' + path;
+                else path = '/';
+                var repos = ajaxplorer.user.getRepositoriesList();
+                workspace = workspace.replace("ws-", "");
+                var object = $H(repos).detect(function(pair){
+                    return pair.value.getSlug() == workspace;
+                });
+                if(!object) return;
+                var foundRepo = object.value;
+                if(ajaxplorer.repositoryId != foundRepo.getId()){
+                    if(path){
+                        this._initLoadRep = path;
+                    }
+                    hideLightBox();
+                    ajaxplorer.triggerRepositoryChange(foundRepo.getId());
+                }else if(path){
+                    window.setTimeout(function(){
+                        hideLightBox();
+                        ajaxplorer.goTo(path);
+                    }, 1000);
+                }
+            }
+
+        });
+
+        this.router = new WorkspaceRouter();
+        var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
+        if(appRoot && appRoot != "/"){
+            Backbone.history.start({
+                pushState: true,
+                root:appRoot
+            });
+        }else{
+            Backbone.history.start({
+                pushState: true
+            });
+        }
+        var navigate = function(repList, repId){
+            if(repId === false){
+                this.router.navigate("/.");
+            }else{
+                var repositoryObject = repList.get(repId);
+                if(repositoryObject){
+                    var slug = repositoryObject.getSlug();
+                    if(!repositoryObject.getAccessType().startsWith("ajxp_")){
+                        slug = "ws-" + slug;
+                    }
+                    if(this._contextHolder && this._contextHolder.getContextNode()){
+                        slug += this._contextHolder.getContextNode().getPath();
+                    }
+                    this.router.navigate(slug);
+                }
+            }
+        }.bind(this);
+
+        if(this.user){
+            navigate(this.user.getRepositoriesList(), this.user.getActiveRepository());
+        }
+        document.observe("ajaxplorer:repository_list_refreshed", function(event){
+            var repList = event.memo.list;
+            var repId = event.memo.active;
+            navigate(repList, repId);
+        });
+        document.observe("ajaxplorer:context_changed", function(event){
+            if(!this.user) return;
+            var repoList = this.user.getRepositoriesList();
+            var activeRepo = repoList.get(this.user.getActiveRepository());
+            if(activeRepo){
+                var slug = activeRepo.getSlug();
+                if(!activeRepo.getAccessType().startsWith("ajxp_")){
+                    slug = "ws-" + slug;
+                }
+                var path = this.getContextNode().getPath();
+                this.router.navigate(slug + path);
+            }
+        }.bind(this));
+    },
+
 	/**
 	 * Loads the XML Registry, an image of the application in its current state
 	 * sent by the server.
@@ -133,8 +229,9 @@ Class.create("Ajaxplorer", {
 	refreshXmlRegistryPart : function(documentElement){
 		var xPath = documentElement.getAttribute("xPath");
 		var existingNode = XPathSelectSingleNode(this._registry, xPath);
+        var parentNode;
 		if(existingNode && existingNode.parentNode){
-			var parentNode = existingNode.parentNode;
+			parentNode = existingNode.parentNode;
 			parentNode.removeChild(existingNode);
 			if(documentElement.firstChild){
 				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
@@ -142,7 +239,7 @@ Class.create("Ajaxplorer", {
 		}else if(xPath.indexOf("/") > -1){
 			// try selecting parentNode
 			var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
-			var parentNode = XPathSelectSingleNode(this._registry, parentPath);
+			parentNode = XPathSelectSingleNode(this._registry, parentPath);
 			if(parentNode && documentElement.firstChild){
 				//parentNode.ownerDocument.importNode(documentElement.firstChild);
 				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
@@ -193,21 +290,11 @@ Class.create("Ajaxplorer", {
 			this.actionBar.loadActionsFromRegistry(event.memo);
 		}.bind(this) );
 				
-		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
-			this.history = new Proto.History(function(hash){
-				this.goTo(this.historyHashToPath(hash));
-			}.bind(this));
-			document.observe("ajaxplorer:context_changed", function(event){
-				this.updateHistory(this.getContextNode().getPath());
-			}.bind(this));
-		}else{
-			document.observe("ajaxplorer:context_changed", function(event){
-				var path = this.getContextNode().getPath();
-				document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-			}.bind(this));
-		}
 		document.observe("ajaxplorer:context_changed", function(event){
-			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;			
+            var path = this.getContextNode().getPath();
+            document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
+
+			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;
 			window.setTimeout(function(){
 				var data = this.user.getPreference("ls_history", true) || {};
 				data = new Hash(data);
@@ -355,14 +442,16 @@ Class.create("Ajaxplorer", {
 		}
 		this.templatePartsToRestore = futurePartsToRestore;
 	},
-	
-	/**
-	 * Applies a template_part by removing existing components at this location
-	 * and recreating new ones.
-	 * @param ajxpId String The id of the DOM anchor
-	 * @param ajxpClass IAjxpWidget A widget class
-	 * @param ajxpOptions Object A set of options that may have been decoded from json.
-	 */
+
+    /**
+     * Applies a template_part by removing existing components at this location
+     * and recreating new ones.
+     * @param ajxpId String The id of the DOM anchor
+     * @param ajxpClass IAjxpWidget A widget class
+     * @param ajxpClassName
+     * @param ajxpOptionsString
+     * @param cdataContent
+     */
 	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
@@ -382,6 +471,7 @@ Class.create("Ajaxplorer", {
 		if(ajxpOptionsString){
 			ajxpOptions = ajxpOptionsString.evalJSON();			
 		}
+        /*
 		if(Class.objectImplements(oldObj, "IFocusable")){
 			this._focusables = this.unregisterFocusable(oldObj);
 		}
@@ -389,7 +479,7 @@ Class.create("Ajaxplorer", {
 			oldObj.getActions().each(function(act){
 				this.guiActions.unset(act.key);// = this.guiActions.without(act);
 			}.bind(this) );
-		}
+		}*/
 		if(oldObj.htmlElement) var anchor = oldObj.htmlElement;
 		oldObj.destroy();
 
@@ -402,6 +492,7 @@ Class.create("Ajaxplorer", {
             if(compReg.length) this.initAjxpWidgets(compReg);
         }
 		var obj = new ajxpClass($(ajxpId), ajxpOptions);
+
 		if(Class.objectImplements(obj, "IFocusable")){
 			obj.setFocusBehaviour();
 			this.registerFocusable(obj);
@@ -413,6 +504,7 @@ Class.create("Ajaxplorer", {
 			if(!this.guiActions) this.guiActions = new Hash();
 			this.guiActions.update(obj.getActions());
 		}
+
         if($(ajxpId).up('[ajxpClass]') && $(ajxpId).up('[ajxpClass]').ajxpPaneObject && $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes){
             $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes($(ajxpId).up('[ajxpClass]').ajxpPaneObject.htmlElement, true);
         }
@@ -435,6 +527,13 @@ Class.create("Ajaxplorer", {
 		for(var i=0;i<nodes.length;i++){
 			this.setGuiComponentConfig(nodes[i]);
 		}
+        var element = $(window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
+        if(element && element.ajxpPaneObject &&  element.ajxpPaneObject.resize){
+            window.setTimeout(function(){
+                // Fire top resize event once after all css are loaded.
+                element.ajxpPaneObject.resize();
+            }, 500);
+        }
 	},
 	
 	/**
@@ -535,7 +634,7 @@ Class.create("Ajaxplorer", {
 			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});
 		}else{
 			document.fire("ajaxplorer:repository_list_refreshed", {list:false,active:false});
-		}		
+		}
 	},
 	
 	/**
@@ -546,9 +645,9 @@ Class.create("Ajaxplorer", {
 		document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
 			if(event.memo != "user/repositories") return;
 			this.logXmlUser(this._registry, true);
-			repId = this.user.getActiveRepository();
-			repList = this.user.getRepositoriesList();
-			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});			
+			document.fire("ajaxplorer:repository_list_refreshed", {
+                list:this.user.getRepositoriesList(),
+                active:this.user.getActiveRepository()});
 		}.bind(this));
 		this.loadXmlRegistry(false, "user/repositories");
 	},
@@ -563,6 +662,7 @@ Class.create("Ajaxplorer", {
 			//return;
 		}
         this._contextHolder.setSelectedNodes([]);
+        if(repository == null) return;
 		
 		repository.loadResources();
 		var repositoryId = repository.getId();		
@@ -571,15 +671,16 @@ Class.create("Ajaxplorer", {
 		this.skipLsHistory = true;
 		
 		var providerDef = repository.getNodeProviderDef();
+        var rootNode;
 		if(providerDef != null){
 			var provider = eval('new '+providerDef.name+'()');
 			if(providerDef.options){
 				provider.initProvider(providerDef.options);
 			}
 			this._contextHolder.setAjxpNodeProvider(provider);
-			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
+			rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
 		}else{
-			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+			rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
 			// Default
 			this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		}
@@ -634,7 +735,6 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Require a context change to the given path
 	 * @param nodeOrPath AjxpNode|String A node or a path
-     * @param leaf AjxpNode|String path to the leaf item to be selected
 	 */
 	goTo: function(nodeOrPath){
         var path;
@@ -652,6 +752,10 @@ Class.create("Ajaxplorer", {
             }
 		}
 
+        var current = this._contextHolder.getContextNode();
+        if(current && current.getPath() == path){
+            return;
+        }
         var gotoNode;
         if(path == "" || path == "/") {
             gotoNode = new AjxpNode("/");
@@ -659,9 +763,8 @@ Class.create("Ajaxplorer", {
             return;
         }
         window.setTimeout(function(){
-
             this._contextHolder.loadPathInfoSync(path, function(foundNode){
-                if(foundNode.isLeaf()) {
+                if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
                     this._contextHolder.setPendingSelection(getBaseName(path));
                     gotoNode = new AjxpNode(getRepName(path));
                 }else{
@@ -682,10 +785,10 @@ Class.create("Ajaxplorer", {
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_repository');
 		connexion.addParameter('repository_id', repositoryId);
-		oThis = this;
 		connexion.onComplete = function(transport){
-			this.repositoryId = null;
-			this.loadXmlRegistry();
+            this.actionBar.parseXmlMessage(transport.responseXML);
+            this.repositoryId = null;
+            this.loadXmlRegistry();
 		}.bind(this);
 		var root = this._contextHolder.getRootNode();
 		if(root){
@@ -712,9 +815,9 @@ Class.create("Ajaxplorer", {
 		}
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
-				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
-				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"?true:false),
-				previewProvider: (xmlNode.getAttribute("previewProvider")=="true"?true:false),
+				openable : (xmlNode.getAttribute("openable") == "true"),
+				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"),
+				previewProvider: (xmlNode.getAttribute("previewProvider") == "true"),
 				order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
 				formId : xmlNode.getAttribute("formId") || null,				
 				text : MessageHash[xmlNode.getAttribute("text")],
@@ -738,6 +841,11 @@ Class.create("Ajaxplorer", {
 					$('all_forms').insert(clientForm.firstChild.nodeValue);
 				}
 			}
+            if(xmlNode.getAttribute("order")){
+                extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));
+            }else{
+                extensionDefinition.order = 0;
+            }
 			var extensionOnInit = XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
 			if(extensionOnInit && extensionOnInit.firstChild){
 				try{eval(extensionOnInit.firstChild.nodeValue);}catch(e){}
@@ -781,7 +889,11 @@ Class.create("Ajaxplorer", {
 	},
 	
 	getPluginConfigs : function(pluginQuery){
-		var properties = XPathSelectNodes(this._registry, 'plugins/'+pluginQuery+'/plugin_configs/property | plugins/ajxpcore[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/ajxp_plugin[@id="core.'+pluginQuery+'"]/plugin_configs/property');
+        var xpath = 'plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property';
+        if(pluginQuery.indexOf('.') == -1){
+            xpath = 'plugins/'+pluginQuery+'/plugin_configs/property |' + xpath;
+        }
+		var properties = XPathSelectNodes(this._registry, xpath );
 		var configs = $H();
 		for(var i = 0; i<properties.length; i++){
 			var propNode = properties[i];
@@ -790,14 +902,21 @@ Class.create("Ajaxplorer", {
 		return configs;
 	},
 
+    getDefaultImageFromParameters: function(pluginId, paramName){
+        var node = XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
+        if(node) return node.getAttribute("defaultImage");
+        return '';
+    },
+
     hasPluginOfType : function(type, name){
+        var node;
         if(name == null){
-            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
+            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
         }else{
-            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
+            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
         }
-        if(node) return true;
-        return false;
+        return (node != undefined);
+
     },
 
 	/**
@@ -806,7 +925,6 @@ Class.create("Ajaxplorer", {
 	 * @returns $A()
 	 */
 	getActiveExtensionByType : function(extensionType){
-		var exts = $A();
 		return this._extensionsRegistry[extensionType];
 	},
 	
@@ -818,12 +936,13 @@ Class.create("Ajaxplorer", {
 	findEditorById : function(editorId){
 		return this._extensionsRegistry.editor.detect(function(el){return(el.id == editorId);});
 	},
-	
-	/**
-	 * Find Editors that can handle a given mime type
-	 * @param mime String
-	 * @returns AbstractEditor[]
-	 */
+
+    /**
+     * Find Editors that can handle a given mime type
+     * @param mime String
+     * @returns AbstractEditor[]
+     * @param restrictToPreviewProviders
+     */
 	findEditorsForMime : function(mime, restrictToPreviewProviders){
 		var editors = $A([]);
 		var checkWrite = false;
@@ -873,6 +992,9 @@ Class.create("Ajaxplorer", {
             this._editorOpener.stopObserving("switch", this._editorObserver);
             this._editorOpener = null;
         }
+    },
+    getEditorOpener:function(){
+        return this._editorOpener;
     },
     _messageBoxReference:null,
     registerAsMessageBoxReference: function(element){
@@ -967,9 +1089,11 @@ Class.create("Ajaxplorer", {
 		connexion.onComplete = function(transport){
 			if(transport.responseText){
 				var result = transport.responseText.evalScripts();
-				MessageHash = result[0];
-				for(var key in MessageHash){
-					MessageHash[key] = MessageHash[key].replace("\\n", "\n");
+				window.MessageHash = result[0];
+				for(var key in window.MessageHash){
+                    if(window.MessageHash.hasOwnProperty(key)){
+                        window.MessageHash[key] = window.MessageHash[key].replace("\\n", "\n");
+                    }
 				}
 				this.updateI18nTags();
 				if(this.guiActions){
@@ -1043,48 +1167,6 @@ Class.create("Ajaxplorer", {
 		};
 		connexion.sendSync();		
 	},
-			
-	/**
-	 * Updates the browser history
-	 * @param path String Path
-	 */
-	updateHistory: function(path){
-		if(this.history) this.history.historyLoad(this.pathToHistoryHash(path));
-	},
-	
-	/**
-	 * Translate the path to a history step. Return the count.
-	 * @param path String
-	 * @returns Integer
-	 */
-	pathToHistoryHash: function(path){
-		document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-		if(!this.pathesHash){
-			this.pathesHash = new Hash();
-			this.histCount = -1;
-		}
-		var foundKey;
-		this.pathesHash.each(function(pair){
-			if(pair.value == path) foundKey = pair.key;
-		});
-		if(foundKey != undefined) return foundKey;
-	
-		this.histCount++;
-		this.pathesHash.set(this.histCount, path);
-		return this.histCount;
-	},
-	
-	/**
-	 * Reverse operation
-	 * @param hash Integer
-	 * @returns String
-	 */
-	historyHashToPath: function(hash){
-		if(!this.pathesHash) return "/";
-		var path = this.pathesHash.get(hash);
-		if(path == undefined) return "/";
-		return path;
-	},	
 
 	/**
 	 * Accessor for updating the datamodel context
@@ -1132,8 +1214,8 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Accessor for datamodel.requireContextChange()
 	 */
-	fireNodeRefresh : function(nodePathOrNode){
-		this.getContextHolder().requireNodeReload(nodePathOrNode);
+	fireNodeRefresh : function(nodePathOrNode, completeCallback){
+		this.getContextHolder().requireNodeReload(nodePathOrNode, completeCallback);
 	},
 	
 	/**
@@ -1145,7 +1227,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 	/**
-	 * @returns DOMDocument
+	 * @returns Document
 	 */
 	getXmlRegistry : function(){
 		return this._registry;
@@ -1226,6 +1308,9 @@ Class.create("Ajaxplorer", {
 	 * @param object IAjxpFocusable
 	 */
 	focusOn : function(object){
+        if(!this._focusables || this._focusables.indexOf(object) == -1) {
+            return;
+        }
 		this._focusables.each(function(obj){
 			if(obj != object) obj.blur();
 		});
@@ -1243,7 +1328,7 @@ Class.create("Ajaxplorer", {
 	},
 
     /**
-     * @param IAjxpFocusable widget
+     * @param widget IAjxpFocusable
      */
     registerFocusable: function(widget){
         if(-1 == this._focusables.indexOf(widget) && widget.htmlElement){
@@ -1252,7 +1337,7 @@ Class.create("Ajaxplorer", {
     },
 
     /**
-     * @param IAjxpFocusable widget
+     * @param widget IAjxpFocusable
      */
     unregisterFocusable: function(widget){
         this._focusables = this._focusables.without(widget);
@@ -1283,7 +1368,7 @@ Class.create("Ajaxplorer", {
                 });
                 var shiftKey = e['shiftKey'];
 				var foundFocus = false;
-				for(i=0; i<objects.length;i++)
+				for(var i=0; i<objects.length;i++)
 				{
 					if(objects[i].hasFocus)
 					{
@@ -1310,8 +1395,9 @@ Class.create("Ajaxplorer", {
 				Event.stop(e);
 			}
 			if(this.blockShortcuts || e['ctrlKey'] || e['metaKey']) return;
-			if(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ) ) return;
-			else return this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete":String.fromCharCode(e.keyCode).toLowerCase()));
+            if (!(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ))) {
+                this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete" : String.fromCharCode(e.keyCode).toLowerCase()));
+            }
 		}.bind(this));
 	}
 		

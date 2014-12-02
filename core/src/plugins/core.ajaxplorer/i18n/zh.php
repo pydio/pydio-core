@@ -1,4 +1,23 @@
 <?php
+/*
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*/
 //---------------------------------------------------------------------------------------------------
 //
 //	Pydio 中文 简体 UTF-8 语言包
@@ -15,6 +34,7 @@ $mess=array(
 "languageLabel" => "简体中文",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "zh-CN",
 "0" => "上一版本",
 "1" => "名称",
 "2" => "大小",
@@ -181,9 +201,9 @@ $mess=array(
 "164"=> "注销",
 "165"=> "设置(g)",
 "166"=> "关于(A)",
-"167"=> "关于AjaXplorer",
-"168" => "连接到 Pydio",
-"169" => "断开到AjaXplorer的链接",
+"167"=> "关于Pydio",
+"168" => "连接到 APPLICATION_TITLE",
+"169" => "断开到APPLICATION_TITLE的链接",
 "170" => "当前目录",
 "parent_access_key" => "P",
 "refresh_access_key" => "h",
@@ -406,8 +426,8 @@ $mess=array(
 "366" => "此用户没有任何活动的存储库。",
 "367" => "不能上传此类型的文件。 请在以下扩展名中进行选择: ",
 "368" => "已成功地将所选内容从存档 %s 提取到文件夹 %s",
-"369" => "Pydio 链接",
-"370" => "Pydio 公共下载",
+"369" => "APPLICATION_TITLE 链接",
+"370" => "APPLICATION_TITLE 公共下载",
 "371" => "当前下载需要密码",
 "372" => "当前存储库",
 "373" => "目标",
@@ -426,7 +446,7 @@ $mess=array(
 "389" => "请读取下面的代码:",
 "390" => "代码",
 "391" => "无存储库",
-"392" => "警告，Pydio 版本已更改(现在为 %s)，请清除您的浏览器缓存并刷新页面，以确保一切运行正常!",
+"392" => "警告，APPLICATION_TITLE 版本已更改(现在为 %s)，请清除您的浏览器缓存并刷新页面，以确保一切运行正常!",
 "393" => "警告，名称长度必须低于 %s，此文件的名称将被截断!",
 "394" => "很抱歉，此时无法使用当前身份验证驱动程序进行文件夹共享(用户是不可编辑的)。 尽管如此，仍可以进行文件共享。",
 "395" => "您拖入的项目好像是一个文件夹，文件夹不能上传到服务器! 是否确认要上传?",
@@ -438,7 +458,7 @@ $mess=array(
 "401" => "下载并安装软件hjsplit，即可合并分块文件: ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your Pydio repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
+"404" => "You can use the WebDAV protocol to mount your APPLICATION_TITLE repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
 "405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
 "406" => "Activate WebDAV shares",
 "407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
@@ -558,5 +578,61 @@ $mess=array(
 "509" => "Save the current users list as a personal team",
 "510" => "Please enter a team label",
 "511" => "My %s",
+"512" => "Desktop Full Screen",
+"513" => "show",
+"514" => "hide",
+"515" => "No bookmarks - Drop files or folders here for quick access.",
+"516" => "expand",
+"517" => "collapse",
+"518" => "Alternatively, you can <a class='create_file_alt_link'>create a new empty file</a>.",
+"519" => "Update user",
+"520" => "Update user data and password",
+"521" => "User was update successfully",
+"522" => "User ID",
+"523" => "Password",
+"524" => "Update Password",
+"525"=> "Show original picture",
+"526"=> "Low-resolution version",
+"527"=> "Shared with",
+"528"=> "Internal users",
+"530"=> "External users",
+"531"=> "Int.",
+"532"=> "Ext.",
+"plugtype.title.access" => "Workspaces Drivers",
+"plugtype.desc.access" => "Plugins defining how a workspace will both access its backend (a file storage or whatever else) and major layouts and actions.",
+"plugtype.title.action" => "Action plugins",
+"plugtype.desc.action" => "Feature oriented plugins for various aspects",
+"plugtype.title.authfront" => "Authentication Frontends",
+"plugtype.desc.authfront" => "Methods for gathering identification credentials (web form, api key, etc)",
+"plugtype.title.cypher" => "Encryption Tools",
+"plugtype.desc.cypher" => "Data encryption plugins",
+"plugtype.title.editor" => "Editors",
+"plugtype.desc.editor" => "Viewers or editors for wide range of mime types",
+"plugtype.title.gui" => "Graphical User Interface",
+"plugtype.desc.gui" => "Main web interface and its declinations",
+"plugtype.title.index" => "Indexation",
+"plugtype.desc.index" => "Tools for indexing data and providing quick search option",
+"plugtype.title.meta" => "Workspace Meta Aspects",
+"plugtype.desc.meta" => "Additionnal features to be added to the workspaces",
+"plugtype.title.metastore" => "Metadata Storage",
+"plugtype.desc.metastore" => "Various implementations for storing metadata along with files and folders",
+"plugtype.title.shorten" => "URL Shortening",
+"plugtype.desc.shorten" => "Webservices bridges for shortening public links",
+"plugtype.title.uploader" => "Uploaders",
+"plugtype.desc.uploader" => "Implementation of uploaders using various technologies (html, js, java...)",
+"plugtype.title.auth" => "Authentication Backends",
+"plugtype.desc.auth" => "How users data are stored in the backend",
+"plugtype.title.boot" => "Loader",
+"plugtype.desc.boot" => "Unique plugin for loading the framework.",
+"plugtype.title.conf" => "Configuration Storage",
+"plugtype.desc.conf" => "How configuration data are stored in the backend",
+"plugtype.title.feed" => "Events Feed Storage",
+"plugtype.desc.feed" => "Implementations for storing data events (only SQL yet)",
+"plugtype.title.log" => "Loggers",
+"plugtype.desc.log" => "Send application logs to various channels",
+"plugtype.title.mailer" => "Mailers",
+"plugtype.desc.mailer" => "Tools for letting the application send emails",
+"plugtype.title.mq" => "Instant Messaging",
+"plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
 /* END SENTENCE */
 );

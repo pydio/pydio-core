@@ -8,6 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <link rel="icon" type="image/x-png" href="<?php print(AJXP_THEME_FOLDER);?>/images/html-folder.png">
 <?php
+    print($ADDITIONAL_FRAMEWORKS);
+
 $list = AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz_list.txt";
 $lines = file($list);
 foreach ($lines as $line){
@@ -26,7 +28,7 @@ foreach ($lines as $line){
 }
 ?>
 </head>
-<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow:hidden;">
+<body style="overflow:hidden;">
 <div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
 
 <script type="text/javascript">
@@ -67,5 +69,6 @@ foreach ($lines as $line){
 	</div>
 	</form>
 </div>
+<link rel="stylesheet" href="plugins/gui.ajax/res/js/lib/chosen/chosen.css"/>
 </body>
 </html>

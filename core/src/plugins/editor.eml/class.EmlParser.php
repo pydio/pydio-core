@@ -49,8 +49,12 @@ class EmlParser extends AJXP_Plugin
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $wrapperClassName = $streamData["classname"];
-        if(empty($httpVars["file"])) return;
-        $file = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+
+        $selection = new UserSelection($repository, $httpVars);
+
+        if($selection->isEmpty()) return;
+
+        $file = $destStreamURL.$selection->getUniqueFile();
         $mess = ConfService::getMessages();
 
         $node = new AJXP_Node($file);
@@ -336,7 +340,7 @@ class EmlParser extends AJXP_Plugin
 
         $dom = new DOMDocument("1.0", "UTF-8");
         $dom->loadXML($outputVars["ob_output"]);
-        $mobileAgent = AJXP_Utils::userAgentIsIOS() || (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")!==false);
+        $mobileAgent = AJXP_Utils::userAgentIsIOS() || AJXP_Utils::userAgentIsNativePydioApp();
         $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
             // Replace all text attributes by the "from" value
@@ -347,7 +351,7 @@ class EmlParser extends AJXP_Plugin
                     $ar = explode("&lt;", $from);
                     $from = trim(array_shift($ar));
                     $text = ($index < 10?"0":"").$index.". ".$from." &gt; ".$child->getAttribute("eml_subject");
-                    if ((strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")!==false)) {
+                    if (AJXP_Utils::userAgentIsNativePydioApp()) {
                         $text = html_entity_decode($text, ENT_COMPAT, "UTF-8");
                     }
                     $index ++;

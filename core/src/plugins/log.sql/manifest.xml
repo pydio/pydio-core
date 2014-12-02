@@ -9,5 +9,25 @@
 		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
         <param type="button" name="INSTALL_SQL" choices="run_plugin_action:log.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
 	</server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="analytic_query">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
+                <processing>
+                    <serverCallback methodName="processQuery" restParams="/query_name/start/count" sdkMethodName="analyticQuery" developerComment="Perform an analytics query by name">
+                        <input_param description="Name of the analytic query" name="query_name" type="string"/>
+                        <input_param description="Starting row" name="start" type="integer"/>
+                        <input_param description="Number of rows" name="count" type="integer"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="analytic_list_queries">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
+                <processing>
+                    <serverCallback methodName="exposeQueries" restParams="/" sdkMethodName="analyticListQueries" developerComment="List available analytics queries"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
 	<class_definition filename="plugins/log.sql/class.sqlLogDriver.php" classname="sqlLogDriver"/>
 </logdriver>

@@ -19,13 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"HTML Uploader" => "Uploader HTML",
-"Auto-switching HTML5 or IFrame uploader." => "Uploader HTML5 ou IFRAME.",
+"HTML Uploader" => "Programme d'envoi HTML",
+"Auto-switching HTML5 or IFrame uploader." => "Commutation automatique entre le programme d'envoi HTML5 ou IFRAME.",
 "Default Behaviour" => "Comportement par défaut",
 "Existing Files" => "Fichiers existants",
-"Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)" => "Que faire si les fichiers existent?",
+"Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)" => "Informer l'utilisateur si le fichier existe déjà ? (comportement par défaut, l'utilisateur pourra modifier cette préférence)",
 "Auto Start" => "Envoi automatique",
-"Default value for automatically starting upload or not" => "Démarrage automatique dès qu'on ajoute un fichier",
-"Auto Close" => "Fermeture auto",
-"Default value for automatically closing the dialog after upload or not" => "Fermeture automatique après que les fichiers sont téléchargés.",
+"Default value for automatically starting upload or not" => "Valeur par défaut pour le démarrage automatique de l'envoi",
+"Auto Close" => "Fermeture automatique",
+"Default value for automatically closing the dialog after upload or not" => "Valeur par défaut pour la fermeture automatique après l'envoi.",
 );

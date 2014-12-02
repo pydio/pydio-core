@@ -4,17 +4,25 @@
     <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
     <server_settings>
         <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
+        <param name="REPO_SYNCABLE" type="boolean" label="Syncable Workspace" description="Workspace is syncable" default="true" scope="repository" expose="true"/>
     </server_settings>
     <registry_contributions>
            <actions>
                <action name="changes">
                    <processing>
-                       <serverCallback methodName="switchActions" restParams="/seq_id"/>
+                       <serverCallback methodName="switchActions" restParams="/seq_id" developerComment="List all changes on this workspace starting at a given sequence id">
+                           <input_param name="filter" type="path" description="Path to a directory: will return changes as if this dir was the root"/>
+                           <input_param name="flatten" type="boolen" description="Flatten results or not, i.e. send the full sequence of changes, or try to reduce the ones that cancel the others (like move a to b plus move b to c = move a to c)."/>
+                           <input_param name="stream" type="boolean" description="Return json as a stream or as a whole"/>
+                           <output type="JSON" description="Json OR Streamable JSON : json structures that are line separated, giving the ability to parse the answer as a stream by http clients."/>
+                       </serverCallback>
                    </processing>
                </action>
            </actions>
    		<hooks>
    			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
+   			<serverCallback hookName="node.index.add" methodName="indexNode"/>
+   			<serverCallback hookName="node.index.folder_recursive" methodName="clearIndexForNode"/>
    		</hooks>
     </registry_contributions>
 </meta>

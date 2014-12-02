@@ -31,7 +31,7 @@ Class.create("NotificationLoader", {
 
     initialize: function(){
 
-        if(window.ajxpMinisite) return;
+        if(window.ajxpMinisite || window.ajxpNoNotifLoader) return;
 
         var rP = new RemoteNodeProvider();
         rP.initProvider({get_action:'get_my_feed', format:'xml', connexion_discrete:true});
@@ -39,7 +39,7 @@ Class.create("NotificationLoader", {
         this.ajxpNode._iNodeProvider = rP;
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
-        this.pFactory.setThumbSize(22);
+        this.pFactory.setThumbSize(44);
         this.ajxpNode.observe('loaded', function(){
             this.menuItems = this.childrenToMenuItems();
         }.bind(this));
@@ -60,24 +60,6 @@ Class.create("NotificationLoader", {
         }.bind(this));
         this.ajxpNode.reload();
     },
-
-    /*
-    childrenToMenu: function(menuContainer){
-        this.ajxpNode.getChildren().each(function(el){
-           var div = new Element('a');
-           var imgSpan = new Element('span', {className:'event_image'});
-           var labelSpan = new Element('span', {className:'event_label'});
-           var img = this.pFactory.generateBasePreview(el);
-           div.IMAGE_ELEMENT = img;
-           imgSpan.insert(img);
-           labelSpan.insert(el.getMetadata().get("event_description"));
-           div.insert(imgSpan); div.insert(labelSpan);
-           menuContainer.insert(div);
-           this.pFactory.enrichBasePreview(el, div);
-        }.bind(this) );
-
-    },
-    */
 
     childrenToMenuItems : function(callback){
         var menuItems = $A([]);
@@ -264,7 +246,7 @@ Class.create("NotificationLoader", {
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
-            menuMaxHeight: 480,
+            menuMaxHeight: 680,
             topOffset: 14,
             menuTitle: this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'],
             beforeShow: function(){
@@ -311,7 +293,61 @@ Class.create("NotificationLoader", {
         var offset = protoMenu.computeAnchorOffset();
         protoMenu.container.setStyle(offset);
         protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
-    }
+    },
+
+    loadInfoPanel : function(container, node){
+        var label= MessageHash['notification_center.'+(node.isLeaf()?'11': (node.isRoot()?'9': '10'))];
+        container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+label+'</div><div id="activity_results">Nothing</div>');
+        var resultPane = container.down("#activity_results");
+        if(node.isLeaf()) resultPane.addClassName('leaf_activity');
+        else resultPane.removeClassName('leaf_activity');
+        var timer = NotificationLoader.prototype.loaderTimer;
+        if(timer) window.clearTimeout(timer);
+
+        var fRp = new FetchedResultPane(resultPane, {
+            "fit":"content",
+            "replaceScroller": false,
+            "columnsDef":[
+                {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
+                {"attributeName":"event_time", "messageString":"Time", "sortType":"Number"},
+                {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
+            "silentLoading":true,
+            "fixedSortColumn":"event_time",
+            "fixedSortDirection":"desc",
+            "muteUpdateTitleEvent":true,
+            "nodeProviderProperties":{
+                "get_action":"get_my_feed",
+                "connexion_discrete":true,
+                "format":"xml", "current_repository":"true",
+                "feed_type":"notif",
+                "limit":(node.isLeaf() || node.isRoot() ? 18 : 4),
+                "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
+                "merge_description":"true",
+                "description_as_label":node.isLeaf()?"true":"false"
+            }});
+        var pane = container.up('[ajxpClass="InfoPanel"]');
+        fRp._rootNode.observe("loaded", function(){
+            if(pane && pane.ajxpPaneObject){
+                window.setTimeout(function(){
+                    pane.ajxpPaneObject.resize();
+                },0.2);
+            }
+            if(container.down('#ajxp_activity_panel > div.panelHeader')){
+                if(!fRp._rootNode.getChildren().length){
+                    container.down('#ajxp_activity_panel > div.panelHeader').hide();
+                }else{
+                    container.down('#ajxp_activity_panel > div.panelHeader').show();
+                }
+            }
+        });
+        // fRp.showElement(true);
+        NotificationLoader.prototype.loaderTimer = window.setTimeout(function(){
+            fRp.showElement(true);
+        }, 0.5);
+
+    },
+
+    loaderTimer: null,
 
 });
 

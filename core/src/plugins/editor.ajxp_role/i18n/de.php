@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,52 +18,63 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
+/*******************************************************************************
+* German translation:
+*  	+ update: Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/ 
+
 $mess=array(
 "1" => "Rollenverwaltung",
 "2" => "Rollenverwaltung",
-"3" => "Benutzer Infos",
+"3" => "Benutzerdaten",
 "4" => "ACL",
-"5" => "Actions",
+"5" => "Aktionen",
 "6" => "Parameter",
-"7" => "Interne Daten ",
-"8" => "Persönliche Informationen",
-"9" => "Wählen Sie die Repositories auf die diese Rolle Zugriff erhält. Wenn Sie 'Verweigern' wählen wird der Zugriff verweigert auch wenn der Zugriff, von anderen Rollen, gesetzt oder Vererbt wurde.",
-"10" => "Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given workspace only.",
-"11" => "Plugin Identifier",
-"12" => "Select a plugin...",
-"12a" => "Select an action...",
-"12b" => "Select a parameter...",
-"12c" => "Pick one or all workspaces...",
-"12d" => "All Workspaces",
-"12e" => "Shared Workspaces",
-"13" => "Action name",
-"14" => "Repository Scope",
-"15" => "Add Action",
-"16" => "Use the selectors below to select the parameters you want to refine for the users of this role. Can be applied to all or one given workspace only, although this may depend on the plugin context.",
-"17" => "Parameter name",
-"18" => "Add parameter",
-"19" => "Sie haben ungespeicherte Änderungen. Möchten Sie das Fenster wirklich schließen?",
-"20" => "Rollen Update erfolgreich",
-"21" => "Benutzer ID",
+"7" => "Interne Daten",
+"8" => "Pers&ouml;nliche Informationen",
+"9" => "W&auml;hlen Sie die Arbeitsumgebungen, auf welche diese Rolle Zugriff erh&auml;lt. Wenn Sie 'Verweigern' w&auml;hlen, wird der Zugriff verweigert, auch wenn der Zugriff von anderen Rollen gesetzt oder vererbt wurde.",
+"10" => "Benutzen Sie die untenstehende Auswahl, wenn Sie Aktionen der Benutzer dieser Rolle verbieten wollen. Die Einstellungen k&ouml;nnen f&uuml;r eine oder alle Arbeitsumgebungen angewendet werden.",
+"11" => "Plugin-Identifikation",
+"12" => "W&auml;hlen Sie ein Plugin...",
+"12a" => "W&auml;hlen Sie eine Aktion...",
+"12b" => "W&auml;hlen Sie einen Parameter...",
+"12c" => "W&auml;hlen Sie eine oder alle Arbeitsumgebungen...",
+"12d" => "Alle Arbeitsumgebungen",
+"12e" => "Geteilte Arbeitsumgebungen",
+"13" => "Aktionsname",
+"14" => "Arbeitsumgebungs-Bereich",
+"15" => "Aktion hinzuf&uuml;gen",
+"16" => "Benutzen Sie die untenstehende Auswahl, wenn Sie Parameter der Benutzer dieser Rolle verfeinern wollen. Die Einstellungen k&ouml;nnen, abh&auml;ngig vom Kontext des Plugins, f&uuml;r eine oder alle Arbeitsumgebungen angewendet werden.",
+"17" => "Parametername",
+"18" => "Parameter hinzuf&uuml;gen",
+"19" => "Sie haben ungespeicherte Änderungen. Möchten Sie das Fenster wirklich schliessen?",	 /* Html entity would break tooltip */
+"20" => "Rollen-Update erfolgreich",
+"21" => "Benutzername",
 "22" => "Profilart",
-"23" => "Standard Repository",
-"24" => "Rollen (drücke Ctrl/Cmd um mehrere zu markieren)",
-"25" => "Passwort ändern",
+"23" => "Standard-Arbeitsumgebung",
+"24" => "Rollen (dr&uuml;cke Ctrl/Cmd um mehrere zu markieren)",
+"25" => "Passwort &auml;ndern",
 "26" => "Benutzer sperren",
 "27" => "Benutzer aktivieren",
-"28" => "Passwortänderung erzwingen",
-"29" => "Geben Sie ein neues Passwort, für den Benutzer, ein",
+"28" => "Passwort&auml;nderung erzwingen",
+"29" => "Geben Sie ein neues Passwort f&uuml;r den Benutzer ein",
 "30" => "Wiederholen",
-"31" => "Rollen ID",
-"32" => "Rollen Name",
-"33" => "Apply automatically to users with profile...",
-"34" => "Gruppen ID",
-"35" => "Gruppen Name",
-"36" => "locked",
+"31" => "Rollen-ID",
+"32" => "Rollenname",
+"33" => "Automatisch anwenden f&uuml;r Benutzer mit dem Profile...",
+"34" => "Gruppen-ID",
+"35" => "Gruppenname",
+"36" => "gesperrt",
 "37" => "Verweigern",
 "38" => "Vererbt",
-"39" => "Disable",
-"40" => "Enable",
-"41" => "Remove",
-"42" => "Rollen Daten",
+"39" => "Ausschalten",
+"40" => "Einschalten",
+"41" => "Entfernen",
+"42" => "Rollen-Daten",
+"43" => "Select one or more",
+"44" => "Plugins Parameter Fein-Einstellungen",
+"45" => "Zugriffskontrolle Liste",
+"46" => "Ausgeschaltete Aktionen",
 );
+

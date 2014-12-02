@@ -21,5 +21,10 @@
 $mess=array(
 "1" => "Externes Fenster",
 "2" => "Externes Browser Fenster",
-"3" => "Öffne Datei im externen Fenster, bitte warten, dieses Fenster schließt sich automatisch.",
+"3" => "Bitte warten, die Datei wird in einen externen Fenster geöffnet und dieses Fenster schließt sich automatisch.",
+    "4" => "New URL Bookmark",
+    "5" => "Alternatively, you can <a>create a new bookmark to an URL</a>",
+    "6" => "Enter an URL starting with http/https",
+    "7" => "URL Bookmark",
+    "8" => "Enter a label for this bookmark"
 );

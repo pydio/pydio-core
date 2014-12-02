@@ -19,18 +19,20 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Gemeinsame Benutzer",
-"2" => "Gemeinsame Repositories",
-"3" => "Öffentliche Dateien",
+"title"=> "Mein Dashboard",
+"desc" => "Verwalte meine Kontoeinstellungen, mein Adressbuch, geteilte Elemente, etc.",
+"1" => "Freigegebene Benutzer",
+"2" => "Freigegebene Ordner",
+"3" => "Freigegebene Dateien",
 "4"	=> "Dateipfad",
-"5"	=> "Repository",
+"5"	=> "Arbeitsumgebung",
 "6"	=> "Passwort",
 "7"	=> "Ablauf",
 "8" => "Elemente",
 "9" => "Verknüpfte Benutzer",
-"10"=> "Verknüpfte Repositories",
-"11"=> "Sollen die ausgewählten Elemente wirklich gelöscht werden?",
-"12"=> "Die Berechtigung zum Löschen dieses Elements fehlt.",
+"10"=> "Verknüpfte Arbeitsumgebungen",
+"11"=> "Möchten Sie die ausgewählten Elemente wirklich löschen?",
+"12"=> "Sie sind nicht berechtigt, diese Elemente zu löschen.",
 "13"=> "Öffentliche Dateien erfolgreich entfernt.",
 "14"=> "Integrität",
 "15"=> "OK",
@@ -42,79 +44,38 @@ $mess=array(
 "21"=> "Ja",
 "22"=> "Nein",
 "23"=> "%s Dateien erfolgreich gelöscht.",
-"24"=> "Nichts zum Entfernen.",
-"25"=> "Entfernen abgelaufen",
-"26"=> "Ausgelaufene freigegebene Dateien entfernen.",
+"24"=> "Nichts zu entfernen.",
+"25"=> "Abgelaufene entfernen",
+"26"=> "Ausgelaufene,freigegebene Dateien entfernen.",
 "27"=> "Besitzer",
 "28"=> "Dateien zum direkten Download mit oder ohne Passwortschutz freigegeben.",
-"29"=> "Repositories von Benutzern übertragen.",
-"30"=> "Erzeugte Benutzer zum Zugriff auf die übertragenen Repositories.",
+"29"=> "Arbeitsumgebungen von delegierten Benutzern.",
+"30"=> "Mit delegierten Arbeitsumgebungen verknüpfte Benutzer.",
 "31"=> "Beschreibung",
 "32"=> "Zurücksetzen",
 "33"=> "Download-Zähler zurücksetzen",
-"title" => "My Dashboard",
-"desc" => "Manage my account preferences, my address book, shared elements, etc.",
-"34" => "My Shares",
-"35" => "All my shared items (files and folders)",
-"36" => "Parameters",
-"37" => "My profile and application settings",
-"38"=> "Notifications",
-"39"=> "Select a workspace",
-"40"=> "Welcome, %s",
-"41"=> "Use this workspace as default",
-"42"=> "Enter",
-"43"=> "My Profile",
-"43t"=> "All my personal data",
-"44"=> "My Account",
-"45"=> "Personal data",
-"46"=> "Address Book",
-"47"=> "Users and teams that you created",
-"48"=> "My Users",
-"49"=> "External users that you created",
-"50"=> "My Teams",
-"51"=> "Teams of users, used as shortcuts when sharing",
-"52"=> "Are you sure you want to delete this team? This will not remove any users.",
-    "53"=> "Getting Started",
-    "54"=> "Get started with Pydio by following How-to videos",
-    "55"=> "Do you need help <a>to get started?</a>",
-    "56"=> "Getting started with Pydio? Here are some videos for you!",
-    "57"=> "Download Pydio for...",
-    "58"=> "Android device",
-    "59"=> "iPhone/iPad",
-    "60"=>"Mac OS (Beta)",
-    "61"=>"Windows (Beta)",
-    "62"=>"<h2>Getting started</h2>
-            This video is an introduction to Pydio web application:
-            <ul>
-                <li>User Dashboard</li>
-                <li>GUI Overview</li>
-                <li>Managing files and folders</li>
-                <li>Previewing and editing files</li>
-                <li>Quick access through bookmarks and search engine</li>
-                <li>Selection cart</li>
-            </ul>",
-    "63"=>"<h2>Sharing files with Pydio</h2>
-                            In this tutorial, we will cover the basics of file sharing with Pydio:
-                            <ul>
-                                <li>Create web links</li>
-                                <li>Send them to internal or external users</li>
-                                <li>Get notified that a link was downloaded</li>
-                                <li>Create a password-protected link</li>
-                                <li>Create many links on one file</li>
-                                <li>Stop sharing a file totally</li>
-            </ul>",
-    "64"=>"<h2>Sharing folders with Pydio</h2>
-                            This video covers the various options to share folders in Pydio
-                            <ul>
-                                <li>Share as new workspace</li>
-                                <li>Share as a public minisite</li>
-            </ul>",
-    "65"=> "Discover more on the Pydio channel!",
-    "66"=>"<h2>Using Pydio on iOS device</h2>
-                            This video explains how to use the Pydio application (available on the App Store). Process is quite similar on Android as well.
-<ul><li>Setup the server connection</li>
-<li>Navigating through the files</li>
-<li>Keeping files offline and interacting with external applications</li>
-<li>Protecting the app with a PIN-code</li>
-<li>Using bookmarks and search engine</li></ul>",
+"34"=> "Meine Freigaben",
+"35"=> "Alle meine geteilten Elemente (Dateien und Ordner)",
+"36"=> "Einstellungen",
+"37"=> "Meine Profil- und Anwendungseinstellungen",
+"38"=> "Benachrichtigungen",
+"39"=> "Unten ist eine Liste der Arbeitsbereiche auf die Sie zugreifen können. Diese können persönliche oder mit/von anderen Benutzern genutzt werden.",
+"40"=> "Willkommen, %s",
+"41"=> "Diese Arbeitsumgebung standardmäßig verwenden",
+"42"=> "Betreten",
+"43"=> "Mein Profil",
+"43t"=> "Alle meine persönlichn Daten",
+"44"=> "Mein Konto",
+"45"=> "Persönliche Daten",
+"46"=> "Adressbuch",
+"47"=> "Benutzer und Teams, die Sie erstellt haben",
+"48"=> "Meine Benutzer",
+"49"=> "Externe Benutzer, die Sie erstellt haben",
+"50"=> "Meine Teams",
+"51"=> "Teams von Benutzern, die während des Teilens als Favoriten verfügbar sind.",
+"52"=> "Sind Sie sicher, dass Sie dieses Team löschen möchten? Es werden dabei keine Benutzer entfernt.",
+"53"=> "Zurück zu meinen Arbeitsumgebungen",
+    "54"=> "Update Members",
+    "55"=> "Add/Remove users from this team",
+    "56"=> "Add one user per line, type in the textarea to see the auto-completion list appear.",
 );

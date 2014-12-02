@@ -35,6 +35,12 @@ Class.create("VideoPreviewer", AbstractEditor, {
             this.element.down("#videojs_previewer").setStyle({height:'297px'});
             this.element.down("#videojs_previewer").insert(this.currentRichPreview);
             this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+            if(this.element.down('.vjs-flash-fallback')){
+                fitHeightToBottom(this.element.down('.vjs-flash-fallback'));
+            }
+            if(this.element.down('object')){
+                this.element.down('object').setAttribute('height', this.element.getHeight());
+            }
         }
         modal.setCloseValidation(function(){
             this.currentRichPreview.destroyElement();
@@ -54,6 +60,12 @@ Class.create("VideoPreviewer", AbstractEditor, {
                 maxHeight:this.element.getHeight()
             }, true);
         }catch(e){}
+        if(this.element.down('.vjs-flash-fallback')){
+            fitHeightToBottom(this.element.down('.vjs-flash-fallback'));
+        }
+        if(this.element.down('object')){
+            this.element.down('object').setAttribute('height', this.element.getHeight());
+        }
 
     },
 
@@ -79,9 +91,14 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 
     },
 
-	getPreview : function(ajxpNode, rich){
+    getRESTPreviewLinks:function(node){
+        return {"Video Stream": "&file=" + encodeURIComponent(node.getPath())};
+    },
+
+
+    getPreview : function(ajxpNode, rich){
 		if(rich){
-			var url = document.location.href;
+			var url = document.location.href.split('#').shift().split('?').shift();
 			if(url[(url.length-1)] == '/'){
 				url = url.substr(0, url.length-1);
 			}else if(url.lastIndexOf('/') > -1){
@@ -89,6 +106,9 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 			}
             if($$('base').length){
                 url = $$("base")[0].getAttribute("href");
+                if(!url.startsWith('http') && !url.startsWith('https')){
+                    url = document.location.origin + url;
+                }
             }
 
             var html5proxies = $H({});
@@ -108,6 +128,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
             }
 
 			//if(mime == "mp4" || mime == "webm" || mime == "ogv"){
+            var div, content;
             if(html5proxies.keys().length){
 				// Problem : some embedded HTML5 readers do not send the cookies!
 				if(!window.crtAjxpSessid){
@@ -128,8 +149,8 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 					ogv:'video/ogg; codecs="theora, vorbis"'
 				};
 				var poster = resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
-				var div = new Element("div", {className:"video-js-box"});
-				var content = '';
+				div = new Element("div", {className:"video-js-box"});
+				content = '';
 				content +='	<video class="video-js" controls preload="auto" height="200">';
                 var flashName;
                 html5proxies.each(function(pair){
@@ -193,8 +214,8 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				
 			}else{
                 var f = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data&file='+ajxpNode.getPath());
-				var div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
-				var content = '<object type="application/x-shockwave-flash" data="plugins/editor.video/player_flv_maxi.swf" width="100%" height="200">';
+				div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
+				content = '<object type="application/x-shockwave-flash" data="plugins/editor.video/player_flv_maxi.swf" width="100%" height="200">';
 				content += '	<param name="movie" value="plugins/editor.video/player_flv_maxi.swf" />';
 				content += '	<param name="quality" value="high">';
 				content += '	<param name="allowFullScreen" value="true" />';
@@ -203,6 +224,10 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				div.update(content);
 				div.resizePreviewElement = function(dimensionObject){
 					// do nothing;
+                    var h =dimensionObject.height;
+                    if(h > 400) div.down('object').setAttribute('height', 400);
+                    else if(h > 300) div.down('object').setAttribute('height', 300);
+                    else if(h > 200) div.down('object').setAttribute('height', 200);
 				};
                 div.destroyElement = function(){
                     div.update('');

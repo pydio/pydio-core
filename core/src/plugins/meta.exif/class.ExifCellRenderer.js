@@ -27,7 +27,9 @@ Class.create("ExifCellRenderer", {
 		if(latiCell && longiCell && latiCell.innerHTML && longiCell.innerHTML){
 			var object = new ExifCellRenderer();
 			object.transformGeoCells(latiCell, longiCell);
-		}		
+		}else if(latiCell && longiCell){
+            latiCell.up('div.infoPanelTable').up('div').hide();
+        }
 	},
 	
 	transformGeoCells : function(latiCell, longiCell){
@@ -37,26 +39,57 @@ Class.create("ExifCellRenderer", {
 		split = longiCell.innerHTML.split('--');
 		longiCell.update(split[0]);
 		longiCell.setAttribute("longiDegree", split[1]);
+        var decorator = '<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;">';
+        if(ajaxplorer.currentThemeUsesIconFonts){
+            decorator = '<span class="icon-map-marker" style="font-size: 2em;"></span>';
+        }
 		var button = new Element('div', {
 			className:'fakeUploadButton',
 			style:'padding-top:6px;width:50px;margin-bottom:0px;padding-bottom:3px;text-align:center; font-size: 11px;'
-		}).update('<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;"><br>'+MessageHash['meta.exif.2']);
-		var buttonCell = new Element('td', {
+		}).update( decorator + '<br>'+ MessageHash['meta.exif.2']);
+		var buttonCell = new Element('div', {
 			rowspan:2,
 			align:'center',
 			valign:'center',
 			style:'padding:2px;width:60px;',
             className:'ip_geo_cell'
 		}).update(button);
-		latiCell.insert({after:buttonCell});		
+		latiCell.insert({after:buttonCell});
+        latiCell.up('div').setStyle({position: 'relative'});
 		// Set all other cells colspan to 2.
 		latiCell.up().nextSiblings().each(function(tr){
-			tr.down('td.infoPanelValue').setAttribute('colspan', 2);
+			tr.down('div.infoPanelValue').setAttribute('colspan', 2);
 		});
 		longiCell.setAttribute("colspan", "1");
-		button.observe("click", function(){
-			this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
-		}.bind(this) );		
+        var clicker = function(){
+            this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
+        }.bind(this);
+		button.observe("click", clicker);
+        try{
+            var userMetaButton = latiCell.up('div.infoPanelTable').previous('div.infoPanelGroup').down('span.user_meta_change');
+            userMetaButton.observe("click", clicker);
+        }catch(e){
+
+        }
+
+        var editors = ajaxplorer.findEditorsForMime("ol_layer");
+        var editorData;
+        if(editors.length){
+            editorData = editors[0];
+        }
+        if(editorData){
+            var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
+            var metadata = ajxpNode.getMetadata();
+            ajxpNode.setMetadata(metadata.merge({
+                'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
+                'ol_center' : {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))}
+            }));
+            var  id = "small_map_" + Math.random();
+            latiCell.up('div.infoPanelTable').insert({top:'<div id="'+id+'" style="height: 250px;"></div>'});
+            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+            OLViewer.prototype.createOLMap(ajxpNode, id, false, false);
+        }
+
 	},
 	
 	openLocator : function(latitude, longitude){
@@ -64,6 +97,7 @@ Class.create("ExifCellRenderer", {
 		// Call openLayer editor!
 		// TEST : WestHausen : longitude=10.2;latitude = 48.9;
 		var editors = ajaxplorer.findEditorsForMime("ol_layer");
+        var editorData;
 		if(editors.length){
 			editorData = editors[0];							
 		}					

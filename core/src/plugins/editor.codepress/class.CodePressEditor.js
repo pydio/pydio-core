@@ -84,7 +84,7 @@ Class.create("CodePressEditor", TextEditor, {
 		}.bind(this);
 
 		this.textarea.id = 'cpCode_cp';
-		code = new CodePress(this.textarea, contentObserver);
+		var code = new CodePress(this.textarea, contentObserver);
 		this.cpCodeObject = code;
 		this.textarea.parentNode.insertBefore(code, this.textarea);
 		this.contentMainContainer = this.textarea.parentNode;

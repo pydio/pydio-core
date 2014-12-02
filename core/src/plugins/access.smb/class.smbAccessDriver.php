@@ -57,6 +57,17 @@ class smbAccessDriver extends fsAccessDriver
         $wrapperData = $this->detectStreamWrapper(true);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+
+        if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
+            @mkdir($this->urlBase."/".$recycle);
+            if (!is_dir($this->urlBase."/".$recycle)) {
+                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+            }
+        }
+        if ($recycle != "") {
+            RecycleBinManager::init($this->urlBase, "/".$recycle);
+        }
+
     }
 
     public function detectStreamWrapper($register = false)
@@ -84,18 +95,33 @@ class smbAccessDriver extends fsAccessDriver
     {
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+
         $filePaths = array();
         foreach ($src as $item) {
             $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.(($item[0] == "/")? "" : "/").AJXP_Utils::securePath($item));
-            $basedir = trim(dirname($realFile))."/";
-            $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
-                PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
+            //$basedir = trim(dirname($realFile))."/";
+            if (basename($item) == "") {
+                $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
+            } else {
+                $shortName = basename($item);
+                if(!empty($zipEncoding)){
+                    $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $shortName);
+                    if($test !== false) $shortName = $test;
+                }
+                $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
+                    PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName);
+            }
         }
-        $this->logDebug("Pathes", $filePaths);
-        $this->logDebug("Basedir", array($basedir));
         self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
-        $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON);
+        if($basedir == "__AJXP_ZIP_FLAT__/"){
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+        }else{
+            $basedir = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase).trim($basedir);
+            $this->logDebug("Basedir", array($basedir));
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+        }
         if (!$vList) {
             throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
@@ -114,8 +140,8 @@ class smbAccessDriver extends fsAccessDriver
 
     public function isWriteable($dir, $type="dir")
     {
-        if(substr_count($dir, '/') == 3 && $dir[strlen($dir) - 1] == '/') $rc = true;
-    else $rc = is_writable($dir);
-    return $rc;
+        if(substr_count($dir, '/') <= 3) $rc = true;
+    	else $rc = is_writable($dir);
+    	return $rc;
     }
 }

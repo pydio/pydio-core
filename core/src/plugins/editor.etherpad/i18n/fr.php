@@ -20,14 +20,14 @@
  */
 
 $mess = array(
-    "1" => "Ardoise de Collaboration",
+    "1" => "Ardoise de collaboration",
     "1b"=> "Créer ou rejoindre une ardoise",
-    "2" => "Edition collaborative",
+    "2" => "Editeur collaboratif",
     "3" => "Edition collaborative en temps en réel",
-    "4" => "Rejoindre une ardoise de collaboration, ou en créer une nouvelle",
+    "4" => "Rejoindre une ardoise existante, ou en créer une nouvelle",
     "5" => "Ardoises libres",
     "6" => "Fichiers",
     "7" => "Rejoindre",
-    "8" => "Nom de l'ardoise",
+    "8" => "Nom de l'adroise",
     "9" => "Créer une nouvelle ardoise",
 );

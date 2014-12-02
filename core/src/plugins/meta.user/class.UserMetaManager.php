@@ -27,12 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class UserMetaManager extends AJXP_Plugin
+class UserMetaManager extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     /**
      * @var MetaStoreProvider
      */
@@ -48,7 +44,7 @@ class UserMetaManager extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
 
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
@@ -61,10 +57,15 @@ class UserMetaManager extends AJXP_Plugin
         $def = $this->getMetaDefinition();
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
+        $editButton = '';
+        $u = AuthService::getLoggedUser();
+        if($u != null && $u->canWrite($this->accessDriver->repository->getId())){
+            $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
+        }
         $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span>AJXP_MESSAGE[meta.user.1]</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
-        $cdataFoot = '</table></div>';
+                        <div class="panelHeader infoPanelGroup" colspan="2">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
+                     ';
+        $cdataFoot = '</div>';
         $cdataParts = "";
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
@@ -117,9 +118,9 @@ class UserMetaManager extends AJXP_Plugin
                     break;
             }
             $contrib->appendChild($col);
-            $trClass = ($even?" class=\"even\"":"");
+            $trClass = ($even?" class=\"even infoPanelRow\"":" class=\"infoPanelRow\"");
             $even = !$even;
-            $cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
+            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
@@ -165,13 +166,16 @@ class UserMetaManager extends AJXP_Plugin
                 else if(substr($val, 0,5) == "area_") $this->options["meta_types"].="textarea";
                 else $this->options["meta_types"].="string";
             }
+            if(!empty($this->options["meta_additional"])){
+                $this->fieldsAdditionalData[$this->options["meta_fields"]] = $this->options["meta_additional"];
+            }
             foreach ($this->options as $key => $val) {
                 $matches = array();
                 if (preg_match('/^meta_fields_(.*)$/', $key, $matches) != 0) {
                     $repIndex = $matches[1];
                     $this->options["meta_fields"].=",".$val;
                     $this->options["meta_labels"].=",".$this->options["meta_labels_".$repIndex];
-                    if (isSet($this->options["meta_additional_".$repIndex])) {
+                    if (!empty($this->options["meta_additional_".$repIndex])) {
                         $this->fieldsAdditionalData[$val] = $this->options["meta_additional_".$repIndex];
                     }
                     if (isSet($this->options["meta_types_".$repIndex])) {
@@ -222,6 +226,34 @@ class UserMetaManager extends AJXP_Plugin
         $selection = new UserSelection();
         $selection->initFromHttpVars($httpVars);
         $currentFile = $selection->getUniqueFile();
+
+        $nodes = $selection->buildNodes($this->accessDriver);
+        $nodesDiffs = array();
+        $def = $this->getMetaDefinition();
+        foreach($nodes as $ajxpNode){
+
+            $newValues = array();
+            //$ajxpNode->setDriver($this->accessDriver);
+            AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
+            foreach ($def as $key => $data) {
+                if (isSet($httpVars[$key])) {
+                    $newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
+                } else {
+                    if (!isset($original)) {
+                        $original = $ajxpNode->retrieveMetadata("users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+                    }
+                    if (isSet($original) && isset($original[$key])) {
+                        $newValues[$key] = $original[$key];
+                    }
+                }
+            }
+            $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
+            AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
+
+            $nodesDiffs[$ajxpNode->getPath()] = $ajxpNode;
+
+        }
+        /*
         $urlBase = $this->accessDriver->getResourceUrl($currentFile);
         $ajxpNode = new AJXP_Node($urlBase);
 
@@ -243,8 +275,9 @@ class UserMetaManager extends AJXP_Plugin
         }
         $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
         AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
+        */
         AJXP_XMLWriter::header();
-        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array($ajxpNode->getPath() => $ajxpNode)), true);
+        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
         AJXP_XMLWriter::close();
     }
 
@@ -272,26 +305,46 @@ class UserMetaManager extends AJXP_Plugin
 
     /**
      *
-     * @param AJXP_Node $oldFile
-     * @param AJXP_Node $newFile
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
      * @param Boolean $copy
      */
-    public function updateMetaLocation($oldFile, $newFile = null, $copy = false)
+    public function updateMetaLocation($oldNode, $newNode = null, $copy = false)
     {
-        if($oldFile == null) return;
-        if(!$copy && $this->metaStore->inherentMetaMove()) return;
+        $defs = $this->getMetaDefinition();
+        $updateField = $createField = null;
+        foreach($defs as $f => $data){
+            if($data["type"] == "updater") $updateField = $f;
+            else if($data["type"] == "creator") $createField = $f;
+        }
+        $valuesUpdate = (isSet($updateField) || isSet($createField));
+        $currentUser = null;
+        if($valuesUpdate){
+            $currentUser = AuthService::getLoggedUser()->getId();
+        }
 
-        $oldMeta = $this->metaStore->retrieveMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if($oldNode == null && !$valuesUpdate) return;
+        if(!$copy && !$valuesUpdate && $this->metaStore->inherentMetaMove()) return;
+
+        if($oldNode == null){
+            $oldMeta = $this->metaStore->retrieveMetadata($newNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        }else{
+            $oldMeta = $this->metaStore->retrieveMetadata($oldNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        }
+        if($valuesUpdate){
+            if(isSet($updateField))$oldMeta[$updateField] = $currentUser;
+            if(isSet($createField) && $oldNode == null) $oldMeta[$createField] = $currentUser;
+        }
         if (!count($oldMeta)) {
             return;
         }
         // If it's a move or a delete, delete old data
-        if (!$copy) {
-            $this->metaStore->removeMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if ($oldNode != null && !$copy) {
+            $this->metaStore->removeMetadata($oldNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
         }
         // If copy or move, copy data.
-        if ($newFile != null) {
-            $this->metaStore->setMetadata($newFile, "users_meta", $oldMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
+        if ($newNode != null) {
+            $this->metaStore->setMetadata($newNode, "users_meta", $oldMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
         }
     }
 

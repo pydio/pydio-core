@@ -20,14 +20,14 @@
 */
 $mess=array(
 "timestamp" => "Horodatage",
-"Allow Timestamp file with Universign." => "Permet l'Horodatage de fichier avec Universign.",
+"Allow Timestamp file with Universign." => "Permet l'horodatage de fichier avec Universign.",
 "msgBox1" => "Merci de confirmer votre souhait d'horodater ce fichier",
 "URL" => "URL",
-"Timestamp provider API URL" => "URL de l'API du fournisseur",
-"User Mail" => "User Mail",
-"Password" => "Password",
+"Timestamp provider API URL" => "URL de l'API du fournisseur d'horodatage",
+"User Mail" => "Courriel de l'utilisteur",
+"Password" => "Mot de passe",
 "User account" => "Compte utilisateur",
 "User Password" => "Mot de passe utilisateur",
-"Timestamp" => "Timestamp",
-"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
+"Timestamp" => "Horodatage",
+"Allow timestamp files with Universign." => "Permet l'horodatage des fichiers avec Universign.",
 );

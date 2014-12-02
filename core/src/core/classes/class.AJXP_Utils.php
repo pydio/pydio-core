@@ -718,8 +718,9 @@ class AJXP_Utils
 
     //Relative Date Function
 
-    public static function relativeDate($time, $messages)
+    public static function relativeDate($time, $messages, $shortestForm = false)
     {
+        $crtYear = date('Y');
         $today = strtotime(date('M j, Y'));
         $reldays = ($time - $today)/86400;
         $relTime = date($messages['date_relative_time_format'], $time);
@@ -745,8 +746,19 @@ class AJXP_Utils
             }
 
         }
-
-        return str_replace("DATE", date($messages["date_relative_date_format"], $time ? $time : time()), $messages["date_relative_date"]);
+        $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
+        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && class_exists("IntlDateFormatter")){
+            $intl = IntlDateFormatter::create($messages["date_intl_locale"], IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, "MMMM");
+            $localizedMonth = $intl->format($time ? $time : time());
+            $dateFuncMonth = date("F", $time ? $time : time());
+            $finalDate = str_replace($dateFuncMonth, $localizedMonth, $finalDate);
+        }
+        if(!$shortestForm || strpos($finalDate, $crtYear) !== false){
+            $finalDate = str_replace($crtYear, '', $finalDate);
+            return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
+        }else{
+            return $finalDate = date("M Y", $time ? $time : time());
+        }
 
     }
 
@@ -1469,6 +1481,15 @@ class AJXP_Utils
     {
         return (stripos($_SERVER["HTTP_USER_AGENT"], "android") !== false);
     }
+
+    public static function userAgentIsNativePydioApp(){
+
+        return (stripos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
+                || stripos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false
+                || stripos($_SERVER["HTTP_USER_AGENT"], "python-requests") !== false
+        );
+    }
+
     /**
      * Try to remove a file without errors
      * @static
@@ -1601,9 +1622,6 @@ class AJXP_Utils
                 $options[substr($key, strlen($prefix))] = $value;
                 unset($repDef[$key]);
             } else {
-                if ($key == "DISPLAY") {
-                    $value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
-                }
                 $repDef[$key] = $value;
             }
         }
@@ -1682,19 +1700,31 @@ class AJXP_Utils
         $result = array();
         $file = dirname($file) ."/". str_replace(".sql", $ext, basename($file) );
         $sql = file_get_contents($file);
-        $parts = explode(";", $sql);
-        $remove = array();
-        for ($i = 0 ; $i < count($parts); $i++) {
-            $part = $parts[$i];
-            if (strpos($part, "BEGIN") && isSet($parts[$i+1])) {
-                $parts[$i] .= ';'.$parts[$i+1];
-                $remove[] = $i+1;
+        $separators = explode("/** SEPARATOR **/", $sql);
+
+        $allParts = array();
+
+        foreach($separators as $sep){
+            $firstLine = array_shift(explode("\n", trim($sep)));
+            if($firstLine == "/** BLOCK **/"){
+                $allParts[] = $sep;
+            }else{
+                $parts = explode(";", $sep);
+                $remove = array();
+                for ($i = 0 ; $i < count($parts); $i++) {
+                    $part = $parts[$i];
+                    if (strpos($part, "BEGIN") && isSet($parts[$i+1])) {
+                        $parts[$i] .= ';'.$parts[$i+1];
+                        $remove[] = $i+1;
+                    }
+                }
+                foreach($remove as $rk) unset($parts[$rk]);
+                $allParts = array_merge($allParts, $parts);
             }
         }
-        foreach($remove as $rk) unset($parts[$rk]);
         dibi::connect($p);
         dibi::begin();
-        foreach ($parts as $createPart) {
+        foreach ($allParts as $createPart) {
             $sqlPart = trim($createPart);
             if (empty($sqlPart)) continue;
             try {
@@ -1852,4 +1882,73 @@ class AJXP_Utils
         return $files;
     }
 
+    public static function regexpToLike($regexp)
+    {
+        $left = "~";
+        $right = "~";
+        if ($regexp[0]=="^") {
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $right = "";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
+
+    public static function cleanRegexp($regexp)
+    {
+        return ltrim(rtrim($regexp, "$"), "^");
+    }
+
+    public static function likeToLike($regexp)
+    {
+        $left = "";
+        $right = "";
+        if ($regexp[0]=="%") {
+            $left = "~";
+        }
+        if ($regexp[strlen($regexp)-1] == "%") {
+            $right = "~";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
+
+    public static function cleanLike($regexp)
+    {
+        return ltrim(rtrim($regexp, "%"), "%");
+    }
+
+    public static function regexpToLdap($regexp)
+    {
+        if(empty($regexp))
+            return null;
+
+        $left = "*";
+        $right = "*";
+        if ($regexp[0]=="^") {
+            $regexp = ltrim($regexp, "^");
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $regexp = rtrim($regexp, "$");
+            $right = "";
+        }
+        return $left.$regexp.$right;
+    }
+    /**
+     * Hide file or folder for Windows OS
+     * @static
+     * @param $path
+     * @return void
+     */
+    public static function winSetHidden($file)
+    {
+        @shell_exec("attrib +H " . escapeshellarg($file));
+    }	
 }

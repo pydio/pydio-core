@@ -36,6 +36,10 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
             className = 'quick fadeInLeft';
             originalMethod = 'Appear';
             break;
+        case "ErrorShake":
+            className = 'shake';
+            originalMethod = 'Shake';
+            break;
         case "MessageAppear":
             className = 'fadeInUpBig';
             endStyle = {opacity: 1};
@@ -96,4 +100,4 @@ Effect.RowAppear = function(element, options){ Effect.CSS_ANIMATE("RowAppear", e
 Effect.MessageFade = function(element, options){ Effect.CSS_ANIMATE("MessageFade", element, options);};
 Effect.MessageAppear = function(element, options){ Effect.CSS_ANIMATE("MessageAppear", element, options); };
 Effect.MenuAppear = function(element, options){ Effect.CSS_ANIMATE("MenuAppear", element, options); };
-
+Effect.ErrorShake = function(element, options){ Effect.CSS_ANIMATE("ErrorShake", element, options); };

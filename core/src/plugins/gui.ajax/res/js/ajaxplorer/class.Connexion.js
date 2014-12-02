@@ -17,7 +17,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
+var PydioLog = $A();
 /**
  * Pydio encapsulation of Ajax.Request
  */
@@ -67,7 +67,7 @@ Class.create("Connexion", {
 	 * @param method String
 	 */
 	setMethod : function(method){
-		this._method = 'put';
+		this._method = method;
 	},
 	
 	/**
@@ -108,7 +108,11 @@ Class.create("Connexion", {
 	/**
 	 * Send Asynchronously
 	 */
-	sendAsync : function(){	
+	sendAsync : function(){
+        PydioLog.push({
+            action:this._parameters.get("get_action"),
+            type:"async"
+        });
 		this.addSecureToken();
         this.showLoader();
 		var t = new Ajax.Request(this._baseUrl,
@@ -123,10 +127,14 @@ Class.create("Connexion", {
 	/**
 	 * Send synchronously
 	 */
-	sendSync : function(){	
+	sendSync : function(){
+        PydioLog.push({
+            action:this._parameters.get("get_action"),
+            type:"sync"
+        });
 		this.addSecureToken();
         this.showLoader();
-		var t = new Ajax.Request(this._baseUrl,
+		new Ajax.Request(this._baseUrl,
 		{
 			method:this._method,
 			asynchronous: false,
@@ -147,8 +155,8 @@ Class.create("Connexion", {
         var tok1 = "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!";
         var tok2 =  "reload the page";
         if(window.MessageHash && window.MessageHash[437]){
-            var tok1 = window.MessageHash[437];
-            var tok2 = window.MessageHash[438];
+            tok1 = window.MessageHash[437];
+            tok2 = window.MessageHash[438];
         }
         tokenMessage = tok1.replace("%s", "<a href='javascript:document.location.reload()' style='text-decoration: underline;'>"+tok2+"</a>");
 
@@ -205,8 +213,9 @@ Class.create("Connexion", {
 	 * Load a javascript library
 	 * @param fileName String
 	 * @param onLoadedCode Function Callback
+     * @param aSync Boolean load library asynchroneously
 	 */
-	loadLibrary : function(fileName, onLoadedCode){
+	loadLibrary : function(fileName, onLoadedCode, aSync){
         if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
             fileName += "?v="+window.ajxpBootstrap.parameters.get("ajxpVersion");
         }
@@ -214,14 +223,15 @@ Class.create("Connexion", {
 		new Ajax.Request(path,
 		{
 			method:'get',
-			asynchronous: false,
+			asynchronous: (aSync?true:false),
+            evalJS: false,
 			onComplete:function(transport){
-				if(transport.responseText) 
+				if(transport.responseText)
 				{
 					try
 					{
-						var script = transport.responseText;				
-					    if (window.execScript){	
+						var script = transport.responseText;
+					    if (window.execScript){
 					        window.execScript( script );
 					    }
 					    else{

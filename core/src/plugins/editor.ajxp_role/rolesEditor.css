@@ -5,6 +5,10 @@ div.tabbed_editor{
     border-right: 1px solid #bbbbbb;
     line-height: initial;
 }
+.ajxp_theme_orbit div.tabbed_editor{
+    background-color: #f8f8f8;
+    border: 0;
+}
 
 div.tabbed_editor div.accordion_content{
     padding-bottom: 20px;
@@ -44,7 +48,7 @@ div.tabbed_editor select[multiple='true']{
 
 div.tabbed_editor textarea{
     font-size: 13px;
-    margin: 8px;
+    margin: 3px;
 }
 
 div.tabbed_editor div.SF_input{
@@ -52,7 +56,7 @@ div.tabbed_editor div.SF_input{
 }
 
 div.tabbed_editor div.SF_image_block{
-    max-width: 80px;
+    max-width: 80px !important;
     float: left;
     margin-left: 11px;
     border: 1px solid #C8CCD3;
@@ -196,6 +200,16 @@ div.tabbed_editor div.innerTitle{
     font-size: 15px;
 }
 
+span#user_roles_update_button {
+    padding: 2px 6px;
+    border: 1px solid #C50707;
+    color: #C50707;
+    margin: 0 6px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+}
+
 div#account_actions{
     background: none;
     text-align: right;
@@ -205,15 +219,10 @@ div#account_actions{
 div#actions-selected,
 div#acls-selected
 {
-
-    margin: 20px 0 0 0;
-    border: 0;
-    background-color: #ffffff;
-    border-radius: 7px;
+    margin: 20px;
     overflow-y: auto;
     padding: 2px;
     font-size: 12px;
-
 }
 
 div#parameters-selected{
@@ -326,15 +335,16 @@ div#parameters-selected span.list_remove_item{
 span.m-2 {
     display: inline-block;
     font-size: 11px;
-    padding: 5px 10px 7px 9px;
+    padding: 5px 12px 7px 12px;
     text-align: center;
     overflow: visible;
     color: #fff;
     outline: none;
-    border-radius: 2px;
-    margin: 5px 3px 0 1px;
+    border-radius: 14px;
+    margin: 5px 6px 0 5px;
     background: #4dc5c3;
     letter-spacing: 1px;
+    cursor: pointer;
 }
 
 .pluginfo_list {
@@ -359,4 +369,117 @@ span.m-2 {
 
 div.documentation{
     padding: 0 20px !important;
+}
+
+.shares-list{
+    margin: 10px 15px 15px;
+}
+
+.shares-list div.header_cell:first-child{
+    border-radius: 4px 0 0 0;
+}
+.shares-list div.header_cell:last-child{
+    border-radius: 0 4px 0 0;
+}
+.shares-list div.header_label{
+    padding: 7px 6px 4px;
+}
+.shares-list div.header_resizer{
+    max-height: 30px;
+}
+.shares-list div.paginator{
+    height: 23px;
+    padding-top: 6px;
+}
+
+#shares-toolbar a {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+#shares-toolbar a span.ajxp_icon_span{
+    display: inline-block;
+    margin-right: 5px;
+}
+
+#shares-toolbar{
+    padding: 10px 0 0 24px;
+}
+
+.innerContainer{
+    background-color: #FFFFFF;
+    border-radius: 3px;
+    border: 1px solid #F1F1F1;
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+}
+
+.ajxp_theme_orbit .innerContainer{
+    border: 0;
+    box-shadow: none;
+}
+
+.ajxp_theme_orbit #metaTabulator .innerContainer{
+    background-color: transparent;
+    margin: 0 !important;
+    padding: 10px !important;
+    padding-bottom: 20px !important;
+
+}
+
+.innerTabRow{
+    border-radius: 3px;
+    margin: 0 10px;
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.15);
+}
+
+.ajxp_theme_orbit .innerTabRow{
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* ORBIT THEME */
+
+.ajxp_theme_orbit div.tabbed_editor input[type="text"],
+.ajxp_theme_orbit div.tabbed_editor input[type="password"]{
+    width: inherit !important;
+}
+
+.ajxp_theme_orbit div.tabbed_editor div.chosen-search input[type="text"]{
+    width: 100% !important;
+    padding: 4px 20px 4px 5px !important;
+    border-radius: 2px;
+}
+
+.ajxp_theme_orbit div#parameters-selected span.list_remove_item {
+    top: 42px;
+    left: 400px;
+    right: inherit;
+}
+
+.ajxp_theme_orbit div#account_actions {
+    text-align: left;
+    padding: 12px 40px 18px;
+}
+
+.ajxp_theme_orbit div.meta_plugin_new_form{
+    background-color: white;
+    margin: 8px 0 0 2%;
+    border-radius: 5px;
+    padding: 0 1% 10px;
+    border: 1px solid #C8CCD3;
+    max-width: 447px;
+    width: 93%;
+}
+
+.ajxp_theme_orbit div.meta_plugin_new_form.empty{
+    display: none;
+}
+
+.ajxp_theme_orbit div.meta_source_new_empty_params {
+    margin: 11px 11px 0;
+    font-style: italic;
+}
+.ajxp_theme_orbit div#parameters-selected{
+    border-radius: 0 !important;
 }

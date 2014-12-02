@@ -23,6 +23,7 @@
    			<serverCallback hookName="node.before_change" methodName="precheckQuotaUsage"/>
    			<serverCallback hookName="node.before_path_change" methodName="precheckQuotaUsage"/>
    			<serverCallback hookName="node.before_create" methodName="precheckQuotaUsage"/>
+            <serverCallback methodName="loadRepositoryInfo" hookName="repository.load_info"/>
    		</hooks>
         <actions>
             <action name="monitor_quota">
@@ -32,17 +33,26 @@
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientCallback><![CDATA[
-                        var c = new Connexion();
-                        c.setParameters(new Hash({get_action:'monitor_quota'}));
-                        c.discrete = true;
-                        c.onComplete = function(transport){
-                            var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
-                            if(!action) return;
-                            var data = transport.responseJSON;
-                            action.options.text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
-                            action.refreshInstances();
-                        };
-                        c.sendAsync();
+                        bufferCallback("ajxp_meta_quota_loader", 5, function(){
+                            if(window.ajxp_meta_quota_loading) return;
+                            var c = new Connexion();
+                            c.setParameters(new Hash({get_action:'monitor_quota'}));
+                            c.discrete = true;
+                            c.onComplete = function(transport){
+                                window.ajxp_meta_quota_loading = false;
+                                var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                if(!action) return;
+                                var data = transport.responseJSON;
+                                ajaxplorer.meta_quota_text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
+                                action.options.text = ajaxplorer.meta_quota_text;
+                                if($('ajxp_quota_panel_content')){
+                                    $('ajxp_quota_panel_content').update(ajaxplorer.meta_quota_text);
+                                }
+                                action.refreshInstances();
+                            };
+                            window.ajxp_meta_quota_loading = true;
+                            c.sendAsync();
+                        });
                     ]]></clientCallback>
                     <clientListener name="contextChange"><![CDATA[
                         if(ajaxplorer && !ajaxplorer.meta_quota_pe_created){
@@ -53,7 +63,11 @@
                                     if(newValue){
                                         var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
                                         if(!action) return;
-                                        action.options.text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
+                                        ajaxplorer.meta_quota_text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
+                                        action.options.text = ajaxplorer.meta_quota_text;
+                                        if($('ajxp_quota_panel_content')){
+                                            $('ajxp_quota_panel_content').update(ajaxplorer.meta_quota_text);
+                                        }
                                         action.refreshInstances();
                                     }
                                 });
@@ -72,9 +86,31 @@
                             ajaxplorer.meta_quota_pe_created = true;
                         }
                         ]]></clientListener>
-                    <serverCallback methodName="getCurrentQuota"/>
+                    <serverCallback methodName="getCurrentQuota" restParams="/" developerComment="Get current quota usage information">
+                        <output type="JSON" description="A Json structure containing usage and authorized quota"/>
+                    </serverCallback>
                 </processing>
             </action>
         </actions>
+        <client_configs>
+            <component_config className="InfoPanel">
+                <infoPanelExtension mime="ajxp_root_node" attributes="" >
+                    <messages>
+                        <message key="quota_string" id="meta.quota.4"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div id="ajxp_quota_panel" data-infoPanelPosition="top">
+                            <div class="panelHeader">#{quota_string}</div>
+                            <div id="ajxp_quota_panel_content" style="padding:5px 0;font-size:20px;"></div>
+                            <script>
+                                if(ajaxplorer.getActionBar().getActionByName("monitor_quota")){
+                                    ajaxplorer.getActionBar().fireAction('monitor_quota');
+                                }
+                            </script>
+                        </div>
+                    ]]></html>
+                </infoPanelExtension>
+            </component_config>
+        </client_configs>
     </registry_contributions>
 </meta>

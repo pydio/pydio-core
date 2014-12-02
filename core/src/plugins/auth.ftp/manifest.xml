@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="ftp" label="CONF_MESSAGE[FTP Authentification]" description="CONF_MESSAGE[Authenticate user directly to an FTP server, and connect him to this server.]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<authdriver name="ftp" label="CONF_MESSAGE[FTP authentication]" description="CONF_MESSAGE[Authenticate users by validating their credentials against an FTP server.]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="ftp_auth" path="plugins/auth.ftp/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-        <param name="TEST_CONNEXION" type="button" choices="run_plugin_action:auth.ftp:testParameters" default="auth.ftp" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Test connexion to the FTP server]" mandatory="false"/>
-        <param name="FTP_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog.]" mandatory="true" default="false"/>
-        <param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Repository]" description="CONF_MESSAGE[Id of the repository to use for testing connexion]" mandatory="true"/>
+        <param name="TEST_CONNEXION" type="button" choices="run_plugin_action:auth.ftp:testParameters" default="auth.ftp" label="CONF_MESSAGE[Test connection]" description="CONF_MESSAGE[Test connection to the FTP server]" mandatory="false"/>
+        <param name="FTP_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)]" mandatory="true" default="false"/>
+        <param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Workspace]" description="CONF_MESSAGE[ID of the workspace used to validate credentials]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.ftp/class.ftpAuthDriver.php" classname="ftpAuthDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/action[@name='login'],actions/action[@name='get_seed'],actions/action[@name='get_secure_token'],actions/action[@name='get_captcha'],actions/action[@name='back']" exclude=""/>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/action[@name='back']" exclude=""/>
         <client_configs>
             <template element="ajxp_desktop" name="hide_remember_me" position="bottom"><![CDATA[
                     <style type="text/css"> form#login_form > div > div.SF_element:last-child{ display:none; }</style>
@@ -20,20 +20,12 @@
         </client_configs>
         <actions>
 			<action name="set_ftp_data">
-				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""/>
 				<processing>
-					<serverCallback methodName="setFtpDataCallback"></serverCallback>
+					<serverCallback methodName="setFtpDataCallback"/>
 				</processing>
 			</action>
-			<action name="dynamic_login">
-				<gui text="163" title="168" src="encrypted.png"
-					accessKey="" hasAccessKey="false" iconClass="icon-signin">
-					<context selection="false" dir="" recycle="false"
-						actionBar="true" contextMenu="false" infoPanel="false"
-						actionBarGroup="user">
-					</context>
-				</gui>
-				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+			<action name="login">
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var loginRedirect = AJXP_LOGIN_REDIRECT;
@@ -68,6 +60,10 @@
 							});
 						}
 						]]></clientCallback>
+				</processing>
+			</action>
+			<action name="login">
+				<processing>
 						<clientForm id="ftp_login_form"><![CDATA[
 							<div id="ftp_login_form" action="login" box_width="350">
 							<input type="hidden" name="get_action" value="login">
@@ -104,7 +100,6 @@
 
 							</div>
 						]]></clientForm>
-					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
 			<!-- OVERRIDE LOGOUT -->
@@ -116,7 +111,7 @@
 						actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
 					</context>
 				</gui>
-				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
+				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
 						clearRememberData();
@@ -127,7 +122,7 @@
 							};
 						connexion.sendAsync();
 						]]></clientCallback>
-					<serverCallback methodName="logoutCallback"></serverCallback>
+					<serverCallback methodName="logoutCallback"/>
 				</processing>
 			</action>
 		</actions>

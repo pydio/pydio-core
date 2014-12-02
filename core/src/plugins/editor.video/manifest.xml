@@ -10,6 +10,7 @@
             <js file="plugins/editor.video/class.VideoPreviewer.js" className="VideoPreviewer"/>
             <js file="plugins/editor.video/video-js/video.js" className="VideoJS"/>
             <css file="plugins/editor.video/video-js/video-js.css"/>
+            <css file="plugins/editor.video/video-zindex.css"/>
             <i18n path="plugins/editor.video/i18n" namespace="video_editor"/>
         </resources>
     </client_settings>
@@ -20,12 +21,14 @@
 		<actions>
 			<action name="read_video_data" contentTypedProvider="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Server a video file as a stream">
+                        <input_param name="file" type="AJXP_NODE" description="Path to the file inside the workspace" mandatory="true"/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="get_sess_id">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 		</actions>

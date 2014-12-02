@@ -61,7 +61,7 @@ Class.create("SQLSearchEngine", SearchEngine, {
 		params.set('get_action', 'set_query');
 		params.set('query', query);
 		connexion.setParameters(params);
-		var res = connexion.sendSync();
+		connexion.sendSync();
 		var path = "/ajxpmysqldriver_searchresults";
 		ajaxplorer.updateContextData(new AjxpNode(path));
 	},

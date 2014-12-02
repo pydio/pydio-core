@@ -110,7 +110,6 @@ SelectableElements = Class.create({
 		Event.observe(this.dragSelectionElement, "mousedown", this.eventMouseDown);
 	},
 	dragStart : function(e){
-		var oElement = this._htmlElement;
 		this.originalX = e.clientX;
 		this.originalY = e.clientY;
 		
@@ -258,14 +257,23 @@ SelectableElements = Class.create({
 			if(!this.skipScroll){
 				// CHECK THAT SCROLLING IS OK
 				var parent = this._htmlElement;
-				if(this._htmlElement.up('.table_rows_container')) {
+                if(this._htmlElement.up('.table_rows_container')) {
                     parent = this._htmlElement.up('.table_rows_container');
                 }
-				var scrollOffset = oEl.offsetTop;
-				
-				var parentHeight = parent.getHeight();
-				var parentScrollTop = parent.scrollTop;
-				var elHeight = $(oEl).getHeight(); 
+                var direction = 'offsetTop';
+                var dimMethod = 'getHeight';
+                var scrollDir = 'scrollTop';
+                if(this.options && this.options.horizontalScroll){
+                    parent = $(parent.parentNode);
+                    direction = 'offsetLeft';
+                    dimMethod = 'getWidth';
+                    scrollDir = 'scrollLeft';
+                }
+
+				var scrollOffset = oEl[direction];
+				var parentHeight = parent[dimMethod]();
+				var parentScrollTop = parent[scrollDir];
+				var elHeight = $(oEl)[dimMethod]();
 
                 var sTop = -1;
 				if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){			
@@ -277,7 +285,7 @@ SelectableElements = Class.create({
                     if(parent.scrollerInstance){
                         parent.scrollerInstance.scrollTo(sTop);
                     }else{
-                        parent.scrollTop = sTop;
+                        parent[scrollDir] = sTop;
                     }
                 }
 			}
@@ -367,7 +375,7 @@ SelectableElements = Class.create({
     previousEventTarget: null,
     ie10detailFilter : function(e){
         if(!Prototype.Browser.IE10){
-            return true;
+            return false;
         }
         var result = true;
         if(!this.previousEventTime){
@@ -400,15 +408,13 @@ SelectableElements = Class.create({
 		var selectedBefore = this.getSelectedItems();	// is a cloned array
 	
 		// find row
-		var el = e.target != null ? e.target : e.srcElement;
-		while (el != null && !this.isItem(el))
-			el = el.parentNode;
+        var el = Event.findElement(e, ".ajxpNodeProvider");
 	
 		if (el == null) {	// happens in IE when down and up occur on different items
 			this._fireChange = oldFireChange;
 			return;
 		}
-		var rIndex = el;
+		var rIndex = el, items, item, i, dirUp;
 		var aIndex = this._anchorIndex;
 	
 		// test whether the current row should be the anchor
@@ -418,8 +424,8 @@ SelectableElements = Class.create({
 	
 		if (!ctrlOrCmd && !e.shiftKey || !this._multiple) {
 			// deselect all
-			var items = this._selectedItems;
-			for (var i = items.length - 1; i >= 0; i--) {
+			items = this._selectedItems;
+			for (i = items.length - 1; i >= 0; i--) {
 				if (items[i]._selected && items[i] != el)
 					this.setItemSelectedUi(items[i], false);
 			}
@@ -439,9 +445,9 @@ SelectableElements = Class.create({
 		// ctrl + shift
 		else if (this._multiple && ctrlOrCmd && e.shiftKey) {
 			// up or down?
-			var dirUp = this.isBefore(rIndex, aIndex);
+			dirUp = this.isBefore(rIndex, aIndex);
 	
-			var item = aIndex;
+			item = aIndex;
 			while (item != null && item != rIndex) {
 				if (!item._selected && item != el)
 					this.setItemSelected(item, true);
@@ -455,16 +461,16 @@ SelectableElements = Class.create({
 		// shift
 		else if (this._multiple && !ctrlOrCmd && e.shiftKey) {
 			// up or down?
-			var dirUp = this.isBefore(rIndex, aIndex);
+			dirUp = this.isBefore(rIndex, aIndex);
 	
 			// deselect all
-			var items = this._selectedItems;
-			for (var i = items.length - 1; i >= 0; i--)
+			items = this._selectedItems;
+			for (i = items.length - 1; i >= 0; i--)
 				this.setItemSelectedUi(items[i], false);
 			this._selectedItems = [];
 	
 			// select items in range
-			var item = aIndex;
+			item = aIndex;
 			this.skipScroll=true;
 			while (item != null) {
 				this.setItemSelected(item, true);
@@ -482,7 +488,7 @@ SelectableElements = Class.create({
 		var found;
 		var changed = selectedBefore.length != this._selectedItems.length;
 		if (!changed) {
-			for (var i = 0; i < selectedBefore.length; i++) {
+			for (i = 0; i < selectedBefore.length; i++) {
 				found = false;
 				for (var j = 0; j < this._selectedItems.length; j++) {
 					if (selectedBefore[i] == this._selectedItems[j]) {
@@ -533,7 +539,7 @@ SelectableElements = Class.create({
 	},
 	
 	isItem: function (node) {
-		return node != null && node.nodeType == 1 && node.parentNode == this._htmlElement;
+		return node != null && node.up('#' + this._htmlElement.id);
 	},
 	
 	findSelectableParent : function(el, setSelected){
@@ -547,6 +553,8 @@ SelectableElements = Class.create({
 	},
 	
 	destroy: function () {
+        if(!this._htmlElement) return;
+
 		if (this._htmlElement.removeEventListener)
 			this._htmlElement.removeEventListener("click", this._onclick, false);
 		else if (this._htmlElement.detachEvent)
@@ -590,7 +598,7 @@ SelectableElements = Class.create({
 	getItems: function () {
 		var tmp = [];
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1)
@@ -601,7 +609,7 @@ SelectableElements = Class.create({
 	
 	getItem: function (nIndex) {
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1) {
@@ -625,7 +633,7 @@ SelectableElements = Class.create({
 	
 	getItemIndex: function (el) {
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i] == el)

@@ -27,6 +27,7 @@ Class.create("AjxpMqObserver", {
     currentRepo:null,
     clientId:null,
     ws: null,
+    configs: null,
 
     initialize : function(){
         "use strict";
@@ -34,7 +35,7 @@ Class.create("AjxpMqObserver", {
         if(window.ajxpMinisite) return;
 
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
-        var configs = ajaxplorer.getPluginConfigs("mq");
+        this.configs = ajaxplorer.getPluginConfigs("mq");
 
         document.observe("ajaxplorer:repository_list_refreshed", function(event){
 
@@ -42,76 +43,106 @@ Class.create("AjxpMqObserver", {
             var data = event.memo;
             if(data.active) repoId = data.active;
             else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
+            this.initForRepoId(repoId);
 
-            if(window.WebSocket && configs.get("WS_SERVER_ACTIVE")){
+        }.bind(this));
 
-                if(this.ws) {
-                    if(!repoId){
-                        this.ws.onclose = function(){
-                            delete this.ws;
-                        }.bind(this);
-                        this.ws.close();
+        if(ajaxplorer.repositoryId){
+            this.initForRepoId(ajaxplorer.repositoryId);
+        }
 
-                    } else {
-                        try{
-                            this.ws.send("register:" + repoId);
-                        }catch(e){
-                            if(console) console.log('Error while sending WebSocket message: '+ e.message);
-                        }
-                    }
-                }else{
-                    if(repoId){
-                        var url = "ws"+(configs.get("WS_SERVER_SECURE")?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
-                        this.ws = new WebSocket(url);
-                        this.ws.onmessage = function(event){
-                            var obj = parseXml(event.data);
-                            if(obj){
-                                ajaxplorer.actionBar.parseXmlMessage(obj);
-                                ajaxplorer.notify("server_message", obj);
-                            }
-                        };
-                        this.ws.onopen = function(){
-                            this.ws.send("register:" + repoId);
-                        }.bind(this);
+    },
+
+    initForRepoId:function(repoId){
+        if(window.WebSocket && this.configs.get("WS_SERVER_ACTIVE")){
+
+            if(this.ws) {
+                if(!repoId){
+                    this.ws.onclose = function(){
+                        delete this.ws;
+                    }.bind(this);
+                    this.ws.close();
+
+                } else {
+                    try{
+                        this.ws.send("register:" + repoId);
+                    }catch(e){
+                        if(console) console.log('Error while sending WebSocket message: '+ e.message);
                     }
                 }
-
             }else{
-
-                if(this.pe){
-                    this.pe.stop();
+                if(repoId){
+                    var url = "ws"+(this.configs.get("WS_SERVER_SECURE")?"s":"")+"://"+this.configs.get("WS_SERVER_HOST")+":"+this.configs.get("WS_SERVER_PORT")+this.configs.get("WS_SERVER_PATH");
+                    this.ws = new WebSocket(url);
+                    this.ws.onmessage = function(event){
+                        var obj = parseXml(event.data);
+                        if(obj){
+                            ajaxplorer.actionBar.parseXmlMessage(obj);
+                            ajaxplorer.notify("server_message", obj);
+                        }
+                    };
+                    this.ws.onopen = function(){
+                        this.ws.send("register:" + repoId);
+                    }.bind(this);
                 }
+            }
 
-                if(this.currentRepo){
-                    var conn = new Connexion();
-                    conn.setParameters($H({
-                        get_action:'client_unregister_channel',
-                        channel:'nodes:' + this.currentRepo,
-                        client_id:this.clientId
-                    }));
-                    conn.discrete = true;
-                    conn.sendSync();
-                    this.currentRepo = null;
-                }
+        }else{
 
-                if(!repoId) return;
+            if(this.pe){
+                this.pe.stop();
+            }
 
-                this.currentRepo = repoId;
-                var conn = new Connexion();
-                conn.setParameters($H({
-                    get_action:'client_register_channel',
-                    channel:'nodes:' + repoId,
-                    client_id:this.clientId
-                }));
-                conn.discrete = true;
-                conn.sendAsync();
+            if(this.currentRepo && repoId){
 
-                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
+                this.unregisterCurrentChannel(function(){
+                    this.registerChannel(repoId);
+                }.bind(this));
+
+            }else if(this.currentRepo && !repoId){
+
+                this.unregisterCurrentChannel();
+
+            }else if(!this.currentRepo && repoId){
+
+                this.registerChannel(repoId);
 
             }
 
+        }
 
-        }.bind(this));
+    },
+
+    unregisterCurrentChannel : function(callback){
+
+        var conn = new Connexion();
+        conn.setParameters($H({
+            get_action:'client_unregister_channel',
+            channel:'nodes:' + this.currentRepo,
+            client_id:this.clientId
+        }));
+        conn.discrete = true;
+        conn.onComplete = function(transp){
+            this.currentRepo = null;
+            if(callback) callback();
+        }.bind(this);
+        conn.sendAsync();
+
+    },
+
+    registerChannel : function(repoId){
+
+        this.currentRepo = repoId;
+        var conn = new Connexion();
+        conn.setParameters($H({
+            get_action:'client_register_channel',
+            channel:'nodes:' + repoId,
+            client_id:this.clientId
+        }));
+        conn.discrete = true;
+        conn.sendAsync();
+
+        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), this.configs.get('POLLER_FREQUENCY') || 5);
 
     },
 
@@ -133,7 +164,3 @@ Class.create("AjxpMqObserver", {
     }
 
 });
-
-if(!ajaxplorer.mqObserver){
-    ajaxplorer.mqObserver = new AjxpMqObserver();
-}

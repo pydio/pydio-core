@@ -73,7 +73,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
   onComplete: function(request) {
   	var oXmlDoc = request.responseXML;
   	var token = this.getToken();
-  	var dirs = new Array();
+  	var dirs = $A();
 	if( oXmlDoc == null || oXmlDoc.documentElement == null) 
 	{
 		this.updateChoices('');
@@ -109,7 +109,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
   	}
   	var responseText = '<ul>';
   	dirs.each(function(dir){
-  		value = token.substring(0, token.lastIndexOf("/")+1);
+  		var value = token.substring(0, token.lastIndexOf("/")+1);
   		responseText += '<li>'+value+dir+'</li>';
   	});
   	responseText += '</ul>';

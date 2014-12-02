@@ -60,7 +60,7 @@
 .mailer_input_line span.user{
     display: inline-block;
     padding: 4px;
-    background-color: #aaa;
+    background-color: #555;
     border-radius: 4px;
     color: white;
     margin: 1px 3px;
@@ -75,7 +75,8 @@
 .mailer_tofield_line{
     overflow-y: auto;
     position: relative;
-    height: 25px;
+    height: 31px;
+    min-height: 31px;
 }
 
 .mailer_tofield_line span.mailer_input_label{

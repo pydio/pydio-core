@@ -18,6 +18,7 @@
 		<global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="false"/>
         <global_param name="QUERY_ANALYSER" type="select" choices="utf8num_insensitive|UTF8 Text/Num (case insensitive),utf8num_sensitive|UTF8 Text/Num (case sensitive),utf8_insensitive|UTF8 Text (case insensitive),utf8_sensitive|UTF8 Text (case sensitive),textnum_insensitive|Text/Num (case insensitive),textnum_sensitive|Text/Num (case sensitive),text_insensitive|Text (case insensitive),text_sensitive|Text (case sensitive)" label="CONF_MESSAGE[Query Analyzer]" description="CONF_MESSAGE[Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension.]" default="textnum_insensitive" mandatory="false"/>
         <global_param name="WILDCARD_LIMITATION" type="integer" label="CONF_MESSAGE[Wildcard limitation]" description="CONF_MESSAGE[For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases.]" default="3" mandatory="false"/>
+        <global_param name="AUTO_WILDCARD" type="boolean" label="CONF_MESSAGE[Auto-Wildcard]" description="CONF_MESSAGE[Automatically append a * after the user query to make the search broader]" default="false" mandatory="false"/>
     </server_settings>
 	<registry_contributions>
 		<hooks>
@@ -30,7 +31,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="search">
+					<serverCallback methodName="applyAction" restParams="/query" sdkMethodName="search" developerComment="Search the Lucene index">
                         <input_param description="Query term" name="query" type="string"/>
 					</serverCallback>
 				</processing>
@@ -40,7 +41,8 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="searchByKeyword">
+					<serverCallback methodName="applyAction" restParams="/field/query" sdkMethodName="searchByKeyword" developerComment="Search the Lucene on a specific document field">
+                        <input_param description="Lucene Keyword to search on" name="field" type="string"/>
                         <input_param description="Query term" name="query" type="string"/>
 					</serverCallback>
 				</processing>
@@ -50,13 +52,13 @@
                     write="false" adminOnly="false">
                 </rightsContext>
                 <processing>
-                    <serverCallback methodName="applyAction"/>
+                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkSearchIndexLock" developerComment="Check if the Lucene index is locked"/>
                 </processing>
             </action>
 			<action name="index">
 				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBar="true" contextMenu="false" infoPanel="false"
                              actionBarGroup="remote" inZip="false">
                     </context>
                 </gui>
@@ -73,7 +75,10 @@
 						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restParams="/dir+" developerComment="Re-index content of a given directory, recursively">
+                        <input_param name="dir" type="string" description="Base directory to index"/>
+                        <input_param name="verbose" type="boolean" description="Print out some info about indexation"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>
@@ -83,6 +88,14 @@
                 <div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"},"reloadOnServerMessage":"tree/reload_shared_elements"}'></div>
                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
             ]]></template_part>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="navigation_shared"><![CDATA[
+                    <div ajxp_position="2" id="navigation_shared">
+                        <h3 class="colorcode-shared" ajxp_message_id="share_center.98">AJXP_MESSAGE[share_center.98] <small id="shared_files_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"shared_files_list"}'>AJXP_MESSAGE[513]</small></h3>
+                        <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared", "connexion_discrete":true}, "emptyChildrenMessage":"share_center.131","containerDroppableAction":"share-file-minisite"}'></div>
+                    </div>
+            ]]></additional_content>
+            </component_config>
         </client_configs>
 	</registry_contributions>
     <dependencies>

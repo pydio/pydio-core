@@ -1,0 +1,11 @@
+<p>Authenticate user using <a href="http://www.jasig.org/cas" target="_top">CAS</a>.</p>
+
+<p>You have to set it up correctly in conf/bootstrap_plugins.php using the following keys in <var>$PLUGINS["AUTH_DRIVER"]["OPTIONS"]</var> array:</p>
+
+<pre>
+  CAS_SERVER: hostname of the CAS server (example: login.example.com)
+  CAS_URI: URI where CAS server is installed on (example: /cas)
+  CAS_PORT: port where CAS server is listening on waiting for connections
+  USERS_FILEPATH: Inherited from auth.serial. File where user data is stored
+</pre>
+

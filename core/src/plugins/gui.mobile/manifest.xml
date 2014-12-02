@@ -7,14 +7,46 @@
         </resources>
     </client_settings>
 	<registry_contributions>
+        <actions>
+            <action name="ls_inline" dirDefault="true">
+                <gui text="32" title="32" src="fileopen.png" iconClass="icon-chevron-right"
+                     accessKey="folder_access_key">
+                    <context selection="true" dir="" recycle="false"
+                             actionBar="true" actionBarGroup="inline" contextMenu="true" infoPanel="true">
+                    </context>
+                    <selectionContext dir="true" file="true" recycle="false"
+                                      unique="true" allowedMimes="ajxp_folder,AJXP_MIMES_ZIP" behaviour="hidden">
+                    </selectionContext>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+					var path;
+					if(window.actionArguments && window.actionArguments.length>0){
+						path = window.actionArguments[0];
+						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+					}else{
+						userSelection = ajaxplorer.getUserSelection();
+						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
+							path = userSelection.getUniqueNode();
+						}
+					}
+					if(path){
+						ajaxplorer.updateContextData(path);
+					}
+					]]></clientCallback>
+                </processing>
+            </action>
+        </actions>
 		<client_configs uuidAttr="name">
 			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
 				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
 				<script type="text/javascript">
 					window.ajxpMobile = true;
-					var conn = new Connexion();
-					conn._libUrl = '';
-					conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
+					if(!window.getAjxpMobileActions){
+                        var conn = new Connexion();
+                        conn._libUrl = '';
+                        conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
+                    }
 				</script>
 			]]></template>
 			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
@@ -104,6 +136,66 @@
                 </div>
 				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
 			]]></template>
+            <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}' theme="orbit"><![CDATA[
+            <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+                <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>
+                    <div id="navigation_pane" style="position:relative;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}' >
+                        <div id="navigation_scroller" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop", "replaceScroller":true}'>
+                            <div id="navigation_bookmarks" ajxp_position="1">
+                                <h3 class="colorcode-bookmark" ajxp_message_id="147">AJXP_MESSAGE[147]
+                                    <small id="bookmarks_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>AJXP_MESSAGE[513]</small>
+                                </h3>
+                                <div style="display:none;" id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content", "silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true, "containerDroppableAction":"bookmark", "emptyChildrenMessage":515}'></div>
+                            </div>
+                            <div id="navigation_folders" ajxp_position="3">
+                                <h3 class="colorcode-folder" ajxp_message_id="130">AJXP_MESSAGE[130]
+                                    <small id="folders_pane_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"folder_pane", "detection_id":"tree_container"}'>AJXP_MESSAGE[514]</small>
+                                    <small onclick="$('folder_pane').toggleClassName('show_first_level');$(this).toggleClassName('expand_button_hide')"><span class='expand_label_show' ajxp_message_id="516">AJXP_MESSAGE[516]</span><span class='expand_label_hide'ajxp_message_id="517">AJXP_MESSAGE[517]</span></small>&nbsp;
+                                </h3>
+                                <div id="folder_pane" class="show_first_level" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":false,"fit":"content"}' ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "flexTo":"browser"}'>
+                    <div id="files_list_pane" ajxpClass="AjxpPane">
+                        <div id="files_list_header" ajxpClass="AjxpPane">
+                            <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30}'>
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "info_panel_share","put"],"groupOtherToolbars":["more", "change_main", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            </div>
+                        </div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true},"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                    </div>
+                </div>
+            </div>
+            <div id="info_container" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px;border: 1px solid #59F;box-shadow: rgba(0, 0, 0, 0.7) 1px 1px 31px;">
+                <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
+                <div class="infoPanelActions" style="color: white; position:absolute; top: -5px; right: 5px; font-size: 1.3em;"><a class="icon-remove-sign"></a></div>
+            </div>
+            <style>
+            #global_toolbar{
+                background-color: #345E79;
+                display: block;
+            }
+            </style>
+        ]]></template_part>
+
+            <template_part ajxpClass="FilesList" ajxpId="content_pane" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' theme="orbit"><![CDATA[
+                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+            ]]></template_part>
+            <template element="ajxp_shared_folder" name="minisite_complete" position="bottom"><![CDATA[
+                <div id="info_container" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px;border: 1px solid #59F;box-shadow: rgba(0, 0, 0, 0.7) 1px 1px 31px;">
+                    <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
+                    <div class="infoPanelActions" style="color: white; position:absolute; top: -5px; right: 5px; font-size: 1.3em;"><a class="icon-remove-sign"></a></div>
+                </div>
+            ]]></template>
+            <template element="ajxp_embed_template" name="minisite_complete_bare" position="bottom"><![CDATA[
+                <div id="info_container" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px;border: 1px solid #59F;box-shadow: rgba(0, 0, 0, 0.7) 1px 1px 31px;">
+                    <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
+                    <div class="infoPanelActions" style="color: white; position:absolute; top: -5px; right: 5px; font-size: 1.3em;"><a class="icon-remove-sign"></a></div>
+                </div>
+            ]]></template>
+
 			<component_config className="FilesList">
 				<property name="fixedThumbSize" value="40"/>
 				<columns switchGridMode="filelist">

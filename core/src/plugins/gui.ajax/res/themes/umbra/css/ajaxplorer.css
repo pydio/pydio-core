@@ -922,10 +922,10 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 div.editor_header > span.header_label{
+    display: none;
     font-size: 24px;
     width: 100%;
     padding: 15px 0 0 62px;
-    display: inline-block;
     background-image: url('../images/mimes/64/user-acl.png');
     background-size: 40px;
     background-repeat: no-repeat;
@@ -2761,6 +2761,225 @@ div.user_entry span.cbContainer
     cursor: pointer;
 }
 
+/***********************/
+/* SHARE DIALOG & BUTTONS
+/***********************/
+#share-folder-minisite-public_button.disabled,
+#share-file-minisite_button.disabled{
+    display: none;
+}
+
+input.share_info_panel_link{
+    width: 98% !important;
+    margin-left: 0;
+    font-size: 16px;
+    height: 16px;
+    padding: 5px 2px;
+}
+
+#ajxp_shared_info_panel > div.infoPanelTable{
+    margin: 3%;
+    width: 94%;
+}
+
+#share_folder_form div.SF_element > div.SF_label {
+    float: none;
+    text-align: left;
+    padding: 0;
+}
+
+#share_folder_form div.dialogContentMainTitle {
+    margin: 20px 0 0;
+}
+
+#share_folder_form div.SF_element > input.SF_input,
+select.minisite_layout_selector
+{
+    width: 96% !important;
+}
+
+div#share-folder-type-chooser {
+    font-size: 13px;
+    margin: 0 6px;
+    line-height: 25px;
+}
+
+.share_leaf div.no_share_leaf,
+.share_leaf span.no_share_leaf,
+div.only_share_leaf,
+span.only_share_leaf
+{
+    display: none !important;
+}
+
+.share_leaf div.only_share_leaf{
+    display: block !important;
+}
+
+.share_leaf span.only_share_leaf{
+    display: inline !important;
+}
+
+input#shared_user{
+    width: 370px !important;
+}
+
+div#target_repository_toggle{
+    display: none !important;
+}
+
+.share_edit div#target_repository_toggle{
+    display: block !important;
+    width: 400px;
+}
+
+.share_edit div#target_repository_toggle span{
+    display: inline;
+}
+
+.share_edit div#target_repository_toggle div.SF_horizontal_actions{
+    text-align: right;
+    margin-top: 5px;
+    margin-bottom: -20px;
+    padding-right: 0;
+}
+
+.share_edit div#target_repository,
+.share_edit div#share-folder-type-chooser,
+.share_edit div#share-folder-type-leaf
+{
+    display: none !important;
+}
+
+.share_edit.edit_parameters div#target_repository,
+.share_edit.type-ws div#target_repository
+{
+    display: block !important;
+}
+
+#target_repository_toggle a {
+    border-bottom: 1px solid #555;
+    cursor: pointer;
+}
+#share_generate{
+    height: 40px;
+}
+
+#share_generate div.largeButton{
+    background-color: #4aCEB0;
+}
+
+#shareDialogButtons{
+    padding-top: 30px;
+    text-align: center;
+}
+
+div#share_update{
+    text-align: center;
+    display: none !important;
+}
+
+div#share_result div.non_macos,
+div#share_result div.macos_only
+{
+    font-size:13px;
+    padding:10px 0 0;
+    text-align:center;
+}
+
+.edit_parameters div#shareDialogButtons,
+.edit_parameters div#share_result
+{
+    display: none;
+}
+
+.edit_parameters div#share_update{
+    display: block !important;
+}
+
+#target_repository_toggle span.params_hide,
+.edit_parameters div#target_repository_toggle span.params_view
+{
+    display: none !important;
+}
+.edit_parameters div#target_repository_toggle span.params_hide{
+    display: inline !important;
+}
+
+.share_edit.type-ws span.params_hide, .share_edit.type-ws span.params_view{
+    display: none !important;
+}
+
+#shareDialogButtons div.largeButton,
+#share_update div.largeButton
+{
+    padding: 5px 15px 7px !important;
+    display: inline-block;
+    float: none;
+}
+
+.share_edit.type-ws div#shareDialogButtons{
+    padding-top: 10px;
+}
+.share_edit.type-ws div#shareDialogButtons div.largeButton,
+.share_edit.type-ws div#share_update div.largeButton
+{
+    display: block;
+    margin: 8px 80px;
+}
+
+#shareDialogButtons div.largeButton.destruct{
+    background-color: #A00;
+}
+
+.share_dialog_toggler{
+    cursor: pointer;
+}
+
+.share_dialog_toggler span.toggler_arrow{
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    transform:rotate(270deg);
+}
+
+.share_dialog_toggler_closed span.toggler_arrow{
+    transform:rotate(0deg);
+}
+
+.share_dialog_toggled{
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
+.share_dialog_toggled_closed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+#editable_hash_link{
+    margin:4px 10px;
+    font-size:13px;
+}
+
+#description_parameters{
+    margin: 5px 0;
+}
+
+#editable_hash_parameters{
+    margin: 5px;
+}
+
+#ws_shared_users_parameters{
+    margin: 0 5px;
+    position: relative;
+}
+
+#share_folder_form{
+    max-width: 400px;
+}
+
+
 div.user_entry span.cbContainer{
 
 }
@@ -2773,7 +2992,6 @@ textarea.editor
 	font-family:monospace;
 	font-size:13px;
 	line-height:16px;
-	white-space:normal;
 }
 
 .diaporamaButton

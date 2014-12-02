@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="action.disclaimer" enabled="false" label="CONF_MESSAGE[Disclaimer]" description="CONF_MESSAGE[Display a disclaimer and force acceptation by user]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+        <core_relation packaged="true" tested_version="follow_core"/>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="disclaimer" path="plugins/action.disclaimer/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="DISCLAIMER_ACCEPTED" type="select" choices="yes|Accepted,no|Not Accepted" label="CONF_MESSAGE[Validation]"
+              scope="user,group,role"
+              description="CONF_MESSAGE[Whether the user has accepted the disclaimer or not]" default="no"/>
+        <global_param name="DISCLAIMER_CONTENT" type="textarea" label="CONF_MESSAGE[Disclaimer Content]"
+               description="CONF_MESSAGE[You can use HTML]" default=""/>
+    </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="validate_disclaimer">
+                <gui text="disclaimer.1" title="disclaimer.2" src="contract.png" iconClass="icon-legal" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden" actionBar="false"
+                             ajxpWidgets="UserWidget" actionBarGroup="utils"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var dialogLoadFunction = function(){
+                            var conn = new Connexion();
+                            conn.addParameter("get_action", "load_disclaimer");
+                            conn.onComplete = function(transport){
+                            	var resp = transport.responseText;
+                            	var state = resp.substring(0, resp.indexOf(":")) == "yes" ? true : false;
+                            	var text = resp.substring(resp.indexOf(":")+1);
+                                modal.getForm().down('div#disclaimer_content').update(text);
+                                modal.getForm().down('input#accept_disclaimer').checked = state;
+                            }
+                            conn.sendAsync();
+                        };
+                        var completeFunction = function(){
+                            var value = modal.getForm().down("input#accept_disclaimer").checked ? "true" : "false";
+                            conn = new Connexion();
+                            conn.addParameter("get_action", "validate_disclaimer");
+                            conn.addParameter("validate", value);
+                            conn.onComplete = function(transport){
+                                if(value == "true"){
+                                    window.setTimeout(function(){
+	                                    ajaxplorer.loadXmlRegistry();
+                                    }, 400);
+                                }
+                                hideLightBox();
+                            }
+                            conn.sendSync();
+                        };
+                        modal.showDialogForm("Validation", "disclaimer_form", dialogLoadFunction, completeFunction);
+                    ]]></clientCallback>
+                    <clientForm id="disclaimer_form"><![CDATA[
+                         <div id="disclaimer_form" box_width="60%" box_resize="true">
+                            <div>AJXP_MESSAGE[disclaimer.3]</div>
+                            <div id="disclaimer_content" style="height:350px; overflow:auto; border:1px solid #bbb; border-radius:4px; margin: 15px 0; padding:10px;">Disclaimer</div>
+                            <div><input id="accept_disclaimer" name="accept_disclaimer" type="checkbox"> <label for="accept_disclaimer">AJXP_MESSAGE[disclaimer.4]</label></div>
+                         </div>
+                     ]]></clientForm>
+                    <serverCallback methodName="toggleDisclaimer" restParams="/validate" developerComment="Set disclaimer in accepted state or not">
+                        <input_param name="validate" type="boolean" description="Accept disclaimer or not"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="load_disclaimer">
+                <processing>
+                    <serverCallback methodName="loadDisclaimer" restParams="/" developerComment="Return HTML content of the disclaimer">
+                        <output type="HTML" description="Content of the disclaimer"/>
+                    </serverCallback>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <class_definition filename="plugins/action.disclaimer/class.DisclaimerProvider.php" classname="DisclaimerProvider"/>
+</ajxp_plugin>

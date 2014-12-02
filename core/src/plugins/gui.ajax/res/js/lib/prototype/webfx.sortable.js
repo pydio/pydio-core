@@ -60,6 +60,8 @@
 
 SortableTable = Class.create({
 
+    groupByData: null,
+
 	initialize: function(oTable, oSortTypes, oTHead) {
 	
 		this.gecko = Prototype.Browser.Gecko;
@@ -100,6 +102,10 @@ SortableTable = Class.create({
 		this.addSortType("String");
 		
 	},
+
+    setGroupByData : function(groupByData){
+        this.groupByData = groupByData;
+    },
 
     setMetaSortType : function(columnsDefs){
         this.columnsDefs = columnsDefs;
@@ -340,15 +346,73 @@ SortableTable = Class.create({
 			// remove from doc
 			var nextSibling = tBody.nextSibling;
 			var p = tBody.parentNode;
-			p.removeChild(tBody);
+            if(p) p.removeChild(tBody);
 		}
+        tBody.select('div[data-groupbyvalue]').invoke('remove');
 	
 		// insert in the new order
 		var l = a.length;
-		for (var i = 0; i < l; i++)
-			tBody.appendChild(a[i].element);
-	
-		if (this.removeBeforeSort) {
+        var groupColIndex, groupType, allBlocks, blockType;
+        if(this.groupByData){
+            if(this.columnsDefs){
+                var col = this.columnsDefs.detect(function(c){
+                    return c.attributeName == this.groupByData;
+                }.bind(this));
+                if(col){
+                    groupColIndex = this.columnsDefs.indexOf(col);
+                    groupType = this.getSortType(groupColIndex);
+                    allBlocks = [];
+                    blockType = 'div';
+                }
+            }else{
+                groupColIndex = this.groupByData;
+                groupType = this.getSortType(groupColIndex);
+                allBlocks = [];
+                blockType = 'tr';
+            }
+        }
+
+		for (var i = 0; i < l; i++){
+            if(groupColIndex){
+                var fieldValue = this.getRowValue(a[i].element, groupType, groupColIndex);
+                if(!fieldValue) fieldValue = "N/A";
+                fieldValue = fieldValue.trim();
+                var block;
+                if(blockType == 'tr'){
+                    block = tBody.down( 'tr[data-groupbyvalue="'+fieldValue+'"]');
+                }else{
+                    block = tBody.down( 'div[data-groupbyvalue="'+fieldValue+'"]');
+                }
+                if(!block){
+                    block = new Element(blockType, {"data-groupbyvalue":fieldValue});
+                    tBody.insert(block);
+                    if(MessageHash[fieldValue]) fieldValue = MessageHash[fieldValue];
+                    if(blockType == 'div'){
+                        block.insert(new Element('h3').update(fieldValue));
+                    }else if(blockType == 'tr'){
+                        block.insert(new Element('td', {colspan:this.sortTypes.length}).update(new Element('h3').update(fieldValue)));
+                    }
+                    allBlocks[fieldValue] = block;
+                }
+                if(blockType == 'tr'){
+                    block.insert({after: a[i].element});
+                }else{
+                    block.insert(a[i].element);
+                }
+            }else{
+                tBody.appendChild(a[i].element);
+            }
+        }
+        if(allBlocks && blockType == 'div'){
+            var keys = Object.keys(allBlocks);
+            keys.sort();
+            for(var z=0 ; z<keys.length;z++){
+                tBody.insert(allBlocks[keys[z]]);
+                allBlocks[keys[z]].down('h3').insert('<span class="groupBy-count"> ('+allBlocks[keys[z]].select('.ajxpNodeProvider').length+')</span>');
+            }
+        }
+
+		if (this.removeBeforeSort && p) {
 			// insert into doc
 			p.insertBefore(tBody, nextSibling);
 		}

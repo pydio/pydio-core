@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Jumploader" => "Jumploader",
+"Jumploader" => "Java (big files)",
 "Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc.",
 "Install Applet" => "Install Applet",
 );
