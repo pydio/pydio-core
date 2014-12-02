@@ -49,7 +49,7 @@ $mess = array(
 "Storage Type" => "Speichertyp",
 "Select how the configuration will be stored" => "Wählen Sie wie und wo die Konfigurationsdaten gespeichert werden sollen",
 "No Database (Quick Start)" => "Keine Datenbank (Schnellstart, nicht für produktive Umgebungen)",
-"Database (production environments, requires a DBMS supported by APPLICATION_TITLE)" => "Datenbank (Produktive Umgebungen, von APPLICATION_TITLE unterstütztes DBMS vorausgesetzt)",
+"Database system (production environments, requires a DBMS supported by APPLICATION_TITLE)" => "Datenbank (Produktive Umgebungen, von APPLICATION_TITLE unterstütztes DBMS vorausgesetzt)",
 "Enable Notifications" => "Protokollierung aktivieren",
 "Log all events and alerts" => "Alle Ereignisse und Warnungen protokollieren",
 "Create users for your organization right now. You can do this later by going to the Settings workspace." => "Benutzer für ihre Firma anlegen. Dies kann auch später über die Arbeitsumgebung 'Einstellungen' nachgeholt werden.",
@@ -59,6 +59,5 @@ $mess = array(
 "Display name" => "Angezeigter Name",
 "Password" => "Passwort wählen",
 "Select how the configurations will be stored" => "Auswählen, wie Konfigurationsdaten gespeichert werden",
-"Database system (production environments, requires a DBMS supported by APPLICATION_TITLE))" => "Datenbank (Produktivbetrieb, erfordert ein DBMS das von APPLICATION_TITLE unterstützt wird)",
 
 );
