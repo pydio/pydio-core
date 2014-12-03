@@ -21,11 +21,11 @@
 
 /*******************************************************************************
 * German translation:
-*  	+ update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/ 
+*  	Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/  
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Source Viewer" => "Quelltext-Betrachter",
-"Syntax Highlighter for all major code source files" => "Syntax-Highlighter für alle unterstützten Quelltext-Dateien",
+"Mobile" => "Mobile",
+"Template extending gui.ajax for small screen terminals." => "Erweiterungs-Vorlage für gui.ajax und kleine Bildschirme.",
 );

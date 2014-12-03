@@ -18,14 +18,17 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-
 /*******************************************************************************
 * German translation:
-*  	+ update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/ 
+*  	Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/  
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Source Viewer" => "Quelltext-Betrachter",
-"Syntax Highlighter for all major code source files" => "Syntax-Highlighter für alle unterstützten Quelltext-Dateien",
+"iOS" => "iOS",
+"Template for redirecting to iPhone application" => "Vorlage für die Weiterleitung an die iPhone-Applikation",
+"iOS Application URL" => "URL zur iOS-Applikation",
+"iOS Application" => "iOS-Applikation",
+"Android Application URL" => "URL zur Android-Applikation",
+"Android App" => "Android-App",
 );
