@@ -1,4 +1,24 @@
 <?php
+/*
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*/
+
 $mess = array(
     "1" => "Descarrga remota",
     "2" => "Descargar fichero(s) desde servidor remoto",
@@ -15,10 +35,10 @@ $mess = array(
     "10c"=> "Descargar a %s",
     "10d"=> "Descarga (%s)",
     "11"=> "Arrastre y suelte uno de los siguientes enlaces a su barra de marcadores : ",
-    "12"=> "Trigger remote file download",
+    "12"=> "Iniciar descarga desde servidor remoto",
     "13"=> "Desde el ordenador",
     "14"=> "Desde un servidor remoto",
-    "15"=> "O cree un marcador manualmente y ese el código siguiente como la URL de enlace : ",
+    "15"=> "O cree un marcador manualmente y ese el código siguiente como la URL de enlace: ",
     "16"=> "Arrástreme sobre su barra de marcadores!",
     "17"=> "Descargarfichero",
     "18"=> "Fichero parcial"

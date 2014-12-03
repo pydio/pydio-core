@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,8 +18,10 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+//
 // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
+
 $mess=array(
 "1" => "Usuarios compartidos",
 "2" => "Repositorios compartidos",

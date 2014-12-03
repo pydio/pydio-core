@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2012 Charles du Jeu <contact (at) cdujeu.me>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,16 +18,17 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
 $mess=array(
 "1" => "Notificaciones",
 "2" => "Fuente de Notificaciones",
 "3" => "Alertas",
 "4" => "Notificaciones",
-"5" => "Todos los Eventos",
-"6" => "Go to ...",
-"7" => "Dismiss",
-"8" => "No alerts",
-"9" => "Workspace Activity",
-"10" => "Folder Activity",
-"11" => "File Activity",
+"5" => "Todos los eventos",
+"6" => "Ir a...",
+"7" => "Ignorar",
+"8" => "Sin alertas",
+"9" => "Actividad del Espacio de Trabajo",
+"10" => "Actividad de Carpeta",
+"11" => "Actividad de Archivo",
 );

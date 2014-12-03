@@ -18,9 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+ 
 $mess=array(
 "1" => "Crear Tabla",
-"2" => "Escriba sy consulta SQL aquí",
+"2" => "Escriba su consulta SQL aquí",
 "3"	=> "Consultar",
 "4"	=> "Limpiar"
 );

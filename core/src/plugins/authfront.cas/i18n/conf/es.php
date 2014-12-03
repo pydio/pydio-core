@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
 $mess=array(
     "Order" => "Order.",
     "Order this plugin with other auth frontends" => "Order this plugin with other auth frontends",

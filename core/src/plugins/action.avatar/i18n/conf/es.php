@@ -1,11 +1,31 @@
 <?php
 /*
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*
+*
 * Gravatar plugin for AjaXplorer
 */
+
 $mess=array(
-"Avatars" => "Avatars",
-"Get user avatar from Gravatar/Libravatar" => "Get user avatar from Gravatar/Libravatar",
-"Gravatar type" => "Gravatar type",
-"Provider" => "Provider",
-"Choose an avatar web service" => "Choose an avatar web service",
+"Avatars" => "Avatares",
+"Get user avatar from Gravatar/Libravatar" => "Obtener avatar del usuario desde Gravatar/Libravatar",
+"Gravatar type" => "Tipo de Gravatar",
+"Provider" => "Proveedor",
+"Choose an avatar web service" => "Seleccione un servicio web de avatares",
 );

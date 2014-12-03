@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,11 +18,12 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
 $mess=array(
 "1" => "Datos de Configuración",
 "2" => "Usuarios y Grupos",
 "3" => "Carpetas",
-"4" => "Logs",
+"4" => "Registros",
 "5" => "Diagnósticos",
 "6" => "Nombre de Usuario",
 "7" => "Es Administrador",
@@ -36,7 +37,7 @@ $mess=array(
 "15" => "Falso",
 "16" => "Fecha de archivo",
 "17" => "Fecha",
-"18" => "I.P.",
+"18" => "IP",
 "19" => "Nivel",
 "20" => "Usuario",
 "21" => "Acción",
@@ -51,8 +52,8 @@ $mess=array(
 "30" => "Escribir",
 "32" => "Controlador de Acceso",
 "33" => "Cargando...",
-"34" => "Seguro que desea eliminar este usuario? Esta operación no es reversible!",
-"35" => "Seguro que desea eliminar esta carpeta? Esta operación no es reversible!",
+"34" => "¿Seguro que desea eliminar este usuario? Esta operación es irreversible!",
+"35" => "¿Seguro que desea eliminar esta carpeta? Esta operación es irreversible!",
 "36" => "Faltan campos obligatorios!",
 "37" => "Atención, las contraseñas no coinciden!",
 "38" => "Por favor rellene el campo de login!",
@@ -79,7 +80,7 @@ $mess=array(
 "59" => "Carpeta borrada correctamente",
 "60" => "Usuaro borrado correctamente",
 "61" => "Argumentos erróneos!",
-"62" => "Sumario de Privilegios",
+"62" => "Resumen de Privilegios",
 "63" => "Todos",
 "64" => "Cambiados los privilegios del rol ",
 "65" => "El rol ya existe, elija otro nombre!",
@@ -130,7 +131,7 @@ $mess=array(
 "108" => "Documentación",
 "109" => "Configuraciones globales",
 "110" => "Carpetas y Usuarios",
-"111" => "Log y otros datos",
+"111" => "Registro y otros datos",
 "112" => "<b>Aplicar este rol por defecto</b> para todos los usuarios nuevos.",
 "113" => "El estado del rol ha sido modificado correctamente",
 "114" => "Aplicar a ",
