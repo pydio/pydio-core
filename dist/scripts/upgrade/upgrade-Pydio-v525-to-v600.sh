@@ -48,6 +48,7 @@ echo "</IfModule>" >> $file_name
 create_root_htaccess () {
 file_name=$1
 
+
 echo "<IfModule mod_rewrite.c>" >> $file_name
 echo "# You must set the correct values here if you want" >> $file_name
 echo "# to enable webDAV sharing. The values assume that your " >> $file_name
