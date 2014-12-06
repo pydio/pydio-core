@@ -21,25 +21,25 @@
 
 $mess = array(
     "1" => "Descarrga remota",
-    "2" => "Descargar fichero(s) desde servidor remoto",
+    "2" => "Descargar archivo(s) desde servidor remoto",
     "3" => "m",
-    "4" => "Introduzca al menos una URL apuntando a un fichero que quiera descargar directamente a esta carpeta. Esta acción se ejecutará en segundo plano y podrá seguir usando la aplicación durante la descarga.",
+    "4" => "Introduzca al menos una URL apuntando a un archivo que quiera descargar directamente a esta carpeta. Esta acción se ejecutará en segundo plano y podrá seguir usando la aplicación durante la descarga.",
     "5" => "URL",
     "6" => "Descargando",
     "7" => "al servidor",
-    "8" => "Fichero descargado, actualizando el cliente!",
+    "8" => "Archivo descargado, actualizando el cliente!",
     "9" => "Generando marcador",
     "10"=> "Descargar a la aplicación",
     "10a"=> "Descargar a %s",
     "10b"=> "Descargar a %s",
     "10c"=> "Descargar a %s",
     "10d"=> "Descarga (%s)",
-    "11"=> "Arrastre y suelte uno de los siguientes enlaces a su barra de marcadores : ",
+    "11"=> "Arrastre y suelte uno de los siguientes enlaces a su barra de marcadores: ",
     "12"=> "Iniciar descarga desde servidor remoto",
-    "13"=> "Desde el ordenador",
+    "13"=> "Desde su PC",
     "14"=> "Desde un servidor remoto",
     "15"=> "O cree un marcador manualmente y ese el código siguiente como la URL de enlace: ",
-    "16"=> "Arrástreme sobre su barra de marcadores!",
-    "17"=> "Descargarfichero",
-    "18"=> "Fichero parcial"
+    "16"=> "Arrástrame sobre la barra de marcadores!",
+    "17"=> "Descargar archivo",
+    "18"=> "Archivo parcial"
 );

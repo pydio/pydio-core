@@ -23,41 +23,41 @@
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
 
 $mess=array(
-"title"=> "Home",
-"desc" => "Welcome page",
-"39"=> "Select a workspace",
-"40"=> "Welcome, %s",
-"41"=> "Use this workspace as default",
-"42"=> "Enter",
-"43"=> "My Profile",
-"43t"=> "All my personal data",
-"44"=> "My Account",
-"45"=> "Personal data",
-"46"=> "Address Book",
-"47"=> "Users and teams that you created",
-"48"=> "My Users",
-"49"=> "External users that you created",
-"50"=> "My Teams",
-"51"=> "Teams of users, used as shortcuts when sharing",
-"52"=> "Are you sure you want to delete this team? This will not remove any users.",
-    "53"=> "Getting Started",
-    "54"=> "Get started with APPLICATION_TITLE by following How-to videos",
-    "55"=> "Do you need help <a>to get started?</a>",
-    "56"=> "Getting started with APPLICATION_TITLE? Here are some videos for you!",
-    "57"=> "Download APPLICATION_TITLE for...",
-    "58"=> "Android device",
+"title"=> "Inicio",
+"desc" => "Pagina de Inicio",
+"39"=> "Seleccione un Espacio de Trabajo",
+"40"=> "Bienvenido/a, %s",
+"41"=> "Utilizar este Espacio de Trabajo de manera predeterminada",
+"42"=> "Entrar",
+"43"=> "Mi Perfil",
+"43t"=> "Todos mis datos personales",
+"44"=> "Mi Cuenta",
+"45"=> "Datos Personales",
+"46"=> "Libreta de direcciones",
+"47"=> "Usuarios y Equipos que has creado",
+"48"=> "Mis Usuarios",
+"49"=> "Usuarios externos que has creado",
+"50"=> "Mis Equipos",
+"51"=> "Equipos de usuario, utilizados como accesos directos al compartir",
+"52"=> "¿Está seguro que desea borrar este equipo? Esto no eliminará a ningun usuario.",
+    "53"=> "Primeros pasos",
+    "54"=> "Comience con APPLICATION_TITLE siguiendo los videos tutoriales",
+    "55"=> "¿Necesita ayuda <a>para empezar</a>?",
+    "56"=> "Comenzando con APPLICATION_TITLE? Aquí hay algunos videos para ti!",
+    "57"=> "Descargar APPLICATION_TITLE para...",
+    "58"=> "Dispositivos Android",
     "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
-    "62"=>"<h2>Getting started</h2>
-            This video is an introduction to APPLICATION_TITLE web application:
+    "62"=>"<h2>Primeros pasos</h2>
+            Este video es una introduccion a la aplicación web APPLICATION_TITLE:
             <ul>
-                <li>User Dashboard</li>
-                <li>GUI Overview</li>
-                <li>Managing files and folders</li>
-                <li>Previewing and editing files</li>
-                <li>Quick access through bookmarks and search engine</li>
-                <li>Selection cart</li>
+                <li>Panel del usuario</li>
+                <li>Conceptos de la interfaz del usuario</li>
+                <li>Administrando archivos y carpetas</li>
+                <li>Previsualizando y editando archivos</li>
+                <li>Acceso rápido a traves de Marcadores y motores de búsqueda</li>
+                <li>Carro de seleeción</li>
             </ul>",
     "63"=>"<h2>Sharing files with APPLICATION_TITLE</h2>
                             In this tutorial, we will cover the basics of file sharing with APPLICATION_TITLE:
