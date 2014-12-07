@@ -20,7 +20,7 @@
 */
 
 $mess = array(
-    "1" => "Descarrga remota",
+    "1" => "Descarga remota",
     "2" => "Descargar archivo(s) desde servidor remoto",
     "3" => "m",
     "4" => "Introduzca al menos una URL apuntando a un archivo que quiera descargar directamente a esta carpeta. Esta acción se ejecutará en segundo plano y podrá seguir usando la aplicación durante la descarga.",
@@ -39,7 +39,7 @@ $mess = array(
     "13"=> "Desde su PC",
     "14"=> "Desde un servidor remoto",
     "15"=> "O cree un marcador manualmente y ese el código siguiente como la URL de enlace: ",
-    "16"=> "Arrástrame sobre la barra de marcadores!",
+    "16"=> "Arrastrar sobre la barra de marcadores!",
     "17"=> "Descargar archivo",
     "18"=> "Archivo parcial"
 );
