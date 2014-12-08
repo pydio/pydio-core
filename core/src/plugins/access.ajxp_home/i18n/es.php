@@ -25,19 +25,19 @@
 $mess=array(
 "title"=> "Inicio",
 "desc" => "Pagina de Inicio",
-"39"=> "Seleccione un Espacio de Trabajo",
+"39"=> "Seleccione un espacio de trabajo",
 "40"=> "Bienvenido/a, %s",
-"41"=> "Utilizar este Espacio de Trabajo de manera predeterminada",
+"41"=> "Utilizar este espacio de trabajo de manera predeterminada",
 "42"=> "Entrar",
-"43"=> "Mi Perfil",
+"43"=> "Mi perfil",
 "43t"=> "Todos mis datos personales",
-"44"=> "Mi Cuenta",
-"45"=> "Datos Personales",
+"44"=> "Mi cuenta",
+"45"=> "Datos personales",
 "46"=> "Libreta de direcciones",
-"47"=> "Usuarios y Equipos que has creado",
-"48"=> "Mis Usuarios",
+"47"=> "Usuarios y equipos que has creado",
+"48"=> "Mis usuarios",
 "49"=> "Usuarios externos que has creado",
-"50"=> "Mis Equipos",
+"50"=> "Mis equipos",
 "51"=> "Equipos de usuario, utilizados como accesos directos al compartir",
 "52"=> "¿Estás seguro que deseas borrar este equipo? Esto no eliminará a ningún usuario.",
     "53"=> "Primeros pasos",
@@ -56,7 +56,7 @@ $mess=array(
                 <li>Conceptos de la interfaz del usuario</li>
                 <li>Administrando archivos y carpetas</li>
                 <li>Previsualizando y editando archivos</li>
-                <li>Acceso rápido a través de Marcadores y motores de búsqueda</li>
+                <li>Acceso rápido a través de marcadores y motores de búsqueda</li>
                 <li>Carro de selección</li>
             </ul>",
     "63"=>"<h2>Compartir archivos con APPLICATION_TITLE</h2>
@@ -82,7 +82,7 @@ $mess=array(
 <li>Navegar a por los archivos</li>
 <li>Mantener archivos disponibles sin conexión e interactuar con aplicaciones externas</li>
 <li>Proteger la aplicación con un código PIN</li>
-<li>Utilizar Marcadores favoritos y motores de búsqueda</li></ul>",
+<li>Utilizar marcadores favoritos y motores de búsqueda</li></ul>",
     "67"=> "No eres %s, %logout",
 
 );

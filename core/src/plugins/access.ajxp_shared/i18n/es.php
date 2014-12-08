@@ -54,6 +54,6 @@ $mess=array(
 "29"=> "Repositorios delegados creados por usuarios.",
 "30"=> "Usuarios creados para acceder a repositorios delegados.",
 "31"=> "Descripción",
-"32"=> "Resetear",
-"33"=> "Resetear el contador de descargas",
+"32"=> "Reiniciar",
+"33"=> "Reiniciar el contador de descargas",
 );
