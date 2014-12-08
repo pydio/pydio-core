@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -20,8 +20,8 @@
 */
 $mess=array(
 "Flash uploader" => "Flash",
-"Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Flash Uploader für Altsysteme, bei denen der Browser kein HTML5 unterstützt. Wenn dieser Uploader erzwungen werden soll muss der HTML-Uploader deaktiviert werden und beim Flex-Uploader muss der activeCondition-Tag aus der Manifest-Datei entfernt werden.",
+"Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Flash Uploader für Altsysteme, bei denen der Browser kein HTML5 unterstützt. Wenn dieser Uploader erzwungen werden soll muss der Standard-Uploader deaktiviert werden und beim Flex-Uploader der activeCondition-Tag aus der Manifest-Datei entfernt werden.",
 "Miscalleneous" => "Verschiedenes",
 "HTTPS Policy" => "HTTPS Richtlinie",
-"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Eine HTTPS-Richtlinien-Datei muss benutzt werden, um Probleme beim Flash-Upload zu lösen, wenn https verwendet wird. Der Pfad muss relativ zum Webroot angegeben werden.",
+"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Eine HTTPS Richtliniendatei muss benutzt werden, um Probleme beim Flash-Upload zu lösen, wenn https verwendet wird. Der Pfad muss relativ zum Webroot angegeben werden.",
 );

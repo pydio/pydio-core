@@ -19,6 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"MQ SQL" => "SQL-Warteschlange",
+"Store persistant and worker queues in database" => "Speichert Nachrichten-Warteschlangen in eine Datenbank",
+"Install SQL Tables" => "SQL Tabellen installieren",
+"SQL Tables" => "SQL-Tabellen",
+"SQL Driver" => "SQL-Treiber",
+"SQL Connexion Parameters" => "Parameter für die SQL-Verbindung",
 );
+

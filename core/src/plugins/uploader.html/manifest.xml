@@ -2,7 +2,7 @@
 <uploader id="uploader.html" order="0" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
     <server_settings>
-        <global_param expose="true" name="DEFAULT_EXISTING" group="CONF_MESSAGE[Default Behaviour]" type="select" choices="overwrite|Always Override,rename|Auto Rename File,alert|Prompt user" label="CONF_MESSAGE[Existing Files]" description="CONF_MESSAGE[Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)]" mandatory="false" default="rename"/>
+        <global_param expose="true" name="DEFAULT_EXISTING" group="CONF_MESSAGE[Default Behaviour]" type="select" choices="overwrite|CONF_MESSAGE[Always Override],rename|CONF_MESSAGE[Auto Rename File],alert|CONF_MESSAGE[Prompt user]" label="CONF_MESSAGE[Existing Files]" description="CONF_MESSAGE[Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)]" mandatory="false" default="rename"/>
         <global_param expose="true" name="DEFAULT_AUTO_START" group="CONF_MESSAGE[Default Behaviour]" type="boolean" label="CONF_MESSAGE[Auto Start]" description="CONF_MESSAGE[Default value for automatically starting upload or not]" mandatory="false" default="true"/>
         <global_param expose="true" name="DEFAULT_AUTO_CLOSE" group="CONF_MESSAGE[Default Behaviour]" type="boolean" label="CONF_MESSAGE[Auto Close]" description="CONF_MESSAGE[Default value for automatically closing the dialog after upload or not]" mandatory="false" default="true"/>
     </server_settings>
@@ -201,3 +201,4 @@
 		]]></extensionOnInit>
 	</processing>
 </uploader>
+

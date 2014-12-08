@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -22,7 +22,9 @@ $mess=array(
 "Files MetaStore" => "Metadaten in Datei",
 "Stores metadata inside local hidden files." => "Metadaten werden in versteckten Dateien gespeichert.",
 "File location" => "Speicherort",
-"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Wo werden Dateien mit Metadaten gespeichert: Lokal bedeutet, dass die versteckten Dateien in jedem Ordner erstellt werden. Global bedeutet, dass es nur eine Datei im Ordner AJXP_DATA_PATH/plugins/action.share gibt.",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Wo werden Dateien mit Metadaten gespeichert: 'In lokalem Ordner' bedeutet, dass die versteckten Dateien in jedem Ordner erstellt werden. 'Bei Anwendungsdaten' bedeutet, dass es nur eine Datei im Ordner AJXP_DATA_PATH/plugins/action.share gibt.",
+"Application Data Folder" => "Bei Anwendungsdaten",
+"In Local Folders" => "In lokalem Ordner",
 "Meta File" => "Datei mit Metadaten",
-"Hidden file used inside folders to save meta data" => "Versteckte Datei, die im Ordner verwendet wird, um Metadaten zu speichern",
+"Hidden file used inside folders to save meta data" => "Versteckte Datei, die im konfigurierten Ordner verwendet wird, um Metadaten zu speichern",
 );

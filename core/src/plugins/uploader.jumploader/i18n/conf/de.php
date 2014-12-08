@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Jumploader" => "Java (für große Dateien)",
-"Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "JumpLoader JAVA applet eines Drittanbieters ermöglicht das Hochladen von Ordnern und teilt große Dateien in mehrere Teilstücke auf. etc.",
-"Install Applet" => "Applet installieren",
+"Jumploader" => "JumpLoader",
+"Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "JumpLoader, ein JAVA-Applet von Drittanbietern, ermöglicht das Hochladen ganzer Ordner und großer Dateien indem diese in Teilstücke zerlegt werden.",
+"Install Applet" => "JAVA-Applet installieren",
 );

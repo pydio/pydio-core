@@ -19,6 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"PLUploader" => "PLUploader",
+"PlUpload uploader support. Requires downloading and installing the PLupload sources." => "PlUpload uploader support. Requires downloading and installing the PLupload sources.",
 );
+

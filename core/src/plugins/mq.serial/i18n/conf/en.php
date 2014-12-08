@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"MQ Serial" => "MQ Serial",
+"Store persistant and worker queues in serial files" => "Store persistant and worker queues in serial files",
 );

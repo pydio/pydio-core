@@ -19,6 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"MQ Serial" => "Datei-Warteschlange",
+"Store persistant and worker queues in serial files" => "Serialisiert Nachrichten-Warteschlangen in eine Datei",
 );
+

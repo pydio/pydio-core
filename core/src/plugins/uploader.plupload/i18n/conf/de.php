@@ -19,6 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"PLUploader" => "Plupload",
+"PlUpload uploader support. Requires downloading and installing the PLupload sources." => "Plupload ist eine HTML5-Komponente von Drittanbietern. Nach dem Aktivieren des Plugins muss Plupload auf den Server geladen und installiert werden.",
 );
+

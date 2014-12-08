@@ -19,6 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Remote Download" => "HTTP-Server",
-"Async downloader to load a file from another source" => "Datei asynchron von einem entfernten HTTP-Server laden",
+"Extended Attributes" => "Extended Attributes",
+"Stores metadata inside filesystem Extended Attributes." => "Stores metadata inside filesystem Extended Attributes.",
+"Size limit" => "Size limit",
+"Some filesystem have size limitations" => "Some filesystem have size limitations",
 );
