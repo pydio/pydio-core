@@ -31,5 +31,5 @@ $mess=array(
 "6" => "Persönlich",
 "7" => "Arbeit",
 "8" => "Wichtig",
-"9" => "Keine Werte",
+"9" => "Nicht gesetzt",
 );

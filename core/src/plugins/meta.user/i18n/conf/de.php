@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,24 +19,27 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Text Metadata" => "Metadaten in Textdatei",
-"Simple metadata implementation stored in a hidden file." => "Metadaten werden in versteckten Dateien gespeichert.",
-"Meta File" => "Datei mit Metadaten",
-"Hidden file used inside folders to save meta data" => "Versteckte Datei, die im Ordner verwendet wird, um Metadaten zu speichern",
-"Meta Fields" => "Metafelder",
-"Comma separated list of fields, use standard characters here." => "Kommagetrennte Liste von Metafeldern (Nur Buchstaben ohne Umlaute)",
-"Meta Labels" => "Metatitel",
-"Comma separated list of labels, be sure to define as many as fields!" => "Kommagetrennte Liste von Titeln. Zu jedem Metafeld muss es einen Titel geben!",
-"Columns visibility" => "Sichtbarkeit der Spalten",
-"Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'." => "Setzt die standardmäßige Sichtbarkeit jeder Spalte. Es kann entweder kommagetrennt jede Spalte konfiguriert werden, oder ein Wert für alle Spalten. Mögliche Werte sind 'visible' für sichtbar, oder 'hidden'.",
-"Field ID" => "Feld ID",
-"Id of fiels, use standard characters here." => "Id der Felder (Nur Buchstaben ohne Umlaute).",
+"Text Metadata" => "Zusätzliche Metadaten in Datei",
+"Simple metadata implementation stored in a hidden file." => "Speichert zusätzliche Metadaten in versteckten Dateien.",
+"Meta File" => "Datei mit Metadaten", // This is not used (code is commented out in manifest.xml)
+"Hidden file used inside folders to save meta data" => "Versteckte Datei, die im Ordner verwendet wird, um Metadaten zu speichern",  // This is not used (code is commented out in manifest.xml)
+"Field ID" => "Feld-ID",
+"Id of fiels, use standard characters here." => "ID des Feldes (keine Umlaute möglich).",
 "Label" => "Titel",
-"Label of the field, human friendly" => "Titel des Feldes. Für die Anzeige in der Oberfläche.",
-"Field Type" => "Typ des Feldes",
-"Type of field" => "Der Typ des Feldes",
-"Column visibility" => "Sichtbarkeit der Spalten",
-"Set default visibility." => "Setzt die standardmäßige Sichtbarkeit.",
+"Label of the field, human friendly" => "Titel des Feldes, der in der Oberfläche angezeigt wird.",
+"Field Type" => "Typ",
+"Type of field" => "Der Typ des Feldes.",
+"Short text" => "Kurzer Text",
+"Long text" => "Langer Text",
+"Created by..." => "Erstellt von...",
+"Last updated by..." => "Zuletzt geändert von...",
+"Stars Rating" => "Bewertung",
+"Color labels" => "Schlagwörter",
+"Selection (set choices in Additional Info)" => "Werteliste (Auswahlmöglichkeiten bei 'Zusätzliche Info' setzen)",
+"Column visibility" => "Sichtbarkeit",
+"Visible" => "Sichtbar",
+"Hidden" => "Versteckt",
+"Set default visibility." => "Setzt die standardmäßige Sichtbarkeit eines Feldes.",
 "Additional info" => "Zusätzliche Info",
-"Depending on the field type. Currently used for selection only" => "Abhängig vom Typ des Feldes. Aktuell nur für Auswahllisten verwendet.",
+"Depending on the field type. Currently used for selection only" => "Abhängig vom Typ des Feldes. Aktuell nur für Wertelisten verwendet.",
 );
