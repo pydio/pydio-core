@@ -6,6 +6,10 @@ cp -f /etc/bootstrap.json /var/lib/pydio/plugins/boot.conf/bootstrap.json
 touch /var/cache/pydio/admin_counted
 touch /var/cache/pydio/diag_result.php
 touch /var/cache/pydio/first_run_passed
+[ -f /var/lib/pydio/.htaccess ] && rm -f /var/lib/pydio/.htaccess
+[ -f /usr/share/pydio/.htaccess ] && rm -f /usr/share/pydio/.htaccess
+cp -f /etc/public.htaccess /var/lib/pydio/.htaccess
+cp -f /etc/root.htaccess /usr/share/pydio/.htaccess
 
 # fix LANG
 if [ "$LANG" = "" ]; then
