@@ -1,5 +1,5 @@
 # DOCKER-VERSION 0.xx
-# Pydio Version 5.2.5
+# Pydio Version 6.0.0
 FROM centos:centos6
 MAINTAINER team@pyd.io
 
