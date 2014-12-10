@@ -205,6 +205,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         if ($ldapconn) {
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            //ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
 
             if ($this->ldapAdminUsername === null) {
                 //connecting anonymously
@@ -324,9 +325,10 @@ class ldapAuthDriver extends AbstractAuthDriver
 
         do {
             if ($isSupportPagedResult)
-                ldap_control_paged_result($this->ldapconn, $this->pageSize, true, $cookie);
+                ldap_control_paged_result($this->ldapconn, $this->pageSize, false, $cookie);
 
             $ret = ldap_search($conn, $this->ldapDN, $filter, $expected, 0, 0);
+            if($ret === false) break;
             foreach ($ret as $i => $resourceResult) {
                 if ($resourceResult === false) continue;
                 if ($countOnly) {
@@ -380,7 +382,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             if ($isSupportPagedResult)
                 foreach ($ret as $element) {
                     if(is_resource($element))
-                        ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
+                        @ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
                 }
         } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
 
