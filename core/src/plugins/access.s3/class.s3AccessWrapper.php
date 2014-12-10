@@ -180,6 +180,7 @@ class s3AccessWrapper extends fsAccessWrapper
     {
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Should load ".$path);
         $fp = fopen($path, "r");
+        if(!is_resource($fp)) return;
         while (!feof($fp)) {
             $data = fread($fp, 4096);
             fwrite($stream, $data, strlen($data));
