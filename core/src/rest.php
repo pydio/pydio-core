@@ -63,6 +63,12 @@ if($repoID == 'pydio'){
     if ($repo == null) {
         die("Cannot find repository with ID ".$repoID);
     }
+
+    if(!ConfService::repositoryIsAccessible($repo->getId(), $repo, AuthService::getLoggedUser(), false, true)){
+        header('HTTP/1.0 401 Unauthorized');
+        echo 'You are not authorized to access this workspace.';
+        exit;
+    }
     ConfService::switchRootDir($repo->getId());
 }
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
