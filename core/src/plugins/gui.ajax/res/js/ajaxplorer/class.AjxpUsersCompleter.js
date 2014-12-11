@@ -162,28 +162,28 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                         var f = new FormManager();
                         var def1 = $A();
                         def1.push($H({
-                            description: "User ID",
+                            description: MessageHash['533'],
                             editable: false,
                             expose: "true",
-                            label: "User ID",
+                            label: MessageHash['522'],
                             name: "new_user_id",
                             scope: "user",
                             type: "string",
                             mandatory: "true"
                         }),$H({
-                            description: "New user password",
+                            description: MessageHash['534'],
                             editable: "true",
                             expose: "true",
-                            label: "Password",
+                            label: MessageHash['523'],
                             name: "new_password",
                             scope: "user",
                             type: "password-create",
                             mandatory: "true"
                         }),$H({
-                            description: "Send a welcome mail containing the password to the user (email must be set)",
+                            description: MessageHash['536'],
                             editable: "true",
                             expose: "true",
-                            label: "Send password by email",
+                            label: MessageHash['535'],
                             name: "send_email",
                             scope: "user",
                             type: "boolean",
