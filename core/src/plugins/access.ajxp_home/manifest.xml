@@ -9,6 +9,8 @@
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
+        <global_param name="SIMPLE_CLICK_WS_OPEN" type="boolean" label="CONF_MESSAGE[Open workspace by simple click]"
+                      description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
         <global_param name="ENABLE_GETTING_STARTED" type="boolean"
                       label="Enable Getting Started" description="Enable addition tabulation to access getting started videos" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
