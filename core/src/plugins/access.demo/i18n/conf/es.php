@@ -18,17 +18,14 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-// spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
-//---------------------------------------------------------------------------------------------------
 
 $mess=array(
-"1" => "Etiquetas",
-"2" => "Sin etiqueta",
-"3" => "Sin valorar",
-"4" => "Poca importancia",
-"5" => "Pendiente",
-"6" => "A revisar",
-"7" => "Importante",
-"8" => "Urgente",
-"9" => "Sin valor",
+"Demo (no write actions)" => "Demo (sin acciones de escritura)",
+"This is a standard access to the filesystem but with all write actions disabled server-side." => "Este es un acceso estándar al sistema de archivos pero con todas las acciones de escritura deshabilitadas en el lado del servidor.",
+"Path" => "Ruta",
+"Real path to the root folder on the server" => "Ruta real al directorio raíz en el servidor",
+"Create" => "Crear",
+"Create folder if it does not exists" => "Crear carpeta si esta no existe",
+"Recycle Bin Folder" => "Carpeta de Papelera de reciclaje",
+"Leave empty if you do not want to use a recycle bin." => "Dejar en blanco si no deseas utilizar una carpeta de Papelera de reciclaje.",
 );

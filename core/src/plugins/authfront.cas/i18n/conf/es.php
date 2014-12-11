@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,36 +18,37 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
 $mess=array(
-    "Order" => "Order.",
-    "Order this plugin with other auth frontends" => "Order this plugin with other auth frontends",
-    "Create User" => "Create User",
-    "Automatically create user if it does not already exists" => "Automatically create user if it does not already exists",
-    "General" =>"General" ,
-    "Protocol Type" =>"Protocol Type",
-    "Enable/disable automatically based on the protocol used" => "Enable/disable automatically based on the protocol used",
-    "CAS server address" => "CAS server address",
-    "CAS Server" => "CAS Server",
-    "CAS Port" => "CAS Port" ,
-    "Port where CAS server is running on. Default: 443" => "Port where CAS server is running on. Default: 443",
-    "CAS URI" => "CAS URI" ,
-    "URI for CAS service (without / at the end). Default:" => "URI for CAS service (without / at the end). Default:",
-    "Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-    "Modify login page" => "Modify login page" ,
-    "Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." => "Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page.",
-    "Certificate path" => "Certificate path" ,
-    "Path to the ca chain that issued the cas server certificate" => "Path to the ca chain that issued the cas server certificate",
-    "Debug mode" => "Debug mode" ,
-    "Debug file" => "Debug file" ,
-    "Set phpCAS in debug mode" => "Set phpCAS in debug mode" ,
-    "Log to file. If null, use yyyy-mm-dd.txt" => "Log to file. If null, use yyyy-mm-dd.txt",
-    "phpCAS mode" => "phpCAS mode" ,
-    "In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP." => "In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP.",
-    "Client" => "Client" ,
+    "Order" => "Orden",
+    "Order this plugin with other auth frontends" => "Ordenar este plugin con otros frontends de autenticación",
+    "Create User" => "Crear usuario",
+    "Automatically create user if it does not already exists" => "Automáticamente crea un usuario si no existe",
+    "General" => "General",
+    "Protocol Type" => "Tipo de protocolo",
+    "Enable/disable automatically based on the protocol used" => "Habilitar/Deshabilitar automáticamente basado en el protocolo usado",
+    "CAS server address" => "Dirección de Servidor CAS",
+    "CAS Server" => "Servidor CAS",
+    "CAS Port" => "Puerto CAS" ,
+    "Port where CAS server is running on. Default: 443" => "Puerto en el que el Servidor CAS está activo. Predeterminado: 443",
+    "CAS URI" => "URI de Servidor CAS" ,
+    "URI for CAS service (without / at the end). Default:" => "URI para el servicio CAS (sin el '/' al final). Predeterminado:",
+    "Redirect to the given URL on loggin out" => "Redireccionar a la URL definida al desconectar",
+    "Modify login page" => "Modificar página de ingreso (login)" ,
+    "Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." => "La página de ingreso (login) será modificada para entregar al usuario un enlace para autenticar vía CAS manualmente. Sino Pydio redireccionará automáticamente a la página de ingreso de CAS.",
+    "Certificate path" => "Ruta del certificado" ,
+    "Path to the ca chain that issued the cas server certificate" => "Ruta a la cadena CA que emitió el certificado del servidor CAS",
+    "Debug mode" => "Modo Debug" ,
+    "Debug file" => "Archivo Debug" ,
+    "Set phpCAS in debug mode" => "Definir phpCAS en modo Debug" ,
+    "Log to file. If null, use yyyy-mm-dd.txt" => "Registrar (log) a archivo. Si es nulo, utilizar aaaa-mm-dd.txt",
+    "phpCAS mode" => "Modo phpCAS" ,
+    "In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP." => "En modo proxy, phpCAS funciona como un proxy CAS que provee tickets proxy para otros servicios como SMB, IMAP.",
+    "Client" => "Cliente" ,
     "Proxy" => "Proxy" ,
-    "Proxied Service" => "Proxied Service" ,
-    "Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com" => "Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com",
-    "PTG store mode" => "PTG store mode" ,
-    "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" => "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()",
-    "Install SQL Table (support only mysql)" => "Install SQL Table (support only mysql)"
+    "Proxied Service" => "Servicio con Proxy" ,
+    "Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com" => "Servicio con proxy que utiliza Tickets proxy proporcionados por este Proxy CAS. Ej: smb://pydio.com",
+    "PTG store mode" => "Modo de almacenamiento PTG (PTG store mode)" ,
+    "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" => "Configuración para almacenamiento de otorgamiento de tickets de proxy. Si es un archivo de opciones, la localizacion para almacenamiento es session_save_path()",
+    "Install SQL Table (support only mysql)" => "Instalar tabla SQL (soporta solo MySQL)"
 );

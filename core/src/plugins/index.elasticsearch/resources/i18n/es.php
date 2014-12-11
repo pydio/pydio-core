@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -28,6 +28,6 @@ $mess = array(
     "6" => "Atención, la carpeta actual está indexándose, inténtelo más tarde.",
     "7" => "Primera indexación de esta carpeta, por favor espere y reintente más tarde su búsqueda",
     "8" => "Indexando %s en segundo plano",
-    "9" => "No puedo encontrar el índice de la carpeta actual! Debería ejecutar la indexación de los datos primero!",
-    "10" => "Indexing subfolders in background",
+    "9" => "¡No se ha encontrado el índice de la carpeta actual! Debería ejecutar la indexación de los datos primero.",
+    "10" => "Indexando subcarpetas en segundo plano",
 );

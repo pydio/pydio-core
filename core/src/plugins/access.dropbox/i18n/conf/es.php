@@ -18,17 +18,16 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-// spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
-//---------------------------------------------------------------------------------------------------
 
 $mess=array(
-"1" => "Etiquetas",
-"2" => "Sin etiqueta",
-"3" => "Sin valorar",
-"4" => "Poca importancia",
-"5" => "Pendiente",
-"6" => "A revisar",
-"7" => "Importante",
-"8" => "Urgente",
-"9" => "Sin valor",
+"Dropbox" => "Dropbox",
+"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Este plugin permite acceder a una cuenta de Dropbox. Aun en fase experimental, requiere la extensión PEAR/HTTP_OAuth.",
+"Consumer Key" => "Llave del consumidor (Consumer Key)",
+"Key" => "Llave (key)",
+"Consumer Secret" => "Secreto del consumidor (Consumer Secret)",
+"Secret" => "Secreto (Secret)",
+"User Mail" => "Email del usuario",
+"User account" => "Cuenta del usuario",
+"Password" => "Contraseña",
+"User Password" => "Contraseña del usuario",
 );
