@@ -227,7 +227,7 @@
 							document.location.href=downloadUrl;
 						}else{
 						    var minisite_session = null;
-						    var parts = $A("index_shared.php?secure_token=qMrjDEQXxvl0UhRK6w1h5JFXz0ZHhFwx&minisite_session=42a1cd&".replace('?', '&').split('&'));
+						    var parts = $A(window.ajxpServerAccessPath.replace('?', '&').split('&'));
 						    parts.each(function(p){
 						        var sub = p.split('=');
 						        if(sub.length == 2 && sub[0] == 'minisite_session'){
