@@ -1,0 +1,41 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 6.0.1 - Bugfix & Security Release</h2>
+
+    This is a bugfix & security release for v6. Upgrade is recommended.
+    Main bugs fixed are:
+    <ul>
+        <li>White-screen on upgrade if Server URL is manually set</li>
+        <li>Italian language breaking workspace creation</li>
+        <li>New ldap_paged_control php functions can issue warnings on php 5.6</li>
+        <li>Fix WebDAV root listing and authentication problems on REST api.</li>
+        <li>A potential vulnerability reported by Axel Hinrichs</li>
+    </ul>
+
+    <h2>Upgrade instructions</h2>
+    <div style="border:1px solid #c00; padding: 5px; border-radius: 3px;"><b style="color: #cc0000;">IMPORTANT</b>: if you have not yet upgraded to v6.0.0, please read the <a href="https://pyd.io/pydio-core-6.0.0/"‎ target="_blank">Pydio 6 release note and upgrade instructions</a> before going further.</div>
+
+    <ul>
+        <li><b>In-app upgrade</b>: nothing to do</li>
+        <li>
+            <b>Linux Packages</b>: please manually delete the file share.php located in your public folder, and share anything from the interface to regenerate the file.
+        </li>
+    </ul>
+
+    <h2>Changelog</h2>
+    <ul>
+        <li>Fix SQL. insert on update a role (improve performance only for mysql) (<a href="http://github.com/pydio/pydio-core/commit/24643405d9fff0ecc2ba3ef07a30706b15ccd0b5">details</a>)</li>
+        <li>Add script to upgrade 525 to 600 (<a href="http://github.com/pydio/pydio-core/commit/39fe44d083d420f8172eb361873c107b66c9fcdd">details</a>)</li>
+        <li>Fix ldap_paged_control issues and warnings (<a href="http://github.com/pydio/pydio-core/commit/b3df7b0a7fcba018219f55fc41b5f7a99d0654b5">details</a>)</li>
+        <li>Fix Regexp for parsing minisite_session, could break IE & FF downloads for password protected links (<a href="http://github.com/pydio/pydio-core/commit/8310ba41ba8a7046178859512d657a8560ba6fbc">details</a>)</li>
+        <li>Make sure that stream is correctly opened, otherwise it can fill the log with errors. (<a href="http://github.com/pydio/pydio-core/commit/cc545e5c4daeeb3817a64d00c18a16fd24cf54ea">details</a>)</li>
+        <li>Fix html base if set via SERVER_URL parameter (<a href="http://github.com/pydio/pydio-core/commit/8ea576330403763cea639ecf6ac1a892062fbdb2">details</a>)</li>
+        <li>Fix authentication on rest api (<a href="http://github.com/pydio/pydio-core/commit/77c8a1c5238f265f078a3488ed303159de007fe0">details</a>)</li>
+        <li>Missing translation on the first 3 fields of the create user dialog (via sharing). (<a href="http://github.com/pydio/pydio-core/commit/ccb2733ce4542abbe30f646a8d09d49a83605973">details</a>)</li>
+        <li>Fix root listing of webdav (accessing to /shares/) (<a href="http://github.com/pydio/pydio-core/commit/ae956dc9c4ad254391c81db0ecc6bb089463cc63">details</a>)</li>
+        <li>Add a parameter to open workspace by simple click in the home page. (<a href="http://github.com/pydio/pydio-core/commit/bc0cb95e2bad1828dbf56f64c32cbb1d017e8517">details</a>)</li>
+        <li>Make sure to xmlEntities() the CONF_MESSAGE and MIXIN_MESSAGE values as we are inside attributes. (<a href="http://github.com/pydio/pydio-core/commit/adcc9f581bf3e9ffa746d601775385800e067f29">details</a>)</li>
+        <li>Update share.php template (<a href="http://github.com/pydio/pydio-core/commit/0ee767795461f24a479fd9c5a902f99ce0670c94">details</a>)</li>
+    </ul>
+</div>
