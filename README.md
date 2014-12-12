@@ -6,8 +6,8 @@
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 5.2.3
-* Latest Dev release : 5.1.1 (was RC for Pydio 5.2.0)
+* Latest Stable release : 6.0.1
+* Latest Dev release : 5.3.4 (was RC4 for Pydio 6.0.0)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
 
