@@ -1,0 +1,13 @@
+Order Deny,Allow
+Allow from all
+<Files ".ajxp_*">
+deny from all
+</Files>
+
+RewriteEngine on
+RewriteBase /pydio-public
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
+RewriteRule ^([a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+RewriteRule ^([a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]

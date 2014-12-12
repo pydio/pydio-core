@@ -1,5 +1,5 @@
 # DOCKER-VERSION 0.xx
-# Pydio Version 5.2.5
+# Pydio Version 6.0.0
 FROM centos:centos6
 MAINTAINER team@pyd.io
 
@@ -12,6 +12,8 @@ ADD ./gencert /etc/gencert
 ADD ./pydio.conf /etc/pydio.conf
 ADD ./pre_conf_pydio.sh /etc/pre_conf_pydio.sh
 ADD ./configure_php_modules.sh /etc/configure_php_modules.sh
+ADD ./public.htaccess /etc/public.htaccess
+ADD ./root.htaccess /etc/root.htaccess
 
 RUN yum install -y wget
 RUN rpm -Uvh http://dl.ajaxplorer.info/repos/pydio-release-1-1.noarch.rpm
