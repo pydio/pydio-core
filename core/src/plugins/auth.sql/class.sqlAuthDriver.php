@@ -74,7 +74,7 @@ class sqlAuthDriver extends AbstractAuthDriver
             $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
-           return $pairs;
+        return $pairs;
     }
 
     public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){

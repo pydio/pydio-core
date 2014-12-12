@@ -32,13 +32,16 @@
             <action name="keystore_generate_auth_token">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken"/>
+                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken" developerComment="Generate and store a authentication key that can be used by the currently logged user. Used by SDKs talking to REST API to avoid renegociating basic auth on each query.">
+                        <input_param name="device" type="string"
+                                     description="A unique ID identifying the client connecting."/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="keystore_revoke_tokens">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="generateAuthToken"/>
+                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="revokeAuthToken" developerComment="Revoke current tokens for logged user."/>
                 </processing>
             </action>
         </actions>

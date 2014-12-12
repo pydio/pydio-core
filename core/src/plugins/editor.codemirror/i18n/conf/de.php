@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,7 +18,14 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
+/*******************************************************************************
+* German translation:
+*  	+ update: Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/ 
+
+/* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Source Viewer" => "Quelltext Betrachter",
-"Syntax Highlighter for all major code source files" => "Syntax Highlighter für alle wichtigen Quelltext-Dateien",
+"Source Viewer" => "Quelltext-Betrachter",
+"Syntax Highlighter for all major code source files" => "Syntax-Highlighter für alle unterstützten Quelltext-Dateien",
 );

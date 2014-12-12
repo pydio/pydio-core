@@ -52,10 +52,13 @@ class AudioPreviewer extends AJXP_Plugin
 
             $selection = new UserSelection($repository, $httpVars);
             // Backward compat
-            if(strpos($httpVars["file"], "base64encoded:") !== 0){
+            $file = $selection->getUniqueFile();
+            if(!file_exists($destStreamURL.$file) && strpos($httpVars["file"], "base64encoded:") === false){
+                // May be a backward compatibility problem, try to base64decode the filepath
                 $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
-            }else{
-                $file = $selection->getUniqueFile();
+                if(!file_exists($destStreamURL.$file)){
+                    throw new Exception("Cannot find file!");
+                }
             }
 
             $cType = "audio/".array_pop(explode(".", $file));

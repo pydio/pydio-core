@@ -31,6 +31,10 @@ function getRepName(fileName)
 	return fileName.substr(0, fileName.lastIndexOf("/"));
 }
 
+function getUrlFromBase(){
+    return $$('base')[0].href;
+}
+
 function getAjxpMimeType(item){
 	if(!item) return "";
 	if(Object.isHash(item)){

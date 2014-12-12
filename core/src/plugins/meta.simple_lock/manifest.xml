@@ -55,7 +55,10 @@
                         }
 					}
                     ]]></clientListener>
-                    <serverCallback methodName="applyChangeLock"/>
+                    <serverCallback methodName="applyChangeLock" restParams="/file+" developerComment="Lock/Unlock a file for usage by other users.">
+                        <input_param name="file" type="path" description="Path to the file to lock"/>
+                        <input_param name="unlock" type="boolean" description="If set to true, will unlock the file"/>
+                    </serverCallback>
                 </processing>
             </action>
         </actions>

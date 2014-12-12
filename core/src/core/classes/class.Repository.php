@@ -111,6 +111,9 @@ class Repository implements AjxpGroupPathProvider
     protected $groupPath;
 
 
+    /**
+     * @var AbstractAccessDriver
+     */
     public $driverInstance;
 
     /**

@@ -31,7 +31,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="search">
+					<serverCallback methodName="applyAction" restParams="/query" sdkMethodName="search" developerComment="Search the Lucene index">
                         <input_param description="Query term" name="query" type="string"/>
 					</serverCallback>
 				</processing>
@@ -41,7 +41,8 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="searchByKeyword">
+					<serverCallback methodName="applyAction" restParams="/field/query" sdkMethodName="searchByKeyword" developerComment="Search the Lucene on a specific document field">
+                        <input_param description="Lucene Keyword to search on" name="field" type="string"/>
                         <input_param description="Query term" name="query" type="string"/>
 					</serverCallback>
 				</processing>
@@ -51,7 +52,7 @@
                     write="false" adminOnly="false">
                 </rightsContext>
                 <processing>
-                    <serverCallback methodName="applyAction"/>
+                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkSearchIndexLock" developerComment="Check if the Lucene index is locked"/>
                 </processing>
             </action>
 			<action name="index">
@@ -74,7 +75,10 @@
 						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restParams="/dir+" developerComment="Re-index content of a given directory, recursively">
+                        <input_param name="dir" type="string" description="Base directory to index"/>
+                        <input_param name="verbose" type="boolean" description="Print out some info about indexation"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>

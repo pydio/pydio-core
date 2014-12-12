@@ -55,7 +55,7 @@ Class.create("ZohoEditor", AbstractEditor, {
 		this.setOnLoad(true);
 		this.currentNode = node;
 		var fName = this.currentNode.getPath();
-        this.contentMainContainer.src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_zohoserver&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
+        this.contentMainContainer.src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_zohoserver&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getUrlFromBase());
 		var pe = new PeriodicalExecuter(function(){
 			var href;
 			try{

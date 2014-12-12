@@ -165,6 +165,8 @@ Class.create("LogoWidget", AjxpPane, {
                 top         : imgTop + 'px',
                 left        : imgLeft + 'px'
             });
+            this.image.writeAttribute('width', '');
+            this.image.writeAttribute('height', '');
         }else{
             imgW = -3;
             imgH = 0;
@@ -180,18 +182,24 @@ Class.create("LogoWidget", AjxpPane, {
         }
         var htHeight = parseInt(this.htmlElement.getHeight());
 
+        var has_by = false;
         if(!configs.get('SKIP_BY_LOGO') && !this.imageIsDefault){
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
-                backgroundPosition : (imgW+16) + 'px '+ (htHeight - 16) +'px'
+                backgroundPosition : (imgW+16) + 'px '+ (htHeight - 18) +'px'
+            });
+            has_by = true;
+        }else{
+            this.htmlElement.setStyle({
+                backgroundImage : 'none'
             });
         }
         if(this.titleDiv){
             this.titleDiv.setStyle({
                 position:'absolute',
                 left : (imgW + 16) + 'px',
-                top : (htHeight - 39) + 'px',
+                top : (htHeight - (has_by?42:39)) + 'px',
                 fontSize : '19px'
             });
         }
@@ -203,7 +211,6 @@ Class.create("LogoWidget", AjxpPane, {
         if(this.htmlElement.down('div.linked')){
             this.htmlElement.down('div.linked').setStyle({height:htHeight+'px'});
         }
-
 
     }
 

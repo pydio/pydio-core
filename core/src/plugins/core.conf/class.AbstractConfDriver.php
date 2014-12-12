@@ -239,7 +239,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositories($user = null);
 
@@ -253,7 +253,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      *
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositoriesWithCriteria($criteria);
 
@@ -422,7 +422,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * @abstract
      * @param string $repositoryId
-     * @return array()
+     * @return AbstractAjxpUser[]
      */
     abstract public function getUsersForRepository($repositoryId);
 
@@ -431,7 +431,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param string $repositoryId
      * @param string $rolePrefix
      * @param bool $countOnly
-     * @return array()
+     * @return AJXP_Role[]
      */
     abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false);
     /**
@@ -1141,11 +1141,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($regexp == null && !$usersOnly) {
                     $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
+                $indexGroup = 0;
                 if (!$usersOnly && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            $indexGroup++;
                         }
+                        if($indexGroup == $limit) break;
                     }
                 }
                 if ($regexp == null && method_exists($this, "listUserTeams")) {
@@ -1263,6 +1266,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param $rolePrefix get all roles with prefix
      * @param $includeString get roles in this string
      * @param $excludeString eliminate roles in this string
+     * @param bool $byUserRoles
      * @return array
      */
     public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
@@ -1304,9 +1308,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
                     $roleObject = AuthService::getRole($roleId);
                     $label = $roleObject->getLabel();
-                    $label = !empty($label) ? $label : $roleId;
-
-                    $allRoles[$roleId] = substr($label, strlen($rolePrefix));
+                    $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
+                    $allRoles[$roleId] = $label;
                 }
             }
             return $allRoles;

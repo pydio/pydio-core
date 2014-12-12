@@ -9,6 +9,8 @@
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
+        <global_param name="SIMPLE_CLICK_WS_OPEN" type="boolean" label="CONF_MESSAGE[Open workspace by simple click]"
+                      description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
         <global_param name="ENABLE_GETTING_STARTED" type="boolean"
                       label="Enable Getting Started" description="Enable addition tabulation to access getting started videos" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
@@ -180,23 +182,23 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/C6L_9QT0lDE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
+                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/80kq-T6bQO4?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.62]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/C6L_9QT0lDE/0.jpg"></iframe>
+                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg"></iframe>
 
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/Nj3d0AXfJXI?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
+                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.63]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/Nj3d0AXfJXI/0.jpg"></iframe>
+                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg"></iframe>
 
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
+                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.64]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/1o62QF_ATYA/0.jpg"></iframe>
+                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg"></iframe>
 
                             <div class="tutorial_legend" src="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.66]

@@ -1,0 +1,54 @@
+<div style='font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 12px;'>
+
+    <h2>Pydio 5.2.4</h2>
+    <p>This is a security release, upgrade is highly recommended. It also includes bugfixes picked from develop branch.</p>
+
+    <ul>
+        <li><b>Date</b>: 17th, Oct. 2014</li>
+        <li><b>License</b>: Affero GPL</li>
+        <li><b>Copyright</b>: Charles du Jeu 2014</li>
+        <li><b>Demo</b>: <a target="_blank" href="https://demo.pyd.io/">https://demo.pyd.io/</a></li>
+        <li>Contributors: Cdujeu, Signalwerk, Ellega, StephanHuber, c12simple, JohnRegan, SMandon</li>
+        <li><b>Upgrade</b>: In-app upgrade or Linux yum/apt</li>
+    </ul>
+
+    <h2>Bugfixes</h2>
+    <ul>
+        <li>Handle a path filter on the changes feed to synchronize only a subfolder (<a href="http://github.com/pydio/pydio-core/commit/e3b580c12f0eea88733634ed63e2bdb378bdc06f">details</a>)</li>
+        <li>Add the missing German translation (<a href="http://github.com/pydio/pydio-core/commit/771ba86c5591c4bf33b9dbbc147dacd7508db4d9">details</a>)</li>
+        <li>Make sure to update $lastSeq if we "continue" the loop (<a href="http://github.com/pydio/pydio-core/commit/0ea7b2d032f8e26f7ef7249a3d5c37c26c4ddc08">details</a>)</li>
+        <li>Make sure the like $filter expression ends up with a slash, otherwise it can take files beginning with the same prefix. (<a href="http://github.com/pydio/pydio-core/commit/5f8f7a07817d76c3b6df5f71cf7a783b8c1a02a9">details</a>)</li>
+        <li>Update CLA link (<a href="http://github.com/pydio/pydio-core/commit/aa2f79fc7470776c14bd1fbf3fb28e7eada9e55d">details</a>)</li>
+        <li>smb.php with Windows OS (<a href="http://github.com/pydio/pydio-core/commit/f77a9e5af93cd0c78fb2a9085b60b43259106c8d">details</a>)</li>
+        <li>Update README.md (<a href="http://github.com/pydio/pydio-core/commit/fd7e23d38fc56325bc152d1d63ac8b1f7829350c">details</a>)</li>
+        <li>Remove scrutinizer badge it's too depressing. (<a href="http://github.com/pydio/pydio-core/commit/7c4e34cb41eaa4b8d60238c8c582a5ef06d752c0">details</a>)</li>
+        <li>Add Docker folder (<a href="http://github.com/pydio/pydio-core/commit/78f2aa496a58398ad764a36793c9ca524fa91634">details</a>)</li>
+        <li>Create configure_php_modules.sh (<a href="http://github.com/pydio/pydio-core/commit/896b1fde1d754e59c462b810df9721450273746c">details</a>)</li>
+        <li>Adding options for separate client/server websocket settings (<a href="http://github.com/pydio/pydio-core/commit/83467fb36781ddb35cc76955b0794d2ff17cdb63">details</a>)</li>
+        <li>smb.php don't work with lot of files or folders if "Windows OS" (<a href="http://github.com/pydio/pydio-core/commit/80a3f6f630eaac36c38e82b06c671afa9c807c9b">details</a>)</li>
+        <li>SSL detection correction (<a href="http://github.com/pydio/pydio-core/commit/ef4d9a2c4fff8c49c59b76c57fbaaa878247a854">details</a>)</li>
+        <li>New action test_upgrade_scripts to ease production (cherry picked from commit a75f9a4) (<a href="http://github.com/pydio/pydio-core/commit/92dd1f15e6e05bdbcc42b48c5a07e41012d6aeca">details</a>)</li>
+        <li>Fix WebODF file sanitization (cherry picked from commit bd1cd3f) (<a href="http://github.com/pydio/pydio-core/commit/26699af7b7bd8664885897b2d3d688e0c38b7cff">details</a>)</li>
+        <li>Pixlr have changed their domain to apps.pixlr.com - Fix #500 (cherry picked from commit 5a0187e) (<a href="http://github.com/pydio/pydio-core/commit/7982e5b09b3a0166c7e5f907b80270fa36667601">details</a>)</li>
+        <li>Update SabreDAV to 1.8.10 (cherry picked from commit bbc1137) (<a href="http://github.com/pydio/pydio-core/commit/eae0c6d9afda1159340c5d5c71b4daddc6a62911">details</a>)</li>
+        <li>Fix #629: false negative alert when moving a file to another workspace with same folder path (cherry picked from commit 5b1a77f) (<a href="http://github.com/pydio/pydio-core/commit/17029bbb2f5af8a4f4c0cf8155afd95977250259">details</a>)</li>
+        <li>Strengthen meta.mount security by passing the password via environment variable instead of the command line. Still an optional parameter as upgrading will require changing sudo file as well. (cherry picked from commit 5449444) (<a href="http://github.com/pydio/pydio-core/commit/7b53f5406d94b92538163342e59e8becaeb9a1ae">details</a>)</li>
+        <li>ActivityMonitor: cap the intervalue by max 32bit integer to avoid GUI hanging if php session.gc_maxlifetime is too big. Should fix #639 (cherry picked from commit 6fefa80) (<a href="http://github.com/pydio/pydio-core/commit/985883e2ed6585df9412dc658514360fde2d3f1b">details</a>)</li>
+        <li>Add author to the Git commit command, otherwise it can prevent auto-commit (cherry picked from commit 50fa673) (<a href="http://github.com/pydio/pydio-core/commit/683f12f4fd128e4e6c12e8ac4ca7830b76302b00">details</a>)</li>
+        <li>Fix error moving files between different wrapper (cherry picked from commit 5025634) (<a href="http://github.com/pydio/pydio-core/commit/7d093092c74d004e65b1a7143ef1666214e80e96">details</a>)</li>
+        <li>Set update site to https (cherry picked from commit 2d63ac6) (<a href="http://github.com/pydio/pydio-core/commit/9efdeaf7b7040f4e668057c349b61158c08d108a">details</a>)</li>
+        <li>Fix apache pydio.conf for RPM (cherry picked from commit 14cdc03) (<a href="http://github.com/pydio/pydio-core/commit/f2399166040ea607a3bdfb1a78a13fc1efe5e131">details</a>)</li>
+        <li>Typo in SQL UpgradeDB step. Probably non-functionnal in 5.2.3 ! (cherry picked from commit a85eef4) (<a href="http://github.com/pydio/pydio-core/commit/e0f7194d9b88996c3e83b9c7c6bee79f59d2fd20">details</a>)</li>
+        <li>Fix radio button problem in Role Editor (cherry picked from commit cdcc459) (<a href="http://github.com/pydio/pydio-core/commit/69965d95a9d03a4640bf24673af5a145630d7c50">details</a>)</li>
+        <li>Fix WebDAV enabler & password form (close #556) (cherry picked from commit 5e78246) (<a href="http://github.com/pydio/pydio-core/commit/9803dc13f90c3c3875caca581dd2dd191bd4caee">details</a>)</li>
+        <li>Allow WS creation on read-only FS if option CREATE is not set. (cherry picked from commit ca130b5) (<a href="http://github.com/pydio/pydio-core/commit/a0ec6bca21bdc06ffc80ac6e37094cb8582b8630">details</a>)</li>
+        <li>Silently delete failing alert to avoid filling error logs (cherry picked from commit 357805d) (<a href="http://github.com/pydio/pydio-core/commit/51e974115826c136e6ed7d42a6f4e705bea63e55">details</a>)</li>
+        <li>Fix Session Credentials & WebDAV Basic Auth (cherry picked from commit 0552dfd) (<a href="http://github.com/pydio/pydio-core/commit/83cf2149bb726e1394e6efb0d27f34a48f9d3f8f">details</a>)</li>
+        <li>[edito.pixlr] Fix #500, properly close editor tab after saving (cherry picked from commit 85260f5) (<a href="http://github.com/pydio/pydio-core/commit/5c58d3fbb8baef8140a8d15409132bc7c611e401">details</a>)</li>
+        <li>core.mailer: Make sure to add a typed email to the list of "to", if people don't explicitely click on the auto-complete list. (cherry picked from commit 9581bf0) (<a href="http://github.com/pydio/pydio-core/commit/b566e2384544fcfabe5489894258244f0161f117">details</a>)</li>
+        <li>Update CONTRIBUTING.md (cherry picked from commit 77ce3d6) (<a href="http://github.com/pydio/pydio-core/commit/e1d877cb1f424401e9bbff603d883080dc0c0a18">details</a>)</li>
+        <li>Disable saveState on Tabulator (<a href="http://github.com/pydio/pydio-core/commit/d9df19f853e26a6c6db62c1f80211ec491f0bdd9">details</a>)</li>
+        <li>Fix IE9 error in FilesList (<a href="http://github.com/pydio/pydio-core/commit/b8cd94b50d0e285f6262792de53edb92253a236d">details</a>)</li>
+        <li>Fix IE11 carriage return not working in Text Editor (<a href="http://github.com/pydio/pydio-core/commit/8e745141d218a550aecc497fe3674f51a75b0c36">details</a>)</li>
+    </ul>
+</div>

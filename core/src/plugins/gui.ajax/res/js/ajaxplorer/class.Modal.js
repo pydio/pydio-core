@@ -50,9 +50,7 @@ Class.create("Modal", {
 		this.htmlElement = $(this.elementName);
 		this.dialogTitle = this.htmlElement.down(".dialogTitle");
 		this.dialogContent = this.htmlElement.down(".dialogContent");
-		this.currentForm;
 		this.cachedForms = new Hash();
-		this.iframeIndex = 0;	
 	},
 	
 	/**
@@ -300,11 +298,9 @@ Class.create("Modal", {
 		// FORCE FIXED FOR FIREFOX
 		if (Prototype.Browser.Gecko){					
 			$(elementName).style.position = 'fixed';
-		}
-		else if(Prototype.Browser.IE){
-			$$('select').invoke('show');
-			// REFRESH PNG IMAGES FOR IE!
-			refreshPNGImages(this.dialogContent);			
+		} else if(Prototype.Browser.IE && !Prototype.Browser.IE10plus){
+			$(elementName).select('select').invoke('show');
+			refreshPNGImages(this.dialogContent);
 		}
 
         if(this.currentResizeListener) this.currentResizeListener();
@@ -702,7 +698,9 @@ Class.create("Modal", {
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
         if(this.messageDivOpen){
-            this.messageContent.insert('<br>' + message);
+            if(!this.messageContent.innerHTML.contains(message)){
+                this.messageContent.insert('<br>' + message);
+            }
             this.tempoMessageDivClosing();
             return;
         }else{

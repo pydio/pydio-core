@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,12 +18,17 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+/*******************************************************************************
+* German translation:
+*  	+ update: Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/  
+
 $mess=array(
-    "1" => "Passwort zurücksetzen",
+    "1" => "Passwort zur&uuml;cksetzen",
     "2" => "Neues Passwort setzen",
-    "3" => "Please enter your login, a reset password will be sent to you by email.",
-    "4" => "Your identifier",
-    "5" => "A reset password request has been sent to the email registered with your account. Click on the link in the email to recreate a password.",
-    "6" => "Vielen Dank, Sie können sich jetzt einloggen!",
-    "7" => "A password reset has been requested on the account associated to this email address. If you are not the author of this request, you can safely ignore this email. Otherwise click on the following link to reset your password:",
+    "3" => "Bitte geben Sie Ihren Benutzernamen ein.<br/>Via E-Mail wird Ihnen einen Link f&uuml;r die Vergabe eines neuen Passwortes zugeschickt.",
+    "4" => "Ihr Benutzername",
+    "5" => "F&uuml;r Ihr Konto wurde Ihnen via E-Mail ein Link zugestellt. F&uuml;r das Erstellen eines neues Passwortes klicken Sie dann auf den Link.",
+    "6" => "Vielen Dank. Sie k&ouml;nnen sich jetzt anmelden.",
+    "7" => "Für das Konto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes erhalten. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie dieses E-Mail ignorieren. Ansonsten klicken Sie um Ihr Passwort zurückzusetzen auf diesen Link:", /* No HTML entities, might be the body of the mail */
 );

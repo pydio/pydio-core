@@ -89,3 +89,9 @@ CREATE TABLE ajxp_user_teams (
     owner_id varchar(255) NOT NULL,
     PRIMARY KEY(team_id, user_id)
 );
+
+CREATE TABLE ajxp_version (
+  db_build INT NOT NULL
+);
+
+INSERT INTO ajxp_version VALUES (0);

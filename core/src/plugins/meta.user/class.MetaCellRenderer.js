@@ -57,13 +57,20 @@ Class.create("MetaCellRenderer", {
             }
         }
         values = MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName);
-        if((type == 'row' || type == 'detail') && element != null){
+        var nodeMetaValue = ajxpNode.getMetadata().get(metadataDef.attributeName) || '';
+        if(nodeMetaValue){
+            nodeMetaValue = $H(values).keys().indexOf(nodeMetaValue);
+        }else{
+            nodeMetaValue = -1;
+        }
+        if(element != null){
             if(type == 'row'){
                 if(values[element.down('.text_label').innerHTML.stripTags()]){
                     element.down('.text_label').update(values[element.down('.text_label').innerHTML.stripTags()]);
                 }
+                element.writeAttribute("data-sorter_value", nodeMetaValue);
             }else{
-
+                element.writeAttribute("data-"+metadataDef.attributeName+"-sorter_value", nodeMetaValue);
             }
         }
     },
@@ -127,9 +134,9 @@ Class.create("MetaCellRenderer", {
             if(content){
                 obj = new MetaCellRenderer();
                 rule = obj.findCssRule(content.strip());
-                if(rule && element.up('div')){
-                    element.up('div').addClassName(rule.cssClass);
-                    element.up('div').writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
+                if(rule && element){
+                    element.addClassName(rule.cssClass);
+                    element.writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
                 }
             }
 

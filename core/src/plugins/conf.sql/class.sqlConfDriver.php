@@ -457,7 +457,7 @@ class sqlConfDriver extends AbstractConfDriver
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
@@ -540,7 +540,7 @@ class sqlConfDriver extends AbstractConfDriver
                 }
                 break;
             default:
-                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
@@ -551,6 +551,16 @@ class sqlConfDriver extends AbstractConfDriver
         return $allRoles;
     }
 
+
+    public function getUsersForRole($roleId, $countOnly = false){
+        if($countOnly){
+            $res =  dibi::query("SELECT count([login]) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
+            return $res->fetchSingle();
+        }else{
+            $res =  dibi::query("SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
+            return $res->fetchAll();
+        }
+    }
 
     /**
      * @param string $repositoryId
@@ -568,6 +578,14 @@ class sqlConfDriver extends AbstractConfDriver
             if($details) return array('internal' => $groupUsers);
             else return $groupUsers;
         }
+        // Users from roles
+        $internal = 0;
+        $roles = $this->getRolesForRepository($repositoryId);
+        foreach($roles as $rId){
+            if(strpos($rId, "AJXP_USR_/") === 0) continue;
+            $internal += $this->getUsersForRole($rId, true);
+        }
+
         // NEW METHOD : SEARCH PERSONAL ROLE
         if(is_numeric($repositoryId)){
             $likeValue = "i:$repositoryId;s:";
@@ -584,7 +602,7 @@ class sqlConfDriver extends AbstractConfDriver
                 $q = 'SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [serial_role] LIKE %~like~';
                 break;
             default:
-                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
         if($details){
             if($this->sqlDriver["driver"] == "sqlite" || $this->sqlDriver["driver"] == "sqlite3"){
@@ -597,12 +615,12 @@ class sqlConfDriver extends AbstractConfDriver
             $intRes = dibi::query($q.$internalClause, $likeValue);
             $extRes = dibi::query($q.$externalClause, $likeValue);
             return array(
-                'internal' => $intRes->fetchSingle(),
+                'internal' => $internal + $intRes->fetchSingle(),
                 'external' => $extRes->fetchSingle()
             );
         }else{
             $res = dibi::query($q, $likeValue);
-            return $res->fetchSingle();
+            return $internal + $res->fetchSingle();
 
         }
         //$all = $res->fetchAll();
@@ -679,7 +697,7 @@ class sqlConfDriver extends AbstractConfDriver
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $roleId, serialize($roleObject));
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
             }
         }
     }
@@ -689,18 +707,25 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function updateRole($role, $userObject = null)
     {
-        dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
+        // if role is not existed => insert into
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
             case "sqlite3":
             case "postgre":
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), serialize($role->listAcls()));
+                $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
+                $res = $row->fetchSingle();
+                if($res != null){
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), $role->getId());
+                }
+                else{
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), serialize($role->listAcls()));
+                }
                 break;
             case "mysql":
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $role->getId(), serialize($role));
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role])", $role->getId(), serialize($role));
                 break;
             default:
-                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
     }
 
@@ -1018,7 +1043,15 @@ class sqlConfDriver extends AbstractConfDriver
     public function installSQLTables($param)
     {
         $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $res = AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        // SET DB VERSION
+        if(defined('AJXP_VERSION_DB') && AJXP_VERSION_DB != "##DB_VERSION##"){
+            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+            dibi::connect($p);
+            dibi::query("UPDATE [ajxp_version] SET [db_build]=%i", intval(AJXP_VERSION_DB));
+            dibi::disconnect();
+        }
+        return $res;
     }
 
     public function supportsUserTeams()

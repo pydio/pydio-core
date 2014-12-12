@@ -644,6 +644,7 @@ Class.create("ShareCenter", {
 
         oRow.down('[name="link_url"]').setValue(linkData["publiclet_link"]);
         oRow.down('[name="link_tag"]').setValue('');
+        /*
         var actions = oRow.down('.SF_horizontal_actions');
         if(linkData['has_password']){
             actions.insert({top:new Element('span', {className:'icon-key simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update(' '+MessageHash["share_center.84"])});
@@ -671,7 +672,7 @@ Class.create("ShareCenter", {
                 conn.sendAsync();
             }
         }.bind(this));
-
+        */
         oRow.down('[data-action="remove"]').observe("click", function(){
             this.performUnshareAction(linkData['element_id'], oRow);
         }.bind(this));
@@ -682,6 +683,9 @@ Class.create("ShareCenter", {
 
         if(linkData['tags']){
             oRow.down('[name="link_tag"]').setValue(linkData['tags']);
+        }
+        if(linkData['is_expired']){
+            oRow.addClassName('share_expired');
         }
         oRow.down('[name="link_tag"]').observe("keydown", function(event){
             if(event.keyCode == Event.KEY_RETURN){
@@ -773,18 +777,6 @@ Class.create("ShareCenter", {
                     }.bind(this));
 
                 }
-                /*
-                this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_EXPIRATION"));
-                if(this.maxexpiration > 0){
-                    oForm.down("[name='expiration']").setValue(this.maxexpiration);
-                }
-                this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_DOWNLOAD"));
-                if(this.maxdownload > 0){
-                    oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
-                }
-                var button = $(oForm).down('#generate_publiclet');
-                button.observe("click", this.generatePublicLinkCallback.bind(this));
-                */
             }.bind(this),
             function(oForm){
                 oForm.down('#generate_publiclet').stopObserving("click");
@@ -817,8 +809,9 @@ Class.create("ShareCenter", {
                 if(!jsonData) return ;
                 var linksCount = jsonData.length;
                 jsonData = jsonData[0];
+                var linkExpired = jsonData['is_expired']?true:false;
                 var directLink = "";
-                if(!jsonData.has_password){
+                if(!jsonData['has_password'] && !jsonData['is_expired']){
                     var shortlink = jsonData.publiclet_link + (jsonData.publiclet_link.indexOf('?') !== -1 ? '&' : '?') + 'dl=true';
                     directLink += '\
                     <div class="infoPanelRow">\
@@ -848,9 +841,10 @@ Class.create("ShareCenter", {
                 }
 
                 container.down('#ajxp_shared_info_panel .infoPanelTable').update('\
+                    <div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ '</div>\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
-                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" class="'+(jsonData['is_expired']?'share_info_panel_link_expired':'')+'" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
                     </div>'+directLink+'\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.51']+'</div>\
@@ -882,7 +876,7 @@ Class.create("ShareCenter", {
                 }
                 if(node.isLeaf()){
                     // LEAF SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ '. ' + pwdProtected + '</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ ' ' + pwdProtected + '</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.121']+'</div>\
                             <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\

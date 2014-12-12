@@ -82,3 +82,9 @@ CREATE TABLE IF NOT EXISTS ajxp_user_teams (
     team_label text NOT NULL,
     owner_id text NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS ajxp_version (
+  db_build INT NOT NULL
+);
+
+INSERT INTO ajxp_version VALUES (0);

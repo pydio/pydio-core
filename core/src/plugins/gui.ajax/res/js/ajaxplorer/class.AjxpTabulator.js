@@ -22,6 +22,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     tabulatorData: null,
     tabsConfigs: null,
+    _eventPath: null,
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -444,6 +445,14 @@ Class.create("AjxpTabulator", AjxpPane, {
         this.notify("switch", tabId);
 
 	},
+
+    switchToFirstIfPathDiffers: function(event){
+        var cNode = event.memo;
+        if(this._eventPath && cNode.getPath() != this._eventPath){
+            this.switchTabulator(this.tabulatorData.first().id);
+        }
+        this._eventPath = cNode.getPath();
+    },
 
 	/**
 	 * Resizes the widget

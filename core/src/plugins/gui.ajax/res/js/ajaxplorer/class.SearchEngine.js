@@ -330,7 +330,10 @@ Class.create("SearchEngine", AjxpPane, {
 		this._queue = $A();
 		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
-
+        var groupByData = 'mimestring_id';
+        if(this.options['groupByData'] !== undefined){
+            groupByData = this.options['groupByData'];
+        }
 
         this._fileList = new FilesList($(this._resultsBoxId), {
             dataModel:this._dataModel,
@@ -339,7 +342,7 @@ Class.create("SearchEngine", AjxpPane, {
                 {attributeName:"filename", messageString:'Path', sortType:'String'},
                 {attributeName:"mimestring_id", messageString:'Type', sortType:'String'}
             ],
-            groupByData:'mimestring_id',
+            groupByData:groupByData,
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
             defaultSortTypes:["String", "String", "String"],

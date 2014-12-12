@@ -597,8 +597,8 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        if(!ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS")){
-            foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
+        if(ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS") !== true){
+            foreach (ConfService::getRepositoriesList("all") as $repoId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
                 if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
                 $adminUser->personalRole->setAcl($repoId, "rw");
@@ -607,6 +607,7 @@ class AuthService
             $adminUser->save("superuser");
         }else if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
             $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
+            $adminUser->recomputeMergedRole();
             $adminUser->save("superuser");
         }
         return $adminUser;
@@ -975,7 +976,7 @@ class AuthService
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
             $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
-            $paginated = true;
+            $paginated = ($offset != -1 || $limit != -1);
         } else {
             $users = $authDriver->listUsers($baseGroup);
         }
