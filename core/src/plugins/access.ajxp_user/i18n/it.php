@@ -20,7 +20,7 @@
  */
 $mess=array(
 "title"=> "Bacheca",
-"desc" => "Modifica le impostazioni dell'account, della ribrica, degli elementi condivisi ecc.",
+"desc" => "Modifica le impostazioni dell'account, della rubrica, degli elementi condivisi ecc.",
 "1" => "Rubrica",
 "2" => "Cartelle condivise",
 "3" => "File condivisi",
