@@ -21,7 +21,7 @@
 $mess=array(
 "MQ SQL" => "SQL-Warteschlange",
 "Store persistant and worker queues in database" => "Speichert Nachrichten-Warteschlangen in eine Datenbank",
-"Install SQL Tables" => "SQL Tabellen installieren",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 "SQL Tables" => "SQL-Tabellen",
 "SQL Driver" => "SQL-Treiber",
 "SQL Connexion Parameters" => "Parameter für die SQL-Verbindung",
