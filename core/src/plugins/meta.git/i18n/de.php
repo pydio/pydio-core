@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 $mess = array(
     "1" => "Versionen",
-    "2" => "Vorherige Versionen",
+    "2" => "Ältere Versionen des Elements", // Do not use html here
     "3" => "Herunterladen",
     "4" => "Ausgewählte Version herunterladen",
     "5" => "Vorschau (Browser)",
@@ -33,8 +33,8 @@ $mess = array(
     "9" => "#",
     "10" => "Datum",
     "11" => "Autor",
-    "12" => "Änderung",
-    "13" => "Wenn Sie zum alten Stand zurückkehren wird eine neue Version mit dem ausgewählten Stand des Dokuments erstellt. Soll diese Änderung durchgeführt werden?",
+    "12" => "&Auml;nderung",
+    "13" => "Wenn Sie zum alten Stand zurückkehren wird eine neue Version mit dem ausgewählten Stand des Dokuments erstellt. Soll diese Änderung durchgeführt werden?", // Do not use html here
     "RENAME"        => "Datei umbenannt",
     "MOVE"          => "Datei verschoben",
     "MODIFICATION"  => "Inhalt bearbeitet",
