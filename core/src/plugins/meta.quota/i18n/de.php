@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Speicherverbrauch (Lädt gerade...)",
+"1" => "Speicherverbrauch (lädt...)",
 "2" => "Speicherverbrauch neu ermitteln",
-"3" => "Speicherplatz für Benutzer überschritten",
+"3" => "Speicherlimit für Benutzer überschritten",
 "4" => "Speicherverbrauch",
 );
