@@ -21,8 +21,8 @@
 $mess=array(
 "FS Mount" => "Dateisystem einbinden",
 "Mount a remote location on the file system before accessing the repository" => "Dateisystem einbinden, bevor auf die Arbeitsumgebung zugegriffen wird",
-"FS Type" => "Typ des Dateisystems",
-"Filesystem Type, will be used for the -t option of the mount command" => "Typ des Dateisystems, der beim Mount-Befehl mit dem Parameter -t angegeben wird.",
+"FS Type" => "Art des Dateisystems",
+"Filesystem Type, will be used for the -t option of the mount command" => "Art des Dateisystems, die beim Mount-Befehl mit dem Parameter -t angegeben wird.",
 "Sudo" => "Sudo",
 "Call the mount/umount commands through sudo, must be configured on the server" => "Ruft den mount/umount Befehl mit sudo auf. (Muss auf dem Server konfiguriert sein)",
 "Remote Path" => "Netzwerkpfad zur Freigabe",
@@ -31,4 +31,6 @@ $mess=array(
 "Mount Path, use AJXP_USER" => "Ordner, auf den die Freigabe gemountet wird (benutzbare Variablen: AJXP_USER)",
 "Mount Options" => "Einhängoptionen",
 "Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID" => "Wird mit dem Parameter -o verwendet (benutzbare Variablen: AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID)",
+"Pass Password via environment instead of command line" => "Passwort über Umgebungsvariable statt Kommandozeile",
+"Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly." => "Statt das Passwort durch die AJXP_PASS-Variable an die Mount-Optionen anzuhängen wird es über eine Umgebungsvariable gesetzt. Sudo-Datei muss entsprechend angepasst werden.",
 );
