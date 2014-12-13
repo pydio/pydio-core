@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Subversion Repository" => "Subversion Repository",
-"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Informationen aus Subversion abrufen (Versionen, Änderungsprotokolle, etc) wenn die Arbeitsumgebung ein Repository ist und SVN über die Kommandozeile aufgerufen werden kann.",
+"Subversion Repository" => "Subversion-Repository",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Informationen aus einem Subversion-Repository abrufen (z.B. Versionen, Änderungsprotokolle, etc). Erfordert, dass SVN über die Kommandozeile aufgerufen werden kann.",
 );
