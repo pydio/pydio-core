@@ -19,6 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Comments Feed" => "Kommentar Feed",
-"Display a chat-like feed on all nodes" => "Zeigt einen Chat ähnlichen feed an",
+"Comments Feed" => "Kommentare",
+"Display a chat-like feed on all nodes" => "Kommentare zu Elementen hinzufügen und im Info-Bereich anzeigen",
+"Comment limit" => "Maximale Länge",
+"Maximum number of characters for each comment" => "Maximale Anzahl der Zeichen pro Kommentar",
 );
