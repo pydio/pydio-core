@@ -19,8 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Lucene Search Engine" => "Lucene Search Engine",
-"Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene implementation to index all files and search a whole workspace quickly.",
+"ElasticSearch Search Engine" => "ElasticSearch Search Engine",
+"ElasticSearch implementation to index all files and search a whole repository quickly." => "ElasticSearch implementation to index all files and search a whole repository quickly.",
+"Max results displayed" => "Max results displayed",
+"Set the maximum results that will be displayed." => "Set the maximum results that will be displayed.",
 "Index Content" => "Index Content",
 "Parses the file when possible and index its content (see plugin global options)" => "Parses the file when possible and index its content (see plugin global options)",
 "Index Meta Fields" => "Index Meta Fields",
@@ -33,10 +35,6 @@ $mess=array(
 "List of extensions to consider as HTML file and parse content" => "List of extensions to consider as HTML file and parse content",
 "Text files" => "Text files",
 "List of extensions to consider as Text file and parse content" => "List of extensions to consider as Text file and parse content",
-"ElasticSearch Search Engine" => "ElasticSearch Search Engine",
-"ElasticSearch implementation to index all files and search a whole repository quickly." => "ElasticSearch implementation to index all files and search a whole repository quickly.",
-"Max results displayed" => "Max results displayed",
-"Set the maximum results that will be displayed." => "Set the maximum results that will be displayed.",
 "Unoconv Path" => "Unoconv Path",
 "Full path on the server to the 'unoconv' binary" => "Full path on the server to the 'unoconv' binary",
 "PdftoText Path" => "PdftoText Path",
@@ -45,4 +43,6 @@ $mess=array(
 "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension." => "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension.",
 "Wildcard limitation" => "Wildcard limitation",
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases.",
+"Auto-Wildcard" => "Auto-Wildcard",
+"Automatically append a * after the user query to make the search broader" => "Automatically append a * after the user query to make the search broader",
 );

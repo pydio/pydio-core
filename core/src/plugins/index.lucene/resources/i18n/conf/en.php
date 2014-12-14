@@ -41,4 +41,6 @@ $mess=array(
 "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension." => "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension.",
 "Wildcard limitation" => "Wildcard limitation",
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases.",
+"Auto-Wildcard" => "Auto-Wildcard",
+"Automatically append a * after the user query to make the search broader" => "Automatically append a * after the user query to make the search broader",
 );
