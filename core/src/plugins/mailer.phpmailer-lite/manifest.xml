@@ -2,8 +2,13 @@
 <ajxp_plugin id="mailer.phpmailer-lite" enabled="true" label="CONF_MESSAGE[PHPMailer-lite]" description="CONF_MESSAGE[A simple mailer]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
-        <param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="CONF_MESSAGE[Mailer]" description="CONF_MESSAGE[Php mailer to use (see phpmail-lite documentation).'.]" mandatory="true" default="sendmail"/>
+        <param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="CONF_MESSAGE[Mailer]" description="CONF_MESSAGE[Php mailer to use (see phpmail-lite documentation).]" mandatory="true" default="sendmail"/>
         <param name="SENDMAIL_PATH" type="string" label="CONF_MESSAGE[Sendmail Path]" description="CONF_MESSAGE[Path to sendmail if not the default one]" mandatory="true" default="/usr/sbin/sendmail"/>
     </server_settings>
-	<class_definition filename="plugins/mailer.phpmailer-lite/class.PhpMailLiteMailer.php" classname="PhpMailLiteMailer"/>
+    <class_definition filename="plugins/mailer.phpmailer-lite/class.PhpMailLiteMailer.php" classname="PhpMailLiteMailer"/>
+    <client_settings>
+	<resources>
+	    <i18n namespace="mailer.phpmailer-lite" path="plugins/mailer.phpmailer-lite/i18n" />
+	</resources>
+    </client_settings>
 </ajxp_plugin>
