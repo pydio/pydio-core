@@ -19,6 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"File Hasher" => "Datei Hashes",
-"Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Berechnet bei Bedarf einen Hash des Dateiinhalts und speichert diesen in einem Speicher für Metadaten (wenn konfiguriert)",
+"File Hasher" => "Datei-Hashes",
+"Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Berechnet bei Bedarf einen Hash des Dateiinhalts und speichert diesen in den Metadaten. (wenn konfiguriert)",
+"Rsync Support" => "Rsync-Unterstützung",
+"Cache full tree" => "XML-Baum puffern",
+"Cache XML tree and invalidate on node change" => "Speichert die XML-Baumstruktur zwichen. Beim Ändern eines XML-Knotens wird der Zwischenspeicher neu aufgebaut.",
+"Dont edit, it will be detected by the server" => "Nicht ändern, wird vom Server automatisch erkannt!",
 );

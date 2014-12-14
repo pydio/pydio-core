@@ -3,8 +3,8 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.filehasher/class.FileHasher.php" classname="FileHasher"/>
     <server_settings>
-        <param name="CACHE_XML_TREE" type="boolean" default="false" label="Cache full tree" description="Cache XML tree and invalidate on node change"/>
-        <global_param name="RSYNC_SUPPORTED" type="boolean" label="Rsync Support" description="Don't edit, it will be detected by the server" expose="true"/>
+        <param name="CACHE_XML_TREE" type="boolean" default="false" label="CONF_MESSAGE[Cache full tree]" description="CONF_MESSAGE[Cache XML tree and invalidate on node change]"/>
+        <global_param name="RSYNC_SUPPORTED" type="boolean" label="CONF_MESSAGE[Rsync Support]" description="CONF_MESSAGE[Dont edit, it will be detected by the server]" expose="true"/>
     </server_settings>
    	<client_settings>
    		<resources>
