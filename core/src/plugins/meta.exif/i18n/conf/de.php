@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Exif Metadata" => "Exif Metadaten",
-"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extrahiert die EXIF Metadaten aus JPG-Bildern. In Verbindung mit editor.exif verwendet",
-"Info Panel Fields" => "Felder im Info-Bereich",
-"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Kommagetrennte Liste von Feldern. Verwendete Syntax: 'EXIF_SECTION.ExifName'.",
-"Info Panel Labels" => "Titel im Info-Bereich",
-"Associated list of labels, be sure to define as many as fields!" => "Kommagetrennte Liste von Titeln. Zu jedem Metafeld muss es einen Titel geben!",
+"Exif Metadata" => "Exif-Metadaten",
+"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extrahiert die EXIF-Metadaten aus JPG-Bildern. In Verbindung mit editor.exif verwendet.",
+"Info Panel Fields" => "Exif-Felder im Info-Bereich",
+"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Durch Komma getrennte Liste mit Exif-Feldnamen. Verwendete Syntax: 'EXIF_SECTION.ExifName'.",
+"Info Panel Labels" => "Titel der Felder im Info-Bereich",
+"Associated list of labels, be sure to define as many as fields!" => "Durch Komma getrennte Liste mit den Titeln der einzelnen Exif-Felder. Zu jedem Exif-Feld muss es einen Titel geben!",
 );
