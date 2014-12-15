@@ -7,4 +7,9 @@
                       type="group_switch:dibi" mandatory="true"/>
         <param type="button" name="INSTALL_SQL" choices="run_plugin_action:feed.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
     </server_settings>
+    <client_settings>
+        <resources>
+            <i18n namespace="feed.sql" path="plugins/feed.sql/i18n"/>
+        </resources>
+    </client_settings>
 </ajxp_plugin>
