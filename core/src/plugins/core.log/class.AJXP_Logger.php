@@ -294,7 +294,7 @@ class AJXP_Logger extends AJXP_Plugin
     {
         if (!isset(self::$loggerInstance)) {
             $p = AJXP_PluginsService::findPlugin("core", "log");
-            $p->init(array());
+            if(is_object($p)) $p->init(array());
         }
         return self::$loggerInstance;
     }
