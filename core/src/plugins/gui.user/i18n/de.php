@@ -24,7 +24,7 @@
 *******************************************************************************/  
 
 $mess=array(
-    "1" => "Passwort zur&uuml;cksetzen",
+    "1" => "Passwort zurücksetzen",
     "2" => "Neues Passwort setzen",
     "3" => "Bitte geben Sie Ihren Benutzernamen ein.<br/>Sie erhalten dann eine E-Mail mit einem Link zur Vergabe eines neuen Passwortes.",
     "4" => "Ihr Benutzername",
