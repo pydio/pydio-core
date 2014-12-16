@@ -1,5 +1,10 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio 6.0.2 - Microfix for install screen
+
+Previous release fixed XML problems by xml-encoding some messages, which breaks the HTML display of the install wizard.
+Please see 6.0.1 for release note.
+
 Pydio 6.0.1 - Bugfix & Security Release
 
 This is a bugfix & security release for v6. Upgrade is recommended. Main bugs fixed are:
