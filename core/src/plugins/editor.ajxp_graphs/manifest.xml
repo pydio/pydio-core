@@ -2,7 +2,7 @@
 <editor id="editor.ajxp_graphs" openable="true" order="10" text="graphs_viewer.1"
         title="graphs_viewer.2" iconClass="icon-bar-chart" icon="edit.png" className="GraphsViewer"
         mimes="ajxp_graphs" formId="graph_viewer_box" label="CONF_MESSAGE[Graphs Viewer]"
-        description="CONF_MESSAGE[Plugin Editor]"
+        description="CONF_MESSAGE[Graphs Viewer]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
