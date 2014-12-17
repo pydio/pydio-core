@@ -20,8 +20,8 @@
  */
 $mess=array(
 "1" => "Externes Fenster",
-"2" => "Externes Browser Fenster",
-"3" => "Bitte warten, die Datei wird in einen externen Fenster geöffnet und dieses Fenster schließt sich automatisch.",
+"2" => "Externes Browser-Fenster",
+"3" => "Bitte warten, die Datei wird in einem externen Fenster geöffnet. Dieses Fenster schließt sich automatisch.",
 "4" => "Neues URL-Lesezeichen",
 "5" => "Alternativ kann ein <a>neues Lesezeichen zu einer URL angelegt werden</a>",
 "6" => "URL beginnend mit http/https eingeben",
