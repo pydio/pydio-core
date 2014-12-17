@@ -20,15 +20,17 @@
 */
 $mess=array(
 "Image viewer" => "Bildbetrachter",
-"Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images." => "Der Bildbetrachter ist für die Bildvorschau, das Betrachten von Bildern und eine Diashow zuständig. Er generiert eine Vorschau aus den Bildern.",
-"Remote Wrappers" => "Remote Adapter",
-"When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped." => "Wenn Sie sich mit einen Remote Server verbinden kann das Auslesen von Metadaten sehr lange dauern, weil zuerst alle Dateien vor Ort kopiert werden müssen. Bei Plugins die den definierten Adapter verwenden und die Dateigröße größer ist als der Grenzbereich wird der Bildtyp und die Abmessung übersprungen.",
-"Size Threshold" => "Grenzbereich Größe",
-"Threshold" => "Grenzbereich",
-"Thumbnails" => "Bildvorschauen",
+"Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images." => "Der Bildbetrachter ist für die Bildvorschau, das Betrachten von Bildern und eine Diashow zuständig.",
+"Remote Wrappers" => "Metadaten für Adapter nur bedingt auslesen",
+"When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped." => "Wenn Sie sich mit einem entfernten Server verbinden kann das Auslesen der Metadaten sehr lange dauern, da die Dateien erst heruntergeladen werden müssen. Bei den konfigurierten Adaptern werden die Metadaten nur bis zu einer bestimmten Dateigrösse ermittelt.",
+"Size Threshold" => "Metadaten auslesen bis",
+"Threshold" => "Maximale Dateigröße, bis zu der die Metadaten ausgelesen werden, wenn obige Adapter verwendet werden.",
+"Thumbnails" => "Vorschau generieren",
 "Generate thumbnails or not" => "Vorschau für Bilder erstellen oder nicht",
 "Quality" => "Qualität",
-"Thumbs quality" => "Vorschau Qualität",
-"Exif Rotation" => "Exif Rotation",
-"Rotate image using exif rotation" => "Exif Rotation für Bild drehung verwenden"
+"Thumbs quality" => "Qualität der Vorschaubilder",
+"Exif Rotation" => "Exif-Drehung",
+"Rotate image using exif rotation" => "Drehung der Bilder aus den Exif-Daten auslesen",
+"Low-res Sizes" => "Grössen der Vorschaubilder",
+"Threshold for low-res versions of images" => "Grössen der Vorschaubilder",
 );
