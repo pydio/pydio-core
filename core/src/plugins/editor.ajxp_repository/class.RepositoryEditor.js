@@ -284,16 +284,16 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
                     insertSave = true;
                 }else{
-                    form.update('<div>No parameters</div>');
+                    form.update("<div>"+MessageHash['ajxp_repository_editor.19']+"</div>");
                 }
                 accordionContent.insert(form);
                 var saveButton = null;
                 accordionContent.insert(new Element('div',{className:'tabPaneButtons', style:'clear:both; padding-right: 20px;'}));
                 if(insertSave){
-                    accordionContent.down(".tabPaneButtons").insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
+                    accordionContent.down(".tabPaneButtons").insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-save'></span> <span class=\"title\">"+MessageHash['53']+"</span></div>");
                     saveButton = accordionContent.down("div[name='meta_source_edit']");
                 }
-                accordionContent.down(".tabPaneButtons").insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-trash'></span> <span class=\"title\">Remove</span></div>");
+                accordionContent.down(".tabPaneButtons").insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-trash'></span> <span class=\"title\">"+MessageHash['257']+"</span></div>");
                 metaTabHead.insert(title);
                 metaTabBody.insert(accordionContent);
                 if(saveButton){
@@ -337,7 +337,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             addForm.insert(formEl);
             addForm.insert('<div style="clear: both"></div>');
             formEl.insert(this.metaSelector);
-            new Chosen(this.metaSelector, {placeholder_text_single:'Add a feature to this workspace'});
+            new Chosen(this.metaSelector, {placeholder_text_single:MessageHash["ajxp_repository_editor.21"]});
             metaPane.down("div.dialogLegend").update(MessageHash["ajxp_repository_editor.7"]);
             metaPane.down("div.dialogLegend").insert({after:addForm});
             var addFormDetail = new Element("div", {className:'meta_plugin_new_form empty'});
@@ -360,7 +360,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
                     this.formManager.disableShortcutsOnForm(addFormDetail);
                 }else{
-                    addFormDetail.insert('<div class="meta_source_new_empty_params">No parameters for this plugin</div>')
+                    addFormDetail.insert('<div class="meta_source_new_empty_params">'+MessageHash['ajxp_repository_editor.20']+'</div>')
                 }
 
             }
