@@ -14,7 +14,6 @@ ADD ./pre_conf_pydio.sh /etc/pre_conf_pydio.sh
 ADD ./configure_php_modules.sh /etc/configure_php_modules.sh
 ADD ./public.htaccess /etc/public.htaccess
 ADD ./root.htaccess /etc/root.htaccess
-ADD ./post_install.sh /etc/post_install.sh
 
 RUN yum install -y wget
 RUN rpm -Uvh http://dl.ajaxplorer.info/repos/pydio-release-1-1.noarch.rpm
