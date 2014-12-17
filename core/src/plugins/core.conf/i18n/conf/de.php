@@ -59,4 +59,7 @@ $mess=array(
 "Country" => "Land",
 "Language" => "Sprache",
 "User Language" => "Benutzer Sprache",
+"Role Label" => "Rollenname",
+"Users Lock Action" => "Anmelde-Aktion",
+"If set, this action will be triggered automatically at users login. Can be logout (to lock out the users), pass_change (to force password change), or anything else" => "Dieser Befehl wir automatisch bei der Benutzeranmeldung ausgeführt. (z.B. Benutzer sperren, Passwortänderung, etc.)",
 );

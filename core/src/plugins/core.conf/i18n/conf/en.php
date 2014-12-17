@@ -59,4 +59,7 @@ $mess=array(
 "Country" => "Country",
 "Language" => "Language",
 "User Language" => "User Language",
+"Role Label" => "Role Label",
+"Users Lock Action" => "Users Lock Action",
+"If set, this action will be triggered automatically at users login. Can be logout (to lock out the users), pass_change (to force password change), or anything else" => "If set, this action will be triggered automatically at users login. Can be logout (to lock out the users), pass_change (to force password change), or anything else",
 );
