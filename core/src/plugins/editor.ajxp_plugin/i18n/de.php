@@ -19,9 +19,9 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Plugin Editor",
-"2" => "Plugin editor",
-"3" => "Optionen",
+"1" => "Erweiterungs-Editor",
+"2" => "Erweiterungs-Editor",
+"3" => "Einstellungen",
 "4" => "Dokumentation",
 "5" => "Funktion auswählen",
 "6" => "Parameter bearbeiten",
