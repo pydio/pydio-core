@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Office Docs" => "Zoho Office-Dokument-Editor",
+"Office Docs" => "Zoho Office-Editor",
 "Zoho editor" => "Ein Online-Dienst zum ansehen oder bearbeiten von Office-Dokumenten.",
 "Zoho API Key, you must have registered to api.zoho.com" => "Zoho API Key, der bei api.zoho.com registriert ist",
 "API Key" => "API-Key",
