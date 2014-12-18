@@ -1058,7 +1058,7 @@ class AuthService
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+        return $authDriver->getUsersCount(self::filterBaseGroup($baseGroup), $regexp, $filterProperty, $filterValue, $recursive);
     }
 
     /**
