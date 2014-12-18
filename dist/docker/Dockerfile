@@ -29,7 +29,7 @@ RUN chmod +x /etc/pre_conf_pydio.sh
 RUN chmod +x /etc/configure_php_modules.sh
 
 # generate certificate for server
-RUN /etc/gencert.sh
+#RUN /etc/gencert.sh
 
 # install some php modules
 RUN /etc/configure_php_modules.sh
@@ -46,8 +46,10 @@ RUN /etc/pre_conf_pydio.sh
 # install supervisord
 RUN yum install -y python-pip && pip install "pip>=1.4,<1.5" --upgrade
 RUN pip install supervisor
-VOLUME ["/var/lib/pydio"]
+VOLUME /var/lib/pydio
+VOLUME /var/lib/mysql
+VOLUME /etc/pki/tls
+VOLUME /var/cache/pydio
 
 EXPOSE 443
 CMD ["supervisord", "-n"]
-
