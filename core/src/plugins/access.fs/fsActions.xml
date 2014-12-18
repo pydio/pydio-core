@@ -226,10 +226,15 @@
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href=downloadUrl;
 						}else{
-                            var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
-                            val = window.ajxpServerAccessPath.replace(regex, "$1");
-                            var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
-
+						    var minisite_session = null;
+						    var parts = $A(window.ajxpServerAccessPath.replace('?', '&').split('&'));
+						    parts.each(function(p){
+						        var sub = p.split('=');
+						        if(sub.length == 2 && sub[0] == 'minisite_session'){
+						            minisite_session = sub[1];
+                                    throw $break;
+                                }
+						    });
 							$('download_form').action = window.ajxpServerAccessPath;
 							$('download_form').secure_token.value = Connexion.SECURE_TOKEN;
 							$('download_form').select("input").each(function(input){

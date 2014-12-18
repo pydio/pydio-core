@@ -142,6 +142,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 $configUrl = ConfService::getCoreConf("SERVER_URL");
                 if(!empty($configUrl)){
                     $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
+                    if(strlen($root) > 1) $root = rtrim($root, '/').'/';
                 }else{
                     preg_match ('/ws-(.)*\/|settings|dashboard|welcome/', $root, $matches, PREG_OFFSET_CAPTURE);
                     if(count($matches)){

@@ -241,7 +241,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         $users = AuthService::listUsers($baseGroup, $term);
         foreach ($users as $userId => $userObject) {
-            $trimmedG = trim($userObject->getGroupPath(), "/");
+            $gPath = $userObject->getGroupPath();
+            $realGroup = AuthService::filterBaseGroup(AuthService::getLoggedUser()->getGroupPath());
+            if(strlen($realGroup) > 1 && strpos($gPath, $realGroup) === 0){
+                $gPath = substr($gPath, strlen($realGroup));
+            }
+            $trimmedG = trim($gPath, "/");
             if(!empty($trimmedG)) $trimmedG .= "/";
 
             $nodeKey = "/data/users/".$trimmedG.$userId;
@@ -2019,13 +2024,25 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         $count = null;
         // Load all repositories = normal, templates, and templates children
-        $repos = ConfService::listRepositoriesWithCriteria(array(
-                "parent_uuid"   => AJXP_FILTER_EMPTY,
-                "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
-                "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
-            ), $count
-        );
+        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        if($currentUserIsGroupAdmin){
+            $repos = ConfService::listRepositoriesWithCriteria(array(
+                    "owner_user_id" => AJXP_FILTER_EMPTY,
+                    "groupPath"     => "regexp:/^".str_replace("/", "\/", AuthService::getLoggedUser()->getGroupPath()).'/',
+                    "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
+                    "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
+                ), $count
+            );
+        }else{
+            $repos = ConfService::listRepositoriesWithCriteria(array(
+                    "parent_uuid"   => AJXP_FILTER_EMPTY,
+                    "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
+                    "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
+                ), $count
+            );
+        }
         if(!$returnNodes){
+            var_dump($count);
             AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
             AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
                 <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>

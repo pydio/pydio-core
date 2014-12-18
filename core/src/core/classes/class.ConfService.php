@@ -514,8 +514,10 @@ class ConfService
         $repositories = array();
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
         foreach ($repoList as $repoId => $repoObject) {
+            $failOneCriteria = false;
             foreach($criteria as $key => $value){
                 if(!in_array($key, $searchableKeys)) continue;
+                $criteriumOk = false;
                 if($key == "uuid") $comp = $repoObject->getUniqueId();
                 else if($key == "parent_uuid") $comp = $repoObject->getParentId();
                 else if($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
@@ -525,16 +527,28 @@ class ConfService
                 else if($key == "slug") $comp = $repoObject->getSlug();
                 else if($key == "groupPath") $comp = $repoObject->getGroupPath();
                 if(is_array($value) && in_array($comp, $value)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == AJXP_FILTER_EMPTY && empty($comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == AJXP_FILTER_NOT_EMPTY && !empty($comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if(is_string($value) && strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == $comp){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }
+                if(!$criteriumOk) {
+                    $failOneCriteria = true;
+                    break;
+                }
+            }
+            if(!$failOneCriteria){
+                $repositories[$repoId] = $repoObject;
             }
         }
         return $repositories;
@@ -940,7 +954,7 @@ class ConfService
             $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
             foreach ($nodes as $node) {
                 $nameSpace = $node->getAttribute("namespace");
-                $path = $node->getAttribute("path");
+                $path = AJXP_INSTALL_PATH."/".$node->getAttribute("path");
                 $lang = $crtLang;
                 if (!is_file($path."/".$crtLang.".php")) {
                     $lang = "en"; // Default language, minimum required.

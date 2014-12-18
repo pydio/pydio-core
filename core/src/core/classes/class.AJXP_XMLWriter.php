@@ -300,7 +300,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("CONF_MESSAGE[$messId]", $message, $xml);
+                $xml = str_replace("CONF_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
             }
         }
         if (preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)) {
@@ -310,7 +310,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("MIXIN_MESSAGE[$messId]", $message, $xml);
+                $xml = str_replace("MIXIN_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
             }
         }
         if ($stripSpaces) {

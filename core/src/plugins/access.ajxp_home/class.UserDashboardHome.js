@@ -46,6 +46,8 @@ Class.create("UserDashboardHome", AjxpPane, {
         var wsElement = oFormObject.down('#workspaces_list');
         attachMobileScroll(oFormObject.down('#list_cont'), 'vertical');
 
+        var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
+
         var switchToRepo = function(repoId){
             if(!repoId) return;
             if(oFormObject.down('#save_ws_choice').checked){
@@ -156,14 +158,22 @@ Class.create("UserDashboardHome", AjxpPane, {
                     switchToRepo(repoId);
                 }
             };
-            repoEl.observe("click", select);
             attachMobilTouchForClick(repoEl, select);
             disableTextSelection(repoEl);
-            repoEl.observe("dblclick", function(e){
-                select(e);
-                Event.findElement(e, "li").setOpacity(0.7);
-                switchToRepo(repoId);
-            });
+            if(simpleClickOpen){
+                repoEl.observe("click", function(e){
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }else{
+                repoEl.observe("click", select);
+                repoEl.observe("dblclick", function(e){
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }
             repoEl.observe("mouseover", function(){
                 updateWsLegend(repoObject);
             });

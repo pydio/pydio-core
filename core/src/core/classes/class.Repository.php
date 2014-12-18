@@ -423,7 +423,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function getId()
     {
-        if($this->isWriteable()) return $this->getUniqueId();
+        if($this->isWriteable() || $this->id == null) return $this->getUniqueId();
         return $this->id;
     }
 

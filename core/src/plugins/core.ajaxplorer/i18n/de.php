@@ -593,6 +593,10 @@ $mess=array(
 "530"=> "Externe Benutzer",
 "531"=> "Intern",
 "532"=> "Extern",
+"533" => "Identifier used to login, please use alphanumeric or email lowercase characters.",
+"534" => "Password used to login",
+"535" => "Send password by email",
+"536" => "Send a welcome email including the password to the new user",
 /* Html entity would break tooltip */
 "plugtype.title.access" => "Arbeitsumgebungs-Treiber",
 "plugtype.desc.access" => "Erweiterungen die bei Arbeitsumgebungen festlgen, wie auf die Daten zugegriffen werden kann",

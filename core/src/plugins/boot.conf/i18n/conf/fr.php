@@ -20,10 +20,10 @@
 */
 
 $mess = array(
-"Admin access" => "&lt;span class='icon-key'&gt;&lt;/span&gt; Accès administrateur",
-"Global options" => "&lt;span class='icon-cogs'&gt;&lt;/span&gt; Options globales",
-"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Stockage des configurations",		
-"Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Ajouter des utilisateurs",
+"Admin access" => "<span class='icon-key'></span> Accès administrateur",
+"Global options" => "<span class='icon-cogs'></span> Options globales",
+"Configurations storage" => "<span class='icon-save'></span> Stockage des configurations",
+"Add some users" => "<span class='icon-group'></span> Ajouter des utilisateurs",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Veuillez saisir un identifiant et un mot de passe pour l'administrateur. Ceci est requis pour vous connecter la première fois. Vous pourrez créer d'autres administrateurs ultérieurement, en vous connectant au dépôt 'Paramètres'.",		
 "Admin Login" => "Identifiant de l'administrateur",
 "Alphanumeric login" => "Identifiant alphanumérique",
@@ -45,7 +45,7 @@ $mess = array(
 "Set up the correct value to send emails" => "Choisir la valeur correcte pour envoyer des courriels",
 "Administrator Email" => "Courriel de l'administrateur",
 "Default 'From' email used to send emails." => "Expéditeur par défaut utilisé pour envoyer des courriels.",
-"How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "Stockage des configurations de l'application (utilisateurs, plugins, etc. &lt;b&gt;ceci ne définit pas&lt;/b&gt; la manière dont vos documents sont stockés). Le mode 'Pas de base de données' permet un démarrage rapide. Configurez une base de données pour accéder aux fonctionnalités avancées.",
+"How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "Stockage des configurations de l'application (utilisateurs, plugins, etc. <b>ceci ne définit pas</b> la manière dont vos documents sont stockés). Le mode 'Pas de base de données' permet un démarrage rapide. Configurez une base de données pour accéder aux fonctionnalités avancées.",
 "Storage Type" => "Type de stockage",
 "Select how the configurations will be stored" => "Choisissez comment les configurations seront stockées",
 "No Database (Quick Start)" => "Pas de base de données (Deprecié, utilisez Sqlite à la place!)",

@@ -1,7 +1,76 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-Major release
+Pydio 6.0.2 - Microfix for install screen
 
-TO DO
+Previous release fixed XML problems by xml-encoding some messages, which breaks the HTML display of the install wizard.
+Please see 6.0.1 for release note.
+
+Pydio 6.0.1 - Bugfix & Security Release
+
+This is a bugfix & security release for v6. Upgrade is recommended. Main bugs fixed are:
+
+White-screen on upgrade if Server URL is manually set
+Italian language breaking workspace creation
+New ldap_paged_control php functions can issue warnings on php 5.6
+Fix WebDAV root listing and authentication problems on REST api.
+A potential vulnerability reported by Axel Hinrichs
+
+Date: Dec, 12rd 2014
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2014
+Contributors: Charles du Jeu, Tran The Cuong, Axel Hinrichs
+
+Changelog
+
+Fix SQL. insert on update a role (improve performance only for mysql) (details)
+Add script to upgrade 525 to 600 (details)
+Fix ldap_paged_control issues and warnings (details)
+Fix Regexp for parsing minisite_session, could break IE & FF downloads for password protected links (details)
+Make sure that stream is correctly opened, otherwise it can fill the log with errors. (details)
+Fix html base if set via SERVER_URL parameter (details)
+Fix authentication on rest api (details)
+Missing translation on the first 3 fields of the create user dialog (via sharing). (details)
+Fix root listing of webdav (accessing to /shares/) (details)
+Add a parameter to open workspace by simple click in the home page. (details)
+Make sure to xmlEntities() the CONF_MESSAGE and MIXIN_MESSAGE values as we are inside attributes. (details)
+Update share.php template (details)
+
+
+------------------------------
+Last Major release Pydio 6.0.0
+------------------------------
+
+The Pydio Team is thrilled to announce Pydio 6, a major stable release. Main features include a full UX reloaded, new
+server capabilities to enable sync with the future PydioSync client, an analytics dashboard for admins, and many, many
+more. You can have a complete product tour here.
+
+IMPORTANT: if you are using the following plugins: auth.serial_otp, auth.cas, auth.basic_http, PLEASE DO NOT UPGRADE
+NOW as they must be replaced by their new 'authfront' counterparts. Please read more on this How-To.
+
+Release Data
+
+Date: Dec, 3rd 2014
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2014
+Upgrade: In-app upgrade for archives installs - RPM/DEB require manual script upgrade
+Contributors: Thomas Nicot (UX), Charles du Jeu, Tran The Cuong, Nicolas Pouliquen, Pär Strindevall, Martin Schaible,
+Lawrence Ho, Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt, Gerrit Pannek, Max Ruman,
+Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon, Gerald Me, Matthieu Simon, Florian Huwyler,
+Aaron Guggisberg, Stefan Wüthrich, Teki Imai, Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy,
+Lukasz Lis.
+
+
+Upgrade Process
+
+Archive-based installs (zip/tar.gz):
+From 5.2.5: automatic with in-app upgrade. Make sure to backup both your DB and your files.
+From 5.3.4(dev): automatic with in-app upgrade, only files are impacted.
+Linux packages (deb/rpm) - Please READ
+Please read the detailed upgrade how-to. Baseline is that the apt-get/yum will not update DB, but there is a script ready for that, that you can run manually.
+
 --
 See core/doc/PREVIOUS_RELEASES file to learn more about previous releases.

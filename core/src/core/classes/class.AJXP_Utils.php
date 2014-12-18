@@ -1884,6 +1884,7 @@ class AJXP_Utils
 
     public static function regexpToLike($regexp)
     {
+        $regexp = trim($regexp, '/');
         $left = "~";
         $right = "~";
         if ($regexp[0]=="^") {
@@ -1900,6 +1901,7 @@ class AJXP_Utils
 
     public static function cleanRegexp($regexp)
     {
+        $regexp = str_replace("\/", "/", trim($regexp, '/'));
         return ltrim(rtrim($regexp, "$"), "^");
     }
 
