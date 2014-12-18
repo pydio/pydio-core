@@ -314,7 +314,8 @@ Class.create("Ajaxplorer", {
 		/* USER GUI
 		/*********************/
 		this.guiLoaded = false;
-		this.buildGUI($(ajxpBootstrap.parameters.get('MAIN_ELEMENT')));
+        var mainElement = $(ajxpBootstrap.parameters.get('MAIN_ELEMENT'));
+		this.buildGUI(mainElement);
 		document.fire("ajaxplorer:before_gui_load");
 		// Rewind components creation!
 		if(this.guiCompRegistry){
@@ -322,6 +323,14 @@ Class.create("Ajaxplorer", {
 		}
 		this.guiLoaded = true;
 		document.fire("ajaxplorer:gui_loaded");
+        document.observe("ajaxplorer:repository_list_refreshed", function(e){
+            mainElement.classNames().findAll(function(c){ return c.startsWith('ajxp_ws-'); }).each(function(cName){
+                mainElement.removeClassName(cName);
+            });
+            if(e.memo.active && e.memo.list){
+                mainElement.addClassName('ajxp_ws-' + e.memo.list.get(e.memo.active).getSlug());
+            }
+        });
 		modal.updateLoadingProgress('GUI Initialized');
 		this.initTabNavigation();
 		this.blockShortcuts = false;

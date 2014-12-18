@@ -161,7 +161,7 @@ Class.create("LogoWidget", AjxpPane, {
             this.image.setStyle({
                 position    : 'absolute',
                 height      : imgH + 'px',
-                /*width       : imgW + 'px',*/
+                width       : 'auto',
                 top         : imgTop + 'px',
                 left        : imgLeft + 'px'
             });
