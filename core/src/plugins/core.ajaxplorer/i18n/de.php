@@ -628,7 +628,7 @@ $mess=array(
 "plugtype.desc.log" => "Sendet Anwendungsprotokolle an verschiedene Ziele",
 "plugtype.title.mailer" => "Mailer",
 "plugtype.desc.mailer" => "Werkzeuge für den Versand von E-Mails",
-"plugtype.title.mq" => "Instant Messaging",
+"plugtype.title.mq" => "Nachrichten-Warteschlangen",
 "plugtype.desc.mq" => "Implementation eines einfachen PUB/SUB-Servers",
 /* END SENTENCE */
 );
