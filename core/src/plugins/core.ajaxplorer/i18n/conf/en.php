@@ -138,4 +138,6 @@ $mess=array(
 "Explicitly disable WebDAV access for this repository." => "Explicitly disable WebDAV access for this repository.",
 "Allow to group admins" => "Allow to group admins",
 "Allow group administrators to create a repository from this template." => "Allow group administrators to create a repository from this template.",
+"Skip auto-update admin rights" => "Skip auto-update admin rights",
+"If you have tons of workspaces (which is not recommanded), admin users login can take a long time while updating admin access to all repositories. Use this option to disable this step, admin will always have access to the Settings." => "If you have tons of workspaces (which is not recommanded), admin users login can take a long time while updating admin access to all repositories. Use this option to disable this step, admin will always have access to the Settings.",
 );
