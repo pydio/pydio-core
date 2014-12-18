@@ -940,7 +940,7 @@ class ConfService
             $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
             foreach ($nodes as $node) {
                 $nameSpace = $node->getAttribute("namespace");
-                $path = $node->getAttribute("path");
+                $path = AJXP_INSTALL_PATH."/".$node->getAttribute("path");
                 $lang = $crtLang;
                 if (!is_file($path."/".$crtLang.".php")) {
                     $lang = "en"; // Default language, minimum required.
