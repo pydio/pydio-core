@@ -8,7 +8,7 @@
 	<class_definition filename="plugins/uploader.plupload/class.PluploadProcessor.php" classname="PluploadProcessor"/>
     <registry_contributions>
         <actions>
-            <action name="upload_chunks_unify">
+            <action name="upload_chunks_unify_plupload">
                 <processing>
                     <serverCallback methodName="unifyChunks"/>
                 </processing>
