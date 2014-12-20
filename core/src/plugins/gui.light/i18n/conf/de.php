@@ -26,5 +26,5 @@
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
 "Light" => "Light",
-"Simple Template for Bookmarklets" => "Einfache Vorlage für Bookmarklets",
+"Simple Template for Bookmarklets" => "Stellt Funktionen für Bookmarklets zur Verfügung",
 );

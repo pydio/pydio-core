@@ -21,12 +21,9 @@
 $mess=array(
 "Text logger" => "Text logger",
 "Stores the logs as readable tab delimited text." => "Stores the logs as readable tab delimited text.",
-"Logpath" => "Logpath",
 "The path to where the logs are kept." => "The path to where the logs are kept.",
-"Logfile" => "Logfile",
 "The name of the log file" => "The name of the log file",
 "Files Permissions" => "Files Permissions",
-"" => "",
 "Log Folder" => "Log Folder",
 "Files Name Pattern" => "Files Name Pattern",
 );

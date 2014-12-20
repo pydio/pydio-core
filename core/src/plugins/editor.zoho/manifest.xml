@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.zoho" order="3" enabled="false" openable="true" text="zoho_editor.1" iconClass="icon-edit" title="zoho_editor.2" description="Zoho editor" icon="zoho_img/zoho.png" label="Office Docs" className="ZohoEditor" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pps,odp,sxi,doc,docx,rtf,odt,sxw" formId="zoho_box" write="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.zoho" order="3" enabled="false" openable="true" text="zoho_editor.1" iconClass="icon-edit" title="zoho_editor.2" description="CONF_MESSAGE[Zoho editor]" icon="zoho_img/zoho.png" label="CONF_MESSAGE[Office Docs]" className="ZohoEditor" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pps,odp,sxi,doc,docx,rtf,odt,sxw" formId="zoho_box" write="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.zoho/class.ZohoEditor.php" classname="ZohoEditor"/>
     <server_settings>
         <global_param name="ZOHO_API_KEY" type="string" description="CONF_MESSAGE[Zoho API Key, you must have registered to api.zoho.com]" label="CONF_MESSAGE[API Key]" mandatory="true"/>

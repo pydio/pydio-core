@@ -8,7 +8,11 @@
 
     <class_definition classname="FSMonitoringManager"
                       filename="plugins/meta.monitor_fs/class.FSMonitoringManager.php"/>
-
+    <client_settings>
+        <resources>
+            <i18n namespace="meta.monitor_fs" path="plugins/meta.monitor_fs/i18n" />
+        </resources>
+    </client_settings>
     <registry_contributions>
         <hooks>
             <serverCallback methodName="beforePathChange" hookName="node.before_path_change"/>

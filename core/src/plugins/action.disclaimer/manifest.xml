@@ -10,7 +10,7 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="DISCLAIMER_ACCEPTED" type="select" choices="yes|Accepted,no|Not Accepted" label="CONF_MESSAGE[Validation]"
+        <param name="DISCLAIMER_ACCEPTED" type="select" choices="yes|CONF_MESSAGE[Accepted],no|CONF_MESSAGE[Not Accepted]" label="CONF_MESSAGE[Validation]"
               scope="user,group,role"
               description="CONF_MESSAGE[Whether the user has accepted the disclaimer or not]" default="no"/>
         <global_param name="DISCLAIMER_CONTENT" type="textarea" label="CONF_MESSAGE[Disclaimer Content]"

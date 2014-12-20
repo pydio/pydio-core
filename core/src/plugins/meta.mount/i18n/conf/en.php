@@ -31,4 +31,6 @@ $mess=array(
 "Mount Path, use AJXP_USER" => "Mount Path, use AJXP_USER",
 "Mount Options" => "Mount Options",
 "Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID" => "Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID",
+"Pass Password via environment instead of command line" => "Pass Password via environment instead of command line",
+"Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly." => "Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly.",
 );

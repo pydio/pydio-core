@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -23,6 +23,8 @@ $mess=array(
 "Stores metadata inside local hidden files." => "Guarda a informação de metadata dentro de um ficheiro local oculto.",
 "File location" => "Localização do ficheiro",
 "Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Onde guardar o ficheiro de metadata : LOCAL significa que será criado um ficheiro oculto em cada pasta, GLOBAL significa que será criado um ficheiro na pasta AJXP_DATA_PATH/plugins/action.share .",
+"Application Data Folder" => "Application Data Folder",
+"In Local Folders" => "In Local Folders",
 "Meta File" => "Ficheiro Metafile",
 "Hidden file used inside folders to save meta data" => "Ficheiro oculto usado dentro das pastas para guardar informação de Meta Data",
 );

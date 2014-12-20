@@ -22,14 +22,14 @@
 			    <ul class="tabrow">
                     <li class="selected" data-PaneID="pane-infos"><i class="icon-cogs"></i> <span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
                     <li class="" data-PaneID="pane-metas"><i class="icon-puzzle-piece"></i> <span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
-                    <li class="" data-PaneID="pane-shares"><i class="icon-share"></i> <span ajxp_message_id="ajxp_repository_editor.4">Shares</span></li>
+                    <li class="" data-PaneID="pane-shares"><i class="icon-share"></i> <span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.16]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
 	            <div id="pane-infos">
 	            </div>
                 <div id="pane-metas">
-                    <div class="innerTitle" tabindex="0">Workspace additional features</div>
+                    <div class="innerTitle" tabindex="0">AJXP_MESSAGE[ajxp_repository_editor.17]</div>
                     <div class="dialogLegend" style="padding: 0 20px;"></div>
                     <div id="metaTabulator" style="clear:both;">
                         <ul class="tabrow innerTabRow"></ul>
@@ -38,7 +38,7 @@
                 </div>
                 <div id="pane-shares">
                     <div id="shares-toolbar" style="float: right;margin: 4px 20px;"></div>
-                    <div class="innerTitle" tabindex="0">Shared Files and Folders from this workspace</div>
+                    <div class="innerTitle" tabindex="0">AJXP_MESSAGE[ajxp_repository_editor.18]</div>
                     <div id="shares-list" class="innerContainer"></div>
                 </div>
 			</div>

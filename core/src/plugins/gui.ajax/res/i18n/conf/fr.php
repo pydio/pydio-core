@@ -63,4 +63,8 @@ $mess=array(
 "Manually set a top offset" => "Définissez manuellement le décalage du logo par rapport au haut",
 "Logo Left" => "Décalage à gauche du logo",
 "Manually set a left offset" => "Définissez manuellement le décalage du logo par rapport à la gauche",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.",
+"Detected Encoding" => "Detected Encoding",
+"Detected Server Path" => "Detected Server Path",
+"Application Title" => "Application Title",
 );

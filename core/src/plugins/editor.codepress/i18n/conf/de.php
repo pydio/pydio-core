@@ -20,5 +20,5 @@
 */
 $mess=array(
 "CodePress" => "CodePress",
-"Legacy Syntax Highlighter" => "Alter Syntax Highlighter",
+"Legacy Syntax Highlighter" => "Text-Editor mit Syntaxhervorhebung (veraltet)",
 );

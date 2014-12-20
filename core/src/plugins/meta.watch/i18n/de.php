@@ -7,21 +7,21 @@
  * To change this template use File | Settings | File Templates.
  */
 $mess = array(
-    "1" => "Beobachten nach..",
-    "2" => "Benachrichtigen, wenn auf diesen Ordner/Datei zugegriffen wird",
-    "3" => "Stopp beobachten",
-    "4" => "Das Beobachten des Ordners nach Änderungen wird gestoppt.",
-    "5" => "Beobachten nach...",
-    "6" => "Diese Datein auf Änderungen Beobachten",
-    "7" => "Beobachten Stoppen",
-    "8" => "Das Beobachten der Datei nach Änderungen wird gestoppt.",
-    "9" => "Zugriffen",
-    "10"=> "Irgendjemand hat die Datei geöffnet.",
-    "10b"=> "Irgendjemand hat den Ordner geöffnet",
-    "11"=> "Veränderungen",
-    "12"=> "Irgendjemand hat die Datei bearbeitet",
-    "12b"=> "Irgendjemand hat eine  Datei des Ordners bearbeitet",
+    "1" => "Beobachten auf...",
+    "2" => "Benachrichtigen, wenn auf dieses Element zugegriffen wird",
+    "3" => "Nicht mehr beobachten",
+    "4" => "Ordner nicht mehr auf Änderungen beobachten", // Do not use html here
+    "5" => "Beobachten auf...",
+    "6" => "Diese Datei auf Änderungen beobachten", // This string seems to be unused
+    "7" => "Nicht mehr beobachten",
+    "8" => "Datei nicht mehr auf Änderungen beobachten", // Do not use html here
+    "9" => "Zugriffe",
+    "10"=> "Benachrichtigen, wenn die Datei geöffnet wird",  // Do not use html here
+    "10b"=> "Benachrichtigen, wenn Dateien des Ordners geöffnet werden",  // Do not use html here
+    "11"=> "Ver&auml;nderungen",
+    "12"=> "Benachrichtigen, wenn die Datei bearbeitet wird",
+    "12b"=> "Benachrichtigen, wenn Dateien des Ordners bearbeitet werden",
     "13"=> "Beides",
-    "14"=> "Irgendjemand hat die Datei geöffnet oder bearbeitet sie.",
-    "14b"=> "Irgendjemand hat eine Datei des Ordners geöffnet oder bearbeitet sie.",
+    "14"=> "Benachrichtigen, wenn die Datei bearbeitet oder geöffnet wird", // Do not use html here
+    "14b"=> "Benachrichtigen, wenn Dateien des Ordners bearbeitet oder geöffnet werden", // Do not use html here
 );

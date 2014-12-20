@@ -25,8 +25,6 @@ $mess=array(
 "Key" => "Key",
 "Consumer Secret" => "Consumer Secret",
 "Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
 "Password" => "Password",
 "User Password" => "User Password",
 );
