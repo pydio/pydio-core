@@ -20,13 +20,15 @@
 */
 $mess=array(
 "S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK for PHP" => "Auf den AWS Server zugreifen. Dafür ist ein AWS-SDK Zugang für PHP nötig",
+"Access an AWS server. Requires AWS-SDK v2 for PHP" => "Auf den AWS-Server zugreifen. Dafür ist ein AWS-SDK-Zugang (Version 2) für PHP nötig",
 "Key" => "Key",
-"S3 Api Key" => "S3 Api Key",
-"Secret Key" => "Secret Key",
-"S3 secret key" => "S3 secret key",
+"S3 Api Key" => "S3 Api-Key",
+"Secret Key" => "Secret-Key",
+"S3 secret key" => "S3 Secret-key",
 "Region" => "Region",
-"S3 storage region" => "S3 Speicher Region",
+"S3 storage region" => "S3 Speicher-Region",
 "Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket"
+"Root container in the S3 storage" => "S3-Bucket",
+"Storage URL" => "Speicher-URL",
+"Replace default AWS access points (built from region). Set a full URL, including protocol" => "Standard-Zugriffs-URL, die anhand der Region ermittelt wird, ersetzen. Komplette URL incl. Protokoll eintragen.",
 );

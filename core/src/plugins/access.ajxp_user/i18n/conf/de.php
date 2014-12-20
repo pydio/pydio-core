@@ -19,6 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Javascript Api Browser" => "Javascript-Api Browser",
-"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Pydio Javascript-Klassen und Interfaces durchsuchen. Hilfe für Entwickler oder um zu zeigen, wie Pydio-Daten von anderen Quellen einlesen kann (kein Dateisystem).",
+"User Dashboard"=> "Mein Dashboard",
+"User home dashboard, can be displayed before accessing to workspaces" => "Dashboard welches den Benutzern vor dem Zugriff auf eine Arbeitsumgebung angezeigt werden kann.",
+"Disable Address Book" => "Adressbuch deaktivieren",
+"Do not display address book in user account panel." => "Das Adressbuch nicht im Dashboard anzeigen.",
 );

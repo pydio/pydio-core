@@ -19,14 +19,17 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK for PHP" => "Access an AWS server. Requires AWS-SDK for PHP ",
-"Key" => "Key",
-"S3 Api Key" => "S3 Api Key",
-"Secret Key" => "Secret Key",
-"S3 secret key" => "S3 secret key",
+"Open Stack (Swift)" => "OpenStack (Swift)",
+"Access Open Stack Object Storage via Swift API" => "Auf einen OpenStack-Speicher über die Swift-API zugreifen",
+"Username" => "Benutzername",
+"User email as you enter it to log to the console" => "E-Mail-Adresse für den Login auf der Konsole",
+"Console Password" => "Passwort",
+"Tenant ID" => "Tenant ID",
+"Tenant ID (see API Keys page)" => "Tenant ID (siehe API-Dokumentation)",
+"Endpoint" => "Endpoint",
+"Endpoint (see API Keys page, Identity endpoint)" => "Endpoint (siehe API-Dokumentation)",
 "Region" => "Region",
-"S3 storage region" => "S3 storage region",
-"Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket"
+"Your region identifier" => "Identifikatur für die Region",
+"Container" => "Container",
+"Base Container" => "Der Basis-Container",
 );

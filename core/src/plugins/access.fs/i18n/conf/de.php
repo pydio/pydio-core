@@ -20,9 +20,9 @@
 */
 $mess=array(
 "File System (Standard)" => "Dateisystem (Standard)",
-"The most standard access to a filesystem located on the server." => "Der Standardzugriff zu dem Dateisystem auf den Server.",
+"The most standard access to a filesystem located on the server." => "Zugriff auf Dateien, die auf dem Server liegen.",
 "Path" => "Pfad",
-"Real path to the root folder on the server" => "Realer Pfad zum Root-Verzeichnis auf dem Server",
+"Real path to the root folder on the server" => "Absoluter Pfad zum Haupt-Verzeichnis auf dem Server",
 "Create" => "Erstellen",
 "Create folder if it does not exists" => "Erstelle Verzeichnis wenn dieses nicht existiert",
 "File Creation Mask" => "Maske für Dateirechte",

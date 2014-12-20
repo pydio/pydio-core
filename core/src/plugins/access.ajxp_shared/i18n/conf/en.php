@@ -19,14 +19,6 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $mess=array(
-"SSH File Transfer Protocol (SFTP)" => "SSH File Transfer Protocol (SFTP)",
-"The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2." => "Ein Netzwerk-Protokoll für Datei-Zugriff und Datei-Verwaltung über SSH2.",
-"Host" => "Host",
-"SFTP Host to connect to" => "SFTP Host mit dem eine Verbindung aufgebaut werden soll",
-"Port" => "Port",
-"SFTP Host port" => "Port auf dem SFTP-Host",
-"Path" => "Pfad",
-"Real path to the root folder on the server" => "Absoluter Pfad zum Hauptordner auf dem Server",
-"Fix Permissions" => "Berechtigungen korrigieren",
-"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung."
+"Shared Elements (deprecated)" => "Shared Elements (deprecated)",
+"Browse user shared elements. Replaced by User Dashboard" => "Browse user shared elements. Replaced by User Dashboard",
 );

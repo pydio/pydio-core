@@ -19,18 +19,18 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Mysql Database" => "Mysql Datenbank",
+"Mysql Database" => "Mysql-Datenbank",
 "This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin." => "Dieser Treiber kann eine SQL-Datenbank durchsuchen und ändern. (wie PhpMyAdmin)",
 "Host" => "Host",
-"Host to the MySQL Server" => "Host des MySQL Servers",
+"Host to the MySQL Server" => "Host des MySQL-Servers",
 "Database" => "Datenbank",
 "Database name" => "Name der Datenbank",
 "User" => "Benutzer",
 "User name (must have privileges to access this db)" => "Benutzername (muss Zugriff auf die Datenbank haben)",
 "Password" => "Passwort",
 "User password" => "Passwort des Benutzers",
-"Pattern" => "Prefix",
-"If not empty, only tables beginning with such a prefix will be displayed." => "Wenn befüllt werden nur Tabellen, die mit diesem prefix beginnen angezeigt.",
+"Pattern" => "Präfix",
+"If not empty, only tables beginning with such a prefix will be displayed." => "Wenn befüllt werden nur Tabellen, die mit diesem Präfix beginnen angezeigt.",
 "Repository Commons" => "Allgemeines zur Arbeitsumgebung",
-"Default Rights" => "Standard Rechte",
+"Default Rights" => "Standardrechte",
 );

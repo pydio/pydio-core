@@ -18,7 +18,9 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+//	german translation: Axel Otterstätter <axel.otterstaetter@googlemail.com>
+
 $mess=array(
-"Javascript Api Browser" => "Javascript-Api Browser",
-"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Pydio Javascript-Klassen und Interfaces durchsuchen. Hilfe für Entwickler oder um zu zeigen, wie Pydio-Daten von anderen Quellen einlesen kann (kein Dateisystem).",
+"Admin Driver" => "Administration",
+"Access Pydio configuration data." => "Die Pydio-Konfiguration administrieren",
 );

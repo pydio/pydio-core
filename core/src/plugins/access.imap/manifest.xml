@@ -15,9 +15,9 @@
 		<param name="USER" group="CONF_MESSAGE[Mailbox Definition]" type="string" label="CONF_MESSAGE[User]" description="CONF_MESSAGE[User account]" mandatory="true"/>
 		<param name="PASS" group="CONF_MESSAGE[Mailbox Definition]" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>
 		<param name="MAILBOX" group="CONF_MESSAGE[Mailbox Definition]" type="string" label="CONF_MESSAGE[Default Mailbox]" description="CONF_MESSAGE[Mailbox to connect by default]" mandatory="false"/>
-        <param name="DEFAULT_RIGHTS" group="CONF_MESSAGE[Repository Options]" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="CONF_MESSAGE[Default Rights]" description="CONF_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
-		<param name="PAGINATION_THRESHOLD" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[Pagination Threshold]" description="CONF_MESSAGE[When a folder will contain more items than this number, display will switch to pagination mode, for better performances.]" default="20"/>
-		<param name="PAGINATION_NUMBER" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[#Items per page]" description="CONF_MESSAGE[Once in pagination mode, number of items to display per page.]" default="20"/>
+        <param name="DEFAULT_RIGHTS" group="CONF_MESSAGE[Repository Commons]" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="CONF_MESSAGE[Default Rights]" description="CONF_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
+		<param name="PAGINATION_THRESHOLD" group="CONF_MESSAGE[Repository Commons]" type="integer" label="CONF_MESSAGE[Pagination Threshold]" description="CONF_MESSAGE[When a folder will contain more items than this number, display will switch to pagination mode, for better performances.]" default="20"/>
+		<param name="PAGINATION_NUMBER" group="CONF_MESSAGE[Repository Commons]" type="integer" label="CONF_MESSAGE[#Items per page]" description="CONF_MESSAGE[Once in pagination mode, number of items to display per page.]" default="20"/>
 	</server_settings>
 	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
 	<registry_contributions>
