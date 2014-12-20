@@ -600,8 +600,8 @@ $mess=array(
 /* Html entity would break tooltip */
 "plugtype.title.access" => "Arbeitsumgebungs-Treiber",
 "plugtype.desc.access" => "Erweiterungen die bei Arbeitsumgebungen festlgen, wie auf die Daten zugegriffen werden kann",
-"plugtype.title.action" => "Aktions-Plugins",
-"plugtype.desc.action" => "Plugins für verschiedene Zusatzfunktionen",
+"plugtype.title.action" => "Aktionen",
+"plugtype.desc.action" => "Erweiterungen für verschiedene Zusatzfunktionen",
 "plugtype.title.authfront" => "Authentifizierungs-Frontends",
 "plugtype.desc.authfront" => "Verschiedene Methoden für die Anmeldung von Benutzern via Formular, API und mehr",
 "plugtype.title.cypher" => "Verschlüsselung",
