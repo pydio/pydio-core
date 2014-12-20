@@ -21,5 +21,7 @@
 $mess = array(
     // will be replaced by the application title
     "Power FS" => "Power FS",
-    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Diese Einstellungen setzen Administrator-Zugriff voraus: Die Möglichkeit, den Webserver sowie die php-Konfiguration zu ändern, Zugriff per Kommandozeile, etc."
+    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Diese Einstellungen setzen Administrator-Zugriff voraus: Die Möglichkeit, den Webserver sowie die php-Konfiguration zu ändern, Zugriff per Kommandozeile, etc.",
+    "Zip path" => "Pfad zu 'Zip'",
+    "Path of the zip utilitary on the command line" => "Pfad zur ausführbaren Datei 'zip'.",
 );
