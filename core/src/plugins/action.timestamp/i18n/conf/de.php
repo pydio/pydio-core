@@ -19,13 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"timestamp" => "timestamp",
-"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
-"msgBox1" => "Please confirm that you want to add a timestamp to this file",
-"URL" => "URL",
-"Timestamp provider API URL" => "Timestamp provider API URL",
-"User Mail" => "User Mail",
-"Password" => "Password",
-"User account" => "User account",
-"User Password" => "User Password",
+"timestamp" => "Universign",
+"Allow timestamp files with Universign." => "Dokumente mit Universign digital signieren und mit einem Zeitstempel versehen.",
+"msgBox1" => "Soll diese Datei wirklich mit Universign signiert werden?",
+"URL" => "URL zum Universign API Webservice",
+"Timestamp provider API URL" => "Universign-API URL",
+"User Mail" => "E-Mail-Adresse",
+"Password" => "Passwort wählen",
+"User account" => "Die bei Universign registrierte E-Mail-Adresse",
+"User Password" => "Das Passwort zum Universign-Benutzer",
 );
