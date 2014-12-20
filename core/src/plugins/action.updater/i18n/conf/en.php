@@ -35,4 +35,8 @@ $mess=array(
 "Predefined proxy user name" => "Predefined proxy user name",
 "Proxy Pass" => "Proxy Pass",
 "Predefined proxy password" => "Predefined proxy password",
+"Proxy configuration" => "Proxy configuration",
+"Stable" => "Stable",
+"Development" => "Development",
+"Testing (blank)" => "Testing (blank)",
 );
