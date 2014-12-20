@@ -56,4 +56,6 @@ $mess = array(
     "20d" => "Generate Crontab expression",
     "21" => "Add the following line to your CRONTAB, replacing your password real value, and the scheduling you want (here configured to run every five minutes).",
     "22" => "Generic scheduler to perform tasks on a regular basis. Requires CLI activation and a CRONTAB or similar system.",
+    "23" => "Execution Context",
+    "24" => "Parameters",
 );
