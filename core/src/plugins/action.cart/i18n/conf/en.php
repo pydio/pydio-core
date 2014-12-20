@@ -20,20 +20,6 @@
  */
 
 $mess = array(
-
-    "1" => "In Korb legen",
-    "2" => "Das Element in den ausgewählten Korb legen",
-    "3" => "Leer",
-    "4" => "Ausgewählten Korb leeren",
-    "5" => "Neu",
-    "6" => "Neuen Korb anlegen",
-    "7" => "Download",
-    "8" => "Inhalt des ausgewählten Korbs herunterladen",
-    "9" => "Standard-Korb",
-    "10"=> "Körbe",
-    "11"=> "Inhalt des ausgewählten Korbs komprimieren und teilen",
-    "12"=> "Archiv aus Auswahl erstellen und dieses teilen",
-    "13"=> "Name des Korbs",
-    "14"=> "Archiv aus allen Dateien des Korbs erstellen und teilen. Bitte einen Namen für das Archiv angeben:",
-    "15"=> "Elemente in den Korb legen, um sie später herunter zu laden oder zu teilen.",
+    "Selection Cart" => "Selection Cart",
+    "Select files to a cart and download/share all at once" => "Select files to a cart and download/share all at once",
 );
