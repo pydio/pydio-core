@@ -21,11 +21,11 @@
 $mess=array(
 "1" => "Meta data",
 "2" => "Bez označení",
-"3" => "Remove Rating",
+"3" => "Odstranit hodnocení",
 "4" => "Nedůležité",
 "5" => "Úkoly",
 "6" => "Osobní",
 "7" => "Práce",
 "8" => "Důležité",
-"9" => "No Value",
+"9" => "Bez hodnoty",
 );
