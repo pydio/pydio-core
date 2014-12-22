@@ -55,7 +55,7 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
-			<action name="ls">
+			<action name="ls" dirDefault="true">
 				<post_processing>
 					<serverCallback methodName="lsPostProcess" capture="true"></serverCallback>
 				</post_processing>

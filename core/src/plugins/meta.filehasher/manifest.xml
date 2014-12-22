@@ -46,7 +46,7 @@
                        </serverCallback>
                    </processing>
                </action>
-               <action name="ls">
+               <action name="ls" dirDefault="true">
                    <pre_processing>
                        <serverCallback methodName="checkFullTreeCache" applyCondition="$apply=isSet($httpVars['recursive']);"/>
                    </pre_processing>
