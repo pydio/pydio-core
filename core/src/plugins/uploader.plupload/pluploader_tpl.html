@@ -6,7 +6,8 @@
     if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
     $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
     $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");    
-    
+    $pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "plupload")->getConfigs();    
+
 	$repository = ConfService::getRepository();
 	$accessType = $repository->getAccessType();
 	if($accessType == "fs"){
@@ -57,23 +58,23 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
-var upurl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
+var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
-var chunkSize = '<?PHP echo (($UploadMaxSize/1048576) - 1) . "mb"; ?>';
+var config_runtimes = '<?php echo $pluginConfigs["RUNTIMES"]; ?>';
+var config_max_file_size = '<?php echo $pluginConfigs["MAX_FILE_SIZE"]; ?>';
+var config_chunk_size = '<?php echo (!empty($pluginConfigs["CHUNK_SIZE"]) ? $pluginConfigs["CHUNK_SIZE"] : (($UploadMaxSize/1048576) - 1)."mb"); ?>';
 var currentDir = parent.ajaxplorer.getContextNode().getPath();
 
 $(function() {
 	$("#plupload_uploader").pluploadQueue({
 		// General settings
-		runtimes : 'silverlight,flash,html5,html4',
+		runtimes : config_runtimes,
 		url : uploadUrl,
-        //max_file_size : maxFileSize, //Uncomment this line and comment the following to use php.ini max file size for maximum filesize
-		max_file_size : '4096mb',
-		chunk_size : chunkSize, //Uncomment this line to use php.ini maxsize-1 for chunk size
-		//chunk_size : '2mb',
+		max_file_size : config_max_file_size,
+		chunk_size : config_chunk_size,
+
 		unique_names : false,
         multiple_queues : true,
 		multipart : true,
@@ -100,7 +101,6 @@ $(function() {
 				parent.ajaxplorer.fireContextRefresh();
                 parent.document.fire("ajaxplorer:longtask_finished");
 			}
-			$.get(upurl);
 		});
 	}
 

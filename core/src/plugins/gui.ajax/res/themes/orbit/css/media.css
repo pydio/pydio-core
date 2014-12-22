@@ -1,4 +1,12 @@
 @media only screen
+and (max-height: 500px){
+
+    div.dialogBox.form-switch_language_form div.dialogContent, div.dialogBox.form-reset-password div.dialogContent, div.dialogBox.form-reset-password-ask div.dialogContent, div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent{
+        top: 22%;
+    }
+}
+
+@media only screen
 and (max-width : 800px) {
     .custom_top_title{
         width: 23%;
@@ -75,6 +83,9 @@ and (max-width : 720px) {
     #topPane{
         width: 200px;
     }
+    #cpane_container{
+        left: 200px;
+    }
 
     .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
         width: 121px;
@@ -96,6 +107,9 @@ and (max-width : 420px){
     #topPane{
         width: 0;
         display: none;
+    }
+    #cpane_container{
+        left: 0;
     }
 
     #simple_repository_label{

@@ -162,6 +162,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             disableTextSelection(repoEl);
             if(simpleClickOpen){
                 repoEl.observe("click", function(e){
+                    repoEl.stopObserving("click");
                     select(e);
                     Event.findElement(e, "li").setOpacity(0.7);
                     switchToRepo(repoId);
@@ -169,6 +170,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             }else{
                 repoEl.observe("click", select);
                 repoEl.observe("dblclick", function(e){
+                    repoEl.stopObserving("dblclick");
                     select(e);
                     Event.findElement(e, "li").setOpacity(0.7);
                     switchToRepo(repoId);
