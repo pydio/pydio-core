@@ -1448,11 +1448,11 @@ div.dialogBox.form-diaporama_box div.dialogContent{
     float:left;
     width:280px;
     background-color: rgba(50,50,50,0.93);
-    /*background-color: rgba(32, 32, 32, 0.93);*/
 }
 
-#cpane_container{
-    float: left;
+#cpane_container {
+    position: absolute;
+    left: 280px;
 }
 
 #simple_repository_label{
