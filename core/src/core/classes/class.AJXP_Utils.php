@@ -1604,7 +1604,7 @@ class AJXP_Utils
                     } else if ($type == "text/json") {
                         $value = json_decode($value, true);
                     }
-                    if (!in_array($type, array("textarea", "boolean", "text/json"))) {
+                    if (!in_array($type, array("textarea", "boolean", "text/json", "password"))) {
                         $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                     }
                     unset($repDef[$key."_ajxptype"]);
