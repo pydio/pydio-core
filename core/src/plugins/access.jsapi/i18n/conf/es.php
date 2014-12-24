@@ -18,16 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
-$mess = array(
-    "1" => "Indexar contenido",
-    "2" => "Indexar el contenido de la carpeta",
-    "3" => "Ejecutando indexación en segundo plano",
-    "4" => "El índice parece estar bloqueado, puede que un proceso de indexación se esté realizando en este momento. En caso contrario borre el fichero .ajxp_lock localizado en la carpeta cache/indexes.",
-    "5" => "Indexación finalizada",
-    "6" => "Atención, la carpeta actual está indexándose, inténtelo más tarde.",
-    "7" => "Primera indexación de esta carpeta, por favor espere y reintente más tarde su búsqueda",
-    "8" => "Indexando %s en segundo plano",
-    "9" => "No puedo encontrar el índice de la carpeta actual! Debería ejecutar la indexación de los datos primero!",
-    "10" => "Indexando subcarpetas en segundo plano",
+ 
+$mess=array(
+"Javascript Api Browser" => "Navegador de API Javascript",
+"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Navega las clases e interfaces Javascript de Pydio. Útil para desarrolladores, pero también una buena demostración de como Pydio puede alimentarse por algo diferente a un servidor de archivos remoto.",
 );
