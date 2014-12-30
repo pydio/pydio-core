@@ -226,6 +226,9 @@
                             box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.42);
                             border-radius: 4px;
                         }
+                        .ajxp_theme_orbit .share_qrcode {
+                            margin: 18px auto 4px;
+                        }
                         #generate_publiclet, #unshare_button{
                             float: none;
                             width: 41%;
