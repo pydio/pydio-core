@@ -1168,9 +1168,14 @@ Class.create("ShareCenter", {
         }
 
         // QRCODE BUTTON
+        console.log(dialogButtonsOrRow);
         var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
-        if (this.createQRCode && qrcodediv) {
-
+        if (this.createQRCode) {
+            if(!qrcodediv){
+                qrcodediv = new Element('div', {className:'share_qrcode'});
+                dialogButtonsOrRow.insert(qrcodediv);
+                qrcodediv.hide();
+            }
             if(!dialogButtonsOrRow.down('#qrcode_button')){
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'><span class='icon-qrcode'></span> "+MessageHash['share_center.95']+"</span>"});
             }
