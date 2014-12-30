@@ -1516,7 +1516,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                     AJXP_XMLWriter::header();
                     if ($res == -1) {
-                        AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
+                        AJXP_XMLWriter::sendMessage(null, $mess[427]);
                     } else {
                         AJXP_XMLWriter::sendMessage($mess["ajxp_conf.59"], null);
                         AJXP_XMLWriter::reloadDataNode();
