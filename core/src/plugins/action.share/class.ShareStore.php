@@ -316,7 +316,7 @@ class ShareStore {
             $this->testUserCanEditShare($repo->getOwner());
             $res = ConfService::deleteRepository($element);
             if ($res == -1) {
-                throw new Exception($mess["ajxp_conf.51"]);
+                throw new Exception($mess[427]);
             }
             if($this->sqlSupported){
                 if(isSet($share)){
@@ -339,7 +339,7 @@ class ShareStore {
             $this->testUserCanEditShare($repo->getOwner());
             $res = ConfService::deleteRepository($repoId);
             if ($res == -1) {
-                throw new Exception($mess["ajxp_conf.51"]);
+                throw new Exception($mess[427]);
             }
             // Silently delete corresponding role if it exists
             AuthService::deleteRole("AJXP_SHARED-".$repoId);
