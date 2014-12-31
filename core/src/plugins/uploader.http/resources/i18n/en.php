@@ -21,5 +21,5 @@ $mess = array(
     "15"=> "Or create a bookmark manually and use the code below as the link url : ",
     "16"=> "Drag me to your bookmark bar!",
     "17"=> "Download file",
-    "18"=> "Partial file"
+    "18"=> "Partial file",
 );

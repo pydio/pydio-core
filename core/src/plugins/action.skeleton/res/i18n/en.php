@@ -28,5 +28,5 @@ $mess = array(
     "4" => "Modal Link",
     "5" => "Open the link in a modal dialog",
     "6" => "Dynamic content",
-    "7" => "Loading content, please wait..."
+    "7" => "Loading content, please wait...",
 );
