@@ -50,5 +50,5 @@ $mess = array(
     "Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com" => "Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com",
     "PTG store mode" => "PTG store mode" ,
     "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" => "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()",
-    "Install SQL Table (support only mysql)" => "Install SQL Table (support only mysql)"
+    "Install SQL Table (support only mysql)" => "Install SQL Table (support only mysql)",
 );

@@ -34,5 +34,5 @@ $mess=array(
 "Test password" => "Test password",
 "Password for connection testing" => "Password for connection testing",
 "Test Connection" => "Test connection",
-"Try to connect to RADIUS server" => "Try to connect to the RADIUS server"
+"Try to connect to RADIUS server" => "Try to connect to the RADIUS server",
 );
