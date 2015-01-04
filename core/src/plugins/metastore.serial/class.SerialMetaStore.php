@@ -263,10 +263,27 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = fopen($metaFile, "w");
+            $set_attribute_hide = false;            
+            // check if file metaFile is created for the first time and if Windows OS
+            if (!file_exists($metaFile) && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $set_attribute_hide = true;
+            }
+
+            if (!file_exists($metaFile) || strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                $fp = fopen($metaFile, "w");
+            } else { 
+                $fp = fopen($metaFile, "rw+"); // rw+ Necessary on File Hidden if Windows OS 
+            }
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+                // file metaFile is Hidden with Attribute H the first time if Windows OS 
+                if ($set_attribute_hide) {
+                    $path_metafile = realpath(fsAccessWrapper::getRealFSReference($metaFile));
+                    if (is_dir(dirname($path_metafile))) {
+                        $attributes = shell_exec('attrib +H ' . escapeshellarg($path_metafile));
+                    }
+                }
             }
             if ($scope == AJXP_METADATA_SCOPE_GLOBAL) {
                  AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));
