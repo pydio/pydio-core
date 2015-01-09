@@ -19,13 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $mess=array(
-"1" => "Meta data",
-"2" => "Bez označení",
-"3" => "Odstranit hodnocení",
-"4" => "Nedůležité",
-"5" => "Úkoly",
-"6" => "Osobní",
-"7" => "Práce",
-"8" => "Důležité",
-"9" => "Bez hodnoty",
+"1" => "Vytvořit tabulku",
+"2" => "Zde zapište svůj SQL požadavek",
+"3"	=> "Hledat",
+"4"	=> "Vymazat"
 );

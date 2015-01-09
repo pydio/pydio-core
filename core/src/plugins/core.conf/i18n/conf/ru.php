@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Generic Conf Features" => "Generic Conf Features",
-"Let user create repositories" => "Let user create workspaces",
+"Generic Conf Features" => "Основная конфигурация",
+"Let user create repositories" => "Разрешить пользоватею создавать рабочие пространства",
 "Remember guest preferences" => "Запоминать настройки для гостя",
 "Configurations Management" => "Управление конфигурациями",
 "Sets how the application core data (users,roles,etc) is stored." => "Sets how the application core data (users,roles,etc) is stored.",
@@ -49,7 +49,7 @@ $mess=array(
 "List of parameters to be edited when creating a new shared user." => "List of parameters to be edited when creating a new shared user.",
 "Configuration Store Instance" => "Configuration Store Instance",
 "Instance" => "Instance",
-"Choose the configuration plugin" => "Choose the configuration plugin",
+"Choose the configuration plugin" => "Выберите конфигурационный плагин",
 "Name" => "Имя",
 "Full name displayed to others" => "Имя, которое отображается для всех",
 "Avatar" => "Аватара",
