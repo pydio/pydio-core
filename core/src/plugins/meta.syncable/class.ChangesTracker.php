@@ -36,6 +36,96 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         parent::init($options);
     }
 
+    protected function indexIsSync(){
+        // Grab all folders mtime and compare them
+        $repoIdentifier = $this->computeIdentifier($this->accessDriver->repository);
+        $res = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [md5] = %s AND [repository_identifier] = %s", 'directory', $repoIdentifier);
+        $modified = array();
+
+        // REGISTER ROOT ANYWAY: WE PROBABLY CAN'T GET A "FILEMTIME" ON IT.
+        $mod = array(
+            "url"   => $this->accessDriver->getResourceUrl(""),
+            "path"  => "/",
+            "children" => array()
+        );
+        $children = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
+             $repoIdentifier, "/%", "/%/%");
+        foreach($children as $cRow){
+            $mod["children"][substr($cRow->node_path, 1)] = $cRow->mtime;
+        }
+        $modified[] = $mod;
+
+        clearstatcache();
+        // CHECK ALL FOLDERS
+        foreach($res as $row){
+            $path = $row->node_path;
+            $mtime = intval($row->mtime);
+            $url = $this->accessDriver->getResourceUrl($path);
+            $currentTime = @filemtime($url);
+            if($currentTime === false && !file_exists($url)) {
+                // Deleted folder!
+                $this->logDebug(__FUNCTION__, "Folder deleted directly on storage: ".$url);
+                $node = new AJXP_Node($url);
+                AJXP_Controller::applyHook("node.change", array(&$node, null, false));
+                continue;
+            }
+            if($currentTime > $mtime){
+                $mod = array(
+                    "url" => $url,
+                    "path" => $path,
+                    "children" => array(),
+                    "current_time" => $currentTime
+                );
+                $children = dibi::query("SELECT [node_path],[mtime],[md5] FROM [ajxp_index] WHERE [md5] != %s AND [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
+                    'directory', $repoIdentifier, "$path/%", "$path/%/%");
+                foreach($children as $cRow){
+                    $mod["children"][substr($cRow->node_path, strlen($path)+1)] = $cRow->mtime;
+                }
+                $modified[] = $mod;
+            }
+        }
+
+        // NOW COMPUTE DIFFS
+        foreach($modified as $mod_data){
+            $url = $mod_data["url"];
+            $current_time = $mod_data["current_time"];
+            $currentChildren = $mod_data["children"];
+            $files = scandir($url);
+            foreach($files as $f){
+                if($f[0] == ".") continue;
+                $nodeUrl = $url."/".$f;
+                $node = new AJXP_Node($nodeUrl);
+                // Ignore dirs modified time
+                // if(is_dir($nodeUrl) && $mod_data["path"] != "/") continue;
+                if(!isSet($currentChildren[$f])){
+                    // New items detected
+                    $this->logDebug(__FUNCTION__, "New item detected on storage: ".$nodeUrl);
+                    AJXP_Controller::applyHook("node.change", array(null, &$node, false));
+                    continue;
+                }else {
+                    if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
+                    if(filemtime($nodeUrl) > $currentChildren[$f]){
+                        // Changed!
+                        $this->logDebug(__FUNCTION__, "Item modified directly on storage: ".$nodeUrl);
+                        AJXP_Controller::applyHook("node.change", array(&$node, &$node, false));
+                    }
+                }
+            }
+            foreach($currentChildren as $cPath => $mtime){
+                if(!in_array($cPath, $files)){
+                    // Deleted
+                    $this->logDebug(__FUNCTION__, "File deleted directly on storage: ".$url."/".$cPath);
+                    $node = new AJXP_Node($url."/".$cPath);
+                    AJXP_Controller::applyHook("node.change", array(&$node, null, false));
+                }
+            }
+            // Now "touch" parent directory
+            if(isSet($current_time)){
+                dibi::query("UPDATE [ajxp_index] SET ", array("mtime" => $current_time), " WHERE [repository_identifier] = %s AND [node_path] = %s", $repoIdentifier, $mod_data["path"]);
+            }
+        }
+    }
+
     public function switchActions($actionName, $httpVars, $fileVars)
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
@@ -46,6 +136,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         $currentRepo = $this->accessDriver->repository;
         $recycle = $currentRepo->getOption("RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
+
+        if($this->options["OBSERVE_STORAGE_CHANGES"]){
+            $this->indexIsSync();
+        }
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
         if(isSet($httpVars["filter"])){
