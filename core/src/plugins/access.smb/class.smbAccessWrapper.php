@@ -44,6 +44,11 @@ class smbAccessWrapper extends fsAccessWrapper
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
         $path = $url["path"];
+        if (isset($url["fragment"]) && strlen($url["fragment"])) {
+            $path .= "#".$url["fragment"];
+        } elseif (substr($path, -1) == "#") {
+            $path .= "#";
+        }
         // Fix if the host is defined as //MY_HOST/path/to/folder
         $hostOption = AuthService::getFilteredRepositoryOption("access.smb", $repoObject, "HOST");
         $host = str_replace("//", "", $hostOption);
