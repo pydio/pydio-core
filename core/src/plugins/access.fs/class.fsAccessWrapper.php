@@ -70,6 +70,8 @@ class fsAccessWrapper implements AjxpWrapper
         $atRoot = empty($test);
         if (isSet($url["fragment"]) && strlen($url["fragment"]) > 0) {
             $url["path"] .= "#".$url["fragment"];
+        } elseif (substr($path, -1) == "#") {
+            $path .= "#";
         }
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
