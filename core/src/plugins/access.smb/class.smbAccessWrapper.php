@@ -37,16 +37,16 @@ class smbAccessWrapper extends fsAccessWrapper
      * @param string $path
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
-    protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
+    protected static function initPath($inputPath, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = parse_url($path);
+        $url = parse_url($inputPath);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
         $path = $url["path"];
         if (isset($url["fragment"]) && strlen($url["fragment"])) {
             $path .= "#".$url["fragment"];
-        } elseif (substr($path, -1) == "#") {
+        } elseif (substr($inputPath, -1) == "#") {
             $path .= "#";
         }
         // Fix if the host is defined as //MY_HOST/path/to/folder
