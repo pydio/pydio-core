@@ -1011,10 +1011,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 closedir($handle);
                 $fullList = array("d" => array(), "z" => array(), "f" => array());
 
+                $nodes = scandir($path);
+                usort($nodes, "strcasecmp");
                 if (isSet($orderField) && isSet($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
-                    $nodes = scandir($path, 1);
-                } else {
-                    $nodes = scandir($path);
+                    $nodes = array_reverse($nodes);
                 }
                 if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
                     usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
