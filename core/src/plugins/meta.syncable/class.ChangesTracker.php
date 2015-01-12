@@ -100,7 +100,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 if(!isSet($currentChildren[$f])){
                     // New items detected
                     $this->logDebug(__FUNCTION__, "New item detected on storage: ".$nodeUrl);
-                    AJXP_Controller::applyHook("node.change", array(null, &$node, false));
+                    AJXP_Controller::applyHook("node.change", array(null, &$node, false, true));
                     continue;
                 }else {
                     if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
