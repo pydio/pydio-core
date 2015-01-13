@@ -29,7 +29,11 @@
     	// Then pass this URL to the javascript uploadUrl => to the applet.
     	*/
 	}
-	
+
+    $minisite_session = "";
+    if(strpos(session_name(), "AjaXplorer_Shared") === 0){
+    $minisite_session = "&minisite_session=".substr(session_name(), strlen("AjaXplorer_Shared"));
+    }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -40,12 +44,11 @@
 <body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
 
 <link rel="stylesheet" href="plugins/uploader.plupload/plupload/jquery.plupload.queue/css/jquery.plupload.queue.css?v=2" type="text/css" media="screen" />
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript"> google.load("jquery", "1.6.4"); </script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 
 <script type="text/javascript" src="plugins/uploader.plupload/plupload/plupload.full.min.js"></script>
 <script type="text/javascript" src="plugins/uploader.plupload/plupload/jquery.plupload.queue/jquery.plupload.queue.min.js"></script>
-<script type="text/javascript" src="plugins/uploader.plupload/plupload/moxie.min.js"></script>
+
 <script language="javascript" type="text/javascript">
 // Fix height of modal box
 //$(window.parent.document).find("#generic_dialog_box").height(355); 
@@ -58,7 +61,7 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
+var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
