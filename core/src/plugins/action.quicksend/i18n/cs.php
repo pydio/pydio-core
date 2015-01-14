@@ -18,8 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+
 $mess = array(
-    // will be replaced by the application title
-    "Power FS" => "Power FS",
-    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc.",
+    "1" => "Rychle odeslat",
+    "2" => "Nahrát soubor, nasdílet a odeslat odkaz v jednom kroku",
+    "3" => "Vybrat soubor",
+    "4" => "Kliknout pro vybrání souboru, nebo soubor přetáhnout do zóny níže",
 );
