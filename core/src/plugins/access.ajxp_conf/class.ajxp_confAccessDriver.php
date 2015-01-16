@@ -94,7 +94,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
                 }
                 HTMLWriter::charsetHeader("application/json");
-                echo json_encode(array("LEGEND" => "Select a repository", "LIST" => $repoOut));
+                echo json_encode(array("LEGEND" => "Select a workspace", "LIST" => $repoOut));
 
             break;
 
@@ -1141,7 +1141,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                 } else {
                     if ($currentUserIsGroupAdmin) {
-                        throw new Exception("You are not allowed to create a repository from a driver. Use a template instead.");
+                        throw new Exception("You are not allowed to create a workspace from a driver. Use a template instead.");
                     }
                     $pServ = AJXP_PluginsService::getInstance();
                     $driver = $pServ->getPluginByTypeName("access", $repDef["DRIVER"]);
@@ -1228,15 +1228,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repository = ConfService::getRepositoryById($repId);
                 if ($repository == null) {
-                    throw new Exception("Cannot find repository with id $repId");
+                    throw new Exception("Cannot find workspace with id $repId");
                 }
                 if (!AuthService::canAdministrate($repository)) {
-                    throw new Exception("You are not allowed to edit this repository!");
+                    throw new Exception("You are not allowed to edit this workspace!");
                 }
                 $pServ = AJXP_PluginsService::getInstance();
                 $plug = $pServ->getPluginById("access.".$repository->accessType);
                 if ($plug == null) {
-                    throw new Exception("Cannot find access driver (".$repository->accessType.") for repository!");
+                    throw new Exception("Cannot find access driver (".$repository->accessType.") for workspace!");
                 }
                 AJXP_XMLWriter::header("admin_data");
                 $slug = $repository->getSlug();
@@ -1332,6 +1332,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "edit_repository_data" :
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
+                if(!$repo->isWriteable()){
+                    throw new Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
+                }
                 $res = 0;
                 if (isSet($httpVars["newLabel"])) {
                     $newLabel = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["newLabel"]), AJXP_SANITIZE_HTML);
@@ -1409,7 +1412,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid repository id! $repId");
+                    throw new Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceType = AJXP_Utils::sanitize($httpVars["new_meta_source"], AJXP_SANITIZE_ALPHANUM);
                 if (isSet($httpVars["json_data"])) {
@@ -1439,7 +1442,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid repository id! $repId");
+                    throw new Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceId = $httpVars["plugId"];
                 $repoOptions = $repo->getOption("META_SOURCES");
@@ -1461,7 +1464,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid repository id! $repId");
+                    throw new Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceId = $httpVars["plugId"];
                 $repoOptions = $repo->getOption("META_SOURCES");
