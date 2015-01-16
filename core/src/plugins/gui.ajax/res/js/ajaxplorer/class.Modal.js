@@ -131,7 +131,7 @@ Class.create("Modal", {
 				newForm.appendChild(actionField);
 			}		
 		}
-		if(!this.cachedForms.get(sFormId) && !skipButtons){
+		if((!this.cachedForms.get(sFormId) || sFormId == 'login_form_dynamic')  && !skipButtons){
 			this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly, "bottom", useNextButtons);
 		}
 		this.dialogContent.appendChild(newForm);
@@ -522,7 +522,7 @@ Class.create("Modal", {
 		{
 			var oThis = this;
 			object.select("form").each(function(currentForm){
-				if(currentForm.target == 'hidden_iframe' || currentForm.id=='login_form' || currentForm.id=='user_pref_form'){
+				if(currentForm.target == 'hidden_iframe' || currentForm.id == 'login_form' || currentForm.id == 'login_form_dynamic' || currentForm.id == 'user_pref_form'){
 					currentForm.hide();
 					oThis.cachedForms.set(currentForm.id,true);
 				}
