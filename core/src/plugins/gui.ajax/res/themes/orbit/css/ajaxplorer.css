@@ -5615,6 +5615,17 @@ div.overlay.form-reset-password-ask
     background-color: transparent !important;
 }
 
+.ajxp_guest_enabled div.overlay.form-login_form,
+.ajxp_guest_enabled div.overlay.form-login_form_dynamic,
+.ajxp_guest_enabled div.overlay.form-switch_language_form,
+.ajxp_guest_enabled div.overlay.form-reset-password,
+.ajxp_guest_enabled div.overlay.form-reset-password-ask
+{
+    opacity: 1 !important;
+    background-color: inherit !important;
+}
+
+
 /****************************************/
 /* WEBDAV PREFERENCES                    */
 /****************************************/

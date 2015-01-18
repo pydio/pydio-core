@@ -16,10 +16,10 @@
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="true" contextMenu="false" infoPanel="false"
-                             actionBarGroup="user">
+                             actionBarGroup="user,admin">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+                <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
 					var loginRedirect = AJXP_LOGIN_REDIRECT;
@@ -29,6 +29,7 @@
 					    modal.setCloseValidation(function(){
 					        return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
 					    });
+					    if(ajaxplorer.user && ajaxplorer.user.id == 'guest') $$('html')[0].addClassName('ajxp_guest_enabled');
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
 						function(oForm){
 						    $("generic_dialog_box").setStyle({
