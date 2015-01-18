@@ -315,7 +315,7 @@ class AuthService
             } else {
                 if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
             }
-            if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
+            if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
                 $authDriver = ConfService::getAuthDriverImpl();
                 if (!$authDriver->userExists("guest")) {
                     self::createUser("guest", "");
@@ -598,7 +598,8 @@ class AuthService
     public static function updateAdminRights($adminUser)
     {
         if(ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS") !== true){
-            foreach (ConfService::getRepositoriesList("all", false) as $repoId => $repoObject) {
+            $allRepoList = ConfService::getRepositoriesList("all", false);
+            foreach ($allRepoList as $repoId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
                 if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
                 $adminUser->personalRole->setAcl($repoId, "rw");
@@ -745,7 +746,9 @@ class AuthService
         }
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
+        AJXP_Controller::applyHook("user.before_password_change", array($userId));
         $authDriver->changePassword($userId, $userPass);
+        AJXP_Controller::applyHook("user.after_password_change", array($userId));
         if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
