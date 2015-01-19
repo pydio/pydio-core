@@ -305,9 +305,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-        if (stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")) {
-            $config["cssResources"] = array("css/pngHack/pngHack.css");
-        }
         $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
@@ -317,7 +314,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();
-        $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
         $config["SECURE_TOKEN"] = AuthService::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];

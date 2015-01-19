@@ -53,8 +53,8 @@ var Protopass = Class.create({
                 }
         	}
         }
-        if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get('password_min_length')){
-        	this.options.minchar = window.ajxpBootstrap.parameters.get('password_min_length');
+        if(window.ajxpBootstrap && parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
+        	this.options.minchar = parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
         }
         Object.extend(this.options, options || { });
         var ins = {};
