@@ -492,15 +492,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function getExposedPreferences($userObject)
     {
-        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style");
-        $jsonPrefs = array("ls_history","columns_size", "columns_visibility", "gui_preferences");
+        $stringPrefs = array("lang","history/last_repository","pending_folder","plugins_preferences");
+        $jsonPrefs = array("ls_history","gui_preferences");
         $prefs = array();
         if ( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false) {
             return array();
         }
         if ( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ) {
-            $stringPrefs = array("display","lang","pending_folder", "thumb_size","plugins_preferences","upload_auto_send","upload_auto_close", "upload_existing","action_bar_style");
-            $jsonPrefs = array("columns_size", "columns_visibility", "gui_preferences");
+            $stringPrefs = array("lang","pending_folder", "plugins_preferences");
+            $jsonPrefs = array("gui_preferences");
             $prefs["SKIP_USER_HISTORY"] = array("value" => "true", "type" => "string" );
         }
         foreach ($stringPrefs as $pref) {

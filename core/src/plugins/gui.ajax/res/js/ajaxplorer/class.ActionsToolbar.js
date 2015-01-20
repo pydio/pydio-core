@@ -56,8 +56,8 @@ Class.create("ActionsToolbar", AjxpPane, {
             this.buildActionBarStylingMenu();
             this.style = this.options.defaultStyle;
             this.styleObserver = function(){
-                if(ajaxplorer.user && ajaxplorer.user.getPreference("action_bar_style")){
-                    this.style = ajaxplorer.user.getPreference("action_bar_style");
+                if(this.getUserPreference("action_bar_style")){
+                    this.style = this.getUserPreference("action_bar_style");
                 }else{
                     this.style = this.options.defaultStyle;
                 }
@@ -565,9 +565,8 @@ Class.create("ActionsToolbar", AjxpPane, {
                 }.bind(this));
             }
             if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
-            if(ajaxplorer.user && !start){
-                ajaxplorer.user.setPreference("action_bar_style", style);
-                ajaxplorer.user.savePreference("action_bar_style");
+            if(!start){
+                this.setUserPreference("action_bar_style", style);
             }
         }.bind(this);
 
