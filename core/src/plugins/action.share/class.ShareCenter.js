@@ -94,6 +94,19 @@ Class.create("ShareCenter", {
 
     performShare: function(type){
         this.currentNode = ajaxplorer.getUserSelection().getUniqueNode();
+        var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
+        this.authorizations = {
+            folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+            folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+            file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+            editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+        };
+
+        if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
+            alert('You are not authorized to share folders');
+            return;
+        }
+
         if(type == 'workspace'){
             this.shareFolderMode = 'workspace';
         }else if(type == 'minisite-public'){
@@ -104,8 +117,17 @@ Class.create("ShareCenter", {
             this.shareFolderMode = 'file';
         }
         if(this.shareFolderMode == 'file'){
+            if(this.currentNode.isLeaf() && !this.authorizations.file_public_link){
+                alert('You are not authorized to share files');
+                return;
+            }
             this.shareFile();
         }else{
+            if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
+                this.shareFolderMode = "workspace";
+            }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
+                this.shareFolderMode = "minisite_public";
+            }
             this.shareRepository();
         }
     },
@@ -264,12 +286,14 @@ Class.create("ShareCenter", {
             if(this.maxdownload > 0){
                 oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
             }
-            this.authorizations = {
-                folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
-                folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
-                file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
-                editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
-            };
+            if(!this.authorizations){
+                this.authorizations = {
+                    folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+                    folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+                    file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+                    editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+                };
+            }
 
             if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
                 alert('You are not authorized to share folders');
@@ -280,7 +304,7 @@ Class.create("ShareCenter", {
                 hideLightBox();
                 return;
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
-                this.shareFolderMode = "workspaces";
+                this.shareFolderMode = "workspace";
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
                 this.shareFolderMode = "minisite_public";
             }
