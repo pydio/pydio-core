@@ -324,10 +324,10 @@ Class.create("FilesList", SelectableElements, {
 			change = true;
 		}
 		if(change){
+            this.setUserPreference("columns_visibility", this.hiddenColumns);
 			this.initGUI();
             this.empty(true);
 			this.fill(this.crtContext);
-            this.setUserPreference("columns_visibility", this.hiddenColumns);
 		}
 		
 	},
