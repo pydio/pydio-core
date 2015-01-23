@@ -491,8 +491,9 @@ SortableTable = Class.create({
 
 		var s;
 		var c = oRow.cells[nColumn];
-		if (c && typeof c.innerText != "undefined")
-			s = c.innerText;
+        var tC = c.textContent || c.innerText;
+		if (c && typeof tC != "undefined")
+			s = tC;
 		else
 			s = this.getInnerText(c);
 		return this.getValueFromString(s, sType);

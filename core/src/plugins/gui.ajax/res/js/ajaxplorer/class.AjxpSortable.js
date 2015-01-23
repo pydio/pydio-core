@@ -173,8 +173,9 @@ Class.create("AjxpSortable", SortableTable, {
 	splitDirsAndFiles: function(oRow, nColumn) {
 		var s;
 		var c = oRow.cells[nColumn];
-		if (typeof c.innerText != "undefined")
-			s = c.innerText;
+        var cT = c.textContent || c.innerText;
+		if (typeof cT != "undefined")
+			s = cT;
 		else
 			s = this.getInnerText(c);
 
