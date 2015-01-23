@@ -135,12 +135,15 @@ class AJXP_Plugin implements Serializable
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
-    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL)
+    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
     {
         if(!is_array($this->options)) $this->options = array();
         $merged = $this->options;
         if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $userObject;
+        if($loggedUser == null){
+            $loggedUser = AuthService::getLoggedUser();
+        }
         if ($loggedUser != null) {
             if ($repositoryScope == AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
