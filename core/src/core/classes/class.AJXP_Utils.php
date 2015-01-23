@@ -1738,7 +1738,6 @@ class AJXP_Utils
 
     public static function runCreateTablesQuery($p, $file)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
         switch ($p["driver"]) {
             case "sqlite":
@@ -1755,7 +1754,7 @@ class AJXP_Utils
                 $ext = ".pgsql";
                 break;
             default:
-                return "ERROR!, DB driver "+ $p["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $p["driver"] ." not supported yet in __FUNCTION__";
         }
 
         $result = array();

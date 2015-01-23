@@ -311,7 +311,7 @@ class AjaXplorerUpgrader
                     $ext = (is_file($this->workingFolder."/".$this->dbUpgrade.".mysql")) ? ".mysql" : ".sql";
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $conf["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver ". $conf["driver"] ." not supported yet in __FUNCTION__";
             }
 
             $file = $this->dbUpgrade.$ext;
@@ -322,7 +322,6 @@ class AjaXplorerUpgrader
             $results = array();
             $errors = array();
 
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($conf);
             dibi::begin();
             foreach ($parts as $sqlPart) {

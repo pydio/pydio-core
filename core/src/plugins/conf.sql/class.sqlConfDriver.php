@@ -55,7 +55,6 @@ class sqlConfDriver extends AbstractConfDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             dibi::connect($this->sqlDriver);
@@ -1043,7 +1042,6 @@ class sqlConfDriver extends AbstractConfDriver
         $res = AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
         // SET DB VERSION
         if(defined('AJXP_VERSION_DB') && AJXP_VERSION_DB != "##DB_VERSION##"){
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($p);
             dibi::query("UPDATE [ajxp_version] SET [db_build]=%i", intval(AJXP_VERSION_DB));
             dibi::disconnect();

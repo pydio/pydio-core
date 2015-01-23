@@ -130,7 +130,6 @@ class ChangesTracker extends AJXP_AbstractMetaSource
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
 
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $filter = null;
         $currentRepo = $this->accessDriver->repository;
@@ -321,7 +320,6 @@ class ChangesTracker extends AJXP_AbstractMetaSource
     public function updateNodesIndex($oldNode = null, $newNode = null, $copy = false)
     {
 
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         try {
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE

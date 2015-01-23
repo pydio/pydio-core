@@ -40,7 +40,6 @@ class customDbAuthDriver extends AbstractAuthDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER . "/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_CUSTOM_DRIVER"]);
         $this->coreSqlDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
 
@@ -186,7 +185,6 @@ class customDbAuthDriver extends AbstractAuthDriver
             }
         }
 
-        require_once(AJXP_BIN_FOLDER . "/dibi.compact.php");
         // Should throw an exception if there was a problem.
         dibi::connect($p);
         $cTableName = $httpVars["SQL_CUSTOM_TABLE"];
