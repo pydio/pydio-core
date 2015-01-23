@@ -263,10 +263,27 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = @fopen($metaFile, "w");
+            // check if file metaFile is created for the first time and if WinOS
+            if (!file_exists($metaFile) && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $set_attribute_hide = true;
+            } else {
+                $set_attribute_hide = false;
+            }			
+            if (!file_exists($metaFile) || strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                $fp = @fopen($metaFile, "w"); // "w" in all case if file doesn't exist
+            } else { 
+                $fp = @fopen($metaFile, "rw+"); // "rw+" Necessary for hidden File if WinOS 
+            }
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+                // file metaFile is Hidden with Attribute H the first time if WinOS 
+                if ($set_attribute_hide && $ajxpNode->wrapperClassName == "fsAccessWrapper")  {
+                    $path_metafile = realpath(fsAccessWrapper::getRealFSReference($metaFile));
+                    if (is_dir(dirname($path_metafile))) {
+                        AJXP_Utils::winSetHidden($path_metafile);
+                    }				
+                }
             }else{
                 $this->logError(__FUNCTION__, "Error while trying to open the meta file, maybe a permission problem?");
             }
