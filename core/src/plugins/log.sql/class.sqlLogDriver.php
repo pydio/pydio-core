@@ -309,9 +309,10 @@ class sqlLogDriver extends AbstractLogDriver
                     $metadata = array(
                         "icon" => "toggle_log.png",
                         "date"=> $date,
-                        "ajxp_mime" => "datagrid",
-                        "grid_datasource" => "get_action=ls&dir=".urlencode($path),
-                        "grid_header_title" => "Application Logs for $date"
+                        "ajxp_mime"         => "datagrid",
+                        "grid_datasource"   => "get_action=ls&dir=".urlencode($path),
+                        "grid_header_title" => "Application Logs for $date",
+                        "grid_actions"      => "refresh,copy_as_text"
                     );
                     $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }

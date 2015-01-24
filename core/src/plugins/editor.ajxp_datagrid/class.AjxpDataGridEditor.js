@@ -40,6 +40,75 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
         this._lists = $A();
     },
 
+    addAction: function(aName){
+        if(aName == 'refresh' && this.fRP){
+            if(!this.htmlElement.down("#refreshButton")){
+                this.htmlElement.down(".editor_action_bar").insert('' +
+                    '<a id="refreshButton" class="icon-refresh" title="Refresh">' +
+                    '   <span message_id="235" class="actionbar_button_label">Refresh</span>' +
+                    '</a>');
+                this.htmlElement.down("#refreshButton").observe("click", function(){
+                    this.fRP.reloadDataModel();
+                }.bind(this));
+            }
+        }else if(aName == 'copy_as_text'){
+            if(!this.htmlElement.down("#copyAsTextButton")){
+                this.htmlElement.down(".editor_action_bar").insert('' +
+                    '<a id="copyAsTextButton" class="icon-copy" title="Copy">' +
+                    '   <span message_id="235" class="actionbar_button_label">Copy Selection</span>' +
+                    '</a>');
+                this.htmlElement.down("#copyAsTextButton").observe("click", function(){
+                    var nodes = this.fRP.getDataModel().getSelectedNodes();
+                    if(nodes){
+                        this.showCopyAsTextWindow(nodes);
+                    }
+                }.bind(this));
+            }
+
+        }
+    },
+
+    showCopyAsTextWindow: function(nodes){
+        if(!nodes.first()) {
+            alert('Please select at least one line');
+            return;
+        }
+        if(!$('copy_as_text')){
+            $('all_forms').insert('<div id="copy_as_text" action="copy" box_width="80%">' +
+                '   <textarea id="text_copy" style="width:100%; height: 450px;"></textarea>' +
+                '</div>');
+        }
+        var onLoad = function(oForm){
+            var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
+            var exclude = ['icon','ajxp_mime','is_file','filename', 'ajxp_modiftime'];
+            var message = '';
+            var first = nodes.first();
+            var meta = first.getMetadata();
+            meta.each(function(pair){
+                if(exclude.indexOf(pair.key) == -1) {
+                    message += pair.key + '\t';
+                }
+            });
+            message += '\n\n';
+            nodes.each(function(node){
+                var meta = node.getMetadata();
+                meta.each(function(pair){
+                    if(exclude.indexOf(pair.key) == -1) {
+                        message += pair.value + '\t';
+                    }
+                });
+                message += '\n';
+            });
+            copyDiv.setValue(message);
+            copyDiv.select();
+        };
+        modal.prepareHeader('Export as text','', 'icon-copy');
+        modal.showDialogForm('Copy', 'copy_as_text', onLoad, function(){
+            hideLightBox(true);
+            return false;
+        },null,false);
+    },
+
     open : function($super, node){
         $super(node);
         this.node = node;
@@ -63,6 +132,10 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
             this.fRP._dataLoaded = false;
             this.fRP.showElement(true);
             this._lists.push(this.fRP);
+            var actions = this.node.getMetadata().get("grid_actions") || "";
+            $A(actions.split(",")).each(function(a){
+                this.addAction(a);
+            }.bind(this));
         }else{
             var i = 1;
             while(this.node.getMetadata().get("grid_datasource_" + i)){

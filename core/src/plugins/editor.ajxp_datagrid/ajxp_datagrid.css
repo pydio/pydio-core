@@ -1,5 +1,10 @@
 #ajxp_datagridbox{
     overflow: auto;
+    position: relative;
+}
+
+#ajxp_datagridbox div.action_bar.editor_action_bar{
+    top:1px;
 }
 
 #ajxp_datagridbox .tabrow{
