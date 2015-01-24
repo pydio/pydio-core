@@ -864,6 +864,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 $confStorage = ConfService::getConfStorageImpl();
                 $userId = null;
+                $usersMoved = array();
+
+                $basePath = (AuthService::getLoggedUser()!=null ? AuthService::getLoggedUser()->getGroupPath(): "/");
+                if(empty ($basePath)) $basePath = "/";
+                if (!empty($groupPath)) {
+                    $targetPath = rtrim($basePath, "/")."/".ltrim($groupPath, "/");
+                } else {
+                    $targetPath = $basePath;
+                }
+
                 foreach ($userSelection->getFiles() as $selectedUser) {
                     $userId = basename($selectedUser);
                     if (!AuthService::userExists($userId)) {
@@ -873,18 +883,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if( ! AuthService::canAdministrate($user) ){
                         continue;
                     }
-                    $basePath = (AuthService::getLoggedUser()!=null ? AuthService::getLoggedUser()->getGroupPath(): "/");
-                    if(empty ($basePath)) $basePath = "/";
-                    if (!empty($groupPath)) {
-                        $user->setGroupPath(rtrim($basePath, "/")."/".ltrim($groupPath, "/"), true);
-                    } else {
-                        $user->setGroupPath($basePath, true);
-                    }
+                    $user->setGroupPath($targetPath, true);
                     $user->save("superuser");
+                    $usersMoved[] = $user->getId();
                 }
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::reloadDataNode($dest, $userId);
+                if(count($usersMoved)){
+                    AJXP_XMLWriter::sendMessage(count($usersMoved)." user(s) successfully moved to ".$targetPath, null);
+                    AJXP_XMLWriter::reloadDataNode($dest, $userId);
+                    AJXP_XMLWriter::reloadDataNode();
+                }else{
+                    AJXP_XMLWriter::sendMessage(null, "No users moved, there must have been something wrong.");
+                }
                 AJXP_XMLWriter::close();
 
                 break;
