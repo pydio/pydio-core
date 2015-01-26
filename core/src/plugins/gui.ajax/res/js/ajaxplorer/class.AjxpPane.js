@@ -486,7 +486,9 @@ Class.create("AjxpPane", {
         }
         if (bStyles.length) {
             i = Math.floor( Math.random() * bStyles.length);
-            this.htmlElement.setAttribute("style", bStyles[i]);
+            var bg = bStyles[i];
+            if(Modernizr.backgroundsize) bg = bg.replace('background-size:100%','background-size:cover').replace('background-size:140%','background-size:cover');
+            this.htmlElement.setAttribute("style", bg);
         }
 
     }
