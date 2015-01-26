@@ -121,8 +121,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 // already loaded!
                 return true;
             }
-            $this->load();
-            if (! isSet($this->rights["ajxp.admin"])) {
+            $result_rights = dibi::query('SELECT [rights] FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), 'ajxp.admin');
+            $testRight = $result_rights->fetchSingle();
+            if ($testRight === false) {
                 return false;
             }
 
