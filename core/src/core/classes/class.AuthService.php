@@ -191,8 +191,8 @@ class AuthService
         } else $login = array("count"=>1, "time"=>time());
         $loginArray[$serverAddress] = $login;
         if ($login["count"] > 3) {
-            if (AJXP_SERVER_DEBUG) {
-                AJXP_Logger::debug("DEBUG : IGNORING BRUTE FORCE ATTEMPTS!");
+            if (AJXP_SERVER_DEBUG || ConfService::getCoreConf("DISABLE_BRUTE_FORCE_CHECK", "auth") === true) {
+                AJXP_Logger::debug("Warning: failed login 3 time for $login from address $serverAddress! Captcha is disabled.");
                 return true;
             }
             return FALSE;
