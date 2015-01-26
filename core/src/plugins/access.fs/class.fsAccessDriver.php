@@ -1973,6 +1973,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if(class_exists("ShareCenter")){
             $shareCenter = ShareCenter::getShareCenter("action.share");
         }
+        if($handle === false){
+            $this->logError(__FUNCTION__, "Cannot open folder ".$dirName);
+            return;
+        }
         while (false !== ($entry = readdir($handle))) {
             if ($entry == "" || $entry == ".."  || AJXP_Utils::isHidden($entry) ) {
                 continue;
