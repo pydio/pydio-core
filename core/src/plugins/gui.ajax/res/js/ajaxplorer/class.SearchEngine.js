@@ -81,7 +81,12 @@ Class.create("SearchEngine", AjxpPane, {
                  if(this._ajxpOptions.openSearchInput){
                      this.closeSearchInput();
                  }
-                 ajaxplorer.goTo(selectedNode);
+                 if(ajxpOptions['leavesOpenOnSelect'] && selectedNode.isLeaf()){
+                     ajaxplorer.openCurrentSelectionInEditor(null, selectedNode);
+                 }else{
+                     ajaxplorer.goTo(selectedNode);
+                 }
+                 this._dataModel.setSelectedNodes([]);
              }
          }.bind(this));
 

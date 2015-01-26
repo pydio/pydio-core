@@ -155,7 +155,7 @@ Class.create("RemoteNodeProvider", {
 		    if(console){
 		         console.log(transport.responseText);
 		    }
-		    nodeCallback(origNode);
+		    if(nodeCallback) nodeCallback(origNode);
 		    origNode.setLoaded(false);
 		    throw new Error('Invalid XML Document (see console)');
 		}

@@ -255,7 +255,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            echo AJXP_XMLWriter::renderNode($nodeKey, $userId, false, $meta, true, false);
+            echo AJXP_XMLWriter::renderNode($nodeKey, $userId, true, $meta, true, false);
 
         }
 
