@@ -136,11 +136,11 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
 
         $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
         $res = null;
-        if($this->getOption("MOUNT_ENV_PASSWD") === true){
+        if($this->getOption("MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
         }
         system($cmd, $res);
-        if($this->getOption("MOUNT_ENV_PASSWD") === true){
+        if($this->getOption("MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=");
         }
         if($res === null){
