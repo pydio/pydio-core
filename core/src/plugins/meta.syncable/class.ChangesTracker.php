@@ -129,8 +129,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource
     public function switchActions($actionName, $httpVars, $fileVars)
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
-
-        dibi::connect($this->sqlDriver);
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
         $filter = null;
         $currentRepo = $this->accessDriver->repository;
         $recycle = $currentRepo->getOption("RECYCLE_BIN");
@@ -319,7 +320,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource
      */
     public function updateNodesIndex($oldNode = null, $newNode = null, $copy = false)
     {
-
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
         try {
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
