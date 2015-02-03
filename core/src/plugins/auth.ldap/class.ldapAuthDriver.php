@@ -47,6 +47,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     public $separateGroup = "";
 
     public $hasGroupsMapping = false;
+    public $attrMemberInGroup = true;
 
 
     /**
@@ -73,6 +74,12 @@ class ldapAuthDriver extends AbstractAuthDriver
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if (!empty($options["LDAP_FAKE_MEMBEROF"])) $this->fakeAttrMemberOf = $options["LDAP_FAKE_MEMBEROF"];
+        if (isset($options["LDAP_VALUE_MEMBERATTR_IN_GROUP"])) {
+            $this->attrMemberInGroup = $options["LDAP_VALUE_MEMBERATTR_IN_GROUP"];
+        }else{
+            $this->attrMemberInGroup = true;
+        }
+
         if ($options["LDAP_PAGE_SIZE"]) $this->pageSize = $options["LDAP_PAGE_SIZE"];
         if ($options["LDAP_GROUP_PREFIX"]) $this->mappedRolePrefix = $options["LDAP_GROUP_PREFIX"];
         if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
@@ -358,7 +365,14 @@ class ldapAuthDriver extends AbstractAuthDriver
 
                         // fake memberOf
                         if (($this->fakeAttrMemberOf) && method_exists($this, "fakeMemberOf") && in_array(strtolower("memberof"), array_map("strtolower", $expected))) {
-                            $uid = $entry["dn"];
+                            if($this->attrMemberInGroup){
+                                $uid = $entry["dn"];
+                            }else{
+                                $uidWithEqual = explode(",", $entry["dn"]);
+                                $uidShort = explode("=",$uidWithEqual[0]);
+                                $uid = $uidShort[1];
+                            }
+
                             $strldap = "(&" . $this->ldapGFilter . "(" .$this->fakeAttrMemberOf. "=" . $uid . "))";
                             $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
                         }
