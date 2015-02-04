@@ -6,7 +6,6 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="BITLY_USER" type="string" label="CONF_MESSAGE[User Name]" description="CONF_MESSAGE[Bit.ly account user name]" mandatory="true"/>
         <global_param name="BITLY_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[Bit.ly account API Key]" mandatory="true"/>
     </server_settings>
 	<registry_contributions>

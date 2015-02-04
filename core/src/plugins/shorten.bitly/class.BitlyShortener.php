@@ -39,24 +39,22 @@ class BitlyShortener extends AJXP_Plugin
             $elementId = -1;
         }
 
-        $BITLY_USER = $this->getFilteredOption("BITLY_USER");
         $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
 
-        if (empty($BITLY_USER) || empty($BITLY_APIKEY)) {
+        if (empty($BITLY_APIKEY)) {
             print($url);
-            $this->logError("Config", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
+            $this->logError("Config", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the api key!");
             return;
         }
-        $bitly_login = $BITLY_USER;
         $bitly_api = $BITLY_APIKEY;
         $format = 'json';
-        $version = '2.0.1';
-        $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
+        $version = '3';
+        $bitly = 'https://api-ssl.bitly.com/v$version/shorten?longUrl='.urlencode($url).'&access_token='.$bitly_api.'&format='.$format;
         $response = AJXP_Utils::getRemoteContent($bitly);
         $json = json_decode($response, true);
-        if (isSet($json['results'][$url]['shortUrl'])) {
-            print($json['results'][$url]['shortUrl']);
-            $this->updateMetaShort($httpVars["file"], $elementId, $json['results'][$url]['shortUrl']);
+        if (isSet($json['data']['url'])) {
+            print($json['data']['url']);
+            $this->updateMetaShort($httpVars["file"], $elementId, $json['data']['url']);
         } else {
             print($url);
         }

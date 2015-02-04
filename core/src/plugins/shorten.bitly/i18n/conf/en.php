@@ -21,8 +21,6 @@
 $mess=array(
 "Bit.ly URL Shortener" => "Bit.ly URL Shortener",
 "Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Shorten Download Links before sending them back to the user. Requires a Bit.ly account.",
-"User Name" => "User Name",
-"Bit.ly account user name" => "Bit.ly account user name",
 "API Key" => "API Key",
 "Bit.ly account API Key" => "Bit.ly account API Key",
 );
