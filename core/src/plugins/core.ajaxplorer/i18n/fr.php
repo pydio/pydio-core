@@ -592,6 +592,7 @@ $mess=array(
 "534" => "Mot de passe utilisé pour se logger",
 "535" => "Envoyer le mot de passe par email",
 "536" => "Envoyer un email de bienvenue à l'utilisateur, contenant son mot de passe.",
+"537" => "Fichier Powerpoint",
 "plugtype.title.access" => "Drivers de dépôts",
 "plugtype.desc.access" => "Les plugins définissent tant à la fois le fonctionnement d'un dépot (stockage de fichiers ou tout autre chose), que l'apparence et les actions.",
 "plugtype.title.action" => "Plugins d'actions",

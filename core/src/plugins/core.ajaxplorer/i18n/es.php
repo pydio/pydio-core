@@ -596,6 +596,7 @@ $mess=array(
 "534" => "Password used to login",
 "535" => "Send password by email",
 "536" => "Send a welcome email including the password to the new user",
+"537" => "Archivo Powerpoint",
 "plugtype.title.access" => "Workspaces Drivers",
 "plugtype.desc.access" => "Plugins defining how a workspace will both access its backend (a file storage or whatever else) and major layouts and actions.",
 "plugtype.title.action" => "Action plugins",
