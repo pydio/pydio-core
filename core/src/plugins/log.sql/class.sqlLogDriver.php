@@ -124,9 +124,10 @@ class sqlLogDriver extends AbstractLogDriver
         if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
             for($i = 0;$i<$count;$i++){
                 $dateCurs = $start + $i;
-                $dateK = date($dKeyFormat, strtotime("-$dateCurs day", $ref));
+                $timeDate = strtotime("-$dateCurs day", $ref);
+                $dateK = date($dKeyFormat, $timeDate);
                 if(!isSet($dKeyFormat[$dateK])){
-                    array_push($all, array("Date" => $dateK));
+                    array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
                 }
             }
         }
