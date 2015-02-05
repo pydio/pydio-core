@@ -190,10 +190,11 @@ kbd {
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel{
     margin-top: -29px;
-    opacity: 0;
-    background-color: rgba(58, 58, 58, 0.52);
+    opacity: 1;
+    background-color: rgba(237, 237, 237, 0.82);
     padding: 8px 3px;
-    color: #FFF;
+    color: #666;
+    text-shadow: 1px 1px 0px white;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
