@@ -153,8 +153,12 @@ class AjaXplorerUpgrader
     public function checkTargetFolder()
     {
         if (!is_writable(AJXP_INSTALL_PATH)) {
-            throw new Exception("The root install path is not writeable, no file will be copied!
-            The archive is available on your server, you can copy its manually to override the current installation.");
+            throw new Exception("The root install path is not writeable, no file will be overriden!
+            <br>When performing upgrades, first change the ownership (using chown) of the Pydio root folder
+            to your web server account (e.g. www-data or apache) and propagate that ownership change to all
+            Pydio sub-folders. <br>Run the upgrade again then, post upgrade, change the ownership back
+            to the previous settings for all Pydio folders, <b>except for the data/ folder</b> that must stay
+            writeable by the web server.");
         }
         return "OK";
     }
