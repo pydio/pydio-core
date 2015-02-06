@@ -99,13 +99,13 @@ class ShareStore {
             $loader = 'ShareCenter::loadPubliclet($data);';
         }
 
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $data, MCRYPT_MODE_ECB));
+        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, str_pad($hash, 16, "\0"), $data, MCRYPT_MODE_ECB));
         $fileData = "<"."?"."php \n".
             '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
             '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
             '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-            '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
-            '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
+            '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
+            '   // if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
             '   // Ok extract the data '."\n".
             '   $data = unserialize($inputData); '.$loader;
         if (@file_put_contents($this->downloadFolder."/".$hash.".php", $fileData) === FALSE) {
@@ -125,6 +125,7 @@ class ShareStore {
                 $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
                 if(!empty($data)){
                     $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
+                    $data["SECURITY_MODIFIED"] = false;
                     return $data;
                 }
             }
@@ -134,6 +135,12 @@ class ShareStore {
         $inputData = '';
         // Necessary for the eval
         $id = $hash;
+        // UPDATE LINK FOR PHP5.6
+        if(trim($lines[4]) == '$inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");' && is_writable($file)){
+            // Upgrade line
+            $lines[4] = '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");'."\n";
+            $res = file_put_contents($file, implode('', $lines));
+        }
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         if(empty($inputData)) return false;

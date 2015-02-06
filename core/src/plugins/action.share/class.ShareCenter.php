@@ -1118,12 +1118,30 @@ class ShareCenter extends AJXP_Plugin
         if(!is_a($repoObject, "Repository")) {
             $repoObject = ConfService::getRepositoryById($data["REPOSITORY"]);
         }
+        $repoLoaded = false;
 
-        ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
-        AJXP_Controller::registryReset();
-        $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
+        if(!empty($repoObject)){
+            try{
+                ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
+                $repoLoaded = true;
+            }catch (Exception $e){
+                // Cannot load this repository anymore.
+            }
+        }
+        if($repoLoaded){
+            AJXP_Controller::registryReset();
+            $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
+        }
         $this->getShareStore()->deleteShare("file", $elementId);
-        $this->removeShareFromMeta($ajxpNode, $elementId);
+        if(isSet($ajxpNode)){
+            try{
+                $this->removeShareFromMeta($ajxpNode, $elementId);
+            }catch (Exception $e){
+
+            }
+            gc_collect_cycles();
+        }
+
     }
 
     /**
