@@ -871,7 +871,13 @@ class AJXP_Utils
         if (!$withURI) {
             return "$protocol://$name$port";
         } else {
-            return "$protocol://$name$port".dirname($_SERVER["REQUEST_URI"]);
+            $uri = dirname($_SERVER["REQUEST_URI"]);
+            $api = ConfService::currentContextIsRestAPI();
+            if(!empty($api)){
+                // Keep only before api base
+                $uri = array_shift(explode("/".$api."/", $uri));
+            }
+            return "$protocol://$name$port".$uri;
         }
     }
 

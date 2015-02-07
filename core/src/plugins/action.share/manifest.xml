@@ -243,8 +243,9 @@
                             if(action) action.selectionContext.dir = false;
                         }
                     ]]></clientListener>
-                    <serverCallback methodName="switchAction" developerComment="Main action for sharing a file or a folder">
-                        <input_param description="Path of the resource to share" name="file" type="path" mandatory="true"/>
+                    <serverCallback methodName="switchAction" restParams="/simple_share_type/file+" developerComment="Main action for sharing a file or a folder">
+                        <input_param description="Path of the resource to share" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                        <input_param description="Simple type for sharing via the REST api, always links, public or private" name="simple_share_type" type="public|private" mandatory="false"/>
                         <input_param description="Specific type of sharing" name="sub_action" type="delegate_repo|create_minisite|public_link" mandatory="true"/>
                         <input_param description="For editing the data of an existing workspace/minisite" name="repository_id" type="string" mandatory="false"/>
                         <input_param description="For a workspace, directly set a watch on this for the current user" name="self_watch_folder" type="boolean"/>

@@ -164,6 +164,26 @@ class ConfService
     {
         return php_sapi_name() === "cli";
     }
+
+    protected static $restAPIContext;
+
+    /**
+     * Set or get if we are currently running REST
+     * @static
+     * @param null $set
+     * @param string $baseUrl
+     * @return bool
+     */
+    public static function currentContextIsRestAPI($restBase = '')
+    {
+        if(!empty($restBase)){
+            self::$restAPIContext = $restBase;
+            return $restBase;
+        }else{
+            return self::$restAPIContext;
+        }
+    }
+
     /**
      * Check the presence of mcrypt and option CMDLINE_ACTIVE
      * @static

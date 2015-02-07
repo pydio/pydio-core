@@ -182,6 +182,12 @@ class ShareCenter extends AJXP_Plugin
             //------------------------------------
             case "share":
                 $subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
+                if(empty($subAction) && isSet($httpVars["simple_share_type"])){
+                    $subAction = "create_minisite";
+                    if(!isSet($httpVars["simple_right_read"]) && !isSet($httpVars["simple_right_download"])){
+                        $httpVars["simple_right_read"] = $httpVars["simple_right_download"] = "true";
+                    }
+                }
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $ajxpNode = new AJXP_Node($this->urlBase.$file);
                 if (!file_exists($ajxpNode->getUrl())) {
@@ -223,6 +229,12 @@ class ShareCenter extends AJXP_Plugin
                 } else if ($subAction == "create_minisite") {
                     header("Content-type:text/plain");
                     if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
+                    if(isSet($httpVars["simple_share_type"])){
+                        $httpVars["create_guest_user"] = "true";
+                        if($httpVars["simple_share_type"] == "private" && !isSet($httpVars["guest_user_pass"])){
+                            throw new Exception("Please provide a guest_user_pass for private link");
+                        }
+                    }
                     $res = $this->createSharedMinisite($httpVars, $this->repository, $this->accessDriver);
                     if (!is_array($res)) {
                         $url = $res;
@@ -971,10 +983,19 @@ class ShareCenter extends AJXP_Plugin
                 $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
             }
         }
-        $templateName = "ajxp_shared_folder";
+        // Default value
         if(isSet($data["AJXP_TEMPLATE_NAME"])){
             $templateName = $data["AJXP_TEMPLATE_NAME"];
             if($templateName == "ajxp_film_strip" && AJXP_Utils::userAgentIsMobile()){
+                $templateName = "ajxp_shared_folder";
+            }
+        }
+        if(!isSet($templateName)){
+            $repoObject = ConfService::getRepositoryById($repository);
+            $filter = $repoObject->getContentFilter();
+            if(!empty($filter) && count($filter->virtualPaths) == 1){
+                $templateName = "ajxp_unique_strip";
+            }else{
                 $templateName = "ajxp_shared_folder";
             }
         }
@@ -1537,6 +1558,10 @@ class ShareCenter extends AJXP_Plugin
             }
             if($setFilter){
                 $httpVars["filter_nodes"] = $userSelection->buildNodes($this->accessDriver);
+            }
+            if(!isSet($httpVars["repo_label"])){
+                $first = $userSelection->getUniqueNode($this->accessDriver);
+                $httpVars["repo_label"] = SystemTextEncoding::toUTF8($first->getLabel());
             }
         }
         $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser);
