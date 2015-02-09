@@ -890,10 +890,12 @@ class ldapAuthDriver extends AbstractAuthDriver
 
     public function getCountFromCache()
     {
+        $ttl = $this->getOption("LDAP_COUNT_CACHE_TTL");
+        if(empty($ttl)) $ttl = 1;
         $fileName = "ldap.ser";
         if (file_exists($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName)) {
             $fileContent = unserialize(file_get_contents($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName));
-            if (($fileContent) && ($fileContent["count"]) && ($fileContent["timestamp"]) && ((time() - $fileContent["timestamp"]) < 60 * 30)) {
+            if (($fileContent) && ($fileContent["count"]) && ($fileContent["timestamp"]) && ((time() - $fileContent["timestamp"]) < 60 * 60 * $ttl)) {
                 return $fileContent;
             }
         }
