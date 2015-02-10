@@ -388,6 +388,7 @@ class AJXP_Controller
               } else {
                   $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
                   $tmpBat = implode(DIRECTORY_SEPARATOR, array( $basePath, "data","tmp", md5(time()).".bat"));
+                  $cmd = "@chcp 1252 > nul \r\n".$cmd;
                   $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                   AJXP_Logger::debug("Writing file $cmd to $tmpBat");
                   file_put_contents($tmpBat, $cmd);
