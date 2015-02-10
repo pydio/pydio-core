@@ -415,7 +415,6 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-        //if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;
@@ -487,7 +486,9 @@ Class.create("AjxpPane", {
         }
         if (bStyles.length) {
             i = Math.floor( Math.random() * bStyles.length);
-            this.htmlElement.setAttribute("style", bStyles[i]);
+            var bg = bStyles[i];
+            if(Modernizr.backgroundsize) bg = bg.replace('background-size:100%','background-size:cover').replace('background-size:140%','background-size:cover');
+            this.htmlElement.setAttribute("style", bg);
         }
 
     }

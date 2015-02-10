@@ -20,7 +20,6 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
 /**
  * AJXP_User class for the conf.sql driver.
@@ -122,8 +121,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 // already loaded!
                 return true;
             }
-            $this->load();
-            if (! isSet($this->rights["ajxp.admin"])) {
+            $result_rights = dibi::query('SELECT [rights] FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), 'ajxp.admin');
+            $testRight = $result_rights->fetchSingle();
+            if ($testRight === false) {
                 return false;
             }
 

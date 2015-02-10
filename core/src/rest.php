@@ -44,7 +44,7 @@ if(AuthService::getLoggedUser() == null){
     exit;
 }
 $authDriver = ConfService::getAuthDriverImpl();
-
+ConfService::currentContextIsRestAPI("api");
 
 $uri = $_SERVER["REQUEST_URI"];
 $scriptUri = ltrim(dirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";

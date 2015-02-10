@@ -190,10 +190,11 @@ kbd {
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel{
     margin-top: -29px;
-    opacity: 0;
-    background-color: rgba(58, 58, 58, 0.52);
+    opacity: 1;
+    background-color: rgba(237, 237, 237, 0.82);
     padding: 8px 3px;
-    color: #FFF;
+    color: #666;
+    text-shadow: 1px 1px 0px white;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
@@ -1448,11 +1449,11 @@ div.dialogBox.form-diaporama_box div.dialogContent{
     float:left;
     width:280px;
     background-color: rgba(50,50,50,0.93);
-    /*background-color: rgba(32, 32, 32, 0.93);*/
 }
 
-#cpane_container{
-    float: left;
+#cpane_container {
+    position: absolute;
+    left: 280px;
 }
 
 #simple_repository_label{
@@ -5615,6 +5616,17 @@ div.overlay.form-reset-password-ask
     background-color: transparent !important;
 }
 
+.ajxp_guest_enabled div.overlay.form-login_form,
+.ajxp_guest_enabled div.overlay.form-login_form_dynamic,
+.ajxp_guest_enabled div.overlay.form-switch_language_form,
+.ajxp_guest_enabled div.overlay.form-reset-password,
+.ajxp_guest_enabled div.overlay.form-reset-password-ask
+{
+    opacity: 1 !important;
+    background-color: inherit !important;
+}
+
+
 /****************************************/
 /* WEBDAV PREFERENCES                    */
 /****************************************/
@@ -5630,7 +5642,6 @@ div.overlay.form-reset-password-ask
 }
 
 #perworkspace-urls-toggle{
-    text-decoration: underline;
     cursor: pointer;
 }
 #perworkspace-urls-toggle span{

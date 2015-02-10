@@ -94,6 +94,9 @@ define("USE_OPENSSL_RANDOM", false);
 
 function AjaXplorer_autoload($className)
 {
+    if($className == "dibi"){
+        require_once(AJXP_BIN_FOLDER."/dibi/dibi.php");
+    }
     $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
     if (file_exists($fileName)) {
         require_once($fileName);

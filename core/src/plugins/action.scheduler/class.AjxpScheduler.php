@@ -175,13 +175,16 @@ class AjxpScheduler extends AJXP_Plugin
             $queued = false;
         }
         if ( ( $res >= $lastExec && $res < $now && !$alreadyRunning ) || $queued || $forceStart) {
-            if ($data["user_id"] == "*") {
-                $data["user_id"] = implode(",", array_keys(AuthService::listUsers()));
-            } else if ($data["user_id"] == "*/*") {
+            if ($data["user_id"] == "*/*" || $data["user_id"] == "*") {
                 // Recurse all groups and put them into a queue file
                 $allUsers = array();
-                $this->gatherUsers($allUsers, "/");
+                if($data["user_id"] == "*"){
+                    $allUsers = $this->listUsersIds();
+                }else{
+                    $this->gatherUsers($allUsers, "/");
+                }
                 $tmpQueue = AJXP_CACHE_DIR."/cmd_outputs/queue_".$taskId."";
+                echo "Queuing ".count($allUsers)." users in file ".$tmpQueue."\n";
                 file_put_contents($tmpQueue, implode(",", $allUsers));
                 $data["user_id"] = "queue:".$tmpQueue;
             }
@@ -205,10 +208,16 @@ class AjxpScheduler extends AJXP_Plugin
         return false;
     }
 
+    protected function listUsersIds($baseGroup = "/"){
+        $authDriver = ConfService::getAuthDriverImpl();
+        $pairs = $authDriver->listUsers($baseGroup);
+        return array_keys($pairs);
+    }
+
     protected function gatherUsers(&$users, $startGroup="/")
     {
-        $u = AuthService::listUsers($startGroup);
-        $users = array_merge($users, array_keys($u));
+        $u = $this->listUsersIds($startGroup);
+        $users = array_merge($users, $u);
         $g = AuthService::listChildrenGroups($startGroup);
         if (count($g)) {
             foreach ($g as $gName => $gLabel) {
@@ -505,9 +514,9 @@ class AjxpScheduler extends AJXP_Plugin
     public function fakeLongTask($action, $httpVars, $fileVars)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        $this->logDebug("Running Fake task on ".AuthService::getLoggedUser()->getId());
+        $this->logInfo(__FUNCTION__, "Running Fake task on ".AuthService::getLoggedUser()->getId());
         print('STARTING FAKE TASK');
-        sleep($minutes * 60);
+        sleep($minutes * 30);
         print('ENDIND FAKE TASK');
     }
 

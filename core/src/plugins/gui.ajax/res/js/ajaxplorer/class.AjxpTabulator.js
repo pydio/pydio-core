@@ -552,7 +552,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             if(Class.objectImplements(ajxpObject, "IActionProvider") && ajxpObject.getActions()){
                 ajxpObject.getActions().each(function(act){
-                    this.guiActions.unset(act.key);// = this.guiActions.without(act);
+                    ajaxplorer.guiActions.unset(act.key);
                 }.bind(this) );
             }
 			ajxpObject.destroy();

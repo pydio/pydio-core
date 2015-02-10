@@ -55,7 +55,6 @@ class sqlConfDriver extends AbstractConfDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             dibi::connect($this->sqlDriver);
@@ -270,7 +269,7 @@ class sqlConfDriver extends AbstractConfDriver
                     }
                 }else if(strpos($cValue, "regexp:") === 0){
                     $regexp = str_replace("regexp:", "", $cValue);
-                    $wheres[] = array("[$cName] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanLike($regexp));
+                    $wheres[] = array("[$cName] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanRegexp($regexp));
                 }else if ($cValue == AJXP_FILTER_NOT_EMPTY){
                     $wheres[] = array("[$cName] IS NOT NULL");
                 }else if ($cValue == AJXP_FILTER_EMPTY){
@@ -442,15 +441,17 @@ class sqlConfDriver extends AbstractConfDriver
     public function deleteRepository($repositoryId)
     {
         try {
-            $result = dibi::query('DELETE FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
-            $result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
-            $result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
+            dibi::query('DELETE FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
+            dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
+            dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId);
 
             switch ($this->sqlDriver["driver"]) {
-                case "sqlite":
-                case "sqlite3":
                 case "postgre":
                     dibi::nativeQuery("SET bytea_output=escape");
+                    $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                    break;
+                case "sqlite":
+                case "sqlite3":
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 case "mysql":
@@ -467,15 +468,10 @@ class sqlConfDriver extends AbstractConfDriver
             }
 
         } catch (DibiException $e) {
+            $this->logError(__FUNCTION__, $e->getMessage());
             return -1;
         }
-
-        // Deleting a non-existent repository also qualifies as an error jcg Call to a member function getAffectedRows() on a non-object
-        /*
-        if (false === $result->getAffectedRows()) {
-            return -1;
-        }
-        */
+        return 1;
     }
 
     public function getUserChildren( $userId )
@@ -1046,7 +1042,6 @@ class sqlConfDriver extends AbstractConfDriver
         $res = AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
         // SET DB VERSION
         if(defined('AJXP_VERSION_DB') && AJXP_VERSION_DB != "##DB_VERSION##"){
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($p);
             dibi::query("UPDATE [ajxp_version] SET [db_build]=%i", intval(AJXP_VERSION_DB));
             dibi::disconnect();

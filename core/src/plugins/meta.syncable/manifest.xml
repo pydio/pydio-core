@@ -5,6 +5,7 @@
     <server_settings>
         <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
         <param name="REPO_SYNCABLE" type="boolean" label="Syncable Workspace" description="Workspace is syncable" default="true" scope="repository" expose="true"/>
+        <param name="OBSERVE_STORAGE_CHANGES" type="boolean" label="Observe storage changes [Experimental]" description="Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio." default="false" scope="repository" expose="false"/>
     </server_settings>
     <registry_contributions>
            <actions>

@@ -28,6 +28,10 @@ Class.create("XHRUploader", {
     dataModel: null,
     contextNode: null,
     currentBackgroundPanel: null,
+    // Copy get/setUserPrefs from AjxpPane
+    getUserPreference: AjxpPane.prototype.getUserPreference,
+    setUserPreference: AjxpPane.prototype.setUserPreference,
+
 
 	initialize : function( formObject, mask ){
 
@@ -35,7 +39,7 @@ Class.create("XHRUploader", {
 
 		formObject = $(formObject);
 		// Main form
-		this.mainForm = formObject;
+		this.htmlElement = this.mainForm = formObject;
 		
 		// Where to write the list
 		this.listTarget = formObject.down('div.uploadFilesList');
@@ -312,32 +316,29 @@ Class.create("XHRUploader", {
 		optionPane.autoSendCheck.observe("click", function(e){				
 			var autoSendOpt = optionPane.autoSendCheck.checked;
 			if(ajaxplorer.user){
-				ajaxplorer.user.setPreference('upload_auto_send', (autoSendOpt?'true':'false'));
-				ajaxplorer.user.savePreference('upload_auto_send');
+				this.setUserPreference('upload_auto_send', (autoSendOpt?'true':'false'));
 			}else{
 				 setAjxpCookie('upload_auto_send', (autoSendOpt?'true':'false'));
 			}			
-		});
+        }.bind(this));
 		optionPane.autoCloseCheck.observe("click", function(e){				
 			var autoCloseOpt = optionPane.autoCloseCheck.checked;
 			if(ajaxplorer.user){
-				ajaxplorer.user.setPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
-				ajaxplorer.user.savePreference('upload_auto_close');
+                this.setUserPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}else{
 				 setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}			
-		});
+		}.bind(this));
 		optionPane.existingRadio.each(function(el){
 			el.observe("click", function(e){
 				var value = el.value;
 				if(ajaxplorer.user){
-					ajaxplorer.user.setPreference('upload_existing', value);
-					ajaxplorer.user.savePreference('upload_existing');
+                    this.setUserPreference('upload_existing', value);
 				}else{
 					 setAjxpCookie('upload_existing', value);
 				}							
-			});
-		});
+			}.bind(this));
+		}.bind(this));
 		optionPane.getExistingBehaviour = function(){
 			var value;
 			optionPane.existingRadio.each(function(el){
@@ -352,8 +353,8 @@ Class.create("XHRUploader", {
             message += '&nbsp;&nbsp;'+ MessageHash[284] + ':' + this.max;
             optionPane.optionsStrings.update(message);
 			var autoSendValue = false;
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_send')){
-				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
+			if(this.getUserPreference('upload_auto_send')){
+				autoSendValue = this.getUserPreference('upload_auto_send');
 				autoSendValue = (autoSendValue =="true" ? true:false);
             }else if(this._globalConfigs.get('DEFAULT_AUTO_START')){
                 autoSendValue = this._globalConfigs.get('DEFAULT_AUTO_START');
@@ -364,8 +365,8 @@ Class.create("XHRUploader", {
 			optionPane.autoSendCheck.checked = autoSendValue;
 			
 			var autoCloseValue = false;			
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_close')){
-				autoCloseValue = ajaxplorer.user.getPreference('upload_auto_close');
+			if(this.getUserPreference('upload_auto_close')){
+				autoCloseValue = this.getUserPreference('upload_auto_close');
 				autoCloseValue = (autoCloseValue =="true" ? true:false);
             }else if(this._globalConfigs.get('DEFAULT_AUTO_CLOSE')){
                 autoCloseValue = this._globalConfigs.get('DEFAULT_AUTO_CLOSE');
@@ -376,8 +377,8 @@ Class.create("XHRUploader", {
 			optionPane.autoCloseCheck.checked = autoCloseValue;
 			
 			var existingValue = 'overwrite';
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_existing')){
-				existingValue = ajaxplorer.user.getPreference('upload_existing');
+			if(this.getUserPreference('upload_existing')){
+				existingValue = this.getUserPreference('upload_existing');
             }else if(this._globalConfigs.get('DEFAULT_EXISTING')){
                 existingValue = this._globalConfigs.get('DEFAULT_EXISTING');
 			}else if(getAjxpCookie('upload_existing')){

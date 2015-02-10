@@ -34,6 +34,10 @@ Class.create("FilesList", SelectableElements, {
     _detailThumbSize : 28,
     _inlineToolbarOptions: null,
     _instanciatedToolbars : null,
+    // Copy get/setUserPrefs from AjxpPane
+    getUserPreference: AjxpPane.prototype.getUserPreference,
+    setUserPreference: AjxpPane.prototype.setUserPreference,
+
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -85,18 +89,18 @@ Class.create("FilesList", SelectableElements, {
 
         var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-			var disp = ajaxplorer.user.getPreference("display");
+			var disp = this.getUserPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
 			}
-			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
+			this._thumbSize = parseInt(this.getUserPreference("thumb_size"));
 			if(this.slider){
 				this.slider.setValue(this._thumbSize);
 				this.resizeThumbnails();
 			}
 		}.bind(this);
         this._registerObserver(document, "ajaxplorer:user_logged", userLoggedObserver);
-		
+
 		
 		var loadObserver = this.contextObserver.bind(this);
 		var childAddedObserver = this.childAddedToContext.bind(this);
@@ -154,7 +158,8 @@ Class.create("FilesList", SelectableElements, {
             this._registerObserver(document, "ajaxplorer:component_config_changed", componentConfigObserver, false);
             this._registerObserver(document, "ajaxplorer:selection_changed", selectionChangedObserver, false);
         }
-
+        var userDisplay = this.getUserPreference("display");
+        if(userDisplay) this._displayMode = userDisplay;
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
         if(this.options.fixedThumbSize){
@@ -319,18 +324,10 @@ Class.create("FilesList", SelectableElements, {
 			change = true;
 		}
 		if(change){
-			if(ajaxplorer && ajaxplorer.user){
-				var data = ajaxplorer.user.getPreference("columns_visibility", true) || {};
-				data = new Hash(data);
-				data.set(ajaxplorer.user.getActiveRepository(), this.hiddenColumns);
-				ajaxplorer.user.setPreference("columns_visibility", data, true);				
-			}			
+            this.setUserPreference("columns_visibility", this.hiddenColumns);
 			this.initGUI();
             this.empty(true);
 			this.fill(this.crtContext);
-			if(ajaxplorer && ajaxplorer.user){
-				ajaxplorer.user.savePreference("columns_visibility");
-			}
 		}
 		
 	},
@@ -453,7 +450,8 @@ Class.create("FilesList", SelectableElements, {
 					refreshGUI = true;
 				}else if(property.getAttribute("name") == "displayMode"){
 					var displayMode = property.getAttribute("value");
-					if(!(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("display"))){
+                    var userPrefDisp = this.getUserPreference("display");
+					if(!userPrefDisp){
 						this._displayMode = displayMode;
 						refreshGUI = true;
 					}
@@ -663,19 +661,15 @@ Class.create("FilesList", SelectableElements, {
         var scrollElement, buffer;
 		if(this._displayMode == "list")
 		{
-            var data;
-			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
-				data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
-				if(data.get(ajaxplorer.user.getActiveRepository())){
-					this.hiddenColumns = $A(data.get(ajaxplorer.user.getActiveRepository()));
-				}else{
-					this.hiddenColumns = $A();
-				}
+            this.hiddenColumns = $A();
+            var testPref = this.getUserPreference("columns_visibility");
+			if(testPref){
+                this.hiddenColumns = $A(testPref);
 			}
 			var visibleColumns = this.getVisibleColumns();			
 			var userPref;
-			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
-				data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
+			if(this.getUserPreference("columns_size")){
+				var data = new Hash(this.getUserPreference("columns_size"));
 				if(this.columnsTemplate && data.get(this.columnsTemplate)){
 					userPref = new Hash(data.get(this.columnsTemplate));
 				}else if(data.get(ajaxplorer.user.getActiveRepository())){
@@ -752,14 +746,13 @@ Class.create("FilesList", SelectableElements, {
 				this.prefSaver = window.setTimeout(function(){
 					if(!ajaxplorer.user || (this.gridStyle == "grid" && !this.columnsTemplate)) return;
 					var sizes = this._headerResizer.getCurrentSizes('percent');
-					var data = ajaxplorer.user.getPreference("columns_size", true);
+					var data = this.getUserPreference("columns_size");
 					data = (data?new Hash(data):new Hash());
 					sizes['type'] = 'percent';
 					var id = (this.columnsTemplate?this.columnsTemplate:ajaxplorer.user.getActiveRepository());
 					data.set(id, sizes);
-					ajaxplorer.user.setPreference("columns_size", data, true);
-					ajaxplorer.user.savePreference("columns_size");
-				}.bind(this), 2000);				
+                    this.setUserPreference("columns_size", data);
+				}.bind(this), 2000);
 			}.bind(this) );
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
             if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
@@ -852,8 +845,8 @@ Class.create("FilesList", SelectableElements, {
             }.bind(this);
             this.observe("resize", this.observer);
 			
-			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
-				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
+			if(this.getUserPreference("thumb_size")){
+				this._thumbSize = parseInt(this.getUserPreference("thumb_size"));
 			}
 			if(this._fixedThumbSize){
 				this._thumbSize = parseInt(this._fixedThumbSize);
@@ -921,8 +914,7 @@ Class.create("FilesList", SelectableElements, {
                             this.notify("resize");
                         }
                         if(!ajaxplorer || !ajaxplorer.user) return;
-                        ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-                        ajaxplorer.user.savePreference("thumb_size");
+                        this.setUserPreference("thumb_size", this._thumbSize);
                     }.bind(this)
                 });
             }
@@ -1155,10 +1147,7 @@ Class.create("FilesList", SelectableElements, {
         this.empty(true);
 		this.fill(this.getCurrentContextNode());
 		this.fireChange();
-		if(ajaxplorer && ajaxplorer.user){
-			ajaxplorer.user.setPreference("display", this._displayMode);
-			ajaxplorer.user.savePreference("display");
-		}
+        this.setUserPreference("display", this._displayMode);
         document.fire("ajaxplorer:switchDisplayMode-FilesList-" + this.htmlElement.id);
 		return this._displayMode;
 	},

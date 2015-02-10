@@ -46,7 +46,6 @@ class sqlLogDriver extends AbstractLogDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             dibi::connect($this->sqlDriver);
@@ -125,9 +124,10 @@ class sqlLogDriver extends AbstractLogDriver
         if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
             for($i = 0;$i<$count;$i++){
                 $dateCurs = $start + $i;
-                $dateK = date($dKeyFormat, strtotime("-$dateCurs day", $ref));
+                $timeDate = strtotime("-$dateCurs day", $ref);
+                $dateK = date($dKeyFormat, $timeDate);
                 if(!isSet($dKeyFormat[$dateK])){
-                    array_push($all, array("Date" => $dateK));
+                    array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
                 }
             }
         }
@@ -310,9 +310,10 @@ class sqlLogDriver extends AbstractLogDriver
                     $metadata = array(
                         "icon" => "toggle_log.png",
                         "date"=> $date,
-                        "ajxp_mime" => "datagrid",
-                        "grid_datasource" => "get_action=ls&dir=".urlencode($path),
-                        "grid_header_title" => "Application Logs for $date"
+                        "ajxp_mime"         => "datagrid",
+                        "grid_datasource"   => "get_action=ls&dir=".urlencode($path),
+                        "grid_header_title" => "Application Logs for $date",
+                        "grid_actions"      => "refresh,copy_as_text"
                     );
                     $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }

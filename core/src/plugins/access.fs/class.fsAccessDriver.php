@@ -1011,10 +1011,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 closedir($handle);
                 $fullList = array("d" => array(), "z" => array(), "f" => array());
 
+                $nodes = scandir($path);
+                usort($nodes, "strcasecmp");
                 if (isSet($orderField) && isSet($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
-                    $nodes = scandir($path, 1);
-                } else {
-                    $nodes = scandir($path);
+                    $nodes = array_reverse($nodes);
                 }
                 if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
                     usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
@@ -1972,6 +1972,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $shareCenter = false;
         if(class_exists("ShareCenter")){
             $shareCenter = ShareCenter::getShareCenter("action.share");
+        }
+        if($handle === false){
+            $this->logError(__FUNCTION__, "Cannot open folder ".$dirName);
+            return;
         }
         while (false !== ($entry = readdir($handle))) {
             if ($entry == "" || $entry == ".."  || AJXP_Utils::isHidden($entry) ) {

@@ -492,15 +492,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function getExposedPreferences($userObject)
     {
-        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style");
-        $jsonPrefs = array("ls_history","columns_size", "columns_visibility", "gui_preferences");
+        $stringPrefs = array("lang","history/last_repository","pending_folder","plugins_preferences");
+        $jsonPrefs = array("ls_history","gui_preferences");
         $prefs = array();
         if ( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false) {
             return array();
         }
         if ( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ) {
-            $stringPrefs = array("display","lang","pending_folder", "thumb_size","plugins_preferences","upload_auto_send","upload_auto_close", "upload_existing","action_bar_style");
-            $jsonPrefs = array("columns_size", "columns_visibility", "gui_preferences");
+            $stringPrefs = array("lang","pending_folder", "plugins_preferences");
+            $jsonPrefs = array("gui_preferences");
             $prefs["SKIP_USER_HISTORY"] = array("value" => "true", "type" => "string" );
         }
         foreach ($stringPrefs as $pref) {
@@ -1102,18 +1102,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             // donothing
                             break;
                         case 'group':
-                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                             $authGroups = AuthService::listChildrenGroups($baseGroup);
                             foreach ($authGroups as $gId => $gName) {
                                 $allGroups["AJXP_GRP_" . AuthService::filterBaseGroup($gId)] = $gName;
                             }
                             break;
                         case 'role':
-                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                             $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
                             break;
                         case 'rolegroup';
-                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                             $groups = array();
                             $authGroups = AuthService::listChildrenGroups($baseGroup);
                             foreach ($authGroups as $gId => $gName) {
@@ -1161,7 +1158,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if($userObject->getId() == $loggedUser->getId()) continue;
                     if ( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
                         $userLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
-                        if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
+                        //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
                         if(empty($userLabel)) $userLabel = $userId;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
                         if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
@@ -1273,9 +1270,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     {
         if ($userObject) {
             if ($byUserRoles) {
-            $allUserRoles = $userObject->getRoles();
+                $allUserRoles = $userObject->getRoles();
             } else {
-                $allUserRoles = AuthService::getRolesList();
+                $allUserRoles = AuthService::getRolesList(array(), true);
             }
             $allRoles = array();
             if (isset($allUserRoles)) {

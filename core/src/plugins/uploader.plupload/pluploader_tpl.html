@@ -6,7 +6,8 @@
     if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
     $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
     $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");    
-    
+    $pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "plupload")->getConfigs();    
+
 	$repository = ConfService::getRepository();
 	$accessType = $repository->getAccessType();
 	if($accessType == "fs"){
@@ -28,7 +29,11 @@
     	// Then pass this URL to the javascript uploadUrl => to the applet.
     	*/
 	}
-	
+
+    $minisite_session = "";
+    if(strpos(session_name(), "AjaXplorer_Shared") === 0){
+    $minisite_session = "&minisite_session=".substr(session_name(), strlen("AjaXplorer_Shared"));
+    }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -39,12 +44,11 @@
 <body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
 
 <link rel="stylesheet" href="plugins/uploader.plupload/plupload/jquery.plupload.queue/css/jquery.plupload.queue.css?v=2" type="text/css" media="screen" />
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript"> google.load("jquery", "1.6.4"); </script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 
 <script type="text/javascript" src="plugins/uploader.plupload/plupload/plupload.full.min.js"></script>
 <script type="text/javascript" src="plugins/uploader.plupload/plupload/jquery.plupload.queue/jquery.plupload.queue.min.js"></script>
-<script type="text/javascript" src="plugins/uploader.plupload/plupload/moxie.min.js"></script>
+
 <script language="javascript" type="text/javascript">
 // Fix height of modal box
 //$(window.parent.document).find("#generic_dialog_box").height(355); 
@@ -57,23 +61,23 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
-var upurl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id(); ?>';
+var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
-var chunkSize = '<?PHP echo (($UploadMaxSize/1048576) - 1) . "mb"; ?>';
+var config_runtimes = '<?php echo $pluginConfigs["RUNTIMES"]; ?>';
+var config_max_file_size = '<?php echo $pluginConfigs["MAX_FILE_SIZE"]; ?>';
+var config_chunk_size = '<?php echo (!empty($pluginConfigs["CHUNK_SIZE"]) ? $pluginConfigs["CHUNK_SIZE"] : (($UploadMaxSize/1048576) - 1)."mb"); ?>';
 var currentDir = parent.ajaxplorer.getContextNode().getPath();
 
 $(function() {
 	$("#plupload_uploader").pluploadQueue({
 		// General settings
-		runtimes : 'silverlight,flash,html5,html4',
+		runtimes : config_runtimes,
 		url : uploadUrl,
-        //max_file_size : maxFileSize, //Uncomment this line and comment the following to use php.ini max file size for maximum filesize
-		max_file_size : '4096mb',
-		chunk_size : chunkSize, //Uncomment this line to use php.ini maxsize-1 for chunk size
-		//chunk_size : '2mb',
+		max_file_size : config_max_file_size,
+		chunk_size : config_chunk_size,
+
 		unique_names : false,
         multiple_queues : true,
 		multipart : true,
@@ -100,7 +104,6 @@ $(function() {
 				parent.ajaxplorer.fireContextRefresh();
                 parent.document.fire("ajaxplorer:longtask_finished");
 			}
-			$.get(upurl);
 		});
 	}
 

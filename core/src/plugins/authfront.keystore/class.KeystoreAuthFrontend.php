@@ -74,10 +74,28 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
     }
 
+    public function revokeUserTokens($userId){
+
+        $this->storage = ConfService::getConfStorageImpl();
+        if(!is_a($this->storage, "sqlConfDriver")) return false;
+
+        $user = AuthService::getLoggedUser()->getId();
+        if($userId == $user || AuthService::getLoggedUser()->isAdmin()){
+            $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($userId).':"'.$userId.'"%');
+            foreach($keys as $keyId => $keyData){
+                $this->storage->simpleStoreClear("keystore", $keyId);
+            }
+            if(count($keys)){
+                $this->logInfo(__FUNCTION__, "Revoking ".count($keys)." keys for user '".$userId."' on password change action.");
+            }
+        }
+    }
+
     /**
      * @param String $action
      * @param Array $httpVars
      * @param Array $fileVars
+     * @return String
      */
     function authTokenActions($action, $httpVars, $fileVars){
 
@@ -105,6 +123,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
                     }
                     $data["DEVICE_ID"] = $device;
                 }
+                $data["DEVICE_UA"] = $_SERVER['HTTP_USER_AGENT'];
+                $data["DEVICE_IP"] = $_SERVER['REMOTE_ADDR'];
                 $this->storage->simpleStoreSet("keystore", $token, $data, "serial");
                 header("Content-type: application/json;");
                 echo(json_encode(array(
@@ -117,20 +137,54 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
             case "keystore_revoke_tokens":
 
                 // Invalidate previous tokens
-                $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($user).':"'.$user.'"%');
+                $mess = ConfService::getMessages();
+                $passedKeyId = "";
+                if(isSet($httpVars["key_id"])) $passedKeyId = $httpVars["key_id"];
+                $keys = $this->storage->simpleStoreList("keystore", null, $passedKeyId, "serial", '%"USER_ID";s:'.strlen($user).':"'.$user.'"%');
                 foreach($keys as $keyId => $keyData){
                     $this->storage->simpleStoreClear("keystore", $keyId);
                 }
+                $message = array(
+                    "result" => "SUCCESS",
+                    "message" => $mess["keystore.8"]
+                );
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode($message);
+                break;
+
+            case "keystore_list_tokens":
+                if(!isSet($user)) break;
+                $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($user).':"'.$user.'"%');
+                foreach($keys as $keyId => &$keyData){
+                    unset($keyData["PRIVATE"]);
+                    unset($keyData["USER_ID"]);
+                    $deviceDesc = "Web Browser";
+                    $deviceOS = "Unkown";
+                    if(isSet($keyData["DEVICE_UA"])){
+                        $agent = $keyData["DEVICE_UA"];
+                        if(strpos($agent, "python-requests") !== false) {
+                            $deviceDesc = "PydioSync";
+                            if(strpos($agent, "Darwin") !== false) $deviceOS = "Mac OS X";
+                            else if(strpos($agent, "Windows/7") !== false) $deviceOS = "Windows 7";
+                            else if(strpos($agent, "Windows/8") !== false) $deviceOS = "Windows 8";
+                            else if(strpos($agent, "Linux") !== false) $deviceOS = "Linux";
+                        }else{
+                            $deviceOS = AJXP_Utils::osFromUserAgent($agent);
+                        }
+                    }
+                    $keyData["DEVICE_DESC"] = $deviceDesc;
+                    $keyData["DEVICE_OS"]   = $deviceOS;
+                }
+                header("Content-type: application/json;");
+                echo json_encode($keys);
+
                 break;
 
             default:
                 break;
         }
 
-
-
-
-
+        return null;
     }
 
 } 

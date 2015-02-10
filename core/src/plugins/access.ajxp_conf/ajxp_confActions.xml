@@ -518,47 +518,6 @@
 				</serverCallback>
 				</processing>
 		</action>
-		<action name="copyAsText">
-			<gui text="302" title="303" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
-				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="log,testResult"  image="false" editable="false"/></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var onLoad = function(oForm){
-						var userSelection =  ajaxplorer.getUserSelection();
-						var nodes = userSelection.getSelectedNodes();
-						var firstNode = userSelection.getUniqueNode();
-		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
-		   		    	var attributes = ['date','ip','level','user','action','params'];
-			   		    var message = attributes.join("\t") + "\n\n";
-		   		    	nodes.each(function(node){
-		   		    		var meta = node.getMetadata();
-		   		    		for(var i=0;i<attributes.length;i++){
-		   		    			var attName = attributes[i];
-		   		    			if(attName == "ajxp_label") attName = "text";
-		   		    			message += meta.get(attName) + '\t';
-		   		    		}
-			   		    	message += '\n';
-		   		    	});
-		   		    	copyDiv.setValue(message);
-		   		    	copyDiv.select();
-					};
-					modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
-						hideLightBox(true);
-						return false;
-					},null,true);
-					]]></clientCallback>
-				<clientForm id="copy_as_text"><![CDATA[
-				<div id="copy_as_text" action="copy" box_width="650">
-					<textarea id="text_copy" style="width:630px; height: 350px;"></textarea>
-				</div>
-				]]></clientForm>
-				</processing>
-		</action>
 	    <action name="user_update_right">
             <processing>
                 <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true" developerComment="Update a user access right on a given workspace.">

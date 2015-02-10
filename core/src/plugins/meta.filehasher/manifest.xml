@@ -38,7 +38,7 @@
                    </processing>
                </action>
                <action name="stat_hash">
-                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
+                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
                        <serverCallback methodName="switchActions" checkParams="false" restParams="/file+" developerComment="Returns an fstat() structure including the hash of the file">
                            <input_param description="One or more nodes to stat." name="nodes" type="AJXP_NODE[]"/>
@@ -46,7 +46,7 @@
                        </serverCallback>
                    </processing>
                </action>
-               <action name="ls">
+               <action name="ls" dirDefault="true">
                    <pre_processing>
                        <serverCallback methodName="checkFullTreeCache" applyCondition="$apply=isSet($httpVars['recursive']);"/>
                    </pre_processing>

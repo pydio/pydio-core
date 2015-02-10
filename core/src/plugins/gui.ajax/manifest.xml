@@ -399,8 +399,8 @@
                         <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div id="cpane_container1" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container1", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     </div>
 				</div>
                 <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
@@ -427,6 +427,8 @@
                     background-size:120px;
                 }
 				#cpane_container{
+				    left:0;
+				    width:100%;
 				    float: none;
 				}
                 div#breadcrumb {
@@ -587,10 +589,12 @@
                     width: auto;
                 }
                 #cpane_container{
-				          float: none;
-				        }
-				        #cpane_header{
-				            padding-bottom: 7px;
+                  float: none;
+                  left:0;
+                  width: 100%;
+                }
+                #cpane_header{
+                    padding-bottom: 7px;
                     height: 48px;
                     background-color: #222;
                     border-bottom: 0;
@@ -686,6 +690,7 @@
 				}
 				#cpane_container{
 				    float:none;
+                    left:0;
 				    position: absolute;
                     width: 100%;
                     top:0;
@@ -792,7 +797,7 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; }</style>
+				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;}</style>
 			]]></template>
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>

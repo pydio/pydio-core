@@ -165,7 +165,7 @@ Class.create("ConfigEditor",{
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.39']);
 			return false;
 		}
-		if(pass.value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+		if(pass.value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
 			ajaxplorer.displayMessage("ERROR", MessageHash[378]);
 			return false;
 		}

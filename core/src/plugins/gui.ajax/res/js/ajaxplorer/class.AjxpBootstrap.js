@@ -89,6 +89,7 @@ Class.create("AjxpBootstrap", {
 	    		ajaxplorer.actionBar.selectorData = new Hash(this.parameters.get("SELECTOR_DATA"));	    		
 			}
 		}.bind(this));
+        window.pydioBootstrap = this;
 	},
 	/**
 	 * Real loading action
@@ -189,7 +190,7 @@ Class.create("AjxpBootstrap", {
 		window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
         var masterClassLoaded = function(){
             document.fire("ajaxplorer:boot_loaded");
-            window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
+            window.pydio = window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
             if(this.parameters.get("currentLanguage")){
                 window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
             }

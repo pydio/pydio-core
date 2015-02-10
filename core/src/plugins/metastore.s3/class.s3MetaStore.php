@@ -150,9 +150,13 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         } else {
             $pathName = $this->updateNodeMetaPath($ajxpNode, false);
             if($pathName == null) return;
-            $response = $aws->headObject(array("Bucket" => $this->bucketName, "Key" => $pathName));
-            $metadata = $response["Metadata"];
-            if($metadata == null){
+            try{
+                $response = $aws->headObject(array("Bucket" => $this->bucketName, "Key" => $pathName));
+                $metadata = $response["Metadata"];
+                if($metadata == null){
+                    $metadata = array();
+                }
+            }catch(Aws\S3\Exception\S3Exception $e){
                 $metadata = array();
             }
             self::$metaCache[$ajxpNode->getPath()] = $metadata;
@@ -187,9 +191,13 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
             $this->logDebug("Should retrieve metadata for ".$ajxpNode->getPath());
             $pathName = $this->updateNodeMetaPath($ajxpNode, false);
             if($pathName == null) return;
-            $response = $aws->headObject(array("Bucket" => $this->bucketName, "Key" => $pathName));
-            $metadata = $response["Metadata"];
-            if($metadata == null){
+            try{
+                $response = $aws->headObject(array("Bucket" => $this->bucketName, "Key" => $pathName));
+                $metadata = $response["Metadata"];
+                if($metadata == null){
+                    $metadata = array();
+                }
+            }catch (Aws\S3\Exception\S3Exception $e){
                 $metadata = array();
             }
             self::$metaCache[$ajxpNode->getPath()] = $metadata;

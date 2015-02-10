@@ -263,10 +263,12 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = fopen($metaFile, "w");
+            $fp = @fopen($metaFile, "w");
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+            }else{
+                $this->logError(__FUNCTION__, "Error while trying to open the meta file, maybe a permission problem?");
             }
             if ($scope == AJXP_METADATA_SCOPE_GLOBAL) {
                  AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));

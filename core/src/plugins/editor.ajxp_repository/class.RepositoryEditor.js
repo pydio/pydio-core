@@ -248,6 +248,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 this.feedMetaSourceForm(xmlData, this.metaPane);
             }else{
                 this.metaPane.down("div.dialogLegend").update(MessageHash['ajxp_repository_editor.15']);
+                this.metaPane.select("div#metaTabulator").invoke("hide");
             }
         }
 

@@ -871,7 +871,13 @@ class AJXP_Utils
         if (!$withURI) {
             return "$protocol://$name$port";
         } else {
-            return "$protocol://$name$port".dirname($_SERVER["REQUEST_URI"]);
+            $uri = dirname($_SERVER["REQUEST_URI"]);
+            $api = ConfService::currentContextIsRestAPI();
+            if(!empty($api)){
+                // Keep only before api base
+                $uri = array_shift(explode("/".$api."/", $uri));
+            }
+            return "$protocol://$name$port".$uri;
         }
     }
 
@@ -1490,6 +1496,67 @@ class AJXP_Utils
         );
     }
 
+    public static function osFromUserAgent($useragent = null) {
+
+        $osList = array
+        (
+            'Windows 10' => 'windows nt 10.0',
+            'Windows 8.1' => 'windows nt 6.3',
+            'Windows 8' => 'windows nt 6.2',
+            'Windows 7' => 'windows nt 6.1',
+            'Windows Vista' => 'windows nt 6.0',
+            'Windows Server 2003' => 'windows nt 5.2',
+            'Windows XP' => 'windows nt 5.1',
+            'Windows 2000 sp1' => 'windows nt 5.01',
+            'Windows 2000' => 'windows nt 5.0',
+            'Windows NT 4.0' => 'windows nt 4.0',
+            'Windows Me' => 'win 9x 4.9',
+            'Windows 98' => 'windows 98',
+            'Windows 95' => 'windows 95',
+            'Windows CE' => 'windows ce',
+            'Windows (version unknown)' => 'windows',
+            'OpenBSD' => 'openbsd',
+            'SunOS' => 'sunos',
+            'Ubuntu' => 'ubuntu',
+            'Linux' => '(linux)|(x11)',
+            'Mac OSX Beta (Kodiak)' => 'mac os x beta',
+            'Mac OSX Cheetah' => 'mac os x 10.0',
+            'Mac OSX Puma' => 'mac os x 10.1',
+            'Mac OSX Jaguar' => 'mac os x 10.2',
+            'Mac OSX Panther' => 'mac os x 10.3',
+            'Mac OSX Tiger' => 'mac os x 10.4',
+            'Mac OSX Leopard' => 'mac os x 10.5',
+            'Mac OSX Snow Leopard' => 'mac os x 10.6',
+            'Mac OSX Lion' => 'mac os x 10.7',
+            'Mac OSX Mountain Lion' => 'mac os x 10.8',
+            'Mac OSX Mavericks' => 'mac os x 10.9',
+            'Mac OSX Yosemite' => 'mac os x 10.10',
+            'Mac OS (classic)' => '(mac_powerpc)|(macintosh)',
+            'QNX' => 'QNX',
+            'BeOS' => 'beos',
+            'OS2' => 'os/2',
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves/teoma)|(ia_archiver)'
+        );
+
+        if($useragent == null){
+            $useragent = $_SERVER['HTTP_USER_AGENT'];
+            $useragent = strtolower($useragent);
+        }
+
+        $found = "Not automatically detected.$useragent";
+        foreach($osList as $os=>$match) {
+            if (preg_match('/' . $match . '/i', $useragent)) {
+                $found = $os;
+                break;
+            }
+        }
+
+        return $found;
+
+
+    }
+
+
     /**
      * Try to remove a file without errors
      * @static
@@ -1677,7 +1744,6 @@ class AJXP_Utils
 
     public static function runCreateTablesQuery($p, $file)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
         switch ($p["driver"]) {
             case "sqlite":
@@ -1694,7 +1760,7 @@ class AJXP_Utils
                 $ext = ".pgsql";
                 break;
             default:
-                return "ERROR!, DB driver "+ $p["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $p["driver"] ." not supported yet in __FUNCTION__";
         }
 
         $result = array();
@@ -1884,6 +1950,7 @@ class AJXP_Utils
 
     public static function regexpToLike($regexp)
     {
+        $regexp = trim($regexp, '/');
         $left = "~";
         $right = "~";
         if ($regexp[0]=="^") {
@@ -1900,6 +1967,7 @@ class AJXP_Utils
 
     public static function cleanRegexp($regexp)
     {
+        $regexp = str_replace("\/", "/", trim($regexp, '/'));
         return ltrim(rtrim($regexp, "$"), "^");
     }
 

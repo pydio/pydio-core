@@ -69,6 +69,7 @@ Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Luka
 	Folders & Files icons in Orbit Theme, by Ionic : http://ionicons.com/ (MIT License)
 
 [Core PHP Classes]
+    Dibi ORM: Copyright (c) 2004, 2014 David Grudl (http://davidgrudl.com) All rights reserved. (New BSD)
 	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
 	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
 	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
