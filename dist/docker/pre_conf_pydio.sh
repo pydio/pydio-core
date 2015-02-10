@@ -11,6 +11,8 @@ touch /var/cache/pydio/first_run_passed
 [ -f /usr/share/pydio/.htaccess ] && rm -f /usr/share/pydio/.htaccess
 cp -f /etc/public.htaccess /var/lib/pydio/public/.htaccess
 cp -f /etc/root.htaccess /usr/share/pydio/.htaccess
+chown -R apache:apache /var/lib/pydio/public
+chown apache:apache /usr/share/pydio/.htaccess
 
 # fix LANG
 if [ "$LANG" = "" ]; then
