@@ -310,12 +310,12 @@ class PowerFSController extends AJXP_Plugin
 		$linescnt = count($linesarr);
 		$fprocessed = 0;
 						
-		$maxwaiting = 10; //Waiting for zipper to start
-		for ($l = 0; $l <= $maxwaiting; $l++)
+		$maxwaiting = 5; //Waiting for zipper to start
+		for ($l = 0; $l <= $maxwaiting * 10; $l++)
 		{
 			$stat = proc_get_status($proc);
 			if (!$stat['running'])
-				usleep(500000);
+				usleep(100000);
 			else
 				$l = $maxwaiting + 1;
 		}
