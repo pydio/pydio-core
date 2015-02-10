@@ -2,6 +2,14 @@ Pydio ##VERSION_NUMBER## Release Note
 
 Pydio 6.0.3 - Important Bugfix release
 
+Date: Feb, 10th 2014
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2015
+Upgrade: In-app upgrade for archives installs - RPM/DEB update
+Contributors: Charles du Jeu, Tran The Cuong, Nicolas Pouliquen, DepaMarco, Elangenhan, Gerald ST, NHellFire, Anael Mobilia, Dmitri Bosenko, Jaroslav Lichtblau - Thanks to all of you!
+
 Probably found the root cause of "Ooops your language file is empty..." (details)
 Admin Delegation: fix various criteria filtering and workspace listing conditions that were breaking template-created workspaces for group Admin, as well as returning wrong users count (although correct users list). (details)
 Fix various customization options: logo height/width + add a class to the main element observing the current workspace slug, can be used for specific welcome, settings, etc styling. (details)
