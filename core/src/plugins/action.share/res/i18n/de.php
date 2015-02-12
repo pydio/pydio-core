@@ -183,6 +183,6 @@ $mess = array(
     "170" => "Dieser Link ist durch ein Passwort geschützt.",
     "171" => "Link-Kürzel",
     "172" => "Dieser Link wird bereits genutzt. Wähle ein anderes Kürzel.",
-    "173" => "Wenn Sie ein dauerhaften und ansehlichen Link möchten (z.B. https://.../meine-freigabe), können Sie dieses Feld nutzen. Wenn freigelassen wird das Kürzel zufällig generiert.",
+    "173" => "Wenn Sie ein dauerhaften und ansehlichen Link möchten (z.B. https://.../mein-kuerzel), können Sie dieses Feld nutzen. Ansonsten wird das Kürzel zufällig generiert.",
     "174" => "Deaktiviere Passwort",
 );
