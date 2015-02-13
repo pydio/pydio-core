@@ -148,4 +148,5 @@ $mess=array(
 "114" => "Applicato a",
 "115" => "Schema",
 "127" => "Warning, please do not use special characters, user would be created with login id '%s'",
+"128" => "Successfully deleted group",
 );

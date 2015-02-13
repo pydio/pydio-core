@@ -1553,7 +1553,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $gName = basename($groupPath);
                     AuthService::deleteGroup($basePath, $gName);
                     AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage($mess["ajxp_conf.125"], null);
+                    AJXP_XMLWriter::sendMessage($mess["ajxp_conf.128"], null);
                     AJXP_XMLWriter::reloadDataNode();
                     AJXP_XMLWriter::close();
                 } else {
