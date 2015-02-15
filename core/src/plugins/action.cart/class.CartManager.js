@@ -151,7 +151,7 @@ Class.create("CartManager", FetchedResultPane, {
                 if(success){
                     ajaxplorer.goTo('/'+zipName+'.zip');
                     window.setTimeout(function(){
-                        ajaxplorer.actionBar.fireAction('share');
+                        ajaxplorer.actionBar.fireAction('share-file-minisite');
                     }, 500);
                 }
             }.bind(this);
