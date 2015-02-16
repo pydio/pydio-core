@@ -1303,7 +1303,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
                     if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
                     if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
-                    $roleObject = AuthService::getRole($roleId);
+                    if(is_a($role, "AJXP_Role")) $roleObject = $role;
+                    else $roleObject = AuthService::getRole($roleId);
                     $label = $roleObject->getLabel();
                     $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
                     $allRoles[$roleId] = $label;
