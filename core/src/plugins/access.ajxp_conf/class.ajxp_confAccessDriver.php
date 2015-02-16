@@ -391,6 +391,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     unset($rootNodes["admin"]);
                     unset($rootNodes["developer"]);
                 }
+                if (AJXP_ADMIN_DISABLE) { 
+                    unset($rootNodes["config"]); 
+                    unset($rootNodes["developer"]); 
+                } 
+                if (AJXP_ADMIN_WS_DISABLE) { 
+                    unset($rootNodes["data"]["CHILDREN"]["repositories"]); 
+                } 
                 AJXP_Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
                 $parentName = "";
                 $dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
