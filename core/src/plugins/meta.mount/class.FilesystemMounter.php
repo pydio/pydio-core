@@ -171,7 +171,14 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
 
-        system(($MOUNT_SUDO?"sudo":"")." umount ".$MOUNT_POINT);
+        system(($MOUNT_SUDO?"sudo":"")." umount ".$MOUNT_POINT, $res);
+        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !is_file($MOUNT_POINT."/.ajxp_mount")){
+            // Remove mount point
+            $testRm = @rmdir($MOUNT_POINT);
+            if($testRm === false){
+                $this->logError("[umount]", "Error while trying to delete mount point on unmount");
+            }
+        }
         return true;
     }
 
