@@ -456,6 +456,9 @@ class AJXP_PluginsService
                 }
             }
         }
+        if(isSet($this->activePlugins[$type.".".$name])){
+            unset($this->activePlugins[$type.".".$name]);
+        }
         $this->activePlugins[$type.".".$name] = $active;
         if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
             $this->registry[$type][$name] = $updateInstance;
