@@ -292,13 +292,22 @@ class ChangesTracker extends AJXP_AbstractMetaSource
      * @param Repository $repository
      * @return String
      */
-    protected function computeIdentifier($repository)
+    protected function computeIdentifier($repository, $resolveUserId = null)
     {
         $parts = array($repository->getId());
         if ($repository->securityScope() == 'USER') {
-            $parts[] = AuthService::getLoggedUser()->getId();
+            if($resolveUserId != null) {
+                $parts[] = $resolveUserId;
+            } else {
+                $parts[] = AuthService::getLoggedUser()->getId();
+            }
         } else if ($repository->securityScope() == 'GROUP') {
-            $parts[] = AuthService::getLoggedUser()->getGroupPath();
+            if($resolveUserId != null) {
+                $userObject = ConfService::getConfStorageImpl()->createUserObject($resolveUserId);
+                if($userObject != null) $parts[] = $userObject->getGroupPath();
+            }else{
+                $parts[] = AuthService::getLoggedUser()->getGroupPath();
+            }
         }
         return implode("-", $parts);
     }
@@ -335,7 +344,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 }
             }
             if ($newNode == null) {
-                $repoId = $this->computeIdentifier($oldNode->getRepository());
+                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 // DELETE
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
             } else if ($oldNode == null || $copy) {
@@ -346,10 +355,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
-                    "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository())
+                    "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
                 ));
             } else {
-                $repoId = $this->computeIdentifier($oldNode->getRepository());
+                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 if ($oldNode->getPath() == $newNode->getPath()) {
                     // CONTENT CHANGE
                     clearstatcache();

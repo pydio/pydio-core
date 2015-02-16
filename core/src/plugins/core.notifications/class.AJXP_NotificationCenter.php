@@ -91,8 +91,14 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         $n = ($oldNode == null ? $newNode : $oldNode);
         $repoId = $n->getRepositoryId();
-        $userId = AuthService::getLoggedUser()->getId();
-        $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        if($n->getUser()){
+            $userId = $n->getUser();
+            $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
+            if($obj) $userGroup = $obj->getGroupPath();
+        }else{
+            $userId = AuthService::getLoggedUser()->getId();
+            $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        }
         $repository = ConfService::getRepositoryById($repoId);
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");

@@ -39,10 +39,10 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         parent::init($options);
         set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
         $metaFields = $this->getFilteredOption("index_meta_fields");
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
+        $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($specKey)) {
             $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
         }
@@ -411,7 +411,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             if (isSet($this->currentIndex)) {
                 $index = $this->currentIndex;
             } else {
-                $index =  $this->loadIndex($node->getRepositoryId());
+                $index =  $this->loadIndex($node->getRepositoryId(), true, $node->getUser());
             }
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
@@ -453,9 +453,9 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             $index = $this->currentIndex;
         } else {
             if($oldNode == null){
-                $index =  $this->loadIndex($newNode->getRepositoryId());
+                $index =  $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
             }else{
-                $index = $this->loadIndex($oldNode->getRepositoryId());
+                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $newNode->getUser());
             }
         }
         $this->setDefaultAnalyzer();
@@ -687,11 +687,19 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
      * @param bool $create
      * @return Zend_Search_Lucene_Interface the index
      */
-    protected function loadIndex($repositoryId, $create = true)
+    protected function loadIndex($repositoryId, $create = true, $resolveUserId = null)
     {
         require_once("Zend/Search/Lucene.php");
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
-        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$this->specificId;
+        $specificId = $this->specificId;
+        if($resolveUserId != null){
+            $specKey = $this->getFilteredOption("repository_specific_keywords");
+            if (!empty($specKey)) {
+                $specKey = str_replace("AJXP_USER", $resolveUserId, $specKey);
+                $specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
+            }
+        }
+        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$specificId;
         if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
         if (is_dir($iPath)) {
             $index = Zend_Search_Lucene::open($iPath);

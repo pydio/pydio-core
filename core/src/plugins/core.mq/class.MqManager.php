@@ -86,15 +86,17 @@ class MqManager extends AJXP_Plugin
     }
 
     /**
-     * @param null AJXP_Node $origNode
-     * @param null AJXP_Node $newNode
-     * @param bool bool $copy
+     * @param AJXP_Node $origNode
+     * @param AJXP_Node $newNode
+     * @param bool $copy
      */
     public function publishNodeChange($origNode = null, $newNode = null, $copy = false)
     {
-        $content = "";$repo = "";
+        $content = "";$repo = "";$targetUserId=null;
+        $update = false;
         if ($newNode != null) {
             $repo = $newNode->getRepositoryId();
+            $targetUserId = $newNode->getUser();
             $update = false;
             $data = array();
             if ($origNode != null && !$copy) {
@@ -107,11 +109,12 @@ class MqManager extends AJXP_Plugin
         }
         if ($origNode != null && ! $update && !$copy) {
             $repo = $origNode->getRepositoryId();
+            $targetUserId = $origNode->getUser();
             $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
         }
         if (!empty($content) && $repo != "") {
 
-            $this->sendInstantMessage($content, $repo);
+            $this->sendInstantMessage($content, $repo, $targetUserId);
 
         }
 
@@ -124,7 +127,8 @@ class MqManager extends AJXP_Plugin
         } else {
             $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
             if ($scope == "USER") {
-                $userId = AuthService::getLoggedUser()->getId();
+                if($targetUserId) $userId = $targetUserId;
+                else $userId = AuthService::getLoggedUser()->getId();
             } else if ($scope == "GROUP") {
                 $gPath = AuthService::getLoggedUser()->getGroupPath();
             } else if (isSet($targetUserId)) {

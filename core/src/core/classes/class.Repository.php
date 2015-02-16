@@ -306,9 +306,10 @@ class Repository implements AjxpGroupPathProvider
      * Get the repository options, filtered in various maners
      * @param string $oName
      * @param bool $safe Do not filter
+     * @param AbstractAjxpUser $resolveUser
      * @return mixed|string
      */
-    public function getOption($oName, $safe=false)
+    public function getOption($oName, $safe=false, $resolveUser = null)
     {
         if (!$safe && $this->inferOptionsFromParent) {
             if (!isset($this->parentTemplateObject)) {
@@ -324,7 +325,7 @@ class Repository implements AjxpGroupPathProvider
         }
         if (isSet($this->options[$oName])) {
             $value = $this->options[$oName];
-            if(!$safe) $value = AJXP_VarsFilter::filter($value);
+            if(!$safe) $value = AJXP_VarsFilter::filter($value, $resolveUser);
             return $value;
         }
         if ($this->inferOptionsFromParent) {

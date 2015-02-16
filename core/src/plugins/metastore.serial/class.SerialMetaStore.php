@@ -137,7 +137,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $ajxpNode->mergeMetadata($allMeta);
     }
 
-    protected function updateSecurityScope($metaFile, $repositoryId)
+    protected function updateSecurityScope($metaFile, $repositoryId, $resolveUserId = null)
     {
         $repo = ConfService::getRepositoryById($repositoryId);
         if (!is_object($repo)) {
@@ -145,8 +145,17 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         }
         $securityScope = $repo->securityScope();
         if($securityScope == false) return $metaFile;
-
-        if (AuthService::getLoggedUser() != null) {
+        if($resolveUserId != null){
+            if ($securityScope == "USER") {
+                $metaFile .= "_".$resolveUserId;
+            }else if($securityScope == "GROUP"){
+                $uObj= ConfService::getConfStorageImpl()->createUserObject($resolveUserId);
+                if($uObj != null){
+                    $u = str_replace("/", "__", $uObj->getGroupPath());
+                    $metaFile.= "_".$u;
+                }
+            }
+        }else if (AuthService::getLoggedUser() != null) {
             if ($securityScope == "USER") {
                 $u = AuthService::getLoggedUser();
                 if($u->getResolveAsParent()) $id = $u->getParent();
@@ -186,7 +195,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             $fileKey = basename($fileKey);
         } else {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
         }
         self::$metaCache = array();
         if (!isSet(self::$fullMetaCache[$metaFile])) {
@@ -237,7 +246,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                 mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
         }
         if($scope==AJXP_METADATA_SCOPE_REPOSITORY
             || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile))

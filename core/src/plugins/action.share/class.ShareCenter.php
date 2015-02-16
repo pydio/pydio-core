@@ -604,11 +604,18 @@ class ShareCenter extends AJXP_Plugin
             if($node->getRepository()->hasParent()){
                 $parentRepoId = $node->getRepository()->getParentId();
                 $currentRoot = $node->getRepository()->getOption("PATH");
-                $parentRoot = ConfService::getRepositoryById($parentRepoId)->getOption("PATH");
+                $owner = $node->getRepository()->getOwner();
+                $resolveUser = null;
+                if($owner != null){
+                    $resolveUser = ConfService::getConfStorageImpl()->createUserObject($owner);
+                }
+                $parentRoot = ConfService::getRepositoryById($parentRepoId)->getOption("PATH", false, $resolveUser);
                 $relative = substr($currentRoot, strlen($parentRoot));
                 $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
                 $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
-                $result[$parentRepoId] = array(new AJXP_Node($parentNodeURL), "UP");
+                $parentNode = new AJXP_Node($parentNodeURL);
+                if($owner != null) $parentNode->setUser($owner);
+                $result[$parentRepoId] = array($parentNode, "UP");
             }
         }
         return $result;

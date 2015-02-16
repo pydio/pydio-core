@@ -33,22 +33,27 @@ class AJXP_VarsFilter
      * Calls the vars.filter hooks.
      * @static
      * @param $value
+     * @param AbstractAjxpUser $resolveUser
      * @return mixed|string
      */
-    public static function filter($value)
+    public static function filter($value, $resolveUser = null)
     {
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
             if (AuthService::usersEnabled()) {
-                $loggedUser = AuthService::getLoggedUser();
-                if ($loggedUser != null) {
-                    if ($loggedUser->hasParent() && $loggedUser->getResolveAsParent()) {
-                        $loggedUserId = $loggedUser->getParent();
+                if($resolveUser != null){
+                    $value = str_replace("AJXP_USER", $resolveUser->getId(), $value);
+                }else{
+                    $loggedUser = AuthService::getLoggedUser();
+                    if ($loggedUser != null) {
+                        if ($loggedUser->hasParent() && $loggedUser->getResolveAsParent()) {
+                            $loggedUserId = $loggedUser->getParent();
+                        } else {
+                            $loggedUserId = $loggedUser->getId();
+                        }
+                        $value = str_replace("AJXP_USER", $loggedUserId, $value);
                     } else {
-                        $loggedUserId = $loggedUser->getId();
+                        return "";
                     }
-                    $value = str_replace("AJXP_USER", $loggedUserId, $value);
-                } else {
-                    return "";
                 }
             } else {
                 $value = str_replace("AJXP_USER", "shared", $value);
@@ -56,7 +61,11 @@ class AJXP_VarsFilter
         }
         if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
             if (AuthService::usersEnabled()) {
-                $loggedUser = AuthService::getLoggedUser();
+                if($resolveUser != null){
+                    $loggedUser = $resolveUser;
+                }else{
+                    $loggedUser = AuthService::getLoggedUser();
+                }
                 if ($loggedUser != null) {
                     $gPath = $loggedUser->getGroupPath();
                     $value = str_replace("AJXP_GROUP_PATH_FLAT", str_replace("/", "_", trim($gPath, "/")), $value);
