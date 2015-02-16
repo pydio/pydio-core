@@ -597,6 +597,7 @@ $mess=array(
 "534" => "Password used to login",
 "535" => "Send password by email",
 "536" => "Send a welcome email including the password to the new user",
+"537" => "Powerpoint-Dokument",
 /* Html entity would break tooltip */
 "plugtype.title.access" => "Treiber für Arbeitsumgebungen",
 "plugtype.desc.access" => "Plugins die den Zugriff von Arbeitsumgebungen auf das 'Backend' (Ein Speichermedium oder Ähnliches) regeln. Diese Plugins sind auch für die hauptsächlichen Layouts und Aktionen zuständig.",
