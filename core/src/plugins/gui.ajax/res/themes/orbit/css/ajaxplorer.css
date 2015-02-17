@@ -1327,7 +1327,8 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
     height: 100%;
     background-color: transparent;
     color: white;
-    padding-top: 37% !important;
+    transition: padding-top 0.5s;
+   -webkit-transition: padding-top 0.5s;
 }
 
 div.dialogBox.form-switch_language_form div.dialogTitle,
@@ -1338,7 +1339,8 @@ div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
     display: block !important;
     position: absolute;
-    top: 35%;
+    top: 0;
+    height: 90% !important;
     right: -113%;
     background-color: transparent;
 }

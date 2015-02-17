@@ -181,8 +181,8 @@ and (max-width : 420px){
     }
 
     div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent {
-        height: 100%;
-        padding-top: 20%!important;
+        /*height: 100%;
+        padding-top: 20%!important;*/
     }
 
     #login_form, #login_form_dynamic {

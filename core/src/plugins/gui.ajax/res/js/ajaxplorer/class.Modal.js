@@ -479,10 +479,17 @@ Class.create("Modal", {
 				boxHeight = element.getHeight();
 			}
 		}else if(!checkHeight && dContentScrollHeight > winHeight){
-            dContent.setStyle({
-                height:(winHeight- parseInt(dTitle.getHeight()) - 20)+'px',
-                overflow:'auto'
-            });
+            if(dTitle.getStyle('position') == 'absolute'){
+                dContent.setStyle({
+                    height:(winHeight)+'px',
+                    overflow:'auto'
+                });
+            }else{
+                dContent.setStyle({
+                    height:(winHeight- parseInt(dTitle.getHeight()) - 20)+'px',
+                    overflow:'auto'
+                });
+            }
             if (window.ajxpMobile){
                 attachMobileScroll(dContent, "vertical");
             }
@@ -490,6 +497,15 @@ Class.create("Modal", {
         }else if(dContentScrollHeight >= dContent.getHeight() && !this.currentListensToHeight){
             dContent.setStyle({height: 'auto'});
             boxHeight = element.getHeight();
+        }
+
+        if(dTitle.getStyle('position') == 'absolute'){
+            var innerH = 0;
+            $A(dContent.childNodes).each(function(c){
+                if(c.getHeight) innerH += c.getHeight();
+            });
+            var topPadding = Math.min(winHeight*25/100, Math.max(0, parseInt((winHeight - innerH)/2)));
+            dContent.setStyle({paddingTop: topPadding + 'px'});
         }
 
 		var offsetLeft = parseInt((winWidth - parseInt(boxWidth)) / 2);
