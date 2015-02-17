@@ -56,6 +56,11 @@ class ContentFilter {
             foreach($userSelection->getFiles() as $f){
                 if(isSet($this->virtualPaths[$f])){
                     $newFiles[] = $this->virtualPaths[$f];
+                }else{
+                    $testB = base64_decode($f);
+                    if(isSet($this->virtualPaths[$testB])){
+                        $newFiles[] = $this->virtualPaths[$testB];
+                    }
                 }
             }
             $userSelection->setFiles($newFiles);

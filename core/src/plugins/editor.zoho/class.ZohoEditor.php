@@ -110,6 +110,8 @@ class ZohoEditor extends AJXP_Plugin
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
+
+            $selection = new UserSelection($repository, $httpVars);
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
                 $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
