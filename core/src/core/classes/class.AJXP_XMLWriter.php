@@ -636,9 +636,14 @@ class AJXP_XMLWriter
                 $merged = $loggedUser->mergedRole;
                 $params = array();
                 foreach($exposed as $exposed_prop){
-                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $exposed_prop["DEFAULT"]);
+                    $metaOptions = $repoObject->getOption("META_SOURCES");
+                    $value = $exposed_prop["DEFAULT"];
+                    if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]]) && isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
+                        $value = $metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]];
+                    }
+                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
                     if($value !== null){
-                        if($value === true  || $value === false) $value = ($value?"true":"false");
+                        if($value === true  || $value === false) $value = ($value === true ?"true":"false");
                         $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
                         $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
                     }
