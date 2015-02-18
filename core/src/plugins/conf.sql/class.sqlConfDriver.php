@@ -388,7 +388,7 @@ class sqlConfDriver extends AbstractConfDriver
      *
      * @param Repository $repositoryObject
      * @param Boolean $update
-     * @return -1 if failed
+     * @return int -1 if failed
      */
     public function saveRepository($repositoryObject, $update = false)
     {
