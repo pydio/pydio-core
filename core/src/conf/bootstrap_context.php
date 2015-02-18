@@ -41,6 +41,11 @@ if(!defined("AJXP_VERSION")){
 
 define("AJXP_EXEC", true);
 
+// If set to true the gui functions of admins (config of app & developer ressources) will be disabled 
+define("AJXP_ADMIN_DISABLE", true); 
+// If set to true the gui functions of admins workspace will be disabled 
+define("AJXP_ADMIN_WS_DISABLE", true); 
+
 // APPLICATION PATHES CONFIGURATION
 define("AJXP_DATA_PATH", AJXP_INSTALL_PATH."/data");
 define("AJXP_CACHE_DIR", AJXP_DATA_PATH."/cache");
