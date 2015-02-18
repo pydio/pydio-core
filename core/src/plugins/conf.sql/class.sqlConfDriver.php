@@ -367,6 +367,10 @@ class sqlConfDriver extends AbstractConfDriver
             $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [slug] LIKE '".$slug."%'");
         }
         $existingSlugs = $res->fetchPairs();
+        $configSlugs = ConfService::reservedSlugsFromConfig();
+        if(in_array($slug, $configSlugs)){
+            $existingSlugs[$slug] = $slug;
+        }
         if(!count($existingSlugs)) return $slug;
         $index = 1;
         $base = $slug;

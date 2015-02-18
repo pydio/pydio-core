@@ -767,6 +767,23 @@ class ConfService
     }
 
     /**
+     * Get the reserved slugs used for config defined repositories
+     * @return array
+     */
+    public static function reservedSlugsFromConfig(){
+        $inst = self::getInstance();
+        $slugs = array();
+        if(isSet($inst->configs["DEFAULT_REPOSITORIES"])){
+            foreach($inst->configs["DEFAULT_REPOSITORIES"] as $repo){
+                if(isSet($repo["AJXP_SLUG"])){
+                    $slugs[] = $repo["AJXP_SLUG"];
+                }
+            }
+        }
+        return $slugs;
+    }
+
+    /**
      * Retrieve a repository object
      *
      * @param String $repoId
