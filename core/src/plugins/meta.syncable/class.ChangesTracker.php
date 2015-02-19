@@ -332,6 +332,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
+        $this->logInfo("Syncable index", array($oldNode == null?'null':$oldNode->getUrl(), $newNode == null?'null':$newNode->getUrl()));
         try {
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
@@ -349,11 +350,21 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
             } else if ($oldNode == null || $copy) {
                 // CREATE
-                $stat = stat($newNode->getUrl());
+                $newNode->loadNodeInfo();
+                $mtime = $newNode->ajxp_modiftime;
+                $size  = $newNode->bytesize;
+                if(!isSet($mtime)){
+                    $stat = @stat($newNode->getUrl());
+                    if($stat === false){
+                        throw new Exception('Error while trying to sync node '.$newNode->getUrl());
+                    }
+                    $mtime = $stat["mtime"];
+                    $size = $stat["size"];
+                }
                 $res = dibi::query("INSERT INTO [ajxp_index]", array(
                     "node_path" => $newNode->getPath(),
-                    "bytesize"  => $stat["size"],
-                    "mtime"     => $stat["mtime"],
+                    "bytesize"  => $size,
+                    "mtime"     => $mtime,
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
                     "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
                 ));
@@ -386,6 +397,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 }
             }
         } catch (Exception $e) {
+            AJXP_Logger::error("[meta.syncable]", "Exception", $e->getTraceAsString());
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
 
