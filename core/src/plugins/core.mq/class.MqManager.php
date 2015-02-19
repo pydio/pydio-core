@@ -144,7 +144,7 @@ class MqManager extends AJXP_Plugin
         if(isSet($userId)) $message->userId = $userId;
         if(isSet($gPath)) $message->groupPath = $gPath;
 
-        if (isSet($this->msgExchanger)) {
+        if ($this->msgExchanger) {
             $this->msgExchanger->publishInstantMessage("nodes:$repositoryId", $message);
         }
 
