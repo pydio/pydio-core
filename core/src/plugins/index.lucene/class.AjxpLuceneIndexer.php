@@ -455,7 +455,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             if($oldNode == null){
                 $index =  $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
             }else{
-                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $newNode->getUser());
+                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
             }
         }
         $this->setDefaultAnalyzer();
