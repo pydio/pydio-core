@@ -99,10 +99,17 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
 
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
+        if($private == AJXP_METADATA_ALLUSERS){
+            $userScope = AJXP_METADATA_ALLUSERS;
+        }else if($private === true){
+            $userScope = $this->getUserId($ajxpNode);
+        }else{
+            $userScope = AJXP_METADATA_SHAREDUSER;
+        }
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
+            $userScope
         );
         if(!isSet(self::$metaCache[$nameSpace])) return array();
         else return self::$metaCache[$nameSpace];
@@ -206,16 +213,22 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             }
         }
         if (isSet(self::$fullMetaCache[$metaFile]) && is_array(self::$fullMetaCache[$metaFile])) {
-            if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
-                self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
-            } else {
-                if ($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache[$metaFile]) && !isSet(self::$fullMetaCache[$metaFile]["AJXP_METASTORE_UPGRADED"])) {
-                    self::$fullMetaCache[$metaFile] = $this->upgradeDataFromMetaSerial(self::$fullMetaCache[$metaFile]);
-                    if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
-                        self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+            if($userId == AJXP_METADATA_ALLUSERS && is_array(self::$fullMetaCache[$metaFile][$fileKey])){
+                foreach(self::$fullMetaCache[$metaFile][$fileKey] as $uId => $data){
+                    self::$metaCache = array_merge_recursive(self::$metaCache, $data);
+                }
+            }else{
+                if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
+                    self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+                } else {
+                    if ($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache[$metaFile]) && !isSet(self::$fullMetaCache[$metaFile]["AJXP_METASTORE_UPGRADED"])) {
+                        self::$fullMetaCache[$metaFile] = $this->upgradeDataFromMetaSerial(self::$fullMetaCache[$metaFile]);
+                        if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
+                            self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+                        }
+                        // Save upgraded version
+                        file_put_contents($metaFile, serialize(self::$fullMetaCache[$metaFile]));
                     }
-                    // Save upgraded version
-                    file_put_contents($metaFile, serialize(self::$fullMetaCache[$metaFile]));
                 }
             }
         } else {

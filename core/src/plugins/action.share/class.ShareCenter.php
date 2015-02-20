@@ -581,7 +581,7 @@ class ShareCenter extends AJXP_Plugin
         $result = array();
         if($direction !== "UP"){
             $upmetas = array();
-            $node->collectMetadataInParents("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, false, $upmetas);
+            $node->collectMetadataInParents("ajxp_shared", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_REPOSITORY, false, $upmetas);
             foreach($upmetas as $metadata){
                 if (is_array($metadata) && !empty($metadata["shares"])) {
                     foreach($metadata["shares"] as $sId => $sData){
@@ -596,6 +596,7 @@ class ShareCenter extends AJXP_Plugin
                         $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
                         $sharedNodeUrl = $node->getScheme() . "://".$wsId.$sharedPath;
                         $result[$wsId] = array(new AJXP_Node($sharedNodeUrl), "DOWN");
+                        $this->logDebug('MIRROR NODES', 'Found shared in parent - register node '.$sharedNodeUrl);
                     }
                 }
             }

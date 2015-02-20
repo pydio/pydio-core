@@ -142,8 +142,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $aws = $this->getAwsService();
-        if($aws == null) return;
-        $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
+        if($aws == null) return array();
 
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {
             $data = self::$metaCache[$ajxpNode->getPath()];
@@ -162,11 +161,25 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
             self::$metaCache[$ajxpNode->getPath()] = $metadata;
             $data = self::$metaCache[$ajxpNode->getPath()];
         }
-        $mKey = $this->getMetaKey($nameSpace,$scope,$user);
-        if (isSet($data[$mKey])) {
-            $arrMeta =  unserialize(base64_decode($data[$mKey]));
-            if(is_array($arrMeta)) return $arrMeta;
+        if($private === AJXP_METADATA_ALLUSERS){
+            $startKey = $this->getMetaKey($nameSpace, $scope, "");
+            $arrMeta = array();
+            foreach($data as $k => $mData){
+                if(strpos($k, $startKey) === 0){
+                    $decData = unserialize(base64_decode($mData));
+                    if(is_array($decData)) $arrMeta = array_merge_recursive($arrMeta, $decData);
+                }
+            }
+            return $arrMeta;
+        }else{
+            $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
+            $mKey = $this->getMetaKey($nameSpace,$scope,$user);
+            if (isSet($data[$mKey])) {
+                $arrMeta =  unserialize(base64_decode($data[$mKey]));
+                if(is_array($arrMeta)) return $arrMeta;
+            }
         }
+        return array();
     }
 
     private function getMetaKey($namespace, $scope, $user)
