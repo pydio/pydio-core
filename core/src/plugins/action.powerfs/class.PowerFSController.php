@@ -111,10 +111,10 @@ class PowerFSController extends AJXP_Plugin
 
             case "compress" :
             case "precompress" :
-		
-		$zipper = $this->getFilteredOption("ZIPPER");
-		AJXP_Logger::debug("Selected Zipper " . $zipper);
-		
+
+ 				$zipper = $this->getFilteredOption("ZIPPER");
+				AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Selected Zipper " . $zipper);
+				
                 $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
                     $opeId = substr(md5(time()),0,10);
@@ -136,14 +136,14 @@ class PowerFSController extends AJXP_Plugin
                     session_write_close();
                     exit();
                 }
-			
-		if ($zipper == "zip")
-			$this->compress_zip($action, $httpVars, $fileVars, $dir, $selection, $urlBase);
-		else if ($zipper != "")
-			$this->compress_general($action, $httpVars, $fileVars, $dir, $selection, $urlBase, $zipper);
-		else
-			AJXP_Logger::logAction("Not a valid ZIP tool found.");
-		
+				
+				if ($zipper == "zip")
+					$this->compress_zip($action, $httpVars, $fileVars, $dir, $selection, $urlBase);
+				else if ($zipper != "")
+					$this->compress_general($action, $httpVars, $fileVars, $dir, $selection, $urlBase, $zipper);
+				else
+					AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Not a valid ZIP tool found.");
+
                 break;
             default:
                 break;
@@ -195,50 +195,50 @@ class PowerFSController extends AJXP_Plugin
 			$clierrorfile = AJXP_Utils::getAjxpTmpDir()."\\".$httpVars["ope_id"]."_".$httpVars["archive_name"].".cli_error.log";
 		}
 		$zipspeedfile = AJXP_Utils::getAjxpTmpDir() . "\\" . "AJXP_zip_avgspeed.txt";
-		AJXP_Logger::debug("Files \r\n" . $archiveName . "\r\n" . $filesname . "\r\n" . $logfile . "\r\n" . $clioutputfile . "\r\n" . $clierrorfile . "\r\n" . $zipspeedfile);
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Files \r\n" . $archiveName . "\r\n" . $filesname . "\r\n" . $logfile . "\r\n" . $clioutputfile . "\r\n" . $clierrorfile . "\r\n" . $zipspeedfile);
 		
 		//Changing root dir
-		//AJXP_Logger::debug(getcwd());
+		//AJXP_Logger::debug(__CLASS__,__FUNCTION__,getcwd());
 		chdir($rootDir);
-		AJXP_Logger::debug(getcwd());
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,getcwd());
 		
 		// Setting parameters
-	        $zip_exe = $this->getFilteredOption("ZIPPER_MAN");	
-	        if($this->getFilteredOption("ZIPPER_PATH") != "")//Setting ZIPPER_PATH
-	        {
+        $zip_exe = $this->getFilteredOption("ZIPPER_MAN");	
+        if($this->getFilteredOption("ZIPPER_PATH") != "")//Setting ZIPPER_PATH
+        {
 			$zip_path = $this->getFilteredOption("ZIPPER_PATH");
 			if (substr($zip_path, -1) != "\\" || substr($zip_path, -1) != "/") $zip_path = $zip_path . "\\";
 		}
-	        else
-	            $zip_path = "";
-	        if($this->getFilteredOption("MAX_EXE_TIME") != 0)//Setting max execution time
-	            set_time_limit (intval($this->getFilteredOption("MAX_EXE_TIME")));
-	        else
-	            set_time_limit (1400);  
-	        if($this->getFilteredOption("MAX_ZIP_TIME") != 0)//Setting zip time
-	            $max_zip_time = intval($this->getFilteredOption("MAX_ZIP_TIME"));
-	        else
-	            $max_zip_time = 1200;  
-	        if($this->getFilteredOption("MAX_ZIP_TIME_FILE") != 0)//Setting zip time file
-	            $max_zip_time_file = intval($this->getFilteredOption("MAX_ZIP_TIME_FILE"));
-	        else
-	            $max_zip_time_file = 120;  
-	        if($this->getFilteredOption("ZIPPER_MONITOR_PAUSE") != 0)//Setting ZIPPER_MONITOR_PAUSE
-	            $monitor_pause = intval($this->getFilteredOption("ZIPPER_MONITOR_PAUSE")) * 1000;
-	        else
-	            $monitor_pause = 500000;  
-	        if($this->getFilteredOption("ZIPPER_MONITOR_RECOG_PATTERN") != "")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
-	            $recogpattern = $this->getFilteredOption("ZIPPER_MONITOR_RECOG_PATTERN");
-	        else
-	            $recogpattern = "%file%";
-	        if($this->getFilteredOption("ZIPPER_MONITOR_RECOG_AFFECTS") == "end")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
-	            $fproc_regoc_at_zipstart = false;
-	        else
-	            $fproc_regoc_at_zipstart = true;
-	        if($this->getFilteredOption("ZIPPER_MONITOR_SUCCESS_STATEMENT") != "")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
-	            $zipsuccess_statement = $this->getFilteredOption("ZIPPER_MONITOR_SUCCESS_STATEMENT");
-	        else
-	            $zipsuccess_statement = "#none#";
+        else
+            $zip_path = "";
+        if($this->getFilteredOption("MAX_EXE_TIME") != 0)//Setting max execution time
+            set_time_limit (intval($this->getFilteredOption("MAX_EXE_TIME")));
+        else
+            set_time_limit (1400);  
+        if($this->getFilteredOption("MAX_ZIP_TIME") != 0)//Setting zip time
+            $max_zip_time = intval($this->getFilteredOption("MAX_ZIP_TIME"));
+        else
+            $max_zip_time = 1200;  
+        if($this->getFilteredOption("MAX_ZIP_TIME_FILE") != 0)//Setting zip time file
+            $max_zip_time_file = intval($this->getFilteredOption("MAX_ZIP_TIME_FILE"));
+        else
+            $max_zip_time_file = 120;  
+        if($this->getFilteredOption("ZIPPER_MONITOR_PAUSE") != 0)//Setting ZIPPER_MONITOR_PAUSE
+            $monitor_pause = intval($this->getFilteredOption("ZIPPER_MONITOR_PAUSE")) * 1000;
+        else
+            $monitor_pause = 500000;  
+        if($this->getFilteredOption("ZIPPER_MONITOR_RECOG_PATTERN") != "")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
+            $recogpattern = $this->getFilteredOption("ZIPPER_MONITOR_RECOG_PATTERN");
+        else
+            $recogpattern = "%file%";
+        if($this->getFilteredOption("ZIPPER_MONITOR_RECOG_AFFECTS") == "end")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
+            $fproc_regoc_at_zipstart = false;
+        else
+            $fproc_regoc_at_zipstart = true;
+        if($this->getFilteredOption("ZIPPER_MONITOR_SUCCESS_STATEMENT") != "")//Setting ZIPPER_MONITOR_RECOG_AFFECTS
+            $zipsuccess_statement = $this->getFilteredOption("ZIPPER_MONITOR_SUCCESS_STATEMENT");
+        else
+            $zipsuccess_statement = "#none#";
 		
 		// Preparing and executing CLI
 		file_put_contents($filesname, $files);
@@ -278,8 +278,8 @@ class PowerFSController extends AJXP_Plugin
 			default:
 				break;
 		}
-		AJXP_Logger::debug("Executing zip command");
-		AJXP_Logger::debug($cmd);				
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Executing zip command");
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,$cmd);				
 		$proc = proc_open($cmd, $descriptorspec, $pipes, $rootDir, null, $oopt);
 		
 		// Preparing progress check and getting information on files while ZIP is running to save time
@@ -293,7 +293,7 @@ class PowerFSController extends AJXP_Plugin
 		$files_totalsize = 0;
 		
 		$files_name = explode("\r\n",$files);
-		AJXP_Logger::debug("Counting files " . count($files_name));
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Counting files " . count($files_name));
 		foreach ($files_name as &$fle)
 		{
 			if (file_exists($fle))
@@ -305,13 +305,13 @@ class PowerFSController extends AJXP_Plugin
 				$files_size[] = 0;
 			$files_fnd[] = false;
 		}
-		AJXP_Logger::debug("Totalsize MB " . $files_totalsize / 1000000);
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Totalsize MB " . $files_totalsize / 1000000);
 		$linesarr = array();
 		$linescnt = count($linesarr);
 		$fprocessed = 0;
 						
-		$maxwaiting = 5; //Waiting for zipper to start
-		for ($l = 0; $l <= $maxwaiting * 10; $l++)
+		$maxwaiting = 10 * 10; //Waiting for zipper to start
+		for ($l = 0; $l <= $maxwaiting; $l++)
 		{
 			$stat = proc_get_status($proc);
 			if (!$stat['running'])
@@ -340,7 +340,7 @@ class PowerFSController extends AJXP_Plugin
 					$monproc = "avgspeed";
 				else {
 					$monproc = "fileoutput";
-					AJXP_Logger::logAction("Not a valid monitoring process was set, setting to fileoutput");
+					AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Not a valid monitoring process was set, setting to fileoutput");
 				}
 				$recogpattern = "/%file%/";
 				$zipOK = 0;
@@ -358,7 +358,7 @@ class PowerFSController extends AJXP_Plugin
 					$monproc = "avgspeed";
 				else {
 					$monproc = "clioutput";
-					AJXP_Logger::logAction("Not a valid monitoring process was set, setting to clioutput");
+					AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Not a valid monitoring process was set, setting to clioutput");
 				}
 				$recogpattern = '/(\w+): (%file%) \(([^\(]+)\) \(([^\(]+)\)/';
 				$zipOK = 0;
@@ -370,10 +370,10 @@ class PowerFSController extends AJXP_Plugin
 				break;
 			default:
 				$monproc = "avgspeed"; 
-				AJXP_Logger::logAction("Applying default zip monitor");
+				AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Applying default zip monitor");
 				break;
 		}
-		AJXP_Logger::debug("Selected monitor " . $monproc);
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Selected monitor " . $monproc);
 		
 		// Monitoring progress
 		if (is_resource($proc))
@@ -391,22 +391,22 @@ class PowerFSController extends AJXP_Plugin
 					{
 						if (file_exists($moninputfile))
 						{
-							$linesarr = explode("\r\n", file_get_contents($moninputfile));
+							$linesarr = explode("\r\n",file_get_contents($moninputfile));
 							if ($linescnt != count($linesarr)) // Has a new line been added
 							{
 								for ($i = 0; $i <= count($files_name) - 1 ; $i++) // Check all files to be in the zip
 								{
-									//AJXP_Logger::debug("Current file " . $files_name[$i]);
+									//AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Current file " . $files_name[$i]);
 									if ($files_fnd[$i] == false)
 									{
 										$patt = str_replace("%file%", str_replace("\\", "\\\\", $files_name[$i]), $recogpattern);
-										//AJXP_Logger::debug("Pattern " . $patt);
+										//AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Pattern " . $patt);
 										foreach ($linesarr as &$str2)			// If file matches a should file, mark it as found, add the size, calc percent and restart max zip file time
 										{
 											$obj = str_replace("/", "\\", $str2);
 											$test = preg_match($patt, $obj);
-											//AJXP_Logger::debug(" Comp " . $obj);
-											//AJXP_Logger::debug(" Resu " . $test);
+											//AJXP_Logger::debug(__CLASS__,__FUNCTION__," Comp " . $obj);
+											//AJXP_Logger::debug(__CLASS__,__FUNCTION__," Resu " . $test);
 											if($fproc_regoc_at_zipstart) $fprocessed_delta = $files_size[$i] / 2;
 												
 											if ($test == 1) 
@@ -417,7 +417,7 @@ class PowerFSController extends AJXP_Plugin
 												$zipstartfile = time();
 												$files_fnd[$i] = true;
 												$fprocessed_cnt++;
-												//AJXP_Logger::debug("File found " . $files_name[$i]);
+												//AJXP_Logger::debug(__CLASS__,__FUNCTION__,"File found " . $files_name[$i]);
 											}
 										}
 									}
@@ -428,27 +428,27 @@ class PowerFSController extends AJXP_Plugin
 							if ($fprocessed_cnt >= count($files_name))
 							{
 								$zipcomplete = true;
-								AJXP_Logger::debug("All found files compressed! Setting 100%");
+								AJXP_Logger::debug(__CLASS__,__FUNCTION__,"All found files compressed! Setting 100%");
 							}
 						}
 						$stat = proc_get_status($proc); // Checking wether the process is running or has completed
 						if (!$stat['running']) { if ($zipstat == 0)
-							{ $zipstat = 1; AJXP_Logger::debug("Process end detected");}
+							{ $zipstat = 1; AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Process end detected");}
 						else 
-							{ $zipcomplete = true; AJXP_Logger::debug("Setting ZIP Complete true");}}
-						if (file_exists($moninputfile)) $cliout = file_get_contents($moninputfile); // Checking success statement in command line output
+							{ $zipcomplete = true; AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Setting ZIP Complete true");}}
+						if (file_exists($clioutputfile)) $cliout = file_get_contents($clioutputfile); // Checking success statement in command line output
 						if (strpos($cliout, $zipsuccess_statement) > 1) {$zipcomplete = true; $zipOK = 1;}
 						if (time() - $zipstart > $max_zip_time) $kill_proc = true; // Maximum exe time reached
 						if (time() - $zipstartfile > $max_zip_time_file) // Max execution time per file
 						{
-							AJXP_Logger::logAction("Abort due monitoringfile has not changed max given time.");
+							AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Abort due logfile has not changed in longer time.");
 							$kill_proc = true;
 						}
 						
 						if(!$zipcomplete) usleep($monitor_pause);
 					}
-					//AJXP_Logger::debug($fprocessed_cnt);
-					//AJXP_Logger::debug(count($files_name));
+					//AJXP_Logger::debug(__CLASS__,__FUNCTION__,$fprocessed_cnt);
+					//AJXP_Logger::debug(__CLASS__,__FUNCTION__,count($files_name));
 					if ($fprocessed_cnt == count($files_name))
 						$zipOK = 1;
 					break;
@@ -458,10 +458,10 @@ class PowerFSController extends AJXP_Plugin
 					$zipspeeda = array(1, 25); //seconds per MB
 					if (file_exists($zipspeedfile)) $zipspeeda = explode("#",file_get_contents($zipspeedfile));
 					$zipspeed = ( ((int)$zipspeeda[1]) / ((int)$zipspeeda[0]) );
-					AJXP_Logger::debug("AvgSpeed MB/s " . $zipspeed);
+					AJXP_Logger::debug(__CLASS__,__FUNCTION__,"AvgSpeed MB/s " . $zipspeed);
 					if (((int)$zipspeeda[0]) > 10000)
 					{
-						AJXP_Logger::logAction("Reducing speed average values to avoid stack overflow");
+						AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Reducing speed average values to avoid stack overflow");
 						$zipspeeda[0] = ((int)( (int)$zipspeeda[0] / 100 ));
 						$zipspeeda[1] = ((int)( (int)$zipspeeda[1] / 100 ));
 					}
@@ -474,7 +474,7 @@ class PowerFSController extends AJXP_Plugin
 						else if (!$zipwaiting)
 						{
 							file_put_contents($percentFile, 98);
-							AJXP_Logger::debug("Waiting for ending ... 98% is reached");
+							AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Waiting for success statement ... 98% is reached");
 							$zipwaiting = true;
 						}
 							
@@ -493,28 +493,29 @@ class PowerFSController extends AJXP_Plugin
 							$zipOK = 1;
 					break;
 				default:
-					AJXP_Logger::logAction("Cannot find appropiate monitoring process");
+					AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Cannot find appropiate monitoring process");
 					break;
+			
 			}
 		}
 		else
 		{
-			AJXP_Logger::logAction("Zip Process could not be started.");
+			AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Zip Process could not be started.");
 			file_put_contents($percentFile, 100);
 		}
 		
 		if ($kill_proc) // Terminate in case of errors
 		{
-			AJXP_Logger::logAction("Zip process should be terminated due to an error. Terminating process ...");
+			AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Zip process should be terminated due to an error. Terminating process ...");
 			proc_terminate($proc);
 		}
-		$maxwaiting = 30; // Waiting x seconds to give process time to quit
-		for ($k = 0; $k <= $maxwaiting * 10; $k++)
+		$maxwaiting = 30 * 10; // Waiting x seconds to give process time to quit
+		for ($k = 0; $k <= $maxwaiting; $k++)
 		{
 			$stat = proc_get_status($proc);
 			if ($stat['running'] && k == $maxwaiting) // Termintate in case of still running
 			{
-				AJXP_Logger::logAction("Zip process still running after ".$maxwaiting."s. Terminating process ...");
+				AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Zip process still running after ".$maxwaiting."s. Terminating process ...");
 				proc_terminate($proc);
 			}
 			if ($stat['running'])
@@ -523,10 +524,9 @@ class PowerFSController extends AJXP_Plugin
 				$k = $maxwaiting + 1;
 		}
 		file_put_contents($percentFile, 100);
-		AJXP_Logger::debug("Closing Proc");
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Closing Proc");
 		proc_close ($proc);
 		
-		// Deleting input / output files
 		if (file_exists($filesname)) unlink($filesname);
 		if (file_exists($logfile)) unlink($logfile);
 		if (file_exists($clioutputfile)) unlink($clioutputfile);
@@ -534,14 +534,13 @@ class PowerFSController extends AJXP_Plugin
 		{
 			$fcontent = file_get_contents($clierrorfile);
 			unlink($clierrorfile);
-			if (strlen($fcontent) > 2) AJXP_Logger::logAction("Command Line Error " . $fcontent);
+			if (strlen($fcontent) > 2) AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"Command Line Error " . $fcontent);
 		}
-		
 		if ($zipOK == 0) // Checking success statement
-			AJXP_Logger::logAction("No expected success statement found. ZIP has probable errors.");
+			AJXP_Logger::logAction(__CLASS__,__FUNCTION__,"No expected success statement found. ZIP has probable errors.");
 		
 		file_put_contents($percentFile, 100);  // Ending monitoring process by writing 100% in percentfile
-		AJXP_Logger::debug("Final end of compressing");
+		AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Final end compressing function");
 	}
 	
 	public function compress_zip($action, $httpVars, $fileVars, $dir, $selection, $urlBase)
@@ -589,11 +588,10 @@ class PowerFSController extends AJXP_Plugin
 		$toks = array();
 		$handled = array();
 		$finishedEchoed = false;
-		if($this->getFilteredOption("MAX_ZIP_TIME_FILE") != 0)//Setting zip time
-			$max_zip_time = (int)$this->getFilteredOption("MAX_ZIP_TIME_FILE");
-		else
-			$max_zip_time = 120;  
-		
+        if($this->getFilteredOption("MAX_ZIP_TIME") != 0)//Setting zip time
+            $max_zip_time = (int)$this->getFilteredOption("MAX_ZIP_TIME");
+        else
+            $max_zip_time = 120;  
 		while (!feof($proc)) {
 			set_time_limit ($max_zip_time);
 			$results = fgets($proc, 256);
