@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,14 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK for PHP" => "Access an AWS server. Requires AWS-SDK for PHP ",
-"Key" => "Key",
-"S3 Api Key" => "S3 Api Key",
-"Secret Key" => "Secret Key",
-"S3 secret key" => "S3 secret key",
-"Region" => "Region",
-"S3 storage region" => "S3 storage region",
-"Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket",
+"Activate desktop notifications" => "Aktivovat upozornění na ploše",
+"Desktop Notifications" => "Upozornění na ploše",
 );

@@ -22,5 +22,5 @@ $mess = array(
     // will be replaced by the application title
     "1" => "Creating archive, please wait",
     "2" => "Reload current folder",
-    "3" => "Archive download should start automatically"
+    "3" => "Archive download should start automatically",
 );

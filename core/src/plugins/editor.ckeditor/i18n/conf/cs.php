@@ -19,14 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK for PHP" => "Access an AWS server. Requires AWS-SDK for PHP ",
-"Key" => "Key",
-"S3 Api Key" => "S3 Api Key",
-"Secret Key" => "Secret Key",
-"S3 secret key" => "S3 secret key",
-"Region" => "Region",
-"S3 storage region" => "S3 storage region",
-"Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket",
+"CKEditor" => "CKEditor",
+"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Wysiwyg HTML editor, vyžaduje stažení oddělené knihovny.",
 );
