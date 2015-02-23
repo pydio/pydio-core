@@ -332,7 +332,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
-        $this->logInfo("Syncable index", array($oldNode == null?'null':$oldNode->getUrl(), $newNode == null?'null':$newNode->getUrl()));
+        //$this->logInfo("Syncable index", array($oldNode == null?'null':$oldNode->getUrl(), $newNode == null?'null':$newNode->getUrl()));
         try {
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
@@ -347,24 +347,17 @@ class ChangesTracker extends AJXP_AbstractMetaSource
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 // DELETE
+                $this->logDebug('DELETE', $oldNode->getUrl());
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
             } else if ($oldNode == null || $copy) {
                 // CREATE
-                $newNode->loadNodeInfo();
-                $mtime = $newNode->ajxp_modiftime;
-                $size  = $newNode->bytesize;
-                if(!isSet($mtime)){
-                    $stat = @stat($newNode->getUrl());
-                    if($stat === false){
-                        throw new Exception('Error while trying to sync node '.$newNode->getUrl());
-                    }
-                    $mtime = $stat["mtime"];
-                    $size = $stat["size"];
-                }
-                $res = dibi::query("INSERT INTO [ajxp_index]", array(
+                $stat = stat($newNode->getUrl());
+                $newNode->setLeaf(!($stat['mode'] & 040000));
+                $this->logDebug('INSERT', $newNode->getUrl());
+                dibi::query("INSERT INTO [ajxp_index]", array(
                     "node_path" => $newNode->getPath(),
-                    "bytesize"  => $size,
-                    "mtime"     => $mtime,
+                    "bytesize"  => $stat["size"],
+                    "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
                     "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
                 ));
@@ -375,6 +368,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     clearstatcache();
                     $stat = stat($newNode->getUrl());
                     $this->logDebug("Content changed", "current stat size is : " . $stat["size"]);
+                    $this->logDebug('UPDATE CONTENT', $newNode->getUrl());
                     dibi::query("UPDATE [ajxp_index] SET ", array(
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],
@@ -384,10 +378,12 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     // PATH CHANGE ONLY
                     $newNode->loadNodeInfo();
                     if ($newNode->isLeaf()) {
+                        $this->logDebug('UPDATE LEAF PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET ", array(
                             "node_path"  => $newNode->getPath(),
                         ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
                     } else {
+                        $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             $oldNode->getPath(),
                             $newNode->getPath()

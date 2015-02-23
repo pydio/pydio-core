@@ -24,6 +24,9 @@
 		<hooks>
 			<serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"/>
 			<serverCallback hookName="node.meta_change" methodName="updateNodeIndexMeta" defer="true"/>
+            <serverCallback hookName="node.index.recursive.start" methodName="indexationStarts"/>
+            <serverCallback hookName="node.index.recursive.end" methodName="indexationEnds"/>
+            <serverCallback hookName="node.index" methodName="indexationIndexNode"/>
 		</hooks>
 		<actions>
 			<action name="search">
@@ -44,40 +47,6 @@
 					<serverCallback methodName="applyAction" restParams="/field/query" sdkMethodName="searchByKeyword" developerComment="Search the Lucene on a specific document field">
                         <input_param description="Lucene Keyword to search on" name="field" type="string"/>
                         <input_param description="Query term" name="query" type="string"/>
-					</serverCallback>
-				</processing>
-			</action>
-            <action name="check_lock">
-                <rightsContext noUser="true" userLogged="only" read="true"
-                    write="false" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkSearchIndexLock" developerComment="Check if the Lucene index is locked"/>
-                </processing>
-            </action>
-			<action name="index">
-				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
-                    <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="false" infoPanel="false"
-                             actionBarGroup="remote" inZip="false">
-                    </context>
-                </gui>
-				<rightsContext noUser="true" userLogged="only" read="true"
-					write="false" adminOnly="false">
-				</rightsContext>
-				<processing>
-					<clientCallback prepareModal="false"><![CDATA[
-                        var crtDir = "/";
-                        if(!ajaxplorer.getUserSelection().isEmpty()){
-                            crtDir = ajaxplorer.getUserSelection().getUniqueNode().getPath();
-                        }
-						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
-						bgManager.next();
-					]]></clientCallback>
-					<serverCallback methodName="applyAction" restParams="/dir+" developerComment="Re-index content of a given directory, recursively">
-                        <input_param name="dir" type="string" description="Base directory to index"/>
-                        <input_param name="verbose" type="boolean" description="Print out some info about indexation"/>
 					</serverCallback>
 				</processing>
 			</action>

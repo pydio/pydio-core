@@ -5496,38 +5496,19 @@ div.menuActions img{
     color: #666;
 }
 
-/*
-.backgroundPanel{
-    position:absolute;
-    right:0;
-    bottom:20px;
-    padding:1px 5px 3px 7px;
-    font-size:11px;
-    font-weight:bold;
-    color: #fff;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif , sans-serif;
-    background-color:#5599ff;
-    filter:alpha(opacity=80);
-    opacity: 0.8;
-    -moz-opacity:0.8;
-    z-index:10000;
-    border-radius: 3px 0 0 3px;
-}*/
-
 .backgroundPanel {
     position: absolute;
-    bottom: 0;
-    padding: 3px 7px 4px 7px;
-    font-size: 11px;
-    font-weight: bold;
+    bottom: -1px;
+    padding: 4px 7px 6px 7px;
     color: #fff;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif , sans-serif;
-    background-color: #77b8e2;
+    background-color: rgba(119, 184, 226, 0.62);
     z-index: 10000;
     border-radius: 3px 3px 0 0;
-    width: 15%;
-    margin-left: 45%;
+    width: 25%;
+    margin-left: 40%;
     text-align: center;
+    letter-spacing: 1px;
+    border: 1px solid rgba(119, 184, 226, 0.62);
 }
 
 /*******************************/

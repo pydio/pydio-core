@@ -22,8 +22,8 @@
            </actions>
    		<hooks>
    			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
-   			<serverCallback hookName="node.index.add" methodName="indexNode"/>
-   			<serverCallback hookName="node.index.folder_recursive" methodName="clearIndexForNode"/>
+   			<serverCallback hookName="node.index" methodName="indexNode"/>
+   			<serverCallback hookName="node.index.recursive.start" methodName="clearIndexForNode"/>
    		</hooks>
     </registry_contributions>
 </meta>
