@@ -44,6 +44,7 @@ Class.create("Ajaxplorer", {
 		this._resourcesRegistry = {};
 		this._guiComponentsConfigs = new Hash();
 		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "Pydio";
+        window.pydio = this;
 	},
 	
 	/**
