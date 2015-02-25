@@ -28,6 +28,7 @@ Class.create("AjxpMqObserver", {
     clientId:null,
     ws: null,
     configs: null,
+    channel_pending: false,
 
     initialize : function(){
         "use strict";
@@ -147,6 +148,9 @@ Class.create("AjxpMqObserver", {
     },
 
     consumeChannel : function(){
+        if(this.channel_pending) {
+            return;
+        }
         var conn = new Connexion();
         conn.setParameters($H({
             get_action:'client_consume_channel',
@@ -155,11 +159,13 @@ Class.create("AjxpMqObserver", {
         }));
         conn.discrete = true;
         conn.onComplete = function(transport){
+            this.channel_pending = false;
             if(transport.responseXML){
                 ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
                 ajaxplorer.notify("server_message", transport.responseXML);
             }
-        };
+        }.bind(this);
+        this.channel_pending = true;
         conn.sendAsync();
     }
 
