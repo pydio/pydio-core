@@ -125,7 +125,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $size = fgets ( $io, 4096);
             $size = trim(str_replace($dir, "", $size));
             $size =  floatval($size);
-            if(PHP_OS == "Darwin") $s = $s * 1024;
+            if(PHP_OS == "Darwin") $size = $size * 1024;
             pclose ( $io );
         }
         if($size != -1){
