@@ -137,7 +137,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         $recycle = $currentRepo->getOption("RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
 
-        if($this->options["OBSERVE_STORAGE_CHANGES"]){
+        if($this->options["OBSERVE_STORAGE_CHANGES"] === true){
             $this->indexIsSync();
         }
 
