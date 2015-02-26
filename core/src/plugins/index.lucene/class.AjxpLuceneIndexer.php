@@ -333,6 +333,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         $this->currentIndex->optimize();
         $this->logDebug('INDEX.END', 'Commiting Index');
         $this->currentIndex->commit();
+        unset($this->currentIndex);
         $this->logDebug('INDEX.END', 'Merging Temporary in main');
         $this->mergeTemporaryIndexToMain($parentNode->getRepositoryId());
         $this->logDebug('INDEX.END', 'Done');
@@ -684,7 +685,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         $indexPath = $this->getIndexPath($repositoryId);
         $tmpIndexPath = $indexPath."-PYDIO_TMP";
         $this->clearIndexIfExists($indexPath);
-        $this->copyIndex($tmpIndexPath, $indexPath);
+        $this->moveIndex($tmpIndexPath, $indexPath);
         $this->clearIndexIfExists($tmpIndexPath);
     }
 
@@ -712,6 +713,21 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         foreach($content as $file){
             if($file == "." || $file == "..") continue;
             copy($folder1.DIRECTORY_SEPARATOR.$file, $folder2.DIRECTORY_SEPARATOR.$file);
+        }
+    }
+
+
+    /**
+     * @param $folder1
+     * @param $folder2
+     */
+    private function moveIndex($folder1, $folder2){
+        if(!is_dir($folder1))return;
+        if(!is_dir($folder2)) mkdir($folder2, 0755);
+        $content = scandir($folder1);
+        foreach($content as $file){
+            if($file == "." || $file == "..") continue;
+            rename($folder1.DIRECTORY_SEPARATOR.$file, $folder2.DIRECTORY_SEPARATOR.$file);
         }
     }
 
