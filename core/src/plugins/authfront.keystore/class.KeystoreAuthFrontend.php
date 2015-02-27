@@ -42,7 +42,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
         $token = $this->detectVar($httpVars, "auth_token");
         if(empty($token)){
-            $this->logDebug(__FUNCTION__, "Empty token", $_POST);
+            //$this->logDebug(__FUNCTION__, "Empty token", $_POST);
             return false;
         }
         $this->storage = ConfService::getConfStorageImpl();
@@ -51,20 +51,20 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $data = null;
         $this->storage->simpleStoreGet("keystore", $token, "serial", $data);
         if(empty($data)){
-            $this->logDebug(__FUNCTION__, "Cannot find token in keystore");
+            //$this->logDebug(__FUNCTION__, "Cannot find token in keystore");
             return false;
         }
-        $this->logDebug(__FUNCTION__, "Found token in keystore");
+        //$this->logDebug(__FUNCTION__, "Found token in keystore");
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
         $server_uri = rtrim(array_shift(explode("?", $_SERVER["REQUEST_URI"])), "/");
         $server_uri = implode("/", array_map("rawurlencode", array_map("urldecode", explode("/", $server_uri))));
         $server_uri = str_replace("~", "%7E", $server_uri);
-        $this->logDebug(__FUNCTION__, "Decoded URI is ".$server_uri);
+        //$this->logDebug(__FUNCTION__, "Decoded URI is ".$server_uri);
         list($nonce, $hash) = explode(":", $this->detectVar($httpVars, "auth_hash"));
-        $this->logDebug(__FUNCTION__, "Nonce / hash is ".$nonce.":".$hash);
+        //$this->logDebug(__FUNCTION__, "Nonce / hash is ".$nonce.":".$hash);
         $replay = hash_hmac("sha256", $server_uri.":".$nonce.":".$private, $token);
-        $this->logDebug(__FUNCTION__, "Replay is ".$replay);
+        //$this->logDebug(__FUNCTION__, "Replay is ".$replay);
 
         if($replay == $hash){
             $res = AuthService::logUser($userId, "", true);
