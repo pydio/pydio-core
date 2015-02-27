@@ -36,6 +36,20 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         parent::init($options);
     }
 
+    protected function excludeFromSync($path){
+        $excludedExtensions = array("dlpart");
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        if(!empty($ext) && in_array($ext, $excludedExtensions)){
+            return true;
+        }
+        try{
+            $this->accessDriver->filterUserSelectionToHidden(array($path));
+        }catch(Exception $e){
+            return true;
+        }
+        return false;
+    }
+
     protected function indexIsSync(){
         // Grab all folders mtime and compare them
         $repoIdentifier = $this->computeIdentifier($this->accessDriver->repository);
@@ -51,7 +65,12 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         $children = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
              $repoIdentifier, "/%", "/%/%");
         foreach($children as $cRow){
-            $mod["children"][substr($cRow->node_path, 1)] = $cRow->mtime;
+            $cp = substr($cRow->node_path, 1);
+            if(empty($cp)) continue;
+            if(PHP_OS == 'Darwin'){
+                $cp = Normalizer::normalize($cp, Normalizer::FORM_D);
+            }
+            $mod["children"][$cp] = $cRow->mtime;
         }
         $modified[] = $mod;
 
@@ -66,7 +85,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 // Deleted folder!
                 $this->logDebug(__FUNCTION__, "Folder deleted directly on storage: ".$url);
                 $node = new AJXP_Node($url);
-                AJXP_Controller::applyHook("node.change", array(&$node, null, false));
+                AJXP_Controller::applyHook("node.change", array(&$node, null, false), true);
                 continue;
             }
             if($currentTime > $mtime){
@@ -76,10 +95,15 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     "children" => array(),
                     "current_time" => $currentTime
                 );
-                $children = dibi::query("SELECT [node_path],[mtime],[md5] FROM [ajxp_index] WHERE [md5] != %s AND [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
-                    'directory', $repoIdentifier, "$path/%", "$path/%/%");
+                $children = dibi::query("SELECT [node_path],[mtime],[md5] FROM [ajxp_index] WHERE [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
+                    $repoIdentifier, "$path/%", "$path/%/%");
                 foreach($children as $cRow){
-                    $mod["children"][substr($cRow->node_path, strlen($path)+1)] = $cRow->mtime;
+                    $cp = substr($cRow->node_path, strlen($path)+1);
+                    if(empty($cp)) continue;
+                    if(PHP_OS == 'Darwin'){
+                        $cp = Normalizer::normalize($cp, Normalizer::FORM_D);
+                    }
+                    $mod["children"][$cp] = $cRow->mtime;
                 }
                 $modified[] = $mod;
             }
@@ -88,41 +112,76 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         // NOW COMPUTE DIFFS
         foreach($modified as $mod_data){
             $url = $mod_data["url"];
+            $this->logDebug("Current folder is ".$url);
             $current_time = $mod_data["current_time"];
             $currentChildren = $mod_data["children"];
             $files = scandir($url);
             foreach($files as $f){
                 if($f[0] == ".") continue;
                 $nodeUrl = $url."/".$f;
+                $this->logDebug(__FUNCTION__, "Scanning ".$nodeUrl);
                 $node = new AJXP_Node($nodeUrl);
                 // Ignore dirs modified time
                 // if(is_dir($nodeUrl) && $mod_data["path"] != "/") continue;
                 if(!isSet($currentChildren[$f])){
+                    if($this->excludeFromSync($nodeUrl)){
+                        $this->logDebug(__FUNCTION__, "Excluding item detected on storage: ".$nodeUrl);
+                        continue;
+                    }
                     // New items detected
                     $this->logDebug(__FUNCTION__, "New item detected on storage: ".$nodeUrl);
-                    AJXP_Controller::applyHook("node.change", array(null, &$node, false, true));
+                    AJXP_Controller::applyHook("node.change", array(null, &$node, false, true), true);
                     continue;
                 }else {
                     if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
                     if(filemtime($nodeUrl) > $currentChildren[$f]){
+                        if($this->excludeFromSync($nodeUrl)){
+                            $this->logDebug(__FUNCTION__, "Excluding item changed on storage: ".$nodeUrl);
+                            continue;
+                        }
                         // Changed!
                         $this->logDebug(__FUNCTION__, "Item modified directly on storage: ".$nodeUrl);
-                        AJXP_Controller::applyHook("node.change", array(&$node, &$node, false));
+                        AJXP_Controller::applyHook("node.change", array(&$node, &$node, false), true);
                     }
                 }
             }
             foreach($currentChildren as $cPath => $mtime){
+                $this->logDebug(__FUNCTION__, "Existing children ".$cPath);
                 if(!in_array($cPath, $files)){
+                    if($this->excludeFromSync($url."/".$cPath)){
+                        $this->logDebug(__FUNCTION__, "Excluding item deleted on storage: ".$url."/".$cPath);
+                        continue;
+                    }
                     // Deleted
                     $this->logDebug(__FUNCTION__, "File deleted directly on storage: ".$url."/".$cPath);
                     $node = new AJXP_Node($url."/".$cPath);
-                    AJXP_Controller::applyHook("node.change", array(&$node, null, false));
+                    AJXP_Controller::applyHook("node.change", array(&$node, null, false), true);
                 }
             }
             // Now "touch" parent directory
             if(isSet($current_time)){
                 dibi::query("UPDATE [ajxp_index] SET ", array("mtime" => $current_time), " WHERE [repository_identifier] = %s AND [node_path] = %s", $repoIdentifier, $mod_data["path"]);
             }
+        }
+    }
+
+    protected function getResyncTimestampFile($check = false){
+        $repo = ConfService::getRepository();
+        $sScope = $repo->securityScope();
+        $suffix = "-".$repo->getId();
+        if(!empty($sScope)) $suffix = "-".AuthService::getLoggedUser()->getId();
+        $file = $this->getPluginCacheDir(true, $check)."/storage_changes_time".$suffix;
+        return $file;
+    }
+
+    public function resyncAction($actionName, $httpVars, $fileVars)
+    {
+        if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+            AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), "resync_storage", $httpVars);
+        }else{
+            $file = $this->getResyncTimestampFile(true);
+            file_put_contents($file, time());
+            $this->indexIsSync();
         }
     }
 
@@ -138,7 +197,17 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         $recycle = (!empty($recycle)?$recycle:false);
 
         if($this->options["OBSERVE_STORAGE_CHANGES"] === true){
-            $this->indexIsSync();
+            // Do it every XX minutes
+            $minutes = 5;
+            if(isSet($this->options["OBSERVE_STORAGE_EVERY"])){
+                $minutes = intval($this->options["OBSERVE_STORAGE_EVERY"]);
+            }
+            $file = $this->getResyncTimestampFile();
+            $last = 0;
+            if(is_file($file)) $last = intval(file_get_contents($file));
+            if(time() - $last >  $minutes * 60){
+                $this->resyncAction("resync_storage", array(), array());
+            }
         }
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
