@@ -637,8 +637,11 @@ class AJXP_XMLWriter
                 $params = array();
                 foreach($exposed as $exposed_prop){
                     $metaOptions = $repoObject->getOption("META_SOURCES");
+                    if(!isSet($metaOptions[$exposed_prop["PLUGIN_ID"]])){
+                        continue;
+                    }
                     $value = $exposed_prop["DEFAULT"];
-                    if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]]) && isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
+                    if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
                         $value = $metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]];
                     }
                     $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
