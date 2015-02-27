@@ -317,9 +317,11 @@ class AJXP_Utils
      * Parse the $fileVars[] PHP errors
      * @static
      * @param $boxData
+     * @param bool $throwException
      * @return array|null
+     * @throws Exception
      */
-    public static function parseFileDataErrors($boxData)
+    public static function parseFileDataErrors($boxData, $throwException=false)
     {
         $mess = ConfService::getMessages();
         $userfile_error = $boxData["error"];
@@ -327,23 +329,27 @@ class AJXP_Utils
         $userfile_size = $boxData["size"];
         if ($userfile_error != UPLOAD_ERR_OK) {
             $errorsArray = array();
-            $errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409, "File is too big! Max is" . ini_get("upload_max_filesize"));
-            $errorsArray[UPLOAD_ERR_NO_FILE] = array(410, "No file found on server!");
-            $errorsArray[UPLOAD_ERR_PARTIAL] = array(410, "File is partial");
-            $errorsArray[UPLOAD_ERR_INI_SIZE] = array(410, "No file found on server!");
-            $errorsArray[UPLOAD_ERR_NO_TMP_DIR] = array(410, "Cannot find the temporary directory!");
-            $errorsArray[UPLOAD_ERR_CANT_WRITE] = array(411, "Cannot write into the temporary directory!");
-            $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, "A PHP extension stopped the upload process");
+            $errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409, str_replace("%i", ini_get("upload_max_filesize"), $mess["537"]));
+            $errorsArray[UPLOAD_ERR_NO_FILE] = array(410, $mess[538]);
+            $errorsArray[UPLOAD_ERR_PARTIAL] = array(410, $mess[539]);
+            $errorsArray[UPLOAD_ERR_NO_TMP_DIR] = array(410, $mess[540]);
+            $errorsArray[UPLOAD_ERR_CANT_WRITE] = array(411, $mess[541]);
+            $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, $mess[542]);
             if ($userfile_error == UPLOAD_ERR_NO_FILE) {
                 // OPERA HACK, do not display "no file found error"
                 if (!ereg('Opera', $_SERVER['HTTP_USER_AGENT'])) {
-                    return $errorsArray[$userfile_error];
+                    $data = $errorsArray[$userfile_error];
+                    if($throwException) throw new Exception($data[1], $data[0]);
+                    return $data;
                 }
             } else {
-                return $errorsArray[$userfile_error];
+                $data = $errorsArray[$userfile_error];
+                if($throwException) throw new Exception($data[1], $data[0]);
+                return $data;
             }
         }
         if ($userfile_tmp_name == "none" || $userfile_size == 0) {
+            if($throwException) throw new Exception($mess[31], 410);
             return array(410, $mess[31]);
         }
         return null;
