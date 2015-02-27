@@ -628,5 +628,11 @@ $mess=array(
 "plugtype.desc.mailer" => "Outils pour permettre à l'application d'envoyer des courriels",
 "plugtype.title.mq" => "Discution instantannée",
 "plugtype.desc.mq" => "Implémentations d'un simple serveur PUB/SUB",
+"537" => "Le fichier est trop gros! La taille maximum autorisée est %i",
+"538" => "Erreur de transfert: fichier introuvable sur le serveur!",
+"539" => "Erreur de transfert: le fichier est partiellement transferé.",
+"540" => "Erreur de transfert: impossible d'ouvrir le répertoire temporaire.",
+"541" => "Erreur de transfert: impossible d'écrire dans le répertoire temporaire.",
+"542" => "Erreur de transfert: une extension PHP a stoppé le processus."
 /* END SENTENCE */
 );

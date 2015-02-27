@@ -646,5 +646,11 @@ $mess=array(
 "plugtype.desc.mailer" => "Strumenti per consentire all'applicazione di inviare email",
 "plugtype.title.mq" => "Messaggistica Istantanea",
 "plugtype.desc.mq" => "Implementazione di un semplice server PUB/SUB",
+    "537" => "File is too large! Maximum authorized size is %i",
+    "538" => "Upload error: no file found on server!",
+    "539" => "Upload error: file is partial",
+    "540" => "Upload error: cannot find the temporary directory",
+    "541" => "Upload error: cannot write into the temporary directory",
+    "542" => "Upload error: a PHP extension stopped the upload process."
 /* END SENTENCE */
 );
