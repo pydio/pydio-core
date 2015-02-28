@@ -52,6 +52,16 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         $this->indexContent = ($this->getFilteredOption("index_content") == true);
     }
 
+    public function parseSpecificContributions(&$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
+        if($contribNode->nodeName != "client_configs") return ;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
+        if(!$nodeList->length) return ;
+        $contribNode->removeChild($nodeList->item(0));
+    }
+
     public function initMeta($accessDriver)
     {
         parent::initMeta($accessDriver);
