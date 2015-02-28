@@ -223,6 +223,20 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         }
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
+        $stream = isSet($httpVars["stream"]);
+        $separator = $stream ? "\n" : ",";
+
+
+        $veryLastSeq = intval(dibi::query("SELECT MAX([seq]) FROM [ajxp_changes]")->fetchSingle());
+        $seqId = intval(AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        if($veryLastSeq > 0 && $seqId > $veryLastSeq){
+            // This is not normal! Send a signal reload all changes from start.
+            if(!$stream) echo json_encode(array('changes'=>array(), 'last_seq'=>1));
+            else echo 'LAST_SEQ:1';
+            return null;
+        }
+
+
         if(isSet($httpVars["filter"])){
             $filter = AJXP_Utils::decodeSecureMagic($httpVars["filter"]);
             $res = dibi::query("SELECT
@@ -232,7 +246,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier($currentRepo), rtrim($filter, "/")."/", rtrim($filter, "/")."/", AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), rtrim($filter, "/")."/", rtrim($filter, "/")."/", $seqId);
         }else{
             $res = dibi::query("SELECT
                 [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
@@ -241,11 +255,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier($currentRepo), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), $seqId);
         }
 
-        $stream = isSet($httpVars["stream"]);
-        $separator = $stream ? "\n" : ",";
         if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
@@ -325,7 +337,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 echo '], "last_seq":'.$lastSeq.'}';
             }
         }
-
+        return null;
     }
 
     protected function cancelRecycleNodes(&$row, $recycle){
