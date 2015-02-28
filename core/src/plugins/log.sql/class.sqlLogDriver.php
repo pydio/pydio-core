@@ -86,6 +86,7 @@ class sqlLogDriver extends AbstractLogDriver
         if($query === false){
             throw new Exception("Cannot find query ".$query_name);
         }
+        $pg = ($this->sqlDriver["driver"] == "postgre");
         $start = 0;
         $count = 30;
         if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
@@ -104,20 +105,34 @@ class sqlLogDriver extends AbstractLogDriver
 
         $q = $query["SQL"];
         $q = str_replace("AJXP_CURSOR_DATE", $dateCursor, $q);
+        if($pg){
+            $q = str_replace("ORDER BY logdate DESC", "ORDER BY DATE(logdate) DESC",$q);
+        }
 
         //$q .= " LIMIT $start, $count";
         $res = dibi::query($q);
         $all = $res->fetchAll();
         $allDates = array();
         foreach($all as $row => &$data){
+            // PG: Recapitalize keys
+            if($pg){
+                foreach($data as $k => $v){
+                    $data[ucfirst($k)] = $v;
+                }
+            }
             if(isSet($data["Date"])){
-                $key = date($dKeyFormat, $data["Date"]->getTimestamp());
-                $data["Date_sortable"] = $data["Date"]->getTimestamp();
+                if(is_a($data["Date"], "DibiDateTime")){
+                    $tStamp = $data["Date"]->getTimestamp();
+                }else {
+                    $tStamp = strtotime($data["Date"]);
+                }
+                $key = date($dKeyFormat, $tStamp);
+                $data["Date_sortable"] = $tStamp;
                 $data["Date"] = $key;
                 $allDates[$key] = true;
             }
-            if(isSet($data["File Name"])){
-                $data["File Name"] = AJXP_Utils::safeBasename($data["File Name"]);
+            if(isSet($data["File"])){
+                $data["File"] = AJXP_Utils::safeBasename($data["File"]);
             }
         }
 
