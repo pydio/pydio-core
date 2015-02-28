@@ -391,6 +391,17 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         }
     }
 
+
+    /**
+     * Called on workspace.after_delete event, clear the index!
+     * @param $repoId
+     */
+    public function clearWorkspaceIndexes($repoId){
+        $iPath = $this->getIndexPath($repoId);
+        $this->clearIndexIfExists($iPath);
+        $this->clearIndexIfExists($iPath."-PYDIO_TMP");
+    }
+
     /**
      *
      * Hooked to node.meta_change, this will update the index

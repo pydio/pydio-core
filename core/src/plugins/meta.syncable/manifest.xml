@@ -30,6 +30,7 @@
    			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
    			<serverCallback hookName="node.index" methodName="indexNode"/>
    			<serverCallback hookName="node.index.recursive.start" methodName="clearIndexForNode"/>
-   		</hooks>
+            <serverCallback hookName="workspace.after_delete" methodName="clearIndexForWorkspaceId"/>
+        </hooks>
     </registry_contributions>
 </meta>

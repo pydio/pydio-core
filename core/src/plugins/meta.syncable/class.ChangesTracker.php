@@ -371,6 +371,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
 
     /**
      * @param Repository $repository
+     * @param null $resolveUserId
      * @return String
      */
     protected function computeIdentifier($repository, $resolveUserId = null)
@@ -401,6 +402,18 @@ class ChangesTracker extends AJXP_AbstractMetaSource
         $id = $this->computeIdentifier($repository);
         $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s", $id);
         return floatval($res->fetchSingle());
+    }
+
+    /**
+     * Called on workspace.after_delete event. Remove all references to this WS in the DB.
+     * Find all repo identifier exactly equal to $repoId , or like $repoId-%
+     * @param $repoId
+     */
+    public function clearIndexForWorkspaceId($repoId){
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
+        dibi::query("DELETE FROM [ajxp_index] WHERE [repository_identifier] = %s OR [repository_identifier] LIKE %like~", $repoId, $repoId."-");
     }
 
     /**
