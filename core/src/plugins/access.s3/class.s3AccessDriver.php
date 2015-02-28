@@ -58,7 +58,8 @@ class s3AccessDriver extends fsAccessDriver
             require_once("aws.phar");
             $options = array(
                 'key'    => $this->repository->getOption("API_KEY"),
-                'secret' => $this->repository->getOption("SECRET_KEY")
+                'secret' => $this->repository->getOption("SECRET_KEY"),
+                'signature' => 'v4'
             );
             $baseURL = $this->repository->getOption("STORAGE_URL");
             if(!empty($baseURL)){
