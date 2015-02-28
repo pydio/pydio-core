@@ -209,6 +209,18 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 $this->resyncAction("resync_storage", array(), array());
             }
         }
+        if($this->options["REQUIRES_INDEXATION"]){
+            if (ConfService::backgroundActionsSupported()){
+                AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), "index", array());
+            }else{
+                AJXP_Controller::findActionAndApply("index", array(), array());
+            }
+            // Unset the REQUIRES_INDEXATION FLAG
+            $meta =  $currentRepo->getOption("META_SOURCES");
+            unset($meta["meta.syncable"]["REQUIRES_INDEXATION"]);
+            $currentRepo->addOption("META_SOURCES", $meta);
+            ConfService::replaceRepository($currentRepo->getId(), $currentRepo);
+        }
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
         if(isSet($httpVars["filter"])){

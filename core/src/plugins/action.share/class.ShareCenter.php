@@ -1842,9 +1842,12 @@ class ShareCenter extends AJXP_Plugin
         } else {
             if ($repository->getOption("META_SOURCES")) {
                 $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
-                foreach ($options["META_SOURCES"] as $index => $data) {
+                foreach ($options["META_SOURCES"] as $index => &$data) {
                     if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
                         $options["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+                    }
+                    if($index == "meta.syncable" && $data["REPO_SYNCABLE"] === true ){
+                        $data["REQUIRES_INDEXATION"] = true;
                     }
                 }
             }

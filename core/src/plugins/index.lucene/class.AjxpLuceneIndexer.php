@@ -164,7 +164,8 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 AJXP_XMLWriter::header();
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     AJXP_Controller::applyActionInBackground($repoId, "index", array());
-                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 2);
+                    sleep(2);
+                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
                 }
                 AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
                 AJXP_XMLWriter::close();
