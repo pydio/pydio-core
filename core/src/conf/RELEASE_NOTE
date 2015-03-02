@@ -1,5 +1,46 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Update de.php
+Fix #834 - Wrong message on group deletion
+CartManager is triggering the old-fashion public link
+Make sure to push the newly activated plugins at the end of the list. Should fix #822
+Transport a contextual user ID as a node property or through the URL. Pass a contextual user to the VarsFilter::filter() function Fix shareEventsForwarding when in a personal workspace (shared events not going to parents, preventing sync for example)
+Performances: do not call getRole() again if role is already loaded in the loop
+Meta.mount: New option to delete mount point on unmount
+Fix #803
+Open search box when clicking on magnifier.
+Modal: handle case where dialogTitle is positioned absolute. Modify CSS accordingly.
+Typo prevented shared users deletion when not logged as admin
+Try base64_decode for legacy - Was breaking the mp3 player in a shared minisite
+Fix repository exposed property, values not correctly retrieved
+Error in slug generation, make sure to look at the reserved slugs when building new ones
+Share users list: Add an option to not trigger any listing if no regexp is sent
+Fix error if msgExchanger is not set.
+Use loadNodeInfo() instead of stat in ChangesTracker, otherwise eventForwarding can end up indexing a folder as file.
+[index.lucene] Typo calling getUser() on wrong object
+Introduce an AJXP_METADATA_ALLUSERS metadata users scope to gather meta from all users. Used in eventForwarding for ShareCenter.
+Big refactoring to decouple meta.syncable from index.lucene: core.index is now responsible for triggering a recursive indexation and sending corresponding events.
+Fix #842 : API issue on IIS when in root folder.
+Fix inZip detection for UserSelection built without "dir" parameter.
+Set pydio global variable from within AjaXplorer class, not only Bootstrap (skip updating bootstrap)
+Consume_channel: avoid repeating query if previous query is not yet finished
+Make sure to unset currentIndex to trigger the __destruct function and release all handlers on files. Prevented the cleaning of the TMP index on Windows.
+Fix Quota computation on MacOS server
+The indexIsSync() feature can be triggered with bad value, creating issues in synchro
+Comment out debugs from authfront.keystore , too verbose.
+Refactor upload method to make it more readable. Fix wrong event sent after partial uploads.
+Translate PHP errors
+Move fsAccessDriver functions to its parent AbstractAccessDriver
+Update "Observe Storage" mechanism to make it more reliable and less frequent.
+Do not set default plugin value if not in meta source.
+Fix Analytics Dashboard for Sqlite and PostgreSQL drivers
+New parameter in Index.Lucene to hide the "My Shares" section
+Close SearchEngine on context_changed
+Mark a repository for REQUIRES_INDEXATION at share time. Trigger indexation if necessary when requiring changes - Fix auto-indexation on first search.
+Trigger events on workspace before/after create/update/delete Hook indexers (lucene & meta.syncable) to the after_delete event to clear the indexes.
+Sync: trigger client last_seq reset if the sequence ID is greater than the current max of the changes table. Foresee the need to vacuum the changes table.
+
+
 Pydio 6.0.3 - Important Bugfix release
 
 Date: Feb, 10th 2014
@@ -10,102 +51,102 @@ Copyright: Abstrium SAS / Charles du Jeu 2015
 Upgrade: In-app upgrade for archives installs - RPM/DEB update
 Contributors: Charles du Jeu, Tran The Cuong, Nicolas Pouliquen, DepaMarco, Elangenhan, Gerald ST, NHellFire, Anael Mobilia, Dmitri Bosenko, Jaroslav Lichtblau - Thanks to all of you!
 
-Probably found the root cause of "Ooops your language file is empty..." (details)
-Admin Delegation: fix various criteria filtering and workspace listing conditions that were breaking template-created workspaces for group Admin, as well as returning wrong users count (although correct users list). (details)
-Fix various customization options: logo height/width + add a class to the main element observing the current workspace slug, can be used for specific welcome, settings, etc styling. (details)
-Changed action name (details)
-Changed action name (details)
-Added Plugin Parameters (details)
-Added configuration parameters (details)
-meta.user plugin translation into Czech (details)
-meta.comments plugin translation into Czech (details)
-core.ajaxplorer Czech translation update, as there was already something available (details)
-FIX: Changed some translations to convert accented letters (details)
-FIX: Some other little changes in Italian translations (details)
-Fixed some little translation error (details)
-FIX: Italian little fixes (details)
-Italian translation for plugin 'editor.imagick' (details)
-Italian translation for plugin 'editor.openlayer' (details)
-Italian translation for plugin 'editor.other' (details)
-Italian transtaltion for plugin 'editor.pixlr' (details)
-Make sure to use the dirDefault attribute when overriding the ls action, or it can be lost by XML merging. Was breaking folder opening in guest user mode. (details)
-Fix video player overlap with menu in FF and IE (details)
-Fix wrong typing for settings leftpane initA value, was making the right pane disappear if folded. (details)
-Fix positioning problems that could lead to the right panel totally disappearing (details)
-Stop observing click after clicking on a workspace to avoid multiple loading Replace margin-top by top positioning to use window height instead of window with as reference. z-index and width fix in gui.ios (details)
-Faster Loading GUI (details)
-conf.sql plugin Czech translation (details)
-Update ru.php (details)
-access.mysql Czech translation (details)
-missing "," character in access.mysql en.php file causing missing string via php2po transition (details)
-Fix cpane_container positioning for minisites (details)
-Update ru.php (details)
-Create ru.php (details)
-Update ru.php (details)
-Update ru.php (details)
-Update french translation (details)
-Expand a simple diagnostic tool to test REST API on a given workspace. Call runTests.php?api=true to trigger. (details)
-Filter the for(var k in ...) entries with hasOwnProperty() call in RoleEditor. Fixes #789 (details)
-Do not include shared repositories in updateAdminRights or it can end up filing the role with tons of repos. (details)
-Fix sqlite deleteRepository case - Use better error message and log SQL error. Fix #779 (details)
-The return of the QRCode - Fix #783 (details)
-Add an optional parameter to use a specific header value (e.g. X-Forwarder-For) instead of local detected IP in the logs. Fix #763 (details)
-Do not trigger error on fopen (it is catched later). (details)
-Experimental feature to monitor underlying storage changes. To be tested. (details)
-access.fs: Sort filenames case insensitive (details)
-Index new detected items recursively (details)
-Move folder operation for s3: get all keys with prefix, copy objects to new key and delete old ones. (details)
-Make sure to catch exception on S3Client->headObject calls. Could lead to NoSuchKeyException in some cases (minisites). (details)
-Make sure to use minisite_session parameter in plUploader (details)
-Plupload Fix Minisite-Problem (details)
-Italian translation for plugin 'editor.soundmanager' (details)
-Italian translation for plugin 'editor.text' (details)
-Italian translation for plugin 'editor.video' (details)
-Italian translation for plugin 'editor.webodf' (details)
-Italian translation for plugin 'editor.zoho' (details)
-Fix videos tutorial zIndex issue (details)
-Fix #807 - Change language on Public minisite Error (details)
-In some case it's possible to hit save on non-writeable workspace, which creates duplicates. Fix #806 (details)
-UI bug, fix #796 (details)
-Issue in static repository id was creating a bug in updateAdminRights, inflating admin role until DB error. (details)
-Disable guest user detection for minisite. UpdateAdminRights : do not call method in foreach loop (details)
-Display a new panel in My Account to manage api keys. Let this plugin active for all protocols otherwise it will not appear in web interface. Ability to manually revoke one or all keys. Hook to the new user.after_password_change event to revoke all keys automatically. New osFromUserAgent function for prettier display. Minor tweaks in core js/css (details)
-Fix guest login screen (details)
-Drop IE6 support (png hack, useless) Clean parameters passed to bootstrap using exposed plugin configs instead. Create aliases in window: pydio and pydioBootstrap objects: (details)
-fix typo (details)
-Clean legacy hard-coded gui preferences, and use get/setUserPreference method in classes. Make sure display pref is loaded at init time for FilesList, shoud fix #777 (details)
-Fix "Share folder as workspaces only" parameter (details)
-Re fix #777 : hidden columns were broken (details)
-Little Charset bug in User Feed (details)
-Italian translation for plugin 'gui.ajax' (details)
-Italian translation for plugin 'gui.ios' (details)
-Italian translation for plugin 'gui.light' (details)
-Italian translation for plugin 'gui.mobile' (details)
-Italian translation for plugin 'gui.user' (details)
-Replace dibi minified by latest head to fix #610 Add autoloader for dibi and remove requires (details)
-Display issue in non-writeable workspaces (details)
-Performance issues with innerText usage (details)
-Make sure to re-display the authorization URL in case of step 2 error. (details)
-getFilteredOption() : pass an optional userObject to be used as mergeRole resolver (details)
-Quota filtered Option: grab values from parent repository owner, not current user. (details)
-Better response for update_user_group - Fix #725 (details)
-Add IPTC support, inspired by and close #577 (details)
-ZIP with SMB Access don't work (details)
-Fix tree issue when domain name contains 'plus'. Manual merge & close #681 (details)
-Fix #819 (missing log refresh button) and fix #820 (restore old "Copy as Text" button) (details)
-Fix the way scheduler handle the "*" users to make it less consuming (not necessary to load whole user objects, jst their ID.). Always use queue mechanism. (details)
-Perf issues with massive ldap directories: divide listing time by 2 (details)
-Add an option to disable the bruteForce test (and thus the Captcha) (details)
-New option "leavesOpenOnSelect" on search engine used in the admin panel, to avoid never-ending searching on the correct user page. Fix #814 (details)
-Catch handle erros on purge operations (details)
-Use background-size: cover when possible (fix #821) (details)
-Fix login header in multi mode. Remove login_patch.xml that was not used anymore (details)
-Fix api test script (details)
-Make sure db is connected for serial-based setup that would use the DB only for indexation. (details)
-Fix API Auth form some server+php configs (details)
-Add the comment SetEnvIf instruction for PHP-FPM setups. (details)
-When fake MemberOf enabled, depend ldap system, the member/memberUid value (attribute of group) is cn (short) or dn (full name). In general, this value is dn but in ldap of Apple, he use cn (details)
-Do not set write persmission on stat_hash, or it prevents the sync of readonly workspaces (details)
+Probably found the root cause of "Ooops your language file is empty..."
+Admin Delegation: fix various criteria filtering and workspace listing conditions that were breaking template-created workspaces for group Admin, as well as returning wrong users count (although correct users list).
+Fix various customization options: logo height/width + add a class to the main element observing the current workspace slug, can be used for specific welcome, settings, etc styling.
+Changed action name
+Changed action name
+Added Plugin Parameters
+Added configuration parameters
+meta.user plugin translation into Czech
+meta.comments plugin translation into Czech
+core.ajaxplorer Czech translation update, as there was already something available
+FIX: Changed some translations to convert accented letters
+FIX: Some other little changes in Italian translations
+Fixed some little translation error
+FIX: Italian little fixes
+Italian translation for plugin 'editor.imagick'
+Italian translation for plugin 'editor.openlayer'
+Italian translation for plugin 'editor.other'
+Italian transtaltion for plugin 'editor.pixlr'
+Make sure to use the dirDefault attribute when overriding the ls action, or it can be lost by XML merging. Was breaking folder opening in guest user mode.
+Fix video player overlap with menu in FF and IE
+Fix wrong typing for settings leftpane initA value, was making the right pane disappear if folded.
+Fix positioning problems that could lead to the right panel totally disappearing
+Stop observing click after clicking on a workspace to avoid multiple loading Replace margin-top by top positioning to use window height instead of window with as reference. z-index and width fix in gui.ios
+Faster Loading GUI
+conf.sql plugin Czech translation
+Update ru.php
+access.mysql Czech translation
+missing "," character in access.mysql en.php file causing missing string via php2po transition
+Fix cpane_container positioning for minisites
+Update ru.php
+Create ru.php
+Update ru.php
+Update ru.php
+Update french translation
+Expand a simple diagnostic tool to test REST API on a given workspace. Call runTests.php?api=true to trigger.
+Filter the for(var k in ...) entries with hasOwnProperty() call in RoleEditor. Fixes #789
+Do not include shared repositories in updateAdminRights or it can end up filing the role with tons of repos.
+Fix sqlite deleteRepository case - Use better error message and log SQL error. Fix #779
+The return of the QRCode - Fix #783
+Add an optional parameter to use a specific header value (e.g. X-Forwarder-For) instead of local detected IP in the logs. Fix #763
+Do not trigger error on fopen (it is catched later).
+Experimental feature to monitor underlying storage changes. To be tested.
+access.fs: Sort filenames case insensitive
+Index new detected items recursively
+Move folder operation for s3: get all keys with prefix, copy objects to new key and delete old ones.
+Make sure to catch exception on S3Client->headObject calls. Could lead to NoSuchKeyException in some cases (minisites).
+Make sure to use minisite_session parameter in plUploader
+Plupload Fix Minisite-Problem
+Italian translation for plugin 'editor.soundmanager'
+Italian translation for plugin 'editor.text'
+Italian translation for plugin 'editor.video'
+Italian translation for plugin 'editor.webodf'
+Italian translation for plugin 'editor.zoho'
+Fix videos tutorial zIndex issue
+Fix #807 - Change language on Public minisite Error
+In some case it's possible to hit save on non-writeable workspace, which creates duplicates. Fix #806
+UI bug, fix #796
+Issue in static repository id was creating a bug in updateAdminRights, inflating admin role until DB error.
+Disable guest user detection for minisite. UpdateAdminRights : do not call method in foreach loop
+Display a new panel in My Account to manage api keys. Let this plugin active for all protocols otherwise it will not appear in web interface. Ability to manually revoke one or all keys. Hook to the new user.after_password_change event to revoke all keys automatically. New osFromUserAgent function for prettier display. Minor tweaks in core js/css
+Fix guest login screen
+Drop IE6 support (png hack, useless) Clean parameters passed to bootstrap using exposed plugin configs instead. Create aliases in window: pydio and pydioBootstrap objects:
+fix typo
+Clean legacy hard-coded gui preferences, and use get/setUserPreference method in classes. Make sure display pref is loaded at init time for FilesList, shoud fix #777
+Fix "Share folder as workspaces only" parameter
+Re fix #777 : hidden columns were broken
+Little Charset bug in User Feed
+Italian translation for plugin 'gui.ajax'
+Italian translation for plugin 'gui.ios'
+Italian translation for plugin 'gui.light'
+Italian translation for plugin 'gui.mobile'
+Italian translation for plugin 'gui.user'
+Replace dibi minified by latest head to fix #610 Add autoloader for dibi and remove requires
+Display issue in non-writeable workspaces
+Performance issues with innerText usage
+Make sure to re-display the authorization URL in case of step 2 error.
+getFilteredOption() : pass an optional userObject to be used as mergeRole resolver
+Quota filtered Option: grab values from parent repository owner, not current user.
+Better response for update_user_group - Fix #725
+Add IPTC support, inspired by and close #577
+ZIP with SMB Access don't work
+Fix tree issue when domain name contains 'plus'. Manual merge & close #681
+Fix #819 (missing log refresh button) and fix #820 (restore old "Copy as Text" button)
+Fix the way scheduler handle the "*" users to make it less consuming (not necessary to load whole user objects, jst their ID.). Always use queue mechanism.
+Perf issues with massive ldap directories: divide listing time by 2
+Add an option to disable the bruteForce test (and thus the Captcha)
+New option "leavesOpenOnSelect" on search engine used in the admin panel, to avoid never-ending searching on the correct user page. Fix #814
+Catch handle erros on purge operations
+Use background-size: cover when possible (fix #821)
+Fix login header in multi mode. Remove login_patch.xml that was not used anymore
+Fix api test script
+Make sure db is connected for serial-based setup that would use the DB only for indexation.
+Fix API Auth form some server+php configs
+Add the comment SetEnvIf instruction for PHP-FPM setups.
+When fake MemberOf enabled, depend ldap system, the member/memberUid value (attribute of group) is cn (short) or dn (full name). In general, this value is dn but in ldap of Apple, he use cn
+Do not set write persmission on stat_hash, or it prevents the sync of readonly workspaces
 
 
 Pydio 6.0.2 - Microfix for install screen
@@ -132,18 +173,18 @@ Contributors: Charles du Jeu, Tran The Cuong, Axel Hinrichs
 
 Changelog
 
-Fix SQL. insert on update a role (improve performance only for mysql) (details)
-Add script to upgrade 525 to 600 (details)
-Fix ldap_paged_control issues and warnings (details)
-Fix Regexp for parsing minisite_session, could break IE & FF downloads for password protected links (details)
-Make sure that stream is correctly opened, otherwise it can fill the log with errors. (details)
-Fix html base if set via SERVER_URL parameter (details)
-Fix authentication on rest api (details)
-Missing translation on the first 3 fields of the create user dialog (via sharing). (details)
-Fix root listing of webdav (accessing to /shares/) (details)
-Add a parameter to open workspace by simple click in the home page. (details)
-Make sure to xmlEntities() the CONF_MESSAGE and MIXIN_MESSAGE values as we are inside attributes. (details)
-Update share.php template (details)
+Fix SQL. insert on update a role (improve performance only for mysql)
+Add script to upgrade 525 to 600
+Fix ldap_paged_control issues and warnings
+Fix Regexp for parsing minisite_session, could break IE & FF downloads for password protected links
+Make sure that stream is correctly opened, otherwise it can fill the log with errors.
+Fix html base if set via SERVER_URL parameter
+Fix authentication on rest api
+Missing translation on the first 3 fields of the create user dialog (via sharing).
+Fix root listing of webdav (accessing to /shares/)
+Add a parameter to open workspace by simple click in the home page.
+Make sure to xmlEntities() the CONF_MESSAGE and MIXIN_MESSAGE values as we are inside attributes.
+Update share.php template
 
 
 ------------------------------
