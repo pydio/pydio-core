@@ -240,7 +240,7 @@ class AJXP_Utils
         } else {
             $s = str_replace(array("<", ">"), array("&lt;", "&gt;"), $s);
         }
-        return trim($s);
+        return ltrim($s);
     }
 
     /**
