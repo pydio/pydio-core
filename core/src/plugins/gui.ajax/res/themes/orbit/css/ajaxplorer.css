@@ -3546,7 +3546,6 @@ span.search_meta_opt.checked > span {
 
 #search_results div[data-groupByValue]{
     clear: left;
-    max-height: 480px;
     overflow: hidden;
     margin-bottom: 10px;
 }
