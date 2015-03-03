@@ -66,5 +66,9 @@
         <li>Mark a repository for REQUIRES_INDEXATION at share time. Trigger indexation if necessary when requiring changes - Fix auto-indexation on first search. (<a href="http://github.com/pydio/pydio-core/commit/f94414e4c51a884cafe2640447a75516a6138751">details</a>)</li>
         <li>Trigger events on workspace before/after create/update/delete Hook indexers (lucene & meta.syncable) to the after_delete event to clear the indexes. (<a href="http://github.com/pydio/pydio-core/commit/8501d449baaa64c4ee0a613f5880940c2b7bd5fd">details</a>)</li>
         <li>Sync: trigger client last_seq reset if the sequence ID is greater than the current max of the changes table. Foresee the need to vacuum the changes table. (<a href="http://github.com/pydio/pydio-core/commit/e97f4aca7adcf96d671870333ae3e2ad4c24f10d">details</a>)</li>
+        <li>Search results are limited by max-height (ndeet)</li>
+        <li>Fix Dav configuration when Server URL is set (andypmuc)</li>
+        <li>Sanitize function: trim spaces only no the left, or it can break when syncing files with trailing space</li>
+        <li>Secure error message on rename operations by catching the result</li>
     </ul>
 </div>
