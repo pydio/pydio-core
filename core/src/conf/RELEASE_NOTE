@@ -1,5 +1,15 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio 6.0.4 - Bugfix Release
+
+Date: March, 3rd 2015
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2015
+Upgrade: In-app upgrade for archives installs - RPM/DEB update
+Contributors: Charles du Jeu, Tran The Cuong, Andypmuc, Ndeet, Flauschbaellchen - Thanks to all of you!
+
 Update de.php
 Fix #834 - Wrong message on group deletion
 CartManager is triggering the old-fashion public link
@@ -46,7 +56,7 @@ Secure error message on rename operations by catching the result
 
 Pydio 6.0.3 - Important Bugfix release
 
-Date: Feb, 10th 2014
+Date: Feb, 10th 2015
 License: Affero GPL
 Download: Sourceforge Project
 Source Code: Github Project
