@@ -781,7 +781,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                                 if(is_file($destination."/".$originalAppendTo)){
                                     unlink($destination."/".$originalAppendTo);
                                 }
-                                rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
+                                $result = @rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
+                                if($result === false){
+                                    throw new Exception("Error renaming ".$destination."/".$userfile_name." to ".$destination."/".$originalAppendTo);
+                                }
                                 $userfile_name = $originalAppendTo;
                                 $partialUpload = false;
                                 // Send a create event!
@@ -1661,7 +1664,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
         $oldNode = new AJXP_Node($old);
         AJXP_Controller::applyHook("node.before_path_change", array(&$oldNode));
-        rename($old,$new);
+        $test = @rename($old,$new);
+        if($test === false){
+            throw new Exception("Error while renaming ".$old." to ".$new);
+        }
         AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
     }
 
