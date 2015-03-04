@@ -434,6 +434,7 @@ Class.create("SearchEngine", AjxpPane, {
 
         document.observe("ajaxplorer:repository_list_refreshed", this.refreshObserver );
 
+        /*
         if($(this.options.toggleResultsVisibility)){
             this.ctxChangeObserver = function(){
                 this.showToggleResult(false);
@@ -441,6 +442,7 @@ Class.create("SearchEngine", AjxpPane, {
             }.bind(this);
             document.observe("ajaxplorer:context_changed", this.ctxChangeObserver);
         }
+        */
 
         this.resize();
 	},
@@ -556,9 +558,11 @@ Class.create("SearchEngine", AjxpPane, {
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
         document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
+        /*
         if(this.ctxChangeObserver){
             document.stopObserving("ajaxplorer:context_changed", this.ctxChangeObserver);
         }
+        */
         if(this.boundSizeEvents){
             this.boundSizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);
