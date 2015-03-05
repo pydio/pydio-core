@@ -730,8 +730,9 @@ class AuthService
             $res = $userObject->checkCookieString($userPass);
             return $res;
         }
-        $seed = $authDriver->getSeed(false);
-        if($seed != $returnSeed) return false;
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
+            if($authDriver->getSeed(false) != $returnSeed) return false;
+        }
         return $authDriver->checkPassword($userId, $userPass, $returnSeed);
     }
     /**
@@ -972,6 +973,8 @@ class AuthService
      * @param $limit
      * @param bool $cleanLosts
      * @param bool $recursive
+     * @param null $countCallback
+     * @param null $loopCallback
      * @return AbstractAjxpUser[]
      */
     public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true, $countCallback = null, $loopCallback = null)
@@ -1064,6 +1067,7 @@ class AuthService
      * @param string $regexp
      * @param null $filterProperty Can be "parent" or "admin"
      * @param null $filterValue Can be a string, or constants AJXP_FILTER_EMPTY / AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
      * @return int
      */
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null, $recursive = true)

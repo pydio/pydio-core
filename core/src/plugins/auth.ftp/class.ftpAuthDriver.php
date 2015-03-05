@@ -39,27 +39,15 @@ class ftpAuthDriver extends AbstractAuthDriver
 {
     public $driverName = "ftp";
 
-    protected function parseSpecificContributions(&$contribNode)
-    {
-        parent::parseSpecificContributions($contribNode);
-        if($contribNode->nodeName != "actions") return ;
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
-        if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false) {
-            // Remove "login" && "ftp_set_data" actions
-            $nodeList = $actionXpath->query('action[@name="login"]', $contribNode);
-            if(!$nodeList->length) return ;
-            foreach($nodeList as $nodeChild){
-                $contribNode->removeChild($nodeChild);
-            }
-            $nodeList = $actionXpath->query('action[@name="ftp_set_data"]', $contribNode);
-            if(!$nodeList->length) return ;
-            unset($this->actions["ftp_set_data"]);
-            $contribNode->removeChild($node = $nodeList->item(0));
-        } else {
-            // Local "login" will replace standard one.
+    public function init($options){
+        parent::init($options);
+        if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false){
+            return;
         }
+        // ENABLE WEBFTP LOGIN SCREEN
+        $this->logDebug(__FUNCTION__, "Enabling authfront.webftp");
+        AJXP_PluginsService::findPluginById("authfront.webftp")->enabled = true;
     }
-
 
     public function listUsers()
     {

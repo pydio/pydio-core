@@ -66,6 +66,12 @@ class multiAuthDriver extends AbstractAuthDriver
             }
             $this->drivers[$name] = $instance;
         }
+        if(!$this->masterSlaveMode){
+            // Enable Multiple choice login screen
+            $multi = AJXP_PluginsService::getInstance()->findPluginById("authfront.multi");
+            $multi->enabled = true;
+            $multi->options = $this->options;
+        }
         // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
         // WILL BE CALLED LATER, TO BE SURE THAT THE
         // SESSION IS ALREADY STARTED.
@@ -95,61 +101,6 @@ class multiAuthDriver extends AbstractAuthDriver
         $this->setCurrentDriverName($authSource);
     }
 
-    protected function parseSpecificContributions(&$contribNode)
-    {
-        parent::parseSpecificContributions($contribNode);
-        if($contribNode->nodeName != "actions") return ;
-
-        if($this->masterSlaveMode) {
-            // REMOVE CHILD
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $actionOverrideNodeList = $actionXpath->query('//action', $contribNode);
-            $actionNode = $actionOverrideNodeList->item(0);
-            if($actionNode->parentNode) $actionNode->parentNode->removeChild($actionNode);
-
-        }else{
-
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $loginCallbackNodeList = $actionXpath->query('//clientCallback', $contribNode);
-            $callbackNode = $loginCallbackNodeList->item(0);
-            $xmlContent = $callbackNode->firstChild->wholeText;
-
-            $sources = array();
-            if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])) return;
-            foreach ($this->getOption("DRIVERS") as $driverDef) {
-                $dName = $driverDef["NAME"];
-                if (isSet($driverDef["LABEL"])) {
-                    $dLabel = $driverDef["LABEL"];
-                } else {
-                    $dLabel = $driverDef["NAME"];
-                }
-                $sources[$dName] = $dLabel;
-            }
-            $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
-            $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
-            $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
-            if($callbackNode) {
-                $callbackNode->removeChild($callbackNode->firstChild);
-                $callbackNode->appendChild($contribNode->ownerDocument->createCDATASection($xmlContent));
-            }
-
-        }
-    }
-/*
-    public function getLoginRedirect(){
-
-        $l = $this->drivers[$this->masterName]->getLoginRedirect();
-        if(!empty($l)) return $l;
-        return $this->drivers[$this->slaveName]->getLoginRedirect();
-    }
-
-    public function getLogoutRedirect(){
-
-        $l = $this->drivers[$this->masterName]->getLogoutRedirect();
-        if(!empty($l)) return $l;
-        return $this->drivers[$this->slaveName]->getLogoutRedirect();
-    }
-*/
     protected function setCurrentDriverName($name)
     {
         $this->currentDriver = $name;

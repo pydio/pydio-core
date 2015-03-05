@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin name="multi" label="CONF_MESSAGE[Multiple Auth Chooser]" enabled="false" description="CONF_MESSAGE[Add a selector on top of the login screen. DO NOT ENABLE MANUALLY, will be activated by auth.multi automatically.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order"
+                      description="Order this plugin with other auth frontends" default="200"/>
+    </server_settings>
+    <class_definition classname="MultiAuthFrontend" filename="plugins/authfront.multi/class.MultiAuthFrontend.php"/>
+    <registry_contributions>
+        <actions>
+            <action name="login">
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var loginRedirect = AJXP_LOGIN_REDIRECT;
+                        var authSources = AJXP_MULTIAUTH_SOURCES;
+                        var masterAuthSource = 'AJXP_MULTIAUTH_MASTER';
+                        var userIdSeparator = 'AJXP_USER_ID_SEPARATOR';
+                        if(loginRedirect){
+                            document.location.href=loginRedirect;
+                        }else{
+                            modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
+                            function(oForm){
+                                $("generic_dialog_box").setStyle({
+                                    top:$("progressBox").getStyle('top'),
+                                    left:$("progressBox").getStyle('left')
+                                });
+                                if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
+                                $("generic_dialog_box").down(".titleString").hide();
+                                $("generic_dialog_box").down("#modalCloseBtn").hide();
+                                $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
+                                if(!$("generic_dialog_box").down("#progressCustomMessage")){
+                                    if($("progressBox").down("#progressCustomMessage")) $("generic_dialog_box").down(".dialogContent").insert({top:$("progressBox").down("#progressCustomMessage").cloneNode(true)});
+                                }
+                                oForm.setStyle({display:'block'});
+                                oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
+
+                                if(!$('auth_source')){
+                                    var auth_chooser = '<div class="SF_element"> \
+                                        <div class="SF_label"><ajxp:message ajxp_message_id="396">'+MessageHash[396]+'</ajxp:message></div> \
+                                        <div class="SF_input"><select id="auth_source" name="auth_source" style="width: 210px; height:28px; padding:3px 0px; font-size:14px;" class="dialogFocus"></select></div> \
+                                    </div>';
+                                    oForm.down('div.SF_element').insert({before:auth_chooser});
+                                    $H(authSources).each(function(pair){
+                                        $('auth_source').insert(new Element("option", {value:pair.key}).update(pair.value));
+                                    });
+                                }
+                                ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
+                                    oForm.select('input').invoke("observe", "keydown", function(event){
+                                        if(event.keyCode == Event.KEY_RETURN){
+                                            var el = Event.findElement(event);
+                                            if(el.hasClassName('dialogButton')){
+                                                el.click();
+                                            }else{
+                                                el.form.down('input.dialogButton').click();
+                                            }
+                                        }
+                                    });
+                                    oForm.down('input[type="text"]').key_enter_attached = true;
+                                }
+                                var authConfs = ajaxplorer.getPluginConfigs("auth");
+                                if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
+                                    try{
+                                        oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
+                                        oForm.down('input[name="userid"]').setAttribute("autocomplete", "off");
+                                        oForm.down('input[name="password"]').setAttribute("autocomplete", "off");
+                                        oForm.setAttribute("autocomplete", "off");
+                                    }catch(e){}
+                                }
+                                if(authConfs && authConfs.get("ENABLE_FORGOT_PASSWORD") && !oForm.down('a.forgot-password-link')){
+                                    try{
+                                        oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link">AJXP_MESSAGE[479]</a></div>'});
+                                        oForm.down('a.forgot-password-link').observe("click", function(e){
+                                            Event.stop(e);
+                                            ajaxplorer.actionBar.fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
+                                        });
+                                    }catch(e){ if(console) console.log(e); }
+                                }
+                                modal.refreshDialogPosition();
+                            },
+                            function(){
+                                var oForm = modal.getForm();
+                                var connexion = new Connexion();
+                                connexion.addParameter('get_action', 'login');
+                                var selectedSource = oForm.auth_source.value;
+                                if(selectedSource == masterAuthSource){
+                                    connexion.addParameter('userid', oForm.userid.value);
+                                }else{
+                                    connexion.addParameter('userid', selectedSource+userIdSeparator+oForm.userid.value);
+                                }
+                                connexion.addParameter('login_seed', oForm.login_seed.value);
+                                connexion.addParameter('auth_source', selectedSource);
+                                connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
+                                if(oForm.login_seed.value != '-1'){
+                                    connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+                                }else{
+                                    connexion.addParameter('password', oForm.password.value);
+                                }
+                                if(oForm.captcha_code){
+                                    connexion.addParameter('captcha_code', oForm.captcha_code.value);
+                                }
+                                connexion.onComplete = function(transport){
+                                    var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                    if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                        ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                    }
+                                    if(success){
+                                        $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
+                                        oForm.up('.dialogContent').writeAttribute("style", "");
+                                        $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
+                                    }
+
+                                };
+                                connexion.setMethod('put');
+                                document.observeOnce("ajaxplorer:user_logged", function(){
+                                    if($('logging_string') && $('logging_string').down('i')){
+                                        var ht = $('logging_string').down('i').innerHTML;
+                                        var exp = ht.split(userIdSeparator);
+                                        if(exp.length > 1){
+                                            $('logging_string').down('i').update(exp[1]);
+                                        }
+                                    }
+                                });
+                                connexion.sendAsync();
+                                oForm.userid.value = '';
+                                oForm.password.value = '';
+                                return false;
+                            });
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="authfront.session_login"/>
+        <activePlugin pluginName="auth.multi"/>
+    </dependencies>
+</ajxp_plugin>
