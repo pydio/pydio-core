@@ -107,4 +107,18 @@ class ContentFilter {
 
     }
 
+    /**
+     * @return Return public data as array, pre-utf8 encoded
+     */
+    public function toArray(){
+        $data = array("filters" => array(), "virtualPaths" => array());
+        foreach($this->filters as $k => $v){
+            $data["filters"][SystemTextEncoding::toUTF8($k)] = SystemTextEncoding::toUTF8($v);
+        }
+        foreach($this->virtualPaths as $k => $v){
+            $data["virtualPaths"][SystemTextEncoding::toUTF8($k)] = SystemTextEncoding::toUTF8($v);
+        }
+        return $data;
+    }
+
 } 

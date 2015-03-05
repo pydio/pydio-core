@@ -2466,6 +2466,10 @@ class ShareCenter extends AJXP_Plugin
                 $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, null);
             }
 
+            $cFilter = $repo->getContentFilter();
+            if(!empty($cFilter)){
+                $cFilter = $cFilter->toArray();
+            }
             $jsonData = array(
                 "repositoryId"  => $repoId,
                 "users_number"  => AuthService::countUsersForRepository($repoId),
@@ -2474,7 +2478,7 @@ class ShareCenter extends AJXP_Plugin
                 "entries"       => $sharedEntries,
                 "element_watch" => $elementWatch,
                 "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/",
-                "content_filter"=> $repo->getContentFilter()
+                "content_filter"=> $cFilter
             );
             if (isSet($minisiteData)) {
                 if(!empty($minisiteData["DOWNLOAD_LIMIT"]) && !$dlDisabled){
