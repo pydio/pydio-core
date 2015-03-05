@@ -17,6 +17,9 @@
 						if(loginRedirect){
 							document.location.href=loginRedirect;
 						}else{
+    					    modal.setCloseValidation(function(){
+                                return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
+                            });
 							modal.showDialogForm('Log In', 'ftp_login_form',
 							function(oForm){
                                 ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
