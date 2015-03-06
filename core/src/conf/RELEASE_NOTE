@@ -1,5 +1,20 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio 6.0.5 - Bugfix Release, again
+
+This is fixing some annoying issues introduced by 6.0.4. Upgrade is recommended and simple. Changes described below.
+
+Revert "close search engine on context change" as it breaks results pane in admin (details)
+Move Multi & WebFTP login screen into dedicated authfront plugin, as previous fixes in AJXP_PluginsService changes the plugins loading order. (details)
+Prevent FTP login screen modal closing (details)
+Fix #847: share link with non-ascii filename on windows IIS (details)
+Fix scrolling issue: use a fixed scrolling step instead of a fraction, could make it hardly usable for long listings (details)
+Upgrade instructions
+
+In-app upgrade: automatic.
+Linux Packages: automatic via yum / apt-get
+
+
 Pydio 6.0.4 - Bugfix Release
 
 Date: March, 3rd 2015
