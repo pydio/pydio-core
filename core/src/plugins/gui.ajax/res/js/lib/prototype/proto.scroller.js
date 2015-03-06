@@ -47,7 +47,7 @@ Control.ScrollBar = Class.create({
                     document.getElementById('scrollbar_track'),
                     { fixed_scroll_distance: 50 });
              */
-            fixed_scroll_distance: -1,
+            fixed_scroll_distance: 100,
             slider_options: {}
         },options || {});
         this.slider = new Control.Slider(this.handle,this.track,Object.extend({
