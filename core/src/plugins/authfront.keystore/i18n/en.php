@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Invalidate existing API keys",
     "7" => "Are you sure you want to revoke this/these key(s)?",
     "8" => "Key(s) removed successfully!",
-    "9" => "Devices connected to your account:"
+    "9" => "Devices connected to your account:",
 );

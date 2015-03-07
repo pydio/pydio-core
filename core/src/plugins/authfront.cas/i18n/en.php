@@ -20,5 +20,5 @@
  */
 
 $mess = array(
-    "1" => "Order"
+    "1" => "Order",
 );
