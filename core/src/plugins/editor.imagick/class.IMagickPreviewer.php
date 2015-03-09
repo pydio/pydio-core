@@ -32,7 +32,7 @@ class IMagickPreviewer extends AJXP_Plugin
     protected $onTheFly = false;
     protected $useOnTheFly = false;
 
-    protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps", "cr2");
+    protected $imagickExtensions = array("svg", "tif", "tiff", "psd", "xcf", "eps", "cr2");
     protected $unoconvExtensios = array("xls", "xlt", "xlsx", "xltx", "ods", "doc", "dot", "docx", "dotx", "odt", "ppt", "pptx", "odp", "rtf");
 
     public function loadConfigs($configsData)
