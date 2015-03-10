@@ -30,7 +30,6 @@ class AJXP_PluginsService
     private static $instance;
     private $registry = array();
     private $required_files = array();
-    private $tmpDependencies = array();
     private $activePlugins = array();
     private $streamWrapperPlugins = array();
     private $registeredWrappers = array();
@@ -44,6 +43,42 @@ class AJXP_PluginsService
     private $mixinsDoc;
     private $mixinsXPath;
 
+
+    /**
+     * @return bool
+     */
+    private function loadRegistryFromCache(){
+
+        if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
+            $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
+            if (count($reqs)) {
+                foreach ($reqs as $filename) {
+                    if (!is_file($filename)) {
+                        // Cache is out of sync
+                        return false;
+                    }
+                    require_once($filename);
+                }
+                $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                $this->registry = $res;
+                // Refresh streamWrapperPlugins
+                foreach ($this->registry as $plugs) {
+                    foreach ($plugs as $plugin) {
+                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
+                            $this->streamWrapperPlugins[] = $plugin->getId();
+                        }
+                    }
+                }
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+
+    }
+
     /**
      * Loads the full registry, from the cache or not
      * @param String $pluginFolder
@@ -52,28 +87,12 @@ class AJXP_PluginsService
      */
     public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false)
     {
-        if (!$rewriteCache && (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)) {
-            $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
-            if (count($reqs)) {
-                foreach ($reqs as $filename) {
-                    if (!is_file($filename)) {
-                        // CACHE IS OUT OF SYNC WITH REQUIRES
-                        $this->loadPluginsRegistry($pluginFolder, $confStorage, true);
-                        return;
-                    }
-                    require_once($filename);
-                }
-                $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                $this->registry = $res;
-                // Refresh streamWrapperPlugins
-                foreach ($this->registry as $pType => $plugs) {
-                    foreach ($plugs as $plugin) {
-                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
-                            $this->streamWrapperPlugins[] = $plugin->getId();
-                        }
-                    }
-                }
-                return ;
+        if(!$rewriteCache){
+            if(!empty($this->registry)){
+                return;
+            }
+            if($this->loadRegistryFromCache()){
+                return;
             }
         }
         if (is_string($pluginFolder)) {
@@ -149,50 +168,6 @@ class AJXP_PluginsService
         $plugin->loadingState = "loaded";
     }
 
-    /**
-     * Save the plugins order in a cache
-     *
-     * @param array $sortedPlugins
-     * @return bool|void
-     */
-    private function cachePlugSort($sortedPlugins)
-    {
-        if(!AJXP_PLUGINS_CACHE_FILE) return false;
-        $indexes = array();
-        $i = 0;
-        foreach ($sortedPlugins as $plugin) {
-            $indexes[$i] = $plugin->getId();
-            $i++;
-        }
-        AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $indexes, false, true);
-    }
-
-    /**
-     * Load the cache, check that all registered plugins
-     * are known by the cache, and in that case sort the array.
-     *
-     * @param array $sortedPlugins
-     * @return mixed
-     */
-    private function loadPlugCache($sortedPlugins)
-    {
-        if(!AJXP_PLUGINS_CACHE_FILE) return false;
-        $cache = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-        if(!count($cache)) return false;
-        // Break if one plugin is not present in cache
-        foreach ($sortedPlugins as $index => $plugin) {
-            if (!in_array($plugin->getId(), $cache)) {return false;}
-        }
-        $sorted = array();
-        foreach ($cache as $id => $plugId) {
-            // Walk the cache and add the plugins in right order.
-            if (isSet($sortedPlugins[$plugId])) {
-                $sorted[] = $sortedPlugins[$plugId];
-            }
-        }
-        return $sorted;
-    }
-
     public function loadFromPluginQueriesCache($key)
     {
         if(AJXP_SKIP_CACHE) return null;
@@ -220,6 +195,18 @@ class AJXP_PluginsService
      */
     public function softLoad($pluginId, $pluginOptions)
     {
+        if(empty($this->registry)){
+            $this->loadRegistryFromCache();
+        }
+        // Try to get from cache
+        list($type, $name) = explode(".", $pluginId);
+        if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+            $plugin = $this->registry[$type][$name];
+            $plugin->init($pluginOptions);
+            return clone $plugin;
+        }
+
+
         $plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
@@ -704,7 +691,7 @@ class AJXP_PluginsService
 
     /**
      * Central function of the registry construction, merges some nodes into the existing registry.
-     * @param $original
+     * @param DOMDocument $original
      * @param $parentName
      * @param $uuidAttr
      * @param $childrenNodes
