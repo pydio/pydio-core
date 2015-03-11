@@ -25,13 +25,12 @@
 
 Class.create("PDFJSViewer", AbstractEditor, {
 
-	initialize: function($super, oFormObject, options)
-	{
+	initialize : function($super, oFormObject, options) {
 		$super(oFormObject, options);
 		this.canWrite = false; // It'a only a viewer.
 	},
 
-	open : function($super, nodeOrNodes){
+	open : function($super, nodeOrNodes) {
 		$super(nodeOrNodes);
 
 		// Get the URL for current workspace path.
@@ -41,15 +40,24 @@ Class.create("PDFJSViewer", AbstractEditor, {
 		}else if(url.lastIndexOf('/') > -1){
 			url = url.substr(0, url.lastIndexOf('/'));
 		}
+		if($$('base').length){
+			url = $$("base")[0].getAttribute("href");
+			if(!url.startsWith('http') && !url.startsWith('https')){
+				url = document.location.origin + url;
+			}
+		}
 
-		// Get the direct PDF file link valid for our session.
+		// Get the direct PDF file link valid for this session.
 		var fileName = nodeOrNodes.getPath();
-		DEFAULT_URL = url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_pdf_data&file='+encodeURIComponent(fileName);
+		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file='+fileName);
 
-		// Set up the main container.
-		this.contentMainContainer = document.getElementById('outerContainer');
+		// Hide the Pydio action bar.
+		this.element.getElementsByClassName('editor_action_bar')[0].style.display = 'none';
 
-		this.element.observeOnce("editor:close", function(){});
+		// Set up the main container and load the PDF file.
+		this.contentMainContainer = this.element.getElementsByTagName('iframe')[0];
+		this.contentMainContainer.src = 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl;
+
 		this.contentMainContainer.observe("focus", function(){
 			ajaxplorer.disableAllKeyBindings()
 		});
@@ -59,16 +67,5 @@ Class.create("PDFJSViewer", AbstractEditor, {
 
 		// Set the tab label.
 		this.updateTitle(getBaseName(fileName));
-
-		// Load the PDF file.
-		PDFViewerApplication.initialize().then(webViewerInitialized);
-
-		// Toolbar layout fix for Chromium.
-		setTimeout(function() {
-			document.getElementById('toolbarViewer').setAttribute('style', 'display:none;');
-			setTimeout(function() {
-				document.getElementById('toolbarViewer').setAttribute('style', '');
-			}, 100);
-		}, 100);
 	}
 });
