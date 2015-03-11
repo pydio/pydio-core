@@ -1540,8 +1540,10 @@ class AJXP_Utils
             'Mac OS (classic)' => '(mac_powerpc)|(macintosh)',
             'QNX' => 'QNX',
             'BeOS' => 'beos',
-            'OS2' => 'os/2',
-            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves/teoma)|(ia_archiver)'
+            'Apple iPad' => 'iPad',
+            'Apple iPhone' => 'iPhone',
+            'OS2' => 'os\/2',
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)'
         );
 
         if($useragent == null){
