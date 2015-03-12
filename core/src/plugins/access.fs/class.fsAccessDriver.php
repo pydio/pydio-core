@@ -1292,6 +1292,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     protected function appendUploadedData($folder, $source, $target){
 
         $already_existed = false;
+        if($source == $target){
+            throw new Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
+        }
         if (file_exists($folder ."/" . $target)) {
             $already_existed = true;
             $this->logDebug("Should copy stream from $source to $target");
