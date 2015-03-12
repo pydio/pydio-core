@@ -52,10 +52,10 @@ Class.create("PDFJSViewer", AbstractEditor, {
 		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file='+fileName);
 
 		// Hide the Pydio action bar.
-		this.element.getElementsByClassName('editor_action_bar')[0].style.display = 'none';
+		this.element.down('.editor_action_bar').setStyle({display:'none'});
 
 		// Set up the main container and load the PDF file.
-		this.contentMainContainer = this.element.getElementsByTagName('iframe')[0];
+		this.contentMainContainer = this.element.down('iframe');
 		this.contentMainContainer.src = 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl;
 
 		this.contentMainContainer.observe("focus", function(){
@@ -67,5 +67,27 @@ Class.create("PDFJSViewer", AbstractEditor, {
 
 		// Set the tab label.
 		this.updateTitle(getBaseName(fileName));
-	}
+
+	},
+    resize : function(size){
+        if(size){
+            this.contentMainContainer.setStyle({height:size+'px'});
+            if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.IEorigWidth});
+        }else{
+            if(this.fullScreenMode){
+                fitHeightToBottom(this.contentMainContainer, this.element);
+                if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.element.getWidth()});
+            }else{
+                if(this.editorOptions.context.elementName){
+                    fitHeightToBottom(this.contentMainContainer, $(this.editorOptions.context.elementName), 5);
+                }else{
+                    fitHeightToBottom($(this.element));
+                    fitHeightToBottom($(this.contentMainContainer), $(this.element));
+                }
+                if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.IEorigWidth});
+            }
+        }
+        this.element.fire("editor:resize", size);
+    }
+
 });

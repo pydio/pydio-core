@@ -15,7 +15,7 @@
 		</resources>
 	</client_settings>
 	<clientForm id="pdf_box"><![CDATA[
-		<div id="pdf_box" class="editor_container pdfjs_viewer"><iframe></iframe></div>
+		<div id="pdf_box"  box_width="90%" box_height="90%" box_resize="true" box_padding="5" class="editor_container pdfjs_viewer"><iframe></iframe></div>
 	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
