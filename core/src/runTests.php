@@ -31,11 +31,11 @@ require_once("base.conf.php");
 function apiPost($baseData, $url, $parameters, $private){
 
     $nonce = substr(md5(microtime()), 0, 6);
+    $url = $baseData["path"].$url;
     $msg = "$url:$nonce:$private";
     $hash = $nonce.":".hash_hmac("sha256", $msg, $parameters["auth_token"]);
     $client = new HttpClient($baseData["host"]);
     $parameters["auth_hash"] = $hash;
-    $url = $baseData["path"].$url;
     $res  = $client->post($url, $parameters);
     return $client;
 
