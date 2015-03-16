@@ -251,7 +251,12 @@ class AbstractAccessDriver extends AJXP_Plugin
                 $error[] = $mess[114];
                 return ;
             } else {
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
+                //AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
+                $ajxpNodeSrc = new AJXP_Node($realSrcFile);
+                $ajxpNodeSrc->setLeaf(false);
+                $ajxpNodeDst = new AJXP_Node($destFile);
+                $ajxpNodeDst->setLeaf(false);
+                AJXP_Controller::applyHook("node.change", array($ajxpNodeSrc, $ajxpNodeDst, !$move));
             }
         } else {
             if ($move) {
