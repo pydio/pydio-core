@@ -1540,8 +1540,10 @@ class AJXP_Utils
             'Mac OS (classic)' => '(mac_powerpc)|(macintosh)',
             'QNX' => 'QNX',
             'BeOS' => 'beos',
-            'OS2' => 'os/2',
-            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves/teoma)|(ia_archiver)'
+            'Apple iPad' => 'iPad',
+            'Apple iPhone' => 'iPhone',
+            'OS2' => 'os\/2',
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)'
         );
 
         if($useragent == null){
@@ -1718,11 +1720,15 @@ class AJXP_Utils
 
     }
 
+    private static $_dibiParamClean = array();
     public static function cleanDibiDriverParameters($params)
     {
         if(!is_array($params)) return $params;
         $value = $params["group_switch_value"];
         if (isSet($value)) {
+            if(isSet(self::$_dibiParamClean[$value])){
+                return self::$_dibiParamClean[$value];
+            }
             if ($value == "core") {
                 $bootStorage = ConfService::getBootConfStorageImpl();
                 $configs = $bootStorage->loadPluginConfig("core", "conf");
@@ -1744,6 +1750,9 @@ class AJXP_Utils
                 $params["formatDateTime"] = "'Y-m-d H:i:s'";
                 $params["formatDate"] = "'Y-m-d'";
                 break;
+        }
+        if(isSet($value)){
+            self::$_dibiParamClean[$value] = $params;
         }
         return $params;
     }

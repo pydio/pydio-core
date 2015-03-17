@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.pdfjs" openable="true" iconClass="icon-picture" order="10" text="pdf_viewer.1" title="pdf_viewer.2"
+        icon="frame_image.png" className="PDFJSViewer" mimes="pdf" formId="pdf_box" label="CONF_MESSAGE[PDF Viewer]"
+        description="CONF_MESSAGE[JavaScript PDF viewer]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="true" tested_version="follow_core"/>
+        <plugin_author>Garnetius</plugin_author>
+    </plugin_info>
+	<client_settings>
+		<resources>
+			<js file="plugins/editor.pdfjs/class.PDFJSViewer.js" className="PDFJSViewer"/>
+			<css file="plugins/editor.pdfjs/PDFJSViewer.css"/>
+			<i18n path="plugins/editor.pdfjs/i18n" namespace="pdf_viewer"/>
+		</resources>
+	</client_settings>
+	<clientForm id="pdf_box"><![CDATA[
+		<div id="pdf_box"  box_width="90%" box_height="90%" box_resize="true" box_padding="5" class="editor_container pdfjs_viewer"><iframe></iframe></div>
+	]]></clientForm>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>
+</editor>

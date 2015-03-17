@@ -416,11 +416,11 @@ class AJXP_Plugin implements Serializable
     public function serialize()
     {
         if ($this->manifestDoc != null) {
-            $this->manifestXML = base64_encode($this->manifestDoc->saveXML());
+            $this->manifestXML = serialize(base64_encode($this->manifestDoc->saveXML()));
         }
         $serialArray = array();
         foreach ($this->serializableAttributes as $attr) {
-            $serialArray[$attr] = serialize($this->$attr);
+            $serialArray[$attr] = $this->$attr;
         }
         return serialize($serialArray);
     }
@@ -434,12 +434,12 @@ class AJXP_Plugin implements Serializable
     {
         $serialArray = unserialize($string);
         foreach ($serialArray as $key => $value) {
-            $this->$key = unserialize($value);
+            $this->$key = $value;
         }
         if ($this->manifestXML != NULL) {
             //$this->manifestDoc = DOMDocument::loadXML(base64_decode($this->manifestXML));
             $this->manifestDoc = new DOMDocument(1.0, "UTF-8");
-            $this->manifestDoc->loadXML(base64_decode($this->manifestXML));
+            $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
             $this->reloadXPath();
             unset($this->manifestXML);
         }
@@ -451,6 +451,7 @@ class AJXP_Plugin implements Serializable
      * on the manifest.
      * @param string $xmlNodeName
      * @param string $format
+     * @param bool $externalFiles
      * @return DOMElement|DOMNodeList|string
      */
     public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false)

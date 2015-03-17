@@ -112,7 +112,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
             array(
                 'Bucket' => $this->bucketName,
                 'Key' => $pathName,
-                'CopySource' => $this->bucketName."/".$pathName,
+                'CopySource' => $this->bucketName."/".rawurlencode($pathName),
                 'MetadataDirective' => 'REPLACE',
                 'Metadata' => array($this->getMetaKey($nameSpace,$scope,$user) => base64_encode(serialize($metaData)))
             )
@@ -131,7 +131,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
                 array(
                     'Bucket' => $this->bucketName,
                     'Key' => $pathName,
-                    'CopySource' => $this->bucketName."/".$pathName,
+                    'CopySource' => $this->bucketName."/".rawurlencode($pathName),
                     'MetadataDirective' => 'REPLACE',
                     'Metadata' => array($this->getMetaKey($nameSpace,$scope,$user) => "")
                 )

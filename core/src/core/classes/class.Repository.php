@@ -413,7 +413,7 @@ class Repository implements AjxpGroupPathProvider
         if (isSet($this->displayStringId)) {
             $mess = ConfService::getMessages();
             if (isSet($mess[$this->displayStringId])) {
-                return SystemTextEncoding::fromUTF8($mess[$this->displayStringId]);
+                return $mess[$this->displayStringId];
             }
         }
         return AJXP_VarsFilter::filter($this->display);

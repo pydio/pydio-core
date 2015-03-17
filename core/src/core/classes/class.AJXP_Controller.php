@@ -40,6 +40,8 @@ class AJXP_Controller
      */
     private static $includeHooks = array();
 
+    private static $hooksCache = array();
+
     /**
      * Initialize the queryable xPath object
      * @static
@@ -59,6 +61,7 @@ class AJXP_Controller
 
     public static function registryReset(){
         self::$xPath = null;
+        self::$hooksCache = array();
     }
 
     /**
@@ -189,7 +192,7 @@ class AJXP_Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param DOMNode $action
-     * @return bool
+     * @return mixed
      */
     public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null)
     {
@@ -207,7 +210,7 @@ class AJXP_Controller
                 }
             }
             self::$lastActionNeedsAuth = true;
-            return ;
+            return null;
         }
         $xPath = self::initXPath();
         if ($action == null) {
@@ -274,14 +277,14 @@ class AJXP_Controller
         if ($preCalls !== false) {
             foreach ($preCalls as $preCall) {
                 // A Preprocessing callback can modify its input arguments (passed by ref)
-                $preResult = self::applyCallback($xPath, $preCall, $actionName, $httpVars, $fileVars);
+                $preResult = self::applyCallback($preCall, $actionName, $httpVars, $fileVars);
                 if (isSet($params)) {
                     $params["pre_processor_results"][$preCall->getAttribute("pluginId")] = $preResult;
                 }
             }
         }
         if ($mainCall) {
-            $result = self::applyCallback($xPath, $mainCall, $actionName, $httpVars, $fileVars);
+            $result = self::applyCallback($mainCall, $actionName, $httpVars, $fileVars);
             if (isSet($params)) {
                 $params["processor_result"] = $result;
             }
@@ -289,7 +292,7 @@ class AJXP_Controller
         if ($postCalls !== false) {
             foreach ($postCalls as $postCall) {
                 // A Preprocessing callback can modify its input arguments (passed by ref)
-                $postResult = self::applyCallback($xPath, $postCall, $actionName, $httpVars, $fileVars);
+                $postResult = self::applyCallback($postCall, $actionName, $httpVars, $fileVars);
                 if (isSet($params)) {
                     $params["post_processor_results"][$postCall->getAttribute("pluginId")] = $postResult;
                 }
@@ -299,11 +302,12 @@ class AJXP_Controller
             $params["ob_output"] = ob_get_contents();
             ob_end_clean();
             foreach ($captureCalls as $captureCall) {
-                self::applyCallback($xPath, $captureCall, $actionName, $httpVars, $params);
+                self::applyCallback($captureCall, $actionName, $httpVars, $params);
             }
         } else {
             if(isSet($result)) return $result;
         }
+        return null;
     }
 
     /**
@@ -352,25 +356,6 @@ class AJXP_Controller
         }
 
         return self::runCommandInBackground($cmd, $logFile);
-        /*
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
-            if (class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")) {
-                $WshShell   = new COM("WScript.Shell");
-                $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
-            } else {
-                $tmpBat = implode(DIRECTORY_SEPARATOR, array( $robustInstallPath, "data","tmp", md5(time()).".bat"));
-                $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
-                AJXP_Logger::debug("Writing file $cmd to $tmpBat");
-                file_put_contents($tmpBat, $cmd);
-                pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
-            }
-        } else {
-            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
-            AJXP_Logger::debug("Starting process and sending output dev null");
-            return $process;
-        }
-        */
     }
 
     /**
@@ -410,7 +395,7 @@ class AJXP_Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return DOMNode|bool
+     * @return DOMElement|bool
      */
     private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true)
     {
@@ -436,7 +421,7 @@ class AJXP_Controller
      * Check in the callback node if an applyCondition XML attribute exists, and eval its content.
      * The content must set an $apply boolean as result
      * @static
-     * @param DOMNode $callback
+     * @param DOMElement $callback
      * @param string $actionName
      * @param array $httpVars
      * @param array $fileVars
@@ -455,21 +440,25 @@ class AJXP_Controller
     /**
      * Applies a callback node
      * @static
-     * @param DOMXPath $xPath
-     * @param DOMNode $callback
+     * @param DOMElement|Array $callback The DOM Node or directly an array of attributes
      * @param String $actionName
      * @param Array $httpVars
      * @param Array $fileVars
      * @param null $variableArgs
      * @param bool $defer
-     * @throws AJXP_Exception* @throw AJXP_Exception
-     * @return void
+     * @throws AJXP_Exception* @internal param \DOMXPath $xPath
+     * @return mixed
      */
-    private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
+    private static function applyCallback($callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
     {
         //Processing
-        $plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
-        $methodName = $xPath->query("@methodName", $callback)->item(0)->value;
+        if(is_array($callback)){
+            $plugId = $callback["pluginId"];
+            $methodName = $callback["methodName"];
+        }else{
+            $plugId = $callback->getAttribute("pluginId");
+            $methodName = $callback->getAttribute("methodName");
+        }
         $plugInstance = AJXP_PluginsService::findPluginById($plugId);
         //return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
         // Do not use call_user_func, it cannot pass parameters by reference.
@@ -498,19 +487,43 @@ class AJXP_Controller
      */
     public static function applyHook($hookName, $args, $forceNonDefer = false)
     {
+        if(isSet(self::$hooksCache[$hookName])){
+            $hooks = self::$hooksCache[$hookName];
+            foreach($hooks as $hook){
+                if (isSet($hook["applyCondition"]) && $hook["applyCondition"]!="") {
+                    $apply = false;
+                    eval($hook["applyCondition"]);
+                    if(!$apply) continue;
+                }
+                $defer = $hook["defer"];
+                if($defer && $forceNonDefer) $defer = false;
+                self::applyCallback($hook, $fake1, $fake2, $fake3, $args, $defer);
+            }
+            return;
+        }
         $xPath = self::initXPath();
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
+        self::$hooksCache[$hookName] = array();
         foreach ($callbacks as $callback) {
-            if ($callback->getAttribute("applyCondition")!="") {
+            $defer = ($callback->getAttribute("defer") === "true");
+            $applyCondition = $callback->getAttribute("applyCondition");
+            $plugId = $callback->getAttribute("pluginId");
+            $methodName = $callback->getAttribute("methodName");
+            $hookCallback = array(
+                "defer" => $defer,
+                "applyCondition" => $applyCondition,
+                "pluginId"    => $plugId,
+                "methodName"    => $methodName
+            );
+            self::$hooksCache[$hookName][] = $hookCallback;
+            if (!empty($applyCondition)) {
                 $apply = false;
-                eval($callback->getAttribute("applyCondition"));
+                eval($applyCondition);
                 if(!$apply) continue;
-              }
-            //$fake1; $fake2; $fake3;
-            $defer = ($callback->attributes->getNamedItem("defer") != null && $callback->attributes->getNamedItem("defer")->nodeValue == "true");
+            }
             if($defer && $forceNonDefer) $defer = false;
-            self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args, $defer);
+            self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
         }
     }
 
