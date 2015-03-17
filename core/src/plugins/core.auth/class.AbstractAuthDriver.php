@@ -314,7 +314,7 @@ class AbstractAuthDriver extends AJXP_Plugin
     public function updateUserObject(&$userObject)
     {
         $applyRole = $this->getOption("AUTO_APPLY_ROLE");
-        if(!empty($applyRole)){
+        if(!empty($applyRole) && !(is_array($userObject->getRoles()) && array_key_exists($applyRole, $userObject->getRoles())) ){
             $rObject = AuthService::getRole($applyRole, true);
             $userObject->addRole($rObject);
             $userObject->save("superuser");
