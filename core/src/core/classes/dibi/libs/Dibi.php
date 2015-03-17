@@ -94,8 +94,9 @@ class dibi
 		if ($name) {
 			trigger_error(__METHOD__ . '(): named connections are deprecated.', E_USER_DEPRECATED);
 		}
-        if ($config["driver"] == "mysql" && extension_loaded("mysqli")){
-            $config["driver"] = dibi::$defaultDriver;
+        if ($config["driver"] == "mysql" && isSet($config["use_mysqli"])
+            && $config["use_mysqli"] !== false && extension_loaded("mysqli")){
+            $config["driver"] = "mysqli";
          }
 		return self::$connection = self::$registry[$name] = new DibiConnection($config, $name);
 	}
