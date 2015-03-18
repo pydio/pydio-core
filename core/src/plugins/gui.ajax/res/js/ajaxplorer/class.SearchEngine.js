@@ -81,7 +81,12 @@ Class.create("SearchEngine", AjxpPane, {
                  if(this._ajxpOptions.openSearchInput){
                      this.closeSearchInput();
                  }
-                 ajaxplorer.goTo(selectedNode);
+                 if(ajxpOptions['leavesOpenOnSelect'] && selectedNode.isLeaf()){
+                     ajaxplorer.openCurrentSelectionInEditor(null, selectedNode);
+                 }else{
+                     ajaxplorer.goTo(selectedNode);
+                 }
+                 this._dataModel.setSelectedNodes([]);
              }
          }.bind(this));
 
@@ -104,7 +109,9 @@ Class.create("SearchEngine", AjxpPane, {
                     this.indexedFields = $A(this.indexedFields["indexed_meta_fields"]);
                     if(!this._ajxpOptions.metaColumns) this._ajxpOptions.metaColumns = {};
                     for(var key in addColumns){
-                        this._ajxpOptions.metaColumns[key] = addColumns[key];
+                        if(addColumns.hasOwnProperty(key)){
+                            this._ajxpOptions.metaColumns[key] = addColumns[key];
+                        }
                     }
                 }else{
                     this.indexedFields = $A(this.indexedFields);
@@ -172,8 +179,10 @@ Class.create("SearchEngine", AjxpPane, {
 
         this.initMetaOption(simpleMeta, advancedMeta, 'filename', MessageHash[1], true);
         for(var key in metadataColumns){
-            if(this.indexedFields && !this.indexedFields.include(key)) continue;
-            this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
+            if(metadataColumns.hasOwnProperty(key)){
+                if(this.indexedFields && !this.indexedFields.include(key)) continue;
+                this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
+            }
         }
 
         var docPropertyTemplate =
@@ -322,11 +331,14 @@ Class.create("SearchEngine", AjxpPane, {
 		this._inputBox = this.htmlElement.down("#search_txt");
 		this._resultsBoxId = 'search_results';
 		this._searchButtonName = "search_button";
-		this._runningQueries = new Array();
-		this._queue = $A([]);
+		this._runningQueries = $A();
+		this._queue = $A();
 		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
-
+        var groupByData = 'mimestring_id';
+        if(this.options['groupByData'] !== undefined){
+            groupByData = this.options['groupByData'];
+        }
 
         this._fileList = new FilesList($(this._resultsBoxId), {
             dataModel:this._dataModel,
@@ -335,7 +347,7 @@ Class.create("SearchEngine", AjxpPane, {
                 {attributeName:"filename", messageString:'Path', sortType:'String'},
                 {attributeName:"mimestring_id", messageString:'Type', sortType:'String'}
             ],
-            groupByData:'mimestring_id',
+            groupByData:groupByData,
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
             defaultSortTypes:["String", "String", "String"],
@@ -360,9 +372,14 @@ Class.create("SearchEngine", AjxpPane, {
                 Event.stop(e);
                 this.search();
             }
-			if(e.keyCode == Event.KEY_TAB) return false;
-			return true;		
+			return e.keyCode != Event.KEY_TAB;
 		}.bind(this));
+        this._inputBox.observe("input", function(e){
+            if(this._inputBox.getValue().length > 2){
+                bufferCallback('searchByTyping', 300, this.searchWhenTyping.bind(this));
+                bufferCallback('fullSearch', 2000, this.searchCompleteTypedResults.bind(this));
+            }
+        }.bind(this));
 
         var opener = function(e){
             ajaxplorer.disableShortcuts();
@@ -391,10 +408,15 @@ Class.create("SearchEngine", AjxpPane, {
             }
 		}.bind(this));
 		
-		$(this._searchButtonName).onclick = function(){
-			this.search();
+		$(this._searchButtonName).observe("click", function(e){
+            Event.stop(e);
+            if(this._ajxpOptions.openSearchInput && !this.searchInputIsOpen()){
+                this._inputBox.focus();
+            }else{
+    			this.search();
+            }
 			return false;
-		}.bind(this);
+		}.bind(this));
 		
 		$('stop_'+this._searchButtonName).onclick = function(){
 			this.interrupt();
@@ -412,8 +434,22 @@ Class.create("SearchEngine", AjxpPane, {
 
         document.observe("ajaxplorer:repository_list_refreshed", this.refreshObserver );
 
+        /*
+        if($(this.options.toggleResultsVisibility)){
+            this.ctxChangeObserver = function(){
+                this.showToggleResult(false);
+                this.closeSearchInput();
+            }.bind(this);
+            document.observe("ajaxplorer:context_changed", this.ctxChangeObserver);
+        }
+        */
+
         this.resize();
 	},
+
+    searchInputIsOpen: function(){
+        return this.htmlElement.hasClassName("search_active");
+    },
 
     openSearchInput: function(){
         var container = this.htmlElement;
@@ -437,6 +473,9 @@ Class.create("SearchEngine", AjxpPane, {
         this.showToggleResult(false);
         this._inputBox.blur();
         window.setTimeout(function(){
+            if(container.hasClassName("search_active")) {
+                return;
+            }
             if(this.htmlElement.down('#search_meta')){
                 this.htmlElement.down('#search_meta').removeClassName("toggle_open");
             }
@@ -519,6 +558,11 @@ Class.create("SearchEngine", AjxpPane, {
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
         document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
+        /*
+        if(this.ctxChangeObserver){
+            document.stopObserving("ajaxplorer:context_changed", this.ctxChangeObserver);
+        }
+        */
         if(this.boundSizeEvents){
             this.boundSizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);
@@ -529,13 +573,14 @@ Class.create("SearchEngine", AjxpPane, {
             try {delete window[ajxpId];}catch(e){}
         }
 	},
-	/**
-	 * Initialise the options for search Metadata
-	 * @param element HTMLElement
-	 * @param optionValue String
-	 * @param optionLabel String
-	 * @param checked Boolean
-	 */
+    /**
+     * Initialise the options for search Metadata
+     * @param element HTMLElement
+     * @param optionValue String
+     * @param optionLabel String
+     * @param checked Boolean
+     * @param advancedPanel
+     */
 	initMetaOption : function(element, advancedPanel, optionValue, optionLabel, checked){
 		var option = new Element('span', {value:optionValue, className:'search_meta_opt'}).update('<span class="icon-ok"></span>'+ optionLabel);
 		if(checked) option.addClassName('checked');
@@ -610,10 +655,30 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		this.hasFocus = false;
 	},
+
+    searchWhenTyping:function(){
+        if(this._searchMode == 'remote'){
+            this.search(9);
+        }
+    },
+    searchCompleteTypedResults:function(){
+        if(this._searchMode == 'remote'){
+            var text = this._inputBox.value.toLowerCase();
+            if(text == this.crtText){
+                if(this._rootNode.getChildren().length >= 9) {
+                    // Get more
+                    this.search(50, true);
+                }
+            }else{
+                this.search(50, false);
+            }
+        }
+    },
+
 	/**
 	 * Perform search
 	 */
-	search : function(){
+	search : function(limit, skipClear){
 		var text = this._inputBox.value.toLowerCase();
         var searchQuery;
         var metadata = this.parseMetadataForm();
@@ -628,12 +693,14 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		if(searchQuery == '') return;
 		this.crtText = searchQuery;
-		this.updateStateSearching();
-		this.clearResults();
+        if(!skipClear){
+		    this.updateStateSearching();
+    		this.clearResults();
+        }
 		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
 		window.setTimeout(function(){
-			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"));
+			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"), limit);
 		}.bind(this), 0);		
 	},
 	/**
@@ -655,7 +722,7 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
                 $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
-                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",submenuOffsetTop:12,toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
+                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
                 this.tb.actionsLoaded({memo:ajaxplorer.actionBar.actions});
                 this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
@@ -783,10 +850,11 @@ Class.create("SearchEngine", AjxpPane, {
             $(this._resultsBoxId).insert({top: new Element('div', {id:'no-results-found'}).update(MessageHash[478])});
         }
     },
-	/**
-	 * Put a folder to search in the queue
-	 * @param path String
-	 */
+    /**
+     * Put a folder to search in the queue
+     * @param path String
+     * @param remoteIndexation
+     */
 	appendFolderToQueue : function(path, remoteIndexation){
 		this._queue.push({path:path,remoteIndexation:remoteIndexation?remoteIndexation:false});
 	},
@@ -841,17 +909,24 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Get a folder content and searches its children 
 	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
 	 * @param currentFolder String
+     * @param remote_indexation Boolean
+     * @param limit integer
 	 */
-	searchFolderContent : function(currentFolder, remote_indexation){
+	searchFolderContent : function(currentFolder, remote_indexation, limit){
 		if(this._state == 'interrupt') {
 			this.updateStateFinished();
 			return;
 		}
+        var connexion;
         if(this._searchMode == "remote"){
             /* REMOTE INDEXER CASE */
-            var connexion = new Connexion();
+            connexion = new Connexion();
+            connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
+            if(limit){
+                connexion.addParameter('limit', limit);
+            }
             if(this.hasMetaSearch()){
                 connexion.addParameter('fields', this.getSearchColumns().join(','));
             }
@@ -867,7 +942,7 @@ Class.create("SearchEngine", AjxpPane, {
 
             if(remote_indexation){
 
-                var connexion = new Connexion();
+                connexion = new Connexion();
                 connexion.addParameter('get_action', remote_indexation);
                 connexion.addParameter('query', this.crtText);
                 connexion.addParameter('dir', currentFolder);
@@ -885,7 +960,7 @@ Class.create("SearchEngine", AjxpPane, {
             }else{
 
                 /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
-                var connexion = new Connexion();
+                connexion = new Connexion();
                 connexion.addParameter('get_action', 'ls');
                 connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
                 connexion.addParameter('dir', currentFolder);
@@ -939,7 +1014,7 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		for (var i = 0; i < nodes.length; i++) 
 		{
-			if (nodes[i].tagName == "tree") 
+			if (nodes[i].tagName == "tree")
 			{
 				var ajxpNode = this.parseAjxpNode(nodes[i]);
                 if(this.hasMetaSearch()){
@@ -1007,13 +1082,12 @@ Class.create("SearchEngine", AjxpPane, {
 			(xmlNode.getAttribute('is_file') == "1" || xmlNode.getAttribute('is_file') == "true"), 
 			xmlNode.getAttribute('text'),
 			xmlNode.getAttribute('icon'));
-		var reserved = ['filename', 'is_file', 'text', 'icon'];
 		var metadata = new Hash();
 		for(var i=0;i<xmlNode.attributes.length;i++)
 		{
-			metadata.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+			metadata.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].value);
 			if(Prototype.Browser.IE && xmlNode.attributes[i].nodeName == "ID"){
-				metadata.set("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+				metadata.set("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].value);
 			}
 		}
 		node.setMetadata(metadata);
@@ -1031,7 +1105,6 @@ Class.create("SearchEngine", AjxpPane, {
         if(start == -1) return haystack;
 		var end = start + needle.length;
 		if(truncate && haystack.length > truncate){
-			var midTrunc = Math.round(truncate/2);
 			var newStart = Math.max(Math.round((end + start) / 2 - truncate / 2), 0);
 			var newEnd = Math.min(Math.round((end + start) / 2 + truncate / 2),haystack.length);
 			haystack = haystack.substring(newStart, newEnd);
@@ -1041,8 +1114,7 @@ Class.create("SearchEngine", AjxpPane, {
 			start = haystack.toLowerCase().indexOf(needle);
 			end = start + needle.length;
 		}
-		var highlight = haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
-		return highlight;
+		return haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
 	},
 
     /**

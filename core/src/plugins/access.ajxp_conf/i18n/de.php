@@ -150,4 +150,5 @@ $mess=array(
 "125" => "Alias",
 "126" => "Sind Sie sicher, dass Sie die ausgewählten Elemente löschen möchten?",
 "127" => "Achtung, bitte verwenden Sie keine Sonderzeichen. Benutzer würde mit Login-ID '%s' erstellt werden.",
+"128" => "Successfully deleted group",
 );

@@ -147,4 +147,6 @@ $mess=array(
 "124" => "Источник",
 "125" => "Псевдоним",
 "126" => "Уверены, что хотите удалить выделенный(е) элемент(ы)?",
+"127" => "Warning, please do not use special characters, user would be created with login id '%s'",
+"128" => "Successfully deleted group",
 );

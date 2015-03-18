@@ -69,8 +69,6 @@ Class.create("Breadcrumb", AjxpPane, {
                 parts = tmpParts;
             }
 
-            var lastValue = parts.values().last();
-            var firstValue = parts.values().first();
             var chevron = "<span class='icon-chevron-right'></span>";
             var clickPath = '';
             if(!this.options['hide_home_icon']){

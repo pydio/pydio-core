@@ -46,8 +46,8 @@ Class.create("MetaCellRenderer", {
         if(!MetaCellRenderer.staticMetadataCache){
             MetaCellRenderer.staticMetadataCache = $H();
         }
+        var values = {};
         if(!MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName)){
-            var values = {};
             if(metadataDef['metaAdditional']){
                 metadataDef['metaAdditional'].split(",").each(function(keyLabel){
                     var parts = keyLabel.split("|");
@@ -56,14 +56,21 @@ Class.create("MetaCellRenderer", {
                 MetaCellRenderer.staticMetadataCache.set(metadataDef.attributeName, values);
             }
         }
-        var values = MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName);
-        if((type == 'row' || type == 'detail') && element != null){
+        values = MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName);
+        var nodeMetaValue = ajxpNode.getMetadata().get(metadataDef.attributeName) || '';
+        if(nodeMetaValue){
+            nodeMetaValue = $H(values).keys().indexOf(nodeMetaValue);
+        }else{
+            nodeMetaValue = -1;
+        }
+        if(element != null){
             if(type == 'row'){
                 if(values[element.down('.text_label').innerHTML.stripTags()]){
                     element.down('.text_label').update(values[element.down('.text_label').innerHTML.stripTags()]);
                 }
+                element.writeAttribute("data-sorter_value", nodeMetaValue);
             }else{
-
+                element.writeAttribute("data-"+metadataDef.attributeName+"-sorter_value", nodeMetaValue);
             }
         }
     },
@@ -85,11 +92,12 @@ Class.create("MetaCellRenderer", {
 	/* LABELS SYSTEM */
 	cssLabelsFilter : function(element, ajxpNode, type, metadataDef, ajxpNodeObject){
         var attName = metadataDef.attributeName;
+        var content, obj, rule;
         if(!element && ajxpNodeObject){
-            var content = ajxpNode.getMetadata().get(attName);
+            content = ajxpNode.getMetadata().get(attName);
             if(content){
-                var obj = new MetaCellRenderer();
-                var rule = obj.findCssRule(content.strip());
+                obj = new MetaCellRenderer();
+                rule = obj.findCssRule(content.strip());
                 if(rule){
                     ajxpNodeObject.addClassName(rule.cssClass);
                 }
@@ -97,12 +105,12 @@ Class.create("MetaCellRenderer", {
         }else if(type == 'row'){
 			try{
 				var span = element.down('span');
-				var content = span.innerHTML;
+				content = span.innerHTML;
 			}catch(e){
 			}
 			if(content){
-				var obj = new MetaCellRenderer();
-				var rule = obj.findCssRule(content.strip());
+				obj = new MetaCellRenderer();
+				rule = obj.findCssRule(content.strip());
 				if(rule){
 					element.up().addClassName(rule.cssClass);					
 					span.update(rule.label);
@@ -110,10 +118,10 @@ Class.create("MetaCellRenderer", {
 				}
 			}
 		}else if(type =='thumb'){
-			var content = ajxpNode.getMetadata().get(attName);
+			content = ajxpNode.getMetadata().get(attName);
 			if(content){
-				var obj = new MetaCellRenderer();
-				var rule = obj.findCssRule(content.strip());
+				obj = new MetaCellRenderer();
+				rule = obj.findCssRule(content.strip());
 				if(rule){
 					element.addClassName(rule.cssClass);
                     element.writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
@@ -122,13 +130,13 @@ Class.create("MetaCellRenderer", {
 		}else if(type == 'detail'){
 
             if(element.nodeName.toLowerCase() == 'span') return;
-            var content = ajxpNode.getMetadata().get(attName);
+            content = ajxpNode.getMetadata().get(attName);
             if(content){
-                var obj = new MetaCellRenderer();
-                var rule = obj.findCssRule(content.strip());
-                if(rule && element.up('div')){
-                    element.up('div').addClassName(rule.cssClass);
-                    element.up('div').writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
+                obj = new MetaCellRenderer();
+                rule = obj.findCssRule(content.strip());
+                if(rule && element){
+                    element.addClassName(rule.cssClass);
+                    element.writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
                 }
             }
 

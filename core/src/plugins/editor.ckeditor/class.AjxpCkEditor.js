@@ -24,7 +24,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 	initialize: function($super, oFormObject, options)
 	{
 		$super(oFormObject, options);
-        window.CKEDITOR_BASEPATH = CKEDITOR.basePath = document.location.href.split('#').shift()+"plugins/editor.ckeditor/ckeditor/";
+        window.CKEDITOR_BASEPATH = CKEDITOR.basePath = getUrlFromBase() +"plugins/editor.ckeditor/ckeditor/";
 
 		this.editorConfig = {
 			resize_enabled:false,
@@ -105,14 +105,14 @@ Class.create("AjxpCkEditor", TextEditor, {
 				this.textarea.value = CKEDITOR.instances[this.editorInstanceId].getData();
 				CKEDITOR.instances[this.editorInstanceId].destroy();
 			}				
-		};
+        }.bind(this);
 		var reInit  = function(){
 			CKEDITOR.replace(this.editorInstanceId, this.editorConfig);
 			window.setTimeout(function(){
 				this.resizeEditor();
 				this.bindCkEditorEvents();								
 			}.bind(this), 100);
-		}
+        }.bind(this);
 		this.element.observe("editor:enterFS", destroy.bind(this));
 		this.element.observe("editor:enterFSend", reInit.bind(this));
 		this.element.observe("editor:exitFS", destroy.bind(this));
@@ -124,8 +124,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 		}
-		return;
-		
+
 	},
 	
 	bindCkEditorEvents : function(){

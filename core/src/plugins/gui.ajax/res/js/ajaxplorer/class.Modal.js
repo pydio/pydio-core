@@ -50,9 +50,7 @@ Class.create("Modal", {
 		this.htmlElement = $(this.elementName);
 		this.dialogTitle = this.htmlElement.down(".dialogTitle");
 		this.dialogContent = this.htmlElement.down(".dialogContent");
-		this.currentForm;
 		this.cachedForms = new Hash();
-		this.iframeIndex = 0;	
 	},
 	
 	/**
@@ -118,7 +116,7 @@ Class.create("Modal", {
                 autocomplete:'off'
             });
 			newForm.insert(formDiv.cloneNode(true));
-			var reloadIFrame = null;
+			var reloadIFrame, reloadIFrameSrc;
 			if($(newForm).getElementsByTagName("iframe")[0])
 			{
 				reloadIFrame = $(newForm).getElementsByTagName("iframe")[0];
@@ -133,7 +131,7 @@ Class.create("Modal", {
 				newForm.appendChild(actionField);
 			}		
 		}
-		if(!this.cachedForms.get(sFormId) && !skipButtons){
+		if((!this.cachedForms.get(sFormId) || sFormId == 'login_form_dynamic')  && !skipButtons){
 			this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly, "bottom", useNextButtons);
 		}
 		this.dialogContent.appendChild(newForm);
@@ -143,29 +141,34 @@ Class.create("Modal", {
 
 		if(this.dialogTitle.select('#modalCloseBtn')[0]){
             if(fOnCancel){
-                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel(modal.getForm());hideLightBox();});
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){
+                    fOnCancel(this.getForm());
+                    hideLightBox();
+                }.bind(this));
             }
             else{
-                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){
+                    hideLightBox();
+                });
             }
         }
 
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
 				try{
-					fOnComplete(modal.getForm());
+					fOnComplete(this.getForm());
 				}catch(e){
 					alert('Unexpected Error : please report!\n'+e);				
 				}
 				return false;
-			};
+            }.bind(this);
 		}
 		else {
 			newForm.onsubmit = function(){
-				ajaxplorer.actionBar.submitForm(modal.getForm());
+				ajaxplorer.actionBar.submitForm(this.getForm());
 				hideLightBox();
 				return false;
-			};
+            }.bind(this);
 		}
         var overlayStyle = undefined;
         if($(sFormId).getAttribute("overlayStyle")){
@@ -181,9 +184,12 @@ Class.create("Modal", {
         );
 		if($(newForm).select(".dialogFocus").length)
 		{
-			objToFocus = $(newForm).select(".dialogFocus")[0];
-			setTimeout('objToFocus.focus()', 500);
+			var objToFocus = $(newForm).select(".dialogFocus")[0];
+			setTimeout(function(){
+                objToFocus.focus();
+            }, 500);
 		}
+        var repDisplay;
 		if($(newForm).select(".replace_rep").length)
 		{
 			repDisplay = $(newForm).select(".replace_rep")[0];
@@ -244,7 +250,7 @@ Class.create("Modal", {
 				boxWidth = '90%';
 			}
 			if(boxWidth.indexOf('%') > -1){
-				percentWidth = parseInt(boxWidth);
+				var percentWidth = parseInt(boxWidth);
 				boxWidth = parseInt((winWidth * percentWidth) / 100);
 				this.currentListensToWidth = percentWidth;
 			}
@@ -252,7 +258,7 @@ Class.create("Modal", {
 		}
 		if(boxHeight != null){
 			if(boxHeight.indexOf('%') > -1){
-				percentHeight = parseInt(boxHeight);
+				var percentHeight = parseInt(boxHeight);
 				boxHeight = parseInt((winHeight * percentHeight) / 100);
 				this.currentListensToHeight = percentHeight;
 			}
@@ -261,7 +267,6 @@ Class.create("Modal", {
             $(elementName).setStyle({height:'auto'});
             $(elementName).down('.dialogContent').setStyle({height:'auto'});
 		}
-		this.refreshDialogPosition();
 		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){
 			this.currentResizeListener = function(){
 				if(this.currentListensToWidth){
@@ -284,7 +289,8 @@ Class.create("Modal", {
             }.bind(this);
             Event.observe(window, "resize", this.currentResizeListener);
         }
-			
+        this._bufferedRefreshDialogPosition();
+
 		displayLightBoxById(elementName, overlayStyle, (formId?'form-'+formId:null));
 		
 		// FORCE ABSOLUTE FOR SAFARI
@@ -292,11 +298,9 @@ Class.create("Modal", {
 		// FORCE FIXED FOR FIREFOX
 		if (Prototype.Browser.Gecko){					
 			$(elementName).style.position = 'fixed';
-		}
-		else if(Prototype.Browser.IE){
-			$$('select').invoke('show');
-			// REFRESH PNG IMAGES FOR IE!
-			refreshPNGImages(this.dialogContent);			
+		} else if(Prototype.Browser.IE && !Prototype.Browser.IE10plus){
+			$(elementName).select('select').invoke('show');
+			refreshPNGImages(this.dialogContent);
 		}
 
         if(this.currentResizeListener) this.currentResizeListener();
@@ -313,7 +317,7 @@ Class.create("Modal", {
 			return;
 		}
 		var editorKlass = editorData.editorClass;
-		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
+		this.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
@@ -327,9 +331,8 @@ Class.create("Modal", {
             }
             ajaxplorer.actionBar.editor.getDomNode().observe("editor:updateTitle", function(event){
                 this.setContextTitle(event.memo);
-            }.bind(modal));
-            //ajaxplorer.actionBar.editor.resize();
-		};
+            }.bind(this));
+        }.bind(this);
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
 
@@ -476,10 +479,17 @@ Class.create("Modal", {
 				boxHeight = element.getHeight();
 			}
 		}else if(!checkHeight && dContentScrollHeight > winHeight){
-            dContent.setStyle({
-                height:(winHeight- parseInt(dTitle.getHeight()) - 20)+'px',
-                overflow:'auto'
-            });
+            if(dTitle.getStyle('position') == 'absolute'){
+                dContent.setStyle({
+                    height:(winHeight)+'px',
+                    overflow:'auto'
+                });
+            }else{
+                dContent.setStyle({
+                    height:(winHeight- parseInt(dTitle.getHeight()) - 20)+'px',
+                    overflow:'auto'
+                });
+            }
             if (window.ajxpMobile){
                 attachMobileScroll(dContent, "vertical");
             }
@@ -487,6 +497,15 @@ Class.create("Modal", {
         }else if(dContentScrollHeight >= dContent.getHeight() && !this.currentListensToHeight){
             dContent.setStyle({height: 'auto'});
             boxHeight = element.getHeight();
+        }
+
+        if(dTitle.getStyle('position') == 'absolute'){
+            var innerH = 0;
+            $A(dContent.childNodes).each(function(c){
+                if(c.getHeight) innerH += c.getHeight();
+            });
+            var topPadding = Math.min(winHeight*25/100, Math.max(0, parseInt((winHeight - innerH)/2)));
+            dContent.setStyle({paddingTop: topPadding + 'px'});
         }
 
 		var offsetLeft = parseInt((winWidth - parseInt(boxWidth)) / 2);
@@ -519,7 +538,7 @@ Class.create("Modal", {
 		{
 			var oThis = this;
 			object.select("form").each(function(currentForm){
-				if(currentForm.target == 'hidden_iframe' || currentForm.id=='login_form' || currentForm.id=='user_pref_form'){
+				if(currentForm.target == 'hidden_iframe' || currentForm.id == 'login_form' || currentForm.id == 'login_form_dynamic' || currentForm.id == 'user_pref_form'){
 					currentForm.hide();
 					oThis.cachedForms.set(currentForm.id,true);
 				}
@@ -564,7 +583,12 @@ Class.create("Modal", {
 				className:"dialogButton"
 			});
 			if(fOnCancel){
-				caButton.observe("click",function(e){fOnCancel(modal.getForm());hideLightBox();Event.stop(e);return false;});
+				caButton.observe("click",function(e){
+                    fOnCancel(this.getForm());
+                    hideLightBox();
+                    Event.stop(e);
+                    return false;
+                }.bind(this));
 			}
 			else{
 				caButton.observe("click",function(e){hideLightBox();Event.stop(e);return false;});
@@ -669,7 +693,8 @@ Class.create("Modal", {
 	 */
 	tempoMessageDivClosing: function(){
 		this.messageDivOpen = true;
-		setTimeout('modal.closeMessageDiv()', 6000);
+        if(this.closeTimer) window.clearTimeout(this.closeTimer);
+		this.closeTimer = window.setTimeout(function(){this.closeMessageDiv();}.bind(this), 6000);
 	},
 	/**
 	 * Display a user message (notice or error)
@@ -688,7 +713,15 @@ Class.create("Modal", {
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
-		this.messageContent.update(message);
+        if(this.messageDivOpen){
+            if(!this.messageContent.innerHTML.contains(message)){
+                this.messageContent.insert('<br>' + message);
+            }
+            this.tempoMessageDivClosing();
+            return;
+        }else{
+    		this.messageContent.update(message);
+        }
 
         var container;
         if(ajaxplorer.getMessageBoxReference()){
@@ -738,16 +771,13 @@ Class.create("Modal", {
 	updateLoadingProgress: function(state){
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
-		if(window.loaderProgress){
-			window.loaderProgress.setPercentage(parseFloat(percent)*100, true);
-		}
+        document.fire("ajaxplorer:loader_state_update", {percent:parseFloat(percent)});
 		if(state && $('progressState')){
 			$('progressState').update(state);
 		}
 		if(this.loadingStep == 0){
 			this.pageLoading = false;
 		}
-		return;
 	},
 	/**
 	 * Callback to be called on close

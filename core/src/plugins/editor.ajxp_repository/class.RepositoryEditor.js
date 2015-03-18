@@ -248,6 +248,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 this.feedMetaSourceForm(xmlData, this.metaPane);
             }else{
                 this.metaPane.down("div.dialogLegend").update(MessageHash['ajxp_repository_editor.15']);
+                this.metaPane.select("div#metaTabulator").invoke("hide");
             }
         }
 
@@ -258,6 +259,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         var metaTabBody = this.metaPane.down('.tabpanes');
         metaTabHead.update("");
         metaTabBody.update("");
+        var id, i;
         var data = XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
         if(data && data.firstChild && data.firstChild.nodeValue){
             var metaSourcesData = data.firstChild.nodeValue.evalJSON();
@@ -265,7 +267,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 var metaLabel = XPathSelectSingleNode(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/@label').nodeValue;
                 var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 
-                var id = this.repositoryId+"-meta-"+plugId.replace(".", "-");
+                id = this.repositoryId+"-meta-"+plugId.replace(".", "-");
                 var title = new Element('li',{tabIndex:0, "data-PaneID":id}).update(metaLabel);
                 var accordionContent = new Element("div", {className:"tabPane", id:id, style:"padding-bottom: 10px;"});
                 var form = new Element("div", {className:'meta_form_container'});
@@ -274,7 +276,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 var insertSave = false;
                 if(metaDefNodes.length){
                     var driverParamsHash = $A([]);
-                    for(var i=0;i<metaDefNodes.length;i++){
+                    for(i=0;i<metaDefNodes.length;i++){
                         driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
                     }
                     var paramsValues = new Hash(metaSourcesData[plugId]);
@@ -322,8 +324,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
             this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
             var prevType = "";
             var currentGroup;
-            for(var i=0;i<choices.length;i++){
-                var id = choices[i].getAttribute("id");
+            for(i=0;i<choices.length;i++){
+                id = choices[i].getAttribute("id");
                 var type = id.split(".").shift();
                 var label = choices[i].getAttribute("label");
                 if(!currentGroup || type != prevType){
@@ -381,13 +383,13 @@ Class.create("RepositoryEditor", AbstractEditor, {
     metaActionClick : function(event){
         var img = Event.findElement(event, 'div');
         Event.stop(event);
-        var action;
+        var action, form;
         if(img && img._form){
-            var form = img._form;
+            form = img._form;
             action = "meta_source_add";
         }else{
             var button = Event.findElement(event, 'div.largeButton');
-            var form = button.up('div.tabPaneButtons').previous('div.meta_form_container');
+            form = button.up('div.tabPaneButtons').previous('div.meta_form_container');
             if(button.getAttribute("name")){
                 action = button.getAttribute("name");
             }else{
@@ -475,7 +477,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
     mergeObjectsRecursive : function(source, destination){
         var newObject = {};
-        for (var property in source) {
+        var property;
+        for (property in source) {
             if (source.hasOwnProperty(property)) {
                 if( source[property] === null ) continue;
                 if( destination.hasOwnProperty(property)){
@@ -493,7 +496,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 }
             }
         }
-        for (var property in destination){
+        for (property in destination){
             if(destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) && destination[property]!==null){
                 if(destination[property] instanceof Object) {
                     newObject[property] = this.mergeObjectsRecursive(destination[property], {});

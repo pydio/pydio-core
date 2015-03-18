@@ -355,18 +355,7 @@ Class.create("HeaderResizer", {
 	createStyleSheet : function(){
         var sheet;
 		if(Prototype.Browser.IE){
-			return;
-			if(!window['ajxp_resizer_'+this.options.body.id]){
-		        window['ajxp_resizer_'+this.options.body.id] = document.createStyleSheet();
-			}
-			sheet = window['ajxp_resizer_'+this.options.body.id];
-	        // Remove previous rules
-	        var rules = sheet.rules;
-	        var len = rules.length;	
-	        for (var i=len-1; i>=0; i--) {
-	          sheet.removeRule(i);
-	        }			
-			
+			return null;
 		}else{
 			var cssTag = $('resizer_css-'+this.options.body.id);
 			// Remove previous rules
@@ -382,19 +371,7 @@ Class.create("HeaderResizer", {
 	 * Removes a style sheet
 	 */
 	removeStyleSheet : function(){
-		if(Prototype.Browser.IE){
-			return;
-
-			if(window['ajxp_resizer_'+this.options.body.id]){
-		        // Remove previous rules
-		        var sheet = window['ajxp_resizer_'+this.options.body.id];
-		        var rules = sheet.rules;
-		        var len = rules.length;	
-		        for (var i=len-1; i>=0; i--) {
-		          sheet.removeRule(i);
-		        }			
-			}			
-		}else{
+		if(!Prototype.Browser.IE){
 			var cssTag = $('resizer_css-'+this.options.body.id);
 			if(cssTag) cssTag.remove();
 		}		

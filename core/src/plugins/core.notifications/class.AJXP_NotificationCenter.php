@@ -28,18 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_NotificationCenter extends AJXP_Plugin
 {
     /**
-     * @var AJXP_NotificationCenter
+     * @var String
      */
-    private static $instance;
     private $userId;
     /**
      * @var AJXP_FeedStore|bool
      */
     private $eventStore = false;
-    /**
-     * @var bool|AJXP_MessageExchanger
-     */
-    private $msgExchanger = false;
 
     public function init($options)
     {
@@ -96,8 +91,14 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         $n = ($oldNode == null ? $newNode : $oldNode);
         $repoId = $n->getRepositoryId();
-        $userId = AuthService::getLoggedUser()->getId();
-        $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        if($n->getUser()){
+            $userId = $n->getUser();
+            $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
+            if($obj) $userGroup = $obj->getGroupPath();
+        }else{
+            $userId = AuthService::getLoggedUser()->getId();
+            $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        }
         $repository = ConfService::getRepositoryById($repoId);
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
@@ -126,13 +127,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     public function loadUserFeed($actionName, $httpVars, $fileVars)
     {
-        if(!$this->eventStore) return;
+        if(!$this->eventStore) return array();
         $u = AuthService::getLoggedUser();
         if ($u == null) {
-            if($httpVars["format"] == "html") return;
+            if($httpVars["format"] == "html") return array();
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::close();
-            return;
+            return array();
         }
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
@@ -201,7 +202,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
                     $node->event_description_long = $notif->getDescriptionLong(true);
-                    $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
+                    $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notif->getDate(), $mess));
                     $node->short_date = AJXP_Utils::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
@@ -343,7 +344,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
                 $node->event_description_long = $notification->getDescriptionLong(true);
-                $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
+                $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notification->getDate(), $mess));
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
                 if ($node->getRepository() != null) {
@@ -373,7 +374,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             }
             // Replace PATH
             $nodeToSend->real_path = $path;
-            $url = parse_url($nodeToSend->getUrl());
+            //$url = parse_url($nodeToSend->getUrl());
             //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
             $index ++;
             AJXP_XMLWriter::renderAjxpNode($nodeToSend);

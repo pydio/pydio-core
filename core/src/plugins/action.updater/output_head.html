@@ -9,7 +9,8 @@
 
             div {
                 font-family: arial;
-                font-size: 11px;
+                font-size: 13px;
+                line-height: 1.4em;
             }
 
             div.main_step{
@@ -49,7 +50,7 @@
         <script type="text/javascript">
             function doScroll(){
                 window.scrollTo(0, 10000);
-            };
+            }
             function replaceTop(){
                 if(document.getElementById('upgrade_last_html')){
                     document.body.insertBefore(document.getElementById('upgrade_last_html'), document.body.firstChild);
@@ -57,7 +58,7 @@
                     for(var i=0;i<steps.length;i++) {
                         document.getElementById("upgrade_last_html").appendChild(steps[i]);
                     }
-                    window.scrollTo(0);
+                    window.scrollTo(0, 0);
                 }
             }
         </script>

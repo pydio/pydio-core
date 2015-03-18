@@ -240,7 +240,7 @@ class AJXP_Utils
         } else {
             $s = str_replace(array("<", ">"), array("&lt;", "&gt;"), $s);
         }
-        return trim($s);
+        return ltrim($s);
     }
 
     /**
@@ -317,9 +317,11 @@ class AJXP_Utils
      * Parse the $fileVars[] PHP errors
      * @static
      * @param $boxData
+     * @param bool $throwException
      * @return array|null
+     * @throws Exception
      */
-    public static function parseFileDataErrors($boxData)
+    public static function parseFileDataErrors($boxData, $throwException=false)
     {
         $mess = ConfService::getMessages();
         $userfile_error = $boxData["error"];
@@ -327,23 +329,27 @@ class AJXP_Utils
         $userfile_size = $boxData["size"];
         if ($userfile_error != UPLOAD_ERR_OK) {
             $errorsArray = array();
-            $errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409, "File is too big! Max is" . ini_get("upload_max_filesize"));
-            $errorsArray[UPLOAD_ERR_NO_FILE] = array(410, "No file found on server!");
-            $errorsArray[UPLOAD_ERR_PARTIAL] = array(410, "File is partial");
-            $errorsArray[UPLOAD_ERR_INI_SIZE] = array(410, "No file found on server!");
-            $errorsArray[UPLOAD_ERR_NO_TMP_DIR] = array(410, "Cannot find the temporary directory!");
-            $errorsArray[UPLOAD_ERR_CANT_WRITE] = array(411, "Cannot write into the temporary directory!");
-            $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, "A PHP extension stopped the upload process");
+            $errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409, str_replace("%i", ini_get("upload_max_filesize"), $mess["537"]));
+            $errorsArray[UPLOAD_ERR_NO_FILE] = array(410, $mess[538]);
+            $errorsArray[UPLOAD_ERR_PARTIAL] = array(410, $mess[539]);
+            $errorsArray[UPLOAD_ERR_NO_TMP_DIR] = array(410, $mess[540]);
+            $errorsArray[UPLOAD_ERR_CANT_WRITE] = array(411, $mess[541]);
+            $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, $mess[542]);
             if ($userfile_error == UPLOAD_ERR_NO_FILE) {
                 // OPERA HACK, do not display "no file found error"
                 if (!ereg('Opera', $_SERVER['HTTP_USER_AGENT'])) {
-                    return $errorsArray[$userfile_error];
+                    $data = $errorsArray[$userfile_error];
+                    if($throwException) throw new Exception($data[1], $data[0]);
+                    return $data;
                 }
             } else {
-                return $errorsArray[$userfile_error];
+                $data = $errorsArray[$userfile_error];
+                if($throwException) throw new Exception($data[1], $data[0]);
+                return $data;
             }
         }
         if ($userfile_tmp_name == "none" || $userfile_size == 0) {
+            if($throwException) throw new Exception($mess[31], 410);
             return array(410, $mess[31]);
         }
         return null;
@@ -871,7 +877,13 @@ class AJXP_Utils
         if (!$withURI) {
             return "$protocol://$name$port";
         } else {
-            return "$protocol://$name$port".dirname($_SERVER["REQUEST_URI"]);
+            $uri = dirname($_SERVER["REQUEST_URI"]);
+            $api = ConfService::currentContextIsRestAPI();
+            if(!empty($api)){
+                // Keep only before api base
+                $uri = array_shift(explode("/".$api."/", $uri));
+            }
+            return "$protocol://$name$port".$uri;
         }
     }
 
@@ -1490,6 +1502,69 @@ class AJXP_Utils
         );
     }
 
+    public static function osFromUserAgent($useragent = null) {
+
+        $osList = array
+        (
+            'Windows 10' => 'windows nt 10.0',
+            'Windows 8.1' => 'windows nt 6.3',
+            'Windows 8' => 'windows nt 6.2',
+            'Windows 7' => 'windows nt 6.1',
+            'Windows Vista' => 'windows nt 6.0',
+            'Windows Server 2003' => 'windows nt 5.2',
+            'Windows XP' => 'windows nt 5.1',
+            'Windows 2000 sp1' => 'windows nt 5.01',
+            'Windows 2000' => 'windows nt 5.0',
+            'Windows NT 4.0' => 'windows nt 4.0',
+            'Windows Me' => 'win 9x 4.9',
+            'Windows 98' => 'windows 98',
+            'Windows 95' => 'windows 95',
+            'Windows CE' => 'windows ce',
+            'Windows (version unknown)' => 'windows',
+            'OpenBSD' => 'openbsd',
+            'SunOS' => 'sunos',
+            'Ubuntu' => 'ubuntu',
+            'Linux' => '(linux)|(x11)',
+            'Mac OSX Beta (Kodiak)' => 'mac os x beta',
+            'Mac OSX Cheetah' => 'mac os x 10.0',
+            'Mac OSX Puma' => 'mac os x 10.1',
+            'Mac OSX Jaguar' => 'mac os x 10.2',
+            'Mac OSX Panther' => 'mac os x 10.3',
+            'Mac OSX Tiger' => 'mac os x 10.4',
+            'Mac OSX Leopard' => 'mac os x 10.5',
+            'Mac OSX Snow Leopard' => 'mac os x 10.6',
+            'Mac OSX Lion' => 'mac os x 10.7',
+            'Mac OSX Mountain Lion' => 'mac os x 10.8',
+            'Mac OSX Mavericks' => 'mac os x 10.9',
+            'Mac OSX Yosemite' => 'mac os x 10.10',
+            'Mac OS (classic)' => '(mac_powerpc)|(macintosh)',
+            'QNX' => 'QNX',
+            'BeOS' => 'beos',
+            'Apple iPad' => 'iPad',
+            'Apple iPhone' => 'iPhone',
+            'OS2' => 'os\/2',
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)'
+        );
+
+        if($useragent == null){
+            $useragent = $_SERVER['HTTP_USER_AGENT'];
+            $useragent = strtolower($useragent);
+        }
+
+        $found = "Not automatically detected.$useragent";
+        foreach($osList as $os=>$match) {
+            if (preg_match('/' . $match . '/i', $useragent)) {
+                $found = $os;
+                break;
+            }
+        }
+
+        return $found;
+
+
+    }
+
+
     /**
      * Try to remove a file without errors
      * @static
@@ -1622,9 +1697,6 @@ class AJXP_Utils
                 $options[substr($key, strlen($prefix))] = $value;
                 unset($repDef[$key]);
             } else {
-                if ($key == "DISPLAY") {
-                    $value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
-                }
                 $repDef[$key] = $value;
             }
         }
@@ -1648,11 +1720,15 @@ class AJXP_Utils
 
     }
 
+    private static $_dibiParamClean = array();
     public static function cleanDibiDriverParameters($params)
     {
         if(!is_array($params)) return $params;
         $value = $params["group_switch_value"];
         if (isSet($value)) {
+            if(isSet(self::$_dibiParamClean[$value])){
+                return self::$_dibiParamClean[$value];
+            }
             if ($value == "core") {
                 $bootStorage = ConfService::getBootConfStorageImpl();
                 $configs = $bootStorage->loadPluginConfig("core", "conf");
@@ -1675,12 +1751,14 @@ class AJXP_Utils
                 $params["formatDate"] = "'Y-m-d'";
                 break;
         }
+        if(isSet($value)){
+            self::$_dibiParamClean[$value] = $params;
+        }
         return $params;
     }
 
     public static function runCreateTablesQuery($p, $file)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
         switch ($p["driver"]) {
             case "sqlite":
@@ -1697,7 +1775,7 @@ class AJXP_Utils
                 $ext = ".pgsql";
                 break;
             default:
-                return "ERROR!, DB driver "+ $p["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $p["driver"] ." not supported yet in __FUNCTION__";
         }
 
         $result = array();
@@ -1887,6 +1965,7 @@ class AJXP_Utils
 
     public static function regexpToLike($regexp)
     {
+        $regexp = trim($regexp, '/');
         $left = "~";
         $right = "~";
         if ($regexp[0]=="^") {
@@ -1903,6 +1982,7 @@ class AJXP_Utils
 
     public static function cleanRegexp($regexp)
     {
+        $regexp = str_replace("\/", "/", trim($regexp, '/'));
         return ltrim(rtrim($regexp, "$"), "^");
     }
 
@@ -1944,4 +2024,14 @@ class AJXP_Utils
         }
         return $left.$regexp.$right;
     }
+    /**
+     * Hide file or folder for Windows OS
+     * @static
+     * @param $path
+     * @return void
+     */
+    public static function winSetHidden($file)
+    {
+        @shell_exec("attrib +H " . escapeshellarg($file));
+    }	
 }

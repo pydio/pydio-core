@@ -200,6 +200,16 @@ div.tabbed_editor div.innerTitle{
     font-size: 15px;
 }
 
+span#user_roles_update_button {
+    padding: 2px 6px;
+    border: 1px solid #C50707;
+    color: #C50707;
+    margin: 0 6px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+}
+
 div#account_actions{
     background: none;
     text-align: right;

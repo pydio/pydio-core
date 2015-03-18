@@ -29,11 +29,12 @@ foreach ($lines as $line){
 }
 ?>
 </head>
-<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow:hidden;">
+<body style="overflow:hidden;">
         <div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
 
         <script type="text/javascript">
 window.ajxpNoNotifLoader = true;
+window.ajxpThemeSkipLoaderProgress = true;
 var ajaxplorer, startParameters = {};
 <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
 window.ajxpBootstrap = new AjxpBootstrap(startParameters);

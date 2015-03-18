@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,9 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+/*******************************************************************************
+* German translation:
+*  	+ update: Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/ 
+
+/* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"1"	=> "Quelltext Editor",
-"2"	=> "CodeMirror Syntax Highlighter",
+"1"	=> "Quelltext-Editor",
+"2"	=> "CodeMirror Syntax-Highlighter",
 "3"   => "Umbruch",
 "3b"  => "Wechsel des Zeilenumbruchs",
 "4"   => "Nummern",

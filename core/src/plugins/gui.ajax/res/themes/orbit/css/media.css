@@ -1,4 +1,12 @@
 @media only screen
+and (max-height: 500px){
+
+    div.dialogBox.form-switch_language_form div.dialogContent, div.dialogBox.form-reset-password div.dialogContent, div.dialogBox.form-reset-password-ask div.dialogContent, div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent{
+        top: 22%;
+    }
+}
+
+@media only screen
 and (max-width : 800px) {
     .custom_top_title{
         width: 23%;
@@ -75,11 +83,21 @@ and (max-width : 720px) {
     #topPane{
         width: 200px;
     }
+    #cpane_container{
+        left: 200px;
+    }
 
     .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
         width: 121px;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+    div#dl_toolbar {
+        margin: 220px auto !important;
+        width: 300px !important;
+    }
+    #ajxp_unique_dl a#share_current_page_button{
+        padding: 10px 10px !important;
     }
 }
 
@@ -89,6 +107,9 @@ and (max-width : 420px){
     #topPane{
         width: 0;
         display: none;
+    }
+    #cpane_container{
+        left: 0;
     }
 
     #simple_repository_label{
@@ -113,13 +134,12 @@ and (max-width : 420px){
     }
 
     #buttons_bar, #buttons_bar_top{
-        padding-top: 6px;
+
     }
 
     #buttons_bar a, #buttons_bar_top a{
-        padding: 0px 8px 0px 11px;
-        margin: 0 3px 0 0;
-        border-radius: 12px;
+        padding: 1px 8px;
+        border-radius: 19px;
     }
 
     .tabulatorContainer.panelHeader.icons_only {
@@ -161,8 +181,8 @@ and (max-width : 420px){
     }
 
     div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent {
-        height: 100%;
-        padding-top: 20%!important;
+        /*height: 100%;
+        padding-top: 20%!important;*/
     }
 
     #login_form, #login_form_dynamic {
@@ -171,5 +191,9 @@ and (max-width : 420px){
 
     div.dialogContent div.SF_element {
         margin: 0 10px;
+    }
+
+    #global_toolbar{
+        z-index: 1000;
     }
 }

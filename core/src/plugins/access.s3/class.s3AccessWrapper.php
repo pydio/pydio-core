@@ -20,6 +20,7 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
+use Aws\S3\S3Client;
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
@@ -34,7 +35,7 @@ class s3AccessWrapper extends fsAccessWrapper
 
     /**
      * Initialize the stream from the given path.
-     * Concretely, transform ajxp.webdav:// into webdav://
+     * Concretely, transform ajxp.s3:// into s3://
      *
      * @param string $path
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
@@ -180,6 +181,7 @@ class s3AccessWrapper extends fsAccessWrapper
     {
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Should load ".$path);
         $fp = fopen($path, "r");
+        if(!is_resource($fp)) return;
         while (!feof($fp)) {
             $data = fread($fp, 4096);
             fwrite($stream, $data, strlen($data));
@@ -187,10 +189,90 @@ class s3AccessWrapper extends fsAccessWrapper
         fclose($fp);
     }
 
-    public static function changeMode($path, $chmodValue)
-    {
-        // DO NOTHING!
-        //$realPath = self::initPath($path, "file");
-        //chmod($realPath, $chmodValue);
+    public static function changeMode($path, $chmodValue){}
+
+    public function rename($from, $to){
+        if(is_dir($from)){
+            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Renaming dir $from to $to");
+            require_once("aws.phar");
+
+            $fromUrl = parse_url($from);
+            $repoId = $fromUrl["host"];
+            $repoObject = ConfService::getRepositoryById($repoId);
+            if (!isSet($repoObject)) {
+                $e = new Exception("Cannot find repository with id ".$repoId);
+                self::$lastException = $e;
+                throw $e;
+            }
+            // Get a client
+            $options = array(
+                'key'    => $repoObject->getOption("API_KEY"),
+                'secret' => $repoObject->getOption("SECRET_KEY")
+            );
+            $baseURL = $repoObject->getOption("STORAGE_URL");
+            if(!empty($baseURL)){
+                $options["base_url"] = $baseURL;
+            }else{
+                $options["region"] = $repoObject->getOption("REGION");
+            }
+            $s3Client = S3Client::factory($options);
+
+            $bucket = $repoObject->getOption("CONTAINER");
+            $basePath = $repoObject->getOption("PATH");
+            $fromKeyname   = trim(str_replace("//", "/", $basePath.parse_url($from, PHP_URL_PATH)),'/');
+            $toKeyname   = trim(str_replace("//", "/", $basePath.parse_url($to, PHP_URL_PATH)), '/');
+
+            // Perform a batch of CopyObject operations.
+            $batch = array();
+            $iterator = $s3Client->getIterator('ListObjects', array(
+                'Bucket'     => $bucket,
+                'Prefix'     => $fromKeyname."/"
+            ));
+            $toDelete = array();
+            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Got iterator looking for prefix ".$fromKeyname."/ , and toKeyName=".$toKeyname);
+            foreach ($iterator as $object) {
+
+                $currentFrom = $object['Key'];
+                $currentTo = $toKeyname.substr($currentFrom, strlen($fromKeyname));
+                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Should move one object ".$currentFrom. " to  new key :".$currentTo);
+                $batch[] = $s3Client->getCommand('CopyObject', array(
+                    'Bucket'     => $bucket,
+                    'Key'        => "{$currentTo}",
+                    'CopySource' => "{$bucket}/".rawurlencode($currentFrom),
+                ));
+                $toDelete[] = $currentFrom;
+            }
+
+            try {
+
+                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute batch on ".count($batch)." objects");
+                $successful = $s3Client->execute($batch);
+
+                $failed = array();
+                $iterator->rewind();
+                $clear = new \Aws\S3\Model\ClearBucket($s3Client, $bucket);
+                $clear->setIterator($iterator);
+                $clear->clear();
+
+            } catch (\Guzzle\Service\Exception\CommandTransferException $e) {
+
+                $successful = $e->getSuccessfulCommands();
+                $failed = $e->getFailedCommands();
+
+            }
+            if(count($failed)){
+                foreach($failed as $c){
+                    // $c is a Aws\S3\Command\S3Command
+                    AJXP_Logger::error("S3Wrapper", __FUNCTION__, "Error while copying: ".$c->getOperation()->getServiceDescription());
+                }
+                self::$lastException = new Exception("Failed moving folder: ".count($failed));
+                return false;
+            }
+            return true;
+        }else{
+            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute standard rename on ".$from." to ".$to);
+            return parent::rename($from, $to);
+        }
     }
+
 }

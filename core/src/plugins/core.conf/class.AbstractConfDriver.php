@@ -239,7 +239,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositories($user = null);
 
@@ -253,7 +253,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      *
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositoriesWithCriteria($criteria);
 
@@ -422,10 +422,18 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * @abstract
      * @param string $repositoryId
-     * @return array()
+     * @return AbstractAjxpUser[]
      */
     abstract public function getUsersForRepository($repositoryId);
 
+    /**
+     * @abstract
+     * @param string $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return AJXP_Role[]
+     */
+    abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false);
     /**
      * @abstract
      * @param string $repositoryId
@@ -484,15 +492,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function getExposedPreferences($userObject)
     {
-        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style");
-        $jsonPrefs = array("ls_history","columns_size", "columns_visibility", "gui_preferences");
+        $stringPrefs = array("lang","history/last_repository","pending_folder","plugins_preferences");
+        $jsonPrefs = array("ls_history","gui_preferences");
         $prefs = array();
         if ( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false) {
             return array();
         }
         if ( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ) {
-            $stringPrefs = array("display","lang","pending_folder", "thumb_size","plugins_preferences","upload_auto_send","upload_auto_close", "upload_existing","action_bar_style");
-            $jsonPrefs = array("columns_size", "columns_visibility", "gui_preferences");
+            $stringPrefs = array("lang","pending_folder", "plugins_preferences");
+            $jsonPrefs = array("gui_preferences");
             $prefs["SKIP_USER_HISTORY"] = array("value" => "true", "type" => "string" );
         }
         foreach ($stringPrefs as $pref) {
@@ -1049,6 +1057,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
                 if(!empty($crtValue)) $regexp = '^'.$crtValue;
                 else $regexp = null;
+                $skipDisplayWithoutRegexp = ConfService::getCoreConf("USERS_LIST_REGEXP_MANDATORY", "conf");
+                if($skipDisplayWithoutRegexp && $regexp == null){
+                    print("<ul></ul>");
+                    break;
+                }
                 $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
                 $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
                 $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
@@ -1058,9 +1071,67 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 AuthService::setGroupFiltering(false);
                 $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
+
                 if (!$usersOnly) {
-                    $allGroups = AuthService::listChildrenGroups($baseGroup);
+                    $allGroups = array();
+
+                    $roleOrGroup = ConfService::getCoreConf("GROUP_OR_ROLE", "conf");
+                    $rolePrefix = $excludeString = $includeString = null;
+                    if(!is_array($roleOrGroup)){
+                        $roleOrGroup = array("group_switch_value" => $roleOrGroup);
+                    }
+
+                    $listRoleType = false;
+
+                    if(isSet($roleOrGroup["PREFIX"])){
+                        $rolePrefix    = $loggedUser->mergedRole->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
+                        $excludeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
+                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
+                        $listUserRolesOnly = $loggedUser->mergedRole->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
+                        if (is_array($listUserRolesOnly) && isset($listUserRolesOnly["group_switch_value"])) {
+                            switch ($listUserRolesOnly["group_switch_value"]) {
+                                case "userroles":
+                                    $listRoleType = true;
+                                    break;
+                                case "allroles":
+                                    $listRoleType = false;
+                                    break;
+                                default;
+                                    break;
+                            }
+                        }
+                    }
+
+                    switch (strtolower($roleOrGroup["group_switch_value"])) {
+                        case 'user':
+                            // donothing
+                            break;
+                        case 'group':
+                            $authGroups = AuthService::listChildrenGroups($baseGroup);
+                            foreach ($authGroups as $gId => $gName) {
+                                $allGroups["AJXP_GRP_" . AuthService::filterBaseGroup($gId)] = $gName;
+                            }
+                            break;
+                        case 'role':
+                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
+                            break;
+                        case 'rolegroup';
+                            $groups = array();
+                            $authGroups = AuthService::listChildrenGroups($baseGroup);
+                            foreach ($authGroups as $gId => $gName) {
+                                $groups["AJXP_GRP_" . AuthService::filterBaseGroup($gId)] = $gName;
+                            }
+                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
+
+                            empty($groups) ? $allGroups = $roles : (empty($roles) ? $allGroups = $groups : $allGroups = array_merge($groups, $roles));
+                            //$allGroups = array_merge($groups, $roles);
+                            break;
+                        default;
+                            break;
+                    }
                 }
+
+
                 $users = "";
                 $index = 0;
                 if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getCoreConf("USER_CREATE_USERS", "conf") && !$existingOnly) {
@@ -1070,13 +1141,16 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $mess = ConfService::getMessages();
                 if ($regexp == null && !$usersOnly) {
-                    $users .= "<li class='complete_group_entry' data-group='/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
+                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
-                if (!$usersOnly) {
+                $indexGroup = 0;
+                if (!$usersOnly && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            $indexGroup++;
                         }
+                        if($indexGroup == $limit) break;
                     }
                 }
                 if ($regexp == null && method_exists($this, "listUserTeams")) {
@@ -1089,7 +1163,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if($userObject->getId() == $loggedUser->getId()) continue;
                     if ( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
                         $userLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
-                        if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
+                        //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
                         if(empty($userLabel)) $userLabel = $userId;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
                         if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
@@ -1175,8 +1249,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
 
                 break;
-
-
             default;
             break;
         }
@@ -1191,4 +1263,59 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         return $xmlBuffer;
     }
 
+    /**
+     * @param $userObject AbstractAjxpUser
+     * @param $rolePrefix get all roles with prefix
+     * @param $includeString get roles in this string
+     * @param $excludeString eliminate roles in this string
+     * @param bool $byUserRoles
+     * @return array
+     */
+    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
+    {
+        if ($userObject) {
+            if ($byUserRoles) {
+                $allUserRoles = $userObject->getRoles();
+            } else {
+                $allUserRoles = AuthService::getRolesList(array(), true);
+            }
+            $allRoles = array();
+            if (isset($allUserRoles)) {
+
+                // Exclude
+                if ($excludeString) {
+                    if (strpos($excludeString, "preg:") !== false) {
+                        $matchFilterExclude = "/" . str_replace("preg:", "", $excludeString) . "/i";
+                    } else {
+                        $valueFiltersExclude = array_map("trim", explode(",", $excludeString));
+                        $valueFiltersExclude = array_map("strtolower", $valueFiltersExclude);
+                    }
+                }
+
+                // Include
+                if ($includeString) {
+                    if (strpos($includeString, "preg:") !== false) {
+                        $matchFilterInclude = "/" . str_replace("preg:", "", $includeString) . "/i";
+                    } else {
+                        $valueFiltersInclude = array_map("trim", explode(",", $includeString));
+                        $valueFiltersInclude = array_map("strtolower", $valueFiltersInclude);
+                    }
+                }
+
+                foreach ($allUserRoles as $roleId => $role) {
+                    if (!empty($rolePrefix) && strpos($roleId, $rolePrefix) === false) continue;
+                    if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
+                    if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
+                    if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
+                    if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
+                    if(is_a($role, "AJXP_Role")) $roleObject = $role;
+                    else $roleObject = AuthService::getRole($roleId);
+                    $label = $roleObject->getLabel();
+                    $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
+                    $allRoles[$roleId] = $label;
+                }
+            }
+            return $allRoles;
+        }
+    }
 }

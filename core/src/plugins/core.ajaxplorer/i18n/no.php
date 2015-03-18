@@ -590,6 +590,10 @@ $mess=array(
 "530"=> "External users",
 "531"=> "Int.",
 "532"=> "Ext.",
+"533" => "Identifier used to login, please use alphanumeric or email lowercase characters.",
+"534" => "Password used to login",
+"535" => "Send password by email",
+"536" => "Send a welcome email including the password to the new user",
 "plugtype.title.access" => "Workspaces Drivers",
 "plugtype.desc.access" => "Plugins defining how a workspace will both access its backend (a file storage or whatever else) and major layouts and actions.",
 "plugtype.title.action" => "Action plugins",
@@ -626,5 +630,11 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
+    "537" => "File is too large! Maximum authorized size is %i",
+    "538" => "Upload error: no file found on server!",
+    "539" => "Upload error: file is partial",
+    "540" => "Upload error: cannot find the temporary directory",
+    "541" => "Upload error: cannot write into the temporary directory",
+    "542" => "Upload error: a PHP extension stopped the upload process."
 /* END SENTENCE */
 );

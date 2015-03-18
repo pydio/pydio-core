@@ -46,7 +46,6 @@ class sqlLogDriver extends AbstractLogDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             dibi::connect($this->sqlDriver);
@@ -87,6 +86,7 @@ class sqlLogDriver extends AbstractLogDriver
         if($query === false){
             throw new Exception("Cannot find query ".$query_name);
         }
+        $pg = ($this->sqlDriver["driver"] == "postgre");
         $start = 0;
         $count = 30;
         if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
@@ -105,29 +105,44 @@ class sqlLogDriver extends AbstractLogDriver
 
         $q = $query["SQL"];
         $q = str_replace("AJXP_CURSOR_DATE", $dateCursor, $q);
+        if($pg){
+            $q = str_replace("ORDER BY logdate DESC", "ORDER BY DATE(logdate) DESC",$q);
+        }
 
         //$q .= " LIMIT $start, $count";
         $res = dibi::query($q);
         $all = $res->fetchAll();
         $allDates = array();
         foreach($all as $row => &$data){
+            // PG: Recapitalize keys
+            if($pg){
+                foreach($data as $k => $v){
+                    $data[ucfirst($k)] = $v;
+                }
+            }
             if(isSet($data["Date"])){
-                $key = date($dKeyFormat, $data["Date"]->getTimestamp());
-                $data["Date_sortable"] = $data["Date"]->getTimestamp();
+                if(is_a($data["Date"], "DibiDateTime")){
+                    $tStamp = $data["Date"]->getTimestamp();
+                }else {
+                    $tStamp = strtotime($data["Date"]);
+                }
+                $key = date($dKeyFormat, $tStamp);
+                $data["Date_sortable"] = $tStamp;
                 $data["Date"] = $key;
                 $allDates[$key] = true;
             }
-            if(isSet($data["File Name"])){
-                $data["File Name"] = AJXP_Utils::safeBasename($data["File Name"]);
+            if(isSet($data["File"])){
+                $data["File"] = AJXP_Utils::safeBasename($data["File"]);
             }
         }
 
         if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
             for($i = 0;$i<$count;$i++){
                 $dateCurs = $start + $i;
-                $dateK = date($dKeyFormat, strtotime("-$dateCurs day", $ref));
+                $timeDate = strtotime("-$dateCurs day", $ref);
+                $dateK = date($dKeyFormat, $timeDate);
                 if(!isSet($dKeyFormat[$dateK])){
-                    array_push($all, array("Date" => $dateK));
+                    array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
                 }
             }
         }
@@ -310,9 +325,10 @@ class sqlLogDriver extends AbstractLogDriver
                     $metadata = array(
                         "icon" => "toggle_log.png",
                         "date"=> $date,
-                        "ajxp_mime" => "datagrid",
-                        "grid_datasource" => "get_action=ls&dir=".urlencode($path),
-                        "grid_header_title" => "Application Logs for $date"
+                        "ajxp_mime"         => "datagrid",
+                        "grid_datasource"   => "get_action=ls&dir=".urlencode($path),
+                        "grid_header_title" => "Application Logs for $date",
+                        "grid_actions"      => "refresh,copy_as_text"
                     );
                     $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }

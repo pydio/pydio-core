@@ -53,7 +53,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
+        if(!isSet($this->actions[$action])) return null;
         if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
             // Force legacy theme for the moment
             $this->pluginConf["GUI_THEME"] = "oxygen";
@@ -65,7 +65,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = AJXP_Utils::securePath($getValue);
         }
-        if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
         $mess = ConfService::getMessages();
 
         switch ($action) {
@@ -82,7 +81,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
                         $folder.= "/".AJXP_Utils::securePath($httpVars["pluginPath"]);
                     }
                 }
-                $crtTheme = $this->pluginConf["GUI_THEME"];
                 $thFolder = AJXP_THEME_FOLDER."/html";
                 if (isset($template_name)) {
                     if (is_file($thFolder."/".$template_name)) {
@@ -115,7 +113,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             case "display_doc":
 
                 HTMLWriter::charsetHeader();
-                echo HTMLWriter::getDocFile(AJXP_Utils::securePath(htmlentities($_GET["doc_file"])));
+                echo HTMLWriter::getDocFile(AJXP_Utils::securePath(htmlentities($httpVars["doc_file"])));
 
             break;
 
@@ -132,7 +130,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     $outputArray = array();
                     $testedParams = array();
                     $passed = AJXP_Utils::runTests($outputArray, $testedParams);
-                    if (!$passed && !isset($_GET["ignore_tests"])) {
+                    if (!$passed && !isset($httpVars["ignore_tests"])) {
                         AJXP_Utils::testResultsToTable($outputArray, $testedParams);
                         die();
                     } else {
@@ -141,13 +139,22 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 }
 
                 $root = $_SERVER['REQUEST_URI'];
-                if(basename($root) == "dashboard" || basename($root) == "settings" || basename($root) == "welcome" || strpos(basename($root), "ws-") === 0){
-                    $root = dirname($root);
+                $configUrl = ConfService::getCoreConf("SERVER_URL");
+                if(!empty($configUrl)){
+                    $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
+                    if(strlen($root) > 1) $root = rtrim($root, '/').'/';
+                }else{
+                    preg_match ('/ws-(.)*\/|settings|dashboard|welcome/', $root, $matches, PREG_OFFSET_CAPTURE);
+                    if(count($matches)){
+                        $capture = $matches[0][1];
+                        $root = substr($root, 0, $capture);
+                    }
                 }
                 $START_PARAMETERS = array(
-                    "BOOTER_URL"=>"index.php?get_action=get_boot_conf",
-                    "MAIN_ELEMENT" => "ajxp_desktop",
-                    "APPLICATION_ROOT" => $root
+                    "BOOTER_URL"        =>"index.php?get_action=get_boot_conf",
+                    "MAIN_ELEMENT"      => "ajxp_desktop",
+                    "APPLICATION_ROOT"  => $root,
+                    "REBASE"            => $root
                 );
                 if (AuthService::usersEnabled()) {
                     AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
@@ -298,9 +305,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-        if (stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")) {
-            $config["cssResources"] = array("css/pngHack/pngHack.css");
-        }
         $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
@@ -310,7 +314,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();
-        $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
         $config["SECURE_TOKEN"] = AuthService::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];
@@ -352,7 +355,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
     public static function filterXml(&$value)
     {
         $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");
-        if($instance === false) return ;
+        if($instance === false) return null;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];
         if (!defined("AJXP_THEME_FOLDER")) {

@@ -99,10 +99,17 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
 
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
+        if($private == AJXP_METADATA_ALLUSERS){
+            $userScope = AJXP_METADATA_ALLUSERS;
+        }else if($private === true){
+            $userScope = $this->getUserId($ajxpNode);
+        }else{
+            $userScope = AJXP_METADATA_SHAREDUSER;
+        }
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
+            $userScope
         );
         if(!isSet(self::$metaCache[$nameSpace])) return array();
         else return self::$metaCache[$nameSpace];
@@ -137,7 +144,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $ajxpNode->mergeMetadata($allMeta);
     }
 
-    protected function updateSecurityScope($metaFile, $repositoryId)
+    protected function updateSecurityScope($metaFile, $repositoryId, $resolveUserId = null)
     {
         $repo = ConfService::getRepositoryById($repositoryId);
         if (!is_object($repo)) {
@@ -145,8 +152,17 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         }
         $securityScope = $repo->securityScope();
         if($securityScope == false) return $metaFile;
-
-        if (AuthService::getLoggedUser() != null) {
+        if($resolveUserId != null){
+            if ($securityScope == "USER") {
+                $metaFile .= "_".$resolveUserId;
+            }else if($securityScope == "GROUP"){
+                $uObj= ConfService::getConfStorageImpl()->createUserObject($resolveUserId);
+                if($uObj != null){
+                    $u = str_replace("/", "__", $uObj->getGroupPath());
+                    $metaFile.= "_".$u;
+                }
+            }
+        }else if (AuthService::getLoggedUser() != null) {
             if ($securityScope == "USER") {
                 $u = AuthService::getLoggedUser();
                 if($u->getResolveAsParent()) $id = $u->getParent();
@@ -186,7 +202,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             $fileKey = basename($fileKey);
         } else {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
         }
         self::$metaCache = array();
         if (!isSet(self::$fullMetaCache[$metaFile])) {
@@ -197,16 +213,22 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             }
         }
         if (isSet(self::$fullMetaCache[$metaFile]) && is_array(self::$fullMetaCache[$metaFile])) {
-            if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
-                self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
-            } else {
-                if ($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache[$metaFile]) && !isSet(self::$fullMetaCache[$metaFile]["AJXP_METASTORE_UPGRADED"])) {
-                    self::$fullMetaCache[$metaFile] = $this->upgradeDataFromMetaSerial(self::$fullMetaCache[$metaFile]);
-                    if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
-                        self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+            if($userId == AJXP_METADATA_ALLUSERS && is_array(self::$fullMetaCache[$metaFile][$fileKey])){
+                foreach(self::$fullMetaCache[$metaFile][$fileKey] as $uId => $data){
+                    self::$metaCache = array_merge_recursive(self::$metaCache, $data);
+                }
+            }else{
+                if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
+                    self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+                } else {
+                    if ($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache[$metaFile]) && !isSet(self::$fullMetaCache[$metaFile]["AJXP_METASTORE_UPGRADED"])) {
+                        self::$fullMetaCache[$metaFile] = $this->upgradeDataFromMetaSerial(self::$fullMetaCache[$metaFile]);
+                        if (isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])) {
+                            self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
+                        }
+                        // Save upgraded version
+                        file_put_contents($metaFile, serialize(self::$fullMetaCache[$metaFile]));
                     }
-                    // Save upgraded version
-                    file_put_contents($metaFile, serialize(self::$fullMetaCache[$metaFile]));
                 }
             }
         } else {
@@ -237,7 +259,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                 mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
         }
         if($scope==AJXP_METADATA_SCOPE_REPOSITORY
             || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile))
@@ -263,10 +285,12 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = fopen($metaFile, "w");
+            $fp = @fopen($metaFile, "w");
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+            }else{
+                $this->logError(__FUNCTION__, "Error while trying to open the meta file, maybe a permission problem?");
             }
             if ($scope == AJXP_METADATA_SCOPE_GLOBAL) {
                  AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));

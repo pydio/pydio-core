@@ -174,17 +174,12 @@ Class.create("ActivityMonitor", {
 			mess = mess.replace("__LOGOUT__", "<span class=\"warning_timer\"></span>");
 			this.warningPane = new Element('div', {id:"activity_monitor_warning", className:'dialogBox', style:'padding:3px'}).update('<div class="dialogContent">'+mess+'<br><span class="click_anywhere">'+MessageHash[376]+'</span></div>');
 			$(document.body).insert(this.warningPane);			
+            displayLightBoxById("activity_monitor_warning");
+            $('overlay').setStyle({cursor:'pointer'});
+            $('overlay').observeOnce("click", this.exitIdleState.bind(this));
+            $('activity_monitor_warning').observeOnce("click", this.exitIdleState.bind(this));
+            new Effect.Shake(this.warningPane);
 		}
-		displayLightBoxById("activity_monitor_warning");
-		$('overlay').setStyle({cursor:'pointer'});
-		$('overlay').observeOnce("click", this.exitIdleState.bind(this));
-		$('activity_monitor_warning').observeOnce("click", this.exitIdleState.bind(this));
-		new Effect.Shake(this.warningPane);
-		this.opaFx = new Effect.Opacity($('overlay'), {
-			from:0.4, 
-			to : 0.7,
-			duration: this._warningMinutes*60
-		});
 	},
 	
 	/**

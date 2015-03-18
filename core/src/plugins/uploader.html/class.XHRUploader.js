@@ -28,6 +28,10 @@ Class.create("XHRUploader", {
     dataModel: null,
     contextNode: null,
     currentBackgroundPanel: null,
+    // Copy get/setUserPrefs from AjxpPane
+    getUserPreference: AjxpPane.prototype.getUserPreference,
+    setUserPreference: AjxpPane.prototype.setUserPreference,
+
 
 	initialize : function( formObject, mask ){
 
@@ -35,7 +39,7 @@ Class.create("XHRUploader", {
 
 		formObject = $(formObject);
 		// Main form
-		this.mainForm = formObject;
+		this.htmlElement = this.mainForm = formObject;
 		
 		// Where to write the list
 		this.listTarget = formObject.down('div.uploadFilesList');
@@ -167,7 +171,7 @@ Class.create("XHRUploader", {
 
         var toArray = function(list){
             return Array.prototype.slice.call(list || [], 0);
-        }
+        };
 
         // Call the reader.readEntries() until no more results are returned.
         var readEntries = function() {
@@ -304,40 +308,37 @@ Class.create("XHRUploader", {
 		optionPane.showPane = function(){
 			totalPane.hide();optionPane.show();
 			modal.refreshDialogAppearance();
-		}
+		};
 		optionPane.hidePane = function(){
 			totalPane.show();optionPane.hide();
 			modal.refreshDialogAppearance();
-		}
+		};
 		optionPane.autoSendCheck.observe("click", function(e){				
 			var autoSendOpt = optionPane.autoSendCheck.checked;
 			if(ajaxplorer.user){
-				ajaxplorer.user.setPreference('upload_auto_send', (autoSendOpt?'true':'false'));
-				ajaxplorer.user.savePreference('upload_auto_send');
+				this.setUserPreference('upload_auto_send', (autoSendOpt?'true':'false'));
 			}else{
 				 setAjxpCookie('upload_auto_send', (autoSendOpt?'true':'false'));
 			}			
-		});
+        }.bind(this));
 		optionPane.autoCloseCheck.observe("click", function(e){				
 			var autoCloseOpt = optionPane.autoCloseCheck.checked;
 			if(ajaxplorer.user){
-				ajaxplorer.user.setPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
-				ajaxplorer.user.savePreference('upload_auto_close');
+                this.setUserPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}else{
 				 setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}			
-		});
+		}.bind(this));
 		optionPane.existingRadio.each(function(el){
 			el.observe("click", function(e){
 				var value = el.value;
 				if(ajaxplorer.user){
-					ajaxplorer.user.setPreference('upload_existing', value);
-					ajaxplorer.user.savePreference('upload_existing');
+                    this.setUserPreference('upload_existing', value);
 				}else{
 					 setAjxpCookie('upload_existing', value);
 				}							
-			});
-		});
+			}.bind(this));
+		}.bind(this));
 		optionPane.getExistingBehaviour = function(){
 			var value;
 			optionPane.existingRadio.each(function(el){
@@ -346,41 +347,42 @@ Class.create("XHRUploader", {
 			return value;
 		};
 		optionPane.loadData = function(){
+            var value;
             var message = '<b>' + MessageHash[281] + '</b> ';
             message += '&nbsp;&nbsp;'+ MessageHash[282] + ':' + roundSize(this.maxUploadSize, '');
             message += '&nbsp;&nbsp;'+ MessageHash[284] + ':' + this.max;
             optionPane.optionsStrings.update(message);
 			var autoSendValue = false;
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_send')){
-				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
+			if(this.getUserPreference('upload_auto_send')){
+				autoSendValue = this.getUserPreference('upload_auto_send');
 				autoSendValue = (autoSendValue =="true" ? true:false);
             }else if(this._globalConfigs.get('DEFAULT_AUTO_START')){
                 autoSendValue = this._globalConfigs.get('DEFAULT_AUTO_START');
 			}else{
-				var value = getAjxpCookie('upload_auto_send');
+				value = getAjxpCookie('upload_auto_send');
 				autoSendValue = ((value && value == "true")?true:false);				
 			}
 			optionPane.autoSendCheck.checked = autoSendValue;
 			
 			var autoCloseValue = false;			
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_close')){
-				autoCloseValue = ajaxplorer.user.getPreference('upload_auto_close');
+			if(this.getUserPreference('upload_auto_close')){
+				autoCloseValue = this.getUserPreference('upload_auto_close');
 				autoCloseValue = (autoCloseValue =="true" ? true:false);
             }else if(this._globalConfigs.get('DEFAULT_AUTO_CLOSE')){
                 autoCloseValue = this._globalConfigs.get('DEFAULT_AUTO_CLOSE');
 			}else{
-				var value = getAjxpCookie('upload_auto_close');
+				value = getAjxpCookie('upload_auto_close');
 				autoCloseValue = ((value && value == "true")?true:false);				
 			}
 			optionPane.autoCloseCheck.checked = autoCloseValue;
 			
 			var existingValue = 'overwrite';
-			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_existing')){
-				existingValue = ajaxplorer.user.getPreference('upload_existing');
+			if(this.getUserPreference('upload_existing')){
+				existingValue = this.getUserPreference('upload_existing');
             }else if(this._globalConfigs.get('DEFAULT_EXISTING')){
                 existingValue = this._globalConfigs.get('DEFAULT_EXISTING');
 			}else if(getAjxpCookie('upload_existing')){
-				var value = getAjxpCookie('upload_existing');				
+				value = getAjxpCookie('upload_existing');
 			}
 			optionPane.down('#uploader_existing_' + existingValue).checked = true;
 			
@@ -584,7 +586,7 @@ Class.create("XHRUploader", {
             };
             try{
                 status = window.MessageHash[messageIds[status]];
-            }catch(e){};
+            }catch(e){}
             if(oThis.currentBackgroundPanel){
                 oThis.currentBackgroundPanel.update(item.file.name + ' ['+status+']');
             }
@@ -621,7 +623,7 @@ Class.create("XHRUploader", {
             };
             try{
                 status = window.MessageHash[messageIds[status]];
-            }catch(e){};
+            }catch(e){}
 			this.statusText.innerHTML = "["+status+"]";
             this.statusText.removeClassName('new');
             this.statusText.removeClassName('loading');
@@ -932,14 +934,12 @@ Class.create("XHRUploader", {
 		function(item){
 			
 			var file = item.file;
-			var fileName = file.name;  
-			var fileSize = file.size;  
-			
+
 			this.cursor = 0;
 			this.fIndex = 0;
 			this.chunkLength = 10 * 1024 * 1024;		
 			this.item = item;		
-			this.fileName = fileName;
+			this.fileName = file.name;
 			this.fileSize  = file.size;
 			
 			this.sendNextBlob();
@@ -951,7 +951,6 @@ Class.create("XHRUploader", {
 			
 			var file = item.file;
 			var fileName = file.name;  
-			var fileSize = file.size;  
 			var reader = new FileReader();
 			this.item = item;
 			
@@ -1007,7 +1006,7 @@ Class.create("XHRUploader", {
 			this.fIndex ++;
 			reader.onloadend = function(evt){
 				if (evt.target.readyState == FileReader.DONE) {
-					item.statusText.update('[building query]');
+					this.statusText.update('[building query]');
 					this.fileData = evt.target.result;
 					this.xhrSendAsBinary(
 							filename, 
@@ -1060,9 +1059,8 @@ if(!XMLHttpRequest.prototype.sendAsBinary){
 	       for (var i in datastr) {
 	               if (datastr.hasOwnProperty(i)) {
 	                       var chr = datastr[i];
-	                       var charcode = chr.charCodeAt(0)
-	                       var lowbyte = (charcode & 0xff)
-	                       ui8a[0] = lowbyte;
+	                       var charcode = chr.charCodeAt(0);
+	                       ui8a[0] = (charcode & 0xff);
 	                       bb.append(data);
 	               }
 	       }

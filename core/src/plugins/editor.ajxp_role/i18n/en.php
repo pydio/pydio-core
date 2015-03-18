@@ -47,7 +47,7 @@ $mess=array(
 "21" => "User ID",
 "22" => "Special Profile",
 "23" => "Default Repository",
-"24" => "Roles (use Ctrl/Cmd keys to select many)",
+"24" => "User Roles",
 "25" => "Change Password",
 "26" => "Lock out user",
 "27" => "Reactivate user",
@@ -66,4 +66,8 @@ $mess=array(
 "40" => "Enable",
 "41" => "Remove",
 "42" => "Role custom data",
+"43" => "Select one or more",
+"44" => "Plugins Parameters Fine-tuning",
+"45" => "Access Control List",
+"46" => "Disabled Actions",
 );

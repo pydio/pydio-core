@@ -164,6 +164,26 @@ class ConfService
     {
         return php_sapi_name() === "cli";
     }
+
+    protected static $restAPIContext;
+
+    /**
+     * Set or get if we are currently running REST
+     * @static
+     * @param null $set
+     * @param string $baseUrl
+     * @return bool
+     */
+    public static function currentContextIsRestAPI($restBase = '')
+    {
+        if(!empty($restBase)){
+            self::$restAPIContext = $restBase;
+            return $restBase;
+        }else{
+            return self::$restAPIContext;
+        }
+    }
+
     /**
      * Check the presence of mcrypt and option CMDLINE_ACTIVE
      * @static
@@ -215,6 +235,11 @@ class ConfService
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
 
+    /**
+     * @param AbstractAjxpUser $loggedUser
+     * @param String|int $parameterId
+     * @return bool
+     */
     public static function switchUserToActiveRepository($loggedUser, $parameterId = -1)
     {
         if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
@@ -509,8 +534,10 @@ class ConfService
         $repositories = array();
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
         foreach ($repoList as $repoId => $repoObject) {
+            $failOneCriteria = false;
             foreach($criteria as $key => $value){
                 if(!in_array($key, $searchableKeys)) continue;
+                $criteriumOk = false;
                 if($key == "uuid") $comp = $repoObject->getUniqueId();
                 else if($key == "parent_uuid") $comp = $repoObject->getParentId();
                 else if($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
@@ -520,16 +547,28 @@ class ConfService
                 else if($key == "slug") $comp = $repoObject->getSlug();
                 else if($key == "groupPath") $comp = $repoObject->getGroupPath();
                 if(is_array($value) && in_array($comp, $value)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == AJXP_FILTER_EMPTY && empty($comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == AJXP_FILTER_NOT_EMPTY && !empty($comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if(is_string($value) && strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }else if($value == $comp){
-                    $repositories[$repoId] = $repoObject;
+                    //$repositories[$repoId] = $repoObject;
+                    $criteriumOk = true;
                 }
+                if(!$criteriumOk) {
+                    $failOneCriteria = true;
+                    break;
+                }
+            }
+            if(!$failOneCriteria){
+                $repositories[$repoId] = $repoObject;
             }
         }
         return $repositories;
@@ -692,7 +731,7 @@ class ConfService
      * Add dynamically created repository
      *
      * @param Repository $oRepository
-     * @return void|-1 if error
+     * @return -1|null if error
      */
     public static function addRepository($oRepository)
     {
@@ -700,19 +739,26 @@ class ConfService
     }
     /**
      * @param $oRepository
-     * @return void|-1 on error
+     * @return -1|null on error
      */
     public function addRepositoryInst($oRepository)
     {
+        AJXP_Controller::applyHook("workspace.before_create", array($oRepository));
         $confStorage = self::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepository);
         if ($res == -1) {
             return $res;
         }
+        AJXP_Controller::applyHook("workspace.after_create", array($oRepository));
         AJXP_Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
         $this->invalidateLoadedRepositories();
+        return null;
     }
 
+    /**
+     * @param $idOrAlias
+     * @return null|Repository
+     */
     public static function findRepositoryByIdOrAlias($idOrAlias)
     {
         $repository = ConfService::getRepositoryById($idOrAlias);
@@ -720,6 +766,23 @@ class ConfService
         $repository = ConfService::getRepositoryByAlias($idOrAlias);
         if($repository != null) return $repository;
         return null;
+    }
+
+    /**
+     * Get the reserved slugs used for config defined repositories
+     * @return array
+     */
+    public static function reservedSlugsFromConfig(){
+        $inst = self::getInstance();
+        $slugs = array();
+        if(isSet($inst->configs["DEFAULT_REPOSITORIES"])){
+            foreach($inst->configs["DEFAULT_REPOSITORIES"] as $repo){
+                if(isSet($repo["AJXP_SLUG"])){
+                    $slugs[] = $repo["AJXP_SLUG"];
+                }
+            }
+        }
+        return $slugs;
     }
 
     /**
@@ -814,11 +877,13 @@ class ConfService
      */
     public function replaceRepositoryInst($oldId, $oRepositoryObject)
     {
+        AJXP_Controller::applyHook("workspace.before_update", array($oRepositoryObject));
         $confStorage = self::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepositoryObject, true);
         if ($res == -1) {
             return $res;
         }
+        AJXP_Controller::applyHook("workspace.after_update", array($oRepositoryObject));
         AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         $this->invalidateLoadedRepositories();
     }
@@ -852,11 +917,13 @@ class ConfService
      */
     public function deleteRepositoryInst($repoId)
     {
+        AJXP_Controller::applyHook("workspace.before_delete", array($repoId));
         $confStorage = self::getConfStorageImpl();
         $res = $confStorage->deleteRepository($repoId);
         if ($res == -1) {
             return $res;
         }
+        AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         $this->invalidateLoadedRepositories();
     }
@@ -869,7 +936,7 @@ class ConfService
     public static function zipEnabled()
     {
         if(ConfService::getCoreConf("DISABLE_ZIP_BROWSING") === true) return false;
-        return (function_exists("gzopen")?true:false);
+        return ((function_exists("gzopen") || function_exists("gzopen64"))?true:false);
     }
     /**
      * Get the list of all "conf" messages
@@ -930,7 +997,7 @@ class ConfService
             $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
             foreach ($nodes as $node) {
                 $nameSpace = $node->getAttribute("namespace");
-                $path = $node->getAttribute("path");
+                $path = AJXP_INSTALL_PATH."/".$node->getAttribute("path");
                 $lang = $crtLang;
                 if (!is_file($path."/".$crtLang.".php")) {
                     $lang = "en"; // Default language, minimum required.

@@ -151,5 +151,6 @@ $mess=array(
 "125" => "Alias",
 "126" => "Are you sure that you want to delete the selected element(s)?",
 "127" => "Warning, please do not use special characters, user would be created with login id '%s'",
+"128" => "Successfully deleted group",
 /* END SENTENCE */
 );

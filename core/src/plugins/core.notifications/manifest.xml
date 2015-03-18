@@ -14,7 +14,7 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="activate_notifications" scope="user" description="Activate desktop notifications" label="Desktop Notifications" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
+        <param name="activate_notifications" scope="user" description="CONF_MESSAGE[Activate desktop notifications]" label="CONF_MESSAGE[Desktop Notifications]" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
         <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
@@ -29,7 +29,9 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
+                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
+                            NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
+                        });
                     ]]></dynamicBuilder>
                 </subMenu>
                 <processing>
@@ -39,11 +41,28 @@
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
                         </div>
                     ]]></clientForm>
-                    <clientListener name="init"><![CDATA[
-                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
-                        NotificationLoader.getInstance();
+                    <clientListener name="contextChange"><![CDATA[
+                        if(!window.NotificationLoader && ajaxplorer.user){
+                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
+                        }
                     ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
+                </processing>
+            </action>
+            <action name="feed">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <processing>
+                    <serverCallback methodName="loadUserFeed" restParams="/feed_type/path+" developerComment="Load an activity feed for the given node. Filtered by what the current user is authorized to see">
+                        <input_param name="path" type="path" description="Optional filter to get activity on a file or a folder"/>
+                        <input_param name="format" type="string" description="html, json, xml, array (internal value)"/>
+                        <input_param name="feed_type" type="string" description="notif, alert or all"/>
+                        <input_param name="offset" type="integer" description="Offset for pagination"/>
+                        <input_param name="limit" type="integer" description="Limit for pagination"/>
+                        <input_param name="merge_description" type="boolean" description="Wether to merge notification title and description in text"/>
+                        <input_param name="merge_description_as_label" type="boolean" description="Wether to merge notification title and description in title"/>
+                        <input_param name="current_repository" type="boolean"
+                                     description="Wether to get activity from current repository (true), or compute all from authorized repositories for user (false)"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="dismiss_user_alert">
@@ -70,7 +89,10 @@
                         conn.sendAsync();
                     }
                     ]]></clientCallback>
-                    <serverCallback methodName="dismissUserAlert"/>
+                    <serverCallback methodName="dismissUserAlert" restParams="/alert_id/occurences" developerComment="Dismiss one or more occurences of alerts">
+                        <input_param name="alert_id" type="integer" description="Id passed in /feed action list"/>
+                        <input_param name="occurences" type="integer" description="1 or more"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="activateDesktopNotifications">

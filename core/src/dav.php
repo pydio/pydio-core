@@ -64,6 +64,10 @@ if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
+if (substr($requestUri, 0, strlen($baseURI)) != $baseURI) 
+{
+    $baseURI = substr($requestUri, 0, stripos($requestUri, $baseURI)) . $baseURI;
+}
 $end = trim(substr($requestUri, strlen($baseURI."/")));
 $rId = null;
 if ((!empty($end) || $end ==="0") && $end[0] != "?") {

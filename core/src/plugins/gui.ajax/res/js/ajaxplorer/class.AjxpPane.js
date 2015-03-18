@@ -93,7 +93,9 @@ Class.create("AjxpPane", {
             }));
             this.htmlElement.insert(this.scroller);
             this.htmlElement.setStyle({overflow:"hidden"});
-            fitHeightToBottom(this.scroller);
+            this.scroller.setStyle({
+                height:this.htmlElement.getHeight() + 'px'
+            });
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
@@ -181,7 +183,7 @@ Class.create("AjxpPane", {
 
     filterWidthFromSiblings : function(original){
         "use strict";
-        if(!this.htmlElement || !this.htmlElement.parentNode) return;
+        if(!this.htmlElement || !this.htmlElement.parentNode) return null;
         var parentWidth = this.htmlElement.parentNode.getWidth();
         var siblingWidth = 0;
         this.htmlElement.siblings().each(function(s){
@@ -214,7 +216,9 @@ Class.create("AjxpPane", {
             }
     		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom, false, minOffsetTop);
             if(this.scrollbar){
-                fitHeightToBottom(this.scroller);
+                this.scroller.setStyle({
+                    height:this.htmlElement.getHeight() + 'px'
+                });
                 this.scrollbar.recalculateLayout();
             }
     	}
@@ -296,11 +300,12 @@ Class.create("AjxpPane", {
             document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
         }
 	},
-	
-	/**
-	 * Find and reference direct children IAjxpWidget
-	 * @param element HTMLElement
-	 */
+
+    /**
+     * Find and reference direct children IAjxpWidget
+     * @param element HTMLElement
+     * @param reset Clear existing children
+     */
 	scanChildrenPanes : function(element, reset){
         if(!element.childNodes) return;
         if(reset) this.childrenPanes = $A();
@@ -359,7 +364,7 @@ Class.create("AjxpPane", {
         if(this.options.headerToolbarOptions){
             var tbD = new Element('div', {id:"display_toolbar"});
             header.insert({top:tbD});
-            var tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
+            new ActionsToolbar(tbD, this.options.headerToolbarOptions);
         }
 
 
@@ -398,10 +403,10 @@ Class.create("AjxpPane", {
     },
 
     getUserPreference : function(prefName){
-        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
+        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return null;
         var gui_pref = ajaxplorer.user.getPreference("gui_preferences", true);
         var classkey = this.htmlElement.id+"_"+this.__className;
-        if(!gui_pref || !gui_pref[classkey]) return;
+        if(!gui_pref || !gui_pref[classkey]) return null;
         if(ajaxplorer.user.activeRepository && gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository]){
             return gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository][prefName];
         }
@@ -410,7 +415,6 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-        //if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;
@@ -434,17 +438,18 @@ Class.create("AjxpPane", {
 
 
     buildImageBackgroundFromConfigs:function(configName, forceConfigs){
+        var bgrounds,paramPrefix,bStyles,index, i;
         if(forceConfigs){
-            var bgrounds = forceConfigs;
-            var paramPrefix = configName;
-            var bStyles = [];
-            var index = 1;
+            bgrounds = forceConfigs;
+            paramPrefix = configName;
+            bStyles = [];
+            index = 1;
             while(bgrounds[paramPrefix+index]){
                 bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
                 index++;
             }
             if (bStyles.length) {
-                var i = Math.floor( Math.random() * bStyles.length);
+                i = Math.floor( Math.random() * bStyles.length);
                 this.htmlElement.setAttribute("style", bStyles[i]);
             }
             return;
@@ -452,13 +457,13 @@ Class.create("AjxpPane", {
 
         var exp = configName.split("/");
         var plugin = exp[0];
-        var paramPrefix = exp[1];
+        paramPrefix = exp[1];
         var registry = ajaxplorer.getXmlRegistry();
         var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
         var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
 
 
-        var bgrounds = {};
+        bgrounds = {};
         configs.each(function(c){
             bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
         });
@@ -473,15 +478,17 @@ Class.create("AjxpPane", {
                 }
             }
         });
-        var bStyles = [];
-        var index = 1;
+        bStyles = [];
+        index = 1;
         while(bgrounds[paramPrefix+index]){
             bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
             index++;
         }
         if (bStyles.length) {
-            var i = Math.floor( Math.random() * bStyles.length);
-            this.htmlElement.setAttribute("style", bStyles[i]);
+            i = Math.floor( Math.random() * bStyles.length);
+            var bg = bStyles[i];
+            if(Modernizr.backgroundsize) bg = bg.replace('background-size:100%','background-size:cover').replace('background-size:140%','background-size:cover');
+            this.htmlElement.setAttribute("style", bg);
         }
 
     }

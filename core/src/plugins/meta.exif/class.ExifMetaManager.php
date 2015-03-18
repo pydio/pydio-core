@@ -115,7 +115,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         if ($exifData !== false && isSet($exifData["GPS"])) {
             $exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
         }
-        $excludeTags = array("componentsconfiguration", "filesource", "scenetype", "makernote");
+        $iptc = $this->extractIPTC($realFile);
+        if(count($iptc)){
+            $exifData["IPTC"] = $iptc;
+        }
+        $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
         AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
         foreach ($exifData as $section => $data) {
             print("<exifSection name='$section'>");
@@ -125,7 +129,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
                 }
                 if(in_array(strtolower($key), $excludeTags)) continue;
                 if(strpos($key, "UndefinedTag:") === 0) continue;
-                if(!is_numeric($value)) $value = $this->string_format($value);
+                $value = preg_replace( '/[^[:print:]]/', '',$value);
                 print("<exifTag name=\"$key\">".SystemTextEncoding::toUTF8($value)."</exifTag>");
             }
             print("</exifSection>");
@@ -159,6 +163,8 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         //if(!exif_imagetype($currentFile)) return ;
         $realFile = $ajxpNode->getRealFile();
         $exif = @exif_read_data($realFile, 0, TRUE);
+        $iptc = $this->extractIPTC($realFile);
+
         if($exif === false) return ;
         $additionalMeta = array();
         foreach ($definitions as $def => $label) {
@@ -169,8 +175,57 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             if (isSet($exif[$exifSection]) && isSet($exif[$exifSection][$exifName])) {
                 $additionalMeta[$def] = $exif[$exifSection][$exifName];
             }
+            if ($exifSection == "IPTC" && isSet($iptc[$exifName])){
+                $additionalMeta[$def] = $iptc[$exifName];
+            }
         }
         $ajxpNode->mergeMetadata($additionalMeta);
+    }
+
+    private function extractIPTC($realFile){
+        $output = array();
+        if(!function_exists("iptcparse")) {
+            return $output;
+        }
+        getimagesize($realFile,$info);
+        if(!isset($info['APP13'])) {
+            return $output;
+        }
+        $iptcHeaderArray = array
+        (
+            '2#005'=>'DocumentTitle',
+            '2#010'=>'Urgency',
+            '2#015'=>'Category',
+            '2#020'=>'Subcategories',
+            '2#025'=>'Keywords',
+            '2#040'=>'SpecialInstructions',
+            '2#055'=>'CreationDate',
+            '2#080'=>'AuthorByline',
+            '2#085'=>'AuthorTitle',
+            '2#090'=>'City',
+            '2#095'=>'State',
+            '2#101'=>'Country',
+            '2#103'=>'OTR',
+            '2#105'=>'Headline',
+            '2#110'=>'Source',
+            '2#115'=>'PhotoSource',
+            '2#116'=>'Copyright',
+            '2#120'=>'Caption',
+            '2#122'=>'CaptionWriter'
+        );
+        $iptc =iptcparse($info['APP13']);
+        if (!is_array($iptc)) {
+            return $output;
+        }
+        foreach (array_keys($iptc) as $key) {
+            if (isSet($iptcHeaderArray[$key])) {
+                $cnt = count($iptc[$key]);
+                $val = "";
+                for ($i=0; $i < $cnt; $i++) $val .= $iptc[$key][$i] . " ";
+                $output[$iptcHeaderArray[$key]] = preg_replace( '/[^[:print:]]/', '',$val);
+            }
+        }
+        return $output;
     }
 
     private function convertGPSData($exif)

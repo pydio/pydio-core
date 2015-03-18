@@ -63,13 +63,57 @@ class QuotaComputer extends AJXP_AbstractMetaSource
             }
         }
         $path = $repo->getOption("PATH");
-        if (iSset($originalUser)) {
+        if ( isSet($originalUser) ) {
             $originalUser->setParent($clearParent);
             $originalUser->setResolveAsParent(false);
             AuthService::updateUser($originalUser);
         }
 
         return $path;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWorkingRepositoryOptions()
+    {
+        $p = array();
+        $repo = $this->accessDriver->repository;
+        $clearParent = null;
+        // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
+        if ($repo->hasParent()) {
+            $parentOwner = $repo->getOwner();
+            if ($parentOwner !== null) {
+                $repo = ConfService::getRepositoryById($repo->getParentId());
+                $originalUser = AuthService::getLoggedUser();
+                $loggedUser = AuthService::getLoggedUser();
+                if (!$loggedUser->hasParent()) {
+                    $loggedUser->setParent($parentOwner);
+                    $clearParent = null;
+                } else {
+                    $clearParent = $loggedUser->getParent();
+                }
+                $loggedUser->setResolveAsParent(true);
+                AuthService::updateUser($loggedUser);
+            }
+        }
+        $path = $repo->getOption("PATH");
+        $p["PATH"] = $path;
+        if ( isSet($originalUser) ) {
+            $originalUser->setParent($clearParent);
+            $originalUser->setResolveAsParent(false);
+            AuthService::updateUser($originalUser);
+        }
+        return $p;
+    }
+
+    public function getFilteredOption($optionName, $repoScope = AJXP_REPO_SCOPE_ALL, $userObject = null){
+        $repo = $this->accessDriver->repository;
+        if ($repo->hasParent() && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
+            // Pass parent user instead of currently logged
+            $userObject = ConfService::getConfStorageImpl()->createUserObject($repo->getOwner());
+        }
+        return parent::getFilteredOption($optionName, $repoScope, $userObject);
     }
 
     /**
@@ -85,14 +129,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
             return null;
         }
         $delta = $newSize;
-        $path = $this->getWorkingPath();
         $quota = $this->getAuthorized();
         $soft = $this->getSoftLimit();
-        $q = $this->getUsage($path);
+        $q = $this->getUsage();
         $this->logDebug("QUOTA : Previous usage was $q");
-        if ($q === false) {
-            $q = $this->computeDirSpace($path);
-        }
         if ($q + $delta >= $quota) {
             $mess = ConfService::getMessages();
             throw new Exception($mess["meta.quota.3"]." (".AJXP_Utils::roundSize($quota) .")!");
@@ -117,7 +157,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     public function getCurrentQuota($action, $httpVars, $fileVars)
     {
-        $u = $this->getUsage($this->getWorkingPath());
+        $u = $this->getUsage();
         HTMLWriter::charsetHeader("application/json");
         print json_encode(array('USAGE' => $u, 'TOTAL' => $this->getAuthorized()));
         return;
@@ -125,21 +165,21 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     public function loadRepositoryInfo(&$data){
         $data['meta.quota'] = array(
-            'usage' => $u = $this->getUsage($this->getWorkingPath()),
+            'usage' => $u = $this->getUsage(),
             'total' => $this->getAuthorized()
         );
     }
 
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
-        $path = $this->getWorkingPath();
-        $q = $this->computeDirSpace($path);
-        $this->storeUsage($path, $q);
+        $repoOptions = $this->getWorkingRepositoryOptions();
+        $q = $this->accessDriver->directoryUsage("", $repoOptions);
+        $this->storeUsage($q);
         $t = $this->getAuthorized();
         AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
     }
 
-    protected function storeUsage($dir, $quota)
+    protected function storeUsage($quota)
     {
         $data = $this->getUserData();
         $repo = $this->accessDriver->repository->getId();
@@ -172,12 +212,13 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      * @param String $dir
      * @return bool|int
      */
-    private function getUsage($dir)
+    private function getUsage()
     {
         $data = $this->getUserData();
         $repo = $this->accessDriver->repository->getId();
+        $repoOptions = $this->getWorkingRepositoryOptions();
         if (!isSet($data["REPO_USAGES"][$repo]) || $this->options["CACHE_QUOTA"] === false) {
-            $quota = $this->computeDirSpace($dir);
+            $quota = $this->accessDriver->directoryUsage("", $repoOptions);
             if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
             $data["REPO_USAGES"][$repo] = $quota;
             $this->saveUserData($data);
@@ -206,78 +247,5 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $logged->save("user");
         AuthService::updateUser($logged);
     }
-
-    private function computeDirSpace($dir)
-    {
-        $this->logDebug("Computing dir space for : ".$dir);
-        $s = -1;
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-
-            $obj = new COM ( 'scripting.filesystemobject' );
-            if ( is_object ( $obj ) ) {
-                $ref = $obj->getfolder ( $dir );
-                $s = floatval($ref->size);
-                $obj = null;
-            } else {
-                echo 'can not create object';
-            }
-        } else {
-            // Try to get quota via smbclient if accessDriver is smb.
-            if ($this->accessDriver->id == 'access.smb') {
-                $credential = AJXP_Safe::tryLoadingCredentialsFromSources("",$this->accessDriver->repository);
-                $strcmd = 'smbclient //'. $this->accessDriver->repository->options['HOST'] .'/' . $credential['user'] . ' -U ' . $credential['user'] . '%' . $credential['password'] . ' -c du';
-                $io = popen($strcmd, 'r');
-                $size = fgets($io, 4096);
-                $size = fgets($io, 4096);
-                $size = fgets($io, 4096);
-                $size = trim($size);
-
-                $num = explode(' ', $size);
-                if (!empty($num)) {
-                    pclose($io);
-                    $s = floatval(array_pop($num));
-                    return $s;
-                }
-                else{
-                    return 0;
-                }
-            }
-            
-            if(PHP_OS == "Darwin") $option = "-sk";
-            else $option = "-sb";
-            $io = popen ( '/usr/bin/du '.$option.' ' . escapeshellarg($dir), 'r' );
-               $size = fgets ( $io, 4096);
-            $size = trim(str_replace($dir, "", $size));
-            $s =  floatval($size);
-            if(PHP_OS == "Darwin") $s = $s * 1024;
-               //$s = intval(substr ( $size, 0, strpos ( $size, ' ' ) ));
-               pclose ( $io );
-        }
-        if ($s == -1) {
-            $s = $this->foldersize($dir);
-        }
-
-        return $s;
-    }
-
-    private function foldersize($path)
-    {
-        $total_size = 0;
-        $files = scandir($path);
-
-        foreach ($files as $t) {
-            if (is_dir(rtrim($path, '/') . '/' . $t)) {
-                if ($t<>"." && $t<>"..") {
-                    $size = foldersize(rtrim($path, '/') . '/' . $t);
-                    $total_size += $size;
-                }
-            } else {
-                $size = sprintf("%u", filesize(rtrim($path, '/') . '/' . $t));
-                $total_size += $size;
-            }
-        }
-        return $total_size;
-    }
-
 
 }

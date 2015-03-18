@@ -66,4 +66,5 @@ $mess=array(
 "40" => "Activar",
 "41" => "Remover",
 "42" => "Informação personalizada de papel",
+"43" => "Select one or more",
 );

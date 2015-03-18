@@ -3,7 +3,7 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js" autoload="true"/>
+            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -13,6 +13,7 @@
         <global_param group="WebSocket Server" description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket client connect address" label="WS Client Address" name="WS_SERVER_HOST" type="string" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket client connect port" label="WS Client Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="WebSocket Server" description="WebSocket client secure connection" label="WS Client SSL" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
         <global_param group="WebSocket Server" description="WebSocket server bind address" label="WS Server Host" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket server bind port" label="WS Server Port" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
         <global_param group="WebSocket Server" description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
@@ -26,23 +27,45 @@
     <registry_contributions>
         <actions>
             <action name="consume_notification_queue">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="consumeQueue"/>
                 </processing>
             </action>
             <action name="client_register_channel">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <clientListener name="contextChange"><![CDATA[
+                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading){
+                            ajaxplorer.mqObserverLoading = true;
+                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
+                                ajaxplorer.mqObserver = new AjxpMqObserver();
+                            }, true);
+                        }
+                    ]]></clientListener>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="client_unregister_channel">
                 <processing>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="client_consume_channel">
                 <processing>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="ws_authenticate" skipSecureToken="true">

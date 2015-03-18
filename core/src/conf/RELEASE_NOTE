@@ -1,159 +1,253 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-Pydio 6 beta2 (5.3.4) - Dev Release
+Pydio 6.0.5 - Bugfix Release, again
 
-This is yet another development release, on the road to stability for v6. A massive bugfix and translation update for previous dev release. Thanks to all testers and contributors! Upgrading is available on dev channel from both last dev release (5.3.3) and last stable release (5.2.5): upgrading from v5.2.5 stable should be done in a staging environment only, but would it be helpful to test it and report us feedbacks about migration process.
-Date: Oct, 31st 2014
+This is fixing some annoying issues introduced by 6.0.4. Upgrade is recommended and simple. Changes described below.
+
+Revert "close search engine on context change" as it breaks results pane in admin (details)
+Move Multi & WebFTP login screen into dedicated authfront plugin, as previous fixes in AJXP_PluginsService changes the plugins loading order. (details)
+Prevent FTP login screen modal closing (details)
+Fix #847: share link with non-ascii filename on windows IIS (details)
+Fix scrolling issue: use a fixed scrolling step instead of a fraction, could make it hardly usable for long listings (details)
+Upgrade instructions
+
+In-app upgrade: automatic.
+Linux Packages: automatic via yum / apt-get
+
+
+Pydio 6.0.4 - Bugfix Release
+
+Date: March, 3rd 2015
 License: Affero GPL
-Copyright: Charles du Jeu 2014
-Upgrade: No-upgrade available yet from stable branch, please deploy separately. In-app upgrade from previous dev branch
-Contributors: c12simple, cdujeu, Ellega, parski, martinshaible, ikho, DutchCloud4Work, DepaMarco, AnaelMobilia, mtskar, Vorlif, Nold360, rmxcc
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2015
+Upgrade: In-app upgrade for archives installs - RPM/DEB update
+Contributors: Charles du Jeu, Tran The Cuong, Andypmuc, Ndeet, Flauschbaellchen - Thanks to all of you!
+
+Update de.php
+Fix #834 - Wrong message on group deletion
+CartManager is triggering the old-fashion public link
+Make sure to push the newly activated plugins at the end of the list. Should fix #822
+Transport a contextual user ID as a node property or through the URL. Pass a contextual user to the VarsFilter::filter() function Fix shareEventsForwarding when in a personal workspace (shared events not going to parents, preventing sync for example)
+Performances: do not call getRole() again if role is already loaded in the loop
+Meta.mount: New option to delete mount point on unmount
+Fix #803
+Open search box when clicking on magnifier.
+Modal: handle case where dialogTitle is positioned absolute. Modify CSS accordingly.
+Typo prevented shared users deletion when not logged as admin
+Try base64_decode for legacy - Was breaking the mp3 player in a shared minisite
+Fix repository exposed property, values not correctly retrieved
+Error in slug generation, make sure to look at the reserved slugs when building new ones
+Share users list: Add an option to not trigger any listing if no regexp is sent
+Fix error if msgExchanger is not set.
+Use loadNodeInfo() instead of stat in ChangesTracker, otherwise eventForwarding can end up indexing a folder as file.
+[index.lucene] Typo calling getUser() on wrong object
+Introduce an AJXP_METADATA_ALLUSERS metadata users scope to gather meta from all users. Used in eventForwarding for ShareCenter.
+Big refactoring to decouple meta.syncable from index.lucene: core.index is now responsible for triggering a recursive indexation and sending corresponding events.
+Fix #842 : API issue on IIS when in root folder.
+Fix inZip detection for UserSelection built without "dir" parameter.
+Set pydio global variable from within AjaXplorer class, not only Bootstrap (skip updating bootstrap)
+Consume_channel: avoid repeating query if previous query is not yet finished
+Make sure to unset currentIndex to trigger the __destruct function and release all handlers on files. Prevented the cleaning of the TMP index on Windows.
+Fix Quota computation on MacOS server
+The indexIsSync() feature can be triggered with bad value, creating issues in synchro
+Comment out debugs from authfront.keystore , too verbose.
+Refactor upload method to make it more readable. Fix wrong event sent after partial uploads.
+Translate PHP errors
+Move fsAccessDriver functions to its parent AbstractAccessDriver
+Update "Observe Storage" mechanism to make it more reliable and less frequent.
+Do not set default plugin value if not in meta source.
+Fix Analytics Dashboard for Sqlite and PostgreSQL drivers
+New parameter in Index.Lucene to hide the "My Shares" section
+Close SearchEngine on context_changed
+Mark a repository for REQUIRES_INDEXATION at share time. Trigger indexation if necessary when requiring changes - Fix auto-indexation on first search.
+Trigger events on workspace before/after create/update/delete Hook indexers (lucene & meta.syncable) to the after_delete event to clear the indexes.
+Sync: trigger client last_seq reset if the sequence ID is greater than the current max of the changes table. Foresee the need to vacuum the changes table.
+Search results are limited by max-height (ndeet)
+Fix Dav configuration when Server URL is set (andypmuc)
+Sanitize function: trim spaces only no the left, or it can break when syncing files with trailing space
+Secure error message on rename operations by catching the result
+
+Pydio 6.0.3 - Important Bugfix release
+
+Date: Feb, 10th 2015
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2015
+Upgrade: In-app upgrade for archives installs - RPM/DEB update
+Contributors: Charles du Jeu, Tran The Cuong, Nicolas Pouliquen, DepaMarco, Elangenhan, Gerald ST, NHellFire, Anael Mobilia, Dmitri Bosenko, Jaroslav Lichtblau - Thanks to all of you!
+
+Probably found the root cause of "Ooops your language file is empty..."
+Admin Delegation: fix various criteria filtering and workspace listing conditions that were breaking template-created workspaces for group Admin, as well as returning wrong users count (although correct users list).
+Fix various customization options: logo height/width + add a class to the main element observing the current workspace slug, can be used for specific welcome, settings, etc styling.
+Changed action name
+Changed action name
+Added Plugin Parameters
+Added configuration parameters
+meta.user plugin translation into Czech
+meta.comments plugin translation into Czech
+core.ajaxplorer Czech translation update, as there was already something available
+FIX: Changed some translations to convert accented letters
+FIX: Some other little changes in Italian translations
+Fixed some little translation error
+FIX: Italian little fixes
+Italian translation for plugin 'editor.imagick'
+Italian translation for plugin 'editor.openlayer'
+Italian translation for plugin 'editor.other'
+Italian transtaltion for plugin 'editor.pixlr'
+Make sure to use the dirDefault attribute when overriding the ls action, or it can be lost by XML merging. Was breaking folder opening in guest user mode.
+Fix video player overlap with menu in FF and IE
+Fix wrong typing for settings leftpane initA value, was making the right pane disappear if folded.
+Fix positioning problems that could lead to the right panel totally disappearing
+Stop observing click after clicking on a workspace to avoid multiple loading Replace margin-top by top positioning to use window height instead of window with as reference. z-index and width fix in gui.ios
+Faster Loading GUI
+conf.sql plugin Czech translation
+Update ru.php
+access.mysql Czech translation
+missing "," character in access.mysql en.php file causing missing string via php2po transition
+Fix cpane_container positioning for minisites
+Update ru.php
+Create ru.php
+Update ru.php
+Update ru.php
+Update french translation
+Expand a simple diagnostic tool to test REST API on a given workspace. Call runTests.php?api=true to trigger.
+Filter the for(var k in ...) entries with hasOwnProperty() call in RoleEditor. Fixes #789
+Do not include shared repositories in updateAdminRights or it can end up filing the role with tons of repos.
+Fix sqlite deleteRepository case - Use better error message and log SQL error. Fix #779
+The return of the QRCode - Fix #783
+Add an optional parameter to use a specific header value (e.g. X-Forwarder-For) instead of local detected IP in the logs. Fix #763
+Do not trigger error on fopen (it is catched later).
+Experimental feature to monitor underlying storage changes. To be tested.
+access.fs: Sort filenames case insensitive
+Index new detected items recursively
+Move folder operation for s3: get all keys with prefix, copy objects to new key and delete old ones.
+Make sure to catch exception on S3Client->headObject calls. Could lead to NoSuchKeyException in some cases (minisites).
+Make sure to use minisite_session parameter in plUploader
+Plupload Fix Minisite-Problem
+Italian translation for plugin 'editor.soundmanager'
+Italian translation for plugin 'editor.text'
+Italian translation for plugin 'editor.video'
+Italian translation for plugin 'editor.webodf'
+Italian translation for plugin 'editor.zoho'
+Fix videos tutorial zIndex issue
+Fix #807 - Change language on Public minisite Error
+In some case it's possible to hit save on non-writeable workspace, which creates duplicates. Fix #806
+UI bug, fix #796
+Issue in static repository id was creating a bug in updateAdminRights, inflating admin role until DB error.
+Disable guest user detection for minisite. UpdateAdminRights : do not call method in foreach loop
+Display a new panel in My Account to manage api keys. Let this plugin active for all protocols otherwise it will not appear in web interface. Ability to manually revoke one or all keys. Hook to the new user.after_password_change event to revoke all keys automatically. New osFromUserAgent function for prettier display. Minor tweaks in core js/css
+Fix guest login screen
+Drop IE6 support (png hack, useless) Clean parameters passed to bootstrap using exposed plugin configs instead. Create aliases in window: pydio and pydioBootstrap objects:
+fix typo
+Clean legacy hard-coded gui preferences, and use get/setUserPreference method in classes. Make sure display pref is loaded at init time for FilesList, shoud fix #777
+Fix "Share folder as workspaces only" parameter
+Re fix #777 : hidden columns were broken
+Little Charset bug in User Feed
+Italian translation for plugin 'gui.ajax'
+Italian translation for plugin 'gui.ios'
+Italian translation for plugin 'gui.light'
+Italian translation for plugin 'gui.mobile'
+Italian translation for plugin 'gui.user'
+Replace dibi minified by latest head to fix #610 Add autoloader for dibi and remove requires
+Display issue in non-writeable workspaces
+Performance issues with innerText usage
+Make sure to re-display the authorization URL in case of step 2 error.
+getFilteredOption() : pass an optional userObject to be used as mergeRole resolver
+Quota filtered Option: grab values from parent repository owner, not current user.
+Better response for update_user_group - Fix #725
+Add IPTC support, inspired by and close #577
+ZIP with SMB Access don't work
+Fix tree issue when domain name contains 'plus'. Manual merge & close #681
+Fix #819 (missing log refresh button) and fix #820 (restore old "Copy as Text" button)
+Fix the way scheduler handle the "*" users to make it less consuming (not necessary to load whole user objects, jst their ID.). Always use queue mechanism.
+Perf issues with massive ldap directories: divide listing time by 2
+Add an option to disable the bruteForce test (and thus the Captcha)
+New option "leavesOpenOnSelect" on search engine used in the admin panel, to avoid never-ending searching on the correct user page. Fix #814
+Catch handle erros on purge operations
+Use background-size: cover when possible (fix #821)
+Fix login header in multi mode. Remove login_patch.xml that was not used anymore
+Fix api test script
+Make sure db is connected for serial-based setup that would use the DB only for indexation.
+Fix API Auth form some server+php configs
+Add the comment SetEnvIf instruction for PHP-FPM setups.
+When fake MemberOf enabled, depend ldap system, the member/memberUid value (attribute of group) is cn (short) or dn (full name). In general, this value is dn but in ldap of Apple, he use cn
+Do not set write persmission on stat_hash, or it prevents the sync of readonly workspaces
+
+
+Pydio 6.0.2 - Microfix for install screen
+
+Previous release fixed XML problems by xml-encoding some messages, which breaks the HTML display of the install wizard.
+Please see 6.0.1 for release note.
+
+Pydio 6.0.1 - Bugfix & Security Release
+
+This is a bugfix & security release for v6. Upgrade is recommended. Main bugs fixed are:
+
+White-screen on upgrade if Server URL is manually set
+Italian language breaking workspace creation
+New ldap_paged_control php functions can issue warnings on php 5.6
+Fix WebDAV root listing and authentication problems on REST api.
+A potential vulnerability reported by Axel Hinrichs
+
+Date: Dec, 12rd 2014
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2014
+Contributors: Charles du Jeu, Tran The Cuong, Axel Hinrichs
+
+Changelog
+
+Fix SQL. insert on update a role (improve performance only for mysql)
+Add script to upgrade 525 to 600
+Fix ldap_paged_control issues and warnings
+Fix Regexp for parsing minisite_session, could break IE & FF downloads for password protected links
+Make sure that stream is correctly opened, otherwise it can fill the log with errors.
+Fix html base if set via SERVER_URL parameter
+Fix authentication on rest api
+Missing translation on the first 3 fields of the create user dialog (via sharing).
+Fix root listing of webdav (accessing to /shares/)
+Add a parameter to open workspace by simple click in the home page.
+Make sure to xmlEntities() the CONF_MESSAGE and MIXIN_MESSAGE values as we are inside attributes.
+Update share.php template
+
+
+------------------------------
+Last Major release Pydio 6.0.0
+------------------------------
+
+The Pydio Team is thrilled to announce Pydio 6, a major stable release. Main features include a full UX reloaded, new
+server capabilities to enable sync with the future PydioSync client, an analytics dashboard for admins, and many, many
+more. You can have a complete product tour here.
+
+IMPORTANT: if you are using the following plugins: auth.serial_otp, auth.cas, auth.basic_http, PLEASE DO NOT UPGRADE
+NOW as they must be replaced by their new 'authfront' counterparts. Please read more on this How-To.
+
+Release Data
+
+Date: Dec, 3rd 2014
+License: Affero GPL
+Download: Sourceforge Project
+Source Code: Github Project
+Copyright: Abstrium SAS / Charles du Jeu 2014
+Upgrade: In-app upgrade for archives installs - RPM/DEB require manual script upgrade
+Contributors: Thomas Nicot (UX), Charles du Jeu, Tran The Cuong, Nicolas Pouliquen, Pär Strindevall, Martin Schaible,
+Lawrence Ho, Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt, Gerrit Pannek, Max Ruman,
+Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon, Gerald Me, Matthieu Simon, Florian Huwyler,
+Aaron Guggisberg, Stefan Wüthrich, Teki Imai, Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy,
+Lukasz Lis.
+
+
 Upgrade Process
 
 Archive-based installs (zip/tar.gz):
-First switch the "Update Engine" channel (in the plugin options) to the "Development" channel.
-From 5.3.3 (dev) : automatic with in-app upgrade, only files are impacted.
-From 5.2.5 (stable) : automatic with in-app upgrade. HOWEVER, make sure to backup both your DB and your files.
-Linux packages (deb/rpm)
-Package is available in the testing channel for both repositories.
-Database migration is not performed automatically, please use this script to manually upgrade your DB.
-Bugs Fixed
-
-Added encodeURIComponent() on file and dir url (details)
-Update class.AudioPreviewer.js (details)
-Update class.SMPlayer.js (details)
-Fix #645: thumbnail generation for JPEG images fail with latest PHP version (details)
-Tilde in filename is breaking auth due to the PHP rawurlencode() not encoding them following RFC3986 (details)
-Update plugin_doc.html (details)
-Fixed: Yubikey-Auth is working again (details)
-Fix tabbed editor unnecessary border (details)
-Create ru.php (details)
-access.ajxp_conf expanded and revised (details)
-revised german translation (details)
-access.ajxp_shared improve grammar (details)
-access.ajxp_user rebase (details)
-access.fs german translation (details)
-access.sftp german translation (details)
-access.webdav german translation (details)
-action.avatar german translation (details)
-Create files for german translation (details)
-Expansion of the german translation (details)
-German translation correction (details)
-Fix query that was broken in fullscreen mode (details)
-Update JS interface IAxjpNodeProvider and all its implementation with missing method. (details)
-Sanitize file name in WebODF plugin (details)
-Update SabreDAV to 1.8.10 (details)
-Update ru.php (details)
-German tanslatin (details)
-Optionally pass a defaultSortColumn in FetchedResultPane, use it in AjxpDataGridEditor (details)
-Update ru.php (details)
-Fix graphsViewer resizing issue for IE (details)
-revert (details)
-Eventually force a secure token through session, can be used to sub-call the ui for PDF generation (details)
-Add Italian translation for plugin 'auth.phpbb' (details)
-Italian translation for plugin 'auth.radius' (details)
-Italian translation for plugin 'auth.remote' (details)
-Fix isWriteable function (details)
-Fix rename() (details)
-Test that exif_read_data exists in PThumb orientation functions. Added a startup test to suggest installing this PHP extension. Fix #664 (details)
-Update phpCAS version 1.3 stable (details)
-Fix domain separator. User decide to use / or \ (details)
-Handle multiple selection in InfoPanel : display simple elements previews, plus the standard action bar inc. Download button. Fix #653 (details)
-Decorate "Click here" (details)
-Restore folding of the right ("info") panel. And thus restore Download and Share actions in the right-click menu. Added an optional foldingMinSize to splitter to keep a different minSize in unfolded mode. Fix #656 (details)
-Fix logout button (details)
-Rename Dashboard to "My Account", more intuitive. Fix #655 (details)
-Fix Resource not Allowed error in webodf frame (details)
-Better widget detroy (guiActions and focusables were not cleanly deregistered). TODO: check legacy themes, the FilesList actions have moved from default to id-actions actionbargroup. (details)
-Update class.CAS_LoginForm.js (details)
-Save Expand state - Fix #669 (details)
-Fix WebODF file sanitization (details)
-Fix URL Shorteners - Tested with Bit.ly service - Fix #649 (details)
-Pixlr have changed their domain to apps.pixlr.com - Fix #500 (details)
-Fix InfoPanel scroller Display a "locate" button near to the small map Geolocation Fix race bug of edition by NOT selecting new nodes if a modal is currently running. Fix #225 (details)
-Manual merge of #600 (details)
-Fix #654 (details)
-Update french translation (harmonization & quality) (details)
-Update class.CAS_LoginForm.js (details)
-Update manifest.xml (details)
-Update class.CasAuthFrontend.php (details)
-Update class.CAS_LoginForm.js (details)
-Fix GraphsViewer resizing issues. There's a deeper D3 issue to be fixed. (details)
-Last compile with prototype update (details)
-Fix #486 (details)
-Update french translation (harmonization & quality) (details)
-Update CONTRIBUTING.md (details)
-Fix errors in FilesList action naming. userExists function: make sure to translate to integer the SQL result, can create problems with sqlite. (details)
-Optionally pass a LEGEND to replace the default chart legend indicating "All" (details)
-modify log function (details)
-Typo (minor) (details)
-Typo (minor) (details)
-Update french translation (harmonization & quality) (details)
-Clean-up for Thumbs.db files (minor) (details)
-Update french translation (harmonization & quality) (details)
-ajxp -> pydio (french translation) (details)
-Fix graphics resize on FF (details)
-Italian translation for plugin 'conf.sql' (details)
-FIX English translations for plugins 'auth.sql' and 'conf.sql' (details)
-FIX some other English translations (details)
-Updated Italian translation for plugin 'core.ajaxplorer' (details)
-Added Italian translation for plugin 'core.auth' (details)
-Map/filter role_id with ldap multi-value attribute (details)
-Copy operation was wrongly handled by ChangesTracker (details)
-Pass "Range" headers to the stat_hash action to get a partial hash of a file. Used for resumed downloads (details)
-Add partial_upload support (in conjunction with appendo_urlencoded_part) for resuming uploads (details)
-Clean unnecessary comment (details)
-Php doc (details)
-Update nl.php (details)
-Update manifest.xml (details)
-Fix wrong test creating false positive - should be ported to master branch... (details)
-Fix s3 wrapper old "nullifying stat" code. Was breaking file_exists() on directory (and thus directory sharing). Should fix #679 (details)
-Create nl.php (details)
-Update nl.php (details)
-Remove the html content template on mkfile action - could be eventually replaced by a generic templating mechanism (details)
-Set additional parameter on mkfile to force overriding existing file (details)
-Fix previous translations problems. Warning, DO NOT USE escaped quotes in conf translations, as they are breaking XML when reinserted in manifests parameters! (details)
-Update nl.php (details)
-Do not trigger a recursive indexation by default, pass a specific parameter (details)
-Fix Orbit theme potential resizing problem when resize is called before CSS is applied. (details)
-Totally replace old proto.history by Backbone router - Wire router to current context node path (details)
-Fix Shares edition in user and admin dashboard: legacy shares were broken - disable "Update" button, leave only invite & stop active. Fix #648 (details)
-Ajxp_conf does not support atomic refresh - Fix #682 (details)
-Fix password change look - Close #673 (details)
-Should fix #678 (details)
-Fix S3 driver to load underlying wrappers during detectStreamWrapper (details)
-Fix router for root folder (details)
-Fix usage of document href with # in it. (details)
-Add user / group identifier in listing - Close #479 (details)
-Fix display in workspace admin. Introduce a new component to make pretty select boxes (Chosen). Fix #628 tooltips not replicated. (details)
-Work on responsiveness & web mobile (details)
-Add some styling on pydio buttons on Etherpad. (details)
-Add an option to disable address book in user account panel (details)
-Avoid js error on logout (new router side effect) (details)
-Fix translation problem (german string inside en files!) (details)
-Fix modal resizing issue (details)
-Update image (details)
-Fix errors induced by the FilesList actions "actionBar" renaming (from default to id-actions) (details)
-Forgotten to parent method (details)
-Typo in new Exif test - Fix #686 (details)
-Do not display update button for metadata is repository is read-only (details)
-Sanitize and lowercase custom share handle (details)
-Fix addressbook/teams tab ordering Fix Webdav pane display and scrolling Basic implementation of Teams handling: add / remove users with auto-completion. To be finished. (details)
-Fix CKEditor: hash in URL was breaking the load, set the CKEDITOR_BASEPATH manually (details)
-Fix CKEditor: hash in URL was breaking the load, set the CKEDITOR_BASEPATH manually (details)
-Fix goTo: if current context is already the correct one, unnecessary to go to it. If isLeaf but browsable archive, still go to folder content. (details)
-Fix selectbox padding for FF (details)
-Shake effect on login error Fix loading folder old blue icon in orbit Fix team edition (details)
-Update i18n (details)
-Fix Share reload in user dashboard (losing group sorting) Populate countries list with a json file (new json_file: prefix for choices parameter) Fix FF search result displaying no result. Last compile (details)
-Fix Diaporama Left / Right arrows and disabled buttons state. (details)
-Loading optimization: add a #NO_MINI has in the css or js lists to avoid minification when it's not possible, but still put all css in one unique file. Should fix #687 by the way (details)
-move chosen resources (details)
-Fix IE dashboard sizing (details)
-Adapt gui_debug.html for css placement. Close #687 (details)
-Serialized php must be stored as bytea in PGSql - close #680 (details)
-My Account: disabling WebDav pane was disabling Team Pane as well, use a finer XPath. (details)
-Fix mailer testing - Missing description on boot.conf plugin (details)
+From 5.2.5: automatic with in-app upgrade. Make sure to backup both your DB and your files.
+From 5.3.4(dev): automatic with in-app upgrade, only files are impacted.
+Linux packages (deb/rpm) - Please READ
+Please read the detailed upgrade how-to. Baseline is that the apt-get/yum will not update DB, but there is a script ready for that, that you can run manually.
 
 --
 See core/doc/PREVIOUS_RELEASES file to learn more about previous releases.

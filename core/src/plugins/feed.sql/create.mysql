@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS ajxp_feed (
   PRIMARY KEY (id),
   KEY edate (edate,etype,htype,user_id,repository_id),
   INDEX (index_path(40))
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;

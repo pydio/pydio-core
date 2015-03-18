@@ -20,10 +20,10 @@
 */
 
 $mess = array(
-"Admin access" => "&lt;span class='icon-key'&gt;&lt;/span&gt; Accesso Admin",
-"Global options" => "&lt;span class='icon-cogs'&gt;&lt;/span&gt; Opzioni Globali",
-"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Memorizzazione Configurazioni",
-"Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Aggiunti utenti",
+"Admin access" => "<span class='icon-key'></span> Accesso Admin",
+"Global options" => "<span class='icon-cogs'></span> Opzioni Globali",
+"Configurations storage" => "<span class='icon-save'></span> Memorizzazione Configurazioni",
+"Add some users" => "<span class='icon-group'></span> Aggiunti utenti",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Inserisci un username ed una password per l'utente amministratore. Questo passo è necessario per autenticarsi la prima volta, al termine della procedura d'installazione. Potrai creare altri amministratori successivamente, accedendo al workspace 'Impostazioni'.",
 "Admin Login" => "Username Admin",
 "Alphanumeric login" => "Username alfanumerico",
@@ -45,7 +45,7 @@ $mess = array(
 "Set up the correct value to send emails" => "Imposta i valori corretti per spedire email",
 "Administrator Email" => "Email Amministratore",
 "Default 'From' email used to send emails." => "Comparirà nel campo 'From' automanticamente e sarà utilizzata per spedire le mail.",
-"How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "Riguarda la modalità con la quale le configurazioni (utenti, plugins ecc &lt;b&gt;not&lt;/b&gt come gli attuali documenti sono gestiti) saranno memorizzate. Per iniziare rapidamente, seleziona 'No Database'. Per abilitare più funzionalità avanzate, configura una connessione al database.",
+"How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "Riguarda la modalità con la quale le configurazioni (utenti, plugins ecc <b>no</b> come gli attuali documenti sono gestiti) saranno memorizzate. Per iniziare rapidamente, seleziona 'No Database'. Per abilitare più funzionalità avanzate, configura una connessione al database.",
 "Storage Type" => "Tipo Memorizzazione",
 "Select how the configurations will be stored" => "Scegli come le configurazioni saranno memorizzate",
 "No Database (Quick Start)" => "No DB (partenza rapida, non per ambienti produzione)",

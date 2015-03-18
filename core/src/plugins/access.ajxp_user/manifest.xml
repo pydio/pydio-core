@@ -197,12 +197,12 @@
 							ajaxplorer.updateContextData(path);
 						}
 						]]></clientCallback>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="stat">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="delete">
@@ -238,7 +238,7 @@
 					<span id="delete_message"></span>
 					<input type="hidden" name="ajxp_mime" value="">
 					</div>				]]></clientForm>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 					</processing>
 			</action>
 		</actions>

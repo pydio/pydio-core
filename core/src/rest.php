@@ -20,20 +20,6 @@
  *
  * Description : Real RESTful API access
  */
-
-//die("This is experimental! You must set an API KEY & SECRET to enable Basic Http Auth");
-/*
-define("AJXP_API_LOGIN", "admin");
-define("AJXP_API_PASSWORD", "123456");
-define("AJXP_API_USER", "admin");
-
-if (!isset($_SERVER['PHP_AUTH_USER'])  || $_SERVER["PHP_AUTH_USER"] != AJXP_API_LOGIN || $_SERVER["PHP_AUTH_PW"] != AJXP_API_PASSWORD ) {
-    header('WWW-Authenticate: Basic realm="Pydio API"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You are not authorized to access this API.';
-    exit;
-}
-*/
 include_once("base.conf.php");
 
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
@@ -58,10 +44,10 @@ if(AuthService::getLoggedUser() == null){
     exit;
 }
 $authDriver = ConfService::getAuthDriverImpl();
-
+ConfService::currentContextIsRestAPI("api");
 
 $uri = $_SERVER["REQUEST_URI"];
-$scriptUri = ltrim(dirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
+$scriptUri = ltrim(AJXP_Utils::safeDirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
 $uri = substr($uri, strlen($scriptUri));
 $uri = explode("/", trim($uri, "/"));
 // GET REPO ID
@@ -77,6 +63,12 @@ if($repoID == 'pydio'){
     if ($repo == null) {
         die("Cannot find repository with ID ".$repoID);
     }
+
+    if(!ConfService::repositoryIsAccessible($repo->getId(), $repo, AuthService::getLoggedUser(), false, true)){
+        header('HTTP/1.0 401 Unauthorized');
+        echo 'You are not authorized to access this workspace.';
+        exit;
+    }
     ConfService::switchRootDir($repo->getId());
 }
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
@@ -86,4 +78,9 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 
-AJXP_Controller::findRestActionAndApply($action, $path);
+$xmlResult = AJXP_Controller::findRestActionAndApply($action, $path);
+if (!empty($xmlResult) && !headers_sent()) {
+    AJXP_XMLWriter::header();
+    print($xmlResult);
+    AJXP_XMLWriter::close();
+}

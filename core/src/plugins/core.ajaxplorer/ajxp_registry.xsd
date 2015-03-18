@@ -75,6 +75,7 @@
             <xs:attribute name="infoPanel" type="xs:boolean"/>
             <xs:attribute name="recycle" use="required" type="xs:NCName"/>
             <xs:attribute name="selection" use="required" type="xs:boolean"/>
+            <xs:attribute name="allowedMimes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="selectionContext">
@@ -470,6 +471,7 @@
             <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
+            <xs:attribute name="primary" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template">

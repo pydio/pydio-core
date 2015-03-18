@@ -30,9 +30,14 @@ if (function_exists("xdebug_disable")) {
 //setlocale(LC_ALL, '');
 @libxml_disable_entity_loader(false);
 
-list($vNmber,$vDate) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
-define("AJXP_VERSION", $vNmber);
-define("AJXP_VERSION_DATE", $vDate);
+@include_once("VERSION.php");
+if(!defined("AJXP_VERSION")){
+    list($vNmber,$vDate,$vRevision,$vDbVersion) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
+    define("AJXP_VERSION", $vNmber);
+    define("AJXP_VERSION_DATE", $vDate);
+    if(!empty($vRevision)) define("AJXP_VERSION_REV", $vRevision);
+    if(!empty($vDbVersion)) define("AJXP_VERSION_DB", intval($vDbVersion));
+}
 
 define("AJXP_EXEC", true);
 
@@ -89,6 +94,9 @@ define("USE_OPENSSL_RANDOM", false);
 
 function AjaXplorer_autoload($className)
 {
+    if($className == "dibi"){
+        require_once(AJXP_BIN_FOLDER."/dibi/dibi.php");
+    }
     $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
     if (file_exists($fileName)) {
         require_once($fileName);

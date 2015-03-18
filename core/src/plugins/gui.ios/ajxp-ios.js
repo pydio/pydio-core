@@ -18,7 +18,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 function cleanURL(url){
-    split = url.split("#");
+    var split = url.split("#");
    	url = split[0];
 	split = url.split("?");
 	url = split[0];

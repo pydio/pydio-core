@@ -66,7 +66,7 @@ Class.create("HistoryBrowser", {
             toolbarsList : $A(['history'])
         });
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.revertAction));
-        this.toolbar.insert("<div class='separator'></div>")
+        this.toolbar.insert("<div class='separator'></div>");
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.dlAction));
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.openAction));
         this.toolbarObject.resize();
@@ -163,7 +163,9 @@ Class.create("HistoryBrowser", {
            };
         var src = connex._baseUrl;
         for(var key in params){
-            src += "&" + key + "=" + encodeURIComponent(params[key]);
+            if(params.hasOwnProperty(key)){
+                src += "&" + key + "=" + encodeURIComponent(params[key]);
+            }
         }
         if(action == "dl"){
             $("historydownload_iframe").setAttribute("src", src);
@@ -186,7 +188,7 @@ Class.create("HistoryBrowser", {
         connex.onComplete = function(transport){
             ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
             hideLightBox();
-        }
+        };
         connex.sendAsync();
     },
 

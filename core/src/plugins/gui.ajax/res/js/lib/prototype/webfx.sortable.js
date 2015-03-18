@@ -352,22 +352,23 @@ SortableTable = Class.create({
 	
 		// insert in the new order
 		var l = a.length;
+        var groupColIndex, groupType, allBlocks, blockType;
         if(this.groupByData){
             if(this.columnsDefs){
                 var col = this.columnsDefs.detect(function(c){
                     return c.attributeName == this.groupByData;
                 }.bind(this));
                 if(col){
-                    var groupColIndex = this.columnsDefs.indexOf(col);
-                    var groupType = this.getSortType(groupColIndex);
-                    var all_blocks = [];
-                    var blockType = 'div';
+                    groupColIndex = this.columnsDefs.indexOf(col);
+                    groupType = this.getSortType(groupColIndex);
+                    allBlocks = [];
+                    blockType = 'div';
                 }
             }else{
-                var groupColIndex = this.groupByData;
-                var groupType = this.getSortType(groupColIndex);
-                var all_blocks = [];
-                var blockType = 'tr';
+                groupColIndex = this.groupByData;
+                groupType = this.getSortType(groupColIndex);
+                allBlocks = [];
+                blockType = 'tr';
             }
         }
 
@@ -391,7 +392,7 @@ SortableTable = Class.create({
                     }else if(blockType == 'tr'){
                         block.insert(new Element('td', {colspan:this.sortTypes.length}).update(new Element('h3').update(fieldValue)));
                     }
-                    all_blocks[fieldValue] = block;
+                    allBlocks[fieldValue] = block;
                 }
                 if(blockType == 'tr'){
                     block.insert({after: a[i].element});
@@ -402,12 +403,12 @@ SortableTable = Class.create({
                 tBody.appendChild(a[i].element);
             }
         }
-        if(all_blocks && blockType == 'div'){
-            var keys = Object.keys(all_blocks);
+        if(allBlocks && blockType == 'div'){
+            var keys = Object.keys(allBlocks);
             keys.sort();
             for(var z=0 ; z<keys.length;z++){
-                tBody.insert(all_blocks[keys[z]]);
-                all_blocks[keys[z]].down('h3').insert('<span class="groupBy-count"> ('+all_blocks[keys[z]].select('.ajxpNodeProvider').length+')</span>');
+                tBody.insert(allBlocks[keys[z]]);
+                allBlocks[keys[z]].down('h3').insert('<span class="groupBy-count"> ('+allBlocks[keys[z]].select('.ajxpNodeProvider').length+')</span>');
             }
         }
 
@@ -490,8 +491,9 @@ SortableTable = Class.create({
 
 		var s;
 		var c = oRow.cells[nColumn];
-		if (c && typeof c.innerText != "undefined")
-			s = c.innerText;
+        var tC = c.textContent || c.innerText;
+		if (c && typeof tC != "undefined")
+			s = tC;
 		else
 			s = this.getInnerText(c);
 		return this.getValueFromString(s, sType);

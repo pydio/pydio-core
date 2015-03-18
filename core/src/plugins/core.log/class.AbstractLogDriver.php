@@ -72,7 +72,7 @@ abstract class AbstractLogDriver extends AJXP_Plugin
      * @param null $year
      * @param null $month
      * @param string $rootPath
-     * @return void
+     * @return String[]
      * @internal param $String [optional] $nodeName
      * @internal param $String [optional] $year
      * @internal param $String [optional] $month

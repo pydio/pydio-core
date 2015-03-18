@@ -114,8 +114,10 @@ Class.create("RoleEditor", AbstractEditor, {
             var objectValue = pair.value.evalJSON();
             var repoScope = pName;
             for(var pluginId in objectValue){
+                if(!objectValue.hasOwnProperty(pluginId)) continue;
                 var pluginData = objectValue[pluginId];
                 for(var paramName in pluginData){
+                    if(!pluginData.hasOwnProperty(paramName)) continue;
                     // update roleWrite
                     if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
                     if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
@@ -303,15 +305,18 @@ Class.create("RoleEditor", AbstractEditor, {
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
             f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
             var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
+            var updateRoleButton = new Element('span', {id:'user_roles_update_button'}).update('<span class="icon-save"></span> UPDATE');
+            rolesSelect.insert({after:updateRoleButton});
+            updateRoleButton.hide();
             rolesSelect.observe("change", function(){
                 this.setDirty();
-                if(this.updateRoleAccumulator){
-                    window.clearTimeout(this.updateRoleAccumulator);
-                }
-                this.updateRoleAccumulator = window.setTimeout(function(){
-                    this.updateRoles(rolesSelect.getValue());
-                }.bind(this) , 500);
+                updateRoleButton.show();
             }.bind(this) );
+            updateRoleButton.observe("click", function(){
+                this.updateRoles(rolesSelect.getValue());
+                updateRoleButton.hide();
+            }.bind(this));
+            new Chosen(rolesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
@@ -411,6 +416,7 @@ Class.create("RoleEditor", AbstractEditor, {
             appliesSelect.observe("change", function(){
                 this.roleWrite.APPLIES = appliesSelect.getValue();
             }.bind(this) );
+            new Chosen(appliesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
         }else if(scope == "group"){
             // MAIN INFO
@@ -511,7 +517,9 @@ Class.create("RoleEditor", AbstractEditor, {
 
     feedPluginsSelectors : function(jsonData, select){
         var oManager = this;
+        window.jsd = jsonData;
         for(var key in jsonData.LIST){
+            if(!jsonData.LIST.hasOwnProperty(key)) continue;
             select.insert(new Element("option", {value:key}).update(key));
         }
         var nextSelect = select.up("div.SF_element").next().down("select");
@@ -539,7 +547,7 @@ Class.create("RoleEditor", AbstractEditor, {
             nextSelect.select("*").invoke("remove");
             nextSelect.insert(new Element("option", {value:-1}).update((type == "action" ? MessageHash["ajxp_role_editor.12a"]:MessageHash["ajxp_role_editor.12b"])));
             for(var key in actions){
-                if(!actions[key][type]) continue;
+                if(!actions.hasOwnProperty(key) || !actions[key][type]) continue;
                 var label = actions[key]['label'];
                 if(label){
                     if(MessageHash[label]) label = actions[key][type] +" (" +MessageHash[label] +")";
@@ -571,6 +579,7 @@ Class.create("RoleEditor", AbstractEditor, {
             select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update(MessageHash["ajxp_role_editor.12d"]));
             select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_SHARED"}).update(MessageHash["ajxp_role_editor.12e"]));
             for(var key in repositories){
+                if(!repositories.hasOwnProperty(key)) continue;
                 select.insert(new Element("option", {value:key}).update(repositories[key]));
             }
             //select.disabled = false;
@@ -585,6 +594,7 @@ Class.create("RoleEditor", AbstractEditor, {
         if(!Object.keys(repositories).length) return;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
    		for(var repoId in repositories){
+            if(!repositories.hasOwnProperty(repoId)) continue;
    			var repoLabel = repositories[repoId];
    			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'});
    			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'});

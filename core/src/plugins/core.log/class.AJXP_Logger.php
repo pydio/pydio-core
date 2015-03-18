@@ -217,14 +217,19 @@ class AJXP_Logger extends AJXP_Plugin
      */
     public static function getClientAdress()
     {
-        if (isSet($_SERVER['REMOTE_ADDR'])) {
-            $msg = $_SERVER['REMOTE_ADDR'];
-        } else if (php_sapi_name() == "cli") {
-            $msg = "PHP_CLI";
-        } else {
-            $msg = "Unknown Origin";
+        if (isSet(self::$globalOptions["CUSTOM_HEADER_FOR_IP"])){
+            $hName = "HTTP_".strtoupper(str_replace("-", "_", self::$globalOptions["CUSTOM_HEADER_FOR_IP"]));
+            if(isSet($_SERVER[$hName])) {
+                return $_SERVER[$hName];
+            }
         }
-        return $msg;
+        if (isSet($_SERVER['REMOTE_ADDR'])) {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+        if (php_sapi_name() == "cli") {
+            return "PHP_CLI";
+        }
+        return "Unknown Origin";
     }
 
     /**
@@ -294,7 +299,7 @@ class AJXP_Logger extends AJXP_Plugin
     {
         if (!isset(self::$loggerInstance)) {
             $p = AJXP_PluginsService::findPlugin("core", "log");
-            $p->init(array());
+            if(is_object($p)) $p->init(array());
         }
         return self::$loggerInstance;
     }

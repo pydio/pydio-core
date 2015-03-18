@@ -144,7 +144,7 @@ class UserSelection
                 $this->localZipPath = $test[1];
             }
         } else if (!$this->isEmpty() && $this->isUnique()) {
-            if ($test = $this->detectZip($this->files[0])) {
+            if ($test = $this->detectZip(AJXP_Utils::safeDirname($this->files[0]))) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];

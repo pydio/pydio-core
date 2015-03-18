@@ -27,6 +27,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AuthService
 {
+    public static $cacheRoles = false;
     public static $roles;
     public static $useSession = true;
     private static $currentUser;
@@ -190,8 +191,8 @@ class AuthService
         } else $login = array("count"=>1, "time"=>time());
         $loginArray[$serverAddress] = $login;
         if ($login["count"] > 3) {
-            if (AJXP_SERVER_DEBUG) {
-                AJXP_Logger::debug("DEBUG : IGNORING BRUTE FORCE ATTEMPTS!");
+            if (AJXP_SERVER_DEBUG || ConfService::getCoreConf("DISABLE_BRUTE_FORCE_CHECK", "auth") === true) {
+                AJXP_Logger::debug("Warning: failed login 3 time for $login from address $serverAddress! Captcha is disabled.");
                 return true;
             }
             return FALSE;
@@ -315,7 +316,7 @@ class AuthService
             } else {
                 if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
             }
-            if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
+            if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
                 $authDriver = ConfService::getAuthDriverImpl();
                 if (!$authDriver->userExists("guest")) {
                     self::createUser("guest", "");
@@ -370,15 +371,13 @@ class AuthService
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
-        if ($user->isAdmin()) {
-            $user = self::updateAdminRights($user);
-        } else {
-            if (!$user->hasParent() && $user_id != "guest") {
-                //$user->setAcl("ajxp_shared", "rw");
-            }
-        }
         if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
         else self::$currentUser = $user;
+
+        if ($user->isAdmin()) {
+            $user = self::updateAdminRights($user);
+            self::updateUser($user);
+        }
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now
@@ -599,8 +598,9 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        if(!ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS")){
-            foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
+        if(ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS") !== true){
+            $allRepoList = ConfService::getRepositoriesList("all", false);
+            foreach ($allRepoList as $repoId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
                 if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
                 $adminUser->personalRole->setAcl($repoId, "rw");
@@ -609,6 +609,7 @@ class AuthService
             $adminUser->save("superuser");
         }else if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
             $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
+            $adminUser->recomputeMergedRole();
             $adminUser->save("superuser");
         }
         return $adminUser;
@@ -623,7 +624,8 @@ class AuthService
     {
         if (!$userObject->hasParent()) {
             $changes = false;
-            foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject) {
+            $repoList = ConfService::getRepositoriesList();
+            foreach ($repoList as $repositoryId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
                 if($repoObject->isTemplate) continue;
                 if ($repoObject->getDefaultRight() != "") {
@@ -634,7 +636,8 @@ class AuthService
             if ($changes) {
                 $userObject->recomputeMergedRole();
             }
-            foreach (self::getRolesList(array(), true) as $roleId => $roleObject) {
+            $rolesList = self::getRolesList(array(), true);
+            foreach ($rolesList as $roleId => $roleObject) {
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if ($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")) {
                     $userObject->addRole($roleObject);
@@ -651,7 +654,8 @@ class AuthService
      */
     public static function updateAutoApplyRole(&$userObject)
     {
-        foreach (self::getRolesList(array(), true) as $roleId => $roleObject) {
+        $roles = self::getRolesList(array(), true);
+        foreach ($roles as $roleObject) {
             if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
             if ($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")) {
                 $userObject->addRole($roleObject);
@@ -726,8 +730,9 @@ class AuthService
             $res = $userObject->checkCookieString($userPass);
             return $res;
         }
-        $seed = $authDriver->getSeed(false);
-        if($seed != $returnSeed) return false;
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
+            if($authDriver->getSeed(false) != $returnSeed) return false;
+        }
         return $authDriver->checkPassword($userId, $userPass, $returnSeed);
     }
     /**
@@ -746,7 +751,9 @@ class AuthService
         }
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
+        AJXP_Controller::applyHook("user.before_password_change", array($userId));
         $authDriver->changePassword($userId, $userPass);
+        AJXP_Controller::applyHook("user.after_password_change", array($userId));
         if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
@@ -936,6 +943,18 @@ class AuthService
     }
 
     /**
+     * Retrieve the current users who have either read or write access to a repository
+     * @param $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return array
+     */
+    public static function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false)
+    {
+        return ConfService::getConfStorageImpl()->getRolesForRepository($repositoryId, $rolePrefix, $countOnly);
+    }
+
+    /**
      * Count the number of users who have either read or write access to a repository
      * @param $repositoryId
      * @param bool $details
@@ -954,9 +973,11 @@ class AuthService
      * @param $limit
      * @param bool $cleanLosts
      * @param bool $recursive
+     * @param null $countCallback
+     * @param null $loopCallback
      * @return AbstractAjxpUser[]
      */
-    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true)
+    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true, $countCallback = null, $loopCallback = null)
     {
         $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
@@ -965,14 +986,30 @@ class AuthService
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
             $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
-            $paginated = true;
+            $paginated = ($offset != -1 || $limit != -1);
         } else {
             $users = $authDriver->listUsers($baseGroup);
         }
+        $index = 0;
+
+        // Callback func for display progression on cli mode
+        if($countCallback != null){
+            call_user_func($countCallback, $index, count($users), "Update users");
+        }
+
+        self::$cacheRoles = true;
+        self::$roles = null;
         foreach (array_keys($users) as $userId) {
             if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
             if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
             $allUsers[$userId] = $confDriver->createUserObject($userId);
+            $index++;
+
+            // Callback func for display progression on cli mode
+            if($countCallback != null){
+                call_user_func($loopCallback, $index);
+            }
+
             if ($paginated) {
                 // Make sure to reload all children objects
                 foreach ($confDriver->getUserChildren($userId) as $childObject) {
@@ -980,6 +1017,8 @@ class AuthService
                 }
             }
         }
+        self::$cacheRoles = false;
+
         if ($paginated && $cleanLosts) {
             // Remove 'lost' items (children without parents).
             foreach ($allUsers as $id => $object) {
@@ -1028,12 +1067,13 @@ class AuthService
      * @param string $regexp
      * @param null $filterProperty Can be "parent" or "admin"
      * @param null $filterValue Can be a string, or constants AJXP_FILTER_EMPTY / AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
      * @return int
      */
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+        return $authDriver->getUsersCount(self::filterBaseGroup($baseGroup), $regexp, $filterProperty, $filterValue, $recursive);
     }
 
     /**
@@ -1196,20 +1236,25 @@ class AuthService
      */
     public static function getRolesList($roleIds = array(), $excludeReserved = false)
     {
-        //if(isSet(self::$roles)) return self::$roles;
+        if(self::$cacheRoles && !count($roleIds) && $excludeReserved == true && self::$roles != null) {
+            return self::$roles;
+        }
         $confDriver = ConfService::getConfStorageImpl();
-        self::$roles = $confDriver->listRoles($roleIds, $excludeReserved);
+        $roles = $confDriver->listRoles($roleIds, $excludeReserved);
         $repoList = null;
-        foreach (self::$roles as $roleId => $roleObject) {
+        foreach ($roles as $roleId => $roleObject) {
             if (is_a($roleObject, "AjxpRole")) {
                 if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprectated($repoList, $roleObject);
-                self::$roles[$roleId] = $newRole;
+                $roles[$roleId] = $newRole;
                 self::updateRole($newRole);
             }
         }
-        return self::$roles;
+        if(self::$cacheRoles && !count($roleIds) && $excludeReserved == true) {
+            self::$roles = $roles;
+        }
+        return $roles;
     }
 
     /**

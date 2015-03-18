@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin name="webftp" label="CONF_MESSAGE[Webftp Login Screen]" enabled="false" description="CONF_MESSAGE[DO NOT ENABLE MANUALLY, will be activated by the auth.ftp plugin.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order"
+                      description="Order this plugin with other auth frontends" default="210"/>
+    </server_settings>
+    <class_definition classname="FTPAuthFrontend" filename="plugins/authfront.webftp/class.FTPAuthFrontend.php"/>
+    <registry_contributions>
+        <actions>
+            <action name="login">
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+						var loginRedirect = AJXP_LOGIN_REDIRECT;
+						if(loginRedirect){
+							document.location.href=loginRedirect;
+						}else{
+    					    modal.setCloseValidation(function(){
+                                return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
+                            });
+							modal.showDialogForm('Log In', 'ftp_login_form',
+							function(oForm){
+                                ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+							},
+							function(){
+								var oForm = modal.getForm();
+
+								var connexion = new Connexion();
+								connexion.addParameter("get_action", "set_ftp_data");
+								oForm.getElements().each(function(el){
+									if(el.name != "userid" && el.name!="password" && el.name != "get_action" && el.name!="login_seed"){
+										connexion.addParameter(el.name, el.getValue());
+									}
+								});
+								connexion.onComplete = function(transport){
+									ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
+                                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                        if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                            ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                        }
+                                    });
+									oForm.reset();
+								};
+								connexion.sendSync();
+								return false;
+							});
+						}
+						]]></clientCallback>
+                </processing>
+            </action>
+            <action name="ftp_login">
+                <processing>
+                    <clientForm id="ftp_login_form"><![CDATA[
+							<div id="ftp_login_form" action="login" box_width="350">
+							<input type="hidden" name="get_action" value="login">
+							<input type="hidden" name="login_seed" id="login_seed" value="-1">
+							<div>
+								<table cellpadding="2" border="0" cellspacing="0" style="font-size:11px;margin-bottom:5px;">
+								<tr>
+									<td colspan="4">
+										<div class="dialogLegend" ajxp_message_id="ftp_auth.1">AJXP_MESSAGE[ftp_auth.1]</div>
+									</td>
+								</tr>
+								<tr>
+									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.2">AJXP_MESSAGE[ftp_auth.2]</ajxp:message> </td><td colspan="3"><input type="text" name="FTP_HOST" style="width: 190px; padding:0px; margin-right: 10px;" class="dialogFocus"><ajxp:message ajxp_message_id="ftp_auth.8">AJXP_MESSAGE[ftp_auth.8]</ajxp:message> &nbsp;<input type="text" name="FTP_PORT" style="width: 25px; padding:0px;" value="21"></td>
+								</tr>
+								<tr>
+									<td align="right"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message> </td><td><input type="text" name="userid" style="width: 100px; padding:0px;"></td>
+									<td align="right"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message> </td><td><input type="password" name="password"  style="width: 90px; padding:0px;"></td>
+								</tr>
+								<tr>
+									<td colspan="4">
+										<div class="dialogLegend" style="margin-top: 12px;" ajxp_message_id="ftp_auth.3">AJXP_MESSAGE[ftp_auth.3]</div>
+									</td>
+								</tr>
+								<tr>
+									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.4">AJXP_MESSAGE[ftp_auth.4]</ajxp:message> </td><td><input type="text" name="PATH" style="width: 100px; padding:0px;" class="" value="/"></td>
+									<td align="right" style="padding-left:10px;"><ajxp:message ajxp_message_id="ftp_auth.5">AJXP_MESSAGE[ftp_auth.5]</ajxp:message> </td><td><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;"> FTP</label><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;"> FTPS</label></td>
+								</tr>
+								<tr>
+									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.6">AJXP_MESSAGE[ftp_auth.6]</ajxp:message> </td><td><input type="text" name="CHARSET" style="width: 100px; padding:0px;" class="" value=""></td>
+									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.7">AJXP_MESSAGE[ftp_auth.7]</ajxp:message> </td><td><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;">AJXP_MESSAGE[440]</label><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;">AJXP_MESSAGE[441]</label></td>
+								</tr>
+								</table>
+							</div>
+
+							</div>
+						]]></clientForm>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="authfront.session_login"/>
+        <activePlugin pluginName="auth.ftp"/>
+    </dependencies>
+</ajxp_plugin>

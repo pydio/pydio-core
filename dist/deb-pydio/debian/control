@@ -8,8 +8,8 @@ Standards-Version: 3.8.0
 Package: pydio
 Architecture: all
 Homepage: http://pyd.io
-Depends: libapache2-mod-php5 | php5-cgi | php5, php5-gd, php5-mcrypt
-Recommends: apache2 | lighttpd | httpd
+Depends: libapache2-mod-php5 | php5-cgi | php5, php5-gd, php5-mcrypt, php5-intl
+Recommends: apache2 | lighttpd | httpd, php5-cli
 Suggests: php5-ldap 
 Description: Build your own box on your own servers with Pydio.
  .

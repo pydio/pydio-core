@@ -23,8 +23,7 @@ Class.create("UserGuiController", AjxpPane, {
 
     initialize: function(element){
         try{
-            var pathName = document.location.pathname.substr('/user/'.length).split('/')[0];
-            this._currentAction = pathName;
+            this._currentAction = document.location.pathname.substr('/user/'.length).split('/')[0];
             ajaxplorer.actionBar.fireAction(this._currentAction);
         }catch(e){
             if(console) console.log(e);

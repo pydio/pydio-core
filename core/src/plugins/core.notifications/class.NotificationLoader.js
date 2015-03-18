@@ -314,6 +314,7 @@ Class.create("NotificationLoader", {
             "silentLoading":true,
             "fixedSortColumn":"event_time",
             "fixedSortDirection":"desc",
+            "muteUpdateTitleEvent":true,
             "nodeProviderProperties":{
                 "get_action":"get_my_feed",
                 "connexion_discrete":true,

@@ -26,7 +26,7 @@ Class.create("UserProfileEditor", AjxpPane, {
 
         $super(oFormObject, editorOptions);
 
-
+        attachMobileScroll(oFormObject.down("#user_profile_form"), "vertical");
 
         if(ajaxplorer.actionBar.getActionByName('custom_data_edit')){
 

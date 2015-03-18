@@ -28,6 +28,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
 {
+    /**
+     * @var Zend_Search_Lucene_Interface
+     */
     private $currentIndex;
     private $metaFields = array();
     private $indexContent = false;
@@ -39,14 +42,24 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         parent::init($options);
         set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
         $metaFields = $this->getFilteredOption("index_meta_fields");
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
+        $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($specKey)) {
             $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
         }
         $this->indexContent = ($this->getFilteredOption("index_content") == true);
+    }
+
+    public function parseSpecificContributions(&$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
+        if($contribNode->nodeName != "client_configs") return ;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
+        if(!$nodeList->length) return ;
+        $contribNode->removeChild($nodeList->item(0));
     }
 
     public function initMeta($accessDriver)
@@ -141,22 +154,25 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             if (strpos($httpVars["query"], "keyword:") === 0) {
                 $parts = explode(":", $httpVars["query"]);
                 $this->applyAction("search_by_keyword", array("field" => $parts[1]), array());
-                return;
+                return null;
             }
 
             require_once("Zend/Search/Lucene.php");
-            if ($this->isIndexLocked($repoId)) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                $this->applyAction("index", array("inner_apply" => "true"), array());
-                throw new Exception($messages["index.lucene.7"]);
+                AJXP_XMLWriter::header();
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                    AJXP_Controller::applyActionInBackground($repoId, "index", array());
+                    sleep(2);
+                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
+                }
+                AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                AJXP_XMLWriter::close();
+                return null;
             }
             $textQuery = $httpVars["query"];
             if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
-                $isQuote = false;
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
                 }else if($textQuery[strlen($textQuery)-1] != "*" ){
@@ -205,6 +221,10 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             } else {
                 AJXP_XMLWriter::header();
             }
+            $cursor = 0;
+            if(isSet($httpVars['limit'])){
+                $limit = intval($httpVars['limit']);
+            }
             foreach ($hits as $hit) {
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
@@ -230,6 +250,8 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 } else {
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
+                $cursor++;
+                if(isSet($limit) && $cursor > $limit) break;
             }
             if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {
@@ -239,14 +261,17 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             require_once("Zend/Search/Lucene.php");
             $scope = "user";
 
-            if ($this->isIndexLocked($repoId)) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                $this->applyAction("index", array(), array());
-                throw new Exception($messages["index.lucene.7"]);
+                AJXP_XMLWriter::header();
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                    AJXP_Controller::applyActionInBackground($repoId, "index", array());
+                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 2);
+                }
+                AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                AJXP_XMLWriter::close();
+                return null;
             }
             $sParts = array();
             $searchField = $httpVars["field"];
@@ -299,62 +324,37 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             if ($commitIndex) {
                 $index->commit();
             }
-        } else if ($actionName == "index") {
-            $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-            if(empty($dir)) $dir = "/";
-            $repo = $this->accessDriver->repository;
-            if ($this->isIndexLocked($repoId)) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
-            $accessType = $repo->getAccessType();
-            $accessPlug = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-            $stData = $accessPlug->detectStreamWrapper(true);
-            $url = $stData["protocol"]."://".$repoId.$dir;
-            if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
-                $this->verboseIndexation = true;
-            }
-
-            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], $dir), true, 2);
-                if(!isSet($httpVars["inner_apply"])){
-                    AJXP_XMLWriter::close();
-                }
-                return;
-            }
-
-            $this->lockIndex($repoId);
-
-            // GIVE BACK THE HAND TO USER
-            session_write_close();
-            $this->currentIndex = $this->loadIndex($repoId);
-            AJXP_Controller::applyHook("node.index.folder_recursive", array(new AJXP_Node($url)));
-            $this->recursiveIndexation($url);
-            if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
-                print("Optimizing\n");
-            }
-            $this->currentIndex->optimize();
-            if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
-                print("Commiting Index\n");
-            }
-            $this->currentIndex->commit();
-            $this->currentIndex = null;
-            $this->releaseLock($repoId);
-        } else if ($actionName == "check_lock") {
-            $repoId = $httpVars["repository_id"];
-            if ($this->isIndexLocked($repoId)) {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), $messages["index.lucene.10"], true, 3);
-                AJXP_XMLWriter::close();
-            } else {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("info_message", array(), $messages["index.lucene.5"], true, 5);
-                AJXP_XMLWriter::close();
-            }
         }
         if(isSet($returnNodes)) return $returnNodes;
+        else return null;
+    }
 
+    /**
+     * @param AJXP_Node $parentNode
+     */
+    public function indexationStarts($parentNode){
+        $this->currentIndex = $this->loadTemporaryIndex($parentNode->getRepositoryId());
+    }
+
+    /**
+     * @param AJXP_Node $parentNode
+     */
+    public function indexationEnds($parentNode){
+        $this->logDebug('INDEX.END', 'Optimizing Index');
+        $this->currentIndex->optimize();
+        $this->logDebug('INDEX.END', 'Commiting Index');
+        $this->currentIndex->commit();
+        unset($this->currentIndex);
+        $this->logDebug('INDEX.END', 'Merging Temporary in main');
+        $this->mergeTemporaryIndexToMain($parentNode->getRepositoryId());
+        $this->logDebug('INDEX.END', 'Done');
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function indexationIndexNode($node){
+        $this->updateNodeIndex(null, $node, false, false);
     }
 
     public function recursiveIndexation($url)
@@ -391,6 +391,17 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         }
     }
 
+
+    /**
+     * Called on workspace.after_delete event, clear the index!
+     * @param $repoId
+     */
+    public function clearWorkspaceIndexes($repoId){
+        $iPath = $this->getIndexPath($repoId);
+        $this->clearIndexIfExists($iPath);
+        $this->clearIndexIfExists($iPath."-PYDIO_TMP");
+    }
+
     /**
      *
      * Hooked to node.meta_change, this will update the index
@@ -405,7 +416,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             if (isSet($this->currentIndex)) {
                 $index = $this->currentIndex;
             } else {
-                $index =  $this->loadIndex($node->getRepositoryId());
+                $index =  $this->loadIndex($node->getRepositoryId(), true, $node->getUser());
             }
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
@@ -429,7 +440,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         }
     }
 
-        /**
+    /**
      *
      * Hooked to node.change, this will update the index
      * if $oldNode = null => create node $newNode
@@ -439,6 +450,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param Boolean $copy
+     * @param bool $recursive
      */
     public function updateNodeIndex($oldNode, $newNode = null, $copy = false, $recursive = false)
     {
@@ -447,9 +459,9 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             $index = $this->currentIndex;
         } else {
             if($oldNode == null){
-                $index =  $this->loadIndex($newNode->getRepositoryId());
+                $index =  $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
             }else{
-                $index = $this->loadIndex($oldNode->getRepositoryId());
+                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
             }
         }
         $this->setDefaultAnalyzer();
@@ -476,8 +488,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                     $index->delete($hit->id);
                 }
             }
-            $doc = $this->createIndexedDocument($newNode, $index);
-            //$index->addDocument($doc);
+            $this->createIndexedDocument($newNode, $index);
             if ( $recursive && $oldNode == null && is_dir($newNode->getUrl())) {
                 $this->recursiveIndexation($newNode->getUrl());
             }
@@ -582,9 +593,9 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
         }
         $unoconv = $this->getFilteredOption("UNOCONV");
+        $pipe = false;
         if ($parseContent && !empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
             $targetExt = "txt";
-            $pipe = false;
             if (in_array($ext, array("xls", "ods"))) {
                 $targetExt = "csv";
             } else if (in_array($ext, array("odp", "ppt"))) {
@@ -657,36 +668,108 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         return $hits;
     }
 
-    protected function lockIndex($repositoryId)
-    {
-        $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
-        if(!is_dir($iPath)) mkdir($iPath,0755, true);
-        touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
+    /**
+     * @param $repositoryId
+     * @param null $resolveUserId
+     * @return string
+     */
+    protected function getIndexPath($repositoryId, $resolveUserId = null){
+        $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
+        $specificId = $this->specificId;
+        if($resolveUserId != null){
+            $specKey = $this->getFilteredOption("repository_specific_keywords");
+            if (!empty($specKey)) {
+                $specKey = str_replace("AJXP_USER", $resolveUserId, $specKey);
+                $specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
+            }
+        }
+        if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
+        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$specificId;
+        return $iPath;
     }
 
-    protected function isIndexLocked($repositoryId)
-    {
-        return file_exists((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
+    /**
+     * @param $repositoryId
+     * @return Zend_Search_Lucene_Interface
+     */
+    protected function loadTemporaryIndex($repositoryId){
+        $indexPath = $this->getIndexPath($repositoryId);
+        $tmpIndexPath = $indexPath."-PYDIO_TMP";
+        $this->clearIndexIfExists($tmpIndexPath);
+        $this->copyIndex($indexPath, $tmpIndexPath);
+        return $this->loadIndex($repositoryId, true, null, $tmpIndexPath);
     }
 
-    protected function releaseLock($repositoryId)
-    {
-        @unlink((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
+    /**
+     * @param $repositoryId
+     */
+    protected function mergeTemporaryIndexToMain($repositoryId){
+        $indexPath = $this->getIndexPath($repositoryId);
+        $tmpIndexPath = $indexPath."-PYDIO_TMP";
+        $this->clearIndexIfExists($indexPath);
+        $this->moveIndex($tmpIndexPath, $indexPath);
+        $this->clearIndexIfExists($tmpIndexPath);
     }
+
+    /**
+     * @param $folder
+     */
+    private function clearIndexIfExists($folder){
+        if(!is_dir($folder))return;
+        $content = scandir($folder);
+        foreach($content as $file){
+            if($file == "." || $file == "..") continue;
+            unlink($folder.DIRECTORY_SEPARATOR.$file);
+        }
+        rmdir($folder);
+    }
+
+    /**
+     * @param $folder1
+     * @param $folder2
+     */
+    private function copyIndex($folder1, $folder2){
+        if(!is_dir($folder1))return;
+        if(!is_dir($folder2)) mkdir($folder2, 0755);
+        $content = scandir($folder1);
+        foreach($content as $file){
+            if($file == "." || $file == "..") continue;
+            copy($folder1.DIRECTORY_SEPARATOR.$file, $folder2.DIRECTORY_SEPARATOR.$file);
+        }
+    }
+
+
+    /**
+     * @param $folder1
+     * @param $folder2
+     */
+    private function moveIndex($folder1, $folder2){
+        if(!is_dir($folder1))return;
+        if(!is_dir($folder2)) mkdir($folder2, 0755);
+        $content = scandir($folder1);
+        foreach($content as $file){
+            if($file == "." || $file == "..") continue;
+            rename($folder1.DIRECTORY_SEPARATOR.$file, $folder2.DIRECTORY_SEPARATOR.$file);
+        }
+    }
+
 
     /**
      *
      * Enter description here ...
      * @param Integer $repositoryId
      * @param bool $create
+     * @param null $resolveUserId
+     * @param null $iPath
+     * @throws Exception
      * @return Zend_Search_Lucene_Interface the index
      */
-    protected function loadIndex($repositoryId, $create = true)
+    protected function loadIndex($repositoryId, $create = true, $resolveUserId = null, $iPath = null)
     {
         require_once("Zend/Search/Lucene.php");
-        $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
-        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$this->specificId;
-        if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
+        if($iPath == null){
+            $iPath = $this->getIndexPath($repositoryId, $resolveUserId);
+        }
         if (is_dir($iPath)) {
             $index = Zend_Search_Lucene::open($iPath);
         } else {

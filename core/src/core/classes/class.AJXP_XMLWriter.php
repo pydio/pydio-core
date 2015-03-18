@@ -300,7 +300,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("CONF_MESSAGE[$messId]", $message, $xml);
+                $xml = str_replace("CONF_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
             }
         }
         if (preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)) {
@@ -310,7 +310,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("MIXIN_MESSAGE[$messId]", $message, $xml);
+                $xml = str_replace("MIXIN_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
             }
         }
         if ($stripSpaces) {
@@ -636,9 +636,17 @@ class AJXP_XMLWriter
                 $merged = $loggedUser->mergedRole;
                 $params = array();
                 foreach($exposed as $exposed_prop){
-                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $exposed_prop["DEFAULT"]);
+                    $metaOptions = $repoObject->getOption("META_SOURCES");
+                    if(!isSet($metaOptions[$exposed_prop["PLUGIN_ID"]])){
+                        continue;
+                    }
+                    $value = $exposed_prop["DEFAULT"];
+                    if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
+                        $value = $metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]];
+                    }
+                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
                     if($value !== null){
-                        if($value === true  || $value === false) $value = ($value?"true":"false");
+                        if($value === true  || $value === false) $value = ($value === true ?"true":"false");
                         $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
                         $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
                     }

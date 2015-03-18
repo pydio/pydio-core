@@ -48,11 +48,13 @@ var Protopass = Class.create({
         if(window.MessageHash){
         	var keys = [379,380,381,382,383,384,385];
         	for(var key in keys){
-        		this.options.messages[key] = window.MessageHash[keys[key]];
-        	}        	
+                if(keys.hasOwnProperty(key)){
+            		this.options.messages[key] = window.MessageHash[keys[key]];
+                }
+        	}
         }
-        if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get('password_min_length')){
-        	this.options.minchar = window.ajxpBootstrap.parameters.get('password_min_length');
+        if(window.ajxpBootstrap && parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
+        	this.options.minchar = parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
         }
         Object.extend(this.options, options || { });
         var ins = {};
@@ -74,12 +76,11 @@ var Protopass = Class.create({
         }
     },
     
-    checkUserPasswordStrength: function (field_name) {
+    checkUserPasswordStrength: function () {
         var options = this.options;
         var value = this.item.value;
-        var field_name = this.field_name;
 
-        strength = this.getPasswordScore(value, options);
+        var strength = this.getPasswordScore(value, options);
         this.strength = strength;
 
         if (strength == -200) {

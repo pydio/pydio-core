@@ -99,6 +99,9 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
             AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
         }
+        if(isSet($this->repositoryId) && ConfService::getRepositoryById($this->repositoryId)->getOption("AJXP_WEBDAV_DISABLED") === true){
+            throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
+        }
         ConfService::switchRootDir($this->repositoryId);
         // the method used here will invalidate the cached password every minute on the minute
         if (!$cachedPasswordValid) {

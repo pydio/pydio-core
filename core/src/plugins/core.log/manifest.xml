@@ -5,6 +5,8 @@
     <server_settings>
         <global_param name="ERROR_TO_ERROR_LOG" type="boolean" label="CONF_MESSAGE[Send errors to system log]"
                       description="CONF_MESSAGE[Always send all Error-level messages to the system error log]" default="false" mandatory="true"/>
+        <global_param name="CUSTOM_HEADER_FOR_IP" type="string" label="CONF_MESSAGE[Custom Header for IP]"
+                      description="CONF_MESSAGE[Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP.]" mandatory="false"/>
         <global_param description="CONF_MESSAGE[Plugin instance to handle log implementation]" label="CONF_MESSAGE[Logger plugin]"
                       name="UNIQUE_PLUGIN_INSTANCE" type="plugin_instance:log" default="log.text" mandatory="true"/>
     </server_settings>

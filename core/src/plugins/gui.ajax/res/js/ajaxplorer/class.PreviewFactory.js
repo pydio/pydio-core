@@ -108,7 +108,7 @@ Class.create("PreviewFactory", {
 
     /**
      *
-     * @param element
+     * @param oImageToLoad
      */
     loadImage : function(oImageToLoad){
 
@@ -135,7 +135,7 @@ Class.create("PreviewFactory", {
 
     /**
    	 * Resize the thumbnails
-   	 * @param one_element HTMLElement Optionnal, if empty all thumbnails are resized.
+   	 * @param element HTMLElement Optionnal, if empty all thumbnails are resized.
    	 */
    	resizeThumbnail: function(element){
 

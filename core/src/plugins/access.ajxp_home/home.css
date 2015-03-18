@@ -28,22 +28,29 @@
     float: left;
 }
 
-#home_center_panel{
-    float: left;
+#global_toolbar{
+    z-index: 2;
+}
+
+#home_center_panel {
+    position: absolute;
+    left: 420px;
+    z-index: 1;
 }
 
 .repoInfoBadge {
     display: inline-block;
     font-size: 25px;
-    width: 190px;
+    min-width: 210px;
+    max-width: 300px;
     line-height: 30px;
     border: 1px solid rgba(255,255,255,0.7);
     border-radius: 8px;
     margin: 10px 16px;
-    min-height: 116px;
+    min-height: 106px;
     font-family: "Open sans Regular", Arial, sans-serif;
     vertical-align: top;
-    padding: 3px 8px;
+    padding: 13px 8px;
     text-align: left;
 }
 
@@ -204,12 +211,22 @@
 #logo_div{
     text-align: center;
     padding-top: 20px;
-    margin: 25% 20px;
-    transition: margin 0.5s ease;
+    margin: 0 20px;
 }
 
-div.legend_visible div#logo_div{
-    margin: 0 20px;
+#home_center_panel > div{
+    transition: top 0.4s ease;
+    top:28%;
+    position: relative;
+}
+
+div#home_center_panel.legend_visible > div{
+    top: 5%;
+}
+
+div.legend_visible div#ws_legend{
+    top: 2%;
+    position: relative;
 }
 
 #home_account_pane div#ws_legend > small {
@@ -293,7 +310,7 @@ div.legend_visible div#logo_div{
 
 #videos_pane {
     color: rgb(64, 68, 71);
-    background-color: rgba(255, 255, 255, 0.74);
+    background-color: rgba(255, 255, 255, 1);
     position: absolute;
     top: 0;
     right: 0;
@@ -306,6 +323,7 @@ div.legend_visible div#logo_div{
     display: none;
     max-width: 930px;
     -webkit-font-smoothing: antialiased;
+    z-index:20000;
 }
 
 #tutorials_pane h2{

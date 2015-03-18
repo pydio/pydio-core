@@ -110,7 +110,6 @@ SelectableElements = Class.create({
 		Event.observe(this.dragSelectionElement, "mousedown", this.eventMouseDown);
 	},
 	dragStart : function(e){
-		var oElement = this._htmlElement;
 		this.originalX = e.clientX;
 		this.originalY = e.clientY;
 		
@@ -415,7 +414,7 @@ SelectableElements = Class.create({
 			this._fireChange = oldFireChange;
 			return;
 		}
-		var rIndex = el;
+		var rIndex = el, items, item, i, dirUp;
 		var aIndex = this._anchorIndex;
 	
 		// test whether the current row should be the anchor
@@ -425,8 +424,8 @@ SelectableElements = Class.create({
 	
 		if (!ctrlOrCmd && !e.shiftKey || !this._multiple) {
 			// deselect all
-			var items = this._selectedItems;
-			for (var i = items.length - 1; i >= 0; i--) {
+			items = this._selectedItems;
+			for (i = items.length - 1; i >= 0; i--) {
 				if (items[i]._selected && items[i] != el)
 					this.setItemSelectedUi(items[i], false);
 			}
@@ -446,9 +445,9 @@ SelectableElements = Class.create({
 		// ctrl + shift
 		else if (this._multiple && ctrlOrCmd && e.shiftKey) {
 			// up or down?
-			var dirUp = this.isBefore(rIndex, aIndex);
+			dirUp = this.isBefore(rIndex, aIndex);
 	
-			var item = aIndex;
+			item = aIndex;
 			while (item != null && item != rIndex) {
 				if (!item._selected && item != el)
 					this.setItemSelected(item, true);
@@ -462,16 +461,16 @@ SelectableElements = Class.create({
 		// shift
 		else if (this._multiple && !ctrlOrCmd && e.shiftKey) {
 			// up or down?
-			var dirUp = this.isBefore(rIndex, aIndex);
+			dirUp = this.isBefore(rIndex, aIndex);
 	
 			// deselect all
-			var items = this._selectedItems;
-			for (var i = items.length - 1; i >= 0; i--)
+			items = this._selectedItems;
+			for (i = items.length - 1; i >= 0; i--)
 				this.setItemSelectedUi(items[i], false);
 			this._selectedItems = [];
 	
 			// select items in range
-			var item = aIndex;
+			item = aIndex;
 			this.skipScroll=true;
 			while (item != null) {
 				this.setItemSelected(item, true);
@@ -489,7 +488,7 @@ SelectableElements = Class.create({
 		var found;
 		var changed = selectedBefore.length != this._selectedItems.length;
 		if (!changed) {
-			for (var i = 0; i < selectedBefore.length; i++) {
+			for (i = 0; i < selectedBefore.length; i++) {
 				found = false;
 				for (var j = 0; j < this._selectedItems.length; j++) {
 					if (selectedBefore[i] == this._selectedItems[j]) {

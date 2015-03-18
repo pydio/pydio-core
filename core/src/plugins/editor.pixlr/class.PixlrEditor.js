@@ -68,8 +68,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 		this.setOnLoad(true);
 		this.currentNode = node;
 		var fName = this.currentNode.getPath();
-		var src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=base64encoded:" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
-		this.contentMainContainer.src = src;
+        this.contentMainContainer.src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=base64encoded:" + base64_encode(fName) + "&parent_url=" + base64_encode(getUrlFromBase());
 		var pe = new PeriodicalExecuter(function(){
 			var href;
 			try{
@@ -91,7 +90,6 @@ Class.create("PixlrEditor", AbstractEditor, {
 			}
 		}.bind(this) , 0.5);
         this.element.fire("editor:updateTitle", node.getLabel());
-		return;		
 	},
 	
 	setOnLoad: function(openMessage){

@@ -415,6 +415,10 @@ class AJXP_Node
      */
     public function setUser($userId){
         $this->_user = $userId;
+        $this->urlParts["user"] = $userId;
+        // Update url with a user@workspaceID
+        $crt = $this->getScheme()."://".$this->getRepositoryId();
+        $this->_url = str_replace($crt, $this->getScheme()."://".$this->_user."@".$this->getRepositoryId(), $this->_url);
     }
 
     /**

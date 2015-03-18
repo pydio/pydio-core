@@ -1,0 +1,7 @@
+To install Mozilla PDF.JS viewer plugin in Pydio:
+
+  * Download latest PDF.JS release from http://mozilla.github.io/pdf.js/
+
+  * Extract its contents into this folder, but don’t overwrite any of the original files.
+
+  * Enable PDF.JS plugin in your Pydio preferences.

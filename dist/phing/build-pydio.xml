@@ -124,7 +124,7 @@
         		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
-        		<property name="package_name" value="pydio-core-${new_version}"/>
+        		<property name="package_name" value="pydio-core-${build.version}"/>
         	</else>
         </if>
         <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
@@ -156,7 +156,7 @@
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
             <then><mkdir dir="${build.working_folder}/upgrade"/></then>
         </if>
-    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/pydio-core-upgrade-${previous_version}-${new_version}"/>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/pydio-core-upgrade-${previous_version}-${build.version}"/>
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<git_summarize
@@ -182,7 +182,18 @@
 	            <filterchain>
         	        <replacetokens begintoken="##" endtoken="##">
                 	    <token key="VERSION_NUMBER" value="${build.version}"/>
-  	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+                        <token key="DB_VERSION" value="${build.dbversion}"/>
+                        <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+        	            <token key="REVISION" value="${LASTREVISION}"/>
+                	</replacetokens>
+          	    </filterchain>
+		</copy>
+		<copy file="${git.local_repository}/core/src/conf/VERSION.php" toFile="${upgrade_export}/conf/VERSION.php">
+	            <filterchain>
+        	        <replacetokens begintoken="##" endtoken="##">
+                	    <token key="VERSION_NUMBER" value="${build.version}"/>
+                        <token key="DB_VERSION" value="${build.dbversion}"/>
+                        <token key="VERSION_DATE" value="${VERSION_DATE}"/>
         	            <token key="REVISION" value="${LASTREVISION}"/>
                 	</replacetokens>
           	    </filterchain>
@@ -190,27 +201,27 @@
 
 		<!-- ADDITIONAL UPGRADE SCRIPT -->
 		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${new_version}.php"/>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.php"/>
 			<then>
-				<copy file="${git.local_repository}/dist/php/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
+				<copy file="${git.local_repository}/dist/php/${build.version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
 			</then>
 		</if>
 
 		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${new_version}.html"/>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.html"/>
 			<then>
-				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
+				<copy file="${git.local_repository}/dist/php/${build.version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
 			</then>
 		</if>
 
 		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sql"/>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
 			<then>
-				<copy file="${git.local_repository}/dist/php/${new_version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
                 <if>
-              			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sqlite"/>
+              			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
               			<then>
-              				<copy file="${git.local_repository}/dist/php/${new_version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+              				<copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
               			</then>
               		</if>
 			</then>
@@ -237,7 +248,7 @@
         		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
-        		<property name="package_name" value="pydio-core-${new_version}"/>
+        		<property name="package_name" value="pydio-core-${build.version}"/>
         	</else>
         </if>
         <property name="packaged_zip" value="${package_name}.zip"/>
@@ -283,7 +294,7 @@
     <target name="zip_upgrade" description="Packaging upgrade">
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/upgrade" />
-        <property name="packaged_zip" value="pydio-core-upgrade-${previous_version}-${new_version}.zip"/>
+        <property name="packaged_zip" value="pydio-core-upgrade-${previous_version}-${build.version}.zip"/>
         <zip
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
@@ -482,12 +493,14 @@
     <target name="replace_variables" description="Replace version, revision number, etc in files">
         <reflexive>
         	<fileset dir="${passed_directory}">
+        		<include pattern="conf/VERSION.php"/>
         		<include pattern="conf/VERSION"/>
         		<include pattern="conf/RELEASE_NOTE"/>
         	</fileset>
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="DB_VERSION" value="${build.dbversion}"/>
                     <token key="VERSION_DATE" value="${VERSION_DATE}"/>
                     <token key="REVISION" value="${LASTREVISION}"/>
                 </replacetokens>

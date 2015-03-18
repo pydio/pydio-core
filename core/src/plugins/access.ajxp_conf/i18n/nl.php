@@ -148,5 +148,6 @@ $mess=array(
 "125" => "Alias",
 "126" => "Weet je zeker dat je de / het geselecteerde element(en) wilt verwijderen?",
 "127" => "Waarschuwing, gebruik geen speciale karakters, gebruiker wordt aangemaakt met login ID '%s'",
+"128" => "Successfully deleted group",
 );
 

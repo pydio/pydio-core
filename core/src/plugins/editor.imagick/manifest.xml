@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.imagick" enabled="false" openable="true" iconClass="icon-picture" previewProvider="true" formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2" label="CONF_MESSAGE[Image Magick]" description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.imagick" enabled="false" openable="true" order="11" iconClass="icon-picture" previewProvider="true"
+        formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer"
+        mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2" label="CONF_MESSAGE[Image Magick]"
+        description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
     <client_settings>
         <resources>
@@ -19,22 +23,30 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache"/>
 		</hooks>
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Serve JPG previews for a PDF or imagick-compatible file.">
+                        <input_param name="file" type="AJXP_NODE" description="Path to the file"/>
+                        <input_param name="all" type="boolean" description="Whether to pre-extract all pages or pass them one by one"/>
+                        <output type="json|jpg" description="Depending on the mode, will return either directly an image (thumbnail), or a json structure containing links to all pages."/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="delete_imagick_data">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="get_extracted_page">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file/src_file+" developerComment="Server a prefetched thumbnail for a PDF or imagick compatible file. See imagick_data_proxy.">
+                        <input_param name="file" type="string"
+                                     description="Name of the page thumbnail, as returned by imagick_data_proxy request"/>
+                        <input_param name="src_file" type="AJXP_NODE" description="Path to the original file, if the given page was not yet generated"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>

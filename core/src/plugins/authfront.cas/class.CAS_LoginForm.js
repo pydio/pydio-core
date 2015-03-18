@@ -50,12 +50,12 @@ Class.create("CAS_LoginForm", {
                                                         
         var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_pyd_msg + '</span>';
 
-        objallforms = $("all_forms");
+        var objallforms = $("all_forms");
         if(!objallforms.down("#enableredirecttocas")){
             objallforms.insert({top:login_via_cas_form});
         }
         $$("div.dialogContent").first().setStyle("padding-top: 17% !important");
-        obj_loginform = $("login_form");
+        var obj_loginform = $("login_form");
         if(!obj_loginform.down(("#span_to_modify_login_form_with_cas"))){
             obj_loginform.insert({top:login_session_span});
             obj_loginform.insert({top:cas_session_a_tag});

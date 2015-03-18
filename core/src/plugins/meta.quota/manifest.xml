@@ -86,7 +86,9 @@
                             ajaxplorer.meta_quota_pe_created = true;
                         }
                         ]]></clientListener>
-                    <serverCallback methodName="getCurrentQuota"/>
+                    <serverCallback methodName="getCurrentQuota" restParams="/" developerComment="Get current quota usage information">
+                        <output type="JSON" description="A Json structure containing usage and authorized quota"/>
+                    </serverCallback>
                 </processing>
             </action>
         </actions>

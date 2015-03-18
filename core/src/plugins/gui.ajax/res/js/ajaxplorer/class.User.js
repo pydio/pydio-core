@@ -98,8 +98,8 @@ Class.create("User", {
 	 */
 	setActiveRepository : function (id, read, write){
 		this.activeRepository = id;
-		this.read = (read=="1"?true:false);
-		this.write = (write=="1"?true:false);		
+		this.read = (read == "1");
+		this.write = (write == "1");
 		if(this.repositories.get(id)){
 			this.crossRepositoryCopy = this.repositories.get(id).allowCrossRepositoryCopy;
 		}
@@ -278,7 +278,8 @@ Class.create("User", {
 	loadFromXml: function(userNodes){
 	
 		var repositories = new Hash();
-		for(var i=0; i<userNodes.length;i++)
+        var i,j;
+		for(i=0; i<userNodes.length;i++)
 		{
 			if(userNodes[i].nodeName == "active_repo")
 			{

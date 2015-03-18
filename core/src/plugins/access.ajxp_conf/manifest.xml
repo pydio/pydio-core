@@ -49,12 +49,12 @@
                     <div ajxpClass="AjxpTabulator" id="leftTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"ajxp_conf.122","iconClass":"icon-cogs","element":"leftPane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                         <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
                         <div id="leftPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                            <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10}'></div>
+                            <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10, "groupByData":false}'></div>
                             <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                         </div>
                     </div>
                     <div id="rightPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
-                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
+                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchToFirstIfPathDiffers(arguments[0]);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div><div ajxpClass="BookmarksBar" ajxpOptions='{}' id="bm_bar"></div></div>
                                 <div id="actions" class="buttons_bar_container">
@@ -84,16 +84,16 @@
                 </script>
 			]]></template_part>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fitMinOffsetTop":"$(\"global_toolbar\").getHeight();", "fakeOption":"true"}' theme="orbit"><![CDATA[
-                <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "280", "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0}'>
+                <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": 280, "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
                     <div ajxpClass="AjxpTabulator" id="leftTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"ajxp_conf.122","iconClass":"icon-cogs","element":"leftPane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                         <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
                         <div id="leftPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                            <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10}'></div>
-                            <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                            <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10, "groupByData":false, "leavesOpenOnSelect": true}'></div>
+                            <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"fit":"height", "fitParent":"leftPane", "display":"dz","replaceScroller":true}' ></div>
                         </div>
                     </div>
                     <div id="rightPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
-                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
+                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchToFirstIfPathDiffers(arguments[0]);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div><div ajxpClass="BookmarksBar" ajxpOptions='{}' id="bm_bar"></div></div>
                                 <div id="actions" class="buttons_bar_container">

@@ -223,7 +223,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function getLock()
     {
-        if($this->isAdmin() && $this->getGroupPath() == "/") return false;
+        if(AJXP_SERVER_DEBUG && $this->isAdmin() && $this->getGroupPath() == "/") return false;
         if (!empty($this->rights["ajxp.lock"])) {
             return $this->rights["ajxp.lock"];
         }

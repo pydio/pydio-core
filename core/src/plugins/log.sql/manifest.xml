@@ -14,7 +14,7 @@
             <action name="analytic_query">
                 <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
                 <processing>
-                    <serverCallback methodName="processQuery" restParams="/query_name/start/count" sdkMethodName="analyticQuery">
+                    <serverCallback methodName="processQuery" restParams="/query_name/start/count" sdkMethodName="analyticQuery" developerComment="Perform an analytics query by name">
                         <input_param description="Name of the analytic query" name="query_name" type="string"/>
                         <input_param description="Starting row" name="start" type="integer"/>
                         <input_param description="Number of rows" name="count" type="integer"/>
@@ -24,7 +24,7 @@
             <action name="analytic_list_queries">
                 <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
                 <processing>
-                    <serverCallback methodName="exposeQueries" restParams="/" sdkMethodName="analyticListQueries"/>
+                    <serverCallback methodName="exposeQueries" restParams="/" sdkMethodName="analyticListQueries" developerComment="List available analytics queries"/>
                 </processing>
             </action>
         </actions>

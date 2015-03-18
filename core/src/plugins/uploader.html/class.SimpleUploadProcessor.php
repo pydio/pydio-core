@@ -109,7 +109,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 }
                 AJXP_XMLWriter::close();
                 /* for further implementation */
-                if (!$result["PREVENT_NOTIF"]) {
+                if (!isSet($result["PREVENT_NOTIF"])) {
                     if (isset($result["CREATED_NODE"])) {
                         AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
                     } else if (isSet($result["UPDATED_NODE"])) {

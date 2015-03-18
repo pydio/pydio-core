@@ -169,7 +169,7 @@ function addVolumeButton(){
         null,
         false,
         false
-    )
+    );
     volumeButton.down("img").src = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.soundmanager/kmixdocked.png";
     locBar.bmButton.insert({before:volumeButton});
     new SliderInput(volumeButton, {
@@ -228,7 +228,7 @@ Class.create("SMPlayer", AbstractEditor, {
         var rgxtrim = new RegExp('\/+$');
         crtRoot = crtRoot.replace(rgxtrim, '');
 
-        var tpl = new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
+        return new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
 &lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"&gt;&lt;/script&gt;\n\
 &lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"&gt;&lt;/script&gt;\n\
 &lt;script&gt;\n \
@@ -239,8 +239,6 @@ soundManager.setup({\n\
 &lt;/script&gt;\n\
 <a href="#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'" class="sm2_button">'+node.getLabel()+'</a> '+node.getLabel());
 
-        return tpl;
-
     },
 
     getRESTPreviewLinks:function(node){
@@ -249,8 +247,7 @@ soundManager.setup({\n\
 
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
-            var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
-            return im;
+            return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
         }
         addVolumeButton();
         var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+encodeURIComponent(base64_encode(ajxpNode.getPath()));
@@ -276,16 +273,16 @@ soundManager.setup({\n\
             }else{
                 var addLeft = 12;
                 if(container.up('.thumbnail_selectable_cell.detailed')) addLeft = 2;
-
+                var mT, mB;
                 if(element.height >= 50)
                 {
-                    var mT = parseInt((element.height - 50)/2) + element.margin;
-                    var mB = element.height+(element.margin*2)-50-mT-1;
+                    mT = parseInt((element.height - 50)/2) + element.margin;
+                    mB = element.height+(element.margin*2)-50-mT-1;
                     container.removeClassName("nobackground");
                     container.setStyle({paddingTop:mT+'px', paddingBottom:mB+'px', marginBottom:'0px'});
                 }else{
-                    var mT = 0;
-                    var mB = element.height-40;
+                    mT = 0;
+                    mB = element.height-40;
                     container.addClassName("nobackground");
                     if(mB + addLeft < 0) {
                         container.setStyle({marginTop:(mB/2)+'px', paddingBottom:'0px', marginLeft:((mB/2)-2)+'px'});

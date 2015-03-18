@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@ $mess=array(
 "Custom Icon" => "Custom Icon",
 "URI to a custom image to be used as start up logo" => "URI to a custom image to be used as start up logo",
 "Icon Width" => "Icon Width",
-"Width of the custom image (by default 35px)" => "Width of the custom image (by default 35px)",
+"Width of the custom image (by default 35px)" => "Width of the custom image (Default 35px)",
 "Welcome Message" => "Welcome Message",
-"An additionnal message displayed in the start up screen" => "An additionnal message displayed in the start up screen",
+"An additionnal message displayed in the start up screen" => "An additional message displayed in the start up screen",
 "Client Session Config" => "Client Session Config",
 "Client Timeout" => "Client Timeout",
-"The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons." => "The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to -1, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.",
-"Warning Before" => "Warning Before",
+"The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons." => "The length of the client session in SECONDS. The server session length will be used by default. In most PHP installations, the session length is set to 1440 seconds (24 minutes). You can set this value to 0. This will make the client session 'infinite' by pinging the server periodically. This keeps the PHP session alive. For evident security reasons, this is not a recommended setting.",
+"Warning Before" => "Warning before session expires",
 "Number of MINUTES before the session expiration for issuing an alert to the user" => "Number of MINUTES before the session expiration for issuing an alert to the user",
 "Google Analytics" => "Google Analytics",
 "Analytics ID" => "Analytics ID",
@@ -63,4 +63,20 @@ $mess=array(
 "Manually set a top offset" => "Manually set a top offset",
 "Logo Left" => "Logo Left",
 "Manually set a left offset" => "Manually set a left offset",
+"Additional JS frameworks" => "Additional JS frameworks",
+"Additional JS frameworks description" => "List of comma separated pathes to JS files, which must be loaded BEFORE the main Pydio framework is loaded. The preferred way should be using plugin resources declarations. Loading JS files at the very start up of the page might be option in some cases only.",
+"Login Screen" => "Login Page",
+"Welcome Page" => "Welcome Page",
+"Replace the logo displayed in the welcome page" => "Replace the logo displayed in the welcome page",
+"Custom Background (4)" => "Custom background (4)",
+"Background Attributes (4)" => "Background attributes (4)",
+"Custom Background (5)" => "Custom background (5)",
+"Background Attributes (5)" => "Background attributes (5)",
+"Custom Background (6)" => "Custom background (6)",
+"Background Attributes (6)" => "Background attributes (6)",
+"Attributes of the image used as a background" => "Attributes of the image used as a background",
+"Center in Page (no-repeat)" => "Center in Page (no-repeat)",
+"Fetch Window (repeat vertically)" => "Fetch Window (repeat vertically)",
+"Fetch Window (no repeat)" => "Fetch Window (no repeat)",
+"Tile (repeat both directions)" => "Tile (repeat both directions)",
 );

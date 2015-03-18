@@ -5,6 +5,8 @@
     <client_settings>
         <resources>
             <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js" autoload="true"/>
+            <i18n namespace="keystore" path="plugins/authfront.keystore/i18n"/>
+            <css file="plugins/authfront.keystore/apikeypane.css" autoload="true"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -12,18 +14,25 @@
                       description="Order this plugin with other auth frontends" default="2"/>
         <global_param name="PROTOCOL_TYPE" type="select"
                       choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="no_session"/>
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="both"/>
+        <global_param name="USER_GENERATE_KEYS" type="boolean" label="Let users generate keys"
+                      description="Display a Generate Key button in the Api key panel to let the user create their own key. Not really useful yet, for future usage."
+                      default="false" mandatory="false" expose="true"/>
     </server_settings>
     <registry_contributions>
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="apikeys_pane"
-                                tabInfo='{"id":"my-api-data","iconClass":"icon-cog","element":"apikeys_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":2}'
+                                tabInfo='{"id":"my-api-data","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="apikeys_pane" ajxpClass="ApikeysPane" class="tabbed_editor">
-                        <div id="generate_token_button">Generate new tokens!</div>
-                        <div id="token_results"></div>
-                        <div id="revoke_tokens_button">Revoke existing token!</div>
+                    <div id="apikeys_pane" ajxpClass="ApikeysPane" ajxpOptions='{}' class="tabbed_editor" style="position:relative;">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[keystore.1]</h3>
+                        <div id="token_results"><span class="icon-remove-sign"></span><div id="token_results_content"></div></div>
+                        <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
+                            <h2>AJXP_MESSAGE[keystore.9]</h2>
+                            <ul></ul>
+                        </div>
                     </div>
                     ]]></additional_tab>
             </component_config>
@@ -32,15 +41,28 @@
             <action name="keystore_generate_auth_token">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken"/>
+                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken" developerComment="Generate and store a authentication key that can be used by the currently logged user. Used by SDKs talking to REST API to avoid renegociating basic auth on each query.">
+                        <input_param name="device" type="string"
+                                     description="A unique ID identifying the client connecting."/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="keystore_revoke_tokens">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="generateAuthToken"/>
+                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="revokeAuthToken" developerComment="Revoke current tokens for logged user."/>
+                </processing>
+            </action>
+            <action name="keystore_list_tokens">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="listAuthToken" developerComment="List current tokens for logged user."/>
                 </processing>
             </action>
         </actions>
+        <hooks>
+            <serverCallback methodName="revokeUserTokens" hookName="user.after_password_change"/>
+            <serverCallback methodName="revokeUserTokens" hookName="user.after_delete"/>
+        </hooks>
     </registry_contributions>
 </ajxpcore>

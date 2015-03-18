@@ -22,6 +22,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     tabulatorData: null,
     tabsConfigs: null,
+    _eventPath: null,
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -97,9 +98,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	},
 
     _renderTab:function(tabInfo){
-
+        var td;
         if(tabInfo.ajxpClass && tabInfo.ajxpOptions){
-            var td = new Element('span', {className:'toggleHeader'});
+            td = new Element('span', {className:'toggleHeader'});
             var klass = Class.getByName(tabInfo.ajxpClass);
             new klass(td, tabInfo.ajxpOptions);
             tabInfo.headerElement = td;
@@ -115,11 +116,10 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.label){
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
-            var forceTabsTips = false;
             var title = MessageHash[tabInfo.title] || label.stripTags();
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
-            var td = new Element('span', options);
+            td = new Element('span', options);
             var short = this.shortenLabel(label);
             if(this.options.tabsTips || short!=label){
                 var horizontal = this.htmlElement.hasClassName('left_tabulator');
@@ -426,7 +426,6 @@ Class.create("AjxpTabulator", AjxpPane, {
                 fitHeightToBottom($(toShowElement), null, this.options.fitMarginBottom);
                 toShow.showElement(true);
             }
-            var reFold = false;
             if(this.htmlElement && this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
                 if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
@@ -447,6 +446,14 @@ Class.create("AjxpTabulator", AjxpPane, {
 
 	},
 
+    switchToFirstIfPathDiffers: function(event){
+        var cNode = event.memo;
+        if(this._eventPath && cNode.getPath() != this._eventPath){
+            this.switchTabulator(this.tabulatorData.first().id);
+        }
+        this._eventPath = cNode.getPath();
+    },
+
 	/**
 	 * Resizes the widget
 	 */
@@ -466,7 +473,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
             fitHeightToBottom(nodeElement, this.htmlElement, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
-            var left ;
+            var left = 0 ;
             var total = 0;
             var cont = this.htmlElement.down('div.tabulatorContainer');
             var innerWidth = parseInt(this.htmlElement.getWidth()) - parseInt(cont.getStyle('paddingLeft')) - parseInt(cont.getStyle('paddingRight'));
@@ -545,7 +552,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             if(Class.objectImplements(ajxpObject, "IActionProvider") && ajxpObject.getActions()){
                 ajxpObject.getActions().each(function(act){
-                    this.guiActions.unset(act.key);// = this.guiActions.without(act);
+                    ajaxplorer.guiActions.unset(act.key);
                 }.bind(this) );
             }
 			ajxpObject.destroy();
@@ -589,6 +596,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.id == tabId) return tabInfo;
         });
         if(theInfo) return this.getAndSetAjxpObject(theInfo);
+        return null;
     },
 
     __stateLoaded : false,

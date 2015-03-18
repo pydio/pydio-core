@@ -1,0 +1,7 @@
+<p>This plugin allows you to point the authentication operation (does a user exists? check the user password) to a third party, readonly, database.
+    <br>You can define your own DB connection, and the table characteristics to identify a user: table name, user name field, password field, and password method hashing. Currently supporting clear, md5 and pdbkf2.
+    <br>Currently this plugin does not support group management.
+    <br>Should be typically used in a master/slave config, where custom_db is the master and pydio "standard" db is the slave.
+    <br><b>MSSql Server</b>: this plugin can support "non-standard" DB driver for MS Sql Server. However, before it can work, you must first download the 2 files DibiMsSqlDriver and DibiMsSqlReflector contained in the folder <a href="https://github.com/dg/dibi/tree/master/dibi/drivers">https://github.com/dg/dibi/tree/master/dibi/drivers</a>
+    and drop them inside the folder INSTALL_PATH/core/drivers/ (you have to create the folder as well).
+</p>

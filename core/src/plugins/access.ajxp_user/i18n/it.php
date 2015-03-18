@@ -20,7 +20,7 @@
  */
 $mess=array(
 "title"=> "Bacheca",
-"desc" => "Modifica le impostazioni dell'account, della ribrica, degli elementi condivisi ecc.",
+"desc" => "Modifica le impostazioni dell'account, della rubrica, degli elementi condivisi ecc.",
 "1" => "Rubrica",
 "2" => "Cartelle condivise",
 "3" => "File condivisi",
@@ -60,7 +60,7 @@ $mess=array(
 "37"=> "Il mio profilo e le impostazioni dell'applicativo",
 "38"=> "Notifiche",
 "39"=> "Seleziona un workspace",
-"40"=> "Benvanuto, %s",
+"40"=> "Benvenuto, %s",
 "41"=> "Usa questo workspace come principale",
 "42"=> "Entra",
 "43"=> "Il Mio Profilo",

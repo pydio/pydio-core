@@ -35,7 +35,6 @@ class AJXP_Role implements AjxpGroupPathProvider
 
     protected $groupPath;
     protected $roleId;
-    protected $roleLabel;
 
     protected $acls = array();
     protected $parameters = array();
@@ -412,13 +411,15 @@ class AJXP_Role implements AjxpGroupPathProvider
 
     public function setLabel($roleLabel)
     {
-        $this->roleLabel = $roleLabel;
+        $this->setParameterValue("core.conf", "ROLE_DISPLAY_NAME", $roleLabel);
     }
 
     public function getLabel()
     {
-        return $this->roleLabel;
-    }
+        $test = $this->filterParameterValue("core.conf", "ROLE_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $this->roleId);
+        if(!empty($test)) return $test;
+        return $this->roleId;
+   }
 
     /**
      * @param array $specificRights

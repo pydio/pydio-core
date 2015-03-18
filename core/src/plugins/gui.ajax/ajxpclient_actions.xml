@@ -8,7 +8,9 @@
 		</action>
 		<action name="get_i18n_messages">
 			<processing>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/" developerComment="Load the list of translation strings">
+                    <output type="json" description="A JSON table of all strings contributed by all plugins."/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="get_editors_registry">
@@ -18,7 +20,9 @@
 		</action>
 		<action name="display_doc">
 			<processing>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/doc_file" developerComment="Load a doc file">
+                    <input_param name="doc_file" type="string" description="Text file base name (without extension) located inside the doc folder."/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="up_dir">

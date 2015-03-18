@@ -22,4 +22,13 @@ RewriteRule (.*) index.php [L]
 
 #RewriteCond %{HTTP:Authorization} ^(.*)
 #RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+
+#Following lines may be necessary for a PHP-FPM setup
+# to make sure that authorization is transmitted.
+# Just remove the # at the beginning of the line
+
+#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 </IfModule>
+
+AddType application/json .json

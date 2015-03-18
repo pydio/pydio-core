@@ -78,6 +78,13 @@ class fsAccessWrapper implements AjxpWrapper
         if($split && $streamType == "file" && $split[1] != "/") $insideZip = true;
         if($split && $streamType == "dir") $insideZip = true;
         if($skipZip) $insideZip = false;
+
+        $resolveUser = null;
+        if(isSet($url["user"]) && AuthService::usersEnabled()){
+            $resolveUser = ConfService::getConfStorageImpl()->createUserObject($url["user"]);
+        }
+        $resolvedPath = realpath(SystemTextEncoding::toStorageEncoding($repoObject->getOption("PATH", false, $resolveUser)));
+
         //var_dump($path);
         //var_dump($skipZip);
         // Inside a zip : copy the file to a tmp file and return a reference to it
@@ -93,7 +100,7 @@ class fsAccessWrapper implements AjxpWrapper
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");
                        register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
-                    $crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($zipPath)));
+                    $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                     $content = $crtZip->listContent();
                     foreach ($content as $item) {
                         $fName = AJXP_Utils::securePath($item["stored_filename"]);
@@ -116,7 +123,7 @@ class fsAccessWrapper implements AjxpWrapper
                        }
                    }
                } else {
-                $crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($zipPath)));
+                $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                 $liste = $crtZip->listContent();
                 if($storeOpenContext) self::$crtZip = $crtZip;
                 $folders = array(); $files = array();$builtFolders = array();
@@ -178,7 +185,7 @@ class fsAccessWrapper implements AjxpWrapper
                     return -1;
                 }
             }
-            return realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($url["path"]);
+            return $resolvedPath.$repoObject->resolveVirtualRoots($url["path"]);
         }
     }
 

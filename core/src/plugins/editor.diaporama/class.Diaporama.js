@@ -298,14 +298,14 @@ Class.create("Diaporama", AbstractEditor, {
 	{
 		$super(node);
         var userSelection = ajaxplorer.getUserSelection();
-		var allNodes, sCurrentFile;
+		var allItems, sCurrentFile;
 		if(userSelection.isUnique()){
-			var allItems = userSelection.getContextNode().getChildren();
+			allItems = userSelection.getContextNode().getChildren();
 			sCurrentFile = node.getPath();
 		}else{
-			var allItems = userSelection.getSelectedNodes();
+			allItems = userSelection.getSelectedNodes();
 		}
-		this.items = new Array();
+		this.items = $A();
 		this.nodes = new Hash();
 		this.sizes = new Hash();
         if($A(allItems).size() > 0){
@@ -376,7 +376,7 @@ Class.create("Diaporama", AbstractEditor, {
 
         if (ort>4)
         {
-            tmp=height;
+            var tmp=height;
             height=width;
             width=tmp;
         }
@@ -457,13 +457,13 @@ Class.create("Diaporama", AbstractEditor, {
     },
 
     getNavigatorOverlay : function(){
-        if(!this.infoPanel) return;
+        if(!this.infoPanel) return null;
         var ov = this.infoPanel.htmlElement.down("div.imagePreviewOverlay");
         if(ov && ov.draggableInitialized) {
             return ov;
         }
         var theImage = this.infoPanel.htmlElement.down("img");
-        if(!theImage) return;
+        if(!theImage) return null;
         if(!ov){
             ov = new Element('div',{className:"imagePreviewOverlay"}).setStyle({
                 position:'absolute',
@@ -491,7 +491,7 @@ Class.create("Diaporama", AbstractEditor, {
                 onDrag:function(){
                     if(!theImage) return;
                     var offset = theImage.positionedOffset();
-                    var dim = theImage.getDimensions();
+                    theImage.getDimensions();
                     var coord = {
                         top:parseInt(ov.getStyle("top"))-offset.top,
                         left:parseInt(ov.getStyle("left"))-offset.left,
@@ -501,7 +501,7 @@ Class.create("Diaporama", AbstractEditor, {
                     this.navigatorMove(coord);
                 }.bind(this),
                 snap:function(x,y,theDraggable){
-                    if(!theImage) return;
+                    if(!theImage) return null;
                     var offset = theImage.positionedOffset();
                     var imageDim = theImage.getDimensions();
                     var objDim = theDraggable.element.getDimensions();
@@ -637,8 +637,8 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 
 	computeFitToScreenFactor: function(){
-		zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
-		zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
+		var zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
+		var zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
 		var zoomFactor = Math.min(zoomFactor1, zoomFactor2)-1;
 		zoomFactor = Math.max(this._minZoom, zoomFactor);
 		zoomFactor = Math.min(this._maxZoom, zoomFactor);
@@ -721,7 +721,7 @@ Class.create("Diaporama", AbstractEditor, {
 	/**
 	 * 
 	 * @param ajxpNode AjxpNode
-	 * @returns {___img1}
+	 * @returns Element
 	 */
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {
@@ -772,7 +772,7 @@ Class.create("Diaporama", AbstractEditor, {
 			if(!theImage.openBehaviour){
 				var opener = new Element('div').update(MessageHash[411]);
 				opener.setStyle({
-					width:(styleObj?styleObj.width:''),
+					width:'',
 					display:'none', 
 					position:'absolute', 
 					color: 'white',

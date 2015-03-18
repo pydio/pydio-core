@@ -27,6 +27,26 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend {
 
         $localHttpLogin = $_SERVER["PHP_AUTH_USER"];
         $localHttpPassw = $_SERVER['PHP_AUTH_PW'];
+
+        // mod_php
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
+            $localHttpLogin = $_SERVER['PHP_AUTH_USER'];
+            $localHttpPassw = $_SERVER['PHP_AUTH_PW'];
+
+        // most other servers
+        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            if (strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']),'basic')===0){
+                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+            }
+        // Sometimes prepend a REDIRECT
+        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+
+            if (strpos(strtolower($_SERVER['REDIRECT_HTTP_AUTHORIZATION']),'basic')===0){
+                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($_SERVER['REDIRECT_HTTP_AUTHORIZATION'], 6)));
+            }
+
+        }
+
         if($isLast && empty($localHttpLogin)){
             header('WWW-Authenticate: Basic realm="Pydio API"');
             header('HTTP/1.0 401 Unauthorized');

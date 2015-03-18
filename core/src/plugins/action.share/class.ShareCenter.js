@@ -94,6 +94,19 @@ Class.create("ShareCenter", {
 
     performShare: function(type){
         this.currentNode = ajaxplorer.getUserSelection().getUniqueNode();
+        var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
+        this.authorizations = {
+            folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+            folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+            file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+            editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+        };
+
+        if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
+            alert('You are not authorized to share folders');
+            return;
+        }
+
         if(type == 'workspace'){
             this.shareFolderMode = 'workspace';
         }else if(type == 'minisite-public'){
@@ -104,8 +117,17 @@ Class.create("ShareCenter", {
             this.shareFolderMode = 'file';
         }
         if(this.shareFolderMode == 'file'){
+            if(this.currentNode.isLeaf() && !this.authorizations.file_public_link){
+                alert('You are not authorized to share files');
+                return;
+            }
             this.shareFile();
         }else{
+            if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
+                this.shareFolderMode = "workspace";
+            }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
+                this.shareFolderMode = "minisite_public";
+            }
             this.shareRepository();
         }
     },
@@ -124,6 +146,10 @@ Class.create("ShareCenter", {
             var conn = new Connexion(publicUrl);
             conn.setMethod("POST");
             var params = modal.getForm().serialize(true);
+            var passwordField = modal.getForm().down('input[name="guest_user_pass"]');
+            if(passwordField.readAttribute('data-password-set') === 'true' && !passwordField.getValue()){
+                delete params['guest_user_pass'];
+            }
             conn.setParameters(params);
             if(this._currentRepositoryId){
                 conn.addParameter("repository_id", this._currentRepositoryId);
@@ -206,7 +232,7 @@ Class.create("ShareCenter", {
                         var err;
                         if(messages[iResponse]) err = MessageHash[messages[iResponse]];
                         else if(MessageHash[response]) err = MessageHash[response];
-                        else err = 'Unknown error code ' + response;
+                        else err = response;
                         ajaxplorer.displayMessage('ERROR', err);
                         if(response == 101){
                             oForm.down("#repo_label").focus();
@@ -219,22 +245,6 @@ Class.create("ShareCenter", {
                             this.shareRepository(true);
                             modal.refreshDialogPosition();
                         }.bind(this));
-                        /*
-                        ajaxplorer.displayMessage('SUCCESS', MessageHash["share_center.156"].replace("%s", response));
-                        oForm.down("#share_container").setValue(response);
-                        this._currentRepositoryLink = response;
-                        this._currentRepositoryLabel = oForm.down("#repo_label").getValue();
-                        oForm.down("#share_container").select();
-                        if(oForm.down("#share_unshare")) {
-                            oForm.down("#share_unshare").show();
-                            oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
-                        }
-                        oForm.down("#share_generate").hide();
-                        this.updateDialogButtons(oForm.down('#target_repository_toggle'), oForm, "folder");
-                        oForm.select('span.simple_tooltip_observer').each(function(e){
-                            modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
-                        });
-                        */
                     }
 
                 }.bind(this);
@@ -263,6 +273,8 @@ Class.create("ShareCenter", {
             oForm.removeClassName('share_leaf');
             oForm.removeClassName('readonly_mode');
             oForm.removeClassName('type-ws');
+            oForm.removeClassName('share_expired');
+            oForm.removeClassName("share_edit");
             var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
             if(this.currentNode.isLeaf()) oForm.addClassName('share_leaf');
             if(this.readonlyMode) oForm.addClassName('readonly_mode');
@@ -274,12 +286,14 @@ Class.create("ShareCenter", {
             if(this.maxdownload > 0){
                 oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
             }
-            this.authorizations = {
-                folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
-                folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
-                file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
-                editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
-            };
+            if(!this.authorizations){
+                this.authorizations = {
+                    folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+                    folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+                    file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+                    editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+                };
+            }
 
             if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
                 alert('You are not authorized to share folders');
@@ -290,7 +304,7 @@ Class.create("ShareCenter", {
                 hideLightBox();
                 return;
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
-                this.shareFolderMode = "workspaces";
+                this.shareFolderMode = "workspace";
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
                 this.shareFolderMode = "minisite_public";
             }
@@ -342,14 +356,13 @@ Class.create("ShareCenter", {
 
 
             var nodeMeta = this.currentNode.getMetadata();
-            oForm.removeClassName("share_edit");
             if(nodeMeta.get("ajxp_shared")) oForm.addClassName("share_edit");
             oForm.down("div#target_repository_toggle").select("a").invoke( "observe", "click", function(){
                 oForm.toggleClassName("edit_parameters");
                 modal.refreshDialogPosition();
             });
 
-            if(!this.authorizations.editable_hash || !nodeMeta.get("ajxp_shared")){
+            if(!this.authorizations.editable_hash){
                 oForm.down('#editable_hash_container').hide();
             }
 
@@ -420,17 +433,33 @@ Class.create("ShareCenter", {
                         if(json['password']){
                             oForm.down('input[name="guest_user_pass"]').setValue(json['password']);
                         }
+                        if(json['has_password']){
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', '***********');
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'true');
+                            oForm.down('#remove_user_pass').show();
+                            oForm.down('#remove_user_pass').observeOnce('click', function(){
+                                oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
+                                oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', MessageHash['share_center.148']);
+                                oForm.down('#remove_user_pass').hide();
+                            });
+                        }else{
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
+                            oForm.down('#remove_user_pass').hide();
+                        }
                         if(json['expire_time']){
                             oForm.down('input[name="expiration"]').setValue(json['expire_after']);
                         }
                         if(json['download_limit']){
                             oForm.down('input[name="downloadlimit"]').setValue(json['download_limit']);
                         }
+                        var chooser = this.createTemplateChooser(oForm);
+                        var container = oForm.down('.layout_template_container');
+                        container.insert(chooser);
                         if(json["minisite_layout"]){
-                            var chooser = this.createTemplateChooser(oForm);
-                            var container = oForm.down('.layout_template_container');
-                            container.insert(chooser);
                             chooser.setValue(json['minisite_layout']);
+                        }
+                        if(json['is_expired']){
+                            oForm.addClassName('share_expired');
                         }
                     }catch(e){}
                     oForm.down('#complete_indicator').hide();
@@ -483,6 +512,10 @@ Class.create("ShareCenter", {
                 $('shared_user').observeOnce("focus", function(){
                     $('share_folder_form').autocompleter.activate();
                 });
+                if(this.authorizations.editable_hash){
+                    oForm.down('#editable_hash_link').insert({top:MessageHash['share_center.171'] + ': '});
+                }
+
                 if(this.shareFolderMode != "workspace"){
                     var generateButton = oForm.down("#generate_publiclet");
                     var container = oForm.down('.layout_template_container');
@@ -525,6 +558,7 @@ Class.create("ShareCenter", {
             if(!reload){
                 window.setTimeout(modal.refreshDialogPosition.bind(modal), 400);
             }
+            this.accordionize(oForm);
 
         }.bind(this);
         var closeFunc = function (oForm){
@@ -536,7 +570,7 @@ Class.create("ShareCenter", {
                     $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
                 }
             }
-        }
+        };
         if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
             ajaxplorer.displayMessage('ERROR', MessageHash[394]);
         }else{
@@ -602,8 +636,9 @@ Class.create("ShareCenter", {
             values[name] = element;
             chooser.insert(new Element('option', {value:element}).update(label));
         });
+        var read;
         if(linkRightsToTemplates && values["unique_preview_file"] && values["unique_preview_download"]){
-            var read = oForm.down("#simple_right_read");
+            read = oForm.down("#simple_right_read");
             var download = oForm.down("#simple_right_download");
             var observer = function(){
                 if(!read.checked && !download.checked){
@@ -619,7 +654,7 @@ Class.create("ShareCenter", {
             download.observe("click", observer);
 
         }else if(noEditorsFound){
-            var read = oForm.down("#simple_right_read");
+            read = oForm.down("#simple_right_read");
             read.checked = false;
             read.disabled = true;
             read.next("label").insert(" (no preview for this file)");
@@ -633,12 +668,17 @@ Class.create("ShareCenter", {
 
         oRow.down('[name="link_url"]').setValue(linkData["publiclet_link"]);
         oRow.down('[name="link_tag"]').setValue('');
+        /*
         var actions = oRow.down('.SF_horizontal_actions');
         if(linkData['has_password']){
             actions.insert({top:new Element('span', {className:'icon-key simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update(' '+MessageHash["share_center.84"])});
         }
         if(linkData["expire_time"]){
-            actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
+            if(linkData['is_expired'] && linkData['expire_after'] <= 0 && (linkData['download_limit'] && linkData['download_limit'] != linkData['download_counter'])){
+                actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update(' '+linkData["expire_time"])});
+            }else{
+                actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
+            }
         }
         var dlC = new Element('span', {className:'icon-download-alt simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update(' '+MessageHash["share_center.88"]+' '+linkData['download_counter']+'/'+linkData['download_limit']);
         actions.insert({top:dlC});
@@ -656,7 +696,7 @@ Class.create("ShareCenter", {
                 conn.sendAsync();
             }
         }.bind(this));
-
+        */
         oRow.down('[data-action="remove"]').observe("click", function(){
             this.performUnshareAction(linkData['element_id'], oRow);
         }.bind(this));
@@ -667,6 +707,9 @@ Class.create("ShareCenter", {
 
         if(linkData['tags']){
             oRow.down('[name="link_tag"]').setValue(linkData['tags']);
+        }
+        if(linkData['is_expired']){
+            oRow.addClassName('share_expired');
         }
         oRow.down('[name="link_tag"]').observe("keydown", function(event){
             if(event.keyCode == Event.KEY_RETURN){
@@ -686,6 +729,37 @@ Class.create("ShareCenter", {
 
         oRow.select('span.simple_tooltip_observer').each(function(e){
             modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
+        });
+
+    },
+
+    accordionize: function(form){
+
+        form.select('div[data-toggleBlock]').each(function(toggler){
+
+            var toggled = form.down('#' + toggler.readAttribute('data-toggleBlock'));
+            if(!toggled) return;
+
+
+            toggler.addClassName('share_dialog_toggler');
+            var initialHeight = toggled.getHeight();
+            if(initialHeight){
+                toggled.setStyle({height: initialHeight+'px'});
+            }
+            if(!toggled.hasClassName('share_dialog_toggled_open')){
+                toggled.addClassName('share_dialog_toggled_closed');
+            }else{
+                toggler.addClassName('share_dialog_toggler_closed');
+            }
+            toggler.insert({top: '<span class="icon-angle-down toggler_arrow"></span>'});
+            toggler.observe('click', function(){
+                toggled.toggleClassName('share_dialog_toggled_closed');
+                toggler.toggleClassName('share_dialog_toggler_closed');
+                window.setTimeout(function(){
+                    modal.refreshDialogPosition();
+                }, (initialHeight?700:10));
+            });
+
         });
 
     },
@@ -727,18 +801,6 @@ Class.create("ShareCenter", {
                     }.bind(this));
 
                 }
-                /*
-                this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_EXPIRATION"));
-                if(this.maxexpiration > 0){
-                    oForm.down("[name='expiration']").setValue(this.maxexpiration);
-                }
-                this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_DOWNLOAD"));
-                if(this.maxdownload > 0){
-                    oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
-                }
-                var button = $(oForm).down('#generate_publiclet');
-                button.observe("click", this.generatePublicLinkCallback.bind(this));
-                */
             }.bind(this),
             function(oForm){
                 oForm.down('#generate_publiclet').stopObserving("click");
@@ -771,8 +833,9 @@ Class.create("ShareCenter", {
                 if(!jsonData) return ;
                 var linksCount = jsonData.length;
                 jsonData = jsonData[0];
+                var linkExpired = jsonData['is_expired']?true:false;
                 var directLink = "";
-                if(!jsonData.has_password){
+                if(!jsonData['has_password'] && !jsonData['is_expired']){
                     var shortlink = jsonData.publiclet_link + (jsonData.publiclet_link.indexOf('?') !== -1 ? '&' : '?') + 'dl=true';
                     directLink += '\
                     <div class="infoPanelRow">\
@@ -802,9 +865,10 @@ Class.create("ShareCenter", {
                 }
 
                 container.down('#ajxp_shared_info_panel .infoPanelTable').update('\
+                    <div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ '</div>\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
-                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" class="'+(jsonData['is_expired']?'share_info_panel_link_expired':'')+'" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
                     </div>'+directLink+'\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.51']+'</div>\
@@ -830,42 +894,48 @@ Class.create("ShareCenter", {
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
                 });
-
+                var pwdProtected = '';
+                if(jsonData['has_password']){
+                    pwdProtected = ' ' + MessageHash['share_center.170'];
+                }
                 if(node.isLeaf()){
                     // LEAF SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ ' ' + pwdProtected + '</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.121']+'</div>\
-                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
                         </div>\
                     ');
+                    if(!jsonData['is_expired'] && !jsonData['has_password'] && jsonData['content_filter']){
+                        mainCont.insert(
+                            '<div class="infoPanelRow">\
+                            <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
+                            <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
+                        </div>');
+                    }
+                    var dlPath = jsonData['content_filter']['filters'][node.getPath()];
+                    mainCont.down("#embed_code").setValue("<a href='"+ jsonData.minisite.public_link +"?dl=true&file="+dlPath+"'>Download "+ getBaseName(node.getPath()) +"</a>");
 
                 }else if(jsonData.minisite){
                     // MINISITE FOLDER SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"]+'</div>');
-                    // Label
-                    /*
-                    mainCont.insert('\
-                    <div class="infoPanelRow">\
-                        <div class="infoPanelLabel">'+MessageHash['share_center.35']+'</div>\
-                        <div class="infoPanelValue">'+ jsonData.label +'</div>\
-                    </div>');
-                    */
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"+(jsonData['is_expired']?'b':'')]+ pwdProtected + '</div>');
                     // Links textearea
                     mainCont.insert('\
                         <div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.62']+'</div>\
-                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
-                        </div>\
-                        <div class="infoPanelRow">\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                        </div>');
+                    if(!jsonData['is_expired']){
+                        mainCont.insert(
+                            '<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
-                        </div>\
-                    ');
+                        </div>');
+                    }
                     mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                 }else{
                     // WORKSPACE FOLDER
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"+(jsonData['is_expired']?'b':'')]+'</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.54']+'</div>\
                         <div class="infoPanelValue">'+ entries.join(', ') +'</div>\
@@ -1034,7 +1104,7 @@ Class.create("ShareCenter", {
                         }
                         conn.onComplete = function(transport){
                             ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                        }
+                        };
                         conn.sendAsync();
                     }
                 }.bind(this));
@@ -1122,9 +1192,14 @@ Class.create("ShareCenter", {
         }
 
         // QRCODE BUTTON
+        console.log(dialogButtonsOrRow);
         var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
-        if (this.createQRCode && qrcodediv) {
-
+        if (this.createQRCode) {
+            if(!qrcodediv){
+                qrcodediv = new Element('div', {className:'share_qrcode'});
+                dialogButtonsOrRow.insert(qrcodediv);
+                qrcodediv.hide();
+            }
             if(!dialogButtonsOrRow.down('#qrcode_button')){
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'><span class='icon-qrcode'></span> "+MessageHash['share_center.95']+"</span>"});
             }
@@ -1158,7 +1233,14 @@ Class.create("ShareCenter", {
         // DOWNLOAD COUNTER BUTTON
         if(jsonData && jsonData["download_limit"]){
 
-            var dlC = new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            var dlC;
+            if(jsonData['is_expired'] && jsonData['download_limit'] && jsonData['download_limit'] == jsonData['download_counter']){
+                dlC = new Element('span', {className:'simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.168"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            }else{
+                dlC = new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            }
+
+
             dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:dlC});
             dlC.observe("click", function(){
                 if(window.confirm(MessageHash['share_center.106'])){
@@ -1175,16 +1257,25 @@ Class.create("ShareCenter", {
 
         }
 
+        // PASSWORD BUTTON
+        if(jsonData['has_password']){
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update('<span class="icon-key"></span> '+MessageHash["share_center.84"])});
+        }
+
         // EXPIRATION TIME
         if(jsonData && jsonData["expire_time"]){
-            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update('<span class="icon-calendar"></span> '+jsonData["expire_time"])});
+            if(jsonData['is_expired'] && jsonData['expire_after'] <= 0 && (jsonData['download_limit'] && jsonData['download_limit'] != jsonData['download_counter'])){
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update('<span class="icon-calendar"></span> '+ jsonData["expire_time"])});
+            }else{
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update('<span class="icon-calendar"></span> '+jsonData["expire_time"])});
+            }
         }
 
         if(updateFunc){
             var aSpan = new Element('span', {
                 className:'',
                 title:MessageHash['share_center.152']
-            }).update('<span class="icon-refresh"></span> '+MessageHash['share_center.152']);
+            }).update('<span class="icon-save"></span> '+MessageHash['share_center.152']);
             var editButton = new Element('div', {className:'largeButton'}).update(aSpan);
             bottomButtonsContainer.insert(editButton);
             bottomButtonsContainer.show();

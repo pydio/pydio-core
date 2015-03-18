@@ -20,10 +20,10 @@
 */
 
 $mess = array(
-"Admin access" => "&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access",
-"Global options" => "&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options",
-"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Configurations storage",
-"Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users",
+"Admin access" => "<span class='icon-key'></span> Admin access",
+"Global options" => "<span class='icon-cogs'></span> Global options",
+"Configurations storage" => "<span class='icon-save'></span> Configurations storage",
+"Add some users" => "<span class='icon-group'></span> Add some users",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace.",
 "Admin Login" => "Admin Login",
 "Alphanumeric login" => "Alphanumeric login",
@@ -45,10 +45,10 @@ $mess = array(
 "Set up the correct value to send emails" => "Set up the correct value to send emails",
 "Administrator Email" => "Administrator Email",
 "Default 'From' email used to send emails." => "Default 'From' email used to send emails.",
-"How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). 'No DB' mode can be suited for a quick test of the system, but it's not suited for production and you should always prefer a db-based setup (sqlite does not require any additional service).",
+"How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "How the application configuration data will be stored (users, plugins, etc. <b>not</b> how your actual documents are managed). 'No DB' mode can be suited for a quick test of the system, but it's not suited for production and you should always prefer a db-based setup (sqlite does not require any additional service).",
 "Storage Type" => "Storage Type",
 "Select how the configurations will be stored" => "Select how the configurations will be stored",
-"No Database (Quick Start)" => "No DB (Quick Start, not for production)",
+"No Database (Quick Start)" => "No DB (Deprecated, use sqlite instead!)",
 "Database system (production environments, requires a DBMS supported by APPLICATION_TITLE))" => "Database (production environments, requires a DBMS supported by APPLICATION_TITLE)",
 "Enable Notifications" => "Enable Notifications",
 "Log all events and alerts" => "Log all events and alerts",

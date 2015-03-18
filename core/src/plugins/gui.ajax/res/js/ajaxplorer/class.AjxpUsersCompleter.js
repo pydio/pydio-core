@@ -132,7 +132,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             Event.stop(event);
                             var close = false;
                             if(event.target.name == "ok"){
-                                if( !createUserPass.value || createUserPass.value.length < ajxpBootstrap.parameters.get('password_min_length')){
+                                if( !createUserPass.value || createUserPass.value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
                                     alert(MessageHash[378]);
                                 }else if(createUserPass.getValue() == createUserConfirmPass.getValue()){
                                     li.NEW_USER_PASSWORD = createUserPass.getValue();
@@ -162,28 +162,28 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                         var f = new FormManager();
                         var def1 = $A();
                         def1.push($H({
-                            description: "User ID",
+                            description: MessageHash['533'],
                             editable: false,
                             expose: "true",
-                            label: "User ID",
+                            label: MessageHash['522'],
                             name: "new_user_id",
                             scope: "user",
                             type: "string",
                             mandatory: "true"
                         }),$H({
-                            description: "New user password",
+                            description: MessageHash['534'],
                             editable: "true",
                             expose: "true",
-                            label: "Password",
+                            label: MessageHash['523'],
                             name: "new_password",
                             scope: "user",
                             type: "password-create",
                             mandatory: "true"
                         }),$H({
-                            description: "Send a welcome mail containing the password to the user (email must be set)",
+                            description: MessageHash['536'],
                             editable: "true",
                             expose: "true",
-                            label: "Send password by email",
+                            label: MessageHash['535'],
                             name: "send_email",
                             scope: "user",
                             type: "boolean",
