@@ -9,6 +9,7 @@
     <client_settings>
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
+            <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -33,6 +34,11 @@
             <script>
                   document.observe("ajaxplorer:afterApply-login", function(){
                     var f= modal.getForm();
+
+                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
+
+                    if(!enableModifyGUI) return;
+
                     if(f.down('input[name="otp_code"]')){
                         return;
                     }
