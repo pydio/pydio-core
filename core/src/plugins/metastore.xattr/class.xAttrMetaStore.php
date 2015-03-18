@@ -119,7 +119,7 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
             //throw new Exception("Filesystem does not support Extended Attributes!");
             return array();
         }
-        if($private == AJXP_METADATA_ALLUSERS){
+        if($private === AJXP_METADATA_ALLUSERS){
             $startKey = $this->getMetaKey($nameSpace, $scope, "");
             $arrMeta = array();
             $keyList = xattr_list($path);
