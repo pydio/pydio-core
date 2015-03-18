@@ -70,7 +70,7 @@ class AjxpMailer extends AJXP_Plugin
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
         $forceFrom = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
         $coreFrom = ConfService::getCoreConf("FROM", "mailer");
-        if($forceFrom && $from != null){
+        if($forceFrom && $coreFrom != null){
             $coreFromName = ConfService::getCoreConf("FROM_NAME", "mailer");
             $from = array("adress" => $coreFrom, "name" => $coreFromName);
         }
