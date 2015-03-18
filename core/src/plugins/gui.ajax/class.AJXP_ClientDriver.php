@@ -144,7 +144,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
                     if(strlen($root) > 1) $root = rtrim($root, '/').'/';
                 }else{
-                    preg_match ('/ws-(.)*\/|settings|dashboard|welcome/', $root, $matches, PREG_OFFSET_CAPTURE);
+                    preg_match ('/ws-(.)*\/|settings|dashboard|welcome|user/', $root, $matches, PREG_OFFSET_CAPTURE);
                     if(count($matches)){
                         $capture = $matches[0][1];
                         $root = substr($root, 0, $capture);

@@ -79,16 +79,14 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $this->storage = ConfService::getConfStorageImpl();
         if(!is_a($this->storage, "sqlConfDriver")) return false;
 
-        $user = AuthService::getLoggedUser()->getId();
-        if($userId == $user || AuthService::getLoggedUser()->isAdmin()){
-            $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($userId).':"'.$userId.'"%');
-            foreach($keys as $keyId => $keyData){
-                $this->storage->simpleStoreClear("keystore", $keyId);
-            }
-            if(count($keys)){
-                $this->logInfo(__FUNCTION__, "Revoking ".count($keys)." keys for user '".$userId."' on password change action.");
-            }
+        $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($userId).':"'.$userId.'"%');
+        foreach($keys as $keyId => $keyData){
+            $this->storage->simpleStoreClear("keystore", $keyId);
         }
+        if(count($keys)){
+            $this->logInfo(__FUNCTION__, "Revoking ".count($keys)." keys for user '".$userId."' on password change action.");
+        }
+        return null;
     }
 
     /**
