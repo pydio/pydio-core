@@ -30,10 +30,9 @@ Class.create("OTP_LoginForm", {
         if(!obj_loginform.down(("#add_otp_notion"))){
             obj_loginform.insert({bottom:otpEnabled});
         }
-
     }
 });
 var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
-if(enableModifyGUI){
-    window.CASFORM = new OTP_LoginForm();
+if(!enableModifyGUI){
+    window.OTPFORM = new OTP_LoginForm();
 }
