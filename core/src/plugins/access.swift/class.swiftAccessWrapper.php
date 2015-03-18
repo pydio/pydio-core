@@ -122,6 +122,12 @@ class swiftAccessWrapper extends fsAccessWrapper
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
         $parsed = parse_url($path);
+        if(mb_substr($p, -1, null, "UTF-8") == '/') {
+            $dirStat = @stat($p . '.marker');
+            $stat["mtime"] = $dirStat["mtime"];
+            $stat["ctime"] = $dirStat["ctime"];
+            $stat["atime"] = $dirStat["atime"];
+        }
         if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
             return null;
@@ -195,7 +201,8 @@ class swiftAccessWrapper extends fsAccessWrapper
     public function mkdir($path, $mode, $options)
     {
         $this->realPath = $this->initPath($path, "dir", true);
-        file_put_contents($this->realPath."/.marker", "tmpdata");
+        file_put_contents($this->realPath."/.marker", "");
+
         return true;
     }
 
@@ -252,5 +259,26 @@ class swiftAccessWrapper extends fsAccessWrapper
         // DO NOTHING!
         //$realPath = self::initPath($path, "file");
         //chmod($realPath, $chmodValue);
+    }
+
+    public function rename($from, $to)
+    {
+        $path = $this->initPath($from, "file", false, true);
+        $dirSep = mb_substr($path, -1, null, "UTF-8") != '/' ? '/' : '';
+        if(file_exists($path . $dirSep . '.marker')) {
+            $dir = $path  . $dirSep;
+            $newdir = $this->initPath($to, "file", false, true) . '/';
+            $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::SELF_FIRST);
+            foreach($objects as $name => $object){
+                $newname = str_replace($dir, $newdir, $name);
+                if(mb_substr($newname, -1, null, "UTF-8") != '/') {
+                    rename($name, $newname);
+                } 
+            }
+
+            return true;
+        } else {
+            return parent::rename($from, $to);
+        }
     }
 }
