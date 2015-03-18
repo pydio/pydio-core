@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ajxp_conf" label="CONF_MESSAGE[Admin Driver]" description="CONF_MESSAGE[Access Pydio configuration data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver name="ajxp_conf" enabled="always" label="CONF_MESSAGE[Admin Driver]" description="CONF_MESSAGE[Access Pydio configuration data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <core_relation packaged="true" tested_version="4.2.0"/>
         <plugin_author>Charles du Jeu</plugin_author>

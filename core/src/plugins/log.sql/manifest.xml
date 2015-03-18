@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<logdriver name="sql" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the logs in an SQL database.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_consumer">
+<logdriver name="sql" enabled="always" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the logs in an SQL database.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_consumer">
     <client_settings>
         <resources>
             <i18n namespace="sql_logger" path="plugins/log.sql/i18n"/>

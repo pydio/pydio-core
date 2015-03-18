@@ -173,7 +173,7 @@
         <xs:attribute name="name" use="optional" type="xs:NCName"/>
         <xs:attribute name="label" use="required"/>
         <xs:attribute name="description" use="required"/>
-        <xs:attribute name="enabled" use="optional" type="xs:boolean"/>
+        <xs:attribute name="enabled" use="optional" type="xs:string"/>
         <xs:attribute name="mixins" use="optional" type="xs:string"/>
     </xs:complexType>
 

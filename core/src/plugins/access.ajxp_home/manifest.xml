@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver id="access.ajxp_home" label="CONF_MESSAGE[Welcome Page]" description="CONF_MESSAGE[Welcome Page displaying a list of workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver id="access.ajxp_home" enabled="always" label="CONF_MESSAGE[Welcome Page]" description="CONF_MESSAGE[Welcome Page displaying a list of workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/i18n" />

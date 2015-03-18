@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="authfront.session_login" enabled="true" label="CONF_MESSAGE[Standard login screen]"
+<ajxpcore id="authfront.session_login" enabled="always" label="CONF_MESSAGE[Standard login screen]"
           description="CONF_MESSAGE[Display a standard user/password login screen]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.session_login/class.SessionLoginFrontend.php" classname="SessionLoginFrontend"/>
