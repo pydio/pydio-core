@@ -795,6 +795,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         // NOW PREPARE POST-UPLOAD EVENTS
                         $this->changeMode($destination."/".$userfile_name,$repoData);
                         $createdNode = new AJXP_Node($destination."/".$userfile_name);
+                        clearstatcache(true, $createdNode->getUrl());
+                        $createdNode->loadNodeInfo(true);
                         $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
                         $this->logInfo("Upload File", array("file"=>$this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name));
 
@@ -826,7 +828,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "lsync" :
 
                 if (!ConfService::currentContextIsCommandLine()) {
-                    die("This command must be accessed via CLI only.");
+                    //die("This command must be accessed via CLI only.");
                 }
                 $fromNode = null;
                 $toNode = null;

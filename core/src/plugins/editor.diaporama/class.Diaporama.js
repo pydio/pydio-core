@@ -537,6 +537,11 @@ Class.create("Diaporama", AbstractEditor, {
 	updateImage : function(){
 
         var node = this.nodes.get(this.currentFile);
+        var mstring = '';
+        if(node && node.getMetadata().get('ajxp_modiftime')){
+            mstring = '&time_seed=' + node.getMetadata().get('ajxp_modiftime');
+        }
+
         if(node && node.getMetadata().get("image_dimensions_thumb")){
             var sizeLoader = new Image();
             var tmpThis = this;
@@ -547,12 +552,12 @@ Class.create("Diaporama", AbstractEditor, {
                 tmpThis.sizes.set(tmpThis.currentFile, {width:this.width, height: this.height});
                 tmpThis.updateImage();
             };
-            sizeLoader.src = this.baseUrl + "&file=" + encodeURIComponent(this.currentFile);
+            sizeLoader.src = this.baseUrl + mstring + "&file=" + encodeURIComponent(this.currentFile);
             return;
         }
 
         var dimObject = this.sizes.get(this.currentFile);
-        var URL = this.getLowResUrl(dimObject) + encodeURIComponent(this.currentFile);
+        var URL = this.getLowResUrl(dimObject, mstring) + encodeURIComponent(this.currentFile);
 		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
 			this.jsImage.src  = URL;
@@ -567,7 +572,7 @@ Class.create("Diaporama", AbstractEditor, {
         this.updateInfoPanel();
 	},
 
-    getLowResUrl: function(dimObject){
+    getLowResUrl: function(dimObject, time_seed){
         var h = parseInt(dimObject.height);
         var w = parseInt(dimObject.width);
         this.currentIsLowRes = false;
@@ -587,6 +592,7 @@ Class.create("Diaporama", AbstractEditor, {
             else break;
         }
         var hasThumb = thumbLimit && (reference > thumbLimit);
+        var time_seed_string = time_seed?time_seed:'';
         if(!this.forceOriginal && hasThumb){
             if(h>w){
                 this.crtHeight = thumbLimit;
@@ -597,12 +603,12 @@ Class.create("Diaporama", AbstractEditor, {
             }
             this.toggleShowOriginal("thumb");
             this.currentIsLowRes = true;
-            return this.baseUrl + "&get_thumb=true&dimension="+thumbLimit+"&file=";
+            return this.baseUrl + time_seed_string + "&get_thumb=true&dimension="+thumbLimit+"&file=";
         }else{
             this.toggleShowOriginal(hasThumb?"original":"hidden");
             this.crtHeight = h;
             this.crtWidth = w;
-            return this.baseUrl + "&file=";
+            return this.baseUrl + time_seed_string + "&file=";
         }
     },
 
@@ -814,7 +820,8 @@ Class.create("Diaporama", AbstractEditor, {
         if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
             repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
         }
-		var source = ajxpServerAccessPath + repoString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+        var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
+		var source = ajxpServerAccessPath + repoString + mtimeString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 		if(ajxpNode.getParent()){
             var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
     		if(preview_seed){
