@@ -178,9 +178,24 @@ class EtherpadClient extends AJXP_Plugin
      * @param AJXP_Node $ajxpNode
      */
     public function hideExtension(&$ajxpNode){
-        if(strtolower(pathinfo($ajxpNode->getPath(), PATHINFO_EXTENSION)) == "pad"){
+        if($ajxpNode->hasExtension("pad")){
             $baseName = AJXP_Utils::safeBasename($ajxpNode->getPath());
             $ajxpNode->setLabel(str_replace(".pad", "", $baseName));
         }
     }
+
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
+     * @param bool $copy
+     */
+    public function handleNodeChange($fromNode=null, $toNode=null, $copy = false){
+        if($fromNode == null) return;
+        if($toNode == null){
+            $fromNode->removeMetadata("etherpad", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+        }else if(!$copy){
+            $toNode->copyOrMoveMetadataFromNode($fromNode, "etherpad", "move", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+        }
+    }
+
 }

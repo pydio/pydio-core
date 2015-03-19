@@ -124,6 +124,7 @@
         </extensions>
         <hooks>
             <serverCallback methodName="hideExtension" hookName="node.info"/>
+            <serverCallback methodName="handleNodeChange" hookName="node.change"/>
         </hooks>
     </registry_contributions>
     <class_definition classname="EtherpadClient" filename="plugins/editor.etherpad/class.EtherpadClient.php"/>
