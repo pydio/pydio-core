@@ -176,7 +176,6 @@ class AJXP_Node
     }
 
     /**
-     * @abstract
      * @param String $nameSpace
      * @param bool $private
      * @param int $scope
@@ -195,10 +194,11 @@ class AJXP_Node
     }
 
     /**
-     * @abstract
      * @param String $nameSpace
      * @param bool $private
      * @param int $scope
+     * @param bool $indexable
+     * @return array
      */
     public function retrieveMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
     {
@@ -211,8 +211,34 @@ class AJXP_Node
             }
             return $data;
         }
+        return array();
     }
 
+    /**
+     * @param AJXP_Node $originalNode
+     * @param string $nameSpace
+     * @param string $operation
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @return array()
+     */
+    public function copyOrMoveMetadataFromNode($originalNode, $nameSpace, $operation="move", $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+
+        if($this->getMetaStore() == false || $this->getMetaStore()->inherentMetaMove()){
+            return array();
+        }
+        $metaData = $originalNode->retrieveMetadata($nameSpace, $private, $scope, $indexable);
+        if(isSet($metaData) && !empty($metaData)){
+            $this->setMetadata($nameSpace, $metaData, $private, $scope, $indexable);
+            if($operation == "move"){
+                $originalNode->removeMetadata($nameSpace, $private, $scope, $indexable);
+            }
+            return $metaData;
+        }
+        return array();
+
+    }
 
     /**
      * @return AJXP_Node|null
@@ -324,6 +350,21 @@ class AJXP_Node
     public function getLabel()
     {
         return isSet($this->_metadata["text"])? $this->_metadata["text"] : basename($this->urlParts["path"]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension(){
+        return strtolower(pathinfo($this->urlParts["path"], PATHINFO_EXTENSION));
+    }
+
+    /**
+     * @param $string
+     * @return bool
+     */
+    public function hasExtension($string){
+        return strcasecmp($string, $this->getExtension()) == 0;
     }
 
     /**
