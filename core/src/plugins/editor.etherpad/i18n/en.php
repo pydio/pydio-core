@@ -29,5 +29,6 @@ $mess = array(
     "6" => "Files",
     "7" => "Join",
     "8" => "Board name",
-    "9" => "Create new board",
+    "9" => "You can also create <a>new discussion board</a>",
+    "10" => "Export"
 );

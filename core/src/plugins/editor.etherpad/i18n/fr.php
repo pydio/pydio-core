@@ -29,5 +29,6 @@ $mess = array(
     "6" => "Fichiers",
     "7" => "Rejoindre",
     "8" => "Nom de l'adroise",
-    "9" => "Créer une nouvelle ardoise",
+    "9" => "Vous pouvez aussi <a>créer une nouvelle ardoise de discussion</a>",
+    "10" => "Exporter"
 );

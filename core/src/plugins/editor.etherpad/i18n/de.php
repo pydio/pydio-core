@@ -29,5 +29,6 @@ $mess = array(
     "6" => "Dateien",
     "7" => "Beitreten",
     "8" => "Board name",
-    "9" => "Neues Board erstellen",
+    "9" => "You can also create <a>new discussion board</a>",
+    "10" => "Export"
 );
