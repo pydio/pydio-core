@@ -560,10 +560,12 @@ class AJXP_XMLWriter
             }
             $buffer.="</preferences>";
             $buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"  ".($lock!==false?"lock=\"$lock\"":"")."/>";
+            /*
             $bMarks = $loggedUser->getBookmarks();
             if (count($bMarks)) {
                 $buffer.= "<bookmarks>".AJXP_XMLWriter::writeBookmarks($bMarks, false)."</bookmarks>";
             }
+            */
             $buffer.="</user>";
         }
         return $buffer;
