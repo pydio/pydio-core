@@ -352,6 +352,26 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }
     }
 
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
+     * @param bool $copy
+     */
+    public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){
+        if($copy || $fromNode == null) return;
+        $user = AuthService::getLoggedUser();
+        if($user == null) return;
+        if (!isSet(self::$loadedBookmarks)) {
+            self::$loadedBookmarks = $user->getBookmarks();
+        }
+        if($toNode == null) {
+            $fromNode->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        } else {
+            $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        }
+        AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId()));
+    }
+
     public static function filterXml(&$value)
     {
         $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");

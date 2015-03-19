@@ -176,7 +176,8 @@
 			</action>
 		</actions>
         <hooks>
-            <serverCallback hookName="node.info" methodName="nodeBookmarkMetadata"></serverCallback>
+            <serverCallback hookName="node.info" methodName="nodeBookmarkMetadata"/>
+            <serverCallback hookName="node.change" methodName="nodeChangeBookmarkMetadata"/>
         </hooks>
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
