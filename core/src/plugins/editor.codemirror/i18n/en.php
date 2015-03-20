@@ -29,5 +29,5 @@ $mess=array(
 "7" => "Undo",
 "8"	=> "Redo",
 "9"	=> "Text Search",
-"10" => "Indent size"
+"10" => "Indent size",
 );

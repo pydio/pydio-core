@@ -39,5 +39,5 @@ $mess = array(
     "MOVE"          => "File moved",
     "MODIFICATION"  => "Content modified",
     "DELETION"      => "File deleted",
-    "CREATION"      => "File created"
+    "CREATION"      => "File created",
 );
