@@ -360,7 +360,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="disable"/>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,group,ajxp_plugin,ajxp_role,ajxp_graphs,datagrid" behaviour="hidden"/>
             </gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
@@ -445,7 +445,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false"/></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false" behaviour="hidden"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
