@@ -135,7 +135,8 @@ class AJXP_Plugin implements Serializable
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
-    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
+    //protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
+    public function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
     {
         if(!is_array($this->options)) $this->options = array();
         $merged = $this->options;
