@@ -143,6 +143,12 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         if($this->getOption("MOUNT_ENV_PASSWD") === true){
             putenv("PASSWD=");
         }
+        $resultsOptions = str_replace(" ", "", $this->getOption("MOUNT_RESULT_SUCCESS"));
+        $acceptedResults = array(0);
+        if(!empty($resultsOptions)){
+            $acceptedResults = array_merge($acceptedResults, array_map("intval", explode(",", $resultsOptions)));
+        }
+
         if($res === null){
             // Check it is correctly mounted now!
             // Could not get the output return code
@@ -150,7 +156,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             $output = shell_exec($cmd1);
             $success = !empty($output);
         }else{
-            $success = ($res == 0 || $res == 32);
+            $success = (in_array($res, $acceptedResults));
         }
         if (!$success) {
             throw new Exception("Error while mounting file system!");

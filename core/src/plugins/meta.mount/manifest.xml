@@ -9,6 +9,7 @@
    		<param name="MOUNT_POINT" type="string" label="CONF_MESSAGE[Mount Point]" description="CONF_MESSAGE[Mount Path, use AJXP_USER]" mandatory="true" default=""/>
    		<param name="MOUNT_OPTIONS" type="string" label="CONF_MESSAGE[Mount Options]" description="CONF_MESSAGE[Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID]" mandatory="false" default="user=AJXP_USER,pass=AJXP_PASS,uid=AJXP_SERVER_UID,gid=AJXP_SERVER_GID"/>
    		<param name="MOUNT_ENV_PASSWD" type="boolean" label="CONF_MESSAGE[Pass Password via environment instead of command line]" description="CONF_MESSAGE[Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly.]" mandatory="false" default="false"/>
+   		<param name="MOUNT_RESULT_SUCCESS" type="string" label="CONF_MESSAGE[Additional result codes to accept as success]" description="CONF_MESSAGE[On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes.]" mandatory="false" default="32"/>
    		<param name="REMOVE_MOUNTPOINT_ON_UNMOUNT" type="boolean" label="CONF_MESSAGE[Remove mount point on unmount]" description="CONF_MESSAGE[Delete mount folder on unmount. Can be required for security reasons.]" mandatory="false" default="false"/>
     </server_settings>
    	<client_settings>
