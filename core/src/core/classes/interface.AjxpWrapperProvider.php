@@ -63,6 +63,17 @@ interface AjxpWrapperProvider
 
     /**
      * @param String $node
+     * @param null $newSize
+     * @return
      */
     public function nodeWillChange($node, $newSize = null);
+
+    /**
+     * @param $nodePath
+     * @param $nodeName
+     * @param $isLeaf
+     * @param $lsOptions
+     * @return mixed
+     */
+    public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions);
 }

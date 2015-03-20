@@ -153,10 +153,11 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             if ($file == "." || $file == "..") {
                 continue;
             }
-            if ( !$this->repository->getOption("SHOW_HIDDEN_FILES") && AJXP_Utils::isHidden($file)) {
+            // This function will perform the is_dir() call and update $isDir variable.
+            if (!$this->getAccessDriver()->filterNodeName($this->getUrl(), $file, $isLeaf, array("d"=>true, "f"=>true, "z"=>true))){
                 continue;
             }
-            if ( is_dir( $this->getUrl() . "/" . $file ) ) {
+            if ( !$isLeaf ) {
                 // Add collection without any children
                 $contents[] = new AJXP_Sabre_Collection($this->path."/".$file, $this->repository, $this->getAccessDriver());
             } else {
