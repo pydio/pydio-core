@@ -153,7 +153,8 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             if ($file == "." || $file == "..") {
                 continue;
             }
-            if ( !$this->repository->getOption("SHOW_HIDDEN_FILES") && AJXP_Utils::isHidden($file)) {
+            //if ( !$this->repository->getOption("SHOW_HIDDEN_FILES") && AJXP_Utils::isHidden($file)) {
+            if ( !$this->getAccessDriver()->getFilteredOption("SHOW_HIDDEN_FILES") && AJXP_Utils::isHidden($file)) {    
                 continue;
             }
             if ( is_dir( $this->getUrl() . "/" . $file ) ) {
