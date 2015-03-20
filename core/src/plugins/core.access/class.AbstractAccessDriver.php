@@ -237,11 +237,14 @@ class AbstractAccessDriver extends AJXP_Plugin
                 $destFile = $destUrlBase.$destDir."/".$newName;
             }
         }
+        $srcNode = new AJXP_Node($realSrcFile);
+        $destNode = new AJXP_Node($destFile);
         if (!is_file($realSrcFile)) {
             $errors = array();
             $succFiles = array();
+            $srcNode->setLeaf(false);
             if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
+                AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) $this->deldir($destFile, $destRepoData);
                 $res = rename($realSrcFile, $destFile);
             } else {
@@ -251,23 +254,24 @@ class AbstractAccessDriver extends AJXP_Plugin
                 $error[] = $mess[114];
                 return ;
             } else {
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
+                $destNode->setLeaf(false);
+                AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, !$move));
             }
         } else {
             if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
+                AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
                 if(strcmp($srcWrapperName,$destWrapperName) === 0){
                     $res = rename($realSrcFile, $destFile);
                 }else{
                     $res = copy($realSrcFile, $destFile);
                 }
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
+                AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, false));
             } else {
                 try {
                     $this->filecopy($realSrcFile, $destFile, $srcWrapperName, $destWrapperName);
                     $this->changeMode($destFile, $destRepoData);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
+                    AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, true));
                 } catch (Exception $e) {
                     $error[] = $e->getMessage();
                     return ;
