@@ -155,7 +155,7 @@ class AJXP_Plugin implements Serializable
                 $repositoryScope,
                 isSet($merged[$optionName]) ? $merged[$optionName] : null
             );
-            if ($repo != null && $repo->hasParent()) {
+            if (isSet($repo) && $repo != null && $repo->hasParent()) {
                 $retest = $loggedUser->mergedRole->filterParameterValue(
                     $this->getId(),
                     $optionName,
