@@ -155,6 +155,9 @@ class swiftAccessDriver extends fsAccessDriver
         return $newOptions;
     }
 
+    /**
+     *  !This returns the top-level bucket bytesize and ignores the directoryPath.
+     */
     public function directoryUsage($directoryPath, $repositoryResolvedOptions)
     {
         $container = $this->store->container($this->bucket);
