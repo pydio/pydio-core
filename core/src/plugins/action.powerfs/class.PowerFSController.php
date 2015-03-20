@@ -119,8 +119,8 @@ class PowerFSController extends AJXP_Plugin
                     AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
                     AJXP_XMLWriter::header();
                     $bgParameters = array(
-                        "dir" => $dir,
-                        "archive_name"  => $archiveName,
+                        "dir" => SystemTextEncoding::toUTF8($dir),
+                        "archive_name"  => SystemTextEncoding::toUTF8($archiveName),
                         "on_end" => (isSet($httpVars["on_end"])?$httpVars["on_end"]:"reload"),
                         "ope_id" => $opeId
                     );

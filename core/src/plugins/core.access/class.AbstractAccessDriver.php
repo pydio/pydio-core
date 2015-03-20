@@ -318,7 +318,9 @@ class AbstractAccessDriver extends AJXP_Plugin
             $dest = fopen($destFile, "w");
             if ($dest !== false) {
                 while (!feof($src)) {
-                    stream_copy_to_stream($src, $dest, 4096);
+                    //stream_copy_to_stream($src, $dest, 4096);
+                    $count = stream_copy_to_stream($src, $dest, 4096);
+                    if ($count == 0) break;
                 }
                 fclose($dest);
             }
