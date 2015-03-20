@@ -72,7 +72,7 @@ define("ADMIN_PASSWORD", "admin");
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
 define("AJXP_SERVER_DEBUG"  ,	false);
-define("AJXP_SKIP_CACHE"    ,   true );
+define("AJXP_SKIP_CACHE"    ,   false);
 
 
 // PBKDF2 CONSTANTS FOR A SECURE STORAGE OF PASSWORDS
