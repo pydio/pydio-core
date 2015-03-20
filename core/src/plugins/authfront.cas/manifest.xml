@@ -27,6 +27,10 @@
         <global_param expose="true" name="AUTH_PYD_MESS_STRING" group="General" type="string" label="String for Pydio auth" default="Use Pydio credential" description="This message will be appeared in login page. Ex: Use Pydio credential"/>
         <global_param expose="true" name="AUTH_CLICK_MESS_STRING" group="General" type="string" label="String for button click here" default="Click Here" description=""/>
         <global_param name="ADDITIONAL_ROLE" group="General" type="string" label="Additional roles for user logged in by CAS" default="" description="Additional roles for user logged in by CAS"/>
+        <global_param name="NAME_ATTRIBUTE" group="User attributes import (optional)" type="string" label="Display name" default="" description="CAS attribute to be used as user display name"/>
+        <global_param name="MAIL_ATTRIBUTE" group="User attributes import (optional)" type="string" label="E-mail" default="" description="CAS attribute to be used as user e-mail"/>
+        <global_param name="QUOTA_ATTRIBUTE" group="User attributes import (optional)" type="string" label="Quota" default="" description="CAS attribute to be used as user global quota"/>
+        <global_param name="QUOTA_MULTIPLIER" group="User attributes import (optional)" type="string" label="Quota multiplier" default="" description="Units (in php.ini format) used in quota attribute value: K, M, G or empty"/>
 
 
         <global_param name="CERTIFICATE_PATH" type="string" group="CONF_MESSAGE[General]"  label="CONF_MESSAGE[Certificate path]"
