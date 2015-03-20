@@ -28,5 +28,5 @@ $mess=array(
 "Region" => "Region",
 "S3 storage region" => "S3 storage region",
 "Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket"
+"Root container in the S3 storage" => "S3 bucket",
 );
