@@ -73,7 +73,7 @@
                 <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
@@ -228,7 +228,7 @@
                 <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="icon-edit" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
@@ -242,7 +242,7 @@
                 <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" src="scheduler/22/task_delete.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
