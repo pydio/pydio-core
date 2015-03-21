@@ -103,12 +103,13 @@ Class.create("UserDashboardHome", AjxpPane, {
                     legendBlock.update('');
                     legendBlock.writeAttribute("data-repoId", "");
                     legendBlock.up('#home_center_panel').removeClassName('legend_visible');
-                }, 3500);
+                }, 7000);
                 return;
             }
             var repoId = repoObject.getId();
             legendBlock.writeAttribute("data-repoId", repoId);
             legendBlock.update(repoObject.getLabel() + '<small>' + repoObject.getDescription() + '</small><div class="repoInfo"></div>');
+            legendBlock.insert('<div style="line-height: 0.5em;"><input type="checkbox" name="save_ws_choice" id="save_ws_choice"><label for="save_ws_choice">'+MessageHash['user_home.41']+'</label></div>');
             legendBlock.insert('<a>'+MessageHash['user_home.42']+'</a>');
             legendBlock.down('a').observe('click', function(){
                 switchToRepo(repoId);
@@ -151,7 +152,6 @@ Class.create("UserDashboardHome", AjxpPane, {
                 target.previousSiblings().invoke('removeClassName', 'selected');
                 target.addClassName('selected');
                 oFormObject.down('#go_to_ws').removeClassName("disabled");
-                oFormObject.down('#save_ws_choice').removeClassName("disabled").disabled = false;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
                 if(window.ajxpMobile){

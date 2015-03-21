@@ -123,11 +123,10 @@
                     <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content"}' style="width:420px;">
                         <div id="welcome" style="min-height:94px;"></div>
                         <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height", "fitParent":"home_left_bar"}'>
-                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"workspaces_center", "fitMarginBottom":100}'>
+                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"workspaces_center"}'>
                                 <ul id="workspaces_list"></ul>
                             </div>
-                            <div id="workspaces_button">
-                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_home.41]</label>
+                            <div id="workspaces_button" style="display:none;">
                                 <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_home.42]" class="disabled">
                             </div>
                         </div>
