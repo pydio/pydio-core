@@ -302,9 +302,7 @@ class BootConfLoader extends AbstractConfDriver
         }
 
 
-        @unlink(AJXP_PLUGINS_CACHE_FILE);
-        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
-        @unlink(AJXP_PLUGINS_MESSAGES_FILE);
+        AJXP_PluginsService::clearPluginsCache();
         AJXP_Utils::setApplicationFirstRunPassed();
 
         if(isSet($htAccessToUpdate)){

@@ -331,21 +331,25 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         )
                     ),
                     "config" => array(
+                        "AJXP_MIME" => "plugins_zone",
                         "LABEL" => $mess["ajxp_conf.109"],
                         "ICON" => "preferences_desktop.png",
                         "DESCRIPTION" => "Global configurations of the application core and of each plugin. Enable/disable plugins",
                         "CHILDREN" => array(
                             "core"	   	   => array(
+                                "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.98"],
                                 "DESCRIPTION" => "Core application parameters",
                                 "ICON" => "preferences_desktop.png",
                                 "LIST" => "listPlugins"),
                             "plugins"	   => array(
+                                "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.99"],
                                 "DESCRIPTION" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
                                 "ICON" => "folder_development.png",
                                 "LIST" => "listPlugins"),
                             "core_plugins" => array(
+                                "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.123"],
                                 "DESCRIPTION" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
                                 "ICON" => "folder_development.png",
@@ -476,6 +480,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 return;
 
             break;
+
+            case "clear_plugins_cache":
+                AJXP_XMLWriter::header();
+                // Clear plugins cache if they exist
+                AJXP_PluginsService::clearPluginsCache();
+                ConfService::clearMessagesCache();
+                AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".(AJXP_SKIP_CACHE?"132":"131")], null);
+                AJXP_XMLWriter::reloadDataNode();
+                AJXP_XMLWriter::close();
+                break;
+
 
             case "create_group":
 
@@ -1678,9 +1693,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $this->parseParameters($httpVars, $options, null, true);
                 $confStorage = ConfService::getConfStorageImpl();
                 $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
-                @unlink(AJXP_PLUGINS_CACHE_FILE);
-                @unlink(AJXP_PLUGINS_REQUIRES_FILE);
-                @unlink(AJXP_PLUGINS_MESSAGES_FILE);
+                AJXP_PluginsService::clearPluginsCache();
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
                 AJXP_XMLWriter::close();

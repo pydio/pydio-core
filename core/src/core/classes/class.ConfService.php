@@ -1029,6 +1029,18 @@ class ConfService
     }
 
     /**
+     * Clear the messages cache
+     */
+    public static function clearMessagesCache(){
+        $i18nFiles = glob(dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n/*.ser");
+        if (is_array($i18nFiles)) {
+            foreach ($i18nFiles as $file) {
+                @unlink($file);
+            }
+        }
+    }
+
+    /**
      * Get all registered extensions, from both the conf/extensions.conf.php and from the plugins
      * @static
      * @return

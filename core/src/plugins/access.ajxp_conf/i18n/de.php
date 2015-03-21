@@ -151,4 +151,8 @@ $mess=array(
 "126" => "Sind Sie sicher, dass Sie die ausgewählten Elemente löschen möchten?",
 "127" => "Achtung, bitte verwenden Sie keine Sonderzeichen. Benutzer würde mit Login-ID '%s' erstellt werden.",
 "128" => "Successfully deleted group",
+"129" => "Refresh plugins cache",
+"130" => "Clear plugins cache, can be necessary to see new plugins appear in the list.",
+"131" => "Plugins cache files were deleted succesfully!",
+"132" => "Cache cleared, but you are currently running in SKIP_CACHE mode (see bootstrap_context.php).",
 );

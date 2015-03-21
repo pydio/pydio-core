@@ -149,4 +149,8 @@ $mess=array(
 "126" => "Voulez-vous vraiment supprimer les éléments sélectionnés?",
 "127" => "Attention, veuillez ne pas utiliser de caractères spéciaux, l'utilisateur serait créé avec l'identifiant '%s'",
 "128" => "Le groupe a été supprimé",
+"129" => "Vider le cache",
+"130" => "Vider le cache des plugins peut être nécessaire pour voir les nouveaux plugins apparaître dans la liste.",
+"131" => "Le cache des plugins a été supprimé!",
+"132" => "Le cache des plugins a été supprimé, mais vous êtes actuellement en mode SKIP_CACHE (voir bootstrap_context.php).",
 );

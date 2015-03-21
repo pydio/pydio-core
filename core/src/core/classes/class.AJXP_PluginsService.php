@@ -187,6 +187,12 @@ class AJXP_PluginsService
         AJXP_Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
     }
 
+    public static function clearPluginsCache(){
+        @unlink(AJXP_PLUGINS_CACHE_FILE);
+        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        @unlink(AJXP_PLUGINS_QUERIES_CACHE);
+    }
+
     /**
      * Simply load a plugin class, without the whole dependencies et.all
      * @param string $pluginId

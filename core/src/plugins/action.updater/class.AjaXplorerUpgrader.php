@@ -385,15 +385,8 @@ class AjaXplorerUpgrader
 
     public function clearCache()
     {
-        @unlink(AJXP_PLUGINS_CACHE_FILE);
-        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
-        @unlink(AJXP_PLUGINS_MESSAGES_FILE);
-        $i18nFiles = glob(dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n/*.ser");
-        if (is_array($i18nFiles)) {
-            foreach ($i18nFiles as $file) {
-                @unlink($file);
-            }
-        }
+        AJXP_PluginsService::clearPluginsCache();
+        ConfService::clearMessagesCache();
         return "Ok";
     }
 
@@ -402,6 +395,7 @@ class AjaXplorerUpgrader
         if (is_file($this->workingFolder."/".$this->releaseNote)) {
             return nl2br(file_get_contents($this->workingFolder."/".$this->releaseNote));
         }
+        return "";
     }
 
     public function displayUpgradeInstructions()

@@ -556,6 +556,19 @@
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
+        <action name="clear_plugins_cache">
+            <gui src="plugins" text="ajxp_conf.129" title="ajxp_conf.130">
+                <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
+            </gui>
+            <processing>
+                <clientCallback><![CDATA[
+                    var conn = new Connexion();
+                    conn.setParameters($H({get_action:'clear_plugins_cache'}));
+                    conn.sendAsync();
+                ]]></clientCallback>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">
