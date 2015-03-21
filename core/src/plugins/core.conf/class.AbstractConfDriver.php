@@ -778,7 +778,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             }
                             $name = $xmlNode->getAttribute("name");
                             if (isSet($data[$name]) || $data[$name] === "") {
-                                if ($data[$name] === "" || $userObject->parentRole == null || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]) {
+                                if ($data[$name] === "" || $userObject->parentRole == null
+                                    || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
+                                    || $userObject->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]) {
                                     $userObject->personalRole->setParameterValue($pluginId, $name, $data[$name]);
                                     $rChanges = true;
                                 }
