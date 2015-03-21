@@ -139,6 +139,15 @@
     font-size: 1.4em;
 }
 
+.settings_main_pane div#remote_toolbar span.icon-bookmark-empty.ajxp_icon_span {
+    padding: 4px 0px 2px 2px;
+}
+
+.settings_main_pane div#remote_toolbar{
+    float: right;
+    margin-right: 4px;
+}
+
 .settings_main_pane #leftPane #buttons_bar{
     position:absolute;
     top: 49px;
