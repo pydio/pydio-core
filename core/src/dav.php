@@ -103,7 +103,7 @@ if ((!empty($end) || $end ==="0") && $end[0] != "?") {
 }
 
 if((AJXP_Sabre_AuthBackendBasic::detectBasicHeader() || ConfService::getCoreConf("WEBDAV_FORCE_BASIC"))
-    && ConfService::getAuthDriverImpl()->getOption("TRANSMIT_CLEAR_PASS")){
+    && ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")){
     $authBackend = new AJXP_Sabre_AuthBackendBasic($rId);
 } else {
     $authBackend = new AJXP_Sabre_AuthBackendDigest($rId);

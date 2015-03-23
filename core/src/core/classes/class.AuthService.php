@@ -517,7 +517,7 @@ class AuthService
         if ($adminCount == 0) {
             $authDriver = ConfService::getAuthDriverImpl();
             $adminPass = ADMIN_PASSWORD;
-            if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true) {
+            if (!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
                 $adminPass = md5(ADMIN_PASSWORD);
             }
              self::createUser("admin", $adminPass, true);
@@ -730,7 +730,7 @@ class AuthService
             $res = $userObject->checkCookieString($userPass);
             return $res;
         }
-        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
+        if(!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")){
             if($authDriver->getSeed(false) != $returnSeed) return false;
         }
         return $authDriver->checkPassword($userId, $userPass, $returnSeed);
@@ -754,7 +754,7 @@ class AuthService
         AJXP_Controller::applyHook("user.before_password_change", array($userId));
         $authDriver->changePassword($userId, $userPass);
         AJXP_Controller::applyHook("user.after_password_change", array($userId));
-        if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
@@ -800,7 +800,7 @@ class AuthService
             $user->setAdmin(true);
             $user->save("superuser");
         }
-        if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             if (!isSet($user)) {

@@ -268,6 +268,18 @@ class AbstractAuthDriver extends AJXP_Plugin
         return (isSet($this->options[$optionName])?$this->options[$optionName]:"");
     }
 
+    /**
+     * @param $optionName
+     * @return bool
+     */
+    public function getOptionAsBool($optionName)
+    {
+        return (isSet($this->options[$optionName]) &&
+            ($this->options[$optionName] === true || $this->options[$optionName] === 1
+                || $this->options[$optionName] === "true" || $this->options[$optionName] === "1")
+        );
+    }
+
     public function isAjxpAdmin($login)
     {
         return ($this->getOption("AJXP_ADMIN_LOGIN") === $login);
@@ -282,7 +294,7 @@ class AbstractAuthDriver extends AJXP_Plugin
 
     public function getSeed($new=true)
     {
-        if($this->getOption("TRANSMIT_CLEAR_PASS") === true) return -1;
+        if($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) return -1;
         if ($new) {
             $seed = md5(time());
             $_SESSION["AJXP_CURRENT_SEED"] = $seed;

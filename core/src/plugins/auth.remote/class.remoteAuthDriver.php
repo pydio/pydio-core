@@ -250,7 +250,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         $users = $this->listUsers();
         if(!is_array($users)) $users = array();
         if(array_key_exists($login, $users)) return "exists";
-        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);
         } else {
             $users[$login] = $passwd;
@@ -262,7 +262,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
-        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);
         } else {
             $users[$login] = $newPass;
