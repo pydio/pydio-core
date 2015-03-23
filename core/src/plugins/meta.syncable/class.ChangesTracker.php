@@ -480,6 +480,14 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                         "mtime"     => $stat["mtime"],
                         "md5"       => md5_file($newNode->getUrl())
                     ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                    try{
+                        $rowCount = dibi::getAffectedRows();
+                        if($rowCount === 0){
+                            $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
+                            $this->updateNodesIndex(null, $newNode, false);
+                        }
+                    }catch (Exception $e){}
+
                 } else {
                     // PATH CHANGE ONLY
                     $newNode->loadNodeInfo();
@@ -488,12 +496,26 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                         dibi::query("UPDATE [ajxp_index] SET ", array(
                             "node_path"  => $newNode->getPath(),
                         ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                        try{
+                            $rowCount = dibi::getAffectedRows();
+                            if($rowCount === 0){
+                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
+                                $this->updateNodesIndex(null, $newNode, false);
+                            }
+                        }catch (Exception $e){}
                     } else {
                         $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             $oldNode->getPath(),
                             $newNode->getPath()
                             , "WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                        try{
+                            $rowCount = dibi::getAffectedRows();
+                            if($rowCount === 0){
+                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".$newNode->getPath()."), relaunching a recursive indexation!");
+                                AJXP_Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
+                            }
+                        }catch (Exception $e){}
                     }
 
                 }
