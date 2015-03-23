@@ -771,13 +771,23 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             $iPath = $this->getIndexPath($repositoryId, $resolveUserId);
         }
         if (is_dir($iPath)) {
-            $index = Zend_Search_Lucene::open($iPath);
+            try{
+                $index = Zend_Search_Lucene::open($iPath);
+            }catch (Zend_Search_Lucene_Exception $se){
+                $this->logError(__FUNCTION__, "Error while trying to load lucene index at path ".$iPath."! Maybe a permission issue?");
+                throw $se;
+            }
         } else {
             if (!$create) {
                 $messages = ConfService::getMessages();
                 throw new Exception($messages["index.lucene.9"]);
             }
-            $index = Zend_Search_Lucene::create($iPath);
+            try{
+                $index = Zend_Search_Lucene::create($iPath);
+            }catch (Zend_Search_Lucene_Exception $se){
+                $this->logError(__FUNCTION__, "Error while trying to create lucene index at path ".$iPath."! Maybe a permission issue?");
+                throw $se;
+            }
         }
         return $index;
     }
