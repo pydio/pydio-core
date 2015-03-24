@@ -25,8 +25,6 @@
 *******************************************************************************/ 
 
 $mess=array(
-"Text Editor" => "Text-Editor",
-"Very basic text editor" => "Einfacher Text-Editor",
-"Role Editor" => "Rolen-Editor",
-"Administrator Role Editor" => "Administrator Rolen-Editor",
+"Role Editor" => "Rollenverwaltung",
+"Administrator Role Editor" => "Editor für Benutzer-Rollen im Administrations-Bereich",
 );

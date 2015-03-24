@@ -9,36 +9,36 @@
     </client_settings>
     <server_settings>
 
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="11" mandatory="true"/>
-        <global_param name="CREATE_USER"  type="boolean" label="Create User"
-                      description="Automatically create user if it does not already exists" default="true"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="11" mandatory="true"/>
+        <global_param name="CREATE_USER"  type="boolean" label="CONF_MESSAGE[Create User]"
+                      description="CONF_MESSAGE[Automatically create user if it does not already exists]" default="true"/>
         <global_param name="PROTOCOL_TYPE" group="CONF_MESSAGE[General]" type="select"
-                      choices="session_only|Sessions Only"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only" mandatory="true" />
+                      choices="session_only|CONF_MESSAGE[Sessions Only]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only" mandatory="true" />
         <global_param name="CAS_SERVER" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[CAS Server]" description="CONF_MESSAGE[CAS server address]" mandatory="true" />
         <global_param name="CAS_PORT" group="CONF_MESSAGE[General]" type="integer" label="CONF_MESSAGE[CAS Port]" description="CONF_MESSAGE[Port where CAS server is running on. Default: 443]" />
         <global_param name="CAS_URI" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[CAS URI]" description="CONF_MESSAGE[URI for CAS service (without / at the end). Default: /]"/>
         <global_param name="LOGOUT_URL" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]"/>
         <!-- global_param name="FORCE_REDIRECT" group="CONF_MESSAGE[General]" type="boolean" label="Force redirect"
                       description="In Client mode, redirect to CAS server for authentication. Otherwise, bypass this and use another following authfront. In mode Proxy, force redirect is mandatory" default="false"/ -->
-        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="Modify login page"
-                       description="Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." default="true"/>
-        <global_param expose="true" name="AUTH_CAS_MESS_STRING" group="General" type="string" label="String for CAS auth" default="Use CAS credential" description="This message will be appeared in login page. Ex: Use CAS credential"/>
-        <global_param expose="true" name="AUTH_PYD_MESS_STRING" group="General" type="string" label="String for Pydio auth" default="Use Pydio credential" description="This message will be appeared in login page. Ex: Use Pydio credential"/>
-        <global_param expose="true" name="AUTH_CLICK_MESS_STRING" group="General" type="string" label="String for button click here" default="Click Here" description=""/>
-        <global_param name="ADDITIONAL_ROLE" group="General" type="string" label="Additional roles for user logged in by CAS" default="" description="Additional roles for user logged in by CAS"/>
+        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="CONF_MESSAGE[Modify login page]"
+                       description="CONF_MESSAGE[Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page.]" default="true"/>
+        <global_param expose="true" name="AUTH_CAS_MESS_STRING" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[String for CAS auth]" default="Use CAS credential" description="CONF_MESSAGE[This message will be appeared in login page. Ex: Use CAS credential]"/>
+        <global_param expose="true" name="AUTH_PYD_MESS_STRING" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[String for Pydio auth]" default="Use Pydio credential" description="CONF_MESSAGE[This message will be appeared in login page. Ex: Use Pydio credential]"/>
+        <global_param expose="true" name="AUTH_CLICK_MESS_STRING" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[String for button click here]" default="Click Here" description=""/>
+        <global_param name="ADDITIONAL_ROLE" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[Additional roles for user logged in by CAS]" default="" description="CONF_MESSAGE[Additional roles for user logged in by CAS]"/>
 
 
         <global_param name="CERTIFICATE_PATH" type="string" group="CONF_MESSAGE[General]"  label="CONF_MESSAGE[Certificate path]"
                       description="CONF_MESSAGE[Path to the ca chain that issued the cas server certificate]" />
 
-        <global_param name="DEBUG_MODE" group="CONF_MESSAGE[General]" type="boolean" label="Debug mode"
-                      description="Set phpCAS in debug mode" default="false"/>
-        <global_param name="DEBUG_FILE" group="CONF_MESSAGE[General]" type="string" label="Debug file"
-                      description="Log to file. If null, use yyyy-mm-dd.txt"/>
+        <global_param name="DEBUG_MODE" group="CONF_MESSAGE[General]" type="boolean" label="CONF_MESSAGE[Debug mode]"
+                      description="CONF_MESSAGE[Set phpCAS in debug mode]" default="false"/>
+        <global_param name="DEBUG_FILE" group="CONF_MESSAGE[General]" type="string" label="CONF_MESSAGE[Debug file]"
+                      description="CONF_MESSAGE[Log to file. If null, use yyyy-mm-dd.txt]"/>
 
         <global_param name="PHPCAS_MODE" type="group_switch:casmode" group="CONF_MESSAGE[phpCAS mode]"  label="CONF_MESSAGE[phpCAS mode]"
-                      description="In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP" mandatory="true" />
+                      description="CONF_MESSAGE[In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP]" mandatory="true" />
         <global_param group_switch_name="casmode" group_switch_label="Client" group_switch_value="client" name="casmode" type="hidden" label="" description="" default="client"/>
         <global_param group_switch_name="casmode" group_switch_label="Proxy"  group_switch_value="proxy"  name="casmode"  type="hidden" label="" description="" default="proxy"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PROXIED_SERVICE_SMB"  type="string" label="CONF_MESSAGE[Proxied Service]"
@@ -46,7 +46,7 @@
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="FIXED_CALLBACK_URL"  type="string" label="CONF_MESSAGE[Set Fixed Callback Url]"
                       description="CONF_MESSAGE[CAS will call this url to pass pgtID and pgtIOU. It's very useful when you deploy Pydio in several nodes]" />
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PTG_STORE_MODE"  type="select" label="CONF_MESSAGE[PTG store mode]" choices="file|File,db|DB"
-                      description="Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" default="file"/>
+                      description="CONF_MESSAGE[Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()]" default="file"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy"  type="button" name="INSTALL_SQL" choices="run_plugin_action:authfront.cas:installSQLTables" label="CONF_MESSAGE[mySQL Tables]"
                       description="CONF_MESSAGE[Install SQL Table (support only mysql)]" mandatory="false"/>
 

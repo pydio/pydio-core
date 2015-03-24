@@ -6,6 +6,11 @@
         <plugin_version>1.0</plugin_version>
     </plugin_info>
 	<class_definition filename="plugins/uploader.plupload/class.PluploadProcessor.php" classname="PluploadProcessor"/>
+	<client_settings>
+		<resources>
+	        <i18n namespace="plupload" path="plugins/uploader.plupload/i18n" />
+		</resources>
+	</client_settings>
     <server_settings>
         <global_param expose="true" name="RUNTIMES" group="CONF_MESSAGE[Upload Options]" type="string" label="CONF_MESSAGE[Runtimes]" description="CONF_MESSAGE[Defines which runtimes are to be used and in what order, separated by comma. Currently html5,silverlight,flash,html4 are supported.]" mandatory="true" default="html5,silverlight,flash,html4"/>
         <global_param expose="true" name="MAX_FILE_SIZE" group="CONF_MESSAGE[Upload Options]" type="string" label="CONF_MESSAGE[Maximum File Size]" description="CONF_MESSAGE[Defines maximum size of files to be transferred, such as 4096mb.]" mandatory="true" default="4096mb"/>

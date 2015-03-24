@@ -20,5 +20,5 @@
 */
 $mess=array(
 "CKEditor" => "CKEditor",
-"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Wysiwyg HTML Editor. Es muss eine seperate Bibliothek heruntergeladen werden.",
+"Wysiwyg HTML Editor, requires separate library to be downloaded." => "WYSIWYG-Editor für HTML-Dateien. Die Komponente CKEditor muss von einem Drittanbieter heruntergeladen werden.",
 );

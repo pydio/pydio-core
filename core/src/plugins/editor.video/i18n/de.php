@@ -19,5 +19,5 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Mediaplayer",
+"1" => "Video-Player",
 );

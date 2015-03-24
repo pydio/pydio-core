@@ -2,6 +2,11 @@
 <ajxp_plugin label="CONF_MESSAGE[Application Logger]" description="CONF_MESSAGE[Setup the logging system]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AJXP_Logger" filename="plugins/core.log/class.AJXP_Logger.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core.log" path="plugins/core.log/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
         <global_param name="ERROR_TO_ERROR_LOG" type="boolean" label="CONF_MESSAGE[Send errors to system log]"
                       description="CONF_MESSAGE[Always send all Error-level messages to the system error log]" default="false" mandatory="true"/>

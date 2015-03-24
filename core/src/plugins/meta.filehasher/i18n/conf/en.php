@@ -21,4 +21,8 @@
 $mess=array(
 "File Hasher" => "File Hasher",
 "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided",
+"Rsync Support" => "Rsync Support",
+"Cache full tree" => "Cache full tree",
+"Cache XML tree and invalidate on node change" => "Cache XML tree and invalidate on node change",
+"Dont edit, it will be detected by the server" => "Don't edit, it will be detected by the server",
 );

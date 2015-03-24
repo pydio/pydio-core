@@ -2,15 +2,20 @@
 <ajxpcore id="authfront.cyphered" label="CONF_MESSAGE[Cyphered Identifiers]" enabled="false" description="CONF_MESSAGE[Cyphered identifiers passed through GET, POST or HTTP Headers, using a private key shared by Pydio and Third-party application.]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.cyphered/class.CypheredAuthFrontend.php" classname="CypheredAuthFrontend"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="authfront.cyphered" path="plugins/authfront.cyphered/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
-        <global_param name="PRIVATE_KEY" type="string" label="Private Key"
-                      description="Key used for hashing" mandatory="true"/>
-        <global_param name="CHECK_NONCE" type="boolean" label="Replay Check"
-                      description="Pass a unique, incrementing, integer on each query to make it impossible to replay twice. Better security." mandatory="true" default="true"/>
-        <global_param name="ORDER" type="integer" label="Order"
-                      description="Order this plugin with other auth frontends" default="2"/>
+        <global_param name="PRIVATE_KEY" type="string" label="CONF_MESSAGE[Private Key]"
+                      description="CONF_MESSAGE[Key used for hashing]" mandatory="true"/>
+        <global_param name="CHECK_NONCE" type="boolean" label="CONF_MESSAGE[Replay Check]"
+                      description="CONF_MESSAGE[Pass a unique, incrementing, integer on each query to make it impossible to replay twice. Better security.]" mandatory="true" default="true"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]"
+                      description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="2"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="both"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only],no_session|CONF_MESSAGE[REST Only],both|CONF_MESSAGE[Session-based or Rest]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="both"/>
     </server_settings>
 </ajxpcore>

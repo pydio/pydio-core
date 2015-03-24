@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Sound Lautstärke",
-"2" => "Sound Player",
+"1" => "Lautstärke",
+"2" => "Audio-Player",
 );

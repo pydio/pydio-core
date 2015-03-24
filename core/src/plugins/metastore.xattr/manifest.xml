@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metastore id="metastore.xattr" label="CONF_MESSAGE[Extended Attributes]" description="CONF_MESSAGE[Stores metadata inside filesystem Extended Attributes.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/metastore.xattr/class.xAttrMetaStore.php" classname="xAttrMetaStore"/>
+	<client_settings>
+        <resources>
+            <i18n namespace="xAttrMetaStore" path="plugins/metastore.xattr/i18n" />
+        </resources>
+    </client_settings>
 	<server_settings>
         <param name="FS_SIZE_LIMITATION" type="integer" label="CONF_MESSAGE[Size limit]" description="CONF_MESSAGE[Some filesystem have size limitations]" mandatory="true" default="0"/>
 	</server_settings>

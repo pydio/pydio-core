@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $mess=array(
-    "1" => "Office Dokumente",
-    "2" => "Onlinevorschau und -bearbeitung von Dokumenten ",
-    "3" => "Word Document",
-    "4" => "Präsentationsdokument",
-    "5" => "Tabellendokument",
+    "1" => "Zoho Office-Editor",
+    "2" => "Dokument über Zoho online betrachten oder bearbeiten",
+    "3" => "Word-Dokument",
+    "4" => "Präsentation",
+    "5" => "Tabellenkalkulation",
 );
