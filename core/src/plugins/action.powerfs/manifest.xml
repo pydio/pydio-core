@@ -8,8 +8,27 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ZIP_PATH" type="string" label="Zip path"
-                      description="Path of the zip utilitary on the command line" default="zip"/>
+             <global_param group="Compression tool" name="ZIPPER" type="select" choices="zip|ZIP (1st edition; default),zip2|ZIP (2nd edition),winrar|WinRAR (only Windows),7zip|7-Zip,other|other (enter command in field below)" label="Tool"
+             	description="Select zip tool" default="zip"/>
+             <global_param group="Compression tool" name="ZIPPER_MAN" type="string" label="Other execution file" 
+             	description="Execution file of other tool" default=""/>
+             <global_param group="Compression tool" name="ZIPPER_PATH" type="string" label="Path" description="Path to the tool, if not in PATH variable" default=""/>
+             <global_param group="Compression tool" name="MAX_ZIP_TIME_FILE" type="integer" label="Max file zip time (seconds)" 
+             	description="Maximum time, which is given to process one file to zip" default="120"/>
+             <global_param group="Compression tool" name="MAX_ZIP_TIME" type="integer" label="Max zip time (seconds)" 
+             	description="Maximum time, after which the zip process is stopped / terminated; must be smaller than max exe time" default="1200"/>
+             <global_param group="Progress monitoring" name="ZIPPER_MONITOR" type="select" choices="clioutput|CLI output,fileoutput|File as output,avgspeed|Average speed" label="Type"
+             	description="Select the monitoring process, not available for zip (1st edition), CLI output available for zip (2nd edition), file as output available for WinRAR, average speed always works" default="zip"/>
+             <global_param group="Progress monitoring" name="ZIPPER_MONITOR_PAUSE" type="integer" label="Pause between checks (milliseconds)"
+             	description="Pause between each progress checking activity of the monitor" default="1000"/>
+             <global_param group="Progress monitoring" name="ZIPPER_MONITOR_RECOG_PATTERN" type="string" label="Recognition pattern"
+             	description="Pattern to be fullfilled, when file is processed; %file% will be replaced by filename to be searched" default=""/>
+             <global_param group="Progress monitoring" name="ZIPPER_MONITOR_RECOG_AFFECTS" type="select" choices="start|zipping of file starts,end|zipping of file has been finished" label="Recognition is when"
+             	description="When does the recognition pattern return true" default="end"/>
+             <global_param group="Progress monitoring" name="ZIPPER_MONITOR_SUCCESS_STATEMENT" type="string" label="Success statement"
+             	description="String which is in the output, when Zip process was successful, like 'Everything is Ok' for 7-zip" default=""/>
+             <global_param group="General options" name="MAX_EXE_TIME" type="integer" label="Max exe time (seconds)" 
+             	description="Maximum time, after which the cmd line process is stopped" default="1400"/>
     </server_settings>
     <registry_contributions>
         <actions>

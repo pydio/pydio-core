@@ -1,1 +1,47 @@
-<p>This plugin will delegate various time/memory-consuming actions to the underlying filesystem. <br><br>For the moment only the <b>ZIP delegation</b> is implemented. It requires the presence of the "zip" utilitary in the system path. Tested on both Linux and windows. If active, the "compress" action, as well as the "download folder" action, will trigger a background action monitoring the current percent of the ZIP operation. This allows the compression of huge amount of data.
+<p>This plugin will delegate various time/memory-consuming actions to the underlying filesystem. <br><br>For the moment only the <b>ZIP delegation</b> is implemented. It requires the presence of the "zip" utilitary. Tested on both Linux and windows. If active, the "compress" action, as well as the "download folder" action, will trigger a background action monitoring the current percent of the ZIP operation. This allows the compression of huge amount of data.<br><br>The following paragraphs describe the setting possibilities in detail.</p>
+
+<h2>Compression tool</h2>
+
+<h3>Tool</h3>
+<p>The tool of the compression can be selected. Default is the zip tool. If other is selected, a not manual tool can be configured in the next field.</p>
+
+<h3>Other execution file</h3>
+<p>Execution file of other tool with options: %archive% will be replace by archive name, %files% by list of files to compress, %listfile% by the name of the file containing files to compress and %outputfile% by the output file of the zipper.</p>
+
+<h3>Path</h3>
+<p>Path to the tool, if not in PATH variable.</p>
+
+<h3>Max file zip time (seconds)</h3>
+<p>Maximum time, which is given to process one file to zip. Only supported by <i>CLI output</i> and <i>File as output</i> monitor.</p>
+
+<h3>Max zip time (seconds)</h3>
+<p>Maximum time, which is given until the zip process will be stopped.</p>
+
+
+<h2>Progress monitoring</h2>
+
+<h3>Tool</h3>
+<p>Select the monitoring process, not available for zip (1st edition), <i>CLI output</i> available for zip (2nd edition), <i>File as output</i> available for WinRAR and <i>Average speed</i> always works.</p>
+<p>If a manual zip tool is selected, the tool has to be check by the user, which monitor process is appropiate. If a standard tool is selected it will be checked whether the selected tool is appropiate and if not the best monitor will be used.</p>
+
+<h3>Pause between checks (milliseconds)</h3>
+<p>Pause between each progress checking activity of the monitor. Reduces the load of the php process to the CPU.</p>
+
+<h3>Recognition pattern</h3>
+<p>Pattern to be fullfilled, when file is successfully processed by the zip tool. %file% will be replaced by the filename to be searched. When the pattern is fullfilled the size of the file will be used to calculate the progress in relation to the total size of the file, which should be zipped.</p>
+<p>This setting will be overwritten by the appropiate value for the standard tool and monitor type. It should by used with a manual tool and has to be a regular expression.</p>
+
+<h3>Recognition is when</h3>
+<p>When does the recognition pattern return true, at the beginning or at the end of the zipping process of the current file.</p>
+<p>This setting will be overwritten by the appropiate value for the standard tool and monitor type. It should by used with a manual tool.</p>
+
+<h3>Success statement</h3>
+<p>String which is in the output, when Zip process was successful, like 'Everything is Ok' for 7-zip.</p>
+<p>This setting will be overwritten by the appropiate value for the standard tool and monitor type. It should by used with a manual tool.</p>
+
+
+<h2>General options</h2>
+
+<h3>Max CLI exe time (seconds)</h3>
+<p>Maximum time, after which the cmd line process is stopped. Ensures that not uncompleted zip processes are running on the server forever. If a process is ended this way, the result will probably be errors.</p>
+
