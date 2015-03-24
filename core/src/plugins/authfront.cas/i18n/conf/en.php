@@ -61,7 +61,7 @@ $mess = array(
     "PTG store mode" => "PTG store mode" ,
     "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" => "Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()",
     "mySQL Tables" => "MySQL Tables",
-    "Install SQL Table (support only mysql)" => "Install SQL Table (support only mysql)"
+    "Install SQL Table (support only mysql)" => "Install SQL Table (support only mysql)",
     "Set Fixed Callback Url" => "Set Fixed Callback Url",
     "CAS will call this url to pass pgtID and pgtIOU. It's very useful when you deploy Pydio in several nodes" => "CAS will call this url to pass pgtID and pgtIOU. It's very useful when you deploy Pydio in several nodes",
 );
