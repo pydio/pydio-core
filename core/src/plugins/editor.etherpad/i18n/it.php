@@ -29,6 +29,6 @@ $mess = array(
     "6" => "File",
     "7" => "Entra",
     "8" => "Nome Sessione",
-    "9" => "You can also create <a>new discussion board</a>",
-    "10" => "Export"
+    "9" => "Puoi anche creare una <a>nuova area collaborativa</a>",
+    "10" => "Esporta"
 );
