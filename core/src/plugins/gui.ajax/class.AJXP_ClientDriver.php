@@ -138,7 +138,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                 }
 
-                $root = $_SERVER['REQUEST_URI'];
+                $root = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                 $configUrl = ConfService::getCoreConf("SERVER_URL");
                 if(!empty($configUrl)){
                     $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
