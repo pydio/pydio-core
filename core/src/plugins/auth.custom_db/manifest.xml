@@ -11,7 +11,7 @@
         <param name="SQL_CUSTOM_TABLE_USER_FIELD" type="string" label="CONF_MESSAGE[Table User Field]" description="CONF_MESSAGE[Name of the field to be used as users identifier]" mandatory="true"/>
         <param name="SQL_CUSTOM_TABLE_PWD_FIELD" type="string" label="CONF_MESSAGE[Table Password Field]" description="CONF_MESSAGE[Name of the field containing the password]" mandatory="true"/>
         <param name="SQL_CUSTOM_TABLE_PWD_HASH" type="select" label="CONF_MESSAGE[Table Password Hashing]" description="CONF_MESSAGE[How the password is minimaly hashed in the table]" choices="clear|Clear,md5|MD5,pbkdf2|PBKFD2 (native)" default="pbkdf2" mandatory="true"/>
-        <param name="SQL_CUSTOM_TABLE_TEST_USER" type="string" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use an existing user ID and click on Test Connexion to verify it is correctly found]" mandatory="true" />
+        <param name="SQL_CUSTOM_TABLE_TEST_USER" type="string" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use an existing user ID and click on Test Connexion to verify it is correctly found]" mandatory="false" />
         <param type="button" name="TEST_SQL" choices="run_plugin_action:auth.custom_db:testSQLConnexion" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Test the SQL connexion]" mandatory="false"/>
     </server_settings>
 	<class_definition filename="plugins/auth.custom_db/class.customDbAuthDriver.php" classname="customDbAuthDriver"/>
