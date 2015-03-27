@@ -20,11 +20,11 @@
 */
 $mess=array(
 "WebDAV (PEAR)" => "WebDAV (PEAR)",
-"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Zugriff auf einen WebDAV Server. Erfordert eine PEAR/HTTP_WebDAVClient Installation mit den Patch aus den Plugin-Ordner.",
+"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Zugriff auf einen WebDAV Server. Erfordert eine PEAR/HTTP_WebDAVClient Installation mit dem Patch aus dem Erweiterungs-Ordner.",
 "Host" => "Host",
-"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Host des WebDAV Server, mit http/https und ohne abschließenden Schrägstrich. Kann auch user:password enthalten.",
+"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Host des WebDAV Servers, mit http/https und ohne abschliessendem Schrägstrich. Kann auch user:password enthalten.",
 "Uri" => "Uri",
-"Path to the root folder on the server" => "Pfad zum Hauptverzeichnis auf den Server.",
-"File Creation Mask" => "File Creation Mask",
-"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optional kann man eine chmod Operation durchführen. Werte müssen nummerisch sein (bsp. 0777, 0644, etc.).",
+"Path to the root folder on the server" => "Pfad zum Hauptverzeichnis auf den Server",
+"File Creation Mask" => "Maske für Dateirechte",
+"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optional kann eine chmod-Operation durchführt werden. Die Werte müssen nummerisch sein (bsp. 0777, 0644, etc.).",
 );

@@ -19,6 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
+"Notification Center" => "Notification Center",
+"Handle users watches and notifications" => "Handle users watches and notifications",
 "Activate desktop notifications" => "Activate desktop notifications",
 "Desktop Notifications" => "Desktop notifications",
+"User events and alerts" => "User events and alerts",
+"Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration." => "Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.",
+"Instance Params" => "Instance Params",
+"Feed Instance" => "Feed Instance",
+"Choose the plugin" => "Choose the plugin",
 );

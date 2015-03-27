@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Etherpad" => "Etherpad",
-"Collaborative edition of text files" => "Gemeinsames bearbeiten von Textdateien",
+"Collaborative edition of text files" => "Komponente eines Drittanbieters zum gleichzeitigen Bearbeiten von Textdateien",
 );

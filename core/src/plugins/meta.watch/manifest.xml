@@ -61,7 +61,7 @@
                             });
                             context.builderMenuItems.push({
                                 name:MessageHash['meta.watch.3'],
-                                alt:MessageHash['meta.watch.4'],
+                                alt:MessageHash["meta.watch." + (n.isLeaf()?"8":"4")],
                                 isDefault : false,
                                 image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
                                 callback:function(e){

@@ -6,10 +6,10 @@
     <server_settings>
         <global_param name="OPEN_DOCS_IN_TAB" type="select" label="CONF_MESSAGE[Open documents in...]"
                       description="CONF_MESSAGE[Choose where the documents are opened]"
-                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+                      choices="application|CONF_MESSAGE[Application Tab],browser|CONF_MESSAGE[Browser Tab]" default="application" expose="true"/>
         <global_param name="OPEN_LINK_IN_TAB" type="select" label="CONF_MESSAGE[Open link in...]"
                       description="CONF_MESSAGE[Choose where the http links are opened]"
-                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+                      choices="application|CONF_MESSAGE[Application Tab],browser|CONF_MESSAGE[Browser Tab]" default="application" expose="true"/>
     </server_settings>
     <client_settings>
         <resources>

@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Open Documents Viewer" => "Open Documents Betrachter",
-"Open Document Formats viewer - based on WebODF.js library" => "Open Document Formate Betrachter - basierend auf der WebODF.js Bibliothek",
+"Open Documents Viewer" => "WebODF-Betrachter",
+"Open Document Formats viewer - based on WebODF.js library" => "Office-Dokument-Betrachter basierend auf der Komponente WebODF.",
 );

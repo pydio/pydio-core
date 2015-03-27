@@ -20,6 +20,6 @@
  */
 
 $mess = array(
-    "1" => "Open Documents Betrachter",
-    "2" => "Open Documents Betrachter",
+    "2" => "WebODF-Betrachter",
+    "3" => "Dokument mit dem WebODF Office-Dokument-Betrachter ansehen",
 );

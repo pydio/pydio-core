@@ -21,8 +21,6 @@
 $mess=array(
 "Remote authentication" => "Remote authentication",
 "Authentication is done remotely (useful in CMS system)." => "Authentication is done remotely (useful in CMS system).",
-"Authentication mode" => "Authentication mode",
-"If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required",
 "Login URL" => "Login URL",
 "When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL" => "When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL",
 "Logout URL" => "Logout URL",
@@ -59,4 +57,7 @@ $mess=array(
 "Main page of your Drupal installation that contains a login form. When not logged, accessing Pydio will redirect to this page. It's also used for the API calls for logging in a user from within Pydio. Make sure it does contain a login form." => "Main page of your Drupal installation that contains a login form. When not logged, accessing Pydio will redirect to this page. It's also used for the API calls for logging in a user from within Pydio. Make sure it does contain a login form.",
 "Custom Auth Function" => "Custom Auth Function",
 "User-defined function for performing real password check, necessary for REST API (including iOS client). Add this function inside the plugin cms_auth_functions.php file" => "User-defined function for performing real password check, necessary for REST API (including iOS client). Add this function inside the plugin cms_auth_functions.php file",
+"Custom" => "Custom",
+"Back to main page" => "Back to main page",
+"Logout" => "Logout",
 );

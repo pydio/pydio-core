@@ -52,4 +52,11 @@ $mess=array(
 "Slave Authentifiaction Label" => "Slave Authentification Label",
 "Users Listing" => "Users Listing",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",
+"Master/Slave" => "Master/Slave",
+"User Choice" => "User Choice",
+"Cache master users" => "Cache master users",
+"Create a local copy (at login time) of master users inside slave base" => "Create a local copy (at login time) of master users inside slave base",
+"Master Only" => "Master Only",
+"Slave Only" => "Slave Only",
+"Both" => "Both",
 );

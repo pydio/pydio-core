@@ -94,7 +94,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
                 }
                 HTMLWriter::charsetHeader("application/json");
-                echo json_encode(array("LEGEND" => "Select a workspace", "LIST" => $repoOut));
+                $mess = ConfService::getMessages();
+                echo json_encode(array("LEGEND" => $mess["ajxp_conf.150"], "LIST" => $repoOut));
 
             break;
 
@@ -307,25 +308,25 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     "data" => array(
                         "LABEL" => $mess["ajxp_conf.110"],
                         "ICON" => "user.png",
-                        "DESCRIPTION" => "Day-to-day administration of the application : who accesses to what, create roles, etc.",
+                        "DESCRIPTION" => $mess["ajxp_conf.137"],
                         "CHILDREN" => array(
                             "repositories" => array(
                                 "AJXP_MIME" => "workspaces_zone",
                                 "LABEL" => $mess["ajxp_conf.3"],
-                                "DESCRIPTION" => "Create and delete workspaces, add features to them using meta sources.",
+                                "DESCRIPTION" => $mess["ajxp_conf.138"],
                                 "ICON" => "hdd_external_unmount.png",
                                 "LIST" => "listRepositories"),
                             "users" => array(
                                 "AJXP_MIME" => "users_zone",
                                 "LABEL" => $mess["ajxp_conf.2"],
-                                "DESCRIPTION" => "Manage users and groups",
+                                "DESCRIPTION" => $mess["ajxp_conf.139"],
                                 "ICON" => "users-folder.png",
                                 "LIST" => "listUsers"
                             ),
                             "roles" => array(
                                 "AJXP_MIME" => "roles_zone",
                                 "LABEL" => $mess["ajxp_conf.69"],
-                                "DESCRIPTION" => "Define profiles that can be applied at once to whole bunch of users.",
+                                "DESCRIPTION" => $mess["ajxp_conf.140"],
                                 "ICON" => "user-acl.png",
                                 "LIST" => "listRoles"),
                         )
@@ -334,24 +335,24 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "AJXP_MIME" => "plugins_zone",
                         "LABEL" => $mess["ajxp_conf.109"],
                         "ICON" => "preferences_desktop.png",
-                        "DESCRIPTION" => "Global configurations of the application core and of each plugin. Enable/disable plugins",
+                        "DESCRIPTION" => $mess["ajxp_conf.136"],
                         "CHILDREN" => array(
                             "core"	   	   => array(
                                 "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.98"],
-                                "DESCRIPTION" => "Core application parameters",
+                                "DESCRIPTION" => $mess["ajxp_conf.133"],
                                 "ICON" => "preferences_desktop.png",
                                 "LIST" => "listPlugins"),
                             "plugins"	   => array(
                                 "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.99"],
-                                "DESCRIPTION" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
+                                "DESCRIPTION" => $mess["ajxp_conf.134"],
                                 "ICON" => "folder_development.png",
                                 "LIST" => "listPlugins"),
                             "core_plugins" => array(
                                 "AJXP_MIME" => "plugins_zone",
                                 "LABEL" => $mess["ajxp_conf.123"],
-                                "DESCRIPTION" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
+                                "DESCRIPTION" => $mess["ajxp_conf.135"],
                                 "ICON" => "folder_development.png",
                                 "LIST" => "listPlugins"),
                         )
@@ -359,32 +360,32 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     "admin" => array(
                         "LABEL" => $mess["ajxp_conf.111"],
                         "ICON" => "toggle_log.png",
-                        "DESCRIPTION" => "Administrator tasks to monitor the application state.",
+                        "DESCRIPTION" => $mess["ajxp_conf.141"],
                         "CHILDREN" => array(
                             "logs" => array(
                                 "LABEL" => $mess["ajxp_conf.4"],
-                                "DESCRIPTION" => "Monitor all activities happening on the server",
+                                "DESCRIPTION" => $mess["ajxp_conf.142"],
                                 "ICON" => "toggle_log.png",
                                 "LIST" => "listLogFiles"),
                             "diagnostic" => array(
                                 "LABEL" => $mess["ajxp_conf.5"],
-                                "DESCRIPTION" => "Read the start-up diagnostic",
+                                "DESCRIPTION" => $mess["ajxp_conf.143"],
                                 "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
                         )
                     ),
                     "developer" => array(
-                        "LABEL" => "Developer Resources",
+                        "LABEL" => $mess["ajxp_conf.144"],
                         "ICON" => "applications_engineering.png",
-                        "DESCRIPTION" => "Generated documentations for developers",
+                        "DESCRIPTION" => $mess["ajxp_conf.145"],
                         "CHILDREN" => array(
                             "actions" => array(
-                                "LABEL" => "Actions API",
-                                "DESCRIPTION" => "List all actions contributed by all plugins and visualize their input parameters",
+                                "LABEL" => $mess["ajxp_conf.146"],
+                                "DESCRIPTION" => $mess["ajxp_conf.147"],
                                 "ICON" => "book.png",
                                 "LIST" => "listActions"),
                             "hooks" => array(
-                                "LABEL" => "Hooks Definitions",
-                                "DESCRIPTION" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
+                                "LABEL" => $mess["ajxp_conf.148"],
+                                "DESCRIPTION" => $mess["ajxp_conf.149"],
                                 "ICON" => "book.png",
                                 "LIST" => "listHooks")
                         )

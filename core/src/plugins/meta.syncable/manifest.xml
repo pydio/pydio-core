@@ -2,9 +2,14 @@
 <meta id="meta.syncable" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Track changes on this workspace to enable the synchronization with an external client]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="meta.syncable" path="plugins/meta.syncable/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
         <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
-        <param name="REPO_SYNCABLE" type="boolean" label="Syncable Workspace" description="Workspace is syncable" default="true" scope="repository" expose="true"/>
+        <param name="REPO_SYNCABLE" type="boolean" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Workspace is syncable]" default="true" scope="repository" expose="true"/>
         <param name="OBSERVE_STORAGE_CHANGES" type="boolean" label="Observe storage changes [Experimental]" description="Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio." default="false" scope="repository" expose="false"/>
         <param name="OBSERVE_STORAGE_EVERY" type="integer" label="Observe storage changes every..." description="If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes." default="5" scope="repository" expose="false"/>
     </server_settings>

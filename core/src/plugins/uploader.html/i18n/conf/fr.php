@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -28,4 +28,7 @@ $mess=array(
 "Default value for automatically starting upload or not" => "Valeur par défaut pour le démarrage automatique de l'envoi",
 "Auto Close" => "Fermeture automatique",
 "Default value for automatically closing the dialog after upload or not" => "Valeur par défaut pour la fermeture automatique après l'envoi.",
+"Always Override" => "Always Override",
+"Auto Rename File" => "Auto Rename File",
+"Prompt user" => "Prompt user",
 );

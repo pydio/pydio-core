@@ -27,18 +27,18 @@
 					</messages>
 					<html><![CDATA[
 						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">Versioning</div>
+							<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.svn.4]</div>
 							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 								<tr>
-									<td class="infoPanelLabel">Last Revision</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.41]</td>
 									<td class="infoPanelValue">#{last_revision}</td>
 								</tr>
 								<tr class="even">
-									<td class="infoPanelLabel">Revision Date</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.42]</td>
 									<td class="infoPanelValue">#{last_revision_date}</td>
 								</tr>
 								<tr>
-									<td class="infoPanelLabel">Revision Author</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.43]</td>
 									<td class="infoPanelValue">#{last_revision_author}</td>
 								</tr>
 							</table>

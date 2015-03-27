@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Timestamp" => "Timestamp",
-"Allow Timestamp file with Universign." => "Allow Timestamp file with Universign.",
+"timestamp" => "timestamp",
+"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
 "msgBox1" => "Please confirm that you want to add a timestamp to this file",
 "URL" => "URL",
 "Timestamp provider API URL" => "Timestamp provider API URL",
@@ -28,6 +28,4 @@ $mess=array(
 "Password" => "Password",
 "User account" => "User account",
 "User Password" => "User Password",
-"timestamp" => "timestamp",
-"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
 );

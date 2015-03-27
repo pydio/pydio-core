@@ -2,8 +2,13 @@
 <ajxp_plugin label="CONF_MESSAGE[MQ SQL]" description="CONF_MESSAGE[Store persistant and worker queues in database]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_consumer">
     <class_definition classname="AJXP_SqlMessageExchanger" filename="plugins/mq.sql/class.AJXP_SqlMessageExchanger.php"/>
+	<client_settings>
+        <resources>
+            <i18n namespace="sqlMessageExchanger" path="plugins/mq.sql/i18n" />
+        </resources>
+    </client_settings>
     <server_settings>
-        <param description="SQL Connexion Parameters" label="SQL Driver" name="SQL_DRIVER"
+        <param description="CONF_MESSAGE[SQL Connexion Parameters]" label="CONF_MESSAGE[SQL Driver]" name="SQL_DRIVER"
                       type="group_switch:dibi" mandatory="true"/>
         <param type="button" name="INSTALL_SQL" choices="run_plugin_action:mq.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
     </server_settings>
