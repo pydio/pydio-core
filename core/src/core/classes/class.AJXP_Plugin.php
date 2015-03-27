@@ -340,29 +340,14 @@ class AJXP_Plugin implements Serializable
                 $name = $names->item(0)->value;
                 $this->actions[$name] = $name;
                 continue;
-                /*
-                $actionData=array();
-                $actionData["XML"] = $contribNode->ownerDocument->saveXML($actionNode);
-                $names = $actionXpath->query("@name", $actionNode);
-                $callbacks = $actionXpath->query("processing/serverCallback/@methodName", $actionNode);
-                if ($callbacks->length) {
-                    $actionData["callback"] = $callbacks->item(0)->value;
-                }
-                $rightContextNodes = $actionXpath->query("rightsContext",$actionNode);
-                if ($rightContextNodes->length) {
-                    $rightContext = $rightContextNodes->item(0);
-                    $actionData["rights"] = $this->nodeAttrToHash($rightContext);
-                }
-                $actionData["node"] = $actionNode;
-                $this->actions[$name] = $actionData;
-                */
             }
         }
     }
+
     /**
      * Load the main manifest.xml file of the plugni
      * @throws Exception
-     * @return
+     * @return void
      */
     public function loadManifest()
     {
@@ -437,13 +422,11 @@ class AJXP_Plugin implements Serializable
             $this->$key = $value;
         }
         if ($this->manifestXML != NULL) {
-            //$this->manifestDoc = DOMDocument::loadXML(base64_decode($this->manifestXML));
             $this->manifestDoc = new DOMDocument(1.0, "UTF-8");
             $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
             $this->reloadXPath();
             unset($this->manifestXML);
         }
-        //var_dump($this);
     }
 
     /**
@@ -566,7 +549,7 @@ class AJXP_Plugin implements Serializable
      */
     protected function loadConfigsDefinitions()
     {
-        $params = $this->xPath->query("//server_settings/global_param");
+        $params = $this->xPath->query("//server_settings/global_param|//server_settings/param");
         $this->pluginConf = array();
         foreach ($params as $xmlNode) {
             $paramNode = $this->nodeAttrToHash($xmlNode);
