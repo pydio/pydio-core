@@ -110,9 +110,11 @@ class AJXP_Safe
     {
         $_SESSION["AJXP_SAFE_CREDENTIALS"] = base64_encode($this->user.$this->separator.$this->encodedPassword);
     }
+
     /**
      * Load the credentials from session
-     * @return
+     * @param string $encodedString
+     * @return void
      */
     public function load($encodedString = "")
     {
@@ -235,7 +237,7 @@ class AJXP_Safe
                 $wallet = $loggedUser->getPref("AJXP_WALLET");
                 if (is_array($wallet) && isSet($wallet[$repository->getId()][$optionsPrefix."USER"])) {
                     $user = $wallet[$repository->getId()][$optionsPrefix."USER"];
-                    $password = $loggedUser->decodeUserPassword($wallet[$repository->getId()][$optionsPrefix."PASS"]);
+                    $password = AJXP_Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix."PASS"]);
                 }
             }
         }
@@ -247,7 +249,7 @@ class AJXP_Safe
                 $p = $loggedUser->mergedRole->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
                 if (!empty($u) && !empty($p)) {
                     $user = $u;
-                    $password = $loggedUser->decodeUserPassword($p);
+                    $password = AJXP_Utils::decypherStandardFormPassword($loggedUser->getId(), $p);
                 }
             }
         }
