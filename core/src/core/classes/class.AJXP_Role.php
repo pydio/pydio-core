@@ -41,6 +41,8 @@ class AJXP_Role implements AjxpGroupPathProvider
     protected $actions = array();
     protected $autoApplies = array();
 
+    static $cypheredPassPrefix = '$pydio_password$';
+
     public function __construct($id)
     {
         $this->roleId = $id;
@@ -146,12 +148,12 @@ class AJXP_Role implements AjxpGroupPathProvider
      * Send all role informations as an associative array
      * @return array
      */
-    public function getDataArray()
+    public function getDataArray($blurPasswords = false)
     {
         $roleData = array();
         $roleData["ACL"] = $this->listAcls();
         $roleData["ACTIONS"] = $this->listActionsStates();
-        $roleData["PARAMETERS"] = $this->listParameters();
+        $roleData["PARAMETERS"] = $this->listParameters(false, $blurPasswords);
         $roleData["APPLIES"] = $this->listAutoApplies();
         return $roleData;
     }
@@ -204,26 +206,52 @@ class AJXP_Role implements AjxpGroupPathProvider
         if (isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])) {
             $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
             if($v === AJXP_VALUE_CLEAR) return "";
-            else return $v;
+            else return $this->filterCypheredPasswordValue($v);
         }
         if (isSet($this->parameters[$repositoryId][$pluginId][$parameterName])) {
             $v = $this->parameters[$repositoryId][$pluginId][$parameterName];
             if($v === AJXP_VALUE_CLEAR) return "";
-            else return $v;
+            else return $this->filterCypheredPasswordValue($v);
         }
         return $parameterValue;
     }
+
     /**
+     * @param bool $preserveCypheredPasswords
+     * @param bool $blurCypheredPasswords
      * @return array Associative array of parameters : array[REPO_ID][PLUGIN_ID][PARAMETER_NAME] = PARAMETER_VALUE
      */
-    public function listParameters()
+    public function listParameters($preserveCypheredPasswords = false, $blurCypheredPasswords = false)
     {
-        return $this->parameters;
+        if($preserveCypheredPasswords) return $this->parameters;
+
+        $copy = $this->parameters;
+        foreach($copy as $repo => &$plugs){
+            foreach($plugs as $plugName => &$plugData){
+                foreach($plugData as $paramName => &$paramValue){
+                    $testValue = $this->filterCypheredPasswordValue($paramValue);
+                    if($testValue != $paramValue){
+                        if($blurCypheredPasswords) $paramValue = "__AJXP_VALUE_SET__";
+                        else $paramValue = $testValue;
+                    }
+                }
+            }
+        }
+        return $copy;
     }
 
     public function listAutoApplies()
     {
         return $this->autoApplies;
+    }
+
+    /**
+     * @param String $value
+     * @return String
+     */
+    private function filterCypheredPasswordValue($value){
+        if(is_string($value) && strpos($value, self::$cypheredPassPrefix) === 0) return str_replace(self::$cypheredPassPrefix, "", $value);
+        return $value;
     }
 
     /**
@@ -302,7 +330,7 @@ class AJXP_Role implements AjxpGroupPathProvider
             $newRole->setAcl($repoId, $rightString);
         }
 
-        $newParams = $this->array_merge_recursive2($role->listParameters(), $this->listParameters());
+        $newParams = $this->array_merge_recursive2($role->listParameters(true), $this->listParameters(true));
         foreach ($newParams as $repoId => $data) {
             foreach ($data as $pluginId => $param) {
                 foreach ($param as $parameterName => $parameterValue) {
