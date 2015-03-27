@@ -9,8 +9,8 @@
 		</resources>
 	</client_settings>
     <server_settings>
-        <param name="COMMENT_SIZE_LIMIT" type="integer" label="Comment limit"
-                      description="Maximum number of characters for each comment" default="1000" />
+        <param name="COMMENT_SIZE_LIMIT" type="integer" label="CONF_MESSAGE[Comment limit]"
+                      description="CONF_MESSAGE[Maximum number of characters for each comment]" default="1000" />
     </server_settings>
 	<registry_contributions>
 		<hooks>

@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Remote authentication" => "Remote authentication",
-"Authentication is done remotely (useful in CMS system)." => "Authentication is done remotely (useful in CMS system).",
+"Authentication on PHPBB is done remotely (useful in CMS system)." => "Authentication is done remotely (useful in CMS system).",
 "Authentication mode" => "Authentication mode",
 "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required",
 "Login URL" => "Login URL",

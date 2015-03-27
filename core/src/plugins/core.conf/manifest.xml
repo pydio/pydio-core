@@ -12,7 +12,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-        <param name="ROLE_DISPLAY_NAME" scope="role" description="Role Label" label="Role Label" type="string" expose="true"/>
+        <param name="ROLE_DISPLAY_NAME" scope="role" description="CONF_MESSAGE[Role Label]" label="CONF_MESSAGE[Role Label]" type="string" expose="true"/>
         <param name="USER_DISPLAY_NAME" scope="user" description="CONF_MESSAGE[Full name displayed to others]" label="CONF_MESSAGE[Name]" type="string" expose="true" editable="true"/>
         <param name="avatar" scope="user" description="CONF_MESSAGE[Image displayed next to the user name]" label="CONF_MESSAGE[Avatar]" type="image" expose="true"
                editable="true"
@@ -27,10 +27,10 @@
         <param name="USER_LOCK_ACTION" scope="role,group" description="CONF_MESSAGE[If set, this action will be triggered automatically at users login. Can be logout (to lock out the users), pass_change (to force password change), or anything else]" label="CONF_MESSAGE[Users Lock Action]" type="string" default=""/>
         <param name="USER_SHARED_USERS_LIMIT" scope="user" description="CONF_MESSAGE[Maximum number of shared users per user]" label="CONF_MESSAGE[Shared users limit]" type="integer" expose="false" editable="false"/>
         <global_param name="DIBI_PRECONFIGURATION" group="CONF_MESSAGE[Core SQL Connexion]" type="group_switch:dibi_provider" label="CONF_MESSAGE[SQL Connexion]" description="CONF_MESSAGE[Simple SQL Connexion definition that can be used by other sql-based plugins]" mandatory="false"/>
-        <global_param name="SAVE_GUEST_PREFERENCES" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Remember guest preferences]" description="If the 'guest' user is enabled, remember her preferences accross sessions."  mandatory="true" default="false"/>
+        <global_param name="SAVE_GUEST_PREFERENCES" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Remember guest preferences]" description="CONF_MESSAGE[If the 'guest' user is enabled, remember her preferences accross sessions.]"  mandatory="true" default="false"/>
         <global_param name="SKIP_USER_HISTORY" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Skip user history]" description="CONF_MESSAGE[Use this option to avoid automatic reloading of the interface state (last folder, opened tabs, etc)]"  mandatory="false" default="true"/>
 
-        <global_param name="USER_CREATE_REPOSITORY" group="CONF_MESSAGE[Worskpace creation delegation]"  type="boolean" label="CONF_MESSAGE[Let user create repositories from templates]" description="Whether users can create their own repositories, based on predefined templates."  mandatory="false" default="false"/>
+        <global_param name="USER_CREATE_REPOSITORY" group="CONF_MESSAGE[Worskpace creation delegation]"  type="boolean" label="CONF_MESSAGE[Let user create repositories from templates]" description="CONF_MESSAGE[Whether users can create their own repositories, based on predefined templates.]"  mandatory="false" default="false"/>
 
         <global_param group="CONF_MESSAGE[Users Directory Listing]" description="CONF_MESSAGE[Maximum number of users displayed in the users autocompleter]" label="CONF_MESSAGE[Users completer limit]" name="USERS_LIST_COMPLETE_LIMIT" type="integer" default="20"/>
         <global_param group="CONF_MESSAGE[Users Directory Listing]" description="CONF_MESSAGE[Minimum number of characters to trigger the auto completion feature]" label="CONF_MESSAGE[Users completer min chars]" name="USERS_LIST_COMPLETE_MIN_CHARS" type="integer" default="3" expose="true"/>
@@ -44,35 +44,35 @@
         <global_param group="CONF_MESSAGE[Roles / Groups Directory Listing]" name="GROUP_OR_ROLE" type="group_switch:GROUP_OR_ROLE"   label="CONF_MESSAGE[Display roles and/or groups]"
                       description="" mandatory="true" default="group"/>
 
-        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Users only (do not list groups nor roles)" group_switch_value="Users" name="USER" type="hidden" label="" description="" default="user"/>
-        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Group Listing" group_switch_value="Group" name="GROUP" type="hidden" label="" description="" default="group"/>
-        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing"  group_switch_value="Role"  name="ROLE"  type="hidden" label="" description="" default="role"/>
-        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Role/Group Listing"  group_switch_value="RoleGroup"  name="GROUP_AND_ROLE"  type="hidden" label="" description="" default="rolegroup"/>
+        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Users only (do not list groups nor roles)]" group_switch_value="Users" name="USER" type="hidden" label="" description="" default="user"/>
+        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Allow Group Listing]" group_switch_value="Group" name="GROUP" type="hidden" label="" description="" default="group"/>
+        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Allow Role Listing]"  group_switch_value="Role"  name="ROLE"  type="hidden" label="" description="" default="role"/>
+        <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Role/Group Listing]"  group_switch_value="RoleGroup"  name="GROUP_AND_ROLE"  type="hidden" label="" description="" default="rolegroup"/>
 
 
 
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="List role by" group_switch_value="Role" name="LIST_ROLE_BY" type="group_switch:LIST_ROLE_BY"   label="CONF_MESSAGE[List Roles By]"
-                      description="List role by"  default="all" mandatory="true" />
-            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="All roles"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
-            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="User roles only"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
+                      description="CONF_MESSAGE[List Roles By]"  default="all" mandatory="true" />
+            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="CONF_MESSAGE[All roles]"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
+            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="CONF_MESSAGE[User roles only]"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="PREFIX" type="string"   label="CONF_MESSAGE[role prefix]"
-                      description="role prefix" default="" mandatory="false"/>
+                      description="CONF_MESSAGE[role prefix]" default="" mandatory="false"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="EXCLUDED" type="textarea"   label="CONF_MESSAGE[Excluded Roles]"
-                      description="Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
+                      description="CONF_MESSAGE[Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex.]"  default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="INCLUDED" type="textarea"   label="CONF_MESSAGE[Included Roles]"
-                      description="Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
+                      description="CONF_MESSAGE[Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex.]"  default="" mandatory="false" />
 
 
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="List role by" group_switch_value="Role" name="LIST_ROLE_BY" type="group_switch:LIST_ROLE_BY"   label="CONF_MESSAGE[List Roles By]"
-                      description="List role by"  default="all" mandatory="true" />
-            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="All roles"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
-            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="User roles only"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
+                      description="CONF_MESSAGE[List Roles By]"  default="all" mandatory="true" />
+            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="CONF_MESSAGE[All roles]"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
+            <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="CONF_MESSAGE[User roles only]"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="PREFIX" type="string"   label="CONF_MESSAGE[role prefix]"
-                      description="role prefix" default="" mandatory="false" />
+                      description="CONF_MESSAGE[role prefix]" default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="EXCLUDED" type="textarea"   label="CONF_MESSAGE[Excluded Roles]"
-                      description="Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
+                      description="CONF_MESSAGE[Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex.]"  default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="INCLUDED" type="textarea"   label="CONF_MESSAGE[Included Roles]"
-                      description="Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
+                      description="CONF_MESSAGE[Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex.]"  default="" mandatory="false" />
 
         <global_param name="USER_CREATE_USERS" group="CONF_MESSAGE[External Users Creation]" type="boolean" label="CONF_MESSAGE[Create external users]" description="CONF_MESSAGE[Allow the users to create a new user when sharing a folder]" mandatory="false" default="true"/>
         <global_param name="NEWUSERS_EDIT_PARAMETERS" group="CONF_MESSAGE[External Users Creation]" type="string" label="CONF_MESSAGE[External users parameters]" description="CONF_MESSAGE[List of parameters to be edited when creating a new shared user.]" mandatory="false" default="email,USER_DISPLAY_NAME,lang" expose="true"/>

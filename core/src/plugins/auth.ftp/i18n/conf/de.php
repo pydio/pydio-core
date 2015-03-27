@@ -21,8 +21,8 @@
 $mess=array(
 "FTP authentication" => "FTP-Authentifizierung",
 "Authenticate users by validating their credentials against an FTP server." => "Anmeldedaten von Benutzern gegen einen FTP-Server prüfen.",
-"FTP login screen" => "FTP-Loginmaske",
-"Replace the default connection screen (username and passwrd) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Normale Anmeldemaske (Benutzername/Passwort) anzeigen, oder stattdessen Benutzern ermöglichen, die eigenen FTP-Verbindungsdaten einzugeben (Server, Port, etc.)",
+"FTP Login Screen" => "FTP-Loginmaske",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Normale Anmeldemaske (Benutzername/Passwort) anzeigen, oder stattdessen Benutzern ermöglichen, die eigenen FTP-Verbindungsdaten einzugeben (Server, Port, etc.)",
 "Workspace" => "Arbeitsumgebung",
 "ID of the workspace used to validate credentials" => "ID des Repository, das verwendet wird, um die Anmeldedaten zu prüfen",
 "Admin user" => "Administrativer Benutzer",

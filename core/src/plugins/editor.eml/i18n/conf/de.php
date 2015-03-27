@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Email Viewer" => "Email Betrachter",
-"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "Email Betrachter, unterstützt eml-Formate und eml-MIME-Typen. Erkennt wenn ein Ordner nur Emails enthält und zeigt die Spalten entsprechend an.",
+"Email Viewer" => "E-Mail-Betrachter",
+"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "E-Mail-Betrachter, unterstützt das Eml-Format. Die Erweiterung zeigt andere Spalten an, wenn ein Ordner nur E-Mails enthält.",
 );

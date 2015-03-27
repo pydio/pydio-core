@@ -20,6 +20,6 @@
  */
 
 $mess = array(
-    "1" => "Visionneur Open Documents",
     "2" => "Visionneur Open Documents",
+    "3" => "Visionneur Open Documents",
 );

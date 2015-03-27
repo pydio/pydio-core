@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Map viewer" => "Karten Betrachter",
-"Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers" => "Geolokalisierung-Funktion, unterstützt das Anzeigen einer WMS-Schicht (Web  Map Service) oder den Aufnahmeort eines durch EXIF-Daten lokalisierten Photos. Erfordert OpenLayers.",
+"Map viewer" => "Karten-Betrachter",
+"Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers" => "Aufnahmeort eines Bildes auf einer OpenLayers-Karte anzeigen.",
 );

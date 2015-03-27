@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Skeleton Plugin" => "Skeleton Plugin",
-"This is an empty container to demonstrate the basics of plugins coding." => "Dies ist ein leerer Container um die Grundlagen der Plugin-Entwicklung zu Demonstrieren.",
+"Skeleton Plugin" => "Leere Erweiterung",
+"This is an empty container to demonstrate the basics of plugins coding." => "Dies ist ein leerer Container um die Grundlagen der Erweiterungs-Entwicklung zu demonstrieren.",
 "Custom Footer" => "Angepasste Fusszeile",
 "Show a custom footer div" => "Eine angepasste Fusszeile anzeigen",
 "Footer Content" => "Fusszeile Inhalt",

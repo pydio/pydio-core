@@ -19,8 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Text Editor" => "Text Editor",
-"Very basic text editor" => "Very basic text editor",
 "Role Editor" => "Role Editor",
 "Administrator Role Editor" => "Administrator Role Editor",
 );

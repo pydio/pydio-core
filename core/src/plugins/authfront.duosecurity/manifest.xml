@@ -10,22 +10,22 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="15"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="15"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only"/>
-        <global_param name="DUO_AUTH_HOST" type="string" label="Api Host"
-                      description="DuoSecurity Host" group="DuoSecurity Config" expose="true"/>
-        <global_param name="DUO_AUTH_IKEY" type="string" label="Integration Key"
-                      description="DuoSecurity Integration Key" group="DuoSecurity Config"/>
-        <global_param name="DUO_AUTH_SKEY" type="string" label="Secret Key"
-                      description="DuoSecurity Secret Key" group="DuoSecurity Config"/>
-        <global_param name="DUO_AUTH_AKEY" type="string" label="Application Key"
-                      description="DuoSecurity Application Key (generate your own)" group="DuoSecurity Config"/>
-        <global_param name="DUO_AUTH_ACTIVE" group="Dual-level Authentication" type="boolean" label="Duo Authentication Active"
-                      description="Active dual-form authentication" default="false" scope="user"/>
-        <global_param name="DUO_AUTH_LAST_SIGNATURE" group="Dual-level Authentication" type="string" label="Request Signature (leave empty)"
-                      description="Used internally" default="false" expose="true"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only],no_session|CONF_MESSAGE[REST Only],both|CONF_MESSAGE[Session-based or Rest]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only"/>
+        <global_param name="DUO_AUTH_HOST" type="string" label="CONF_MESSAGE[Api Host]"
+                      description="CONF_MESSAGE[DuoSecurity Host]" group="CONF_MESSAGE[DuoSecurity Config]" expose="true"/>
+        <global_param name="DUO_AUTH_IKEY" type="string" label="CONF_MESSAGE[Integration Key]"
+                      description="CONF_MESSAGE[DuoSecurity Integration Key]" group="CONF_MESSAGE[DuoSecurity Config]"/>
+        <global_param name="DUO_AUTH_SKEY" type="string" label="CONF_MESSAGE[Secret Key]"
+                      description="CONF_MESSAGE[DuoSecurity Secret Key]" group="CONF_MESSAGE[DuoSecurity Config]"/>
+        <global_param name="DUO_AUTH_AKEY" type="string" label="CONF_MESSAGE[Application Key]"
+                      description="CONF_MESSAGE[DuoSecurity Application Key (generate your own)]" group="CONF_MESSAGE[DuoSecurity Config]"/>
+        <global_param name="DUO_AUTH_ACTIVE" group="CONF_MESSAGE[Dual-level Authentication]" type="boolean" label="CONF_MESSAGE[Duo Authentication Active]"
+                      description="CONF_MESSAGE[Active dual-form authentication]" default="false" scope="user"/>
+        <global_param name="DUO_AUTH_LAST_SIGNATURE" group="CONF_MESSAGE[Dual-level Authentication]" type="string" label="CONF_MESSAGE[Request Signature (leave empty)]"
+                      description="CONF_MESSAGE[Used internally]" default="false" expose="true"/>
     </server_settings>
     <registry_contributions>
         <actions>

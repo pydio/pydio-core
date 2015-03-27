@@ -42,14 +42,14 @@ initialize:function(form){
 		this.revertTemplate = new Template('<a style="color:#79f;font-weight:bold;" data-ajxp_url="'+window.ajxpServerAccessPath+'&get_action=revert_file&file=#{fileName}&revision=#{revision}" href="#" data-ajxp_confirm="#{confirmRevertString}">#{revertString}</a>');
 		this.compareTemplate = new Template('<a style="color:#79f;font-weight:bold;" data-ajxp_url="'+window.ajxpServerAccessPath+'&get_action=revert_file&compare=true&file=#{fileName}&revision=#{revision}" href="#">#{revertString}</a>');
 		this.switchTemplate = new Template('<a style="color:#79f;font-weight:bold;" data-ajxp_url="'+window.ajxpServerAccessPath+'&get_action=svnswitch&revision=#{revision}" href="#">#{switchString}</a>');
-		this.revMessage = MessageHash[243];
-		this.authorMessage = MessageHash[244];
-		this.dateMessage = MessageHash[245];
-		this.messMessage = MessageHash[246];
-		this.downMessage = MessageHash[88];
-		this.revertMessage = "Revert";
-		this.confirmRevertMessage = "This will create a new version of the file with the content of this previous version. Are you sure?";
-		this.compareMessage = "Compare";
+		this.revMessage = MessageHash['243'];
+		this.authorMessage = MessageHash['244'];
+		this.dateMessage = MessageHash['245'];
+		this.messMessage = MessageHash['246'];
+		this.downMessage = MessageHash['88'];
+		this.revertMessage = MessageHash['meta.svn.32'];
+		this.confirmRevertMessage = MessageHash['meta.svn.33'];
+		this.compareMessage = MessageHash['meta.svn.31'];
 		this.switchMessage = MessageHash['meta.svn.3'];
 		if(!$('svndownload_iframe')){
 			$('hidden_frames').insert('<iframe id="svndownload_iframe" name="svndownload_iframe" style="display:none"></iframe>');
@@ -73,10 +73,10 @@ initialize:function(form){
                 dataModel:this.versionsDm,
                 columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
                             {attributeName:"revision", messageString:'#', sortType:'Number'},
-                            {attributeName:"revision_log", messageString:'Message', sortType:'String'},
+                            {attributeName:"revision_log", messageId:246, sortType:'String'},
                             {attributeName:"revision_date", messageId:4, sortType:'String'},
-                            {attributeName:"author", messageString:'Author', sortType:'String'},
-                            {attributeName:"links", messageString:'Actions', sortType:'String'}
+                            {attributeName:"author", messageId:244, sortType:'String'},
+                            {attributeName:"links", messageId:'meta.svn.61', sortType:'String'}
                 ],
                 defaultSortTypes:["String", "String", "String", "String", "String", "String"],
                 columnsTemplate:"svnlog_file",
@@ -89,10 +89,10 @@ initialize:function(form){
             this.filesList = new FilesList(this.element, {
                 dataModel:this.versionsDm,
                 columnsDef:[{attributeName:"revision", messageString:'#', sortType:'Number'},
-                            {attributeName:"revision_log", messageString:'Message', sortType:'String'},
+                            {attributeName:"revision_log", messageId:246, sortType:'String'},
                             {attributeName:"revision_date", messageId:4, sortType:'String'},
-                            {attributeName:"author", messageString:'Author', sortType:'String'},
-                            {attributeName:"links", messageString:'Actions', sortType:'String'}
+                            {attributeName:"author", messageId:244, sortType:'String'},
+                            {attributeName:"links", messageId:'meta.svn.61', sortType:'String'}
                 ],
                 defaultSortTypes:["Number", "String", "String", "String", "String"],
                 columnsTemplate:"svnlog_folder",

@@ -27,7 +27,7 @@
 
 $mess=array(
 "1" => "Benachrichtigungen",
-"2" => "Benachrichtigungs-Feed",
+"2" => "Ereignisspeicher",
 "3" => "Wichtige Nachrichten",
 "4" => "Benachrichtigungen",
 "5" => "Aktuelle Ereignisse",

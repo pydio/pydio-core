@@ -3,6 +3,7 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
+            <i18n namespace="core.mq" path="plugins/core.mq/i18n"/>
             <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js"/>
         </resources>
     </client_settings>
@@ -10,18 +11,18 @@
         <global_param group="CONF_MESSAGE[Inner Messaging]" type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
         <global_param group="CONF_MESSAGE[Inner Messaging]" description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
 
-        <global_param group="WebSocket Server" description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
-        <global_param group="WebSocket Server" description="WebSocket client connect address" label="WS Client Address" name="WS_SERVER_HOST" type="string" expose="true"/>
-        <global_param group="WebSocket Server" description="WebSocket client connect port" label="WS Client Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="WebSocket Server" description="WebSocket client secure connection" label="WS Client SSL" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
-        <global_param group="WebSocket Server" description="WebSocket server bind address" label="WS Server Host" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
-        <global_param group="WebSocket Server" description="WebSocket server bind port" label="WS Server Port" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="WebSocket Server" description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
-        <global_param group="WebSocket Server" description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
-        <global_param group="WebSocket Server" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
-        <global_param group="WebSocket Server" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
-        <global_param group="WebSocket Server" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
-        <global_param group="WebSocket Server" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server is running]" label="CONF_MESSAGE[WebSocket]" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect address]" label="CONF_MESSAGE[WS Client Address]" name="WS_SERVER_HOST" type="string" expose="true"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect port]" label="CONF_MESSAGE[WS Client Port]" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client secure connection]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind address]" label="CONF_MESSAGE[WS Server Host]" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind port]" label="CONF_MESSAGE[WS Server Port]" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket handler path]" label="CONF_MESSAGE[WS Path]" name="WS_SERVER_PATH" type="string" expose="true"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket admin key]" label="CONF_MESSAGE[WS Key]" name="WS_SERVER_ADMIN" type="string"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>

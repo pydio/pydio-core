@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
     "1" => "Externer Link",
-    "2" => "Link der durch das action.skeleton Plugin hinzugefügt wurde",
+    "2" => "Link der durch die action.skeleton-Erweiterung hinzugefügt wurde",
     "3" => "Sind Sie sicher, dass Sie %s in einem neuen Fenster öffnen möchten?",
     "4" => "Modal Link",
     "5" => "Öffne den Link in einem modalen Dialogfeld",

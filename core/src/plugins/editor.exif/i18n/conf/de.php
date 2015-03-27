@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"EXIF Extractor" => "EXIF Extractor",
-"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Zeigt die EXIF-Metadaten von JPG-Dateien an. Kann Bilder auf einer Karte lokalisieren, wenn es GPS-Daten enthält.",
+"EXIF Extractor" => "EXIF-Betrachter",
+"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Zeigt die EXIF-Metadaten von JPG-Dateien an und kann den Aufnahmeort von Bildern auf einer Karte lokalisieren, wenn es GPS-Daten enthält.",
 );

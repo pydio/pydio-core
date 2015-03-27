@@ -277,8 +277,10 @@ class SvnManager extends AJXP_AbstractMetaSource
             $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars);
         }
         $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
+
+        $mess = ConfService::getMessages();
         AJXP_XMLWriter::header();
-        AJXP_XMLWriter::sendMessage("The selected files/folders have been copied/moved (by SVN)", null);
+        AJXP_XMLWriter::sendMessage($mess["meta.svn.5"], null);
         AJXP_XMLWriter::reloadDataNode();
         AJXP_XMLWriter::close();
     }
@@ -309,8 +311,10 @@ class SvnManager extends AJXP_AbstractMetaSource
         $this->commitMessageParams = "[".implode(",",$init["SELECTION"])."]";
         $this->commitChanges($actionName, $httpVars, $filesVars);
         $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
+
+        $mess = ConfService::getMessages();
         AJXP_XMLWriter::header();
-        AJXP_XMLWriter::sendMessage("The selected files/folders have been deleted (by SVN)", null);
+        AJXP_XMLWriter::sendMessage($mess["meta.svn.51"], null);
         AJXP_XMLWriter::reloadDataNode();
         AJXP_XMLWriter::close();
     }

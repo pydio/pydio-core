@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Open in..." => "Öffnen in...",
-"Simple Picker to open any type of file in any available editor." => "Einfaches Auswahlprogramm, um jede Art von Datei in einem beliebigen, verfügbaren Editor zu öffnen..",
+"Open in..." => "Öffnen mit...",
+"Simple Picker to open any type of file in any available editor." => "Aufwahl, um Dateien in einem beliebigen verfügbaren Editor zu öffnen.",
 );

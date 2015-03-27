@@ -4,17 +4,18 @@
 	<class_definition filename="plugins/authfront.keystore/class.KeystoreAuthFrontend.php" classname="KeystoreAuthFrontend"/>
     <client_settings>
         <resources>
+            <i18n namespace="authfront.keystore" path="plugins/authfront.keystore/i18n"/>
             <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js" autoload="true"/>
             <i18n namespace="keystore" path="plugins/authfront.keystore/i18n"/>
             <css file="plugins/authfront.keystore/apikeypane.css" autoload="true"/>
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order"
-                      description="Order this plugin with other auth frontends" default="2"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]"
+                      description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="2"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="both"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only],no_session|CONF_MESSAGE[REST Only],both|CONF_MESSAGE[Session-based or Rest]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="both"/>
         <global_param name="USER_GENERATE_KEYS" type="boolean" label="Let users generate keys"
                       description="Display a Generate Key button in the Api key panel to let the user create their own key. Not really useful yet, for future usage."
                       default="false" mandatory="false" expose="true"/>

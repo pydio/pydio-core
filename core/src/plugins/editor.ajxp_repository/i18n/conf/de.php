@@ -19,5 +19,5 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Repository Editor" => "Arbeitsumgebung Editor",
+"Repository Editor" => "Arbeitsumgebungs-Editor",
 );

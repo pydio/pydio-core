@@ -3,11 +3,16 @@
           description="CONF_MESSAGE[Display a standard user/password login screen]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.session_login/class.SessionLoginFrontend.php" classname="SessionLoginFrontend"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="authfront.session_login" path="plugins/authfront.session_login/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="20"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="20"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only],no_session|CONF_MESSAGE[REST Only],both|CONF_MESSAGE[Session-based or Rest]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only"/>
     </server_settings>
     <registry_contributions>
         <actions>

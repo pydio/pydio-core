@@ -19,7 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Audio Player" => "Sound Player",
-"Uses HTML5 or Flash to play a sound" => "HTML5 oder Flash für das Abspieln von Sound benutzen.",
-"Sound Player" => "Sound Player",
+"Sound Player" => "Audio-Manager",
+"Uses HTML5 or Flash to play a sound" => "HTML5 oder Flash für das Abspieln von Musik benutzen. Benötigt 'editor.audio'.",
 );

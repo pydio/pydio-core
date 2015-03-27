@@ -11,7 +11,7 @@
 		<param name="API_KEY" type="string" label="CONF_MESSAGE[Key]" description="CONF_MESSAGE[S3 Api Key]" mandatory="true" default=""/>
 		<param name="SECRET_KEY" type="string" label="CONF_MESSAGE[Secret Key]" description="CONF_MESSAGE[S3 secret key]" mandatory="true"/>
 		<param name="REGION" type="select" choices="us-east-1|US Standard (Virginia),us-west-1|US West 1 (Northern California),us-west-2|US West 2 (Oregon),eu-west-1|EU (Ireland), ap-southeast-2|South-East (Sydney), ap-southeast-1|South-East (Singapore),ap-northeast-1|Asia Pacific (Japan),sa-east-1|South America (Sao Paulo),us-gov-west-1|EU Governement Cloud" label="CONF_MESSAGE[Region]" description="CONF_MESSAGE[S3 storage region]" mandatory="true"/>
-        <param name="STORAGE_URL" type="string" label="CONF_MESSAGE[Storage URL]" description="Replace default AWS access points (built from region). Set a full URL, including protocol" mandatory="false"/>
+        <param name="STORAGE_URL" type="string" label="CONF_MESSAGE[Storage URL]" description="CONF_MESSAGE[Replace default AWS access points (built from region). Set a full URL, including protocol]" mandatory="false"/>
 		<param name="CONTAINER" type="string" label="CONF_MESSAGE[Container]" description="CONF_MESSAGE[Root container in the S3 storage]" mandatory="true"/>
 	</server_settings>
 	<registry_contributions>

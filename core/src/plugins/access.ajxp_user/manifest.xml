@@ -11,7 +11,7 @@
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
-        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="Disable Address Book" description="Do not display address book in user account panel."/>
+        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="CONF_MESSAGE[Disable Address Book]" description="CONF_MESSAGE[Do not display address book in user account panel.]"/>
     </server_settings>
 	<registry_contributions>
 		<client_configs>

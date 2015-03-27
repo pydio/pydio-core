@@ -55,4 +55,12 @@ $mess=array(
 "Use the Test Connexion button to check if this user is correctly found in your LDAP directory." => "Use the Test Connection button to check if this user is correctly found in your LDAP directory.",
 "Test Connexion" => "Test Connection",
 "Try to connect to LDAP" => "Try to connect to LDAP",
+"LDAP Server page size" => "LDAP Server page size",
+"Page size of LDAP Server" => "Page size of LDAP Server",
+"Search Users by Attribute" => "Search Users by Attribute",
+"When looking for a user through autocomplete, search on a specific parameter instead of user ID" => "When looking for a user through autocomplete, search on a specific parameter instead of user ID",
+"Fake Member from..." => "Fake Member from...",
+"If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema." => "If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema.",
+"Role Prefix (for memberof)" => "Role Prefix (for memberof)",
+"Role prefix when you mapping memberof => roleID" => "Role prefix when you mapping memberof => roleID",
 );
