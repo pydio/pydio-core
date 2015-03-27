@@ -331,7 +331,11 @@ class AJXP_Controller
             else $user = "shared";
         }
         if (AuthService::usersEnabled()) {
-            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), $user, MCRYPT_MODE_ECB));
+            $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
+            if(empty($cKey)){
+                $cKey = "\1CDAFx¨op#";
+            }
+            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token.$cKey), $user, MCRYPT_MODE_ECB));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
@@ -355,7 +359,21 @@ class AJXP_Controller
             }
         }
 
-        return self::runCommandInBackground($cmd, $logFile);
+        $repoObject = ConfService::getRepository();
+        $clearEnv = false;
+        if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
+            $encodedCreds = AJXP_Safe::getEncodedCredentialString();
+            if(!empty($encodedCreds)){
+                putenv("AJXP_SAFE_CREDENTIALS=".$encodedCreds);
+                $clearEnv = "AJXP_SAFE_CREDENTIALS";
+            }
+        }
+
+        $res = self::runCommandInBackground($cmd, $logFile);
+        if(!empty($clearEnv)){
+            putenv($clearEnv);
+        }
+        return $res;
     }
 
     /**

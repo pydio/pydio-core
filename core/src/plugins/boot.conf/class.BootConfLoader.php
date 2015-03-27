@@ -143,6 +143,7 @@ class BootConfLoader extends AbstractConfDriver
         $this->_loadPluginConfig("core.auth", $coreAuth);
         if(!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
         if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
+        $coreConf["AJXP_CLI_SECRET_KEY"] = AJXP_Utils::generateRandomString(24, true);
 
         $storageType = $data["STORAGE_TYPE"]["type"];
         if ($storageType == "db") {
