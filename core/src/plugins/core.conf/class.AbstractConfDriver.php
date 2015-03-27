@@ -778,6 +778,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             }
                             $name = $xmlNode->getAttribute("name");
                             if (isSet($data[$name]) || $data[$name] === "") {
+                                if($data[$name] == "__AJXP_VALUE_SET__") continue;
                                 if ($data[$name] === "" || $userObject->parentRole == null
                                     || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
                                     || $userObject->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]) {
@@ -874,7 +875,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         $password = $httpVars["webdav_pass"];
                         if (function_exists('mcrypt_encrypt')) {
                             $user = $userObject->getId();
-                            $secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
+                            $secret = (defined("AJXP_SAFE_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
                             $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB));
                         }
                         $davData["PASS"] = $password;
