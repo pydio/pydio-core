@@ -124,6 +124,7 @@ class ZohoEditor extends AJXP_Plugin
 
             $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
+            $this->logInfo('Preview', 'Posting content of '.$file.' to Zoho server');
 
             $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
             $httpClient = new http_class();
@@ -219,6 +220,7 @@ class ZohoEditor extends AJXP_Plugin
                     echo "MODIFIED";
                 }
             }
+            $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl());
             AJXP_Controller::applyHook("node.change", array(null, &$node));
         }
 

@@ -66,8 +66,11 @@ class IMagickPreviewer extends AJXP_Plugin
 
         if ($action == "imagick_data_proxy") {
             $this->extractAll = false;
-            if(isSet($httpVars["all"])) $this->extractAll = true;
             $file = $selection->getUniqueFile();
+            if(isSet($httpVars["all"])) {
+                $this->logInfo('Preview', 'Preview content of '.$file);
+                $this->extractAll = true;
+            }
 
             if (($size = filesize($destStreamURL.$file)) === false) {
                 return false;

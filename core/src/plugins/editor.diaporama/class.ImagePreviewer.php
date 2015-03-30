@@ -56,7 +56,7 @@ class ImagePreviewer extends AJXP_Plugin
                 header("Content-Length: 0");
                 return;
             }
-
+            $this->logInfo('Preview', 'Preview content of '.$file);
             if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
