@@ -1036,7 +1036,11 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function pruneTemporaryKeys($keyType, $expiration)
     {
-        dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id] = %s AND [insertion_date] < (CURRENT_TIMESTAMP - %i)", "temporakey_".$keyType, $expiration*60);
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id] = %s AND [insertion_date] < (CURRENT_TIMESTAMP - time '0:$expiration')", "temporakey_".$keyType);
+        }else{
+            dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id] = %s AND [insertion_date] < (CURRENT_TIMESTAMP - %i)", "temporakey_".$keyType, $expiration*60);
+        }
     }
 
 
