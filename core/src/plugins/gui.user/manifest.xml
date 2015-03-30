@@ -29,7 +29,7 @@
                             $(oForm).down('.dialogButtons').insert({bottom:$(oForm).down('.dialogButtons').down('input')});
                         ]]></dialogOnOpen>
                         <dialogOnCancel><![CDATA[
-                                ajaxplorer.actionBar.fireAction('login');
+                                pydio.actionBar.fireAction('login');
                         ]]></dialogOnCancel>
                         <dialogOnComplete><![CDATA[
                             if(!oForm.BUTTON_CLICKED){
@@ -42,6 +42,7 @@
                                         duration:0.5,
                                         afterFinish: function(){
                                             oForm.down('#reset-password-ask').update(MessageHash['gui.user.5']);
+                                            $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
                                         }
                                     });
                                 };
@@ -91,6 +92,7 @@
 									}else if(transport.responseText == 'SUCCESS'){
 										ajaxplorer.displayMessage('SUCCESS', MessageHash['gui.user.6']);
 										oForm.down('#reset-password').update(MessageHash['gui.user.6']);
+                                        $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
 									}
 								}
 							};

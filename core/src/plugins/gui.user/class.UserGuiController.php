@@ -118,10 +118,14 @@ class UserGuiController extends AJXP_Plugin
                 if (isSet($httpVars["key"]) && isSet($httpVars["user_id"])) {
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
                     ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);
-                    if ($key != null && $key["user_id"] == $httpVars["user_id"] && AuthService::userExists($key["user_id"])) {
+                    $uId  = $httpVars["user_id"];
+                    if(AuthService::ignoreUserCase()){
+                        $uId = strtolower($uId);
+                    }
+                    if ($key != null && strtolower($key["user_id"]) == $uId && AuthService::userExists($uId)) {
                         AuthService::updatePassword($key["user_id"], $httpVars["new_pass"]);
                     }else{
-                        echo 'ERROR';
+                        echo 'PASS_ERROR';
                         break;
                     }
                 }
