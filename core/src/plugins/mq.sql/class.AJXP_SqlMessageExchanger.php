@@ -217,7 +217,9 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
     public function consumeWorkerChannel($channelName, $filter = null)
     {
         dibi::connect($this->sqlDriver);
-        $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY [object_id] ASC", "queues.$channelName");
+        $castType = "UNSIGNED";
+        if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
+        $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY CAST([object_id] AS ".$castType.") ASC", "queues.$channelName");
         $rows = $results->fetchAll();
         $arr = array();
         $deleted = array();
@@ -240,7 +242,9 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
     public function publishWorkerMessage($channel, $message)
     {
         dibi::connect($this->sqlDriver);
-        $r = dibi::query("SELECT MAX( [object_id] ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$channel");
+        $castType = "UNSIGNED";
+        if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
+        $r = dibi::query("SELECT MAX( CAST( [object_id] AS ".$castType." ) ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$channel");
         $index = $r->fetchSingle();
         if($index == null) $index = 1;
         else $index = intval($index)+1;
