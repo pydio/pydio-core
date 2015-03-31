@@ -65,8 +65,9 @@ class CoreIndexer extends AJXP_Plugin {
 
             foreach($nodes as $node){
 
+                $dir = $node->getPath() == "/" || is_dir($node->getUrl());
                 // SIMPLE FILE
-                if(!is_dir($node->getUrl())){
+                if(!$dir){
                     try{
                         $this->logDebug("Indexing - node.index ".$node->getUrl());
                         AJXP_Controller::applyHook("node.index", array($node));
@@ -128,10 +129,12 @@ class CoreIndexer extends AJXP_Plugin {
         $url = $node->getUrl();
         $this->logDebug("Indexing Node parent node ".$url);
         $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);
-        try {
-            AJXP_Controller::applyHook("node.index", array($node));
-        } catch (Exception $e) {
-            $this->logDebug("Error Indexing Node ".$url." (".$e->getMessage().")");
+        if($node->getPath() != "/"){
+            try {
+                AJXP_Controller::applyHook("node.index", array($node));
+            } catch (Exception $e) {
+                $this->logDebug("Error Indexing Node ".$url." (".$e->getMessage().")");
+            }
         }
 
         $handle = opendir($url);
