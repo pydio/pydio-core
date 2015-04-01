@@ -9,8 +9,8 @@
     </client_settings>
     <server_settings>
         <param name="index_content" type="boolean" label="CONF_MESSAGE[Index Content]" description="CONF_MESSAGE[Parses the file when possible and index its content (see plugin global options)]" mandatory="true" default="false"/>
-        <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" default=""/>
-        <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false" default=""/>
+        <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" />
+        <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false"/>
         <global_param name="PARSE_CONTENT_MAX_SIZE" type="string" label="CONF_MESSAGE[Parse Content Until]" description="CONF_MESSAGE[Skip content parsing and indexation for files bigger than this size (must be in Bytes)]" mandatory="true" default="500000"/>
         <global_param name="PARSE_CONTENT_HTML" type="string" label="CONF_MESSAGE[HTML files]" description="CONF_MESSAGE[List of extensions to consider as HTML file and parse content]" mandatory="true" default="html,htm"/>
         <global_param name="PARSE_CONTENT_TXT" type="string" label="CONF_MESSAGE[Text files]" description="CONF_MESSAGE[List of extensions to consider as Text file and parse content]" mandatory="true" default="txt"/>
