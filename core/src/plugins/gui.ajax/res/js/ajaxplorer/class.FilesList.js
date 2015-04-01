@@ -52,6 +52,8 @@ Class.create("FilesList", SelectableElements, {
         this._previewFactory = new PreviewFactory();
         this._previewFactory.sequencialLoading = true;
         this.__allObservers = $A();
+        this._parsingCache = new $H();
+        this._filters = $H();
 
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
@@ -694,9 +696,10 @@ Class.create("FilesList", SelectableElements, {
 				if(column.attributeName == "ajxp_label"){// Will contain an icon
 					leftPadding = 24;
 				}
-				headerData.push({label:label, size:userWidth, leftPadding:leftPadding});				
+				headerData.push({label:label, size:userWidth, leftPadding:leftPadding, metaName:column.attributeName});
 			}
 			buffer = '<div id="selectable_div_header-'+this.__currentInstanceIndex+'" class="sort-table"></div>';
+            buffer += '<div id="selectable_div_header_filter-'+this.__currentInstanceIndex+'" class="sort-table-filter"></div>';
 			buffer = buffer + '<div id="table_rows_container-'+this.__currentInstanceIndex+'" class="table_rows_container"><table id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
             var contentContainer = this.htmlElement.down("div.table_rows_container");
@@ -736,6 +739,7 @@ Class.create("FilesList", SelectableElements, {
 			this._headerResizer = new HeaderResizer(this.htmlElement.down('div.sort-table'), {
 				headerData : headerData,
 				body : contentContainer,
+                filterPanel: this.htmlElement.down("div.sort-table-filter"),
 				initSizesType : 'percent',
 				bodyIsMaster : (this.gridStyle == 'grid'),
                 scrollerWidth : this.options.replaceScroller?0:18,
@@ -754,6 +758,10 @@ Class.create("FilesList", SelectableElements, {
                     this.setUserPreference("columns_size", data);
 				}.bind(this), 2000);
 			}.bind(this) );
+            this._headerResizer.observe("filter_update", function(event){
+                if(event.metaValue) this.addMetadataFilter(event.metaName, event.metaValue+'*');
+                else this.removeMetadataFilter(event.metaName);
+            }.bind(this));
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
             if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
 			this._sortableTable.onsort = function(){
@@ -1224,6 +1232,12 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 
+    softReload: function(){
+        this.setSelectedNodes([]);
+        this.removeCurrentLines(true);
+        this.fill(this.getCurrentContextNode(), true);
+    },
+
     empty : function(skipFireChange){
         this._previewFactory.clear();
         if(this.protoMenu){
@@ -1355,6 +1369,9 @@ Class.create("FilesList", SelectableElements, {
         var renderer = this.getRenderer(); //(this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
         var child = this.crtContext.findChildByPath(childPath);
         if(!child) return;
+        if(this._rejectNodeByFilters(child)){
+            return;
+        }
         var newItem;
         newItem = renderer(child);
         newItem.ajxpNode = child;
@@ -1407,7 +1424,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Populates the list with the children of the passed contextNode
 	 * @param contextNode AjxpNode
 	 */
-	fill: function(contextNode){
+	fill: function(contextNode, forceNoRefreshGui){
 
 		var refreshGUI = false;
 		this.gridStyle = 'file';
@@ -1436,7 +1453,7 @@ Class.create("FilesList", SelectableElements, {
 			refreshGUI = true;
 		}
 		
-		if(refreshGUI){
+		if(refreshGUI && !forceNoRefreshGui){
 			this.initGUI();
 		}
 		
@@ -1447,6 +1464,9 @@ Class.create("FilesList", SelectableElements, {
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
+            if(this._rejectNodeByFilters(child)){
+                continue;
+            }
 			var newItem;
             newItem = renderer(child);
 			newItem.ajxpNode = child;
@@ -1495,9 +1515,66 @@ Class.create("FilesList", SelectableElements, {
 		if(this.hasFocus){
 			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
 		}
-		//if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
-		
+
+    toggleFilterPane: function(){
+        this.htmlElement.toggleClassName('fl-showFilterPane');
+        if(!this.htmlElement.hasClassName('fl-showFilterPane')){
+            this.clearMetadataFilters();
+        }
+        window.setTimeout(function(){this.resize()}.bind(this), 0);
+    },
+
+    addMetadataFilter: function(metaName, metaValue){
+        if(!metaValue){
+            this._filters.unset(metaName);
+        }else{
+            this._filters.set(metaName, metaValue);
+        }
+        this.softReload();
+    },
+
+    removeMetadataFilter: function(metaName){
+        this._filters.unset(metaName);
+        this.softReload();
+    },
+
+    clearMetadataFilters: function(){
+        this._filters = $H();
+        this.softReload();
+    },
+
+    _rejectNodeByFilters: function(ajxpNode){
+        var reject = false;
+        this._filters.each(function(pair){
+            if(this._filterNodeByMetadata(ajxpNode, pair.key, pair.value)){
+                reject = true;
+                throw $break;
+            }
+        }.bind(this));
+        return reject;
+    },
+
+    _filterNodeByMetadata: function(ajxpNode, metaName, metaValue){
+        var currentMeta = ajxpNode.getMetadata().get(metaName);
+        if(!currentMeta) currentMeta = '';
+        metaValue = metaValue.toLowerCase();
+        currentMeta = currentMeta.toLocaleLowerCase();
+        var reject = false;
+        var correspond = false;
+        if(metaValue.startsWith('!')){
+            reject = true;
+            metaValue = metaValue.replace('!', '');
+        }
+        if(metaValue.endsWith('*')){
+            correspond = (currentMeta.indexOf(metaValue.replace("*", "")) !== -1);
+        }else{
+            correspond = (currentMeta == metaValue);
+        }
+        if(reject) return correspond;
+        else return !correspond;
+    },
+
 	/**
 	 * Inline Editing of label
 	 * @param callback Function Callback after the label is edited.
@@ -1625,7 +1702,7 @@ Class.create("FilesList", SelectableElements, {
 
     getFromCache:function(cacheKey){
         var result;
-        if(!this.parsingCache.get(cacheKey)){
+        if(!this._parsingCache.get(cacheKey)){
             result = $H();
             var columns;
             switch(cacheKey){
@@ -1644,7 +1721,7 @@ Class.create("FilesList", SelectableElements, {
                     break;
                 case "tBody":
                     var tBody = $(this._htmlElement).down("tbody");
-                    this.parsingCache.set('tBody', tBody);
+                    this._parsingCache.set('tBody', tBody);
                     return tBody;
                 default :
                     columns = this.getColumnsDef();
@@ -1658,15 +1735,15 @@ Class.create("FilesList", SelectableElements, {
                 }
                 result.set(column.attributeName, column);
             });
-            this.parsingCache.set(cacheKey, result);
+            this._parsingCache.set(cacheKey, result);
         }else{
-            result = this.parsingCache.get(cacheKey);
+            result = this._parsingCache.get(cacheKey);
         }
         return result;
     },
 
     clearParsingCache: function(){
-        this.parsingCache = new $H();
+        this._parsingCache = new $H();
     },
 
 	/**
@@ -1989,43 +2066,44 @@ Class.create("FilesList", SelectableElements, {
         var addedCell = 0;
         if(metaData.get("ajxp_description")){
             addedCell ++;
-            metadataDiv.insert(new Element("span", {className:'metadata_chunk'}).update(metaData.get("ajxp_description")));
-        }else{
-            var attributeList = this.getFromCache('visibleColumns');
-            var first = false;
-            var attKeys = attributeList.keys();
-            for(var i = 0; i<attKeys.length;i++ ){
-                var s = attKeys[i];
-                var cell = new Element("span", {className:'metadata_chunk'});
-                if(s == "ajxp_label")
-                {
-                    continue;
-                }else if(s=="ajxp_modiftime"){
-                    var date = new Date();
-                    date.setTime(parseInt(metaData.get(s))*1000);
-                    newRow.ajxp_modiftime = date;
-                    cell.update('<span class="text_label">' + formatDate(date) + '</span>');
-                }else if(s == "filesize" && metaData.get(s) == "-"){
+            metadataDiv.insert(new Element("span", {className:'metadata_chunk metadata_chunk_description'}).update(metaData.get("ajxp_description")));
+        }
 
-                    continue;
-
-                }else
-                {
-                    var metaValue = metaData.get(s) || "";
-                    if(!metaValue) continue;
-                    cell.update('<span class="text_label">' + metaValue  + "</span>");
-                }
-                if(!first){
-                    metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
-                }
-                metadataDiv.insert(cell);
-                addedCell++;
-                first = false;
-                if(attributeList.get(s).modifierFunc){
-                    attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
-                }
+        var attributeList = this.getFromCache('visibleColumns');
+        var first = false;
+        var attKeys = attributeList.keys();
+        for(var i = 0; i<attKeys.length;i++ ){
+            var s = attKeys[i];
+            var cell = new Element("span", {className:'metadata_chunk metadata_chunk_standard metadata_chunk_' + s});
+            if(s == "ajxp_label")
+            {
+                continue;
+            }else if(s=="ajxp_modiftime"){
+                var date = new Date();
+                date.setTime(parseInt(metaData.get(s))*1000);
+                newRow.ajxp_modiftime = date;
+                cell.update('<span class="text_label">' + formatDate(date) + '</span>');
+            }else if(s == "ajxp_dirname" && metaData.get("filename")){
+                var dirName = getRepName(metaData.get("filename"));
+                cell.update('<span class="text_label">' + (dirName?dirName:"/") + '</span>');
+            }else if(s == "filesize" && metaData.get(s) == "-"){
+                continue;
+            }else{
+                var metaValue = metaData.get(s) || "";
+                if(!metaValue) continue;
+                cell.update('<span class="text_label">' + metaValue  + "</span>");
+            }
+            if(!first){
+                cell.insert({top:new Element('span', {className:'icon-angle-right'})});
+            }
+            metadataDiv.insert(cell);
+            addedCell++;
+            first = false;
+            if(attributeList.get(s).modifierFunc){
+                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
             }
         }
+
         if(!addedCell){
             largeRow.addClassName('metadata_empty');
         }

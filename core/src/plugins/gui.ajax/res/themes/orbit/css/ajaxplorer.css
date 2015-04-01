@@ -349,6 +349,19 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     transition: top 0.6s ease;
 }
 
+#browser div.thumbnail_selectable_cell span.metadata_chunk.metadata_chunk_standard{
+    display: none;
+}
+#browser div.thumbnail_selectable_cell span.metadata_chunk.metadata_chunk_standard.metadata_chunk_ajxp_modiftime{
+    display: none !important;
+}
+#browser div.thumbnail_selectable_cell:hover span.metadata_chunk.metadata_chunk_standard,
+#browser div.thumbnail_selectable_cell.selected span.metadata_chunk.metadata_chunk_standard,
+#browser div.thumbnail_selectable_cell.selected-focus span.metadata_chunk.metadata_chunk_standard
+{
+    display: inline;
+}
+
 div.class-FetchedResultPane div.overlay_icon_div {
     top: 16px!important;
     font-size: 13px;
@@ -719,7 +732,7 @@ textarea#myCode
     letter-spacing: 1px;
     float: left;
     cursor: pointer;
-    border-radius: 30px;
+    border-radius: 5px;
 }
 
 div#meta_source_button_add{
@@ -1070,9 +1083,10 @@ input.SF_input.SF_number{
 }
 
 select.SF_input {
-    max-width: 464px !important;
+    max-width: 450px !important;
     width: 99% !important;
-    padding: 0 1% !important;
+    padding: 0 0 0 5px !important;
+    box-sizing: border-box;
 }
 
 .SF_box{
@@ -2407,6 +2421,34 @@ div.resizeGhost{
     opacity:0.7;
 }
 
+div.sort-table-filter div.header_cell {
+    border-right: 1px solid #ccc !important;
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.37);
+}
+
+div.sort-table-filter div.header_cell:last-child {
+    border-right: 0 !important;
+}
+
+div.header_cell input[type="text"] {
+    margin-left: 0;
+    width: 96%;
+    border: 0;
+    background: transparent;
+}
+
+div.sort-table-filter {
+    display: none;
+}
+
+div.fl-showFilterPane div.sort-table-filter {
+    display: block;
+}
+
+div.fl-displayMode-list.fl-showFilterPane div.scroller_track {
+    top: 50px !important;
+}
+
 /*
 div.header_resizer div.descending {
 	background-color: #daddd7;
@@ -3244,6 +3286,13 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     position: absolute;
     right: 13px;
     top: 21px;
+    transition: font-size ease 0.5s, top ease 0.5s, right ease 0.5s;
+}
+
+#search_container.search_active div#search_form a{
+    font-size: 1.6em;
+    top: 17px;
+    right: 16px;
 }
 
 #search_form a.disabled {
@@ -3286,16 +3335,34 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     font-family: "Open Sans Regular", sans-serif;
 }
 
+#search_container span.search_advanced_direct_access{
+    display: block;
+    opacity: 0;
+    position: absolute;
+    bottom: 1px;
+    right: 5px;
+    font-size: 9px;
+    cursor: default;
+    transition: opacity ease 0.5s;
+}
+
+#search_container.search_active span.search_advanced_direct_access{
+    display: block;
+    opacity: 1;
+    cursor: pointer;
+}
+
 #search_meta {
     font-size: 12px;
     padding: 0;
-    background-color: rgba(221, 221, 221, 0.97);
+    background-color: rgba(63, 63, 63, 0.96);
     float: left;
     width: 0;
     overflow: hidden;
     margin-left: 0;
     transition: width 1s ease, margin-left 1s ease;
     margin-top: -62px;
+    position: relative;
 }
 
 #search_meta > div{
@@ -3317,22 +3384,32 @@ div.meta_toggle_button {
     color: #555;
 }
 
-#search_meta input.c3,
-#search_meta span.c3
-{
+#search_meta input.c3, #search_meta span.c3 {
     margin-left: 0;
     margin-right: 0;
-    border: 1px solid #ACB2BB;
+    border: 1px solid rgba(63, 63, 63, 1);
     background-color: #ffffff;
-    padding: 2px 3px;
-    width:90% !important;
+    padding: 4px 3px;
+    width: 90% !important;
+    border-radius: 3px;
 }
+
+#search_meta select.select_meta_selector {
+    margin-left: 0;
+    width: 93%;
+    height: 26px;
+}
+
 #search_meta input.c3:disabled{
     opacity: 0.35;
 }
 
 #search_meta span.c3{
     cursor: pointer;
+}
+span#ajxp_folder.c3 {
+    color: #333;
+    padding: 4px 21px;
 }
 #search_meta input.c3:focus{
     background-color: white;
@@ -3346,6 +3423,7 @@ div.meta_toggle_button {
 
 div#modiftime_fixed_radio {
     margin-top: 16px;
+    color: #333;
 }
 
 #modiftime_fixed_radio span.c3:last-of-type{
@@ -3404,7 +3482,7 @@ div#modiftime_fixed_radio {
     padding:5px 5px 10px;
     line-height: 28px;
     overflow: hidden;
-    color: rgb(77, 85, 94);
+    color: rgb(238, 238, 238);
 }
 
 #search_meta span.toggle_button {
@@ -3426,7 +3504,7 @@ div#modiftime_fixed_radio {
 
 .search_label.open
 {
-    display: inline-block;
+    display: none;
     padding: 2px;
     height: 20px;
 }
@@ -3455,15 +3533,19 @@ div#modiftime_fixed_radio {
 span.toggle_button.open,span.toggle_button.close{
     background-color: white;
     border-radius: 20px;
-    padding: 2px 15px;
+    padding: 3px 11px;
     font-size: 0.8em;
     cursor: pointer;
+}
+
+div#search_container div#search_results.fl-displayMode-detail div.scroller_track {
+    top: 42px;
 }
 
 span.toggle_button.open > span,
 span.toggle_button.close > span
 {
-    display: none;
+    /*display: none;*/
 }
 
 span.toggle_button.close{
@@ -3473,14 +3555,21 @@ span.toggle_button.close{
 .toggle_open span.toggle_button.close,
 span.toggle_button.open
 {
-    display: inline-block;
+    background: #666;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: white;
 }
 
-.toggle_open span.toggle_button.open,
-.toggle_open span#search_meta_options
+.toggle_open span.toggle_button.open
 {
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3);
+    padding: 4px 10px 2px 12px;
+}
+
+span#search_meta_options{
     display: none;
 }
+
 
 #search_meta div.advanced_search_section{
     padding: 5px 5px 15px 17px;
@@ -3555,11 +3644,21 @@ span.search_meta_opt.checked > span {
 }
 
 #search_results h3 {
-    font-size: 30px;
-    margin: 10px 0 10px 14px;
-    color: rgb(77, 85, 94);
+    font-size: 20px;
+    margin: 10px 13px 10px 14px;
+    color: rgb(81, 81, 81);
+    border-bottom: 1px solid rgb(116, 116, 116);
+    padding: 5px 0;
 }
 
+#search_results div#element_overlay {
+    background-color: transparent;
+}
+
+#search_results div#element_overlay img{
+    width: 20px;
+    margin-top: 16px !important;
+}
 
 tr h3 {
     padding: 5px 10px 10px;
@@ -3579,19 +3678,27 @@ div.class-FetchedResultPane div.ajxpNodeProvider
     background-color: transparent !important;
 }
 
+#search_results img.thumbnail_iconlike_shadow {
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.47);
+}
+
 #search_results div.thumbnail_selectable_cell.detailed{
     border-radius: 6px;
-    width:29%;
+    width:45%;
     margin: 0 1% !important;
     padding-top: 0px;
     padding-bottom: 10px;
     overflow: hidden;
-    height: 51px;
+    height: 71px;
 }
 
 #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
-    transition:opacity 0.4s ease;
-    opacity: 0;
+    /*opacity: 1;*/
+}
+
+#search_results div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
+    margin-right: 7px;
+    padding-bottom: 9px;
 }
 
 #search_results div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata,
@@ -3602,6 +3709,22 @@ div.class-FetchedResultPane div.ajxpNodeProvider
 
 #search_results div.thumbnail_selectable_cell div.overlay_icon_div{
     display: none !important;
+}
+
+#search_results span.metadata_chunk.metadata_chunk_standard,
+#search_results span.metadata_chunk.metadata_chunk_standard span.text_label
+{
+    display: block;
+}
+#search_results span.metadata_chunk span.icon-angle-right{
+    display:none;
+}
+#search_results span.metadata_chunk.metadata_chunk_standard.metadata_chunk_mimestring_id{
+    display: none;
+}
+#search_results span.metadata_chunk span.text_label{
+    padding-left: 0;
+    color: #666;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
@@ -3630,7 +3753,7 @@ div.class-FetchedResultPane.display_metadata div.thumbnail_selectable_cell.detai
 
 #search_results div.ajxpNodeProvider:hover
 {
-    background-color: #ffffff !important;
+    background-color: rgb(249, 249, 249) !important;
 }
 
 div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
@@ -3645,8 +3768,9 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabe
 }
 
 #search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
-    font-size: 20px;
+    font-size: 17px;
     padding-top: 11px;
+    color: #333;
 }
 
 #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
@@ -4021,6 +4145,17 @@ div.triple div.infoPanelAllMetadata > div{
     float: left;
     margin: 2%;
     width: 46%;
+}
+
+div.infoPanelAllMetadata span.meta_user_tag_block {
+    font-size: 0.7em;
+    display: inline-block;
+    background-color: rgba(52, 94, 121, 0.78);
+    color: white;
+    padding: 0 7px;
+    border-radius: 4px;
+    margin-right: 5px;
+    font-weight: bold;
 }
 
 #browser
@@ -6006,10 +6141,11 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 #breadcrumb{
-    display: inline-block;
+    display: block;
+    float: left;
     overflow: hidden;
     color: rgb(111, 121, 131);
-    margin-top: 0px;
+    margin-top: 0;
     border-radius: 0 40px 40px 0;
 }
 

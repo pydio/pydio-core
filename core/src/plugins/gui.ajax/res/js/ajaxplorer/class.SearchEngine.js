@@ -145,8 +145,8 @@ Class.create("SearchEngine", AjxpPane, {
 
     initMetadataForm: function(formPanel, metadataColumns){
 
-        var searchChooser = new Element('div',{id:"basic_search"}).update('<span class="toggle_button open">'+MessageHash[486]+' <span class="icon-caret-down"></span></span>' +
-            '<span class="toggle_button close">'+MessageHash[487]+' <span class="icon-caret-up"></span></span> ' +
+        var searchChooser = new Element('div',{id:"basic_search"}).update('<span class="toggle_button open"><span class="icon-chevron-left"></span> '+MessageHash[486]+'</span>' +
+            '<span class="toggle_button close"><span class="icon-chevron-right"></span> '+MessageHash[487]+'</span> ' +
             '<span class="search_label open">'+MessageHash[344]+' : </span><span class="search_label close">'+MessageHash[488]+' <span id="refresh_search_button" class="icon-refresh" title="Apply filter now"></span></span><span id="search_meta_options"></span></div>');
 
         if(this._ajxpOptions.searchChooserAsResultsHeader){
@@ -168,10 +168,15 @@ Class.create("SearchEngine", AjxpPane, {
                 oThis.resize();
             }, 150);
             if(formPanel.hasClassName('toggle_open') && !formPanel.down('#basename').getValue() && oThis._inputBox.getValue()){
-
                 formPanel.down('#basename').setValue(oThis._inputBox.getValue());
                 formPanel.down('#basename').up('.advanced_search_section').addClassName('visible');
             }
+            oThis._closeAdvancedPanel = function(){
+                if(!formPanel.hasClassName('toggle_open')) return;
+                formPanel.toggleClassName('toggle_open');
+                searchChooser.toggleClassName('toggle_open');
+            };
+            oThis._advancedPanelOpen = formPanel.hasClassName('toggle_open');
         });
 
         var simpleMeta = searchChooser.down('#search_meta_options');
@@ -262,8 +267,8 @@ Class.create("SearchEngine", AjxpPane, {
             return false;
         }
         var metadata = $H();
-        formPanel.select('input,span.c3.selected').each(function(el){
-            if(el.tagName.toLowerCase() == 'input'){
+        formPanel.select('input,select,span.c3.selected').each(function(el){
+            if(el.tagName.toLowerCase() == 'input' || el.tagName.toLowerCase() == 'select'){
                 if(!el.getValue() || el.disabled) return;
                 metadata.set(el.id, el.getValue());
             }else{
@@ -299,7 +304,7 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		if(!this.htmlElement) return;
 		
-		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a class="icon-remove" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
+		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><span class="search_advanced_direct_access">'+MessageHash[486].toLocaleLowerCase()+' <span class="icon-caret-down"></span></span><a class="icon-remove" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
         if(this._ajxpOptions.toggleResultsVisibility){
             this.htmlElement.down("#search_results").insert({before:"<div style='display: none;' id='"+this._ajxpOptions.toggleResultsVisibility+"'></div>"});
             this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert(this.htmlElement.down("#search_results"));
@@ -343,8 +348,7 @@ Class.create("SearchEngine", AjxpPane, {
         this._fileList = new FilesList($(this._resultsBoxId), {
             dataModel:this._dataModel,
             columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
-                {attributeName:"search_score", messageString:'Score', sortType:'Number'},
-                {attributeName:"filename", messageString:'Path', sortType:'String'},
+                {attributeName:"ajxp_dirname", messageString:'Path', sortType:'String'},
                 {attributeName:"mimestring_id", messageString:'Type', sortType:'String'}
             ],
             groupByData:groupByData,
@@ -392,6 +396,9 @@ Class.create("SearchEngine", AjxpPane, {
             if(this._ajxpOptions.openSearchInput){
                 this.openSearchInput();
             }
+            if(this._advancedPanelOpen && this.htmlElement.down("input#basename")){
+                this.htmlElement.down("input#basename").focus();
+            }
             return false;
         }.bind(this);
 		this._inputBox.observe("focus", opener);
@@ -402,9 +409,11 @@ Class.create("SearchEngine", AjxpPane, {
             ajaxplorer.enableNavigation();
 			this.hasFocus = false;
             if(this._ajxpOptions.openSearchInput){
-                if(!this._ajxpOptions.toggleResultsVisibility || !$(this._ajxpOptions.toggleResultsVisibility).visible()){
-                    this.closeSearchInput();
-                }
+                window.setTimeout(function(){
+                    if(!this._ajxpOptions.toggleResultsVisibility || !$(this._ajxpOptions.toggleResultsVisibility).visible()){
+                        this.closeSearchInput();
+                    }
+                }.bind(this), 150);
             }
 		}.bind(this));
 		
@@ -423,6 +432,15 @@ Class.create("SearchEngine", AjxpPane, {
 			return false;
 		}.bind(this);
 
+        this.htmlElement.down('span.search_advanced_direct_access').observe('click', function(){
+            this.openSearchInput(true);
+            this.updateStateSearching();
+            this.updateStateFinished();
+            window.setTimeout(function(){
+                this.htmlElement.down(".toggle_button").click();
+            }.bind(this), 250);
+        }.bind(this));
+
         this.refreshObserver = function(e){
             "use strict";
             this._inputBox.setValue("");
@@ -433,17 +451,7 @@ Class.create("SearchEngine", AjxpPane, {
         }.bind(this);
 
         document.observe("ajaxplorer:repository_list_refreshed", this.refreshObserver );
-
-        /*
-        if($(this.options.toggleResultsVisibility)){
-            this.ctxChangeObserver = function(){
-                this.showToggleResult(false);
-                this.closeSearchInput();
-            }.bind(this);
-            document.observe("ajaxplorer:context_changed", this.ctxChangeObserver);
-        }
-        */
-
+        this._dataModel.setContextNode(this._dataModel.getRootNode(), true);
         this.resize();
 	},
 
@@ -451,16 +459,19 @@ Class.create("SearchEngine", AjxpPane, {
         return this.htmlElement.hasClassName("search_active");
     },
 
-    openSearchInput: function(){
+    openSearchInput: function(withResult){
         var container = this.htmlElement;
         container.absolutize();
         var leftPos = 285;
+        if(this.options['openSearchStickLeftTo']){
+            leftPos = parseInt($(this.options['openSearchStickLeftTo']).getWidth()) + 5;
+        }
         var pos = container.positionedOffset();
         var width = pos['left'] + container.getWidth() - leftPos;
         container.setStyle({width:width+'px',left:leftPos+'px'});
         container.addClassName("search_active");
         container.addClassName("skipSibling");
-        if(this._inputBox.getValue()){
+        if(withResult || this._inputBox.getValue()){
             window.setTimeout(function(){
                 this.showToggleResult(true);
                 this.resize();
@@ -596,9 +607,8 @@ Class.create("SearchEngine", AjxpPane, {
         else if (optionValue == 'filename') fName = 'basename';
         else fName = "ajxp_meta_" + optionValue;
         */
-        advancedPanel.insert('<div><span class="c4" style="width: 35%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" id="'+fName+'"></div>');
+        advancedPanel.insert('<div><span class="c4" style="width: 35%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" name="'+optionValue+'" id="'+fName+'"></div>');
 
-        /*
         if(this._ajxpOptions.metaColumnsRenderers && this._ajxpOptions.metaColumnsRenderers[optionValue]){
             var input = advancedPanel.down('#'+fName);
             var func = eval(this._ajxpOptions.metaColumnsRenderers[optionValue]);
@@ -606,7 +616,7 @@ Class.create("SearchEngine", AjxpPane, {
                 func(input);
             }
         }
-        */
+
 		this.metaOptions.push(option);
 	},
 	/**
@@ -736,6 +746,7 @@ Class.create("SearchEngine", AjxpPane, {
                 $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
                     if(this._ajxpOptions.openSearchInput) this.closeSearchInput();
                     else this.showToggleResult(false);
+                    if(this._closeAdvancedPanel) this._closeAdvancedPanel();
                 }.bind(this));
             }
 
@@ -1036,7 +1047,7 @@ Class.create("SearchEngine", AjxpPane, {
 			}
 		}		
 		if(this._fileList){
-            this._fileList.reload();
+            //this._fileList.reload();
             this._fileList._sortableTable.sort(0);
         }
 	},
@@ -1053,7 +1064,7 @@ Class.create("SearchEngine", AjxpPane, {
 		if(searchFileName && ajxpNode.getLabel().toLowerCase().indexOf(this.crtText) != -1){
 			this.addResult(currentFolder, ajxpNode);
             if(this._fileList){
-                this._fileList.reload();
+                //this._fileList.reload();
                 this._fileList._sortableTable.sort(0);
             }
             return;
@@ -1064,7 +1075,7 @@ Class.create("SearchEngine", AjxpPane, {
 			if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
 				this.addResult(currentFolder, ajxpNode, meta);
                 if(this._fileList){
-                    this._fileList.reload();
+                    //this._fileList.reload();
                     this._fileList._sortableTable.sort(0);
                 }
                 return;

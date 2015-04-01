@@ -14,6 +14,10 @@ and (max-width : 800px) {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
+    #search_results div.thumbnail_selectable_cell.detailed{
+        width:95%;
+    }
 }
 
 @media only screen
@@ -86,7 +90,13 @@ and (max-width : 720px) {
     #cpane_container{
         left: 200px;
     }
-
+    #search_meta.toggle_open {
+        margin-left: -200px;
+        width: 200px;
+    }
+    #search_meta > div {
+        width: 200px;
+    }
     .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
         width: 121px;
         white-space: nowrap;

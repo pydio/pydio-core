@@ -38,11 +38,16 @@ Class.create("HeaderResizer", {
 			bodyRowSelector : 'tr',
 			bodyCellSelector : 'td',
 			bodyIsMaster : false,
+            filterPanel: null,
 			handleWidth : 3,
 			headerData : null,			
 			useCSS3 : false,
             scrollerWidth:18
 		}, options || { });
+        this.filterCells = [];
+        if(this.options.filterPanel){
+            this.options.filterPanel.addClassName('header_resizer');
+        }
 		if(this.options.headerData){
 			this.generateHeader();
 		}
@@ -50,6 +55,9 @@ Class.create("HeaderResizer", {
 		this.mainSize = this.element.getWidth();
 		this.cells = this.element.select(this.options.cellSelector);		
 		this.cells.each(function(el){disableTextSelection(el);});
+        if(this.options.filterPanel){
+            this.filterCells = this.options.filterPanel.select(this.options.cellSelector);
+        }
 		this.element.select(this.options.handleSelector).each(function(el){
 			this.initDraggable(el);
 		}.bind(this) );
@@ -88,6 +96,20 @@ Class.create("HeaderResizer", {
 				if(!initSizes) initSizes = $A();
 				initSizes[index] = el.size;
 			}
+            if(this.options.filterPanel){
+                var input = new Element('input', {type:'text', name:el.metaName});
+                var cell = new Element('div', {className:'header_cell'});
+                cell.insert(input);
+                this.options.filterPanel.insert(cell);
+                input.observe("focus", function(){pydio.disableAllKeyBindings();}.bind(this));
+                input.observe("blur", function(){pydio.enableAllKeyBindings();}.bind(this));
+                input.observe('input', function(){
+                    if(input.filterTimer) window.clearTimeout(input.filterTimer);
+                    input.filterTimer = window.setTimeout(function(){
+                        this.notify('filter_update', {metaName:el.metaName, metaValue:input.getValue()});
+                    }.bind(this), 200);
+                }.bind(this));
+            }
 			index++;
 		}.bind(this) );
 		if(initSizes && initSizes.length){
@@ -165,7 +187,7 @@ Class.create("HeaderResizer", {
 
 		var innerWidth = this.getInnerWidth();
 		if(!innerWidth) return;
-		if(!sizes && this.currentInner && innerWidth != this.currentInner){
+		if(!sizes && this.currentInner){
 			sizes = this.computePercentSizes(this.currentSizes, this.currentInner);
 		}
         if(!sizes){
@@ -180,21 +202,33 @@ Class.create("HeaderResizer", {
 			total += sizes[i] + this.options.handleWidth;
 			if(i < this.cells.length -1 && total < innerWidth) {				
 				this.cells[i].setStyle({width:(sizes[i] - (Prototype.Browser.IE?1:0)) + 'px'});
+                if(this.filterCells[i]){
+                    this.filterCells[i].setStyle({width:(sizes[i] - (Prototype.Browser.IE?1:0)) + 'px'});
+                }
 			}else{
 				//this.log(innerWidth +':' + total + ':' + sizes[i]);
 				// go back to previous total
 				total -= sizes[i] + this.options.handleWidth;
 				sizes[i] = Math.floor((innerWidth - (this.verticalScrollerMargin||0) - total) / (this.cells.length - i));
 				this.cells[i].setStyle({width:sizes[i] + 'px'});
+                if(this.filterCells[i]){
+                    this.filterCells[i].setStyle({width:sizes[i] + 'px'});
+                }
 				// Make sure it did not go to the line
 				if(Position.cumulativeOffset(this.cells[i])[1] > Position.cumulativeOffset(this.element)[1] + 10){					
 					sizes[i] = innerWidth - total - 1  - (this.verticalScrollerMargin||0);
 					this.cells[i].setStyle({width:sizes[i] + 'px'});
+                    if(this.filterCells[i]){
+                        this.filterCells[i].setStyle({width:sizes[i] + 'px'});
+                    }
 				}
 				total += sizes[i] + this.options.handleWidth;
 				if(i == this.cells.length - 1 && total < innerWidth - (this.verticalScrollerMargin||0)){
 					sizes[i] = (innerWidth - (this.verticalScrollerMargin||0) - total);
 					this.cells[i].setStyle({width:sizes[i] + 'px'});
+                    if(this.filterCells[i]){
+                        this.filterCells[i].setStyle({width:sizes[i] + 'px'});
+                    }
 				}
 			}
 		}
