@@ -24,4 +24,5 @@
 $mess = array(
 "1" => "GeoLokacija",
 "2" => "Lociraj",
+    "3" => "Meta Data (EXIF)",
 );
