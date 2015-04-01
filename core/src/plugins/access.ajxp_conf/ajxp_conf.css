@@ -7,6 +7,10 @@
     padding: 19px 0 10px 0;
 }
 
+.settings_main_pane #search_form .search_advanced_direct_access{
+    display: none;
+}
+
 .developerDoc{
     font-size: 12px !important;
     line-height: 18px !important;
@@ -43,6 +47,8 @@
     margin: 0;
     padding: 0;
     width: auto;
+    float: none;
+    display: inline-block;
 }
 
 .settings_main_pane #breadcrumb_container{
@@ -222,7 +228,9 @@
 #search_container_settings #search_results div.thumbnail_selectable_cell.detailed {
     margin: 0 !important;
     border-radius: 0;
-    padding-bottom: 20px;
+    padding-bottom: 28px;
+    height: 35px;
+    border-bottom: 1px solid white;
 }
 
 #leftTabulator div.panelHeader{
