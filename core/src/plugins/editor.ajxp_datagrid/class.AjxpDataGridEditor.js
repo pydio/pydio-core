@@ -51,7 +51,17 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
                     this.fRP.reloadDataModel();
                 }.bind(this));
             }
-        }else if(aName == 'copy_as_text'){
+        } else if(aName == 'filter' && this.fRP){
+            if(!this.htmlElement.down("#filterButton")){
+                this.htmlElement.down(".editor_action_bar").insert('' +
+                    '<a id="filterButton" class="icon-filter" title="Filter">' +
+                    '   <span message_id="235" class="actionbar_button_label">Filter</span>' +
+                    '</a>');
+                this.htmlElement.down("#filterButton").observe("click", function(){
+                    this.fRP.toggleFilterPane();
+                }.bind(this));
+            }
+        } else if(aName == 'copy_as_text'){
             if(!this.htmlElement.down("#copyAsTextButton")){
                 this.htmlElement.down(".editor_action_bar").insert('' +
                     '<a id="copyAsTextButton" class="icon-copy" title="Copy">' +
