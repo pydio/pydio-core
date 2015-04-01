@@ -70,8 +70,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 @mkdir($path."/".$recycle);
                 if (!is_dir($path."/".$recycle)) {
                     throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
-                } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                    AJXP_Utils::winSetHidden($path."/".$recycle);
+                } else {
+                    $this->setHiddenAttribute(new AJXP_Node($this->urlBase ."/".$recycle));
                 }
             }
             $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
@@ -1954,6 +1954,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             }
         }
         closedir($handle);
+    }
+
+    /**
+     * Apply specific operation to set a node as hidden.
+     * Can be overwritten, or will probably do nothing.
+     * @param AJXP_Node $node
+     */
+    public function setHiddenAttribute($node){
+        if($this->getWrapperClassName() == "fsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
+            $realPath =  call_user_func(array($this->wrapperClassName, "getRealFSReference"),$node->getUrl());
+            @shell_exec("attrib +H " . escapeshellarg($realPath));
+        }
     }
 
     private function purge($fileName)
