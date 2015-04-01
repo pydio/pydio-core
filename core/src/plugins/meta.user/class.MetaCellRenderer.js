@@ -18,7 +18,8 @@
  * The latest code can be found at <http://pyd.io/>.
  * Description : Static class for renderers
  */
-Class.create("MetaCellRenderer", {	
+Class.create("MetaCellRenderer", {
+
 	initialize: function(){
 		this.cssList = new Hash({
 			'low': {cssClass:'meta_low', label:MessageHash['meta.user.4'], sortValue:'5'},
@@ -38,7 +39,35 @@ Class.create("MetaCellRenderer", {
 			});
 			head.insert(cssNode);
 		}
+
 	},
+
+    staticGetMetaConfigs: function(){
+        if(pydio && pydio.user && pydio.user.activeRepository && MetaCellRenderer.configsCache && MetaCellRenderer.configsCache.get(pydio.user.activeRepository )){
+            return MetaCellRenderer.configsCache.get(pydio.user.activeRepository);
+        }
+        var configs = $H();
+        try{
+            configs = $H(pydio.getPluginConfigs("meta.user").get("meta_definitions").evalJSON());
+            configs.each(function(pair){
+                var type = pair.value.type;
+                if(type == 'choice' && pair.value.data){
+                    var values = {};
+                    $A(pair.value.data.split(",")).each(function(keyLabel){
+                        var parts = keyLabel.split("|");
+                        values[parts[0]] = parts[1];
+                    });
+                    pair.value.data = values;
+                }
+            });
+        }catch(e){
+        }
+        if(pydio && pydio.user && pydio.user.activeRepository){
+            if(!MetaCellRenderer.configsCache) MetaCellRenderer.configsCache = $H();
+            MetaCellRenderer.configsCache.set(pydio.user.activeRepository, configs);
+        }
+        return configs;
+    },
 
     /* SELECTORS */
     selectorsFilter : function(element, ajxpNode, type, metadataDef, ajxpNodeObject){
@@ -70,21 +99,33 @@ Class.create("MetaCellRenderer", {
                 }
                 element.writeAttribute("data-sorter_value", nodeMetaValue);
             }else{
+                if(element.down('.text_label') && values[element.down('.text_label').innerHTML.stripTags()]){
+                    element.down('.text_label').update(values[element.down('.text_label').innerHTML.stripTags()]);
+                }
                 element.writeAttribute("data-"+metadataDef.attributeName+"-sorter_value", nodeMetaValue);
             }
         }
     },
 
     formPanelSelectorFilter: function(formElement, form){
-        if(MetaCellRenderer.staticMetadataCache && MetaCellRenderer.staticMetadataCache.get(formElement.name)){
-            var selectorValues  = MetaCellRenderer.staticMetadataCache.get(formElement.name);
+        var selectorValues;
+        try{
+            selectorValues = MetaCellRenderer.staticMetadataCache.get(formElement.name);
+        }catch(e){}
+        if(!selectorValues){
+            var definitions = MetaCellRenderer.prototype.staticGetMetaConfigs();
+            selectorValues = definitions.get(formElement.name).data;
+        }
+        if(selectorValues){
             if(!selectorValues) return;
             var value = formElement.getValue();
-            var select = new Element('select', {name: formElement.name,style:'width:56%;height:24px;'});
+            var select = new Element('select', {name: formElement.name, className:'select_meta_selector'});
+            select.insert(new Element("option", {value:''}).update(''));
             $H(selectorValues).each(function(pair){
                 select.insert(new Element("option", {value:pair.key}).update(pair.value));
                 if(value) select.setValue(value);
             });
+            if(formElement.id) select.id = formElement.id;
             formElement.replace(select);
         }
     },
@@ -205,7 +246,7 @@ Class.create("MetaCellRenderer", {
         }
 	},
 	
-	infoPanelModifier : function(htmlElement){
+	infoPanelModifier : function(htmlElement, ajxpNode){
         var obj = new MetaCellRenderer();
         htmlElement.select('[data-metatype]').each(function(td){
             var metaType = td.readAttribute("data-metatype");
@@ -232,6 +273,10 @@ Class.create("MetaCellRenderer", {
                             td.update(selectorValues[value]);
                         }
                     }
+                break;
+                case "tags":
+                    var value = td.innerHTML.strip();
+                    this.displayTagsAsBlocks(td, value, ajxpNode);
                 break;
                 case "text":
                 case "string":
@@ -372,5 +417,116 @@ Class.create("MetaCellRenderer", {
 		var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 161px;border-radius: 3px;padding: 2px;height:100px;'});
 		cont.innerHTML = formElement.value;
 		formElement.replace(cont);
-	}
+	},
+
+
+    formPanelTags: function(formElement, form){
+
+        var fieldName = formElement.name;
+        var completer = new MetaTagsCompleter(formElement, fieldName);
+
+    },
+
+    displayTagsAsBlocks: function(element, value, ajxpNode){
+        if(!value) return;
+        var values = $A(value.split(",")).invoke("strip");
+        element.update('');
+        values.each(function(v){
+            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='icon-remove' style='cursor: pointer;'></span>");
+            element.insert(tag);
+            var remove = tag.down(".icon-remove");
+            remove.observe("click", function(){
+                var conn = new Connexion();
+                conn.setParameters($H({
+                    get_action:"edit_user_meta",
+                    file: ajxpNode.getPath(),
+                    tags: values.without(v).join(", ")
+                }));
+                conn.onComplete = function(transport){
+                    pydio.actionBar.parseXmlMessage(transport.responseXML);
+                };
+                conn.sendAsync();
+            });
+        });
+    }
+
+});
+
+/**
+ * Encapsulation of the Prototype Autocompleter for Pydio purposes.
+ * Should be ported for local provides
+ */
+Class.create("MetaTagsCompleter", Autocompleter.Base, {
+
+    valuesLoaded: null,
+    /**
+     * Constructor
+     * @param element HTMLElement
+     * @param fieldName String
+     */
+    initialize: function(element, fieldName) {
+        var update = "meta_tags_complete_"+fieldName;
+        if(Object.isString(update) && !$(update)){
+            $$('body')[0].insert(new Element('div', {
+                id:update,
+                className:"autocomplete",
+                style:"position:absolute;z-index:100000;margin-top: 0;"
+            }));
+        }
+        var options = {fieldName: fieldName, tokens: ","};
+        this.baseInitialize(element, update, options);
+        this.options.defaultParams = this.options.parameters || null;
+        this.options.minChars	   = 0;
+
+        element.observe("click", function(){
+            this.activate();
+        }.bind(this));
+    },
+
+    valuesToChoices: function(search){
+        var currentValues = $A(this.element.getValue().split(",")).invoke("strip");
+        var choices = "";
+        if(search && this.valuesLoaded.indexOf(search)) {
+            choices += "<li>"+search+"</li>";
+        }
+        this.valuesLoaded.each(function(v){
+            if(v.indexOf(search) === 0 && currentValues.indexOf(v) === -1){
+                choices += "<li>"+v+"</li>";
+            }
+        }.bind(this));
+        choices = "<ul>"+ choices + "</ul>";
+        this.updateChoices(choices);
+        return choices;
+    },
+
+    /**
+     * Gets the choices
+     */
+    getUpdatedChoices: function() {
+        this.startIndicator();
+        var value = this.getToken().strip();
+        if(this.valuesLoaded){
+            var choices = this.valuesToChoices(value);
+            this.updateChoices(choices);
+            return choices;
+        }
+
+        var connexion = new Connexion();
+        connexion.setParameters($H({get_action:'meta_user_list_tags'}));
+        if(this.options.fieldName){
+            connexion.addParameter("meta_field_name", this.options.fieldName);
+        }
+        connexion.onComplete = function(transport){
+            this.valuesLoaded = $A(transport.responseJSON);
+            var choices = this.valuesToChoices(value);
+            this.updateChoices(choices);
+            this.stopIndicator();
+            return choices;
+        }.bind(this);
+
+        connexion.sendAsync();
+
+        return "";
+    }
+
 });
