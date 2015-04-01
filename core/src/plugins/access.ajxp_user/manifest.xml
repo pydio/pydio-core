@@ -145,7 +145,7 @@
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
                 </div>
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
                     <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
                         <div class="action_bar">
                             <div class="toolbarGroup"></div>
