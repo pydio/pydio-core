@@ -34,4 +34,10 @@ $mess=array(
 "13" => "Sicuro di voler rimuovere questa sorgente?",
 "14" => "Deve essere indicato un driver!",
 "15" => "Questo workspace è definito in un file di configurazione (si veda 'conf/bootstrap_repositories.php'). Non è possibile modificarne le caratteristiche tramite GUI.",
+    "16" => "Shares",
+    "17" => "Workspace additional features",
+    "18" => "Shared Files and Folders from this workspace",
+    "19" => "No parameters",
+    "20" => "No parameters for this plugin",
+    "21" => "Add a feature to this workspace",
 );

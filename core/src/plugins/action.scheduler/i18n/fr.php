@@ -55,4 +55,6 @@ $mess = array(
     "20d" => "Générer l'expression Cron",
     "21" => "Ajoutez la ligne suivante dans votre CRONTAB, en remplaçant le mot de passe par le votre, et la planification (ici configurée pour un déclenchement toutes les 5 minutes).",
     "22" => "Planificateur permettant l'exécution récurrente de tâches. Nécessite l'activation de la ligne de commande et un système type CRONTAB.",
+    "23" => "Execution Context",
+    "24" => "Parameters",
 );

@@ -34,4 +34,10 @@ $mess=array(
 "13" => "Tem a certeza de que quer apagar esta fonte?",
 "14" => "Por favor escolha um controlador!",
 "15" => "Esta Área de Trabalho é definida no ficheiro de configuração (ver conf/bootstrap_repositories.php), não pode editar as suas funções pela interface gráfica.",
+    "16" => "Shares",
+    "17" => "Workspace additional features",
+    "18" => "Shared Files and Folders from this workspace",
+    "19" => "No parameters",
+    "20" => "No parameters for this plugin",
+    "21" => "Add a feature to this workspace",
 );

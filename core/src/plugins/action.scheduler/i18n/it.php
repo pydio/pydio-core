@@ -56,4 +56,6 @@ $mess = array(
     "20d" => "Genera espressione Crontab",
     "21" => "Aggiungi la linea al CRONTAB, sostituendo il valore reale della tua password, e la schedulazione che preferisci (adesso è configurato per essere eseguito ogni 5 minuti).",
     "22" => "Schedulatore generico per eseguire azioni su basi regolari. Richiede l'attivazione della CLI e del CRONTAB (o equivalente).",
+    "23" => "Execution Context",
+    "24" => "Parameters",
 );
