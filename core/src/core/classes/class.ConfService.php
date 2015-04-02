@@ -1443,7 +1443,9 @@ class ConfService
         $repository->driverInstance = $plugInstance;
         if (isSet($_SESSION["REPO_ID"]) && $_SESSION["REPO_ID"] == $repository->getId()) {
             $this->configs["REPOSITORY"] = $repository;
-            $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']] = $repository;
+            if(is_array($this->configs["REPOSITORIES"])){
+                $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']] = $repository;
+            }
         }
         return $plugInstance;
     }
