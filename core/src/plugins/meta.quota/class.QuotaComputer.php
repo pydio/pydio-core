@@ -109,7 +109,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     public function getFilteredOption($optionName, $repoScope = AJXP_REPO_SCOPE_ALL, $userObject = null){
         $repo = $this->accessDriver->repository;
-        if ($repo->hasParent() && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
+        if ($repo->hasParent() && $repo->getOwner() != null && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
             // Pass parent user instead of currently logged
             $userObject = ConfService::getConfStorageImpl()->createUserObject($repo->getOwner());
         }
