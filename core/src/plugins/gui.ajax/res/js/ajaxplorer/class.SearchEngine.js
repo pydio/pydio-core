@@ -270,7 +270,8 @@ Class.create("SearchEngine", AjxpPane, {
         formPanel.select('input,select,span.c3.selected').each(function(el){
             if(el.tagName.toLowerCase() == 'input' || el.tagName.toLowerCase() == 'select'){
                 if(!el.getValue() || el.disabled) return;
-                metadata.set(el.id, el.getValue());
+                var name = el.id || el.name;
+                if(name) metadata.set(name, el.getValue());
             }else{
                 if(el.id == 'ajxp_folder'){
                     metadata.set('ajxp_mime', 'ajxp_folder');
@@ -613,7 +614,7 @@ Class.create("SearchEngine", AjxpPane, {
             var input = advancedPanel.down('#'+fName);
             var func = eval(this._ajxpOptions.metaColumnsRenderers[optionValue]);
             if(Object.isFunction(func)){
-                func(input);
+                func(input, advancedPanel);
             }
         }
 

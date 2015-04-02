@@ -69,7 +69,9 @@ Class.create("MetaCellRenderer", {
         return configs;
     },
 
+    /*************/
     /* SELECTORS */
+    /*************/
     selectorsFilter : function(element, ajxpNode, type, metadataDef, ajxpNodeObject){
         if(!metadataDef) return;
         if(!MetaCellRenderer.staticMetadataCache){
@@ -130,7 +132,9 @@ Class.create("MetaCellRenderer", {
         }
     },
 
+    /*****************/
 	/* LABELS SYSTEM */
+    /*****************/
 	cssLabelsFilter : function(element, ajxpNode, type, metadataDef, ajxpNodeObject){
         var attName = metadataDef.attributeName;
         var content, obj, rule;
@@ -188,10 +192,15 @@ Class.create("MetaCellRenderer", {
 	formPanelCssLabels: function(formElement, form){
 		var value = formElement.value;
 		var obj = new MetaCellRenderer();
-		var hidden = new Element('input', {type:'hidden', name:formElement.name, value:formElement.value});
+		var hidden = new Element('input', {
+            type:'hidden',
+            name:formElement.name,
+            value:formElement.value,
+            id: formElement.id
+        });
 		form.insert(hidden);
 		var cssList = obj.cssList;
-		var selector = new Element('select', {style:"width:56%;height:24px;"});
+		var selector = new Element('select', {className:'select_meta_selector'});
 		selector.insert(new Element('option', {
 			name:'',
 			value:'', 
@@ -215,8 +224,10 @@ Class.create("MetaCellRenderer", {
 	findCssRule : function(value){
 		return this.cssList.get(value);
 	},
-	
+
+	/*********************/
 	/* STARS RATE SYSTEM */
+    /*********************/
 	starsRateFilter: function(element, ajxpNode, type, metadataDef, ajxpNodeObject){
         var attributeName = metadataDef.attributeName;
 
@@ -224,16 +235,20 @@ Class.create("MetaCellRenderer", {
         if(!element) return;
 		var value = 0;
 		try{
-			var content = element.select('span')[0].innerHTML;
+			var content = element.down('span').innerHTML;
 		}catch(e){
 		}
 		if(content) value = parseInt(content);
+        else{
+            content = ajxpNode.getMetadata().get(attributeName);
+            if(content) value = parseInt(content);
+        }
 		var obj = new MetaCellRenderer();
 		if(element.down('span.text_label')){
 			var div = obj.createStars(value, null, attributeName);
 			div.setStyle({width:'70px'});
             if(type == 'detail') {
-                div.setStyle({display:'inline'});
+                div.setStyle({display:'inline-block'});
             }
 			element.down('span.text_label').update(div);
 		}else{
@@ -245,7 +260,122 @@ Class.create("MetaCellRenderer", {
             element.writeAttribute("data-"+attributeName+"-sorter_value", value);
         }
 	},
-	
+
+    formPanelStars: function(formElement, form){
+        var value = formElement.value;
+        var name = formElement.name;
+        var obj = new MetaCellRenderer();
+        var div = obj.createStars(value, form, name);
+        div.setStyle({paddingTop:3});
+        formElement.replace(div);
+        form.insert(new Element('input', {
+            type:'hidden',
+            name:name,
+            value:value,
+            id:formElement.id
+        }));
+    },
+
+    createStars : function(value, containingForm, elementName){
+        var imgOff = 'plugins/meta.user/rating_off.png';
+        var imgOn = 'plugins/meta.user/rating.png';
+        var imgRemove = 'plugins/meta.user/rating_remove.png';
+        var cont = new Element('div');
+        var img;
+        if(containingForm){
+            img = new Element('img',{
+                src:imgRemove,
+                style:'float:left;cursor:pointer;margin-right:2px;padding-right:3px;border-right:1px solid #ccc;',
+                note:0,
+                title:MessageHash['meta.user.3']
+            });
+            cont.insert(img);
+        }
+        for(var i=1;i<6;i++){
+            img = new Element('img',{
+                src:(value>=i?imgOn:imgOff),
+                style:'float:left;cursor:pointer;margin-right:2px;',
+                note:i,
+                title:i
+            });
+            cont.insert(img);
+        }
+        cont.select('img').invoke('observe', 'click', function(event){
+            var note = Event.element(event).readAttribute('note');
+            if(!containingForm){
+                window.setTimeout(function(){
+                    var selectedNode = pydio.getUserSelection().getUniqueNode();
+                    var conn = new Connexion();
+                    conn.setParameters($H({
+                        get_action : 'edit_user_meta',
+                        file	   : selectedNode.getPath()
+                    }));
+                    conn.addParameter(elementName, note);
+                    conn.onComplete = function(transport){
+                        pydio.actionBar.parseXmlMessage(transport.responseXML);
+                    };
+                    conn.sendAsync();
+                }, 500);
+            }else{
+                containingForm.down('input[name="'+elementName+'"]').setValue(note);
+                var img = Event.element(event);
+                img.previousSiblings('img[src="'+imgOff+'"]').each(function(i){if(i.src!=imgRemove){
+                    i.src = imgOn;
+                }});
+                img.nextSiblings('img[src="'+imgOn+'"]').each(function(i){i.src = imgOff;});
+                img.src = imgOn;
+            }
+        });
+        return cont;
+    },
+
+
+    /*******************/
+    /* TAGS MODIFIERS  */
+    /*******************/
+    formPanelTags: function(formElement, form){
+
+        var fieldName = formElement.name;
+        var completer = new MetaTagsCompleter(formElement, fieldName);
+
+    },
+
+    displayTagsAsBlocks: function(element, value, ajxpNode){
+        if(!value) return;
+        var values = $A(value.split(",")).invoke("strip");
+        element.update('');
+        values.each(function(v){
+            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='icon-remove' style='cursor: pointer;'></span>");
+            element.insert(tag);
+            var remove = tag.down(".icon-remove");
+            remove.observe("click", function(){
+                var conn = new Connexion();
+                conn.setParameters($H({
+                    get_action:"edit_user_meta",
+                    file: ajxpNode.getPath(),
+                    tags: values.without(v).join(", ")
+                }));
+                conn.onComplete = function(transport){
+                    pydio.actionBar.parseXmlMessage(transport.responseXML);
+                };
+                conn.sendAsync();
+            });
+        });
+    },
+
+    /************/
+    /* TEXTAREA */
+    /************/
+    formTextarea: function(formElement, form){
+        var obj = new MetaCellRenderer();
+        var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 161px;border-radius: 3px;padding: 2px;height:100px;'});
+        cont.innerHTML = formElement.value;
+        formElement.replace(cont);
+    },
+
+    /********************/
+    /* GENERIC METHODS  */
+    /********************/
 	infoPanelModifier : function(htmlElement, ajxpNode){
         var obj = new MetaCellRenderer();
         htmlElement.select('[data-metatype]').each(function(td){
@@ -345,109 +475,6 @@ Class.create("MetaCellRenderer", {
             }, 500);
         });
 
-    },
-
-	formPanelStars: function(formElement, form){
-		var value = formElement.value;
-        var name = formElement.name;
-		var obj = new MetaCellRenderer();
-		var div = obj.createStars(value, form, name);
-		div.setStyle({paddingTop:3});
-		formElement.replace(div);
-		form.insert(new Element('input', {type:'hidden',name:name,value:value}));
-	},
-		
-	createStars : function(value, containingForm, elementName){
-		var imgOff = 'plugins/meta.user/rating_off.png';
-		var imgOn = 'plugins/meta.user/rating.png';
-		var imgRemove = 'plugins/meta.user/rating_remove.png';
-		var cont = new Element('div');
-		if(containingForm){
-			var img = new Element('img',{
-				src:imgRemove,
-				style:'float:left;cursor:pointer;margin-right:2px;padding-right:3px;border-right:1px solid #ccc;',
-				note:0,
-				title:MessageHash['meta.user.3']
-			});
-			cont.insert(img);			
-		}
-		for(var i=1;i<6;i++){
-			var img = new Element('img',{
-				src:(value>=i?imgOn:imgOff),
-				style:'float:left;cursor:pointer;margin-right:2px;',
-				note:i,
-				title:i
-			});
-			cont.insert(img);
-		}
-		cont.select('img').invoke('observe', 'click', function(event){
-			var note = Event.element(event).readAttribute('note');
-			window.setTimeout(function(){
-				var selectedNode = ajaxplorer.getUserSelection().getUniqueNode();
-				var conn = new Connexion();
-                var paramms = new Hash({
-                    get_action : 'edit_user_meta',
-                    file	   : selectedNode.getPath()
-                });
-                paramms.set(elementName, note);
-				conn.setParameters(paramms);
-				if(containingForm){
-					containingForm.select('input').each(function(el){						
-						if(el.name != elementName){
-							conn.addParameter(el.name, el.value);
-						}
-					});
-				}
-				conn.onComplete = function(){
-					//ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
-					ajaxplorer.fireNodeRefresh(selectedNode);
-					if(containingForm){
-						hideLightBox(true);
-					}
-				};
-				conn.sendAsync();
-			}, 500);
-		});
-		return cont;
-	},
-	
-	// mod for textarea
-	formTextarea: function(formElement, form){
-		var obj = new MetaCellRenderer();
-		var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 161px;border-radius: 3px;padding: 2px;height:100px;'});
-		cont.innerHTML = formElement.value;
-		formElement.replace(cont);
-	},
-
-
-    formPanelTags: function(formElement, form){
-
-        var fieldName = formElement.name;
-        var completer = new MetaTagsCompleter(formElement, fieldName);
-
-    },
-
-    displayTagsAsBlocks: function(element, value, ajxpNode){
-        if(!value) return;
-        var values = $A(value.split(",")).invoke("strip");
-        element.update('');
-        values.each(function(v){
-            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='icon-remove' style='cursor: pointer;'></span>");
-            element.insert(tag);
-            var remove = tag.down(".icon-remove");
-            remove.observe("click", function(){
-                var conn = new Connexion();
-                conn.setParameters($H({
-                    get_action:"edit_user_meta",
-                    file: ajxpNode.getPath(),
-                    tags: values.without(v).join(", ")
-                }));
-                conn.onComplete = function(transport){
-                    pydio.actionBar.parseXmlMessage(transport.responseXML);
-                };
-                conn.sendAsync();
-            });
-        });
     }
 
 });

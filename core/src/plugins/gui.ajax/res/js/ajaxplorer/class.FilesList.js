@@ -2110,7 +2110,7 @@ Class.create("FilesList", SelectableElements, {
 
         this._htmlElement.insert(largeRow);
 
-        this.getFromCache("columns").each(function(pair){
+        this.getFromCache("hiddenColumns").each(function(pair){
             if(pair.value.modifierFunc){
                 pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value);
             }

@@ -97,13 +97,13 @@ class UserMetaManager extends AJXP_AbstractMetaSource
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.starsRateFilter";
+                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelStars";
                     break;
                 case "css_label":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.cssLabelsFilter";
+                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelCssLabels";
                     break;
                 case "textarea":
                     $searchables[$key] = $label;
@@ -121,6 +121,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
                 case "tags":
                     $searchables[$key] = $label;
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelTags";
+                    break;
                 default:
                     break;
             }
