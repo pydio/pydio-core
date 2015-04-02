@@ -99,7 +99,7 @@ class PowerFSController extends AJXP_Plugin
 
             case "postcompress_download":
 
-                $archive = AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".$httpVars["archive_name"];
+                $archive = AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 if (is_file($archive)) {
                     register_shutdown_function("unlink", $archive);
@@ -161,7 +161,6 @@ class PowerFSController extends AJXP_Plugin
                     }
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
-                //$archiveName = SystemTextEncoding::fromUTF8($httpVars["archive_name"]);
                 if (!$compressLocally) {
                     $archiveName = AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".$archiveName;
                 }
