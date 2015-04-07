@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "S3 MetaStore" => "MetaStore S3",
-    "Stores metadata s3 metadata" => "Store metadata inside S3 object.",
+"Extended Attributes" => "Attributi Estesi",
+"Stores metadata inside filesystem Extended Attributes." => "Salva i metadati negli Attributi Estesi del filesystem.",
+"Size limit" => "Limite Dimensione",
+"Some filesystem have size limitations" => "Alcuni filesystem hanno limiti di dimensione",
 );

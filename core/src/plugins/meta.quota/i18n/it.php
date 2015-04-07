@@ -19,6 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "S3 MetaStore" => "MetaStore S3",
-    "Stores metadata s3 metadata" => "Store metadata inside S3 object.",
+"1" => "Utilizzo (caricamento...)",
+"2" => "Clicca per ricaricare la quota di utilizzo",
+"3" => "Hai oltrepassato la quota di utilizzo stabilita",
+"4" => "Quota di utilizzo",
 );
