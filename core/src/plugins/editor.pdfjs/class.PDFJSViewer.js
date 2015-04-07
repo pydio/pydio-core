@@ -49,7 +49,7 @@ Class.create("PDFJSViewer", AbstractEditor, {
 
 		// Get the direct PDF file link valid for this session.
 		var fileName = nodeOrNodes.getPath();
-		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file='+fileName);
+		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file=base64encoded:' + base64_encode(fileName));
 
 		// Hide the Pydio action bar.
 		this.element.down('.editor_action_bar').setStyle({display:'none'});
