@@ -198,7 +198,9 @@ Autocompleter.Base = Class.create({
 
     onMouseup: function(event) {
         if(!this.hasFocus) {
-            this.hideTimeout = setTimeout(this.hide.bind(this), 250);
+            this.hideTimeout = setTimeout(function(){
+                if(!this.hasFocus) this.hide();
+            }.bind(this), 250);
             this.hasFocus = false;
             this.active = false;
         }
