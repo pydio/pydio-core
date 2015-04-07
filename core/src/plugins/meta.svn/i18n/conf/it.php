@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "S3 MetaStore" => "MetaStore S3",
-    "Stores metadata s3 metadata" => "Store metadata inside S3 object.",
+"Subversion Repository" => "Repository Subversion",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Estrae informazioni SVN (revisione, log cambiamenti, ecc) se il workspace è una Copia-Lavoro (Working-Copy) e se SVN è disponibile come linea di comando.",
 );
