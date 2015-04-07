@@ -394,7 +394,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
                     $this->rights["ajxp.roles"] = unserialize($this->rights["ajxp.roles"]);
                 }
             }
-            $rolesToLoad = array_keys($this->rights["ajxp.roles"]);
+            if(is_array($this->rights["ajxp.roles"])){
+                $rolesToLoad = array_keys($this->rights["ajxp.roles"]);
+            }
         }
         if ($this->groupPath != null) {
             $base = "";
