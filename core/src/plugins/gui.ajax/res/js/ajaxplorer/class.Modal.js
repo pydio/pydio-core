@@ -714,7 +714,7 @@ Class.create("Modal", {
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
         if(this.messageDivOpen){
-            if(!this.messageContent.innerHTML.contains(message)){
+            if(this.messageContent.innerHTML.indexOf(message) === -1){
                 this.messageContent.insert('<br>' + message);
             }
             this.tempoMessageDivClosing();
