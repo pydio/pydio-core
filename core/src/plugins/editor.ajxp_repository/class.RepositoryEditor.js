@@ -348,6 +348,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
         this.metaSelector.observe("change", function(){
             var plugId = this.metaSelector.getValue();
+            if(!addFormDetail) return;
             addFormDetail.update("");
             addFormDetail.addClassName("empty");
             if(plugId){
@@ -425,6 +426,13 @@ Class.create("RepositoryEditor", AbstractEditor, {
             if(button && action == "meta_source_edit"){
                 button.addClassName("SF_disabled");
                 this.setClean();
+            }
+            if(action == "meta_source_add"){
+                this.metaSelector.setValue("");
+                this.metaSelector.fire("chosen:updated");
+                var addFormD = form.down(".meta_plugin_new_form");
+                addFormD.update("");
+                addFormD.addClassName("empty");
             }
         }.bind(this);
         conn.sendAsync();
