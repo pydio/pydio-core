@@ -182,7 +182,35 @@ Class.create("User", {
 	setPreference : function(prefName, prefValue, toJSON){
 		if(toJSON){
             this._parsedJSONCache.unset(prefName);
-			prefValue = Object.toJSON(prefValue);
+            try{
+    			prefValue = Object.toJSON(prefValue);
+            }catch (e){
+                if(console) {
+                    function isCyclic (obj) {
+                        var seenObjects = [];
+
+                        function detect (obj) {
+                            if (obj && typeof obj === 'object') {
+                                if (seenObjects.indexOf(obj) !== -1) {
+                                    return true;
+                                }
+                                seenObjects.push(obj);
+                                for (var key in obj) {
+                                    if (obj.hasOwnProperty(key) && detect(obj[key])) {
+                                        console.log(obj, 'cycle at ' + key);
+                                        return true;
+                                    }
+                                }
+                            }
+                            return false;
+                        }
+                        return detect(obj);
+                    }
+                    console.log("Caught toJSON error " + e.message, prefValue, isCyclic(prefValue));
+
+                }
+                return;
+            }
 		}
 		this.preferences.set(prefName, prefValue);
 	},

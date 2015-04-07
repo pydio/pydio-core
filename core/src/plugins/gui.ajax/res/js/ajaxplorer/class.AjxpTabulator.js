@@ -641,11 +641,14 @@ Class.create("AjxpTabulator", AjxpPane, {
                     pair.value.TAB.dontFocus = true;
                     window.setTimeout(function(){
                         if(!$(this.htmlElement)) return;
-                        this.addTab(pair.value.TAB, pair.value.PANE, true);
+                        this.addTab(Object.clone(pair.value.TAB), Object.clone(pair.value.PANE), true);
+                        if(pair.value.DATA){
+                            var object = this.getAjxpObjectByTabId(pair.key);
+                            if(object && object.loadStateData) object.loadStateData(pair.value.DATA);
+                        }
                     }.bind(this), index * 2000);
                     index ++;
-                }
-                if(pair.value.DATA){
+                }else  if(pair.value.DATA){
                     var object = this.getAjxpObjectByTabId(pair.key);
                     if(object && object.loadStateData) object.loadStateData(pair.value.DATA);
                 }
