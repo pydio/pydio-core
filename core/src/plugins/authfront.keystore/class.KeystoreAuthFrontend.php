@@ -108,6 +108,13 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         switch($action){
             case "keystore_generate_auth_token":
 
+                if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
+                    $this->logDebug("Keystore Generate Tokens", "Session Credentials set: returning empty tokens to force basic authentication");
+                    HTMLWriter::charsetHeader("text/plain");
+                    echo "";
+                    break;
+                }
+
                 $token = AJXP_Utils::generateRandomString();
                 $private = AJXP_Utils::generateRandomString();
                 $data = array("USER_ID" => $user, "PRIVATE" => $private);
@@ -124,7 +131,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
                 $data["DEVICE_UA"] = $_SERVER['HTTP_USER_AGENT'];
                 $data["DEVICE_IP"] = $_SERVER['REMOTE_ADDR'];
                 $this->storage->simpleStoreSet("keystore", $token, $data, "serial");
-                header("Content-type: application/json;");
+                HTMLWriter::charsetHeader("application/json");
                 echo(json_encode(array(
                     "t" => $token,
                     "p" => $private)
