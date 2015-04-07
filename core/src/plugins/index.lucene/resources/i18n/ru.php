@@ -30,4 +30,6 @@ $mess = array(
     "8" => "Индексирование %s в фоновом режиме",
     "9" => "Невозможно найти индекс текущего рабочего пространства! Необходимо сначала включить индексацию!",
     "10" => "Индексирование подпапок в фоновом режиме",
+    "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
+    "12" => "Workspace is not indexed, try launching indexation manually!"
 );

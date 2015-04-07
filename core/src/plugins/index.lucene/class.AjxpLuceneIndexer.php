@@ -162,12 +162,16 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 AJXP_XMLWriter::header();
-                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                if ($this->seemsCurrentlyIndexing($repoId, 3)){
+                    AJXP_XMLWriter::sendMessage($messages["index.lucene.11"], null);
+                }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     AJXP_Controller::applyActionInBackground($repoId, "index", array());
                     sleep(2);
                     AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
+                    AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                }else{
+                    AJXP_XMLWriter::sendMessage($messages["index.lucene.12"], null);
                 }
-                AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
                 AJXP_XMLWriter::close();
                 return null;
             }
@@ -698,6 +702,22 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
         $this->clearIndexIfExists($tmpIndexPath);
         $this->copyIndex($indexPath, $tmpIndexPath);
         return $this->loadIndex($repositoryId, true, null, $tmpIndexPath);
+    }
+
+    /**
+     * @param String $repositoryId
+     * @param int $checkInterval
+     * @return bool
+     */
+    protected function seemsCurrentlyIndexing($repositoryId, $checkInterval){
+        $tmpIndexPath = $this->getIndexPath($repositoryId)."-PYDIO_TMP";
+        if(is_dir($tmpIndexPath)){
+            $mtime = filemtime($tmpIndexPath);
+            if(time() - $mtime <= 60 * $checkInterval){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

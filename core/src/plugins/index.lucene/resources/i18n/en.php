@@ -30,4 +30,6 @@ $mess = array(
     "8" => "Indexing %s in background",
     "9" => "Cannot find index for current workspace! You should trigger the indexation of the data first!",
     "10" => "Indexing subfolders in background",
+    "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
+    "12" => "Workspace is not indexed, try launching indexation manually!"
 );

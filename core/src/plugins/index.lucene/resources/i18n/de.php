@@ -30,4 +30,6 @@ $mess = array(
     "8" => "Indiziere %s im Hintergrund",
     "9" => "Index für aktuelle Arbeitsumgebung nicht gefunden. Bitte starten Sie zuerst die Indizierung!",
     "10" => "Indiziere Unterordner im Hintergrund",
+    "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
+    "12" => "Workspace is not indexed, try launching indexation manually!"
 );
