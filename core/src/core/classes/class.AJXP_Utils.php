@@ -1945,7 +1945,7 @@ class AJXP_Utils
         if (function_exists('openssl_random_pseudo_bytes') && USE_OPENSSL_RANDOM && !$complexChars) {
             $password = base64_encode(openssl_random_pseudo_bytes($length, $strong));
             if($strong == TRUE)
-                return substr(str_replace(array("/","+"), "", $password), 0, $length); //base64 is about 33% longer, so we need to truncate the result
+                return substr(str_replace(array("/","+","="), "", $password), 0, $length); //base64 is about 33% longer, so we need to truncate the result
         }
 
         //fallback to mt_rand if php < 5.3 or no openssl available
