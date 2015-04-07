@@ -1646,7 +1646,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
 
                 echo($allParams);
-                $definitions = $ajxpPlugin->getConfigsDefinitions() + $instancesDefinitions;
+                $definitions = $instancesDefinitions;
+                $configsDefs = $ajxpPlugin->getConfigsDefinitions();
+                if(is_array($configsDefs)){
+                    $definitions = array_merge($configsDefs, $instancesDefinitions);
+                }
                 $values = $ajxpPlugin->getConfigs();
                 if(!is_array($values)) $values = array();
                 echo("<plugin_settings_values>");
