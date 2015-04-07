@@ -951,7 +951,7 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 });
             }
-            this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller'+this.__currentInstanceIndex);
+            this.scrollbar = new Control.ScrollBar(scrollElement,this.scroller);
             if(this.scrollSizeObserver){
                 this.stopObserving("resize", this.scrollSizeObserver);
             }
