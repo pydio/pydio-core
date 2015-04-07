@@ -317,7 +317,11 @@ Class.create("MetaCellRenderer", {
                     conn.sendAsync();
                 }, 500);
             }else{
-                containingForm.down('input[name="'+elementName+'"]').setValue(note);
+                if(note != '0'){
+                    containingForm.down('input[name="'+elementName+'"]').setValue(note);
+                }else{
+                    containingForm.down('input[name="'+elementName+'"]').setValue('');
+                }
                 var img = Event.element(event);
                 img.previousSiblings('img[src="'+imgOff+'"]').each(function(i){if(i.src!=imgRemove){
                     i.src = imgOn;
