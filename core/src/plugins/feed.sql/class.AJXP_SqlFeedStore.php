@@ -224,6 +224,10 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             }
             $startEventNotif = new AJXP_Notification();
             $startEventNotif = unserialize($startEventRow->content);
+            if(empty($startEventNotif)) {
+                // Ignore, empty notif;
+                return;
+            }
             $url = $startEventNotif->getNode()->getUrl();
             $date = $startEventRow->edate;
             $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $date, $url, $occurrences);

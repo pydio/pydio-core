@@ -75,12 +75,19 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function persistNotificationToAlerts(AJXP_Notification &$notification)
     {
         if ($this->eventStore) {
+            $this->eventStore->persistAlert($notification);
             AJXP_Controller::applyHook("msg.instant",array(
                 "<reload_user_feed/>",
                 $notification->getNode()->getRepositoryId(),
                 $notification->getTarget()
             ));
-            $this->eventStore->persistAlert($notification);
+            if($notification->getNode()->getRepository() != null && $notification->getNode()->getRepository()->hasParent()){
+                AJXP_Controller::applyHook("msg.instant",array(
+                    "<reload_user_feed/>",
+                    $notification->getNode()->getRepository()->getParentId(),
+                    $notification->getTarget()
+                ));
+            }
         }
     }
 
@@ -315,7 +322,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $contentFilter = $nodeRepo->getContentFilter();
                     if(isSet($contentFilter)){
                         $nodePath = $contentFilter->filterExternalPath($node->getPath());
-                        if($nodePath == "/"){
+                        if(empty($nodePath) || $nodePath == "/"){
                             $k = array_keys($contentFilter->filters);
                             $nodePath = $k[0];
                         }
