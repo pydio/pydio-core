@@ -779,13 +779,13 @@ div#meta_source_button_add{
     position: absolute;
     z-index: 1500;
     cursor: pointer;
-    border-radius: 3px;
-    box-shadow: 3px 3px 11px rgba(0,0,0,0.25);
+    border-radius: 4px;
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 #message_content
 {
-    font-size: 13px;
-    margin: 8px;
+    font-size: 14px;
+    margin: 10px 7px;
     overflow-y: auto;
     max-height: 120px;
     letter-spacing: 0;
@@ -795,29 +795,43 @@ div#meta_source_button_add{
 {
     background-color: #960000;
     cursor: pointer;
-    filter:alpha(opacity=90);
-    opacity: 0.90;
-    -moz-opacity:0.90;
 }
 
 .logMessage
 {
     background-color: #009600;
-    filter:alpha(opacity=90);
-    opacity: 0.90;
-    -moz-opacity:0.90;
+}
+
+div#message_content::before {
+    font-weight: normal;
+    font-style: normal;
+    font-family: FontAwesome;
+    display: block;
+    padding: 0 6px;
+    margin-right: 5px;
+    font-size: 16px;
+    margin-top: 2px;
+    float: left;
+}
+
+.logMessage > div#message_content::before {
+    content: '\f058';
+}
+
+.errorMessage > div#message_content::before {
+    content: '\f071';
 }
 
 html.boxshadow div.logMessage{
-    border: 1px solid #009600;
+    border: 0;
     color: #009600 !important;
-    background-color: rgb(173, 224, 173);
+    background-color: rgb(194, 236, 194);
 }
 
 html.boxshadow div.errorMessage{
-    border: 1px solid #960001;
+    border: 0;
     color: #960000 !important;
-    background-color: rgb(241, 174, 174);
+    background-color: rgb(242, 193, 193);
 }
 
 

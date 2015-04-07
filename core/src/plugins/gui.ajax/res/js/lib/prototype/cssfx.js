@@ -27,6 +27,10 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
     var originalMethod;
     var endStyle = {};
     if(!options) options = {};
+    ["webkitAnimationEnd", "mozAnimationEnd", "oAnimationEnd", "animationEnd", "transitionend", "animationend", "oanimationend", "mozanimationend"].map(
+        function(event){
+            element.stopObserving(event);
+        });
     switch (effectName){
         case "RowFade":
             className = 'quick bounceOutLeft';
@@ -41,6 +45,7 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
             originalMethod = 'Shake';
             break;
         case "MessageAppear":
+            element.removeClassName('fadeOutDownBig');
             className = 'fadeInUpBig';
             endStyle = {opacity: 1};
             originalMethod ='Appear';
