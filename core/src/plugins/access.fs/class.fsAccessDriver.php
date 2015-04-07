@@ -1317,6 +1317,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=null, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
     {
+        if(!$data && !$gzip && !file_exists($filePathOrData)){
+            throw new Exception("File $filePathOrData not found!");
+        }
         if ($gzip === null) {
             $gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
         }
@@ -1394,6 +1397,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                 header("Content-Length: ". $length);
                 $file = fopen($filePathOrData, 'rb');
+                if(!is_resource($file)){
+                    throw new Exception("Failed opening file ".$filePathOrData);
+                }
                 fseek($file, 0);
                 $relOffset = $offset;
                 while ($relOffset > 2.0E9) {
@@ -1466,6 +1472,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             if ($realfileSystem) {
                 $this->logDebug("realFS!", array("file"=>$filePathOrData));
                 $fp = fopen($filePathOrData, "rb");
+                if(!is_resource($fp)){
+                    throw new Exception("Failed opening file ".$filePathOrData);
+                }
                 if ($byteOffset != -1) {
                     fseek($fp, $byteOffset);
                 }

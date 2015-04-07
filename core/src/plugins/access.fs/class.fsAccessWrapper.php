@@ -244,6 +244,7 @@ class fsAccessWrapper implements AjxpWrapper
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");
+        if(!is_resource($fp)) return;
         while (!feof($fp)) {
             if(!ini_get("safe_mode")) @set_time_limit(60);
              $data = fread($fp, 4096);

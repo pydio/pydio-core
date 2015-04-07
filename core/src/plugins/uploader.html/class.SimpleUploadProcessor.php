@@ -143,10 +143,12 @@ class SimpleUploadProcessor extends AJXP_Plugin
         $newDest = fopen($destStreamURL.$filename, "w");
         for ($i = 0; $i < count($chunks) ; $i++) {
             $part = fopen($destStreamURL.$chunks[$i], "r");
-            while (!feof($part)) {
-                fwrite($newDest, fread($part, 4096));
+            if(is_resource($part)){
+                while (!feof($part)) {
+                    fwrite($newDest, fread($part, 4096));
+                }
+                fclose($part);
             }
-            fclose($part);
             unlink($destStreamURL.$chunks[$i]);
         }
         fclose($newDest);

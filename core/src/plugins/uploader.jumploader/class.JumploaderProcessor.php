@@ -375,10 +375,12 @@ class JumploaderProcessor extends AJXP_Plugin
                             $currentFile = $partitions[$i];
                             $currentFileName = $currentFile["tmp_name"];
                             $part = fopen($currentFileName, "r");
-                            while (!feof($part)) {
-                                $length += fwrite($newDest, fread($part, 4096));
+                            if(is_resource($part)){
+                                while (!feof($part)) {
+                                    $length += fwrite($newDest, fread($part, 4096));
+                                }
+                                fclose($part);
                             }
-                            fclose($part);
                             unlink($currentFileName);
                         }
                         $newFile["type"] = $partitions[0]["type"];
@@ -394,10 +396,12 @@ class JumploaderProcessor extends AJXP_Plugin
 
                         for ($i = 0; $i < $httpVars["partitionCount"] ; $i++) {
                             $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
-                            while (!feof($part)) {
-                                fwrite($newDest, fread($part, 4096));
+                            if(is_resource($part)){
+                                while (!feof($part)) {
+                                    fwrite($newDest, fread($part, 4096));
+                                }
+                                fclose($part);
                             }
-                            fclose($part);
                             unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
 

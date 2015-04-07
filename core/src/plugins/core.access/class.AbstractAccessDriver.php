@@ -316,15 +316,15 @@ class AbstractAccessDriver extends AJXP_Plugin
         if (call_user_func(array($srcWrapperName, "isRemote")) || call_user_func(array($destWrapperName, "isRemote")) || $srcWrapperName != $destWrapperName) {
             $src = fopen($srcFile, "r");
             $dest = fopen($destFile, "w");
-            if ($dest !== false) {
+            if (is_resource($src) && is_resource($dest)) {
                 while (!feof($src)) {
                     //stream_copy_to_stream($src, $dest, 4096);
                     $count = stream_copy_to_stream($src, $dest, 4096);
                     if ($count == 0) break;
                 }
-                fclose($dest);
             }
-            fclose($src);
+            if(is_resource($dest)) fclose($dest);
+            if(is_resource($src)) fclose($src);
         } else {
             copy($srcFile, $destFile);
         }

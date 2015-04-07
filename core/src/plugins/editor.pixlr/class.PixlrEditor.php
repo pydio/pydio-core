@@ -113,11 +113,13 @@ class PixlrEditor extends AJXP_Plugin
 
       $orig = fopen($image, "r");
       $target = fopen($destStreamURL.$file, "w");
-      while (!feof($orig)) {
-        fwrite($target, fread($orig, 4096));
+      if(is_resource($orig) && is_resource($target)){
+          while (!feof($orig)) {
+            fwrite($target, fread($orig, 4096));
+          }
+          fclose($orig);
+          fclose($target);
       }
-      fclose($orig);
-      fclose($target);
         clearstatcache(true, $node->getUrl());
         $node->loadNodeInfo(true);
         AJXP_Controller::applyHook("node.change", array(&$node, &$node));

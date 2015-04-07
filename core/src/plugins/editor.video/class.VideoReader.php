@@ -80,6 +80,7 @@ class VideoReader extends AJXP_Plugin
                 header('Accept-Ranges:bytes');
                 header("Content-Length: ". $length);
                 $file = fopen($filename, 'rb');
+                if(!is_resource($file)) throw new Exception("Cannot open file $file!");
                 fseek($file, 0);
                 $relOffset = $offset;
                 while ($relOffset > 2.0E9) {

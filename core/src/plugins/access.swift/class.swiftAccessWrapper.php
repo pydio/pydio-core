@@ -240,6 +240,7 @@ class swiftAccessWrapper extends fsAccessWrapper
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen($path, "r", null, self::$cloudContext);
+        if(!is_resource($fp)) return;
         while (!feof($fp)) {
             $data = fread($fp, 4096);
             fwrite($stream, $data, strlen($data));
