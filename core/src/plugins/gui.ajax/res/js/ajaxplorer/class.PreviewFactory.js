@@ -89,7 +89,9 @@ Class.create("PreviewFactory", {
    				if(img == null || oImageToLoad.PFacLoader == null) return;
    				var newImg = oImageToLoad.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
    				newImg.setAttribute("data-is_loaded", "true");
-   				img.parentNode.replaceChild(newImg, img);
+   				if(img.parentNode) {
+                    img.parentNode.replaceChild(newImg, img);
+                }
    				oImageToLoad.mainObject.IMAGE_ELEMENT = newImg;
    				this.resizeThumbnail(newImg);
                 oImageToLoad.PFacLoader = null;
