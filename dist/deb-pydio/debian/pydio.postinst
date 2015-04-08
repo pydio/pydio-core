@@ -34,12 +34,12 @@ then
 
 	    fi
 
-	    if [ -f /tmp/pydio_original_htaccess ]
-	    then
+	fi
 
-	        mv /tmp/pydio_original_htaccess $BIN_DIR/.htaccess
-
-	    fi
+	if [ ! -f $BIN_DIR/.htaccess ]
+	then
+        # Install linux specific htaccess
+	    cp $BIN_DIR/plugins/boot.conf/htaccess.tpl.linux $BIN_DIR/.htaccess
 
 	fi
 
