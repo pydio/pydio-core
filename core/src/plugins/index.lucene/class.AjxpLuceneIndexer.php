@@ -527,7 +527,11 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
      */
     public function createIndexedDocument($ajxpNode, &$index)
     {
-        $ajxpNode->loadNodeInfo();
+        if(!empty($this->metaFields)){
+            $ajxpNode->loadNodeInfo(false, false, "all");
+        }else{
+            $ajxpNode->loadNodeInfo();
+        }
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
         $parseContent = $this->indexContent;
         if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {

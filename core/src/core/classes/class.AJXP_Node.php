@@ -53,6 +53,10 @@ class AJXP_Node
      */
     protected $nodeInfoLoaded = false;
     /**
+     * @var string Details level passed to nodeLoadInfo()
+     */
+    protected $nodeInfoLevel = "minimal";
+    /**
      * @var Repository
      */
     private $_repository;
@@ -386,6 +390,9 @@ class AJXP_Node
      */
     public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false)
     {
+        if($this->nodeInfoLoaded && $this->nodeInfoLevel != $details){
+            $forceRefresh = true;
+        }
         if($this->nodeInfoLoaded && !$forceRefresh) return;
         if (!empty($this->_wrapperClassName)) {
             $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
@@ -396,6 +403,7 @@ class AJXP_Node
         }
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
+        $this->nodeInfoLevel = $details;
     }
 
     /**
