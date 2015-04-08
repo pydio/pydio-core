@@ -71,17 +71,15 @@
 							var form = $(oForm).select('div[id="user_meta_form"]')[0];
 							var nodeMeta = $H();
 							var firstNodeMeta = userSelection.getUniqueNode().getMetadata();
-                            var metaFields = firstNodeMeta.get('meta_fields').split(',');
-                            var metaLabels = firstNodeMeta.get('meta_labels').split(',');
-                            var metaTypes =  firstNodeMeta.get('meta_types').split(',');
+							var metaConfigs = MetaCellRenderer.prototype.staticGetMetaConfigs();
 							if(userSelection.isUnique()){
 							    nodeMeta = firstNodeMeta;
                             }
-							for(var i=0;i<metaFields.length;i++){
-								var value = nodeMeta.get(metaFields[i]) || '';
-								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');
-                                var element = form.down('input[name="'+metaFields[i]+'"]');
-                                var fieldType = metaTypes[i];
+							metaConfigs.each(function(pair){
+								var value = nodeMeta.get(pair.key) || '';
+								form.insert('<div class="SF_element"><div class="SF_label">'+pair.value.label+' : </div><input class="SF_input" name="'+pair.key+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');
+                                var element = form.down('input[name="'+pair.key+'"]');
+                                var fieldType = pair.value.type;
 								if(fieldType == 'stars_rate'){
 									MetaCellRenderer.prototype.formPanelStars(element, form);
 								}else if(fieldType == 'css_label'){
@@ -95,7 +93,7 @@
 								}else if(fieldType == 'updater' || fieldType == 'creator'){
 								    element.disabled = true;
 								}
-							}
+							});
 						}
 						var closeFunc = function(){
 							var oForm = $(modal.getForm());

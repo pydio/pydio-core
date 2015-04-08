@@ -174,7 +174,10 @@ Class.create("MetaCellRenderer", {
 			}			
 		}else if(type == 'detail'){
 
-            if(element.nodeName.toLowerCase() == 'span') return;
+            if(element.nodeName.toLowerCase() == 'span') {
+                element = element.up(".detailed");
+                if(!element) return;
+            }
             content = ajxpNode.getMetadata().get(attName);
             if(content){
                 obj = new MetaCellRenderer();
