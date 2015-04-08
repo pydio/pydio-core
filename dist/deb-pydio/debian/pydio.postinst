@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for phpmyadmin
+# postinst script for pydio
 
 set -e
 
@@ -31,6 +31,13 @@ then
 	    then
 
             touch $VAR_DIR/data/cache/first_run_passed
+
+	    fi
+
+	    if [ -f /tmp/pydio_original_htaccess ]
+	    then
+
+	        mv /tmp/pydio_original_htaccess $BIN_DIR/.htaccess
 
 	    fi
 
