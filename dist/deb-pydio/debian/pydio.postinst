@@ -36,7 +36,7 @@ then
 
 	fi
 
-	if [ ! -f $BIN_DIR/.htaccess ]
+	if [ ! -f "$BIN_DIR/.htaccess" ]
 	then
         # Install linux specific htaccess
 	    cp $BIN_DIR/plugins/boot.conf/htaccess.tpl.linux $BIN_DIR/.htaccess

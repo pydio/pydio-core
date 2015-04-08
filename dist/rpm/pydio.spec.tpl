@@ -45,6 +45,9 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{pydiodir}
 cp -pr . %{buildroot}%{pydiodir}
 
+# correct htaccess
+cp -p ./plugins/boot.conf/htaccess.tpl.linux %{buildroot}%{pydiodir}/.htaccess
+
 # apache conf
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
 cp -pr %SOURCE1 %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
