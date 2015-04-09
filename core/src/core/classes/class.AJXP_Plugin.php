@@ -552,9 +552,10 @@ class AJXP_Plugin implements Serializable
         $params = $this->xPath->query("//server_settings/global_param|//server_settings/param");
         $this->pluginConf = array();
         foreach ($params as $xmlNode) {
+            $global = ($xmlNode->nodeName == "global_param");
             $paramNode = $this->nodeAttrToHash($xmlNode);
             $this->pluginConfDefinition[$paramNode["name"]] = $paramNode;
-            if (isset($paramNode["default"])) {
+            if ($global && isset($paramNode["default"])) {
                 if ($paramNode["type"] == "boolean") {
                     $paramNode["default"] = ($paramNode["default"] === "true" ? true: false);
                 } else if ($paramNode["type"] == "integer") {

@@ -65,6 +65,9 @@ Class.create("SearchEngine", AjxpPane, {
             this._ajxpOptions = Object.extend(this._ajxpOptions, ajxpOptions);
         }
 		$super($(mainElementName), this._ajxpOptions);
+
+        if(!this._ajxpOptions.metaColumns) this._ajxpOptions.metaColumns = {};
+
         this.updateSearchModeFromRegistry();
         this.searchModeObserver = this.updateSearchModeFromRegistry.bind(this);
         document.observe("ajaxplorer:registry_loaded", this.searchModeObserver);
