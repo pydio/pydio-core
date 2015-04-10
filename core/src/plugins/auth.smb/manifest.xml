@@ -6,7 +6,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="REPOSITORY_ID" type="string" label="CONF_MESSAGE[Repository]" description="CONF_MESSAGE[Id of the repository to use for testing connexion]" mandatory="true"/>
+		<param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Workspace]" description="CONF_MESSAGE[ID of the workspace used to validate credentials]" mandatory="true"/>
 		<param name="ADMIN_USER" type="string" label="CONF_MESSAGE[Admin user]" description="CONF_MESSAGE[The ID of an existing admin for Pydio (using conf.serial)]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.smb/class.smbAuthDriver.php" classname="smbAuthDriver"/>
