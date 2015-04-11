@@ -47,7 +47,7 @@ spl_autoload_register('__autoload_elastica');
  * @property Elastica\Index $currentIndex
  * @property Elastica\Type $currentType
  */
-class AjxpElasticSearch extends AJXP_AbstractMetaSource
+class AjxpElasticSearch extends AJXP_Plugin
 {
     private $client;
     private $currentIndex;
@@ -55,6 +55,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
     private $nextId;
     private $lastIdPath;
 
+    private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
     private $specificId = "";
@@ -74,14 +75,14 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         }
 
         /* Connexion to Elastica Client with the default parameters */
-        $this->client = new Elastica\Client(array("host" => "localhost", "port" => "9200"));
+        $this->client = new Elastica\Client(array("host" => "192.168.1.210", "port" => "9200"));
 
         $this->indexContent = ($this->getFilteredOption("index_content") == true);
     }
 
     public function initMeta($accessDriver)
     {
-        parent::initMeta($accessDriver);
+        $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);
@@ -136,8 +137,8 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
     public function applyAction($actionName, $httpVars, $fileVars)
     {
         $messages = ConfService::getMessages();
-        $repoId = $this->accessDriver->repository->getId();
-
+        $repoId = ConfService::getRepository()->getId();
+	AJXP_Logger::error(__CLASS__,__FUNCTION__,"ApplyAction: ", $actionName);
         if ($actionName == "search") {
             // TMP
             if (strpos($httpVars["query"], "keyword:") === 0) {
@@ -178,18 +179,20 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
            */
             $this->currentIndex->open();
             $query = $httpVars["query"];
-            $fieldQuery = new Elastica\Query\Field();
+            $fieldQuery = new Elastica\Query\QueryString();
 
             //}
             //$this->setDefaultAnalyzer();
             if ($query == "*") {
-                $fieldQuery->setField("ajxp_node");
-                $fieldQuery->setQueryString("yes");
+		$fields = array("ajxp_node");
+                $fieldQuery->setQuery("yes");
             } else {
-                $fieldQuery->setField("basename");
-                $fieldQuery->setQueryString($query);
+		$fields = array("basename","ajxp_meta_*", "node_*","body");
+                $fieldQuery->setQuery($query);
             }
-
+	    $fieldQuery->setFields($fields);
+	    $fieldQuery->setAllowLeadingWildcard(false);
+            $fieldQuery->setFuzzyMinSim(0.8);
             /*
                 We create this object search because it'll allow us to fetch the number of results we want at once.
                 We just have to set some parameters, the query type and the size of the result set.
@@ -202,7 +205,9 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
                 \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
                 \Elastica\Search::OPTION_SIZE => $maxResults);
 
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"Executing query: ", $query);
             $result = $search->search($fieldQuery, $searchOptions);
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"Search finished. ");
             $total_hits = $result->getTotalHits();
             $hits = $result->getResults();
 
@@ -230,6 +235,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
 
             AJXP_XMLWriter::close();
             $this->currentIndex->close();
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"Finished. ");
         } else if ($actionName == "search_by_keyword") {
         /*    require_once("Zend/Search/Lucene.php");
             $scope = "user";
@@ -289,7 +295,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         } else if ($actionName == "index") {
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
             if(empty($dir)) $dir = "/";
-            $repo = $this->accessDriver->repository;
+            $repo = ConfService::getRepository();
             if ($this->isIndexLocked($repo->getId())) {
                 throw new Exception($messages["index.lucene.6"]);
             }
@@ -415,11 +421,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
     public function updateNodeIndex($oldNode, $newNode = null, $copy = false)
     {
         if (!isSet($this->currentIndex)) {
-            if($oldNode == null){
-                $this->loadIndex($newNode->getRepositoryId());
-            }else{
-                $this->loadIndex($oldNode->getRepositoryId());
-            }
+            $this->loadIndex(ConfService::getRepository()->getId());
         }
 
         //$this->setDefaultAnalyzer();
@@ -492,14 +494,12 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
     {
         $ajxpNode->loadNodeInfo();
 
-        /*
-
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
-
         $parseContent = $this->indexContent;
         if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
+	/*
         if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_HTML")))) {
             $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")) {
@@ -521,6 +521,10 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         $mapping_properties = array();
 
         /* we construct the array that will contain all the data for the document we create */
+	AJXP_Logger::error(__CLASS__,__FUNCTION__,"Creating document: ",  $ajxpNode->getUrl());
+	//AJXP_Logger::error(__CLASS__,__FUNCTION__,"unoconv: ",  $this->getFilteredOption("UNOCONV"));
+	//AJXP_Logger::error(__CLASS__,__FUNCTION__,"pdftotext: ",  $this->getFilteredOption("PDFTOTEXT"));
+	//AJXP_Logger::error(__CLASS__,__FUNCTION__,"parse txt: ",  $this->getFilteredOption("PARSE_CONTENT_TXT"));
         $data = array();
 
         $data["node_url"] = $ajxpNode->getUrl();
@@ -544,6 +548,56 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             }
         }
 
+	//add bodu
+	if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_TXT")))) {
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"parse txt!");
+            $data["body"] = file_get_contents($ajxpNode->getUrl());
+        }
+	$unoconv = $this->getFilteredOption("UNOCONV");
+        if ($parseContent && !empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"parse with unoconv!");
+            $targetExt = "txt";
+            $pipe = false;
+            if (in_array($ext, array("xls", "ods"))) {
+                $targetExt = "csv";
+            } else if (in_array($ext, array("odp", "ppt"))) {
+                $targetExt = "pdf";
+                $pipe = true;
+            }
+            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
+            $unoconv = "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
+            if ($pipe) {
+                $newTarget = str_replace(".$ext", ".pdf", $realFile);
+                $unoconv.= " > $newTarget";
+                register_shutdown_function("unlink", $newTarget);
+            }
+            $output = array();
+            exec($unoconv, $output, $return);
+            if (!$pipe) {
+                $out = implode("\n", $output);
+                $enc = 'ISO-8859-1';
+                $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
+                $data["body"]= $asciiString;
+            } else {
+                $ext = "pdf";
+            }
+        }
+	$pdftotext = $this->getFilteredOption("PDFTOTEXT");
+        if ($parseContent && !empty($pdftotext) && in_array($ext, array("pdf"))) {
+	    AJXP_Logger::error(__CLASS__,__FUNCTION__,"parse with pdftotext!");
+            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
+            if ($pipe && isset($newTarget) && is_file($newTarget)) {
+                $realFile = $newTarget;
+            }
+            $cmd = $pdftotext." ".escapeshellarg($realFile)." -";
+            $output = array();
+            exec($cmd, $output, $return);
+            $out = implode("\n", $output);
+            $enc = 'UTF8';
+            $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
+            $data["body"]= $asciiString;
+        }
+
         /*
             We want some fields not to be analyzed when they are indexed.
             To achieve this we have to dynamically define a mapping.
@@ -552,6 +606,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             Here we want some fields not to be analyzed so we just precise the
             property index and set it to "not_analyzed".
         */
+	AJXP_Logger::error(__CLASS__,__FUNCTION__,"Creating mapping.. ");
         foreach ($data as $key => $value) {
             if ($key == "node_url" || $key = "node_path") {
                 $mapping_properties[$key] = array("type" => "string", "index" => "not_analyzed");
@@ -569,8 +624,8 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         $mapping->setType($this->currentType);
         $mapping->setProperties($mapping_properties);
         $mapping->send();
-
         $doc = new Elastica\Document($this->nextId, $data);
+	AJXP_Logger::error(__CLASS__,__FUNCTION__,"Creating document finished. ");
         $this->nextId++;
 
         /*if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
