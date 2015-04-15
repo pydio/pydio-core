@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Index
  */
-class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
+class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 {
     /**
      * @var Zend_Search_Lucene_Interface
@@ -597,52 +597,11 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
 
             $index->addDocument($privateDoc);
         }
-        if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_TXT")))) {
-            $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
-        }
-        $unoconv = $this->getFilteredOption("UNOCONV");
-        $pipe = false;
-        if ($parseContent && !empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
-            $targetExt = "txt";
-            if (in_array($ext, array("xls", "ods"))) {
-                $targetExt = "csv";
-            } else if (in_array($ext, array("odp", "ppt"))) {
-                $targetExt = "pdf";
-                $pipe = true;
-            }
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $unoconv = "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
-            if ($pipe) {
-                $newTarget = str_replace(".$ext", ".pdf", $realFile);
-                $unoconv.= " > $newTarget";
-                register_shutdown_function("unlink", $newTarget);
-            }
-            $output = array();
-            exec($unoconv, $output, $return);
-            if (!$pipe) {
-                $out = implode("\n", $output);
-                $enc = 'ISO-8859-1';
-                $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
-                   $doc->addField(Zend_Search_Lucene_Field::unStored("body", $asciiString));
-            } else {
-                $ext = "pdf";
-            }
-        }
-        $pdftotext = $this->getFilteredOption("PDFTOTEXT");
-        if ($parseContent && !empty($pdftotext) && in_array($ext, array("pdf"))) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            if ($pipe && isset($newTarget) && is_file($newTarget)) {
-                $realFile = $newTarget;
-            }
-            $cmd = $pdftotext." ".escapeshellarg($realFile)." -";
-            $output = array();
-            exec($cmd, $output, $return);
-            $out = implode("\n", $output);
-            $enc = 'UTF8';
-            $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
-               $doc->addField(Zend_Search_Lucene_Field::unStored("body", $asciiString));
-        }
 
+        if($parseContent){
+            $body = $this->extractIndexableContent($ajxpNode);
+            if(!empty($body)) $doc->addField(Zend_Search_Lucene_Field::unStored("body", $body));
+        }
         $index->addDocument($doc);
         return $doc;
     }

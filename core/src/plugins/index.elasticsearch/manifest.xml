@@ -12,6 +12,8 @@
         </resources>
     </client_settings>
     <server_settings>
+        <param name="ELASTICSEARCH_HOST" type="string" label="CONF_MESSAGE[ElasticSearch Host]" description="CONF_MESSAGE[ElasticSearch Server host (without http)]" mandatory="true" default="localhost"/>
+        <param name="ELASTICSEARCH_PORT" type="integer" label="CONF_MESSAGE[ElasticSearch Port]" description="CONF_MESSAGE[ElasticSearch Server port (default 9200)]" mandatory="true" default="9200"/>
         <param name="index_content" type="boolean" label="CONF_MESSAGE[Index Content]" description="CONF_MESSAGE[Parses the file when possible and index its content (see plugin global options)]" mandatory="true" default="false"/>
         <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" default=""/>
         <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false" default=""/>
@@ -28,6 +30,9 @@
         <hooks>
             <serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"/>
             <serverCallback hookName="node.meta_change" methodName="updateNodeIndexMeta" defer="true"/>
+            <serverCallback hookName="node.index.recursive.start" methodName="indexationStarts"/>
+            <serverCallback hookName="node.index.recursive.end" methodName="indexationEnds"/>
+            <serverCallback hookName="node.index" methodName="indexationIndexNode"/>
         </hooks>
         <actions>
             <action name="search">
@@ -46,37 +51,6 @@
                     <serverCallback methodName="applyAction" restPath="/query/"/>
                 </processing>
             </action>
-            <action name="check_lock">
-                <rightsContext noUser="true" userLogged="only" read="true"
-                               write="false" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <serverCallback methodName="applyAction"/>
-                </processing>
-            </action>
-            <action name="index">
-                <gui text="index.elasticsearch.1" title="index.elasticsearch.2" iconClass="icon-book" src="elastic_search_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
-                    <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="true" infoPanel="false"
-                             actionBarGroup="remote" inZip="false">
-                    </context>
-                </gui>
-                <rightsContext noUser="true" userLogged="only" read="true"
-                               write="true" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
-                        var crtDir = "/";
-                        if(!ajaxplorer.getUserSelection().isEmpty()){
-                            crtDir = ajaxplorer.getUserSelection().getUniqueNode().getPath();
-                        }
-						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
-						bgManager.next();
-					]]></clientCallback>
-                    <serverCallback methodName="applyAction"/>
-                </processing>
-            </action>
         </actions>
         <client_configs>
             <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"shared","label":"363","iconClass":"icon-share","element":"shared_elements"},{"id":"flagged","label":"147","iconClass":"icon-bookmark-empty","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
@@ -84,6 +58,14 @@
                 <div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"},"reloadOnServerMessage":"tree/reload_shared_elements"}'></div>
                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
             ]]></template_part>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="navigation_shared"><![CDATA[
+                    <div ajxp_position="2" id="navigation_shared">
+                        <h3 class="colorcode-shared" ajxp_message_id="share_center.98">AJXP_MESSAGE[share_center.98] <small id="shared_files_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"shared_files_list"}'>AJXP_MESSAGE[513]</small></h3>
+                        <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared", "connexion_discrete":true}, "emptyChildrenMessage":"share_center.131","containerDroppableAction":"share-file-minisite"}'></div>
+                    </div>
+            ]]></additional_content>
+            </component_config>
         </client_configs>
     </registry_contributions>
     <dependencies>

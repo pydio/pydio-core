@@ -47,7 +47,7 @@ spl_autoload_register('__autoload_elastica');
  * @property Elastica\Index $currentIndex
  * @property Elastica\Type $currentType
  */
-class AjxpElasticSearch extends AJXP_AbstractMetaSource
+class AjxpElasticSearch extends AbstractSearchEngineIndexer
 {
     private $client;
     private $currentIndex;
@@ -74,14 +74,17 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         }
 
         /* Connexion to Elastica Client with the default parameters */
-        $this->client = new Elastica\Client(array("host" => "localhost", "port" => "9200"));
+        $this->client = new Elastica\Client(array(
+            "host" => $this->getFilteredOption("ELASTICSEARCH_HOST"),
+            "port" => $this->getFilteredOption("ELASTICSEARCH_PORT"))
+        );
 
         $this->indexContent = ($this->getFilteredOption("index_content") == true);
     }
 
     public function initMeta($accessDriver)
     {
-        parent::initMeta($accessDriver);
+        $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);
@@ -98,40 +101,29 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         parent::init($this->options);
     }
 
-    /*protected function setDefaultAnalyzer(){
+    /**
+     * @param AJXP_Node $node
+     */
+    public function indexationIndexNode($node){
+        $this->updateNodeIndex(null, $node, false, false);
+    }
 
-        switch ($this->getFilteredOption("QUERY_ANALYSER")) {
-            case "utf8num_insensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
-                break;
-            case "utf8num_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num());
-                break;
-            case "utf8_insensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8_CaseInsensitive());
-                break;
-            case "utf8_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8());
-                break;
-            case "textnum_insensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
-                break;
-            case "textnum_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_textNum());
-                break;
-            case "text_insensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text_CaseInsensitive());
-                break;
-            case "text_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text());
-                break;
-            default:
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
-                break;
+
+    /**
+     * @param AJXP_Node $parentNode
+     */
+    public function indexationStarts($parentNode){
+        $this->loadIndex($parentNode->getRepositoryId(), true);
+    }
+
+    /**
+     * @param AJXP_Node $parentNode
+     */
+    public function indexationEnds($parentNode){
+        if($this->currentIndex) {
+            $this->currentIndex->optimize();
         }
-        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(intval($this->getFilteredOption("WILDCARD_LIMITATION")));
-
-    }*/
+    }
 
     public function applyAction($actionName, $httpVars, $fileVars)
     {
@@ -146,9 +138,6 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
                 return;
             }
 
-            if ($this->isIndexLocked($repoId)) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
             try {
                 $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
@@ -156,40 +145,42 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
                 throw new Exception($messages["index.lucene.7"]);
             }
 
-           /*
-
-           if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
-                $sParts = array();
-                foreach (explode(",",$httpVars["fields"]) as $searchField) {
-                    if ($searchField == "filename") {
-                        $sParts[] = "basename:".$httpVars["query"];
-                    } else if (in_array($searchField, $this->metaFields)) {
-                        $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
-                    } else if ($searchField == "ajxp_document_content") {
-                        $sParts[] = "title:".$httpVars["query"];
-                        $sParts[] = "body:".$httpVars["query"];
-                        $sParts[] = "keywords:".$httpVars["query"];
-                    }
-                }
-                $query = implode(" OR ", $sParts);
-                $query = "ajxp_scope:shared AND ($query)";
-                $this->logDebug("Query : $query");
-           } else {
-           */
+            /*
+            TODO : READAPT QUERY WITH EACH FIELD
+            if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
+                 $sParts = array();
+                 foreach (explode(",",$httpVars["fields"]) as $searchField) {
+                     if ($searchField == "filename") {
+                         $sParts[] = "basename:".$httpVars["query"];
+                     } else if (in_array($searchField, $this->metaFields)) {
+                         $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
+                     } else if ($searchField == "ajxp_document_content") {
+                         $sParts[] = "title:".$httpVars["query"];
+                         $sParts[] = "body:".$httpVars["query"];
+                         $sParts[] = "keywords:".$httpVars["query"];
+                     }
+                 }
+                 $query = implode(" OR ", $sParts);
+                 $query = "ajxp_scope:shared AND ($query)";
+                 $this->logDebug("Query : $query");
+            } else {
+            */
             $this->currentIndex->open();
             $query = $httpVars["query"];
-            $fieldQuery = new Elastica\Query\Field();
+            $fieldQuery = new Elastica\Query\QueryString();
 
             //}
             //$this->setDefaultAnalyzer();
             if ($query == "*") {
-                $fieldQuery->setField("ajxp_node");
-                $fieldQuery->setQueryString("yes");
+                $fields = array("ajxp_node");
+                $fieldQuery->setQuery("yes");
             } else {
-                $fieldQuery->setField("basename");
-                $fieldQuery->setQueryString($query);
+                $fields = array("basename","ajxp_meta_*", "node_*","body");
+                $fieldQuery->setQuery($query);
             }
-
+            $fieldQuery->setFields($fields);
+            $fieldQuery->setAllowLeadingWildcard(false);
+            $fieldQuery->setFuzzyMinSim(0.8);
             /*
                 We create this object search because it'll allow us to fetch the number of results we want at once.
                 We just have to set some parameters, the query type and the size of the result set.
@@ -198,17 +189,28 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
             $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            if(isSet($httpVars['limit'])){
+                $maxResults = intval($httpVars['limit']);
+            }
             $searchOptions = array(
                 \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
                 \Elastica\Search::OPTION_SIZE => $maxResults);
 
-            $result = $search->search($fieldQuery, $searchOptions);
-            $total_hits = $result->getTotalHits();
+            $this->logDebug(__FUNCTION__,"Executing query: ", $query);
+            $fullQuery = new Elastica\Query();
+            $fullQuery->setQuery($fieldQuery);
+
+            // ADD SCOPE FILTER
+            $term = new Elastica\Filter\Term();
+            $term->setTerm("ajxp_scope", "shared");
+            $fullQuery->setPostFilter($term);
+
+            $result = $search->search($fullQuery, $searchOptions);
+            $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
 
             AJXP_XMLWriter::header();
-            for ($i=0, $count=count($hits); $i < $count; $i++) {
-                $hit = $hits[$i];
+            foreach ($hits as $hit) {
                 $source = $hit->getSource();
 
                 if ($source["serialized_metadata"] != null) {
@@ -229,27 +231,18 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             }
 
             AJXP_XMLWriter::close();
-            $this->currentIndex->close();
-        } else if ($actionName == "search_by_keyword") {
-        /*    require_once("Zend/Search/Lucene.php");
-            $scope = "user";
 
-            if ($this->isIndexLocked(ConfService::getRepository()->getId())) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
+        } else if ($actionName == "search_by_keyword") {
+
+            $scope = "user";
             try {
-                $this->currentInd =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+                $this->loadIndex(ConfService::getRepository()->getId(), false);
             } catch (Exception $ex) {
-                $this->applyAction("index", array(), array());
                 throw new Exception($messages["index.lucene.7"]);
             }
             $sParts = array();
             $searchField = $httpVars["field"];
-            if ($searchField == "ajxp_node") {
-                $sParts[] = "$searchField:yes";
-            } else {
-                $sParts[] = "$searchField:true";
-            }
+
             if ($scope == "user") {
                 if (AuthService::usersEnabled() && AuthService::getLoggedUser() == null) {
                     throw new Exception("Cannot find current user");
@@ -261,9 +254,46 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             }
             $query = implode(" AND ", $sParts);
             $this->logDebug("Query : $query");
-            $hits = $this->currentIndex->find($query);
 
-            $commitIndex = false;
+
+            $fieldQuery = new Elastica\Query\QueryString();
+            $fields = array($searchField);
+            $fieldQuery->setQuery($searchField == "ajxp_node"?"yes":"true");
+
+            $fieldQuery->setFields($fields);
+            $fieldQuery->setAllowLeadingWildcard(false);
+            $fieldQuery->setFuzzyMinSim(0.8);
+
+
+            $search = new Elastica\Search($this->client);
+            $search->addIndex($this->currentIndex)->addType($this->currentType);
+
+            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            if(isSet($httpVars['limit'])){
+                $maxResults = intval($httpVars['limit']);
+            }
+            $searchOptions = array(
+                \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
+                \Elastica\Search::OPTION_SIZE => $maxResults);
+
+            // ADD SCOPE FILTER
+            $term = new Elastica\Filter\Term();
+            $term->setTerm("ajxp_scope", "user");
+
+            $qb = new Elastica\QueryBuilder();
+            $fullQuery = new Elastica\Query();
+            $fullQuery->setQuery(
+                $qb->query()->filtered(
+                    $fieldQuery,
+                    $qb->filter()->bool()
+                        ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "user")))
+                        ->addMust(new Elastica\Filter\Term(array("user" => AuthService::getLoggedUser()->getId())))
+                )
+            );
+
+            $result = $search->search($fullQuery, $searchOptions);
+            $this->logDebug(__FUNCTION__,"Search finished. ");
+            $hits = $result->getResults();
 
             AJXP_XMLWriter::header();
             foreach ($hits as $hit) {
@@ -275,70 +305,13 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
-                    $this->currentIndex->delete($hit->id);
-                    $commitIndex = true;
+                    $this->currentType->deleteById($hit->id);
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
                 AJXP_XMLWriter::renderAjxpNode($tmpNode);
             }
             AJXP_XMLWriter::close();
-            if ($commitIndex) {
-                $this->currentIndex->commit();
-            }*/
-        } else if ($actionName == "index") {
-            $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-            if(empty($dir)) $dir = "/";
-            $repo = $this->accessDriver->repository;
-            if ($this->isIndexLocked($repo->getId())) {
-                throw new Exception($messages["index.lucene.6"]);
-            }
-
-            $accessType = $repo->getAccessType();
-            $accessPlug = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-            $stData = $accessPlug->detectStreamWrapper(true);
-            $repoId = $repo->getId();
-            $url = $stData["protocol"]."://".$repoId.$dir;
-
-            if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
-                $this->verboseIndexation = true;
-            }
-
-            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], $dir), true, 2);
-                AJXP_XMLWriter::close();
-                return;
-            }
-
-            $this->lockIndex($repoId);
-
-            // GIVE BACK THE HAND TO USER
-            session_write_close();
-            $this->loadIndex($repoId);
-            $this->currentIndex->open();
-            $this->recursiveIndexation($url);
-
-            if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
-                print("Optimizing\n");
-                $this->currentIndex->optimize();
-            }
-
-            $this->currentIndex->close();
-            $this->currentIndex = null;
-            $this->releaseLock($repoId);
-        } else if ($actionName == "check_lock") {
-            $repoId = $httpVars["repository_id"];
-            if ($this->isIndexLocked($repoId)) {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), $messages["index.lucene.10"], true, 3);
-                AJXP_XMLWriter::close();
-            } else {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("info_message", array(), $messages["index.lucene.5"], true, 5);
-                AJXP_XMLWriter::close();
-            }
         }
 
     }
@@ -378,27 +351,25 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
      */
     public function updateNodeIndexMeta($node)
     {
-        /*
-        if (!isSet($this->currentIndex)) {
-            $this->currentIndex =  $this->loadIndex(ConfService::getRepository()->getId());
-        }
-        Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
-
+        $this->loadIndex(ConfService::getRepository()->getId());
         if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
-            $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($node->getUrl()), "node_url");
-            $hits = $this->currentIndex->termDocs($term);
-            foreach ($hits as $hitId) {
-                $hit = $this->currentIndex->getDocument($hitId);
-                if ($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == AuthService::getLoggedUser()->getId())) {
-                    $this->currentIndex->delete($hitId);
+
+            $query = new Elastica\Query\Term();
+            $query->setTerm("node_url", $node->getUrl());
+            $results = $this->currentType->search($query);
+            $hits = $results->getResults();
+            foreach ($hits as $hit) {
+                $source = $hit->getSource();
+                if ($source['ajxp_scope'] == 'shared' || ($source['ajxp_scope'] == 'user' && $source['ajxp_user'] == AuthService::getLoggedUser()->getId())) {
+                    $this->currentType->deleteById($hit->getId());
                 }
             }
         } else {
-            $id = $this->getIndexedDocumentId($this->currentInd, $node);
-            if($id != null) $this->currentIndex->delete($id);
+            $id = $this->getIndexedDocumentId($node);
+            if($id != null) $this->currentType->deleteById($id);
         }
-        $this->createIndexedDocument($node, $this->currentInd);
-        */
+        $this->createIndexedDocument($node);
+
     }
 
     /**
@@ -411,18 +382,16 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param Boolean $copy
+     * @param bool $recursive
      */
-    public function updateNodeIndex($oldNode, $newNode = null, $copy = false)
+    public function updateNodeIndex($oldNode, $newNode = null, $copy = false, $recursive = false)
     {
-        if (!isSet($this->currentIndex)) {
-            if($oldNode == null){
-                $this->loadIndex($newNode->getRepositoryId());
-            }else{
-                $this->loadIndex($oldNode->getRepositoryId());
-            }
+        if($oldNode == null){
+            $this->loadIndex($newNode->getRepositoryId());
+        }else{
+            $this->loadIndex($oldNode->getRepositoryId());
         }
 
-        //$this->setDefaultAnalyzer();
         if ($oldNode != null && $copy == false) {
             $oldDocId = $this->getIndexedDocumentId($oldNode);
             if ($oldDocId != null) {
@@ -457,7 +426,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
 
             $this->createIndexedDocument($newNode);
 
-            if ($oldNode == null && is_dir($newNode->getUrl())) {
+            if ($recursive && $oldNode == null && is_dir($newNode->getUrl())) {
                 $this->recursiveIndexation($newNode->getUrl());
             }
         }
@@ -492,37 +461,12 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
     {
         $ajxpNode->loadNodeInfo();
 
-        /*
-
-        $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
-
         $parseContent = $this->indexContent;
         if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
-        if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_HTML")))) {
-            $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
-        } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $doc = @Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
-        } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Pptx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $doc = @Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
-        } elseif ($parseContent && $ext == "xlsx" && class_exists("Zend_Search_Lucene_Document_Xlsx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $doc = @Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
-        } else {
-            $doc = new Zend_Search_Lucene_Document();
-        }
-        if($doc == null) throw new Exception("Could not load document");
 
-        */
-
-        $mapping_properties = array();
-
-        /* we construct the array that will contain all the data for the document we create */
         $data = array();
-
         $data["node_url"] = $ajxpNode->getUrl();
         $data["node_path"] = str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath());
         $data["basename"] = basename($ajxpNode->getPath());
@@ -537,113 +481,76 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
                 }
             }
         }
-
         foreach ($this->metaFields as $field) {
             if ($ajxpNode->$field != null) {
                 $data["ajxp_meta_$field"] = $ajxpNode->$field;
             }
         }
-
-        /*
-            We want some fields not to be analyzed when they are indexed.
-            To achieve this we have to dynamically define a mapping.
-            When you define a mapping you have to set the type of data you will put
-            in each field and you can define other parameters.
-            Here we want some fields not to be analyzed so we just precise the
-            property index and set it to "not_analyzed".
-        */
-        foreach ($data as $key => $value) {
-            if ($key == "node_url" || $key = "node_path") {
-                $mapping_properties[$key] = array("type" => "string", "index" => "not_analyzed");
-            } else {
-                $type = gettype($value);
-
-                if ($type != "integer" && $type != "boolean" && $type != "double") {
-                    $type = "string";
-                }
-                $mapping_properties[$key] = array("type" => $type, "index" => "simple");
+        if($parseContent){
+            $body = $this->extractIndexableContent($ajxpNode);
+            if(!empty($body)){
+                $data["body"] = $body;
             }
         }
 
         $mapping = new Elastica\Type\Mapping();
         $mapping->setType($this->currentType);
-        $mapping->setProperties($mapping_properties);
+        $mapping->setProperties($this->dataToMappingProperties($data));
         $mapping->send();
-
         $doc = new Elastica\Document($this->nextId, $data);
+        $this->currentType->addDocument($doc);
         $this->nextId++;
 
-        /*if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
-            $privateDoc = new Zend_Search_Lucene_Document();
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
+        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
 
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "user"));
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", AuthService::getLoggedUser()->getId()));
+            $userData = array(
+                "ajxp_scope" => "user",
+                "user"      => AuthService::getLoggedUser()->getId(),
+                "serialized_metadata" => $data["serialized_metadata"],
+                "node_url"  => $data["node_url"],
+                "node_path"  => $data["node_path"]
+            );
+            $userData["ajxp_user"] = AuthService::getLoggedUser()->getId();
             foreach ($ajxpNode->indexableMetaKeys["user"] as $userField) {
                 if ($ajxpNode->$userField) {
-                    $privateDoc->addField(Zend_search_Lucene_Field::keyword($userField, $ajxpNode->$userField));
+                    $userData[$userField] = $ajxpNode->$userField;
                 }
             }
-            $privateDoc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", $serializedMeta));
-
-            $index->addDocument($privateDoc);
+            $mapping = new Elastica\Type\Mapping();
+            $mapping->setType($this->currentType);
+            $mapping->setProperties($this->dataToMappingProperties($userData));
+            $mapping->send();
+            $doc = new Elastica\Document($this->nextId, $userData);
+            $this->currentType->addDocument($doc);
+            $this->nextId++;
         }
-
-        /*
-        if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_TXT")))) {
-            $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
-        }
-        $unoconv = $this->getFilteredOption("UNOCONV");
-        if ($parseContent && !empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
-            $targetExt = "txt";
-            $pipe = false;
-            if (in_array($ext, array("xls", "ods"))) {
-                $targetExt = "csv";
-            } else if (in_array($ext, array("odp", "ppt"))) {
-                $targetExt = "pdf";
-                $pipe = true;
-            }
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $unoconv = "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
-            if ($pipe) {
-                $newTarget = str_replace(".$ext", ".pdf", $realFile);
-                $unoconv.= " > $newTarget";
-                register_shutdown_function("unlink", $newTarget);
-            }
-            $output = array();
-            exec($unoconv, $output, $return);
-            if (!$pipe) {
-                $out = implode("\n", $output);
-                $enc = 'ISO-8859-1';
-                $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
-                $doc->addField(Zend_Search_Lucene_Field::unStored("body", $asciiString));
-            } else {
-                $ext = "pdf";
-            }
-        }
-        $pdftotext = $this->getFilteredOption("PDFTOTEXT");
-        if ($parseContent && !empty($pdftotext) && in_array($ext, array("pdf"))) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            if ($pipe && isset($newTarget) && is_file($newTarget)) {
-                $realFile = $newTarget;
-            }
-            $cmd = $pdftotext." ".escapeshellarg($realFile)." -";
-            $output = array();
-            exec($cmd, $output, $return);
-            $out = implode("\n", $output);
-            $enc = 'UTF8';
-            $asciiString = iconv($enc, 'ASCII//TRANSLIT//IGNORE', $out);
-            $doc->addField(Zend_Search_Lucene_Field::unStored("body", $asciiString));
-        }
-        */
 
         /* we update the last id in the file */
         $file = fopen($this->lastIdPath, "w");
         fputs($file, $this->nextId-1);
         fclose($file);
 
-        $this->currentType->addDocument($doc);
+    }
+
+    protected function dataToMappingProperties($data){
+
+        $mapping_properties = array();
+        foreach ($data as $key => $value) {
+            if ($key == "node_url" || $key == "node_path") {
+                $mapping_properties[$key] = array("type" => "string", "index" => "not_analyzed");
+            } else if($key == "serialized_metadata"){
+                $mapping_properties[$key] = array("type" => "string" /*, "index" => "no" */);
+            } else {
+                $type = gettype($value);
+
+                if ($type != "integer" && $type != "boolean" && $type != "double") {
+                    $type = "string";
+                }
+                $mapping_properties[$key] = array("type" => $type);
+            }
+        }
+        return $mapping_properties;
+
     }
 
     /**
@@ -674,7 +581,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
      */
     public function getIndexedChildrenDocuments($ajxpNode)
     {
-        $testQ = str_replace("/", "AJXPFAKESEP", SystemTextEncoding::toUTF8($ajxpNode->getPath()));
+        $testQ = str_replace("/", "AJXPFAKESEP", SystemTextEncoding::toUTF8($ajxpNode->getPath()."/"));
 
         /* we use a wildcard query to fetch all children documents relatively to their paths */
         $query = new Elastica\Query\Wildcard("node_path", $testQ."*");
@@ -685,24 +592,6 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
         if($results->getTotalHits() == 0) return null;
 
         return $results;
-    }
-
-    protected function lockIndex($repositoryId)
-    {
-        $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
-        if(!is_dir($iPath)) mkdir($iPath,0755, true);
-        touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
-    }
-
-    protected function isIndexLocked($repositoryId)
-    {
-        $test = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId;
-        return file_exists((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
-    }
-
-    protected function releaseLock($repositoryId)
-    {
-        @unlink((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
     /**
@@ -723,9 +612,7 @@ class AjxpElasticSearch extends AJXP_AbstractMetaSource
             $this->currentIndex->create();
         }
 
-        if ($this->currentType == null) {
-            $this->currentType = new Elastica\Type($this->currentIndex, "type_".$repositoryId);
-        }
+        $this->currentType = new Elastica\Type($this->currentIndex, "type_".$repositoryId);
 
         /* we fetch the last id we used to create a document and set the variable nextId */
         $this->lastIdPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/".$repositoryId."/last_id";
