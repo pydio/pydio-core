@@ -72,7 +72,7 @@ class smbAuthDriver extends AbstractAuthDriver
         if(!empty($domain)){
             $login = $domain.$login;
         }
-        $strTmp = "$login:$pass@".$host."/".$basePath."/".$smbPath."/";
+        $strTmp = "$login:$pass@".$host."/".$basePath."/";
         $strTmp = str_replace("//", "/",$strTmp);
         $url = "smb://".$strTmp;
         try {
