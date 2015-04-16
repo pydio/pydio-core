@@ -1006,11 +1006,17 @@ class ShareCenter extends AJXP_Plugin
         }
         if(!isSet($templateName)){
             $repoObject = ConfService::getRepositoryById($repository);
-            $filter = $repoObject->getContentFilter();
-            if(!empty($filter) && count($filter->virtualPaths) == 1){
+            if(!is_object($repoObject)){
+                $mess = ConfService::getMessages();
+                $error = $mess["share_center.166"];
                 $templateName = "ajxp_unique_strip";
             }else{
-                $templateName = "ajxp_shared_folder";
+                $filter = $repoObject->getContentFilter();
+                if(!empty($filter) && count($filter->virtualPaths) == 1){
+                    $templateName = "ajxp_unique_strip";
+                }else{
+                    $templateName = "ajxp_shared_folder";
+                }
             }
         }
         // UPDATE TEMPLATE
