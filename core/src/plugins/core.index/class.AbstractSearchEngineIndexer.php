@@ -9,6 +9,19 @@
 abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
 
     /**
+     * @param DOMNode $contribNode
+     */
+    public function parseSpecificContributions(&$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
+        if($contribNode->nodeName != "client_configs") return ;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
+        if(!$nodeList->length) return ;
+        $contribNode->removeChild($nodeList->item(0));
+    }
+
+    /**
      * @param AJXP_Node $ajxpNode
      * @return null|string
      */
@@ -61,6 +74,65 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
             return $asciiString;
         }
         return null;
+    }
+
+    /**
+     * @param String $query
+     * @return String mixed
+     */
+    protected function filterSearchRangesKeywords($query)
+    {
+        if (strpos($query, "AJXP_SEARCH_RANGE_TODAY") !== false) {
+            $t1 = date("Ymd");
+            $t2 = date("Ymd");
+            $query = str_replace("AJXP_SEARCH_RANGE_TODAY", "[$t1 TO  $t2]", $query);
+        } else if (strpos($query, "AJXP_SEARCH_RANGE_YESTERDAY") !== false) {
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_YESTERDAY", "[$t1 TO $t2]", $query);
+        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_WEEK") !== false) {
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-7, date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_WEEK", "[$t1 TO $t2]", $query);
+        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_MONTH") !== false) {
+            $t1 = date("Ymd", mktime(0,0,0,date('m')-1, date('d'), date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_MONTH", "[$t1 TO $t2]", $query);
+        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_YEAR") !== false) {
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')-1));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_YEAR", "[$t1 TO $t2]", $query);
+        }
+
+        $split = array_map("trim", explode("AND", $query));
+        foreach($split as $s){
+            list($k, $v) = explode(":", $s, 2);
+            if($k == "ajxp_bytesize"){
+                //list($from, $to) = sscanf($v, "[%s TO %s]");
+                preg_match('/\[(.*) TO (.*)\]/', $v, $matches);
+                $oldSize = $s;
+                $newSize = "ajxp_bytesize:[".intval(AJXP_Utils::convertBytes($matches[1]))." TO ".intval(AJXP_Utils::convertBytes($matches[2]))."]";
+            }
+        }
+        if(isSet($newSize) && isSet($oldSize)){
+            $query = str_replace($oldSize, $newSize, $query);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param String $repositoryId
+     * @param String $userId
+     * @return string
+     */
+    protected function buildSpecificId($repositoryId, $userId = null){
+        $specificId = "";
+        $specKey = $this->getFilteredOption("repository_specific_keywords");
+        if (!empty($specKey)) {
+            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey, $userId));
+        }
+        return $repositoryId.$specificId;
     }
 
 } 

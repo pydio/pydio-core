@@ -62,7 +62,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
     public function init($options)
     {
-        parent::init($options);;
+        parent::init($options);
         $metaFields = $this->getFilteredOption("index_meta_fields");
         $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($metaFields)) {
@@ -113,7 +113,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      * @param AJXP_Node $parentNode
      */
     public function indexationStarts($parentNode){
-        $this->loadIndex($parentNode->getRepositoryId(), true);
+        $this->loadIndex($parentNode->getRepositoryId(), true, $parentNode->getUser());
     }
 
     /**
@@ -145,6 +145,42 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 throw new Exception($messages["index.lucene.7"]);
             }
 
+            $textQuery = $httpVars["query"];
+            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
+                if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
+                    $textQuery = substr($textQuery, 1, -1);
+                }else if($textQuery[strlen($textQuery)-1] != "*" ){
+                    $textQuery.="*";
+                }
+            }
+
+
+            $this->currentIndex->open();
+            $fieldQuery = new Elastica\Query\QueryString();
+            $fieldQuery->setAllowLeadingWildcard(false);
+            $fieldQuery->setFuzzyMinSim(0.8);
+
+            if($textQuery == "*"){
+
+                $fields = array("ajxp_node");
+                $fieldQuery->setQuery("yes");
+                $fieldQuery->setFields($fields);
+
+            }else if(strpos($textQuery, ":") !== false){
+
+                // USE LUCENE DSL DIRECTLY (key1:value1 AND key2:value2...)
+                $textQuery = str_replace("ajxp_meta_ajxp_document_content:","body:", $textQuery);
+                $textQuery = $this->filterSearchRangesKeywords($textQuery);
+                $fieldQuery->setQuery($textQuery);
+
+            } else{
+
+                $fields = array("basename","ajxp_meta_*", "node_*","body");
+                $fieldQuery->setQuery($textQuery);
+                $fieldQuery->setFields($fields);
+
+            }
+
             /*
             TODO : READAPT QUERY WITH EACH FIELD
             if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
@@ -165,22 +201,8 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                  $this->logDebug("Query : $query");
             } else {
             */
-            $this->currentIndex->open();
-            $query = $httpVars["query"];
-            $fieldQuery = new Elastica\Query\QueryString();
 
             //}
-            //$this->setDefaultAnalyzer();
-            if ($query == "*") {
-                $fields = array("ajxp_node");
-                $fieldQuery->setQuery("yes");
-            } else {
-                $fields = array("basename","ajxp_meta_*", "node_*","body");
-                $fieldQuery->setQuery($query);
-            }
-            $fieldQuery->setFields($fields);
-            $fieldQuery->setAllowLeadingWildcard(false);
-            $fieldQuery->setFuzzyMinSim(0.8);
             /*
                 We create this object search because it'll allow us to fetch the number of results we want at once.
                 We just have to set some parameters, the query type and the size of the result set.
@@ -196,14 +218,20 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
                 \Elastica\Search::OPTION_SIZE => $maxResults);
 
-            $this->logDebug(__FUNCTION__,"Executing query: ", $query);
+            $this->logDebug(__FUNCTION__,"Executing query: ", $textQuery);
             $fullQuery = new Elastica\Query();
             $fullQuery->setQuery($fieldQuery);
 
-            // ADD SCOPE FILTER
-            $term = new Elastica\Filter\Term();
-            $term->setTerm("ajxp_scope", "shared");
-            $fullQuery->setPostFilter($term);
+            $qb = new Elastica\QueryBuilder();
+            $fullQuery = new Elastica\Query();
+            $fullQuery->setQuery(
+                $qb->query()->filtered(
+                    $fieldQuery,
+                    $qb->filter()->bool()
+                        ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "shared")))
+                )
+            );
+
 
             $result = $search->search($fullQuery, $searchOptions);
             $this->logDebug(__FUNCTION__,"Search finished. ");
@@ -236,7 +264,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             $scope = "user";
             try {
-                $this->loadIndex(ConfService::getRepository()->getId(), false);
+                $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 throw new Exception($messages["index.lucene.7"]);
             }
@@ -351,7 +379,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      */
     public function updateNodeIndexMeta($node)
     {
-        $this->loadIndex(ConfService::getRepository()->getId());
+        $this->loadIndex($node->getRepositoryId(), true, $node->getUser());
         if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
 
             $query = new Elastica\Query\Term();
@@ -387,9 +415,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     public function updateNodeIndex($oldNode, $newNode = null, $copy = false, $recursive = false)
     {
         if($oldNode == null){
-            $this->loadIndex($newNode->getRepositoryId());
+            $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
         }else{
-            $this->loadIndex($oldNode->getRepositoryId());
+            $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
         }
 
         if ($oldNode != null && $copy == false) {
@@ -412,14 +440,21 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             // Make sure it does not already exists anyway
             $newDocId = $this->getIndexedDocumentId($newNode);
             if ($newDocId != null) {
-                $this->currentType->deleteById($newDocId);
+                try{
+                    $this->currentType->deleteById($newDocId);
+                }catch (Elastica\Exception\NotFoundException $eEx){
+                    $this->logError(__FUNCTION__, "Trying to delete a non existing document");
+                }
                 $childrenHits = $this->getIndexedChildrenDocuments($newNode);
-
                 if ($childrenHits != null) {
                     $childrenHits = $childrenHits->getResults();
 
                     foreach ($childrenHits as $hit) {
-                        $this->currentType->deleteById($hit->getId());
+                        try{
+                            $this->currentType->deleteById($hit->getId());
+                        }catch (Elastica\Exception\NotFoundException $eEx){
+                            $this->logError(__FUNCTION__, "Trying to delete a non existing document");
+                        }
                     }
                 }
             }
@@ -473,6 +508,14 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $data["ajxp_node"] = "yes";
         $data["ajxp_scope"] = "shared";
         $data["serialized_metadata"] = base64_encode(serialize($ajxpNode->metadata));
+        $data["ajxp_modiftime"] = date("Ymd", $ajxpNode->ajxp_modiftime);
+        $data["ajxp_bytesize"] = $ajxpNode->bytesize;
+        $ajxpMime = $ajxpNode->ajxp_mime;
+        if (empty($ajxpMime)) {
+            $data["ajxp_mime"] = pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION);
+        } else {
+            $data["ajxp_mime"] = $ajxpNode->ajxp_mime;
+        }
 
         if (isSet($ajxpNode->indexableMetaKeys["shared"])) {
             foreach ($ajxpNode->indexableMetaKeys["shared"] as $sharedField) {
@@ -540,9 +583,10 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 $mapping_properties[$key] = array("type" => "string", "index" => "not_analyzed");
             } else if($key == "serialized_metadata"){
                 $mapping_properties[$key] = array("type" => "string" /*, "index" => "no" */);
+            } else if ($key == "ajxp_bytesize"){
+                $mapping_properties[$key] = array("type" => "long");
             } else {
                 $type = gettype($value);
-
                 if ($type != "integer" && $type != "boolean" && $type != "double") {
                     $type = "string";
                 }
@@ -599,23 +643,26 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      * load the index into the class parameter currentIndex
      * @param Integer $repositoryId
      * @param bool $create
+     * @param null $resolveUserId
      */
-    protected function loadIndex($repositoryId, $create = true)
+    protected function loadIndex($repositoryId, $create = true, $resolveUserId = null)
     {
-        $this->currentIndex = $this->client->getIndex($repositoryId);
+        $specificId = $this->buildSpecificId($repositoryId, $resolveUserId);
+
+        $this->currentIndex = $this->client->getIndex($specificId);
 
         /* if the cache directory for the repository index is not created we do create it */
-        $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/".$repositoryId;
+        $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/".$specificId;
         if(!is_dir($iPath)) mkdir($iPath,0755, true);
 
-        if (!$this->currentIndex->exists() && $create) {
+        if ($create && !$this->currentIndex->exists()) {
             $this->currentIndex->create();
         }
 
-        $this->currentType = new Elastica\Type($this->currentIndex, "type_".$repositoryId);
+        $this->currentType = new Elastica\Type($this->currentIndex, "type_".$specificId);
 
         /* we fetch the last id we used to create a document and set the variable nextId */
-        $this->lastIdPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/".$repositoryId."/last_id";
+        $this->lastIdPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/".$specificId."/last_id";
         if (file_exists($this->lastIdPath)) {
             $file = fopen($this->lastIdPath, "r");
             $this->nextId = floatval(fgets($file)) + 1;

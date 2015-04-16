@@ -34,7 +34,6 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     private $currentIndex;
     private $metaFields = array();
     private $indexContent = false;
-    private $specificId = "";
     private $verboseIndexation = false;
 
     public function init($options)
@@ -45,21 +44,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
-        if (!empty($specKey)) {
-            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
-        }
         $this->indexContent = ($this->getFilteredOption("index_content") == true);
-    }
-
-    public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
-        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
-        if($contribNode->nodeName != "client_configs") return ;
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
-        $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
-        if(!$nodeList->length) return ;
-        $contribNode->removeChild($nodeList->item(0));
     }
 
     public function initMeta($accessDriver)
@@ -115,32 +100,6 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(intval($this->getFilteredOption("WILDCARD_LIMITATION")));
 
-    }
-
-    protected function filterSearchRangesKeywords($query)
-    {
-        if (strpos($query, "AJXP_SEARCH_RANGE_TODAY") !== false) {
-            $t1 = date("Ymd");
-            $t2 = date("Ymd");
-            $query = str_replace("AJXP_SEARCH_RANGE_TODAY", "[$t1 TO  $t2]", $query);
-        } else if (strpos($query, "AJXP_SEARCH_RANGE_YESTERDAY") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
-            $query = str_replace("AJXP_SEARCH_RANGE_YESTERDAY", "[$t1 TO $t2]", $query);
-        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_WEEK") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-7, date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
-            $query = str_replace("AJXP_SEARCH_RANGE_LAST_WEEK", "[$t1 TO $t2]", $query);
-        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_MONTH") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m')-1, date('d'), date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
-            $query = str_replace("AJXP_SEARCH_RANGE_LAST_MONTH", "[$t1 TO $t2]", $query);
-        } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_YEAR") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')-1));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
-            $query = str_replace("AJXP_SEARCH_RANGE_LAST_YEAR", "[$t1 TO $t2]", $query);
-        }
-        return $query;
     }
 
     public function applyAction($actionName, $httpVars, $fileVars)
@@ -642,16 +601,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      */
     protected function getIndexPath($repositoryId, $resolveUserId = null){
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
-        $specificId = $this->specificId;
-        if($resolveUserId != null){
-            $specKey = $this->getFilteredOption("repository_specific_keywords");
-            if (!empty($specKey)) {
-                $specKey = str_replace("AJXP_USER", $resolveUserId, $specKey);
-                $specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
-            }
-        }
         if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
-        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$specificId;
+        $iPath = $mainCacheDir."/indexes/index-".$this->buildSpecificId($repositoryId, $resolveUserId);
         return $iPath;
     }
 
