@@ -183,4 +183,6 @@ $mess = array(
     "172" => "Spiacenti, il link è già in uso. Sceglierne un altro.",
     "173" => "Se desideri un link personalizzato e più duraturo (come https://.../my-share-link), puoi utilizzare questo campo. Un gestore link verrà generato automaticamente in caso contrario.",
     "174" => "Disabilita Password",
+    "175" => "Please set a password and make sure it's long enough!",
+    "176" => "(Mandatory)",
 );

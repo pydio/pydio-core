@@ -46,6 +46,18 @@ Class.create("ShareCenter", {
                 if(console) console.log(e);
             }
         });
+        var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
+        this.authorizations = {
+            folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+            folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+            file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+            editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+        };
+        var pass_mandatory = pluginConfigs.get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
     },
 
     performShareAction : function(dataModel){
@@ -56,6 +68,11 @@ Class.create("ShareCenter", {
         }else{
             userSelection =  ajaxplorer.getUserSelection();
         }
+        var pass_mandatory = ajaxplorer.getPluginConfigs("action.share").get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
         this.readonlyMode = this.currentNode.getMetadata().get('share_data') ? true : false;
@@ -94,14 +111,12 @@ Class.create("ShareCenter", {
 
     performShare: function(type){
         this.currentNode = ajaxplorer.getUserSelection().getUniqueNode();
-        var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
-        this.authorizations = {
-            folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
-            folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
-            file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
-            editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
-        };
 
+        var pass_mandatory = ajaxplorer.getPluginConfigs("action.share").get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
         if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
             alert('You are not authorized to share folders');
             return;
@@ -139,17 +154,24 @@ Class.create("ShareCenter", {
                 alert(MessageHash[349]);
                 return false;
             }
-            oForm.addClassName("share_edit");
-            var userSelection = ajaxplorer.getUserSelection();
-            var publicUrl = ajxpServerAccessPath+'&get_action=share';
-            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
-            var conn = new Connexion(publicUrl);
-            conn.setMethod("POST");
             var params = modal.getForm().serialize(true);
             var passwordField = modal.getForm().down('input[name="guest_user_pass"]');
             if(passwordField.readAttribute('data-password-set') === 'true' && !passwordField.getValue()){
                 delete params['guest_user_pass'];
             }
+            if(this.shareFolderMode == "minisite_public" && this.authorizations.password_mandatory && passwordField.readAttribute('data-password-set') !== 'true'
+                && ( !params['guest_user_pass'] || params['guest_user_pass'].length < parseInt(pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH")) ) ){
+                pydio.displayMessage('ERROR', MessageHash["share_center.175"]);
+                passwordField.addClassName("SF_failed");
+                modal.getForm().down('#generate_publiclet').show();
+                return;
+            }
+            var userSelection = ajaxplorer.getUserSelection();
+            var publicUrl = ajxpServerAccessPath+'&get_action=share';
+            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
+            var conn = new Connexion(publicUrl);
+            conn.setMethod("POST");
+            oForm.addClassName("share_edit");
             conn.setParameters(params);
             if(this._currentRepositoryId){
                 conn.addParameter("repository_id", this._currentRepositoryId);
@@ -389,23 +411,26 @@ Class.create("ShareCenter", {
                 }
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
-            if(!$('share_folder_form').autocompleter){
+            var shareFolderForm = oForm.down('#share_folder_form');
+            if(!shareFolderForm.autocompleter){
                 var pref = ajaxplorer.getPluginConfigs("action.share").get("SHARED_USERS_TMP_PREFIX");
-                $('share_folder_form').autocompleter = new AjxpUsersCompleter(
-                    $("shared_user"),
-                    $("shared_users_summary"),
+                shareFolderForm.autocompleter = new AjxpUsersCompleter(
+                    oForm.down("#shared_user"),
+                    oForm.down("#shared_users_summary"),
                     $("shared_users_autocomplete_choices"),
                     {
                         tmpUsersPrefix:pref,
                         updateUserEntryAfterCreate:updateUserEntryAfterCreate,
-                        indicator: $("complete_indicator"),
+                        indicator: oForm.down("#complete_indicator"),
                         minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }
                 );
             }
+            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', this.authorizations.password_placeholder);
             if(this.readonlyMode){
-                $("shared_user").disabled = true;
+                oForm.down("#shared_user").disabled = true;
             }
+            var openBlocks = null;
             this._currentRepositoryId = null;
             this._currentRepositoryLink = null;
             this._currentRepositoryLabel = null;
@@ -433,18 +458,34 @@ Class.create("ShareCenter", {
                         if(json['password']){
                             oForm.down('input[name="guest_user_pass"]').setValue(json['password']);
                         }
+                        var passwordField = oForm.down('input[name="guest_user_pass"]');
+                        var passwordButton = oForm.down('#remove_user_pass');
+                        var protopassContainer = oForm.down('#password_strength_checker');
                         if(json['has_password']){
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', '***********');
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'true');
-                            oForm.down('#remove_user_pass').show();
-                            oForm.down('#remove_user_pass').observeOnce('click', function(){
-                                oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
-                                oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', MessageHash['share_center.148']);
-                                oForm.down('#remove_user_pass').hide();
+                            var placeholder = this.authorizations.password_placeholder;
+                            passwordField.writeAttribute('placeholder', '***********');
+                            passwordField.writeAttribute('data-password-set', 'true');
+                            protopassContainer.hide();
+                            passwordButton.show();
+                            passwordButton.observeOnce('click', function(){
+                                passwordField.writeAttribute('data-password-set', 'false');
+                                passwordField.writeAttribute('placeholder', placeholder);
+                                passwordButton.hide();
+                                protopassContainer.show();
+                                new Protopass(passwordField, {
+                                    barContainer : protopassContainer,
+                                    barPosition:'bottom',
+                                    labelWidth: 28
+                                });
                             });
                         }else{
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
-                            oForm.down('#remove_user_pass').hide();
+                            passwordField.writeAttribute('data-password-set', 'false');
+                            passwordButton.hide();
+                            new Protopass(passwordField, {
+                                barContainer : protopassContainer,
+                                barPosition:'bottom',
+                                labelWidth: 28
+                            });
                         }
                         if(json['expire_time']){
                             oForm.down('input[name="expiration"]').setValue(json['expire_after']);
@@ -515,7 +556,14 @@ Class.create("ShareCenter", {
                 if(this.authorizations.editable_hash){
                     oForm.down('#editable_hash_link').insert({top:MessageHash['share_center.171'] + ': '});
                 }
-
+                if(this.authorizations.password_mandatory){
+                    openBlocks = ["security_parameters"];
+                }
+                new Protopass(oForm.down('input[name="guest_user_pass"]'), {
+                    barContainer : oForm.down('#password_strength_checker'),
+                    barPosition:'bottom',
+                    labelWidth: 28
+                });
                 if(this.shareFolderMode != "workspace"){
                     var generateButton = oForm.down("#generate_publiclet");
                     var container = oForm.down('.layout_template_container');
@@ -558,14 +606,16 @@ Class.create("ShareCenter", {
             if(!reload){
                 window.setTimeout(modal.refreshDialogPosition.bind(modal), 400);
             }
-            this.accordionize(oForm);
+            this.accordionize(oForm, openBlocks);
 
         }.bind(this);
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
+                /*
                 if($(document.body).down("#shared_users_autocomplete_choices")){
                     $(document.body).down("#shared_users_autocomplete_choices").remove();
                 }
+                */
                 if($(document.body).down("#shared_users_autocomplete_choices_iefix")){
                     $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
                 }
@@ -733,14 +783,17 @@ Class.create("ShareCenter", {
 
     },
 
-    accordionize: function(form){
+    accordionize: function(form, openBlocks){
 
         form.select('div[data-toggleBlock]').each(function(toggler){
 
-            var toggled = form.down('#' + toggler.readAttribute('data-toggleBlock'));
+            var toggleName = toggler.readAttribute('data-toggleBlock');
+            var toggled = form.down('#' + toggleName);
             if(!toggled) return;
 
-
+            if(openBlocks && openBlocks.indexOf(toggleName) > -1){
+                toggled.addClassName('share_dialog_toggled_open');
+            }
             toggler.addClassName('share_dialog_toggler');
             var initialHeight = toggled.getHeight();
             if(initialHeight){

@@ -213,6 +213,7 @@ class ShareCenter extends AJXP_Plugin
                 } else {
                     $httpVars["expiration"] = min($expiration,$maxexpiration);
                 }
+                $forcePassword = $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository->getId());
                 $httpHash = null;
                 $originalHash = null;
 
@@ -234,6 +235,13 @@ class ShareCenter extends AJXP_Plugin
                         if($httpVars["simple_share_type"] == "private" && !isSet($httpVars["guest_user_pass"])){
                             throw new Exception("Please provide a guest_user_pass for private link");
                         }
+                    }
+                    if($forcePassword && (
+                        (isSet($httpVars["create_guest_user"]) && $httpVars["create_guest_user"] == "true" && empty($httpVars["guest_user_pass"]))
+                        || (isSet($httpVars["guest_user_id"]) && isSet($httpVars["guest_user_pass"]) && $httpVars["guest_user_pass"] == "")
+                        )){
+                        $mess = ConfService::getMessages();
+                        throw new Exception($mess["share_center.175"]);
                     }
                     $res = $this->createSharedMinisite($httpVars, $this->repository, $this->accessDriver);
                     if (!is_array($res)) {

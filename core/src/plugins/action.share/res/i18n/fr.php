@@ -185,5 +185,7 @@ $mess = array(
     "171" => "Lien Personnalisé",
     "172" => "Désolé ce lien est déjà utilisé, veuillez en choisir un autre.",
     "173" => "Si vous voulez créer un lien durable, vous pouvez utiliser ce champ pour fixer la dernière partie du lien (e.g. https://.../mon-joli-lien). Laisser vide pour générer automatiquement.",
-    "174" => "Désactiver le mot de passe",
+    "174" => "Remettre à zéro",
+    "175" => "Please set a password and make sure it's long enough!",
+    "176" => "(Mandatory)",
 );
