@@ -1479,6 +1479,7 @@ div.dialogBox.form-diaporama_box div.dialogContent{
     float:left;
     width:280px;
     background-color: rgba(50,50,50,0.93);
+    background-color: rgb(50,50,50)\9;
 }
 
 #cpane_container {
@@ -3370,6 +3371,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     font-size: 12px;
     padding: 0;
     background-color: rgba(63, 63, 63, 0.96);
+    background-color: rgb(63, 63, 63)\9;
     float: left;
     width: 0;
     overflow: hidden;
@@ -3918,6 +3920,7 @@ div.foldedPanel_tooltip td{
     font-size: 13px;
     letter-spacing: 1px;
     background-color: rgba(107, 107, 107, 0.87);
+    background-color: rgb(107, 107, 107)\9;
     color: #fff;
     font-family: "Open Sans Regular", Helvetica, sans-serif;
     -webkit-font-smoothing:auto;
@@ -4165,6 +4168,7 @@ div.infoPanelAllMetadata span.meta_user_tag_block {
     font-size: 0.7em;
     display: inline-block;
     background-color: rgba(52, 94, 121, 0.78);
+    background-color: rgb(52, 94, 121)\9;
     color: white;
     padding: 0 7px;
     border-radius: 4px;
@@ -5384,7 +5388,7 @@ span.letter_badge {
 span#alerts_number {
     display: inline-block;
     font-size: 13px;
-    background-color: rgba(245, 199, 129, 1);
+    background-color: rgb(245, 199, 129);
     color: black;
     border-radius: 20px;
     padding: 0 6px;
@@ -5650,6 +5654,7 @@ div.menuActions img{
     padding: 4px 7px 6px 7px;
     color: #fff;
     background-color: rgba(119, 184, 226, 0.62);
+    background-color: rgb(119, 184, 226)\9;
     z-index: 10000;
     border-radius: 3px 3px 0 0;
     width: 25%;
