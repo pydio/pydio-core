@@ -648,14 +648,26 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($toMirrors[$repoId])){
                     list($tNode, $tDirection) = $toMirrors[$repoId];
                     unset($toMirrors[$repoId]);
-                    AJXP_Controller::applyHook("node.change", array($fNode, $tNode, $copy, $fDirection), true);
+                    try{
+                        AJXP_Controller::applyHook("node.change", array($fNode, $tNode, $copy, $fDirection), true);
+                    }catch(Exception $e){
+                        $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
+                    }
                 }else{
+                    try{
                     AJXP_Controller::applyHook("node.change", array($fNode, null, $copy, $fDirection), true);
+                    }catch(Exception $e){
+                        $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
+                    }
                 }
             }
             foreach($toMirrors as $mirror){
                 list($tNode, $tDirection) = $mirror;
+                try{
                 AJXP_Controller::applyHook("node.change", array(null, $tNode, $copy, $tDirection), true);
+                }catch(Exception $e){
+                    $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
+                }
             }
         }
 
