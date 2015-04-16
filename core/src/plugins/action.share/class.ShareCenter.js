@@ -1211,7 +1211,6 @@ Class.create("ShareCenter", {
                 if(this.shareFolderMode == 'workspace' && oForm) {
                     usersList = oForm.down(".editable_users_list");
                 }
-                console.log(mailerShower);
                 modal.showSimpleModal(
                     mailerShower,
                     mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
@@ -1245,7 +1244,6 @@ Class.create("ShareCenter", {
         }
 
         // QRCODE BUTTON
-        console.log(dialogButtonsOrRow);
         var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
         if (this.createQRCode) {
             if(!qrcodediv){
