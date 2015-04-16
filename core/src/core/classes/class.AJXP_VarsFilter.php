@@ -33,7 +33,7 @@ class AJXP_VarsFilter
      * Calls the vars.filter hooks.
      * @static
      * @param $value
-     * @param AbstractAjxpUser $resolveUser
+     * @param AbstractAjxpUser|String $resolveUser
      * @return mixed|string
      */
     public static function filter($value, $resolveUser = null)
@@ -41,7 +41,12 @@ class AJXP_VarsFilter
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
             if (AuthService::usersEnabled()) {
                 if($resolveUser != null){
-                    $value = str_replace("AJXP_USER", $resolveUser->getId(), $value);
+                    if(is_string($resolveUser)){
+                        $resolveUserId = $resolveUser;
+                    } else {
+                        $resolveUserId = $resolveUser->getId();
+                    }
+                    $value = str_replace("AJXP_USER", $resolveUserId, $value);
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
                     if ($loggedUser != null) {
@@ -62,7 +67,11 @@ class AJXP_VarsFilter
         if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
             if (AuthService::usersEnabled()) {
                 if($resolveUser != null){
-                    $loggedUser = $resolveUser;
+                    if(is_string($resolveUser) && AuthService::userExists($resolveUser)){
+                        $loggedUser = ConfService::getConfStorageImpl()->createUserObject($resolveUser);
+                    }else{
+                        $loggedUser = $resolveUser;
+                    }
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
                 }

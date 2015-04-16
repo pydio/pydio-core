@@ -704,7 +704,8 @@ class AJXP_Utils
             return intval($value);
         } else {
             $value_length = strlen($value);
-            $qty = substr($value, 0, $value_length - 1);
+            $value = str_replace(",",".", $value);
+            $qty = floatval(substr($value, 0, $value_length - 1));
             $unit = strtolower(substr($value, $value_length - 1));
             switch ($unit) {
                 case 'k':
