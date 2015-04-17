@@ -253,6 +253,10 @@ class AJXP_PluginsService
         // First make sure that the given dependencies are present
         foreach ($arrayToSort as $plugId => $plugObject) {
             $plugObject->updateDependencies($this);
+            if($plugObject->hasMissingExtensions()){
+                unset($arrayToSort[$plugId]);
+                continue;
+            }
             $dependencies = $plugObject->getDependencies();
             if(!count($dependencies)) continue;// return ;
             $found = false;
@@ -399,7 +403,7 @@ class AJXP_PluginsService
             $pObject->init(array());
             try {
                 $pObject->performChecks();
-                if(!$pObject->isEnabled()) continue;
+                if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
                 $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
             } catch (Exception $e) {
                 //$this->errors[$pName] = "[$pName] ".$e->getMessage();

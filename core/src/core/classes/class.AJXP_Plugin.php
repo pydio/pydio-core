@@ -55,6 +55,7 @@ class AJXP_Plugin implements Serializable
     protected $pluginConf; // can be passed at load time
     protected $pluginConfDefinition;
     protected $dependencies;
+    protected $extensionsDependencies;
     protected $streamData;
     protected $mixins = array();
     public $loadingState = "";
@@ -85,7 +86,7 @@ class AJXP_Plugin implements Serializable
         "contributionsLoaded",
         "mixins",
         "streamData",
-        "options", "pluginConf", "pluginConfDefinition", "dependencies", "loadingState", "manifestXML");
+        "options", "pluginConf", "pluginConfDefinition", "dependencies", "extensionsDependencies", "loadingState", "manifestXML");
 
     /**
      * Construction method
@@ -102,6 +103,7 @@ class AJXP_Plugin implements Serializable
         $this->name = $split[1];
         $this->actions = array();
         $this->dependencies = array();
+        $this->extensionsDependencies = array();
     }
 
     protected function getPluginWorkDir($check = false)
@@ -487,6 +489,11 @@ class AJXP_Plugin implements Serializable
             $value = $attr->value;
             $this->dependencies = array_merge($this->dependencies, explode("|", $value));
         }
+        $extPaths = "dependencies/phpExtension/@name";
+        $nodes = $this->xPath->query($extPaths);
+        foreach ($nodes as $attr) {
+            $this->extensionsDependencies[] = $attr->value;
+        }
     }
     /**
      * Update dependencies dynamically
@@ -644,6 +651,23 @@ class AJXP_Plugin implements Serializable
         if(!$files->length) return false;
         return $this->nodeAttrToHash($files->item(0));
     }
+
+    public function missingExtensions(){
+        $missing = array();
+        if(count($this->extensionsDependencies)){
+            foreach($this->extensionsDependencies as $ext){
+                if (!extension_loaded($ext)) {
+                    $missing[] = $ext;
+                }
+            }
+        }
+        return $missing;
+    }
+
+    public function hasMissingExtensions(){
+        return count($this->missingExtensions()) > 0;
+    }
+
     /**
      * @return bool
      */

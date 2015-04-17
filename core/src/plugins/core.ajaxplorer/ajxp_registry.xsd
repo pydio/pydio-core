@@ -765,6 +765,7 @@
         <xs:complexType>
             <xs:choice maxOccurs="unbounded">
                 <xs:element ref="activePlugin"/>
+                <xs:element ref="phpExtension"/>
                 <xs:element ref="pluginClass"/>
                 <xs:element name="pluginResources">
                     <xs:complexType>
@@ -777,6 +778,11 @@
     <xs:element name="activePlugin">
         <xs:complexType>
             <xs:attribute name="pluginName" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="phpExtension">
+        <xs:complexType>
+            <xs:attribute name="name" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="pluginClass">
