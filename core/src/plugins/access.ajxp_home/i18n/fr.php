@@ -42,8 +42,8 @@ $mess=array(
 "57"=> "Télécharger APPLICATION_TITLE pour...",
 "58"=> "Appareil Android",
 "59"=> "iPhone / iPad",
-"60"=>"Mac OS (Beta)",
-"61"=>"Windows (Beta)",
+"60"=>"Mac OS",
+"61"=>"Windows",
 "62"=>"<h2>Bien débuter</h2>
             Cette vidéo vous expliquera le fonctionnement de l'application web (anglais) :
             <ul>

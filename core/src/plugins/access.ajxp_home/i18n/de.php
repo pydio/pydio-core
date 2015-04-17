@@ -43,8 +43,8 @@ $mess=array(
     "57"=> "APPLICATION_TITLE herunterladen für...",
     "58"=> "Android-Geräte",
     "59"=> "iPhone/iPad",
-    "60"=>"Mac OS (Beta)",
-    "61"=>"Windows (Beta)",
+    "60"=>"Mac OS",
+    "61"=>"Windows",
     "62"=>"<h2>Erste Schritte</h2>
             Dieses Video gibt eine Einführung zur APPLICATION_TITLE Webapplikation:
             <ul>
