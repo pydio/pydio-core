@@ -513,7 +513,7 @@ Class.create("ShareCenter", {
                         }catch(e){}
                         oForm.down('#simple_right_download').checked = !(json.minisite.disable_download);
                         if(json.entries && json.entries.length){
-                            oForm.down('#simple_right_read').checked = (json.entries[0].RIGHT.indexOf('r') !== -1);
+                            oForm.down('#simple_right_read').checked = (json.entries[0].RIGHT.indexOf('r') !== -1 && json['minisite_layout']!='ajxp_unique_dl');
                             oForm.down('#simple_right_write').checked = (json.entries[0].RIGHT.indexOf('w') !== -1);
                         }
                         if(this.authorizations.editable_hash && this._currentMinisiteHash){
