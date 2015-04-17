@@ -1757,7 +1757,7 @@ class ShareCenter extends AJXP_Plugin
                 if (!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])) {
                     $index++;
                     continue;
-                } else if (AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])) {
+                } else if (AuthService::userExists($u, "w") && isSet($httpVars["user_pass_".$index])) {
                     throw new Exception("User $u already exists, please choose another name.");
                 }
                 if(!AuthService::userExists($u, "r") && !empty($prefix)
