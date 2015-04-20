@@ -210,13 +210,13 @@ Class.create("AjxpBootstrap", {
 	 */
 	detectBaseParameters : function(){
 		$$('script').each(function(scriptTag){
-			if(scriptTag.src.match("/js/ajaxplorer_boot") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
+			if(scriptTag.src.match("/js/ajaxplorer_boot") || scriptTag.src.match("/js/pydio/class.AjxpBootstrap.js")){
 				if(scriptTag.src.match("/js/ajaxplorer_boot")){
 					this.parameters.set("debugMode", false);
 				}else{
 					this.parameters.set("debugMode", true);
 				}
-                var src = scriptTag.src.replace('/js/ajaxplorer/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', '');
+                var src = scriptTag.src.replace('/js/pydio/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', '');
                 if(src.indexOf("?")!=-1) src = src.split("?")[0];
 				this.parameters.set("ajxpResourcesFolder", src);
 			}

@@ -3,7 +3,7 @@ js/lib/prototype/prototype.livepipe.js
 js/lib/prototype/prototype.oo.js
 js/lib/modernizr/modernizr.min.js
 js/lib/prototype/jsProgressBarHandler.js
-js/ajaxplorer/class.Connexion.js
-js/lib/md5/md5.js
-js/ajaxplorer/ajxp_utils.js
-js/ajaxplorer/class.AjxpBootstrap.js
+js/pydio/http/class.Connexion.js
+js/pydio/util/md5.js
+js/pydio/util/ajxp_utils.js
+js/pydio/class.AjxpBootstrap.js
