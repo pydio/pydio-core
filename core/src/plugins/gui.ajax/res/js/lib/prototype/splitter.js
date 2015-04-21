@@ -216,6 +216,7 @@ Class.create("Splitter", AjxpPane, {
             this.paneB.remove();
             this.paneB = null;
         }
+        try{pydio.UI.removeInstanceFromCache(this.htmlElement.id);}catch(e){}
     },
 
     getFoldingAction : function(){

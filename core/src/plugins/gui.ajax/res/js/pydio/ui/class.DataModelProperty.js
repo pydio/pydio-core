@@ -23,7 +23,8 @@ Class.create("DataModelProperty", {
     __implements: ["IAjxpWidget"],
 
     initialize: function(element, options){
-
+        this.element = element;
+        this.element.ajxpPaneObject = this;
         options = Object.extend({
             dmID: "ajaxplorer-global"
         }, options);
@@ -34,7 +35,7 @@ Class.create("DataModelProperty", {
             dm = $(options.dmID).ajxpPaneObject.getDataModel();
         }
         if(!dm) return;
-        dm.getRootNode().observe("loaded", function(){
+        this.observer = function(){
             switch (options.property){
                 case "root_children":
                     var l = dm.getRootNode().getChildren().length;
@@ -56,14 +57,23 @@ Class.create("DataModelProperty", {
             }
 
 
-        }.bind(this));
-
+        }.bind(this);
+        dm.getRootNode().observe("loaded", this.observer);
+        this.dm = dm;
     },
 
     resize : function(){},
     showElement : function(show){},
     getDomNode : function(){},
-    destroy : function(){}
+    destroy : function(){
+        if(this.dm && this.dm.getRootNode()){
+            this.dm.getRootNode().stopObserving(this.observer);
+        }
+        try{
+            pydio.UI.removeInstanceFromCache(this.element.id);
+        }catch(e){}
+        this.element = null;
+    }
 
 
 });

@@ -129,9 +129,7 @@ Class.create("FoldersTree", AjxpPane, {
         });
         if(this.scrollbar) this.scrollbar.destroy();
         if(this.tree) this.tree.destroy();
-        if(window[this.htmlElement.id]){
-            try{delete window[this.htmlElement.id];}catch(e){}
-        }
+        try{pydio.UI.removeInstanceFromCache(this.htmlElement.id);}catch(e){}
         $super();
     },
 

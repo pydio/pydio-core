@@ -32,9 +32,13 @@ Class.create("PydioUI", {
         this._editorOpener = null;
         this._messageBoxReference = null;
 
+        this._instancesCache = $H();
     },
 
 
+    removeInstanceFromCache: function(instanceId){
+        this._instancesCache.unset(instanceId);
+    },
     /**
      *
      * @param passedTarget
@@ -193,7 +197,7 @@ Class.create("PydioUI", {
                 var el = compRegistry[i-1];
                 var ajxpId = el.ajxpId;
                 compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
-                window[ajxpId] = compRegistry[i-1];
+                this._instancesCache.set(ajxpId, compRegistry[i-1]);
                 lastInst = compRegistry[i-1];
             }
             if(lastInst){
@@ -307,9 +311,9 @@ Class.create("PydioUI", {
      * @param cdataContent
      */
     refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
-        if(!window[ajxpId]) return;
+        if(!this._instancesCache.get(ajxpId)) return;
         // First destroy current component, unregister actions, etc.
-        var oldObj = window[ajxpId];
+        var oldObj = this._instancesCache.get(ajxpId);
         if(!oldObj.__className) {
             if(!$(ajxpId)) return;
             oldObj = $(ajxpId).ajxpPaneObject;
@@ -356,7 +360,7 @@ Class.create("PydioUI", {
 
         obj.__ajxpOptionsString = ajxpOptionsString;
 
-        window[ajxpId] = obj;
+        this._instancesCache.set(ajxpId, obj);
         obj.resize();
         delete(oldObj);
     },
@@ -445,7 +449,7 @@ Class.create("PydioUI", {
 
 
 
-    getRegisteredComponentsByClassName(className){
+    getRegisteredComponentsByClassName: function(className){
         return this._guiCompRegistry.select(function(guiComponent){
             return (guiComponent.__className == className);
         });

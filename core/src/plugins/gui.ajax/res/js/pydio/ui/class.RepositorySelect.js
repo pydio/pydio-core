@@ -56,7 +56,8 @@ Class.create("RepositorySelect", {
 	 * Implementation of the IAjxpWidget methods
 	 */	
 	destroy : function(){
-		this.element = null;
+        try{pydio.UI.removeInstanceFromCache(this.element.id);}catch(e){}
+        this.element = null;
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
         if(this.repoMenu){
             this.repoMenu.destroy();

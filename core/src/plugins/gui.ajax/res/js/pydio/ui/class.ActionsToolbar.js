@@ -95,7 +95,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 	getDomNode : function(){
 		return this.element;
 	},
-	destroy : function(){
+	destroy : function($super){
 		this.emptyToolbars();
         if(this.options.manager){
             this.options.manager.stopObserving("actions_loaded", this.actionsLoadedObserver);
@@ -107,6 +107,7 @@ Class.create("ActionsToolbar", AjxpPane, {
         }
         document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );
         if(this.styleObserver) document.stopObserving("ajaxplorer:user_logged", this.styleObserver);
+        $super();
 	},
 
     /**

@@ -259,9 +259,7 @@ Class.create("FilesList", SelectableElements, {
         this.empty(true);
         $super();
         this._clearObservers();
-        if(window[this.htmlElement.id]){
-            try{delete window[this.htmlElement.id];}catch(e){}
-        }
+        try{pydio.UI.removeInstanceFromCache(this.htmlElement.id);}catch(e){}
         if(this.boundSizeEvents){
             this.boundSizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);

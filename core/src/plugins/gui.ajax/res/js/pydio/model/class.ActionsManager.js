@@ -99,15 +99,15 @@ Class.create("ActionsManager", {
         }
     },
 
-    updateGuiActions(actions){
+    updateGuiActions: function(actions){
         this._guiActions.update(actions);
     },
 
-    deleteFromGuiActions(actionName){
+    deleteFromGuiActions: function(actionName){
         this._guiActions.unset(actionName);
     },
 
-    refreshGuiActionsI18n(){
+    refreshGuiActionsI18n: function(){
         this._guiActions.each(function(pair){
             pair.value.refreshFromI18NHash();
         });

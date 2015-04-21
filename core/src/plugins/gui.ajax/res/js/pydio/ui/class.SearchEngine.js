@@ -573,20 +573,13 @@ Class.create("SearchEngine", AjxpPane, {
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
         document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
-        /*
-        if(this.ctxChangeObserver){
-            document.stopObserving("ajaxplorer:context_changed", this.ctxChangeObserver);
-        }
-        */
         if(this.boundSizeEvents){
             this.boundSizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);
             });
         }
 		this.htmlElement = null;
-        if(ajxpId && window[ajxpId]){
-            try {delete window[ajxpId];}catch(e){}
-        }
+        try{pydio.UI.removeInstanceFromCache(ajxpId);}catch(e){}
 	},
     /**
      * Initialise the options for search Metadata

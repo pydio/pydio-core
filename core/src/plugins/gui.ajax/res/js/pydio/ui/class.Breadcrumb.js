@@ -163,9 +163,9 @@ Class.create("Breadcrumb", AjxpPane, {
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */	
-	destroy : function(){
+	destroy : function($super){
         document.stopObserving("ajaxplorer:context_changed",this.observerFunc);
-		this.element = null;
+		$super();
 	},
 
 	/**
