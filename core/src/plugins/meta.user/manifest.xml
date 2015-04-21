@@ -51,7 +51,7 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        ajaxplorer.actionBar.fireAction("edit_user_meta");
+                        pydio.getController().fireAction("edit_user_meta");
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -98,7 +98,7 @@
 						var closeFunc = function(){
 							var oForm = $(modal.getForm());
 							userSelection.updateFormOrUrl(modal.getForm());
-							ajaxplorer.actionBar.submitForm(oForm);
+							pydio.getController().submitForm(oForm);
 							hideLightBox(true);
 							return false;
 						};

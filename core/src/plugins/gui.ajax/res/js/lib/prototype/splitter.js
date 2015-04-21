@@ -204,7 +204,7 @@ Class.create("Splitter", AjxpPane, {
         document.stopObserving("ajaxplorer:component_config_changed", this.compConfigObs);
         this.splitbar.remove();
         this.getActions().each(function(act){
-            ajaxplorer.guiActions.unset(act.key);
+            pydio.getController().deleteFromGuiActions(act.key);
         }.bind(this));
         if(this.paneA.ajxpPaneObject) {
             this.paneA.ajxpPaneObject.destroy();
@@ -219,7 +219,7 @@ Class.create("Splitter", AjxpPane, {
     },
 
     getFoldingAction : function(){
-        return ajaxplorer.actionBar.getActionByName(this.htmlElement.id + "_folding_action");
+        return pydio.getController().getActionByName(this.htmlElement.id + "_folding_action");
     },
 
     /**

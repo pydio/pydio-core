@@ -32,13 +32,13 @@
                             conn.addParameter("unlock", "true");
                         }
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     ]]></clientCallback>
                     <clientListener name="selectionChange"><![CDATA[
 					if(ajaxplorer){
-						var action = ajaxplorer.getActionBar().getActionByName("sl_lock");
+						var action = pydio.getController().getActionByName("sl_lock");
 						var n = ajaxplorer.getUserSelection().getUniqueNode();
                         if(action && n){
                             action.selectionContext.allowedMimes = $([]);

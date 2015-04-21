@@ -28,8 +28,8 @@ Class.create("WebDAVprefsEditor", AjxpPane, {
         var cont = element.down('#webdav_repo_list');
         cont.update('');
         var activator = element.down("#webdav_activator");
-        element.down('#webdav_password').observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
-        element.down('#webdav_password').observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
+        element.down('#webdav_password').observe("focus", function(){pydio.UI.disableAllKeyBindings()});
+        element.down('#webdav_password').observe("blur", function(){pydio.UI.enableAllKeyBindings()});
 
         var even = false;
         var conn = new Connexion();

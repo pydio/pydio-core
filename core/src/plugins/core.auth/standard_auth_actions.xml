@@ -76,7 +76,7 @@
 									hideLightBox(true);
 								}
 								if(logout){
-								    ajaxplorer.actionBar.fireAction("logout");
+								    pydio.getController().fireAction("logout");
 								}
 							};
 							var conn = new Connexion();

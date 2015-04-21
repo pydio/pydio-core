@@ -94,7 +94,7 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.remove();
             this.titleDiv = null;
         }
-        var defaultImage = ajaxplorer.getDefaultImageFromParameters(this._imagePlugin, this._imageParameter);
+        var defaultImage = pydio.Registry.getDefaultImageFromParameters(this._imagePlugin, this._imageParameter);
         if((configs.get(this._imageParameter) || defaultImage) && configs.get(this._imageParameter) != 'ajxp-remove-original'){
             var parameter = 'binary_id';
             if(configs.get( this._imageParameter + "_ISTMP")){

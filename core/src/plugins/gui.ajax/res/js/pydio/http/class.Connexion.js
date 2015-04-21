@@ -185,8 +185,8 @@ Class.create("Connexion", {
 					ajaxplorer._contextHolder.setContextNode(root);
 					root.clear();
 				}
-				ajaxplorer.actionBar.fireAction('logout');
-				ajaxplorer.actionBar.fireAction('login');
+				pydio.getController().fireAction('logout');
+				pydio.getController().fireAction('login');
 			}
 			var messageNode = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
 			if(messageNode){

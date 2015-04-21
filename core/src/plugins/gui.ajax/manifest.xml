@@ -529,7 +529,7 @@
                             var dm = ajaxplorer.getContextHolder();
                             var nodes = dm.getSelectedNodes();
                             if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                             }
                         }catch(e){}
                     });
@@ -546,7 +546,7 @@
                                 var root = dm.getRootNode();
                                 if(root.getChildren().length){
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -666,7 +666,7 @@
                                         return;
                                     }
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }

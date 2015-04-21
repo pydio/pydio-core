@@ -58,10 +58,10 @@ Class.create("FoldersTree", AjxpPane, {
 		var thisObject = this;
 		var action = function(e){
 			if(!ajaxplorer) return;
-			ajaxplorer.focusOn(thisObject);
+			pydio.UI.focusOn(thisObject);
 			if(this.ajxpNode){
                 if(ajaxplorer.getUserSelection().getContextNode() != this.ajxpNode){
-                    ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
+                    pydio.getController().fireDefaultAction("dir", this.ajxpNode);
                 }
                 ajaxplorer.getUserSelection().setSelectedNodes([this.ajxpNode], thisObject);
 			}
@@ -84,7 +84,7 @@ Class.create("FoldersTree", AjxpPane, {
 			this.tree.toggle();		
 		}
 		this.treeContainer.observe("click", function(){			
-			ajaxplorer.focusOn(this);
+			pydio.UI.focusOn(this);
 		}.bind(this));
 	
 		this.rootNodeId = this.tree.id;

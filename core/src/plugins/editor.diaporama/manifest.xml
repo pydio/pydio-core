@@ -58,13 +58,13 @@
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-						var editors = ajaxplorer.findEditorsForMime(selectedMime);
+						var editors = pydio.Registry.findEditorsForMime(selectedMime);
 						var editorData;
 						if(editors.length){
 							editorData = editors[0];
 						}
 						if(editorData){
-							ajaxplorer.loadEditorResources(editorData.resourcesManager);
+							pydio.Registry.loadEditorResources(editorData.resourcesManager);
 							modal.openEditorDialog(editorData);
 						}else{
 							alert('no data found!');

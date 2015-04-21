@@ -259,7 +259,7 @@ Class.create("InfoPanel", AjxpPane, {
         this.contentContainer.select('[data-ajxpAction]').each(function(act){
             if(act.getAttribute('data-ajxpAction') != 'no-action'){
                 act.observe('click', function(event){
-                    window.ajaxplorer.actionBar.fireAction(event.target.getAttribute('data-ajxpAction'));
+                    window.pydio.getController().fireAction(event.target.getAttribute('data-ajxpAction'));
                 }.bind(this));
             }else{
                 act.setStyle({cursor:"default"});
@@ -321,7 +321,7 @@ Class.create("InfoPanel", AjxpPane, {
         if(ajxpAction){
             ic.addClassName('clickable');
             ic.observe("click", function(){
-                ajaxplorer.actionBar.fireAction(ajxpAction);
+                pydio.getController().fireAction(ajxpAction);
             }.bind(this));
         }
         if(panelPointer){
@@ -524,7 +524,7 @@ Class.create("InfoPanel", AjxpPane, {
                 if(!this.actionsToolbars) this.actionsToolbars= $A();
                 var bar = new ActionsToolbar(placeholder, {
                     toolbarsList : $A([tbId]),
-                    manager:ajaxplorer.actionBar
+                    manager:pydio.getController()
                 });
                 bar.actionsLoaded();
                 if(bar.registeredButtons){
@@ -543,7 +543,7 @@ Class.create("InfoPanel", AjxpPane, {
             }.bind(this));
         }
         if(this.options.skipActions) return;
-		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
+		var actions = pydio.getController().getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
 		if(!actions.length) return;
 		var actionString = '<div class="panelHeader infoPanelGroup">'+MessageHash[5]+'</div><div class="infoPanelActions">';
 		var count = 0;
@@ -553,7 +553,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;
             var id ="";
             if(action.options.name) id = 'id="action_instance_'+action.options.name+'"';
-			actionString += '<a href="" '+id+' onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
+			actionString += '<a href="" '+id+' onclick="pydio.getController().fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';
@@ -569,10 +569,10 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	getPreviewElement : function(ajxpNode, getTemplateElement, rich){
         if(rich == undefined) rich = true;
-		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime(), true);
+		var editors = pydio.Registry.findEditorsForMime(ajxpNode.getAjxpMime(), true);
 		if(editors && editors.length)
 		{
-			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
+			pydio.Registry.loadEditorResources(editors[0].resourcesManager);
 			var editorClass = Class.getByName(editors[0].editorClass);
 			if(editorClass){
                 this.contributePanelHeaderIcon('icon-eye-close', 'Preview', 'open_with');

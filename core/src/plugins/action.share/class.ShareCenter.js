@@ -394,7 +394,7 @@ Class.create("ShareCenter", {
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
                 var watchBox = '';
-                if(ajaxplorer.hasPluginOfType("meta", "watch")){
+                if(pydio.Registry.hasPluginOfType("meta", "watch")){
                     if(watchValue) watchValue = ' checked';
                     else watchValue = '';
                     watchBox = '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"'+watchValue+'></span>';
@@ -584,7 +584,7 @@ Class.create("ShareCenter", {
                     } );
                 }
             }
-            if(ajaxplorer.hasPluginOfType("meta", "watch")){
+            if(pydio.Registry.hasPluginOfType("meta", "watch")){
                 oForm.down('#target_user').down('#header_watch').show();
             }else{
                 oForm.down('#target_user').down('#header_watch').hide();
@@ -672,7 +672,7 @@ Class.create("ShareCenter", {
             var name = node.getAttribute('name');
             var label = node.getAttribute('label');
             if(currentExt && name == "unique_preview_file"){
-                var editors = ajaxplorer.findEditorsForMime(currentExt);
+                var editors = pydio.Registry.findEditorsForMime(currentExt);
                 if(!editors.length || (editors.length == 1 && editors[0].editorClass == "OtherEditorChooser")) {
                     noEditorsFound = true;
                     return;
@@ -896,7 +896,7 @@ Class.create("ShareCenter", {
                         <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ shortlink +'">'+ MessageHash[88] + ' ' +node.getLabel()+'</a></textarea></div>\
                     </div>\
                     ';
-                    var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                    var editors = pydio.Registry.findEditorsForMime(node.getAjxpMime(), true);
                     if(editors.length){
                         var tplString ;
                         var messKey = "share_center.61";
@@ -997,8 +997,8 @@ Class.create("ShareCenter", {
                 }
             }
             mainCont.select('textarea,input').each(function(t){
-                t.observe("focus", function(e){ ajaxplorer.disableShortcuts();});
-                t.observe("blur", function(e){ ajaxplorer.enableShortcuts();});
+                t.observe("focus", function(e){ pydio.UI.disableShortcuts();});
+                t.observe("blur", function(e){ pydio.UI.enableShortcuts();});
                 t.observe("click", function(event){event.target.select();});
             });
             container.up("div[ajxpClass]").ajxpPaneObject.resize();
@@ -1125,7 +1125,7 @@ Class.create("ShareCenter", {
             bottomButtonsContainer = bottomButtonsContainer.down("#shareDialogButtons");
         }
         // WATCH BUTTON
-        if(ajaxplorer.hasPluginOfType("meta", "watch")){
+        if(pydio.Registry.hasPluginOfType("meta", "watch")){
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
             if(!dialogButtonsOrRow.down('#watch_folder_eye')) {
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center."+(shareType=='folder'?'83b':'83')]+"'><span class='icon-eye-close'></span> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
@@ -1156,7 +1156,7 @@ Class.create("ShareCenter", {
                             conn.addParameter("repository_id", this._currentRepositoryId);
                         }
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     }
@@ -1180,7 +1180,7 @@ Class.create("ShareCenter", {
         }
         var oForm = dialogButtonsOrRow.up('.dialogContent');
 
-        if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
+        if(pydio.Registry.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
                 Event.stop(event);
                 var s, message, link;
@@ -1371,6 +1371,6 @@ Class.create("ShareCenter", {
 
 });
 
-if(ajaxplorer && ajaxplorer.actionBar){
-    ajaxplorer.actionBar.shareCenter = new ShareCenter();
+if(ajaxplorer && pydio.getController()){
+    pydio.getController().shareCenter = new ShareCenter();
 }

@@ -74,19 +74,19 @@ Class.create("AjxpBootstrap", {
 			}
 		}.bind(this));
 		document.observe("ajaxplorer:actions_loaded", function(){
-			if(!this.parameters.get("SELECTOR_DATA") && ajaxplorer.actionBar.actions.get("ext_select")){
-				ajaxplorer.actionBar.actions.unset("ext_select");
-				ajaxplorer.actionBar.fireContextChange();
-				ajaxplorer.actionBar.fireSelectionChange();	
+			if(!this.parameters.get("SELECTOR_DATA") && pydio.getController().actions.get("ext_select")){
+				pydio.getController().actions.unset("ext_select");
+				pydio.getController().fireContextChange();
+				pydio.getController().fireSelectionChange();
 			}else if(this.parameters.get("SELECTOR_DATA")){
-				ajaxplorer.actionBar.defaultActions.set("file", "ext_select");
+				pydio.getController().defaultActions.set("file", "ext_select");
 			}
 		}.bind(this));					
 		document.observe("ajaxplorer:loaded", function(e){
 			this.insertAnalytics();
 			if(this.parameters.get("SELECTOR_DATA")){
-	    		ajaxplorer.actionBar.defaultActions.set("file", "ext_select");
-	    		ajaxplorer.actionBar.selectorData = new Hash(this.parameters.get("SELECTOR_DATA"));	    		
+	    		pydio.getController().defaultActions.set("file", "ext_select");
+	    		pydio.getController().selectorData = new Hash(this.parameters.get("SELECTOR_DATA"));
 			}
 		}.bind(this));
         window.pydioBootstrap = this;

@@ -201,7 +201,7 @@ Class.create("XHRUploader", {
         var closeButton = this.mainForm.down('#uploadCloseButton');
         this.sendButton.observe("click", function(){
             if(!this.hasClassName("disabled")){
-                ajaxplorer.actionBar.multi_selector.submit();
+                pydio.getController().multi_selector.submit();
             }
         }.bind(this.sendButton) );
         this.sendButton.observerSet = true;
@@ -270,8 +270,8 @@ Class.create("XHRUploader", {
             height		: 4										// Height of the progressbar - don't forget to adjust your image too!!!
         };
         this.mainForm.down('#clear_list_button').observe("click", function(e){
-            ajaxplorer.actionBar.multi_selector.clearList();
-            ajaxplorer.actionBar.multi_selector.updateTotalData();
+            pydio.getController().multi_selector.clearList();
+            pydio.getController().multi_selector.updateTotalData();
         });
         this.optionPane = this.createOptionsPane();
         this.optionPane.loadData();
@@ -737,7 +737,7 @@ Class.create("XHRUploader", {
 				item.updateStatus('loaded');
 
                 if (xhr.responseXML){
-                    var result = ajaxplorer.actionBar.parseXmlMessage(xhr.responseXML);
+                    var result = pydio.getController().parseXmlMessage(xhr.responseXML);
                     if(!result) item.updateStatus("error");
                 }else if (xhr.responseText && xhr.responseText != 'OK') {
 					alert(xhr.responseText); // display response.

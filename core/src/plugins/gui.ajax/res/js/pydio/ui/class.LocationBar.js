@@ -50,7 +50,7 @@ Class.create("LocationBar", {
 			24, 24, 
 			'goto_parent.png', 16, 
 			'inline_hover', 
-			function(){ajaxplorer.actionBar.fireAction('up_dir');}
+			function(){pydio.getController().fireAction('up_dir');}
 			);
 		this.element.insert(this.parentButton);
 		var locDiv = new Element('div', {id:'location_form'});
@@ -145,7 +145,7 @@ Class.create("LocationBar", {
 			}
 		}.bind(this));		
 		this.currentPath.observe("focus", function(e)	{
-			ajaxplorer.disableShortcuts();
+			pydio.UI.disableShortcuts();
 			this.hasFocus = true;
 			this.currentPath.select();
 			return false;
@@ -154,7 +154,7 @@ Class.create("LocationBar", {
 			this.currentPath.hide();
 			this.label.show();
 			if(!currentLightBox){
-				ajaxplorer.enableShortcuts();
+				pydio.UI.enableShortcuts();
 				this.hasFocus = false;
 			}
 		}.bind(this));
@@ -177,7 +177,7 @@ Class.create("LocationBar", {
 	 */
 	submitPath : function(){
 		if(!this._modified){
-			ajaxplorer.actionBar.fireAction("refresh");
+			pydio.getController().fireAction("refresh");
 		}else{
 			var url = this.currentPath.value.stripScripts();
 			if(url == '') return false;	
@@ -191,15 +191,34 @@ Class.create("LocationBar", {
 				node.getMetadata().set("paginationData", data);
 			}
 			// Manually entered, stat path before calling
-			if(!ajaxplorer.pathExists(url)){
+			if(!this.pathExists(url)){
 				modal.displayMessage('ERROR','Cannot find : ' + url);
 				this.currentPath.setValue(this._beforeModified);
 			}else{
-				ajaxplorer.actionBar.fireDefaultAction("dir", node);
+				pydio.getController().fireDefaultAction("dir", node);
 			}
 		}
 		return false;
 	},
+
+    /**
+     * Check whether a path exists by using the "stat" action.
+     * THIS SHOULD BE DELEGATED TO THE NODEPROVIDER.
+     * @param dirName String The path to check
+     * @returns Boolean
+     */
+    pathExists : function(dirName){
+        var connexion = new Connexion();
+        connexion.addParameter("get_action", "stat");
+        connexion.addParameter("file", dirName);
+        var result = false;
+        connexion.onComplete = function(transport){
+            if(transport.responseJSON && transport.responseJSON.mode) result = true;
+        }.bind(this);
+        connexion.sendSync();
+        return result;
+    },
+
 	/**
 	 * Observer for node change
 	 * @param newNode AjxpNode

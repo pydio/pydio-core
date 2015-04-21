@@ -139,8 +139,6 @@ function initializeLightbox(){
 		if(e==null)e=window.event;		
 		if(e.keyCode == 27)
 		{
-			ajaxplorer.cancelCopyOrMove();
-			//modal.close();
             if(modal.currentLightBoxElement){
                 removeLightboxFromElement(modal.currentLightBoxElement);
                 if(modal.currentLightBoxModal && modal.currentLightBoxModal.parentNode) {
@@ -188,9 +186,9 @@ function hideLightBox(onFormSubmit)
 		{
 			currentLightBox = null;
 		}
-		ajaxplorer.enableNavigation();
-		ajaxplorer.focusLast();
-		ajaxplorer.enableShortcuts();
+		pydio.UI.enableNavigation();
+		pydio.UI.focusLast();
+		pydio.UI.enableShortcuts();
 		document.fire("ajaxplorer:selection_changed");
 	}
 	if(currentDraggable) currentDraggable.destroy();

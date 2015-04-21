@@ -60,11 +60,11 @@
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 							var loadFunc = function(oForm){
-								ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
-								ajaxplorer.actionBar.svnLogger.open();
+								pydio.getController().svnLogger = new SVNLogger($(oForm));
+								pydio.getController().svnLogger.open();
 							};
 							var closeFunc = function(){
-								ajaxplorer.actionBar.svnLogger.close();
+								pydio.getController().svnLogger.close();
 								hideLightBox();
 								return false;
 							};
@@ -84,11 +84,11 @@
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var loadFunc = function(oForm){
-							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
-							ajaxplorer.actionBar.svnLogger.open(true);
+							pydio.getController().svnLogger = new SVNLogger($(oForm));
+							pydio.getController().svnLogger.open(true);
 						};
 						var closeFunc = function(){
-							ajaxplorer.actionBar.svnLogger.close();
+							pydio.getController().svnLogger.close();
 							hideLightBox();
 							return false;
 						};

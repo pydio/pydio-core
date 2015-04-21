@@ -101,8 +101,8 @@ Class.create("HeaderResizer", {
                 var cell = new Element('div', {className:'header_cell'});
                 cell.insert(input);
                 this.options.filterPanel.insert(cell);
-                input.observe("focus", function(){pydio.disableAllKeyBindings();}.bind(this));
-                input.observe("blur", function(){pydio.enableAllKeyBindings();}.bind(this));
+                input.observe("focus", function(){pydio.UI.disableAllKeyBindings();}.bind(this));
+                input.observe("blur", function(){pydio.UI.enableAllKeyBindings();}.bind(this));
                 input.observe('input', function(){
                     if(input.filterTimer) window.clearTimeout(input.filterTimer);
                     input.filterTimer = window.setTimeout(function(){

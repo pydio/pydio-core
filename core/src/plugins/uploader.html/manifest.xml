@@ -118,13 +118,13 @@
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-			    if(ajaxplorer.actionBar.multi_selector && ajaxplorer.actionBar.multi_selector.__className == 'XHRUploader'){
-			        ajaxplorer.actionBar.multi_selector.initialize(oForm);
+			    if(pydio.getController().multi_selector && pydio.getController().multi_selector.__className == 'XHRUploader'){
+			        pydio.getController().multi_selector.initialize(oForm);
 			    }else{
-    				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+    				pydio.getController().multi_selector = new XHRUploader(oForm);
                 }
 			}else{
-				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
+				pydio.getController().multi_selector = new MultiUploader(oForm);
 			}
 		]]></dialogOnOpen>
 		<extensionOnInit><![CDATA[
@@ -156,11 +156,11 @@
                         window.UploaderDroppedItems = items;
                         window.UploaderDroppedFiles = event.dataTransfer.files;
                         window.UploaderDroppedTarget = el;
-                        ajaxplorer.actionBar.fireAction('upload');
+                        pydio.getController().fireAction('upload');
                     }else if(event.dataTransfer.files.length){
                         window.UploaderDroppedFiles = event.dataTransfer.files;
                         window.UploaderDroppedTarget = el;
-                        ajaxplorer.actionBar.fireAction('upload');
+                        pydio.getController().fireAction('upload');
                     }
   				}
 			};

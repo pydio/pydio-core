@@ -74,7 +74,7 @@
                                         oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link">AJXP_MESSAGE[479]</a></div>'});
                                         oForm.down('a.forgot-password-link').observe("click", function(e){
                                             Event.stop(e);
-                                            ajaxplorer.actionBar.fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
+                                            pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
                                         });
                                     }catch(e){ if(console) console.log(e); }
                                 }
@@ -102,7 +102,7 @@
                                     connexion.addParameter('captcha_code', oForm.captcha_code.value);
                                 }
                                 connexion.onComplete = function(transport){
-                                    var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                    var success = pydio.getController().parseXmlMessage(transport.responseXML);
                                     if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
                                         ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                     }

@@ -45,8 +45,8 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShareAction();
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
+                        pydio.getController().shareCenter.performShareAction();
                     ]]></clientCallback>
                     <clientForm id="share_form"><![CDATA[
                         <div id="share_form" box_width="420" action="share">
@@ -241,7 +241,7 @@
                     </clientForm>
                     <clientListener name="init"><![CDATA[
                         if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") == "disable" ){
-                            var action = ajaxplorer.getActionBar().getActionByName('share');
+                            var action = pydio.getController().getActionByName('share');
                             if(action) action.selectionContext.dir = false;
                         }
                     ]]></clientListener>
@@ -271,8 +271,8 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShareAction();
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
+                        pydio.getController().shareCenter.performShareAction();
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -283,8 +283,8 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
+                        pydio.getController().shareCenter.performShare('minisite-public');
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -295,8 +295,8 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
+                        pydio.getController().shareCenter.performShare('minisite-public');
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -307,8 +307,8 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
+                        pydio.getController().shareCenter.performShare('minisite-public');
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -369,9 +369,9 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
+                        if(!pydio.getController().shareCenter) pydio.getController().shareCenter = new ShareCenter();
                         if(window.actionManager){
-                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel());
+                            pydio.getController().shareCenter.performShareAction(window.actionManager.getDataModel());
                         }
                     ]]></clientCallback>
                 </processing>
@@ -407,7 +407,7 @@
 						conn.addParameter("get_action", "sharelist-clearExpired");
 						var dm = window.actionManager.getDataModel();
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
                             if(window.actionManager){
                                 dm.requireContextChange(dm.getRootNode(), true);
                             }
@@ -441,10 +441,10 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
+                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && pydio.getController().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
-                                var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                                var editors = pydio.Registry.findEditorsForMime(node.getAjxpMime(), true);
                                 if(editors.length && Class.getByName(editors[0].editorClass)){
                                     var staticClass = Class.getByName(editors[0].editorClass).prototype;
                                     if(staticClass.getRESTPreviewLinks){

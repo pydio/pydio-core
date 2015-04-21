@@ -130,7 +130,7 @@
                         </style>
                     ]]></clientForm>
                     <clientListener name="init"><![CDATA[
-                        ajaxplorer.actionBar.fireAction("ajxp_installer");
+                        pydio.getController().fireAction("ajxp_installer");
                     ]]></clientListener>
                 </processing>
             </action>

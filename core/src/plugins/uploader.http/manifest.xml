@@ -39,7 +39,7 @@
 					<clientCallback><![CDATA[
 						fileName = ajaxplorer.getUserSelection().getUniqueFileName();
 						var crtDir = ajaxplorer.getContextNode().getPath();
-						var bgManager = ajaxplorer.actionBar.bgManager;
+						var bgManager = pydio.getController().bgManager;
 						bgManager.queueAction("external_download", new Hash({dlfile:fileName, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
 						bgManager.next();
 						]]></clientCallback>
@@ -154,7 +154,7 @@
                 oForm = modal.getForm();
                 var dlFile = oForm.down('[name="url"]').getValue();
                 var crtDir = ajaxplorer.getContextNode().getPath();
-                var bgManager = ajaxplorer.actionBar.bgManager;
+                var bgManager = pydio.getController().bgManager;
                 bgManager.queueAction("external_download", new Hash({file:dlFile, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(dlFile)+" " + MessageHash["httpdownloader.7"]);
                 for(var i=2;i<6;i++){
                     var file = oForm.down('[name="url'+i+'"]').getValue();

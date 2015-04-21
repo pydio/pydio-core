@@ -188,8 +188,8 @@ Class.create("AjxpDraggable", Draggable, {
 		if(this.options.starteffect){
 			this.options.starteffect(this.element);
 		}
-		this.dndAction = ajaxplorer.getActionBar().getDefaultAction('dragndrop');
-		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
+		this.dndAction = pydio.getController().getDefaultAction('dragndrop');
+		this.ctrlDndAction = pydio.getController().getDefaultAction('ctrldragndrop');
     },
 
 
@@ -432,7 +432,7 @@ var AjxpDroppables = {
                         }
                         droppable.applyDragMove(srcName, targetName, nodeId, copy);
                     }else{
-                        ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, copy);
+                        pydio.getController().applyDragMove(srcName, targetName, nodeId, copy);
                     }
 				},
 		onHover:function(draggable, droppable, event)

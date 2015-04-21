@@ -78,7 +78,7 @@
                                     conn.addParameter("dir", dir);
                                     conn.onComplete = function(transport){
                                         this.parseXmlMessage(transport.responseXML);
-                                    }.bind(ajaxplorer.actionBar) ;
+                                    }.bind(pydio.getController()) ;
                                     conn.sendAsync();
 
                                 }else{

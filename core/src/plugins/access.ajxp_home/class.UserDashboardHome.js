@@ -29,9 +29,9 @@ Class.create("UserDashboardHome", AjxpPane, {
         $super(oFormObject, editorOptions);
         this._repoInfos = $H();
         this._repoInfosLoading = $H();
-        var dashLogo = ajaxplorer.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
+        var dashLogo = pydio.Registry.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
         if(!dashLogo)
-            dashLogo = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
+            dashLogo = pydio.Registry.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
         if(dashLogo){
             var url;
             if(dashLogo.indexOf('plugins/') === 0){
@@ -221,16 +221,16 @@ Class.create("UserDashboardHome", AjxpPane, {
             switchToRepo(target.CURRENT_REPO_ID);
         });
 
-        if(ajaxplorer.actionBar.getActionByName("logout") && ajaxplorer.user.id != "guest"){
+        if(pydio.getController().getActionByName("logout") && ajaxplorer.user.id != "guest"){
             oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
-            oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
+            oFormObject.down('#disconnect_link').update("<a>"+pydio.getController().getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
-                ajaxplorer.actionBar.fireAction("logout");
+                pydio.getController().fireAction("logout");
             });
-        }else if(ajaxplorer.user.id == "guest" && ajaxplorer.actionBar.getActionByName("login")){
+        }else if(ajaxplorer.user.id == "guest" && pydio.getController().getActionByName("login")){
             oFormObject.down("#welcome").insert("<small>You can <a id='disconnect_link'>login</a> if you are not guest.</small>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
-                ajaxplorer.actionBar.fireAction("login");
+                pydio.getController().fireAction("login");
             });
         }
 
@@ -238,7 +238,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
-            span.down('a').observe('click', function(){ ajaxplorer.getActionBar().fireAction("open_tutorial_pane"); });
+            span.down('a').observe('click', function(){ pydio.getController().fireAction("open_tutorial_pane"); });
             obj.insert(span);
         }
 

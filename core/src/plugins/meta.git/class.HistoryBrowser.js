@@ -186,7 +186,7 @@ Class.create("HistoryBrowser", {
             commit_id   : selectedNode.getMetadata().get("ID")
         }));
         connex.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            pydio.getController().parseXmlMessage(transport.responseXML);
             hideLightBox();
         };
         connex.sendAsync();

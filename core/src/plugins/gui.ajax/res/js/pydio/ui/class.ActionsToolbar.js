@@ -196,7 +196,7 @@ Class.create("ActionsToolbar", AjxpPane, {
                 infoPanel:false
 
             }, {}, {}, {dynamicItems: submenuItems});
-            moreAction.setManager(ajaxplorer.actionBar);
+            moreAction.setManager(pydio.getController());
             this.actions.set("group_more_action", moreAction);
             try{
                 this.toolbars.get($A(this.options.toolbarsList).last()).push("group_more_action");

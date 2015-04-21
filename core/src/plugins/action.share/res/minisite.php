@@ -228,7 +228,7 @@
                 window.ajxpMinisite = true;
                 /*
                 window.onbeforeunload = function(){
-                    if(ajaxplorer && !Prototype.Browser.Gecko) ajaxplorer.actionBar.fireAction("logout");
+                    if(ajaxplorer && !Prototype.Browser.Gecko) pydio.getController().fireAction("logout");
                 }
                 */
                 document.observe("dom:loaded", function(){

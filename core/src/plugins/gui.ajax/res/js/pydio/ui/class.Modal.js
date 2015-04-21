@@ -165,7 +165,7 @@ Class.create("Modal", {
 		}
 		else {
 			newForm.onsubmit = function(){
-				ajaxplorer.actionBar.submitForm(this.getForm());
+				pydio.getController().submitForm(this.getForm());
 				hideLightBox();
 				return false;
             }.bind(this);
@@ -232,9 +232,9 @@ Class.create("Modal", {
      * @param formId String If this id is not null, dialog will have the class form-formId
 	 */
 	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize, overlayStyle, formId){
-		ajaxplorer.disableShortcuts();
-		ajaxplorer.disableNavigation();
-		ajaxplorer.blurAll();
+		pydio.UI.disableShortcuts();
+		pydio.UI.disableNavigation();
+		pydio.UI.blurAll();
 		var winWidth = document.viewport.getWidth();
 		var winHeight = document.viewport.getHeight();
 	
@@ -320,16 +320,16 @@ Class.create("Modal", {
 		this.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
-				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
+				pydio.getController().editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
 			}else{
-				ajaxplorer.actionBar.editor = new editorKlass(oForm, {editorData:editorData, context:modal});
+				pydio.getController().editor = new editorKlass(oForm, {editorData:editorData, context:modal});
 			}
             if(editorArgument){
-                ajaxplorer.actionBar.editor.open(editorArgument);
+                pydio.getController().editor.open(editorArgument);
             }else{
-                ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection().getUniqueNode());
+                pydio.getController().editor.open(ajaxplorer.getUserSelection().getUniqueNode());
             }
-            ajaxplorer.actionBar.editor.getDomNode().observe("editor:updateTitle", function(event){
+            pydio.getController().editor.getDomNode().observe("editor:updateTitle", function(event){
                 this.setContextTitle(event.memo);
             }.bind(this));
         }.bind(this);
@@ -724,8 +724,8 @@ Class.create("Modal", {
         }
 
         var container;
-        if(ajaxplorer.getMessageBoxReference()){
-            container = ajaxplorer.getMessageBoxReference();
+        if(pydio.UI.getMessageBoxReference()){
+            container = pydio.UI.getMessageBoxReference();
         }else if($('content_pane')) {
             container = $('content_pane');
         }else {

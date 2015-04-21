@@ -68,7 +68,7 @@ Class.create("AjxpPane", {
         }
 
         if(this.options.messageBoxReference && ajaxplorer){
-            ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
+            pydio.UI.registerAsMessageBoxReference(this.htmlElement);
         }
 
         if(this.options.imageBackgroundFromConfigs){
@@ -127,8 +127,8 @@ Class.create("AjxpPane", {
                 if(!anchor.down('#'+addNode.getAttribute("id"))){
                     anchor.insert(cdataContent);
                     var compReg = $A();
-                    ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
-                    if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                    pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                    if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
                     change = true;
                 }
             }
@@ -289,11 +289,11 @@ Class.create("AjxpPane", {
             });
         }
         if(Class.objectImplements(this, 'IFocusable')){
-            ajaxplorer.unregisterFocusable(this);
+            pydio.UI.unregisterFocusable(this);
         }
         if(Class.objectImplements(this, "IActionProvider")){
             this.getActions().each(function(act){
-                ajaxplorer.guiActions.unset(act.key);
+                pydio.getController().deleteFromGuiActions(act.key);
             }.bind(this));
         }
         if(this.configObserver){
@@ -375,7 +375,7 @@ Class.create("AjxpPane", {
 	 */
 	setFocusBehaviour : function(){
 		this.htmlElement.observe("click", function(){
-			if(ajaxplorer) ajaxplorer.focusOn(this);
+			if(pydio) pydio.UI.focusOn(this);
 		}.bind(this));
 	},
 

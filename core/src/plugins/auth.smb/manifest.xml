@@ -29,7 +29,7 @@
 						var connexion = new Connexion();
 						connexion.addParameter('get_action', 'smb_logout');
 						connexion.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
 							};
 						connexion.sendAsync();
 						]]></clientCallback>

@@ -23,10 +23,6 @@
  */
 Class.create("Ajaxplorer", {
 
-    blockEditorShortcuts : false,
-    blockShortcuts : false,
-    blockNavigation : false,
-
 	/**
 	 * Constructor.
 	 * @param loadRep String A base folder to load after initialization is complete
@@ -39,10 +35,7 @@ Class.create("Ajaxplorer", {
 		this.usersEnabled = usersEnabled;
 		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
-		this._focusables = [];
-		this._registry = null;
-		this._resourcesRegistry = {};
-		this._guiComponentsConfigs = new Hash();
+        this.Registry = new Registry();
 		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "Pydio";
         window.pydio = this;
 	},
@@ -52,31 +45,33 @@ Class.create("Ajaxplorer", {
 	 * Event ajaxplorer:loaded is fired at the end.
 	 */
 	init:function(){
+
+        this.Controller = new ActionsManager(this.usersEnabled);
+        this.UI = new PydioUI(this);
+
 		document.observe("ajaxplorer:registry_loaded", function(){
-            this.refreshExtensionsRegistry();
-			this.logXmlUser(this._registry, false);
+            this.Registry.refreshExtensionsRegistry();
+			this.Registry.logXmlUser(false);
             if(this.user){
                 var repId = this.user.getActiveRepository();
                 var repList = this.user.getRepositoriesList();
                 var repositoryObject = repList.get(repId);
                 if(repositoryObject) repositoryObject.loadResources();
             }
-			if(this.guiLoaded) {
-				this.refreshTemplateParts();
-				this.refreshGuiComponentConfigs();
-                this.refreshExtensionsRegistry();
+			if(this.UI.guiLoaded) {
+				this.UI.refreshTemplateParts();
+                this.Registry.refreshExtensionsRegistry();
 			} else {
 				document.observe("ajaxplorer:gui_loaded", function(){
-					this.refreshTemplateParts();
-					this.refreshGuiComponentConfigs();
-                    this.refreshExtensionsRegistry();
+					this.UI.refreshTemplateParts();
+                    this.Registry.refreshExtensionsRegistry();
 				}.bind(this));
 			}
             this.loadActiveRepository();
             if(ajxpBootstrap.parameters.get("USER_GUI_ACTION")){
                 var a= ajxpBootstrap.parameters.get("USER_GUI_ACTION");
                 ajxpBootstrap.parameters.unset("USER_GUI_ACTION");
-                var aBar = this.actionBar;
+                var aBar = this.Controller;
                 window.setTimeout(function(){
                     aBar.fireAction(a);
                 }, 2000);
@@ -85,14 +80,18 @@ Class.create("Ajaxplorer", {
 
 		modal.setLoadingStepCounts(5);
         if(ajxpBootstrap.parameters.get("PRELOADED_REGISTRY")){
-            this._registry = parseXml(ajxpBootstrap.parameters.unset("PRELOADED_REGISTRY")).documentElement;
+            this.Registry.loadFromString(ajxpBootstrap.parameters.unset("PRELOADED_REGISTRY"));
             modal.updateLoadingProgress('XML Registry loaded');
         }else{
             this.loadXmlRegistry(true);
         }
-		this.initTemplates();
+		this.UI.initTemplates();
 		modal.initForms();
-		this.initObjects();
+        this.UI.initObjects();
+
+        this.tryLogUserFromCookie();
+        document.fire("ajaxplorer:registry_loaded", this.Registry.getXML());
+
         window.setTimeout(function(){
             document.fire('ajaxplorer:loaded');
         }, 200);
@@ -196,381 +195,18 @@ Class.create("Ajaxplorer", {
 	 * @param xPath String An XPath to load only a subpart of the registry
 	 */
 	loadXmlRegistry : function(sync, xPath){
-		var connexion = new Connexion();
-		connexion.onComplete = function(transport){
-			if(transport.responseXML == null || transport.responseXML.documentElement == null) return;
-			if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
-				this._registry = transport.responseXML.documentElement;
-				modal.updateLoadingProgress('XML Registry loaded');
-				if(!sync) {
-					//console.log('firing registry_loaded');
-					document.fire("ajaxplorer:registry_loaded", this._registry);
-				}
-			}else if(transport.responseXML.documentElement.nodeName == "ajxp_registry_part"){
-				this.refreshXmlRegistryPart(transport.responseXML.documentElement);
-			}
-		}.bind(this);
-		connexion.addParameter('get_action', 'get_xml_registry');
-		if(xPath){
-			connexion.addParameter('xPath', xPath);
-		}
-		if(sync){
-			connexion.sendSync();		
-		}else{
-			connexion.sendAsync();
-		}
-	},
-
-	/**
-	 * Inserts a document fragment retrieved from server inside the full tree.
-	 * The node must contains the xPath attribute to locate it inside the registry.
-	 * Event ajaxplorer:registry_part_loaded is triggerd once this is done.
-	 * @param documentElement DOMNode
-	 */
-	refreshXmlRegistryPart : function(documentElement){
-		var xPath = documentElement.getAttribute("xPath");
-		var existingNode = XPathSelectSingleNode(this._registry, xPath);
-        var parentNode;
-		if(existingNode && existingNode.parentNode){
-			parentNode = existingNode.parentNode;
-			parentNode.removeChild(existingNode);
-			if(documentElement.firstChild){
-				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
-			}
-		}else if(xPath.indexOf("/") > -1){
-			// try selecting parentNode
-			var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
-			parentNode = XPathSelectSingleNode(this._registry, parentPath);
-			if(parentNode && documentElement.firstChild){
-				//parentNode.ownerDocument.importNode(documentElement.firstChild);
-				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
-			}			
-		}else{
-			if(documentElement.firstChild) this._registry.appendChild(documentElement.firstChild.cloneNode(true));
-		}
-		document.fire("ajaxplorer:registry_part_loaded", xPath);		
-	},
-	
-	/**
-	 * Initialize GUI Objects
-	 */
-	initObjects: function(){
-
-		/*********************
-		/* STANDARD MECHANISMS
-		/*********************/
-		this.contextMenu = new Proto.Menu({
-		  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
-		  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
-		  menuItems: [],
-		  fade:false,
-		  zIndex:2000
-		});
-		var protoMenu = this.contextMenu;		
-		protoMenu.options.beforeShow = function(e){
-			this.options.lastElement = Event.element(e);
-			this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e), ["inline"]);
-			this.refreshList();
-		}.bind(protoMenu);
-		protoMenu.options.beforeHide = function(e){
-			this.options.lastElement = null;
-		}.bind(protoMenu);
-		document.observe("ajaxplorer:actions_refreshed", function(){
-			if(this.options.lastElement){
-				this.options.menuItems = ajaxplorer.actionBar.getContextActions(this.options.lastElement, ["inline"]);
-				this.refreshList();
-			}			
-		}.bind(protoMenu));
-		
-		this.actionBar = new ActionsManager(this.usersEnabled);
-		if(this._registry){
-			this.actionBar.loadActionsFromRegistry(this._registry);
-		}
-		document.observe("ajaxplorer:registry_loaded", function(event){
-            if(Prototype.Browser.IE) ResourcesManager.prototype.loadAutoLoadResources(event.memo);
-			this.actionBar.loadActionsFromRegistry(event.memo);
-		}.bind(this) );
-				
-		document.observe("ajaxplorer:context_changed", function(event){
-            var path = this.getContextNode().getPath();
-            document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-
-			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;
-			window.setTimeout(function(){
-				var data = this.user.getPreference("ls_history", true) || {};
-				data = new Hash(data);
-				data.set(this.user.getActiveRepository(), this.getContextNode().getPath());
-				this.user.setPreference("ls_history", data, true);
-				this.user.savePreference("ls_history");
-			}.bind(this), 100 );
-		}.bind(this) );
-		modal.updateLoadingProgress('Actions Initialized');
-		
-		this.activityMonitor = new ActivityMonitor(
-			window.ajxpBootstrap.parameters.get('session_timeout'), 
-			window.ajxpBootstrap.parameters.get('client_timeout'), 
-			window.ajxpBootstrap.parameters.get('client_timeout_warning'));
-		  
-		/*********************
-		/* USER GUI
-		/*********************/
-		this.guiLoaded = false;
-        var mainElement = $(ajxpBootstrap.parameters.get('MAIN_ELEMENT'));
-		this.buildGUI(mainElement);
-		document.fire("ajaxplorer:before_gui_load");
-		// Rewind components creation!
-		if(this.guiCompRegistry){
-            this.initAjxpWidgets(this.guiCompRegistry);
-		}
-		this.guiLoaded = true;
-		document.fire("ajaxplorer:gui_loaded");
-        document.observe("ajaxplorer:repository_list_refreshed", function(e){
-            mainElement.classNames().findAll(function(c){ return c.startsWith('ajxp_ws-'); }).each(function(cName){
-                mainElement.removeClassName(cName);
-            });
-            if(e.memo.active && e.memo.list){
-                mainElement.addClassName('ajxp_ws-' + e.memo.list.get(e.memo.active).getSlug());
-            }
-        });
-		modal.updateLoadingProgress('GUI Initialized');
-		this.initTabNavigation();
-		this.blockShortcuts = false;
-		this.blockNavigation = false;
-		modal.updateLoadingProgress('Navigation loaded');
-		
-
-		this.tryLogUserFromCookie();
-		document.fire("ajaxplorer:registry_loaded", this._registry);		
-	},
-
-    initAjxpWidgets : function(compRegistry){
-        var lastInst;
-        if(compRegistry.length){
-            for(var i=compRegistry.length;i>0;i--){
-                var el = compRegistry[i-1];
-                var ajxpId = el.ajxpId;
-                compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
-                window[ajxpId] = compRegistry[i-1];
-                lastInst = compRegistry[i-1];
-            }
-            if(lastInst){
-                lastInst.resize();
-            }
-            for(var j=0;j<compRegistry.length;j++){
-                var obj = compRegistry[j];
-                if(Class.objectImplements(obj, "IFocusable")){
-                    obj.setFocusBehaviour();
-                    this.registerFocusable(obj);
-                }
-                if(Class.objectImplements(obj, "IContextMenuable")){
-                    obj.setContextualMenu(this.contextMenu);
-                }
-                if(Class.objectImplements(obj, "IActionProvider")){
-                    if(!this.guiActions) this.guiActions = new Hash();
-                    this.guiActions.update(obj.getActions());
-                }
-            }
-        }
-    },
-
-	/**
-	 * Builds the GUI based on the XML definition (template)
-	 * @param domNode
-	 */
-	buildGUI : function(domNode, compRegistry){
-		if(domNode.nodeType != 1) return;
-		if(!this.guiCompRegistry) this.guiCompRegistry = $A([]);
-        if(!compRegistry){
-            compRegistry = this.guiCompRegistry;
-        }
-		domNode = $(domNode);
-		var ajxpClassName = domNode.readAttribute("ajxpClass") || "";
-		var ajxpClass = Class.getByName(ajxpClassName);
-		var ajxpId = domNode.readAttribute("id") || "";
-		var ajxpOptions = {};
-		if(domNode.readAttribute("ajxpOptions")){
-            try{
-                ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
-            }catch(e){
-                alert("Error while parsing JSON for GUI template part " + ajxpId + "!");
-            }
-		}
-		if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
-			compRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
-		}		
-		$A(domNode.childNodes).each(function(node){
-			this.buildGUI(node, compRegistry);
-		}.bind(this) );
-	},
-	
-	/**
-	 * Parses a client_configs/template_part node
-	 */
-	refreshTemplateParts : function(){
-		var parts = XPathSelectNodes(this._registry, "client_configs/template_part");
-		var toUpdate = {};
-        var restoreUpdate = {};
-
-		if(!this.templatePartsToRestore){
-			this.templatePartsToRestore = $A();
-		}
-		for(var i=0;i<parts.length;i++){
-            if(parts[i].getAttribute("theme") && parts[i].getAttribute("theme") != ajxpBootstrap.parameters.get("theme")){
-                continue;
-            }
-			var ajxpId = parts[i].getAttribute("ajxpId");
-			var ajxpClassName = parts[i].getAttribute("ajxpClass");
-			var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");
-            var cdataContent = "";
-            if(parts[i].firstChild && parts[i].firstChild.nodeType == 4 && parts[i].firstChild.nodeValue != ""){
-                cdataContent = parts[i].firstChild.nodeValue;
-            }
-			
-			var ajxpClass = Class.getByName(ajxpClassName);
-			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){				
-				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
-//				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
-			}
-		}
-        var futurePartsToRestore = $A(Object.keys(toUpdate));
-		this.templatePartsToRestore.each(function(key){
-			var part = this.findOriginalTemplatePart(key);
-            if(part){
-                var ajxpClassName = part.getAttribute("ajxpClass");
-                var ajxpOptionsString = part.getAttribute("ajxpOptions");
-                var cdataContent = part.innerHTML;
-                var ajxpClass = Class.getByName(ajxpClassName);
-                restoreUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
-            }
-		}.bind(this));
-		
-		for(var id in restoreUpdate){
-			this.refreshGuiComponent(id, restoreUpdate[id][0], restoreUpdate[id][1], restoreUpdate[id][2], restoreUpdate[id][3]);
-		}
-		for(id in toUpdate){
-			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
-		}
-		this.templatePartsToRestore = futurePartsToRestore;
+        this.Registry.load(sync, xPath);
 	},
 
     /**
-     * Applies a template_part by removing existing components at this location
-     * and recreating new ones.
-     * @param ajxpId String The id of the DOM anchor
-     * @param ajxpClass IAjxpWidget A widget class
-     * @param ajxpClassName
-     * @param ajxpOptionsString
-     * @param cdataContent
+     * Get the XML Registry
+     * @returns Document
      */
-	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
-		if(!window[ajxpId]) return;
-		// First destroy current component, unregister actions, etc.			
-		var oldObj = window[ajxpId];
-        if(!oldObj.__className) {
-            if(!$(ajxpId)) return;
-            oldObj = $(ajxpId).ajxpPaneObject;
-        }
-        if(!oldObj){
-            alert('Cannot find GUI component ' + ajxpId + ' to be refreshed!');
-            return;
-        }
-		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
-			return;
-		}
-		var ajxpOptions = {};
-		if(ajxpOptionsString){
-			ajxpOptions = ajxpOptionsString.evalJSON();			
-		}
-        /*
-		if(Class.objectImplements(oldObj, "IFocusable")){
-			this._focusables = this.unregisterFocusable(oldObj);
-		}
-		if(Class.objectImplements(oldObj, "IActionProvider")){
-			oldObj.getActions().each(function(act){
-				this.guiActions.unset(act.key);// = this.guiActions.without(act);
-			}.bind(this) );
-		}*/
-		if(oldObj.htmlElement) var anchor = oldObj.htmlElement;
-		oldObj.destroy();
-
-        if(cdataContent && anchor){
-            anchor.insert(cdataContent);
-            var compReg = $A();
-            $A(anchor.children).each(function(el){
-                this.buildGUI(el, compReg);
-            }.bind(this));
-            if(compReg.length) this.initAjxpWidgets(compReg);
-        }
-		var obj = new ajxpClass($(ajxpId), ajxpOptions);
-
-		if(Class.objectImplements(obj, "IFocusable")){
-			obj.setFocusBehaviour();
-			this.registerFocusable(obj);
-		}
-		if(Class.objectImplements(obj, "IContextMenuable")){
-			obj.setContextualMenu(this.contextMenu);
-		}
-		if(Class.objectImplements(obj, "IActionProvider")){
-			if(!this.guiActions) this.guiActions = new Hash();
-			this.guiActions.update(obj.getActions());
-		}
-
-        if($(ajxpId).up('[ajxpClass]') && $(ajxpId).up('[ajxpClass]').ajxpPaneObject && $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes){
-            $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes($(ajxpId).up('[ajxpClass]').ajxpPaneObject.htmlElement, true);
-        }
-
-            obj.__ajxpOptionsString = ajxpOptionsString;
-		
-		window[ajxpId] = obj;
-		obj.resize();
-		delete(oldObj);
-	},
-	
-	/**
-	 * Spreads a client_configs/component_config to all gui components.
-	 * It will be the mission of each component to check whether its for him or not.
-	 */
-	refreshGuiComponentConfigs : function(){
-        this._guiComponentsConfigs = $H();
-		var nodes = XPathSelectNodes(this._registry, "client_configs/component_config");
-		if(!nodes.length) return;
-		for(var i=0;i<nodes.length;i++){
-			this.setGuiComponentConfig(nodes[i]);
-		}
-        var element = $(window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
-        if(element && element.ajxpPaneObject &&  element.ajxpPaneObject.resize){
-            window.setTimeout(function(){
-                // Fire top resize event once after all css are loaded.
-                element.ajxpPaneObject.resize();
-            }, 500);
-        }
-	},
-	
-	/**
-	 * Apply the componentConfig to the AjxpObject of a node
-	 * @param domNode IAjxpWidget
-	 */
-	setGuiComponentConfig : function(domNode){
-		var className = domNode.getAttribute("className");
-		var classId = domNode.getAttribute("classId") || null;
-		var classConfig = new Hash();
-		if(classId){
-			classConfig.set(classId, domNode);
-		}else{
-			classConfig.set('all', domNode);
-		}
-        var cumul = this._guiComponentsConfigs.get(className);
-        if(!cumul) cumul = $A();
-		cumul.push(classConfig);
-        this._guiComponentsConfigs.set(className, cumul);
-		document.fire("ajaxplorer:component_config_changed", {className:className, classConfig:classConfig});
-	},
-
-    getGuiComponentConfigs : function(className){
-        return this._guiComponentsConfigs.get(className);
+    getXmlRegistry : function(){
+        return this.Registry.getXML();
     },
 
-	/**
+    /**
 	 * Try reading the cookie and sending it to the server
 	 */
 	tryLogUserFromCookie : function(){
@@ -583,33 +219,12 @@ Class.create("Ajaxplorer", {
 			connexion.addParameter('cookie_login', 'true');
 			connexion.onComplete = function(transport){
                 hideLightBox();
-                this.actionBar.parseXmlMessage(transport.responseXML);
+                this.Controller.parseXmlMessage(transport.responseXML);
             }.bind(this);
 			connexion.sendSync();
 		}
 	},
-			
-	/**
-	 * Translate the XML answer to a new User object
-	 * @param documentElement DOMNode The user fragment
-	 * @param skipEvent Boolean Whether to skip the sending of ajaxplorer:user_logged event.
-	 */
-	logXmlUser: function(documentElement, skipEvent){
-		this.user = null;
-		var userNode = XPathSelectSingleNode(documentElement, "user");
-		if(userNode){
-			var userId = userNode.getAttribute('id');
-			var children = userNode.childNodes;
-			if(userId){ 
-				this.user = new User(userId, children);
-			}
-		}
-		if(!skipEvent){
-			document.fire("ajaxplorer:user_logged", this.user);
-		}
-	},
-		
-	
+
 	/**
 	 * Find the current repository (from the current user) and load it. 
 	 */
@@ -622,9 +237,9 @@ Class.create("Ajaxplorer", {
 			repositoryObject = repList.get(repId);
 			if(!repositoryObject){
                 if(this.user.lock){
-                    this.actionBar.loadActionsFromRegistry(this._registry);
+                    this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
                     window.setTimeout(function(){
-                        this.actionBar.fireAction(this.user.lock);
+                        this.Controller.fireAction(this.user.lock);
                     }.bind(this), 50);
                     return;
                 }
@@ -654,7 +269,7 @@ Class.create("Ajaxplorer", {
 		if(!this.user) return;
 		document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
 			if(event.memo != "user/repositories") return;
-			this.logXmlUser(this._registry, true);
+			this.Registry.logXmlUser(true);
 			document.fire("ajaxplorer:repository_list_refreshed", {
                 list:this.user.getRepositoriesList(),
                 active:this.user.getActiveRepository()});
@@ -725,24 +340,6 @@ Class.create("Ajaxplorer", {
 	},
 
 	/**
-	 * Check whether a path exists by using the "stat" action.
-	 * THIS SHOULD BE DELEGATED TO THE NODEPROVIDER.
-	 * @param dirName String The path to check
-	 * @returns Boolean
-	 */
-	pathExists : function(dirName){
-		var connexion = new Connexion();
-		connexion.addParameter("get_action", "stat");
-		connexion.addParameter("file", dirName);
-		var result = false;
-		connexion.onComplete = function(transport){
-			if(transport.responseJSON && transport.responseJSON.mode) result = true;
-		}.bind(this);
-		connexion.sendSync();		
-		return result;
-	},
-	
-	/**
 	 * Require a context change to the given path
 	 * @param nodeOrPath AjxpNode|String A node or a path
 	 */
@@ -796,7 +393,7 @@ Class.create("Ajaxplorer", {
 		connexion.addParameter('get_action', 'switch_repository');
 		connexion.addParameter('repository_id', repositoryId);
 		connexion.onComplete = function(transport){
-            this.actionBar.parseXmlMessage(transport.responseXML);
+            this.Controller.parseXmlMessage(transport.responseXML);
             this.repositoryId = null;
             this.loadXmlRegistry();
 		}.bind(this);
@@ -808,285 +405,9 @@ Class.create("Ajaxplorer", {
 		connexion.sendAsync();
 	},
 
-	/**
-	 * Find Extension initialisation nodes (activeCondition, onInit, etc), parses 
-	 * the XML and execute JS. 
-	 * @param xmlNode DOMNode The extension node
-	 * @param extensionDefinition Object Information already collected about this extension
-	 * @returns Boolean
-	 */
-	initExtension : function(xmlNode, extensionDefinition){
-		var activeCondition = XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
-		if(activeCondition && activeCondition.firstChild){
-			try{
-				var func = new Function(activeCondition.firstChild.nodeValue.strip());
-				if(func() === false) return false;
-			}catch(e){}
-		}
-		if(xmlNode.nodeName == 'editor'){
-			Object.extend(extensionDefinition, {
-				openable : (xmlNode.getAttribute("openable") == "true"),
-				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"),
-				previewProvider: (xmlNode.getAttribute("previewProvider") == "true"),
-				order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
-				formId : xmlNode.getAttribute("formId") || null,				
-				text : MessageHash[xmlNode.getAttribute("text")],
-				title : MessageHash[xmlNode.getAttribute("title")],
-				icon : xmlNode.getAttribute("icon"),
-				icon_class : xmlNode.getAttribute("iconClass"),
-				editorClass : xmlNode.getAttribute("className"),
-				mimes : $A(xmlNode.getAttribute("mimes").split(",")),
-				write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)
-			});
-		}else if(xmlNode.nodeName == 'uploader'){
-            var th = ajxpBootstrap.parameters.get('theme');
-			var clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm[@theme="'+th+'"]');
-            if(!clientForm){
-                clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm');
-            }
-			if(clientForm && clientForm.firstChild && clientForm.getAttribute('id'))
-			{
-				extensionDefinition.formId = clientForm.getAttribute('id');
-				if(!$('all_forms').select('[id="'+clientForm.getAttribute('id')+'"]').length){
-					$('all_forms').insert(clientForm.firstChild.nodeValue);
-				}
-			}
-            if(xmlNode.getAttribute("order")){
-                extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));
-            }else{
-                extensionDefinition.order = 0;
-            }
-			var extensionOnInit = XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
-			if(extensionOnInit && extensionOnInit.firstChild){
-				try{eval(extensionOnInit.firstChild.nodeValue);}catch(e){}
-			}
-			var dialogOnOpen = XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
-			if(dialogOnOpen && dialogOnOpen.firstChild){
-				extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
-			}
-			var dialogOnComplete = XPathSelectSingleNode(xmlNode, 'processing/dialogOnComplete');
-			if(dialogOnComplete && dialogOnComplete.firstChild){
-				extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
-			}
-		}
-		return true;
-	},
-	
-	/**
-	 * Refresh the currently active extensions
-	 * Extensions are editors and uploaders for the moment.
-	 */
-	refreshExtensionsRegistry : function(){
-		this._extensionsRegistry = {"editor":$A([]), "uploader":$A([])};
-		var extensions = XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
-		for(var i=0;i<extensions.length;i++){
-			var extensionDefinition = {
-				id : extensions[i].getAttribute("id"),
-				xmlNode : extensions[i],
-				resourcesManager : new ResourcesManager()				
-			};
-			this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
-            var resourceNodes = XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
-			for(var j=0;j<resourceNodes.length;j++){
-				var child = resourceNodes[j];
-				extensionDefinition.resourcesManager.loadFromXmlNode(child);
-			}
-			if(this.initExtension(extensions[i], extensionDefinition)){
-				this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);
-			}
-		}
-		ResourcesManager.prototype.loadAutoLoadResources(this._registry);
-	},
-	
 	getPluginConfigs : function(pluginQuery){
-        var xpath = 'plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property';
-        if(pluginQuery.indexOf('.') == -1){
-            xpath = 'plugins/'+pluginQuery+'/plugin_configs/property |' + xpath;
-        }
-		var properties = XPathSelectNodes(this._registry, xpath );
-		var configs = $H();
-		for(var i = 0; i<properties.length; i++){
-			var propNode = properties[i];
-			configs.set(propNode.getAttribute("name"), propNode.firstChild.nodeValue.evalJSON());
-		}
-		return configs;
+        return this.Registry.getPluginConfigs(pluginQuery);
 	},
-
-    getDefaultImageFromParameters: function(pluginId, paramName){
-        var node = XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
-        if(node) return node.getAttribute("defaultImage");
-        return '';
-    },
-
-    hasPluginOfType : function(type, name){
-        var node;
-        if(name == null){
-            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
-        }else{
-            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
-        }
-        return (node != undefined);
-
-    },
-
-	/**
-	 * Find the currently active extensions by type
-	 * @param extensionType String "editor" or "uploader"
-	 * @returns $A()
-	 */
-	getActiveExtensionByType : function(extensionType){
-		return this._extensionsRegistry[extensionType];
-	},
-	
-	/**
-	 * Find a given editor by its id
-	 * @param editorId String
-	 * @returns AbstractEditor
-	 */
-	findEditorById : function(editorId){
-		return this._extensionsRegistry.editor.detect(function(el){return(el.id == editorId);});
-	},
-
-    /**
-     * Find Editors that can handle a given mime type
-     * @param mime String
-     * @returns AbstractEditor[]
-     * @param restrictToPreviewProviders
-     */
-	findEditorsForMime : function(mime, restrictToPreviewProviders){
-		var editors = $A([]);
-		var checkWrite = false;
-		if(this.user != null && !this.user.canWrite()){
-			checkWrite = true;
-		}
-		this._extensionsRegistry.editor.each(function(el){
-			if(el.mimes.include(mime) || el.mimes.include('*')) {
-				if(restrictToPreviewProviders && !el.previewProvider) return;
-				if(!checkWrite || !el.write) editors.push(el);
-			}
-		});
-		if(editors.length && editors.length > 1){
-			editors = editors.sortBy(function(ed){
-				return ed.order||0;
-			});
-		}
-		return editors;
-	},
-	
-	/**
-	 * Trigger the load method of the resourcesManager.
-	 * @param resourcesManager ResourcesManager
-	 */
-	loadEditorResources : function(resourcesManager){
-		var registry = this._resourcesRegistry;
-		resourcesManager.load(registry);
-	},
-
-    /**
-     *
-     * @param passedTarget
-     */
-    _editorOpener:null,
-    registerEditorOpener: function(ajxpWidget){
-        this._editorOpener = ajxpWidget;
-        this._editorObserver = function(tabId){
-            var tabData = ajxpWidget.tabulatorData.detect(function(tabInfo){return tabInfo.id == tabId});
-            if(tabData && tabData.ajxpNode){
-                this.getContextHolder().setSelectedNodes([tabData.ajxpNode]);
-            }
-        }.bind(this);
-        ajxpWidget.observe("switch", this._editorObserver);
-    },
-    unregisterEditorOpener: function(ajxpWidget){
-        if(this._editorOpener == ajxpWidget) {
-            this._editorOpener.stopObserving("switch", this._editorObserver);
-            this._editorOpener = null;
-        }
-    },
-    getEditorOpener:function(){
-        return this._editorOpener;
-    },
-    _messageBoxReference:null,
-    registerAsMessageBoxReference: function(element){
-        this._messageBoxReference = element;
-    },
-    clearMessageBoxReference:function(){
-        this._messageBoxReference = null;
-    },
-    getMessageBoxReference: function(){
-        return $(this._messageBoxReference);
-    },
-
-    openCurrentSelectionInEditor:function(editorData, forceNode){
-        var selectedNode =  forceNode ? forceNode : this.getContextHolder().getUniqueNode();
-        if(!selectedNode) return;
-        if(!editorData){
-            var selectedMime = getAjxpMimeType(selectedNode);
-            var editors = this.findEditorsForMime(selectedMime);
-            if(editors.length && editors[0].openable){
-                editorData = editors[0];
-            }
-        }
-        if(editorData){
-            this.loadEditorResources(editorData.resourcesManager);
-            if(!this._editorOpener || editorData.modalOnly){
-                modal.openEditorDialog(editorData);
-            }else{
-                this._editorOpener.openEditorForNode(selectedNode, editorData);
-            }
-        }else{
-            if(this.actionBar.getActionByName("download")){
-                this.actionBar.getActionByName("download").apply();
-            }
-        }
-
-    },
-
-	/**
-	 * Inserts the main template in the GUI.
-	 */
-	initTemplates:function(passedTarget, mainElementName){
-		if(!this._registry) return;
-		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
-		for(var i=0;i<tNodes.length;i++){
-			var target = tNodes[i].getAttribute("element");
-            var themeSpecific = tNodes[i].getAttribute("theme");
-            if(themeSpecific && window.ajxpBootstrap.parameters.get("theme") && window.ajxpBootstrap.parameters.get("theme") != themeSpecific){
-                continue;
-            }
-            if(mainElementName && target != mainElementName){
-                continue;
-            }
-			if($(target) || $$(target).length || passedTarget){
-				if($(target)) target = $(target);
-				else target = $$(target)[0];
-				if(passedTarget) target = passedTarget;
-				var position = tNodes[i].getAttribute("position");
-				var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
-				target.insert(obj);
-				obj[position].evalScripts();
-			}
-		}		
-		modal.updateLoadingProgress('Html templates loaded');	
-	},
-		
-	findOriginalTemplatePart : function(ajxpId){
-		var tmpElement = new Element("div", {style:"display:none;"});
-		$$("body")[0].insert(tmpElement);
-		this.initTemplates(tmpElement, window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
-		var tPart = tmpElement.down('[id="'+ajxpId+'"]');
-        if(tPart) tPart = tPart.clone(true);
-		tmpElement.remove();
-		return tPart;
-	},
-	
-	/**
-	 * Trigger a simple download
-	 * @param url String
-	 */
-    triggerDownload: function(url){
-        document.location.href = url;
-    },
 
     /**
      * Reload all messages from server and trigger updateI18nTags
@@ -1105,13 +426,9 @@ Class.create("Ajaxplorer", {
                         window.MessageHash[key] = window.MessageHash[key].replace("\\n", "\n");
                     }
 				}
-				this.updateI18nTags();
-				if(this.guiActions){
-					this.guiActions.each(function(pair){
-						pair.value.refreshFromI18NHash();
-					});
-				}
-                //this.repositoryId = null;
+				this.UI.updateI18nTags();
+                this.Controller.refreshGuiActionsI18n();
+
                 this.loadXmlRegistry();
                 this.fireContextRefresh();
                 this.currentLanguage = newLanguage;
@@ -1119,20 +436,7 @@ Class.create("Ajaxplorer", {
 		}.bind(this);
 		connexion.sendSync();
 	},
-	
-	/**
-	 * Search all ajxp_message_id tags and update their value
-	 */
-	updateI18nTags: function(){
-		var messageTags = $$('[ajxp_message_id]');		
-		messageTags.each(function(tag){	
-			var messageId = tag.getAttribute("ajxp_message_id");
-			try{
-				tag.update(MessageHash[messageId]);
-			}catch(e){}
-		});
-	},
-	
+
 	/**
 	 * Trigger a captcha image
 	 * @param seedInputField HTMLInput The seed value
@@ -1177,6 +481,39 @@ Class.create("Ajaxplorer", {
 		};
 		connexion.sendSync();		
 	},
+
+
+    /**
+     * Get the main controller
+     * @returns ActionManager
+     */
+    getController: function(){
+        return this.Controller;
+    },
+
+    /**
+     * Display an information or error message to the user
+     * @param messageType String ERROR or SUCCESS
+     * @param message String the message
+     */
+    displayMessage: function(messageType, message){
+        var urls = parseUrl(message);
+        if(urls.length && this.user && this.user.repositories){
+            urls.each(function(match){
+                var repo = this.user.repositories.get(match.host);
+                if(!repo) return;
+                message = message.replace(match.url, repo.label+":" + match.path + match.file);
+            }.bind(this));
+        }
+        modal.displayMessage(messageType, message);
+    },
+
+
+    /*************************************************
+     *
+     *          PROXY METHODS FOR DATAMODEL
+     *
+     ************************************************/
 
 	/**
 	 * Accessor for updating the datamodel context
@@ -1234,181 +571,7 @@ Class.create("Ajaxplorer", {
 	fireContextUp : function(){
 		if(this.getContextNode().isRoot()) return;
 		this.updateContextData(this.getContextNode().getParent());
-	},
-	
-	/**
-	 * @returns Document
-	 */
-	getXmlRegistry : function(){
-		return this._registry;
-	},	
-	
-	/**
-	 * Utility 
-	 * @returns Boolean
-	 */
-	cancelCopyOrMove: function(){
-		this.actionBar.treeCopyActive = false;
-		//hideLightBox();
-		return false;
-	},
-		
-	/**
-	 * Blocks all access keys
-	 */
-	disableShortcuts: function(){
-		this.blockShortcuts = true;
-	},
-	
-	/**
-	 * Unblocks all access keys
-	 */
-	enableShortcuts: function(){
-		this.blockShortcuts = false;
-	},
-	
-	/**
-	 * blocks all tab keys
-	 */
-	disableNavigation: function(){
-		this.blockNavigation = true;
-	},
-	
-	/**
-	 * Unblocks all tab keys
-	 */
-	enableNavigation: function(){
-		this.blockNavigation = false;
-	},
-
-    disableAllKeyBindings : function(){
-       this.blockNavigation = this.blockShortcuts = this.blockEditorShortcuts = true;
-    },
-
-    enableAllKeyBindings : function(){
-       this.blockNavigation = this.blockShortcuts = this.blockEditorShortcuts = false;
-    },
-
-	/**
-	 * Unblocks all access keys
-	 */	
-	getActionBar: function(){
-		return this.actionBar;
-	},
-	
-	/**
-	 * Display an information or error message to the user 
-	 * @param messageType String ERROR or SUCCESS
-	 * @param message String the message
-	 */	
-	displayMessage: function(messageType, message){
-		var urls = parseUrl(message);
-		if(urls.length && this.user && this.user.repositories){
-			urls.each(function(match){
-				var repo = this.user.repositories.get(match.host);
-				if(!repo) return;
-				message = message.replace(match.url, repo.label+":" + match.path + match.file);
-			}.bind(this));
-		}
-		modal.displayMessage(messageType, message);
-	},
-	
-	/**
-	 * Focuses on a given widget
-	 * @param object IAjxpFocusable
-	 */
-	focusOn : function(object){
-        if(!this._focusables || this._focusables.indexOf(object) == -1) {
-            return;
-        }
-		this._focusables.each(function(obj){
-			if(obj != object) obj.blur();
-		});
-		object.focus();
-	},
-	
-	/**
-	 * Blur all widgets
-	 */
-	blurAll : function(){
-		this._focusables.each(function(f){
-			if(f.hasFocus) this._lastFocused = f;
-			f.blur();
-		}.bind(this) );
-	},
-
-    /**
-     * @param widget IAjxpFocusable
-     */
-    registerFocusable: function(widget){
-        if(-1 == this._focusables.indexOf(widget) && widget.htmlElement){
-            this._focusables.push(widget);
-        }
-    },
-
-    /**
-     * @param widget IAjxpFocusable
-     */
-    unregisterFocusable: function(widget){
-        this._focusables = this._focusables.without(widget);
-    },
-
-	/**
-	 * Find last focused IAjxpFocusable and focus it!
-	 */
-	focusLast : function(){
-		if(this._lastFocused) this.focusOn(this._lastFocused);
-	},
-	
-	/**
-	 * Create a Tab navigation between registerd IAjxpFocusable
-	 */
-	initTabNavigation: function(){
-		// ASSIGN OBSERVER
-		Event.observe(document, "keydown", function(e)
-		{			
-			if(e.keyCode == Event.KEY_TAB)
-			{
-				if(this.blockNavigation) return;
-                var objects = [];
-                $A(this._focusables).each(function(el){
-                    if(el.htmlElement && el.htmlElement.visible()){
-                        objects.push(el);
-                    }
-                });
-                var shiftKey = e['shiftKey'];
-				var foundFocus = false;
-				for(var i=0; i<objects.length;i++)
-				{
-					if(objects[i].hasFocus)
-					{
-						objects[i].blur();
-						var nextIndex;
-						if(shiftKey)
-						{
-							if(i>0) nextIndex=i-1;
-							else nextIndex = (objects.length) - 1;
-						}
-						else
-						{
-							if(i<objects.length-1)nextIndex=i+1;
-							else nextIndex = 0;
-						}
-                        objects[nextIndex].focus();
-                        foundFocus = true;
-                        break;
-					}
-				}
-				if(!foundFocus && objects[0]){
-					this.focusOn(objects[0]);
-				}
-				Event.stop(e);
-			}
-			if(this.blockShortcuts || e['ctrlKey'] || e['metaKey']) return;
-            if (!(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ))) {
-                this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete" : String.fromCharCode(e.keyCode).toLowerCase()));
-            }
-		}.bind(this));
 	}
-		
+
+
 });

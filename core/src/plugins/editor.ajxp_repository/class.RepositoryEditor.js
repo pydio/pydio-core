@@ -90,7 +90,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             conn.setParameters(toSubmit);
             conn.setMethod("post");
             conn.onComplete = function(transport){
-                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                pydio.getController().parseXmlMessage(transport.responseXML);
                 this.loadRepository(this.repositoryId);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
@@ -120,7 +120,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.formManager = this.getFormManager();
         this.loadRepository(this.repositoryId);
 
-        if(ajaxplorer.actionBar.getActionByName("share")){
+        if(pydio.getController().getActionByName("share")){
             var listPaneId = "shares-list-" + this.repositoryId;
             // Create Actionbar with specific datamodel - should detect dm initialisation
             var actionPane = this.sharesPane.down("#shares-toolbar");
@@ -180,7 +180,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             this.feedRepositoryForm(transport.responseXML, metaTab);
             modal.refreshDialogPosition();
             modal.refreshDialogAppearance();
-            ajaxplorer.blurAll();
+            pydio.UI.blurAll();
         }.bind(this);
         connexion.sendAsync();
     },
@@ -421,7 +421,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         var conn = new Connexion();
         conn.setParameters(params);
         conn.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            pydio.getController().parseXmlMessage(transport.responseXML);
             this.loadRepository(this.repositoryId, true);
             if(button && action == "meta_source_edit"){
                 button.addClassName("SF_disabled");

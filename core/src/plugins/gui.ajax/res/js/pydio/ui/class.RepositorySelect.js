@@ -206,7 +206,7 @@ Class.create("RepositorySelect", {
 
         var menuActionsLoader = function(){
             var menuItems = $A();
-            ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
+            pydio.getController().getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
                 menuItems.push({
                     name:otherAction.getKeyedText(),
                     alt:otherAction.options.title,
@@ -290,7 +290,7 @@ Class.create("RepositorySelect", {
                         var conn = new Connexion();
                         conn.setParameters({get_action:'user_delete_repository', repository_id:repositoryId});
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     }

@@ -223,12 +223,12 @@
 						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
 							var oForm = modal.getForm();
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-							ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
-							    this.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().submitForm(oForm, true, function(transport){
+							    this.getController().parseXmlMessage(transport.responseXML);
 							    if(this.getContextHolder()._selectionSource && this.getContextHolder()._selectionSource.__className=='FetchedResultPane'){
 							        this.getContextHolder()._selectionSource.reloadDataModel();
 							    }
-							}.bind(ajaxplorer));
+							}.bind(pydio));
 							hideLightBox(true);
 							return false;
 						});

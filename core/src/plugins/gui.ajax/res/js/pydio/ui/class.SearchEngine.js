@@ -85,7 +85,7 @@ Class.create("SearchEngine", AjxpPane, {
                      this.closeSearchInput();
                  }
                  if(ajxpOptions['leavesOpenOnSelect'] && selectedNode.isLeaf()){
-                     ajaxplorer.openCurrentSelectionInEditor(null, selectedNode);
+                     pydio.UI.openCurrentSelectionInEditor(null, selectedNode);
                  }else{
                      ajaxplorer.goTo(selectedNode);
                  }
@@ -223,8 +223,8 @@ Class.create("SearchEngine", AjxpPane, {
         }
 
         formPanel.select('input').each(function(el){
-            el.observe('focus', ajaxplorer.disableAllKeyBindings.bind(ajaxplorer));
-            el.observe('blur', ajaxplorer.enableAllKeyBindings.bind(ajaxplorer));
+            el.observe('focus', pydio.UI.disableAllKeyBindings.bind(ajaxplorer));
+            el.observe('blur', pydio.UI.enableAllKeyBindings.bind(ajaxplorer));
             el.observe('keydown', function(event){
                 if(event.keyCode == Event.KEY_RETURN){
                     oThis.search();
@@ -368,7 +368,7 @@ Class.create("SearchEngine", AjxpPane, {
             detailThumbSize: this.options.detailThumbSize?this.options.detailThumbSize:22,
             skipSelectFirstOnFocus:true
         });
-        ajaxplorer.registerFocusable(this._fileList);
+        pydio.UI.registerFocusable(this._fileList);
 
 
         this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
@@ -390,8 +390,8 @@ Class.create("SearchEngine", AjxpPane, {
         }.bind(this));
 
         var opener = function(e){
-            ajaxplorer.disableShortcuts();
-            ajaxplorer.disableNavigation();
+            pydio.UI.disableShortcuts();
+            pydio.UI.disableNavigation();
             this.hasFocus = true;
             this._inputBox.select();
             if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
@@ -409,8 +409,8 @@ Class.create("SearchEngine", AjxpPane, {
 		this._inputBox.observe("click", opener);
 
 		this._inputBox.observe("blur", function(e){
-			ajaxplorer.enableShortcuts();
-            ajaxplorer.enableNavigation();
+			pydio.UI.enableShortcuts();
+            pydio.UI.enableNavigation();
 			this.hasFocus = false;
             if(this._ajxpOptions.openSearchInput){
                 window.setTimeout(function(){
@@ -563,7 +563,7 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	destroy : function(){
         if(this._fileList){
-            ajaxplorer.unregisterFocusable(this._fileList);
+            pydio.UI.unregisterFocusable(this._fileList);
             this._fileList.destroy();
             this._fileList = null;
         }
@@ -737,7 +737,7 @@ Class.create("SearchEngine", AjxpPane, {
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
                 $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
                 this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
-                this.tb.actionsLoaded({memo:ajaxplorer.actionBar.actions});
+                this.tb.actionsLoaded({memo:pydio.getController().actions});
                 this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
                     handle:"panelHeader",
@@ -946,7 +946,7 @@ Class.create("SearchEngine", AjxpPane, {
                 connexion.addParameter('fields', this.getSearchColumns().join(','));
             }
             connexion.onComplete = function(transport){
-                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                pydio.getController().parseXmlMessage(transport.responseXML);
                 this.removeOnLoad($(this._resultsBoxId));
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();

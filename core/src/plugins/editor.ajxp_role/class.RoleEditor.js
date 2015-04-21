@@ -334,9 +334,9 @@ Class.create("RoleEditor", AbstractEditor, {
                 pane.insert(passEl2);
                 pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
                 pane.select('input').invoke('observe', 'focus', function(){
-                    ajaxplorer.disableAllKeyBindings();
+                    pydio.UI.disableAllKeyBindings();
                 }).invoke('observe', 'blur', function(){
-                    ajaxplorer.enableAllKeyBindings();
+                    pydio.UI.enableAllKeyBindings();
                 });
                 modal.showSimpleModal(this.element.down("#pane-infos"),pane, function(){
                     var p1 = passEl1.down("input").getValue();

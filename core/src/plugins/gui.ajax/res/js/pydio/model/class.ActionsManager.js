@@ -19,7 +19,7 @@
  */
 
 /**
- * Singleton class that manages all actions. Can be called directly using ajaxplorer.actionBar.
+ * Singleton class that manages all actions. Can be called directly using pydio.getController().
  */
 Class.create("ActionsManager", {
 
@@ -38,6 +38,7 @@ Class.create("ActionsManager", {
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();
+        this._guiActions = new Hash();
 
         this.contextChangedObs = function(event){
             window.setTimeout(function(){
@@ -68,19 +69,6 @@ Class.create("ActionsManager", {
             this._connectDataModel();
         }
 
-        /*
-        if(this._dataModel){
-            this._dataModel.observe("context_changed", this.contextChangedObs);
-            this._dataModel.observe("selection_changed", this.selectionChangedObs);
-            this.localDataModel = true;
-        }else{
-            document.observe("ajaxplorer:context_changed", this.contextChangedObs);
-            document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
-            this._dataModel = ajaxplorer.getContextHolder();
-            this.localDataModel = false;
-        }
-        */
-
         if(this.usersEnabled){
             document.observe("ajaxplorer:user_logged", function(event){
                 if(event.memo && event.memo.getPreference){
@@ -109,6 +97,20 @@ Class.create("ActionsManager", {
             document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
             this._dataModel = ajaxplorer.getContextHolder();
         }
+    },
+
+    updateGuiActions(actions){
+        this._guiActions.update(actions);
+    },
+
+    deleteFromGuiActions(actionName){
+        this._guiActions.unset(actionName);
+    },
+
+    refreshGuiActionsI18n(){
+        this._guiActions.each(function(pair){
+            pair.value.refreshFromI18NHash();
+        });
     },
 
     getDataModel:function(){
@@ -318,7 +320,7 @@ Class.create("ActionsManager", {
 	 */
 	fireActionByKey: function(event, keyName)
 	{	
-		if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
+		if(this._registeredKeys.get(keyName))
 		{
 			if(this._registeredKeys.get(keyName).indexOf("::")!==false){
 				var parts = this._registeredKeys.get(keyName).split("::");
@@ -729,12 +731,10 @@ Class.create("ActionsManager", {
         }
 		this.removeActions();		
 		this.parseActions(registry);
-		if(ajaxplorer && ajaxplorer.guiActions){
-			ajaxplorer.guiActions.each(function(pair){
-				var act = pair.value;
-				this.registerAction(act);
-			}.bind(this));
-		}
+        this._guiActions.each(function(pair){
+            var act = pair.value;
+            this.registerAction(act);
+        }.bind(this));
         if(this.localDataModel){
             this.notify("actions_loaded");
         }else{
@@ -785,7 +785,15 @@ Class.create("ActionsManager", {
 	getActionByName : function(actionName){
 		return this.actions.get(actionName);		
 	},
-	
+
+    /**
+     * Trigger a simple download
+     * @param url String
+     */
+    triggerDownload: function(url){
+        document.location.href = url;
+    },
+
 	/**
 	 * Utilitary to get FlashVersion, should probably be removed from here!
 	 * @returns String

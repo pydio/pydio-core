@@ -94,7 +94,7 @@
                             return (c=='x' ? r : (r&0x7|0x8)).toString(16);
                         });
                         oForm.down("#content").setValue(uuid);
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -112,7 +112,7 @@
                         var link = '<div class="dialogLegend" style="padding-top:20px;" id="alt_mkpad"><span class="icon-chevron-right"></span> '+MessageHash["etherpad.9"]+'</div>';
                         modal.getForm().down("div.dialogButtons").insert({before:link});
                         modal.getForm().down("#alt_mkpad").down("a").addClassName("create_file_alt_link").observe("click", function(){
-                            ajaxplorer.actionBar.fireAction("mkpad");
+                            pydio.getController().fireAction("mkpad");
                         });
                     });
                 ]]></clientListener>

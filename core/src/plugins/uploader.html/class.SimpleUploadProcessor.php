@@ -86,15 +86,15 @@ class SimpleUploadProcessor extends AJXP_Plugin
             print("<html><script language=\"javascript\">\n");
             if (isSet($result["ERROR"])) {
                 $message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
-                print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
+                print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
             } else {
-                print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+                print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
                     $s = '<tree>';
                     $s .= AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
                     print("\n var resultString = '".$s."'; var resultXML = parent.parseXml(resultString);");
-                    print("\n parent.ajaxplorer.actionBar.parseXmlMessage(resultXML);");
+                    print("\n parent.pydio.getController().parseXmlMessage(resultXML);");
                 }
             }
             print("</script></html>");

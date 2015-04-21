@@ -59,10 +59,10 @@ Class.create("PDFJSViewer", AbstractEditor, {
 		this.contentMainContainer.src = 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl;
 
 		this.contentMainContainer.observe("focus", function(){
-			ajaxplorer.disableAllKeyBindings()
+			pydio.UI.disableAllKeyBindings()
 		});
 		this.contentMainContainer.observe("blur", function(){
-			ajaxplorer.enableAllKeyBindings()
+			pydio.UI.enableAllKeyBindings()
 		});
 
 		// Set the tab label.

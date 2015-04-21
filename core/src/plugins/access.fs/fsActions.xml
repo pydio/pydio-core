@@ -56,7 +56,7 @@
                     modal.showDialogForm('Create', 'mkdir_form', function(form){
                         if(form.down('a.create_file_alt_link')){
                             form.down('a.create_file_alt_link').observe('click', function(){
-                                ajaxplorer.actionBar.fireAction('mkfile');
+                                pydio.getController().fireAction('mkfile');
                             });
                         }
                     }, function(){
@@ -67,7 +67,7 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -101,7 +101,7 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -126,7 +126,7 @@
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
+					var uploaders = pydio.Registry.getActiveExtensionByType("uploader");
                     uploaders.sort(function(objA, objB){
                         return objA.order - objB.order;
                     });
@@ -137,10 +137,10 @@
 					    }else{
     						uploader = uploaders[0];
                         }
-						if(ajaxplorer.actionBar.getActionByName("trigger_remote_copy")){
+						if(pydio.getController().getActionByName("trigger_remote_copy")){
                             modal.setCloseAction(function(){
                                 ajaxplorer.fireContextRefresh();
-                                var bgManager = ajaxplorer.actionBar.bgManager;
+                                var bgManager = pydio.getController().bgManager;
                                 bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
                                 bgManager.next();
                             });
@@ -163,7 +163,7 @@
                                 var label = up.xmlNode.getAttribute("label");
                                 var desc = up.xmlNode.getAttribute("description")
                                 var item = new Element('li', {title:desc}).update(label).observe("click", function(){
-                                    ajaxplorer.actionBar.fireAction("upload", up);
+                                    pydio.getController().fireAction("upload", up);
                                 });
                                 if(up == uploader) item.addClassName('current');
                                 chooserList.insert(item);
@@ -196,7 +196,7 @@
 				<clientCallback prepareModal="false"><![CDATA[
 				    ajaxplorer.getContextHolder().selectAll();
 					window.setTimeout(function(){
-						ajaxplorer.actionBar.fireAction('delete');
+						pydio.getController().fireAction('delete');
 					}, 200);
 					]]></clientCallback>
 				</processing>
@@ -284,7 +284,7 @@
 					<clientListener name="selectionChange"><![CDATA[
 					if(ajaxplorer){
 						var userSelection = ajaxplorer.getUserSelection();
-						var action = ajaxplorer.getActionBar().getActionByName("download");
+						var action = pydio.getController().getActionByName("download");
 						if(zipEnabled && multipleFilesDownloadEnabled){
 							if(action){
 								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
@@ -320,7 +320,7 @@
                         dm._bEmpty = dm._bDir = true; dm._bFile = false;
                         dm.publish("selection_changed", dm);
                         window.setTimeout(function(){
-                            ajaxplorer.actionBar.fireAction("download");
+                            pydio.getController().fireAction("download");
                         }, 200);
                 ]]></clientCallback>
             </processing>
@@ -356,7 +356,7 @@
 						};
 						var closeFunc = function(){
 							userSelection.updateFormOrUrl(modal.getForm());
-							ajaxplorer.actionBar.submitForm(modal.getForm(), true);
+							pydio.getController().submitForm(modal.getForm(), true);
 							hideLightBox();
 						};
 						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);
@@ -371,7 +371,7 @@
 				<clientListener name="selectionChange"><![CDATA[
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
-					var action = ajaxplorer.getActionBar().getActionByName("compress");
+					var action = pydio.getController().getActionByName("compress");
 					if(!zipEnabled || !multipleFilesDownloadEnabled){
 						if(action){
 							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
@@ -398,7 +398,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
             </processing>
         </action>
@@ -415,7 +415,7 @@
                     var context = window.builderContext;
                     context.builderMenuItems = $A([]);
                     var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-                    var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                    var editors = pydio.Registry.findEditorsForMime(selectedMime);
                     if(editors.length){
                         var index = 0;
                         var sepAdded = false;
@@ -451,7 +451,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
                 </processing>
         </action>
@@ -566,7 +566,7 @@
 				   connexion.addParameter('get_action', 'restore');
 				   connexion.addParameter('dir', userSelection.getContextNode().getPath());
 				   connexion.onComplete = function(transport){
-				   		ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+				   		pydio.getController().parseXmlMessage(transport.responseXML);
 				   };
 				   fileNames.each(function(filename){
 				   		connexion.addParameter('file', filename);
@@ -599,7 +599,7 @@
 						conn.addParameter('file', filename);
 						conn.addParameter('filename_new', newValue);
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
 						};
 						conn.sendSync();
 						if(orig && ajaxplorer.getUserSelection()){
@@ -636,7 +636,7 @@
 						var user = ajaxplorer.user;
 						var activeRepository = user.getActiveRepository();
 					}
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'copy';
@@ -707,14 +707,14 @@
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[
 				if(ajaxplorer){
-					var action = ajaxplorer.getActionBar().getActionByName("copy");
+					var action = pydio.getController().getActionByName("copy");
 					if(action){
 						action.rightsContext.write = true;
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
 							action.rightsContext.write = false;
-							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
-							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
+							pydio.getController().defaultActions.unset('ctrldragndrop');
+							pydio.getController().defaultActions.unset('dragndrop');
 						}
 						if(ajxpUser && ajxpUser.canWrite() && ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 						    action.rightsContext.write = false;
@@ -745,12 +745,12 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					if(ajaxplorer.user){
 						var user = ajaxplorer.user;
 						var activeRepository = user.getActiveRepository();
 					}
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'move';
@@ -838,9 +838,9 @@
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
+						pydio.getController().submitForm(oForm, true, function(transport){
 						    var result = this.parseXmlMessage(transport.responseXML);
-						}.bind(ajaxplorer.actionBar));
+						}.bind(pydio.getController()));
 						hideLightBox(true);
 						return false;
 					});
@@ -867,15 +867,15 @@
                 <clientCallback prepareModal="true"><![CDATA[
                     var userSelection =  ajaxplorer.getUserSelection();
                     var loadFunc = function(oForm){
-                        ajaxplorer.actionBar.propertyPane = new PropertyPanel(userSelection, oForm);
+                        pydio.getController().propertyPane = new PropertyPanel(userSelection, oForm);
                     };
                     var completeFunc = function(){
-                        if(!ajaxplorer.actionBar.propertyPane.valueChanged()){
+                        if(!pydio.getController().propertyPane.valueChanged()){
                             hideLightBox();
                             return false;
                         }
                         userSelection.updateFormOrUrl(modal.getForm());
-                        ajaxplorer.actionBar.submitForm(modal.getForm());
+                        pydio.getController().submitForm(modal.getForm());
                         hideLightBox();
                         return false;
                     };

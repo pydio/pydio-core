@@ -139,7 +139,7 @@ Class.create("ActivityMonitor", {
 			if(this.interval) window.clearInterval(this.interval);
 			if(this.serverInterval) window.clearInterval(this.serverInterval);
             window.setTimeout(function(){
-                ajaxplorer.actionBar.fireDefaultAction("expire");
+                pydio.getController().fireDefaultAction("expire");
             }, 1000);
             return;
 		}

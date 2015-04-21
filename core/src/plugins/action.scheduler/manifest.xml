@@ -62,7 +62,7 @@
                         var connexion = new Connexion();
                         connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
                         connexion.onComplete = function(transport){
-                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -86,7 +86,7 @@
                             task_id:taskId
                         }));
                         connexion.onComplete = function(transport){
-                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -201,7 +201,7 @@
                             conn.setParameters(values);
                             conn.sendAsync();
                             conn.onComplete = function(transport){
-                                var res = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                var res = pydio.getController().parseXmlMessage(transport.responseXML);
                                 if(res) hideLightBox();
                             };
                        ]]></dialogOnComplete>
@@ -234,7 +234,7 @@
                 <processing>
                     <clientCallback><![CDATA[
                         var u = ajaxplorer.getUserSelection();
-                        ajaxplorer.getActionBar().fireAction('scheduler_addTask', u.getUniqueNode());
+                        pydio.getController().fireAction('scheduler_addTask', u.getUniqueNode());
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -251,7 +251,7 @@
                         var conn = new Connexion();
                         conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(u.getUniqueNode().getPath()) }));
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                          };
                         conn.sendAsync();
 

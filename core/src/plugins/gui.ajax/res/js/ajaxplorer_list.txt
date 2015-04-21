@@ -51,6 +51,7 @@ js/pydio/model/class.ActionsManager.js
 js/pydio/ui/class.ActionsToolbar.js
 js/pydio/ui/class.BackgroundManager.js
 js/pydio/model/class.AjxpDataModel.js
+js/pydio/model/class.Registry.js
 js/pydio/ui/class.HeaderResizer.js
 js/pydio/ui/class.PreviewFactory.js
 js/pydio/ui/class.FilesList.js
@@ -66,4 +67,5 @@ js/pydio/ui/class.FormManager.js
 js/pydio/ui/class.DataModelProperty.js
 js/pydio/ui/class.MultiDownloader.js
 js/pydio/ui/class.ActivityMonitor.js
+js/pydio/ui/class.PydioUI.js
 js/pydio/class.Ajaxplorer.js

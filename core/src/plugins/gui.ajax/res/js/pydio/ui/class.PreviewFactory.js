@@ -46,7 +46,7 @@ Class.create("PreviewFactory", {
 
     enrichBasePreview: function(ajxpNode, mainObject){
 
-        var editors = ajaxplorer.findEditorsForMime((ajxpNode.isLeaf()?ajxpNode.getAjxpMime():"mime_folder"), true);
+        var editors = pydio.Registry.findEditorsForMime((ajxpNode.isLeaf()?ajxpNode.getAjxpMime():"mime_folder"), true);
 		if(editors && editors.length)
 		{
 			this._crtImageIndex ++;
@@ -55,7 +55,7 @@ Class.create("PreviewFactory", {
 			mainObject.IMAGE_ELEMENT.writeAttribute("id", "ajxp_image_"+imgIndex);
 			var crtIndex = this._crtImageIndex;
 
-			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
+			pydio.Registry.loadEditorResources(editors[0].resourcesManager);
 			var editorClass = Class.getByName(editors[0].editorClass);
 			if(editorClass){
 				var oImageToLoad = {

@@ -218,8 +218,8 @@ Proto.Menu = Class.create({
 				newItem.insert(arrowContainer);
                 newItem.setStyle({position:"relative"});
 			}
-			if(item.action_id && ajaxplorer && ajaxplorer.getActionBar() && ajaxplorer.getActionBar().getActionByName(item.action_id)){
-                var actionObject = ajaxplorer.getActionBar().getActionByName(item.action_id);
+			if(item.action_id && ajaxplorer && pydio.getController() && pydio.getController().getActionByName(item.action_id)){
+                var actionObject = pydio.getController().getActionByName(item.action_id);
                 if(this.options.detailedItems){
                     item.name = '<span class="menu_label">'+ actionObject.getKeyedText() + '</span>' + '<span class="menu_description">'+ actionObject.options.title + '</span>'
                 }else{

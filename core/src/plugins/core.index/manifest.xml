@@ -25,7 +25,7 @@
                         if(!pydio.getUserSelection().isEmpty()){
                             crtDir = pydio.getUserSelection().getUniqueNode().getPath();
                         }
-						var bgManager = pydio.actionBar.bgManager;
+						var bgManager = pydio.getController().bgManager;
 						bgManager.queueAction("index", new Hash({file:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>

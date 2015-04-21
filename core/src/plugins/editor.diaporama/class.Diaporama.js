@@ -52,7 +52,7 @@ Class.create("Diaporama", AbstractEditor, {
                 replaceScroll = true;
             }
             this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:replaceScroll});
-            var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
+            var ipConfigs = pydio.UI.getGuiComponentConfigs("InfoPanel");
             ipConfigs.each(function(el){
                 this.infoPanel.parseComponentConfig(el.get("all"));
             }.bind(this));
@@ -795,7 +795,7 @@ Class.create("Diaporama", AbstractEditor, {
 				theImage.setStyle({cursor:'pointer'});
 				theImage.openBehaviour = true;
 				theImage.observe("click", function(event){
-					ajaxplorer.actionBar.fireAction('open_with');
+					pydio.getController().fireAction('open_with');
 				});
 			}
             var off = theImage.positionedOffset();

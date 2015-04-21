@@ -115,9 +115,9 @@ Class.create("FetchedResultPane", FilesList, {
                 onDrop:function(draggable, droppable, event)
                 {
                     if(draggable.getAttribute('user_selection')){
-                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction);
+                        pydio.getController().fireAction(ajxpOptions.containerDroppableAction);
                     }else if(draggable.ajxpNode){
-                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction, draggable.ajxpNode);
+                        pydio.getController().fireAction(ajxpOptions.containerDroppableAction, draggable.ajxpNode);
                     }
                 }
             });

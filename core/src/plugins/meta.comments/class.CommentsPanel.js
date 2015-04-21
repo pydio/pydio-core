@@ -65,10 +65,10 @@ Class.create("CommentsPanel", {
 
         container.down("#comments_container");
         container.down("textarea").observe("focus", function(){
-            ajaxplorer.disableAllKeyBindings();
+            pydio.UI.disableAllKeyBindings();
         });
         container.down("textarea").observe("blur", function(){
-            ajaxplorer.enableAllKeyBindings();
+            pydio.UI.enableAllKeyBindings();
         });
 
         if(node.getMetadata().get("ajxp_has_comments_feed")){

@@ -33,7 +33,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		$super(htmlElement, tabulatorOptions);
 		this.tabulatorData 	= $A(tabulatorOptions.tabInfos);
         if(tabulatorOptions.registerAsEditorOpener){
-            ajaxplorer.registerEditorOpener(this);
+            pydio.UI.registerEditorOpener(this);
         }
         if(tabulatorOptions.events){
             var events = $H();
@@ -212,8 +212,8 @@ Class.create("AjxpTabulator", AjxpPane, {
                 if(!anchor.down('#'+addNode.getAttribute("id"))){
                     anchor.insert(cdataContent);
                     var compReg = $A();
-                    ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
-                    if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                    pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                    if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
                 }
                 this.addTab(addNode.getAttribute("tabInfo").evalJSON(), addNode.getAttribute("paneInfo").evalJSON());
             }
@@ -270,18 +270,18 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(paneInfo.type == 'editor' && paneInfo.node && paneInfo.node.getPath){
             var editorData;
             if(paneInfo.editorID){
-                editorData = ajaxplorer.findEditorById(paneInfo.editorID);
+                editorData = pydio.Registry.findEditorById(paneInfo.editorID);
             }else if(paneInfo.editorData){
                 editorData = paneInfo.editorData;
             }else{
                 var selectedMime = getAjxpMimeType(paneInfo.node);
-                var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                var editors = pydio.Registry.findEditorsForMime(selectedMime);
                 if(editors.length && editors[0].openable){
                     editorData = editors[0];
                 }
             }
             if(editorData && paneInfo.node && paneInfo.node.__className){
-                ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                pydio.Registry.loadEditorResources(editorData.resourcesManager);
                 var oForm = $("all_forms").down("#"+editorData.formId).cloneNode(true);
                 $(tabInfo.element).insert(oForm);
                 var editorOptions = {
@@ -435,7 +435,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             toShow.resize();
 		}
         if(this.options.headerToolbarOptions){
-            ajaxplorer.actionBar.fireSelectionChange();
+            pydio.getController().fireSelectionChange();
         }
         if(this.htmlElement) {
             this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
@@ -548,11 +548,11 @@ Class.create("AjxpTabulator", AjxpPane, {
 			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
 			tabInfo.headerElement.stopObserving("click");
             if(Class.objectImplements(ajxpObject, "IFocusable")){
-                ajaxplorer.unregisterFocusable(ajxpObject);
+                pydio.UI.unregisterFocusable(ajxpObject);
             }
             if(Class.objectImplements(ajxpObject, "IActionProvider") && ajxpObject.getActions()){
                 ajxpObject.getActions().each(function(act){
-                    ajaxplorer.guiActions.unset(act.key);
+                    pydio.getController().deleteFromGuiActions(act.key);
                 }.bind(this) );
             }
 			ajxpObject.destroy();
@@ -561,7 +561,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             this.tb.destroy();
         }
         if(this.options.registerAsEditorOpener){
-            ajaxplorer.registerEditorOpener(this);
+            pydio.UI.registerEditorOpener(this);
         }
         if(this.options.events){
             this.options.events.each(function(pair){

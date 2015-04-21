@@ -120,7 +120,7 @@ Class.create("FormManager", {
                     var firstPart = choicesValue.shift();
                     if(firstPart == "run_client_action"){
                         element.removeClassName('SF_inlineButtonWorking');
-                        ajaxplorer.actionBar.fireAction(choicesValue.shift());
+                        pydio.getController().fireAction(choicesValue.shift());
                         return;
                     }
                     testValues.set('get_action', firstPart);
@@ -656,10 +656,10 @@ Class.create("FormManager", {
     disableShortcutsOnForm: function(form){
         form.select("input,textarea,select").invoke("observe", "focus", function(event){
             if(event.target.nodeName.toLowerCase() == 'select') event.target.writeAttribute('data-disableShortcutsOnForm', 'true');
-            ajaxplorer.disableAllKeyBindings();
+            pydio.UI.disableAllKeyBindings();
         });
         form.select("input,textarea,select").invoke("observe", "blur", function(){
-            ajaxplorer.enableAllKeyBindings();
+            pydio.UI.enableAllKeyBindings();
         });
         form.select(".SF_replicableGroup").invoke("writeAttribute", "data-disableShortcutsOnForm", "true");
     },

@@ -206,7 +206,7 @@ Class.create("FilesList", SelectableElements, {
             document.fire("ajaxplorer:datamodel-loaded-"+this.htmlElement.id);
         }
         if(this.options.messageBoxReference && ajaxplorer){
-            ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
+            pydio.UI.registerAsMessageBoxReference(this.htmlElement);
         }
 
 	},
@@ -273,11 +273,11 @@ Class.create("FilesList", SelectableElements, {
             });
         }
         if(Class.objectImplements(this, 'IFocusable')){
-            ajaxplorer.unregisterFocusable(this);
+            pydio.UI.unregisterFocusable(this);
         }
         if(Class.objectImplements(this, "IActionProvider")){
             this.getActions().each(function(act){
-                ajaxplorer.guiActions.unset(act.key);
+                pydio.getController().deleteFromGuiActions(act.key);
             }.bind(this));
         }
         if(this.slider) this.slider.destroy();
@@ -544,7 +544,7 @@ Class.create("FilesList", SelectableElements, {
 			},
 			listeners : {
 				init:function(){
-                    var actBar = window.ajaxplorer.actionBar;
+                    var actBar = window.pydio.getController();
                     oThis.observe('switch-display-mode', function(e){
                         if(oThis._displayMode != 'thumb') actBar.getActionByName(oThisId+'-thumb_size').disable();
                         else actBar.getActionByName(oThisId+'-thumb_size').enable();
@@ -583,7 +583,7 @@ Class.create("FilesList", SelectableElements, {
 			},
 			listeners : {
 				init:function(){
-                    var actBar = window.ajaxplorer.actionBar;
+                    var actBar = window.pydio.getController();
                     oThis.observe('switch-display-mode', function(e){
                         if(oThis._displayMode == 'list') actBar.getActionByName(oThisId+'-thumbs_sortby').disable();
                         else actBar.getActionByName(oThisId+'-thumbs_sortby').enable();
@@ -1005,8 +1005,8 @@ Class.create("FilesList", SelectableElements, {
 				div.insert({bottom:this.createPaginatorLink(total, '<b>&gt;&gt;</b>', 'Last')});
 			}
 		}
-		currentInput.observe("focus", function(){ajaxplorer.disableAllKeyBindings();}.bind(this));
-		currentInput.observe("blur", function(){ajaxplorer.enableAllKeyBindings();}.bind(this));
+		currentInput.observe("focus", function(){pydio.UI.disableAllKeyBindings();}.bind(this));
+		currentInput.observe("blur", function(){pydio.UI.enableAllKeyBindings();}.bind(this));
 		currentInput.observe("keydown", function(event){
 			if(event.keyCode == Event.KEY_RETURN){
 				Event.stop(event);
@@ -1105,7 +1105,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	setFocusBehaviour : function(){
         var clickObserver = function(){
-			if(ajaxplorer) ajaxplorer.focusOn(this);
+			if(pydio) pydio.UI.focusOn(this);
 		}.bind(this) ;
         this._registerObserver(this.htmlElement, "click", clickObserver);
 	},
@@ -1116,17 +1116,17 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	showElement : function(show){
         if(show) {
-            if(ajaxplorer) {
+            if(pydio) {
                 if(!this._dataModel){
-                    ajaxplorer.updateContextData(null, this.getSelectedNodes(), this);
+                    pydio.updateContextData(null, this.getSelectedNodes(), this);
                 }
-                ajaxplorer.focusOn(this);
+                pydio.UI.focusOn(this);
             }
             this.htmlElement.setStyle({display:'block'});
         }else{
             this.blur();
             if(!this._dataModel && ajaxplorer){
-                ajaxplorer.updateContextData(null, [], this);
+                pydio.updateContextData(null, [], this);
             }
             this.htmlElement.setStyle({display:'none'});
         }
@@ -1513,7 +1513,7 @@ Class.create("FilesList", SelectableElements, {
             if(dm.getSelectionSource() == this) this.hasFocus = true;
 		}
 		if(this.hasFocus){
-			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
+			window.setTimeout(function(){pydio.UI.focusOn(this);}.bind(this),200);
 		}
 	},
 
@@ -2152,7 +2152,7 @@ Class.create("FilesList", SelectableElements, {
             var tBarElement = new Element('div', {id:"FL-tBar-"+this._instanciatedToolbars.size(), className:"FL-inlineToolbar" + (this._inlineToolbarOptions.unique?' FL-inlineToolbarUnique':' FL-inlineToolbarMultiple')});
             element.insert(tBarElement);
             var aT = new ActionsToolbar(tBarElement, options);
-            aT.actions = ajaxplorer.actionBar.actions;
+            aT.actions = pydio.getController().actions;
             aT.initToolbars();
             if(!this._inlineToolbarOptions.unique){
                 var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
@@ -2215,7 +2215,7 @@ Class.create("FilesList", SelectableElements, {
 						$(uuid).pe.stop();
 						$(uuid).pgBar.setPercentage(0);
 						window.setTimeout(function(){
-							ajaxplorer.actionBar.fireAction("refresh");
+							pydio.getController().fireAction("refresh");
 						}, 2);
 					}
 				};
@@ -2240,7 +2240,7 @@ Class.create("FilesList", SelectableElements, {
 				conn.onComplete = function(transport){
 					if(transport.responseText == 'stop'){
 						pe.stop();
-						ajaxplorer.actionBar.fireAction("refresh");
+						pydio.getController().fireAction("refresh");
 					}else{
 						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('data-target_size'))*100 );
 						$(uuid).pgBar.setPercentage(newPercentage);
@@ -2456,11 +2456,11 @@ Class.create("FilesList", SelectableElements, {
         if(this._dataModel) return;
 		if(selNode.isLeaf())
 		{
-			ajaxplorer.getActionBar().fireDefaultAction("file");
+			pydio.getController().fireDefaultAction("file");
 		}
 		else
 		{
-			ajaxplorer.getActionBar().fireDefaultAction("dir", selNode);
+			pydio.getController().fireDefaultAction("dir", selNode);
 		}
 	},
 

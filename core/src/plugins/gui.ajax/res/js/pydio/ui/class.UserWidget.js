@@ -117,7 +117,7 @@ Class.create("UserWidget", {
 	 */
 	updateActions : function(){
 		var menuItems = $A();
-		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("UserWidget", this.element.id);
+		var actions = pydio.getController().getActionsForAjxpWidget("UserWidget", this.element.id);
         var groups = {};
 
         actions.each(function(action){

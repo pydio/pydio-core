@@ -147,11 +147,11 @@ Class.create("CartManager", FetchedResultPane, {
             conn.setMethod("POST");
             conn.setParameters(h);
             conn.onComplete = function(transport){
-                var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                var success = pydio.getController().parseXmlMessage(transport.responseXML);
                 if(success){
                     ajaxplorer.goTo('/'+zipName+'.zip');
                     window.setTimeout(function(){
-                        ajaxplorer.actionBar.fireAction('share-file-minisite');
+                        pydio.getController().fireAction('share-file-minisite');
                     }, 500);
                 }
             }.bind(this);
@@ -284,6 +284,6 @@ Class.create("CartManager", FetchedResultPane, {
 
 if(window.ajxpMinisite){
     document.observe("ajaxplorer:actions_loaded", function(){
-        ajaxplorer.actionBar.actions.unset("send-selection-to-cart");
+        pydio.getController().actions.unset("send-selection-to-cart");
     });
 }

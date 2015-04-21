@@ -198,7 +198,7 @@
                                 return false;
                             }
                         }
-                         return ajaxplorer.actionBar.actions.get('download') != null;
+                         return pydio.getController().actions.get('download') != null;
                     ]]></activeCondition>
                 </processing>
             </action>
@@ -222,7 +222,7 @@
                                 return false;
                             }
                         }
-                        return ajaxplorer.actionBar.actions.get('download') != null;
+                        return pydio.getController().actions.get('download') != null;
                     ]]></activeCondition>
                 </processing>
             </action>
@@ -244,7 +244,7 @@
                                 return false;
                             }
                         }
-                        return ajaxplorer.actionBar.actions.get('compress') != null && ajaxplorer.actionBar.actions.get('share') != null;
+                        return pydio.getController().actions.get('compress') != null && pydio.getController().actions.get('share') != null;
                     ]]></activeCondition>
                 </processing>
             </action>

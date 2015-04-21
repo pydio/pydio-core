@@ -87,13 +87,13 @@ Class.create("AbstractEditor" , {
      */
     showElement : function(show){
         if(show) {
-            ajaxplorer.disableAllKeyBindings();
+            pydio.UI.disableAllKeyBindings();
             this.element.show();
             if(this.inputNode){
                 ajaxplorer.updateContextData(null, [this.inputNode], this);
             }
         }else {
-            ajaxplorer.enableAllKeyBindings();
+            pydio.UI.enableAllKeyBindings();
             this.element.hide();
         }
     },
@@ -159,7 +159,7 @@ Class.create("AbstractEditor" , {
 		}, this);
 		if(this.registeredActions.size()){
 			this.keyObs = function(e){
-                if(ajaxplorer.blockEditorShortcuts) return;
+                if(pydio.UI.blockEditorShortcuts) return;
 				if(this.registeredActions.get(e.keyCode)){
 					this.actions.get(this.registeredActions.get(e.keyCode)).onclick();
 				}else if(this.registeredActions.get(String.fromCharCode(e.keyCode).toLowerCase())){

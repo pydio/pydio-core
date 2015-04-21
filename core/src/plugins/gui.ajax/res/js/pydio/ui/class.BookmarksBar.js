@@ -52,7 +52,7 @@
         }.bind(this);
         document.observe("ajaxplorer:registry_loaded", this.regObserver);
 		document.observeOnce("ajaxplorer:actions_loaded", function(){
-			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+			var bmAction = pydio.getController().actions.get('bookmark');
             if(!bmAction) return;
 			this.addBookmarkObject = {
 				name:bmAction.getKeyedText(),

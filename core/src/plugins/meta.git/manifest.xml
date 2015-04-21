@@ -29,11 +29,11 @@
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         var loadFunc = function(oForm){
-                            ajaxplorer.actionBar.historyBrowser = new HistoryBrowser($(oForm));
-                            ajaxplorer.actionBar.historyBrowser.open();
+                            pydio.getController().historyBrowser = new HistoryBrowser($(oForm));
+                            pydio.getController().historyBrowser.open();
                         };
                         var closeFunc = function(){
-                            ajaxplorer.actionBar.historyBrowser.close();
+                            pydio.getController().historyBrowser.close();
                             hideLightBox();
                             return false;
                         };

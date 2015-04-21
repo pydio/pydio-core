@@ -581,7 +581,7 @@ Class.create("AjxpDataModel", {
         }));
         var result;
         conn.onComplete = function(transport){
-            result = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            result = pydio.getController().parseXmlMessage(transport.responseXML);
         };
         conn.sendSync();
         if(result === false){
