@@ -256,8 +256,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            echo AJXP_XMLWriter::renderNode($nodeKey, $userId, true, $meta, true, false);
-
+            $userDisplayName = $userObject->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", "ajxp_user", $userId);
+            echo AJXP_XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
         }
 
     }
