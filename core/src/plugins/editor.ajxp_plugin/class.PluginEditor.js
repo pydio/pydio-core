@@ -291,7 +291,7 @@ Class.create("PluginEditor", AbstractEditor, {
         sync.sendSync();
         var encoded;
         if(seed != '-1'){
-            encoded = hex_md5(password);
+            encoded = HasherUtils.hex_md5(password);
         }else{
             encoded = password;
         }

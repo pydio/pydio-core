@@ -41,7 +41,7 @@ Class.create("WebDAVprefsEditor", AjxpPane, {
                 && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
                 element.down('#webdav_password_form').show();
             }
-            ajaxplorer.user.getRepositoriesList().each(function(pair){
+            ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
                 if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
                     var div = new Element('div', {className:(even?'even':'')});
                     div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );

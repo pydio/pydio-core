@@ -102,8 +102,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     ConfService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
-                HTMLWriter::charsetHeader('text/javascript');
-                HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
+                if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+                    HTMLWriter::charsetHeader("application/json");
+                    echo json_encode(ConfService::getMessages($refresh));
+                }else{
+                    HTMLWriter::charsetHeader('text/javascript');
+                    HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
+                }
 
             break;
 

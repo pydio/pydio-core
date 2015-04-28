@@ -38,8 +38,8 @@ Class.create("QuicksendManager", AjxpPane, {
             if(pydio.getController().getActionByName("trigger_remote_copy")){
                 modal.setCloseAction(function(){
                     ajaxplorer.fireContextRefresh();
-                    var bgManager = pydio.getController().bgManager;
-                    bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+                    var bgManager = pydio.getController().getBackgroundTasksManager();
+                    bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
                     bgManager.next();
                 });
             }

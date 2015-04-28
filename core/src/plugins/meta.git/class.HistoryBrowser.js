@@ -74,7 +74,7 @@ Class.create("HistoryBrowser", {
         this.revertAction.show(); this.revertAction.disable();
         this.openAction.show(); this.openAction.disable();
 
-        this.versionsDm = new AjxpDataModel(true);
+        this.versionsDm = new PydioDataModel(true);
         this.versionsRoot = new AjxpNode("/", false, "Versions", "folder.png");
 
         this.versionsDm.observe("selection_changed", function(event){

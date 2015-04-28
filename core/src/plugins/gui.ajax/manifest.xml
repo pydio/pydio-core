@@ -543,9 +543,9 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
                                     window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
@@ -660,12 +660,12 @@
                                     return;
                                 }
                                 var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    var first = root.getChildren().first();
+                                var first = root.getFirstChildIfExists();
+                                if(first){
                                     if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
                                         return;
                                     }
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    dm.setSelectedNodes([first], "dataModel");
                                     window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
@@ -775,9 +775,9 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
                                     p.stop();
                                     return;
                                 }

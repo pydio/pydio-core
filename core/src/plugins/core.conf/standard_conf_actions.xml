@@ -183,6 +183,7 @@
                         if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
+                    if(!window.BookmarksBar) return;
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
                         className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
                         mouseClick:'over',
@@ -492,7 +493,7 @@
 						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-                        ajaxplorer.user.getRepositoriesList().each(function(pair){
+                        ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
                             if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
                                 var div = new Element('div', {className:(even?'even':'')});
                                 div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );

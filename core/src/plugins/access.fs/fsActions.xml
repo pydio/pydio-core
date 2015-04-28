@@ -20,7 +20,7 @@
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						userSelection = ajaxplorer.getUserSelection();
+						var userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
 							path = userSelection.getUniqueNode();
 						}
@@ -74,8 +74,12 @@
                     ]]></clientCallback>
                 <clientForm id="mkdir_form"><![CDATA[
                 <div id="mkdir_form" action="mkdir" box_width="200">
+                <!--
                 <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
-                <input type="text" name="dirname" size="30" class="dialogFocus">
+                -->
+                    <paper-input-decorator label="AJXP_MESSAGE[173]" floatingLabel>
+                        <input type="text" name="dirname" size="30" class="dialogFocus" is="core-input">
+                    </paper-input-decorator>
                 <div class="dialogLegend" style="padding-top:20px;" id="alt_mkfile"><span class="icon-chevron-right"></span> AJXP_MESSAGE[518]</div>
                 </div>
                 ]]></clientForm>
@@ -140,8 +144,8 @@
 						if(pydio.getController().getActionByName("trigger_remote_copy")){
                             modal.setCloseAction(function(){
                                 ajaxplorer.fireContextRefresh();
-                                var bgManager = pydio.getController().bgManager;
-                                bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+                                var bgManager = pydio.getController().getBackgroundTasksManager();
+                                bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
                                 bgManager.next();
                             });
 						}
@@ -215,7 +219,7 @@
 					if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
 					{
 						if(gaTrackEvent){
-							fileNames = userSelection.getFileNames();
+							var fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++){
 								gaTrackEvent("Data", "Download", fileNames[i]);
 							}
@@ -257,7 +261,7 @@
 							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
 							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
 							downloader.triggerEnd = function(){hideLightBox()};
-							fileNames = userSelection.getFileNames();
+							var fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++)
 							{
 								downloader.addListRow(fileNames[i]);
@@ -285,7 +289,7 @@
 					if(ajaxplorer){
 						var userSelection = ajaxplorer.getUserSelection();
 						var action = pydio.getController().getActionByName("download");
-						if(zipEnabled && multipleFilesDownloadEnabled){
+						if(window.zipEnabled && window.multipleFilesDownloadEnabled){
 							if(action){
 								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
 									action.setIconSrc('download_manager.png');
@@ -372,7 +376,7 @@
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
 					var action = pydio.getController().getActionByName("compress");
-					if(!zipEnabled || !multipleFilesDownloadEnabled){
+					if(!window.zipEnabled || !window.multipleFilesDownloadEnabled){
 						if(action){
 							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
 							else action.selectionContext.unique = true;
@@ -648,7 +652,7 @@
 						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							var firstKey ;
 							var reposList = new Hash();
-							user.getCrossRepositories().each(function(pair){
+							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 								if(!firstKey) firstKey = pair.key;
 								reposList.set(pair.key, pair.value.getLabel());
 							}.bind(this));
@@ -762,7 +766,7 @@
 						this.treeSelector.load();
 						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							this.treeSelector.setFilterShow(true);
-							user.getCrossRepositories().each(function(pair){
+							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 								this.treeSelector.appendFilterValue(pair.key, pair.value.getLabel());
 							}.bind(this));
 							this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');

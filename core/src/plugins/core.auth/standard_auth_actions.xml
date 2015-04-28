@@ -53,8 +53,8 @@
 								userPass = $('user_change_ownpass1').value;
 								userOldPass = $('user_change_ownpass_old').value;
 							}else{
-								userPass = hex_md5($('user_change_ownpass1').value);
-								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+								userPass = HasherUtils.hex_md5($('user_change_ownpass1').value);
+								userOldPass = HasherUtils.hex_md5( HasherUtils.hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
 							}
 							var onComplete = function(transport){
 								var addition = '';

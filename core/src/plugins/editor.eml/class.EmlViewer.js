@@ -103,7 +103,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 			var firstKey = '';
 			var reposList = new Hash();
-			user.getCrossRepositories().each(function(pair){
+            ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 				if(!firstKey) firstKey = pair.key;
 				reposList.set(pair.key, pair.value.getLabel());								
 			}.bind(this));

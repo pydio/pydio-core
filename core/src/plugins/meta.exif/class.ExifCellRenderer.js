@@ -80,10 +80,8 @@ Class.create("ExifCellRenderer", {
         if(editorData){
             var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
             var metadata = ajxpNode.getMetadata();
-            ajxpNode.setMetadata(metadata.merge({
-                'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
-                'ol_center' : {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))}
-            }));
+            metadata.set('ol_layers', [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}]);
+            metadata.set('ol_center', {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))});
             var  id = "small_map_" + Math.random();
             latiCell.up('div.infoPanelTable').insert({top:'<div id="'+id+'" style="height: 250px;"></div>'});
             pydio.Registry.loadEditorResources(editorData.resourcesManager);
@@ -105,10 +103,8 @@ Class.create("ExifCellRenderer", {
 			// Update ajxpNode with Google Layer!
 			var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
 			var metadata = ajxpNode.getMetadata();
-			ajxpNode.setMetadata(metadata.merge({
-				'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
-				'ol_center' : {latitude:parseFloat(latitude),longitude:parseFloat(longitude)}
-			}));
+            metadata.set('ol_layers', [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}]);
+            metadata.set('ol_center', {latitude:parseFloat(latitude),longitude:parseFloat(longitude)});
             pydio.UI.openCurrentSelectionInEditor(editorData);
 		}
 		

@@ -25,8 +25,8 @@
                         if(!pydio.getUserSelection().isEmpty()){
                             crtDir = pydio.getUserSelection().getUniqueNode().getPath();
                         }
-						var bgManager = pydio.getController().bgManager;
-						bgManager.queueAction("index", new Hash({file:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
+						var bgManager = pydio.getController().getBackgroundTasksManager();
+						bgManager.queueAction("index", {file:crtDir}, MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>
                     <serverCallback methodName="applyAction" restParams="/file+" developerComment="Trigger re-indexation of a directory, recursively">

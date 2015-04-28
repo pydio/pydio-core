@@ -185,12 +185,12 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         };
 
-        var myWS = ajaxplorer.user.repositories.filter(function(pair){
+        var myWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
             return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
         }).sortBy(function(pair){
             return (pair.value.getLabel());
         });
-        var sharedWS = ajaxplorer.user.repositories.filter(function(pair){
+        var sharedWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
             return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
         }).sortBy(function(pair){
             return (pair.value.getLabel());

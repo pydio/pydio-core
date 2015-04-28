@@ -66,7 +66,7 @@
 						    oForm.setStyle({display:'block'});
 						    oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
 
-							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+							ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
 								oForm.select('input').invoke("observe", "keydown", function(event){
 									if(event.keyCode == Event.KEY_RETURN){
@@ -108,7 +108,7 @@
 							connexion.addParameter('login_seed', oForm.login_seed.value);
 							connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
 							if(oForm.login_seed.value != '-1'){
-								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+								connexion.addParameter('password', HasherUtils.hex_md5(HasherUtils.hex_md5(oForm.password.value)+oForm.login_seed.value));
 							}else{
 								connexion.addParameter('password', oForm.password.value);
 							}
@@ -118,17 +118,30 @@
 							oForm.select('input[data-ajxpLoginAdditionalParameter]').each(function(i){
 							    connexion.addParameter(i.name, i.getValue());
 							});
+                            if(oForm.down(".ajxp_login_error")){
+                                oForm.down(".ajxp_login_error").remove();
+                            }
 							connexion.onComplete = function(transport){
                                 oForm.userid.value = '';
                                 oForm.password.value = '';
 								var success = pydio.getController().parseXmlMessage(transport.responseXML);
-								if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-								}
 								if(success){
         						    $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
         						    oForm.up('.dialogContent').writeAttribute("style", "");
     						        $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
+                                    modal.setCloseValidation(null);
+                                    hideLightBox(true);
+        						}else{
+        						    var errorId = PydioApi.getClient().LAST_ERROR_ID;
+                                    if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                        ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                    }
+                                    if(errorId && oForm.visible() && oForm.down("div.dialogLegend")){
+                                        oForm.down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
+                                        Effect.ErrorShake(oForm.down('.ajxp_login_error'));
+                                    }else{
+                                        alert(MessageHash[errorId]);
+                                    }
         						}
 
 							};

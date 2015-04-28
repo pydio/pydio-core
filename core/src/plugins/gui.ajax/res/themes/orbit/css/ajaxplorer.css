@@ -458,7 +458,7 @@ div.shadow_class
 
 .dialogContent
 {
-    background-color: #f8f8f8;
+    background-color: #ffffff;
     padding: 10px 10px;
     -moz-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px;
@@ -499,8 +499,9 @@ div.shadow_class
 .dialogContent input[type="password"]:focus,
 .dialogContent select:focus
 {
-    background: white;
+/*    background: white;
     border: 1px solid #77b8e2;
+    */
 }
 
 .dialogContent input:disabled,
