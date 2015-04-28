@@ -146,9 +146,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
             // root have no last modify
             return time();
         }
-        else{
-            return filemtime($this->getUrl());
-        }
+        return filemtime($this->getUrl());
     }
 
 
