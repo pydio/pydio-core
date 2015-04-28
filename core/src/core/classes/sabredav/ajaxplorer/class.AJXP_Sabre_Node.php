@@ -141,7 +141,14 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      */
     public function getLastModified()
     {
-        return filemtime($this->getUrl());
+        $preg = "/ajxp.smb:/i";
+        if(($this->path == "/") && (preg_match($preg,$this->getUrl()) === 1)){
+            // root have no last modify
+            return time();
+        }
+        else{
+            return filemtime($this->getUrl());
+        }
     }
 
 
