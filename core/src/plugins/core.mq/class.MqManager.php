@@ -189,7 +189,6 @@ class MqManager extends AJXP_Plugin
                 if (AuthService::usersEnabled()) {
                     $user = AuthService::getLoggedUser();
                     if ($user == null) {
-                        //throw new Exception("You must be logged in");
                         AJXP_XMLWriter::header();
                         AJXP_XMLWriter::requireAuth();
                         AJXP_XMLWriter::close();
@@ -201,6 +200,14 @@ class MqManager extends AJXP_Plugin
                 } else {
                     $GROUP_PATH = '/';
                     $uId = 'shared';
+                }
+                $currentRepository = ConfService::getCurrentRepositoryId();
+                $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
+                if($channelRepository != $currentRepository){
+                    AJXP_XMLWriter::header();
+                    echo "<require_registry_reload/>";
+                    AJXP_XMLWriter::close();
+                    return;
                 }
                //session_write_close();
 

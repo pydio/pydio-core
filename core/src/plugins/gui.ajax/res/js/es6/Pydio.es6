@@ -132,21 +132,12 @@ class Pydio extends Observable{
         }else{
             this.loadXmlRegistry(false, null, starterFunc);
         }
-        /*
-        this.UI.initTemplates();
-        if(this.UI.modal) this.UI.modal.initForms();
-        this.UI.initObjects();
-
-        this.tryLogUserFromCookie();
-        this.fire("registry_loaded", this.Registry.getXML());
-
-        window.setTimeout(function(){
-            this.fire('loaded');
-        }.bind(this), 200);
-
-        this.Router = new Router(this);
-        */
-
+        this.observe("server_message", function(xml){
+            if(XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload")){
+                this.repositoryId = null;
+                this.loadXmlRegistry(false);
+            }
+        }.bind(this));
     }
 
     /**
