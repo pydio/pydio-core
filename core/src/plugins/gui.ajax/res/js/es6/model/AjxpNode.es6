@@ -200,7 +200,7 @@ class AjxpNode extends Observable{
                 this._metadata.set(key, value);
             }
         }.bind(this) );
-        if(pathChanged && !this._isLeaf && this.getChildren().length){
+        if(pathChanged && !this._isLeaf && this.getChildren().size){
             window.setTimeout(function(){
                 this.reload(this._iNodeProvider);
             }.bind(this), 100);

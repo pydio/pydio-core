@@ -300,7 +300,7 @@ Class.create("Diaporama", AbstractEditor, {
         var userSelection = ajaxplorer.getUserSelection();
 		var allItems, sCurrentFile;
 		if(userSelection.isUnique()){
-			allItems = userSelection.getContextNode().getChildren();
+			allItems = ProtoCompat.map2values(userSelection.getContextNode().getChildren());
 			sCurrentFile = node.getPath();
 		}else{
 			allItems = userSelection.getSelectedNodes();
