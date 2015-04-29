@@ -314,7 +314,7 @@
             </action>
             <action name="load_shared_element_data">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
                         <input_param description="Path of the resource to share" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <output type="application/json"/>
