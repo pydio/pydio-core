@@ -49,7 +49,7 @@ Class.create("CartManager", FetchedResultPane, {
     },
 
     updateTitle: function(){
-        if(this.htmlElement) this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
+        if(this.htmlElement) this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size+')');
     },
 
     triggerEvent: function(){
@@ -178,7 +178,7 @@ Class.create("CartManager", FetchedResultPane, {
 
         var sel = new $H();
         var i = 0;
-        this._rootNode.getChildren().each(function(n){
+        this._rootNode.getChildren().forEach(function(n){
             var key = "file_" + i;
             sel.set(key, n.getPath());
             i++;
@@ -198,7 +198,7 @@ Class.create("CartManager", FetchedResultPane, {
      */
     initDataModel: function(ajxpOptions){
 
-        var dataModel = new AjxpDataModel(true);
+        var dataModel = new PydioDataModel(true);
         var rNodeProvider = new LocalCartNodeProvider();
         dataModel.setAjxpNodeProvider(rNodeProvider);
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
@@ -212,7 +212,7 @@ Class.create("CartManager", FetchedResultPane, {
 
         if(this._rootNode.findChildByPath(n.getPath())) return;
         var newNode = new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon());
-        newNode.setMetadata($H(Object.clone(n.getMetadata().toObject())));
+        newNode.setMetadata(ProtoCompat.hash2map(ProtoCompat.map2hash(n.getMetadata())));
         this._rootNode.addChild(newNode);
         this.reload();
 
@@ -227,7 +227,7 @@ Class.create("CartManager", FetchedResultPane, {
 
     recurseLeafs: function(node){
 
-        if(this._rootNode.getChildren().length > this.__maxChildren) {
+        if(this._rootNode.getChildren().size > this.__maxChildren) {
             this.updateTitle();
             this.triggerEvent();
             ajaxplorer.displayMessage('ERROR', 'Stopping recursion: please do not select more than ' + this.__maxChildren + ' at once!');
@@ -235,7 +235,7 @@ Class.create("CartManager", FetchedResultPane, {
         }
 
         if(node.isLoaded()){
-            node.getChildren().each(function(n){
+            node.getChildren().forEach(function(n){
                 if(n.isLeaf()){
                     this.localNodeFromRemoteNode(n);
                 }else{
@@ -256,7 +256,7 @@ Class.create("CartManager", FetchedResultPane, {
 
     getStateData: function(){
         var pathes = $A();
-        this._rootNode.getChildren().each(function(el){
+        this._rootNode.getChildren().forEach(function(el){
             pathes.push([el.getPath(), el.getLabel(), el.getIcon()]);
         });
         return pathes;

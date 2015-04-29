@@ -172,7 +172,7 @@
                     <activeCondition><![CDATA[
                         if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
                             var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || !object.getRootNode || object.getRootNode().getChildren().size() == 0){
+                            if(!object || !object.getRootNode || object.getRootNode().getChildren().size == 0){
                                 return false;
                             }
                         }
