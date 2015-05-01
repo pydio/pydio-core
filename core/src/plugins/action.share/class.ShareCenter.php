@@ -1913,6 +1913,11 @@ class ShareCenter extends AJXP_Plugin
                         $userObject->personalRole->setAcl($newRepo->getUniqueId(), "");
                         $userObject->save("superuser");
                     }
+                    $this->watcher->removeWatchFromFolder(
+                        new AJXP_Node($this->urlBase.$file),
+                        $user,
+                        true
+                    );
                 }
             }
             $originalGroups = array_keys($currentRights["GROUPS"]);
