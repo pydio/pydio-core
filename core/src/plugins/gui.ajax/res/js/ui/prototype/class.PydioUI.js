@@ -148,7 +148,7 @@ Class.create("PydioUI", {
             pydioObject.Controller.loadActionsFromRegistry(pydioObject.getXmlRegistry());
         }
         document.observe("ajaxplorer:registry_loaded", function(event){
-            if(Prototype.Browser.IE) ResourcesManager.prototype.loadAutoLoadResources(event.memo);
+            if(Prototype.Browser.IE) ResourcesManager.loadAutoLoadResources(event.memo);
             pydioObject.Controller.loadActionsFromRegistry(event.memo);
         }.bind(this) );
 

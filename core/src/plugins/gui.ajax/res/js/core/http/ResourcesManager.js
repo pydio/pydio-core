@@ -279,6 +279,7 @@ var ResourcesManager = (function () {
             var jsNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js');
             var node;
             ResourcesManager.__modules = new Map();
+            ResourcesManager.__dependencies = new Map();
             ResourcesManager.__components = new Map();
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -291,6 +292,9 @@ var ResourcesManager = (function () {
                     ResourcesManager.__modules.set(node.getAttribute('className'), node.getAttribute('file'));
                     if (node.getAttribute('autoload') === 'true') {
                         manager.loadJSResource(node.getAttribute('file'), node.getAttribute('className'), null, false);
+                    }
+                    if (node.getAttribute('depends')) {
+                        ResourcesManager.__dependencies.set(node.getAttribute('className'), node.getAttribute('depends').split(','));
                     }
                 }
             } catch (err) {
@@ -390,27 +394,58 @@ var ResourcesManager = (function () {
             }
         }
     }, {
+        key: 'findDependencies',
+
+        /**
+         *
+         * @param className String
+         * @param dependencies Set
+         */
+        value: function findDependencies(className, dependencies) {
+            if (ResourcesManager.__dependencies.has(className)) {
+                var deps = ResourcesManager.__dependencies.get(className);
+                deps.forEach(function (dep) {
+                    if (!dependencies.has(dep) && ResourcesManager.__modules.has(dep)) {
+                        dependencies.add(dep);
+                        ResourcesManager.findDependencies(dep, dependencies);
+                    }
+                });
+            }
+        }
+    }, {
         key: 'loadClassesAndApply',
         value: function loadClassesAndApply(classNames, callbackFunc) {
             if (!ResourcesManager.__modules) {
                 ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
             }
-            var modules = [];
+            var modules = new Map();
             classNames.forEach(function (c) {
                 if (!window[c] && ResourcesManager.__modules.has(c)) {
-                    modules.push({
+                    var deps = new Set();
+                    ResourcesManager.findDependencies(c, deps);
+                    if (deps.size) {
+                        deps.forEach(function (d) {
+                            modules.set(d, {
+                                className: d,
+                                fileName: ResourcesManager.__modules.get(d),
+                                require: ResourcesManager.__modules.get(d).replace('.js', '')
+                            });
+                        });
+                    }
+                    modules.set(c, {
                         className: c,
                         fileName: ResourcesManager.__modules.get(c),
                         require: ResourcesManager.__modules.get(c).replace('.js', '')
                     });
                 }
             });
-            if (!modules.length) {
+            if (!modules.size) {
                 callbackFunc();
                 return;
             }
-            if (modules.length == 1) {
-                ResourcesManager.detectModuleToLoadAndApply(modules[0].className, callbackFunc);
+
+            if (modules.size == 1) {
+                ResourcesManager.detectModuleToLoadAndApply(modules.keys().next().value, callbackFunc);
                 return;
             }
             if (window.requirejs) {

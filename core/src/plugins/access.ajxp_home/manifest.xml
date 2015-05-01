@@ -3,7 +3,7 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/i18n" />
-            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js" autoload="true"/>
+            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js" autoload="false"/>
             <css file="plugins/access.ajxp_home/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>

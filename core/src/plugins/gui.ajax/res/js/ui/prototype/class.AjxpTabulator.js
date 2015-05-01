@@ -154,7 +154,7 @@ Class.create("AjxpTabulator", AjxpPane, {
     },
 
     shortenLabel: function(label){
-        if(label && label.innerHTML){
+        if(label && label.innerHTML !== undefined){
             if(label.down('.filenameSpan')){
                 var cont = label.down('.filenameSpan').innerHTML;
                 if(cont.length > 25){

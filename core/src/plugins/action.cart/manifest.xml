@@ -8,8 +8,8 @@
 
     <client_settings>
         <resources>
-            <js className="CartManager" file="plugins/action.cart/class.CartManager.js"/>
-            <js className="LocalCartNodeProvider" file="plugins/action.cart/class.LocalCartNodeProvider.js" autoload="true"/>
+            <js className="LocalCartNodeProvider" file="plugins/action.cart/class.LocalCartNodeProvider.js"/>
+            <js className="CartManager" file="plugins/action.cart/class.CartManager.js" depends="LocalCartNodeProvider"/>
             <i18n namespace="action.cart" path="plugins/action.cart/i18n"/>
         </resources>
     </client_settings>

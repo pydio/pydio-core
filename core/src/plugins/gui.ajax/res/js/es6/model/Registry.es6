@@ -284,6 +284,7 @@ class Registry{
      */
     getDefaultImageFromParameters(pluginId, paramName){
         var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
+        if(!node) return '';
         return node.getAttribute("defaultImage") || '';
     }
 

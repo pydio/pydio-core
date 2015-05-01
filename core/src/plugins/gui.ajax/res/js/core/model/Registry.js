@@ -316,7 +316,9 @@ var Registry = (function () {
          */
         value: function getDefaultImageFromParameters(pluginId, paramName) {
             var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='" + pluginId + "']/server_settings/global_param[@name='" + paramName + "']");
-            return node.getAttribute("defaultImage") || "";
+            if (!node) {
+                return "";
+            }return node.getAttribute("defaultImage") || "";
         }
     }, {
         key: "hasPluginOfType",

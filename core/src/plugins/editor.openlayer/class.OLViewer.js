@@ -17,6 +17,24 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+
+if(!window.OpenLayers && !window.OpenLayersLoading){
+    window.OpenLayersLoading = true;
+    if(Prototype.Browser.IE) window.originalEvent = window.Event;
+    var script = new Element('script', {
+            src:(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.openlayer/openlayer/OpenLayers.js",
+            type:"text/javascript"}
+    );
+    if(Prototype.Browser.IE){
+        script.attachEvent("onreadystatechange", function(){
+            if(script.readyState == "loaded"){
+                window.Event = window.originalEvent;
+            }
+        }, false);
+    }
+    $(document.body).insert(script);
+}
+
 Class.create("OLViewer", AbstractEditor, {
 
 	initialize: function($super, oFormObject, options)
@@ -157,8 +175,17 @@ Class.create("OLViewer", AbstractEditor, {
 		this.layers.invoke('mergeNewParams', filterParams);
 	},
 	
-	createOLMap : function(ajxpNode, targetId, useDefaultControls, dualTileMode){
-		
+	createOLMap : function(ajxpNode, targetId, useDefaultControls, dualTileMode, retries){
+
+        if(!window.OpenLayers && window.OpenLayersLoading){
+            if((retries && retries >= 4)) return;//ABORT
+            else if(retries === undefined) retries = 1;
+            else retries ++;
+            setTimeout(function(){
+                this.createOLMap(ajxpNode, targetId, useDefaultControls, dualTileMode, retries);
+            }.bind(this), 1000);
+            return;
+        }
 		// PARSE METADATA
 		var metadata = ajxpNode.getMetadata();
 		var layersDefinitions;

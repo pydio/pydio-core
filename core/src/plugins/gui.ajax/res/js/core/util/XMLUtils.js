@@ -28,9 +28,10 @@ var XMLUtils = (function () {
          * @signature function(element, query)
          */
         value: function XPathSelectSingleNode(element, query) {
-            if (element.selectSingleNode) {
-                return element.selectSingleNode(query);
-            }
+            try {
+                var res = element.selectSingleNode(query);
+                if (res) return res;
+            } catch (e) {}
 
             if (!XMLUtils.__xpe) {
                 try {
@@ -65,18 +66,17 @@ var XMLUtils = (function () {
          * @signature function(element, query)
          */
         value: function XPathSelectNodes(element, query) {
-            if (element.selectNodes) {
+            try {
                 try {
                     if (element.ownerDocument) {
                         element.ownerDocument.setProperty("SelectionLanguage", "XPath");
                     } else {
                         element.setProperty("SelectionLanguage", "XPath");
                     }
-                } catch (e) {
-                    if (console) console.log(e);
-                }
-                return element.selectNodes(query);
-            }
+                } catch (e) {}
+                var res = Array.from(element.selectNodes(query));
+                if (res) return res;
+            } catch (e) {}
 
             var xpe = XMLUtils.__xpe;
 
