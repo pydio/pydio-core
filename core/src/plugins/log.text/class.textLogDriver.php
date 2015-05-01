@@ -63,6 +63,14 @@ class textLogDriver extends AbstractLogDriver
     }
 
     /**
+     * If the plugin is cloned, make sure to renew the $fileHandle
+     */
+    public function __clone() {
+        $this->close();
+        $this->open();
+    }
+
+    /**
      * Initialise storage: check and/or make log folder and file.
      */
     public function initStorage()
@@ -144,18 +152,20 @@ class textLogDriver extends AbstractLogDriver
      * @param String $ip The client ip
      * @param String $user The user login
      * @param String $source The source of the message
-     * @param String $prefix  The prefix of the message
+     * @param String $prefix The prefix of the message
      * @param String $message The message to log
+     * @throws Exception
      * @return void
      */
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
+        if(AJXP_Utils::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
         $textMessage .= "$ip\t".strtoupper((string) $level)."\t$user\t$source\t$prefix\t$message\n";
 
         if ($this->fileHandle !== false) {
             if(count($this->stack)) $this->stackFlush();
-            if (@fwrite($this->fileHandle, $textMessage) === false) {
+            if (fwrite($this->fileHandle, $textMessage) === false) {
                 throw new Exception("There was an error writing to log file ($this->logFileName)");
             }
         } else {
@@ -185,6 +195,7 @@ class textLogDriver extends AbstractLogDriver
     {
         if(is_resource($this->fileHandle)){
             fclose($this->fileHandle);
+            $this->fileHandle = FALSE;
         }
     }
 

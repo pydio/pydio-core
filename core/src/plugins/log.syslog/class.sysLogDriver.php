@@ -54,6 +54,14 @@ class sysLogDriver extends textLogDriver
     }
 
     /**
+     * If the plugin is cloned, make sure to renew the $fileHandle
+     */
+    public function __clone() {
+        $this->close();
+        $this->open();
+    }
+
+    /**
      * Initialise storage: check and/or make log folder and file.
      */
     public function initStorage()
@@ -175,6 +183,8 @@ class sysLogDriver extends textLogDriver
      * @param String $nodeName Name of the XML node to use as response.
      * @param Integer $year The year to list.
      * @param Integer $month The month to list.
+     * @param string $rootPath
+     * @param bool $print
      * @return null
      */
     public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
@@ -191,8 +201,10 @@ class sysLogDriver extends textLogDriver
     /**
      * Get a log in XML format.
      *
+     * @param $parentDir
      * @param String $date Date in m-d-y format.
      * @param String $nodeName The name of the node to use for each log item.
+     * @param string $rootPath
      * @return null
      */
     public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
