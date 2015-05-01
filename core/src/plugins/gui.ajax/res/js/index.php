@@ -6,6 +6,7 @@
     <script src="vendor/webcomponents/bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <script src="vendor/jquery/jquery-1.11.2.min.js"></script>
     <script src="vendor/es6/browser-polyfill.js"></script>
+    <script src="vendor/xpath-polyfill/javascript-xpath-cmp.js"></script>
 
     <!--<script type="text/javascript" language="javascript" src="../jquery_backbone-min.js"></script>-->
     <?php
