@@ -639,7 +639,9 @@ class smb_stream_wrapper extends smb
         $this->mode = $mode;
         $this->defer_stream_read;
         $this->parsed_url = $pu = smb::parse_url($url);
-        if ($pu['type'] <> 'path') trigger_error('stream_open(): error in URL', E_USER_ERROR);
+        if ($pu['type'] <> 'path') 
+        	return false;
+        	//trigger_error('stream_open(): error in URL', E_USER_ERROR);
         switch ($mode) {
             case 'r':
             case 'r+':
