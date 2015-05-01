@@ -1206,20 +1206,22 @@ Class.create("ShareCenter", {
                 if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
                     message += "\n\n "+ MessageHash["share_center.108"] + "\n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
                 }
-                var mailer = new AjxpMailer();
                 var usersList = null;
                 if(this.shareFolderMode == 'workspace' && oForm) {
                     usersList = oForm.down(".editable_users_list");
                 }
-                modal.showSimpleModal(
-                    mailerShower,
-                    mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
-                    function(){
-                        mailer.postEmail();
-                        return true;
-                    },function(){
-                        return true;
-                    });
+                ResourcesManager.detectModuleToLoadAndApply('AjxpMailer', function(){
+                    var mailer = new AjxpMailer();
+                    modal.showSimpleModal(
+                        mailerShower,
+                        mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
+                        function(){
+                            mailer.postEmail();
+                            return true;
+                        },function(){
+                            return true;
+                        });
+                });
             }.bind(this));
         }else{
             var subject = encodeURIComponent(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle));
@@ -1269,11 +1271,13 @@ Class.create("ShareCenter", {
                     }else{
                         url = this._currentRepositoryLink;
                     }
-                    var qrcode = new QRCode(randId, {
-                        width: 128,
-                        height: 128
+                    ResourcesManager.detectModuleToLoadAndApply('QRCode', function(){
+                        var qrcode = new QRCode(randId, {
+                            width: 128,
+                            height: 128
+                        });
+                        qrcode.makeCode(url);
                     });
-                    qrcode.makeCode(url);
                 }
                 if(qrcodediv.visible()) qrcodediv.hide();
                 else qrcodediv.show();

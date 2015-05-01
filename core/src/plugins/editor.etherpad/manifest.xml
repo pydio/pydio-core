@@ -5,7 +5,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.etherpad/class.EtherpadLauncher.js" className="EtherpadLauncher" autoload="true"/>
+            <js file="plugins/editor.etherpad/class.EtherpadLauncher.js" className="EtherpadLauncher"/>
             <i18n path="plugins/editor.etherpad/i18n" namespace="etherpad"/>
             <img_library alias="etherpad" path="plugins/editor.etherpad"/>
         </resources>

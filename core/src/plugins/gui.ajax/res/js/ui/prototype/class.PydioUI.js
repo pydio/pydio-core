@@ -19,6 +19,8 @@
  */
 Class.create("PydioUI", {
 
+    __ajxpClassRegexp: new RegExp(/ajxpClass="([0-9a-zA-Z]+)"/g),
+
     initialize: function(pydioObject){
 
         this._pydio = pydioObject;
@@ -178,29 +180,38 @@ Class.create("PydioUI", {
          /*********************/
         this.guiLoaded = false;
         var mainElement = $(ajxpBootstrap.parameters.get('MAIN_ELEMENT'));
-        this.buildGUI(mainElement);
-        document.fire("ajaxplorer:before_gui_load");
-        // Rewind components creation!
-        if(this._guiCompRegistry){
-            this.initAjxpWidgets(this._guiCompRegistry);
-        }
-        this.guiLoaded = true;
-        document.fire("ajaxplorer:gui_loaded");
-        document.observe("ajaxplorer:repository_list_refreshed", function(e){
-            mainElement.classNames().findAll(function(c){ return c.startsWith('ajxp_ws-'); }).each(function(cName){
-                mainElement.removeClassName(cName);
-            });
-            if(e.memo.active && e.memo.list){
-                mainElement.addClassName('ajxp_ws-' + e.memo.list.get(e.memo.active).getSlug());
-            }
+        var classNames = $H();
+        mainElement.select('[ajxpClass]').each(function(el){
+            classNames.set(el.readAttribute('ajxpClass'), true);
         });
-        modal.updateLoadingProgress('GUI Initialized');
-        this.initTabNavigation();
-        this.blockShortcuts = false;
-        this.blockNavigation = false;
-        // TODO : ADD TO XML TEMPLATES INSTEAD
-        this.bgManagerPane = new BackgroundManagerPane();
-        modal.updateLoadingProgress('Navigation loaded');
+        classNames = classNames.keys();
+
+        ResourcesManager.loadClassesAndApply(classNames, function(){
+            this.buildGUI(mainElement);
+            document.fire("ajaxplorer:before_gui_load");
+            // Rewind components creation!
+            if(this._guiCompRegistry){
+                this.initAjxpWidgets(this._guiCompRegistry);
+            }
+            this.guiLoaded = true;
+            document.fire("ajaxplorer:gui_loaded");
+            document.observe("ajaxplorer:repository_list_refreshed", function(e){
+                mainElement.classNames().findAll(function(c){ return c.startsWith('ajxp_ws-'); }).each(function(cName){
+                    mainElement.removeClassName(cName);
+                });
+                if(e.memo.active && e.memo.list){
+                    mainElement.addClassName('ajxp_ws-' + e.memo.list.get(e.memo.active).getSlug());
+                }
+            });
+            modal.updateLoadingProgress('GUI Initialized');
+            this.initTabNavigation();
+            this.blockShortcuts = false;
+            this.blockNavigation = false;
+            // TODO : ADD TO XML TEMPLATES INSTEAD
+            this.bgManagerPane = new BackgroundManagerPane();
+            modal.updateLoadingProgress('Navigation loaded');
+        }.bind(this));
+
 
     },
 
@@ -264,6 +275,16 @@ Class.create("PydioUI", {
         }.bind(this) );
     },
 
+    findAjxpClassesInText: function(cdataContent){
+        var match = this.__ajxpClassRegexp.exec(cdataContent);
+        var requiredClasses = $H();
+        while(match !=null){
+            requiredClasses.set(match[1], true);
+            match = this.__ajxpClassRegexp.exec(cdataContent);
+        }
+        return requiredClasses;
+    },
+
     /**
      * Parses a client_configs/template_part node
      */
@@ -271,6 +292,9 @@ Class.create("PydioUI", {
         var parts = XPathSelectNodes(this._pydio.getXmlRegistry(), "client_configs/template_part");
         var toUpdate = {};
         var restoreUpdate = {};
+
+        var requiredClasses = $H();
+        var requiredComponents = $H();
 
         if(!this.templatePartsToRestore){
             this.templatePartsToRestore = $A();
@@ -282,37 +306,52 @@ Class.create("PydioUI", {
             var ajxpId = parts[i].getAttribute("ajxpId");
             var ajxpClassName = parts[i].getAttribute("ajxpClass");
             var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");
+            if(parts[i].getAttribute("components")){
+                parts[i].getAttribute("components").split(",").forEach(function(v){
+                    requiredComponents.set(v, true);
+                });
+            }
             var cdataContent = "";
             if(parts[i].firstChild && parts[i].firstChild.nodeType == 4 && parts[i].firstChild.nodeValue != ""){
                 cdataContent = parts[i].firstChild.nodeValue;
             }
-
-            var ajxpClass = Class.getByName(ajxpClassName);
-            if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
-                toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
-//				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
+            if(ajxpId){
+                toUpdate[ajxpId] = [ajxpClassName, ajxpOptionsString, cdataContent];
+                requiredClasses = requiredClasses.merge(this.findAjxpClassesInText(cdataContent));
             }
         }
-        var futurePartsToRestore = $A(Object.keys(toUpdate));
         this.templatePartsToRestore.each(function(key){
             var part = this.findOriginalTemplatePart(key);
             if(part){
                 var ajxpClassName = part.getAttribute("ajxpClass");
                 var ajxpOptionsString = part.getAttribute("ajxpOptions");
                 var cdataContent = part.innerHTML;
-                var ajxpClass = Class.getByName(ajxpClassName);
-                restoreUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
+                restoreUpdate[key] = [ajxpClassName, ajxpOptionsString, cdataContent];
             }
         }.bind(this));
 
-        for(var id in restoreUpdate){
-            this.refreshGuiComponent(id, restoreUpdate[id][0], restoreUpdate[id][1], restoreUpdate[id][2], restoreUpdate[id][3]);
+        var callback = function(){
+            var futurePartsToRestore = $A();// $A(Object.keys(toUpdate));
+            for(var id in restoreUpdate){
+                this.refreshGuiComponent(id, restoreUpdate[id][0], restoreUpdate[id][1], restoreUpdate[id][2]);
+            }
+            for(id in toUpdate){
+                var ajxpClass = Class.getByName(toUpdate[id][0]);
+                if(ajxpClass && Class.objectImplements(ajxpClass, "IAjxpWidget")){
+                    this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2]);
+                    futurePartsToRestore.push(id);
+                }
+            }
+            this.templatePartsToRestore = futurePartsToRestore;
+            this.refreshGuiComponentConfigs();
+        }.bind(this);
+
+        if(requiredComponents.keys().size()){
+            ResourcesManager.loadWebComponentsAndApply(requiredComponents.keys(), callback);
+        }else{
+            ResourcesManager.loadClassesAndApply(requiredClasses.keys(), callback);
         }
-        for(id in toUpdate){
-            this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
-        }
-        this.templatePartsToRestore = futurePartsToRestore;
-        this.refreshGuiComponentConfigs();
+
     },
 
     /**
@@ -324,8 +363,9 @@ Class.create("PydioUI", {
      * @param ajxpOptionsString
      * @param cdataContent
      */
-    refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
+    refreshGuiComponent:function(ajxpId, ajxpClassName, ajxpOptionsString, cdataContent){
         if(!this._instancesCache.get(ajxpId)) return;
+
         // First destroy current component, unregister actions, etc.
         var oldObj = this._instancesCache.get(ajxpId);
         if(!oldObj.__className) {
@@ -355,6 +395,7 @@ Class.create("PydioUI", {
             }.bind(this));
             if(compReg.length) this.initAjxpWidgets(compReg);
         }
+        var ajxpClass = Class.getByName(ajxpClassName);
         var obj = new ajxpClass($(ajxpId), ajxpOptions);
 
         if(Class.objectImplements(obj, "IFocusable")){

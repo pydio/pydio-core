@@ -156,7 +156,7 @@ var Repository = (function () {
    * Triggers ResourcesManager.load
    */
 		value: function loadResources() {
-			this.resourcesManager.load();
+			this.resourcesManager.load(null, true);
 		}
 	}, {
 		key: 'getNodeProviderDef',

@@ -35,11 +35,15 @@ class ResourcesManager{
 	 * @param fileName String
 	 * @param className String
 	 */
-	addJSResource(fileName, className){
+	addJSResource(fileName, className, autoload=false){
 		if(!this.resources.js){
 			this.resources.js = [];
 		}
-		this.resources.js.push({fileName:fileName,className:className});
+		this.resources.js.push({
+            fileName:fileName,
+            className:className,
+            autoload:false
+        });
 	}
 	/**
 	 * Adds a CSS resource
@@ -83,7 +87,7 @@ class ResourcesManager{
 	 * Load resources
 	 * @param resourcesRegistry $H Ajaxplorer ressources registry
 	 */
-	load(resourcesRegistry){
+	load(resourcesRegistry, jsAutoloadOnly=false){
 		if(this.loaded) return;
 		if(this.hasDependencies()){
 			this.resources.dependencies.forEach(function(el){
@@ -99,6 +103,7 @@ class ResourcesManager{
 		}
 		if(this.resources.js){
 			this.resources.js.forEach(function(value){
+                if(jsAutoloadOnly && !value.autoload) return;
 				this.loadJSResource(value.fileName, value.className);
 			}.bind(this));
 		}
@@ -126,6 +131,14 @@ class ResourcesManager{
             callback();
         }
 	}
+
+    loadWebComponents(fileNames, callback){
+        if(!Polymer){
+            throw Error('Cannot find Polymer library!');
+        }
+        Polymer.import(fileNames, callback);
+    }
+
 	/**
 	 * Load a CSS file
 	 * @param fileName String
@@ -173,7 +186,11 @@ class ResourcesManager{
 		if(node.nodeName == "resources"){
 			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
-					this.addJSResource(node.childNodes[k].getAttribute('file'), node.childNodes[k].getAttribute('className'));
+					this.addJSResource(
+                        node.childNodes[k].getAttribute('file'),
+                        node.childNodes[k].getAttribute('className'),
+                        (node.childNodes[k].getAttribute('autoload') === true)
+                    );
 				}else if(node.childNodes[k].nodeName == 'css'){
 					this.addCSSResource(node.childNodes[k].getAttribute('file'));
 				}else if(node.childNodes[k].nodeName == 'img_library'){
@@ -213,10 +230,22 @@ class ResourcesManager{
 	 */
 	static loadAutoLoadResources(registry){
         var manager = new ResourcesManager();
-		var jsNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js[@autoload="true"]');
+		var jsNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js');
         var node;
+        ResourcesManager.__modules = new Map();
+        ResourcesManager.__components = new Map();
         for(node of jsNodes){
-            manager.loadJSResource(node.getAttribute('file'), node.getAttribute('className'));
+            ResourcesManager.__modules.set(node.getAttribute('className'), node.getAttribute('file'));
+            if(node.getAttribute('autoload') === "true"){
+                manager.loadJSResource(node.getAttribute('file'), node.getAttribute('className'), null, false);
+            }
+        }
+        var compNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/component');
+        for(node of compNodes){
+            ResourcesManager.__components.set(node.getAttribute('componentName'), node.getAttribute('file'));
+            if(node.getAttribute('autoload') === "true"){
+                manager.loadWebComponents([node.getAttribute('file')]);
+            }
         }
 		var imgNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
         for(node of imgNodes){
@@ -227,4 +256,74 @@ class ResourcesManager{
 			manager.loadCSSResource(node.getAttribute("file"));
         }
 	}
+
+    static loadClassesAndApply(classNames, callbackFunc){
+        if(!ResourcesManager.__modules){
+            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
+        }
+        var modules = [];
+        classNames.forEach(function(c){
+            if(!window[c] && ResourcesManager.__modules.has(c)){
+                modules.push({
+                    className:c,
+                    fileName:ResourcesManager.__modules.get(c),
+                    require:ResourcesManager.__modules.get(c).replace('.js', '')
+                });
+            }
+        });
+        if(!modules.length){
+            callbackFunc();
+            return;
+        }
+        if(modules.length == 1){
+            ResourcesManager.detectModuleToLoadAndApply(modules[0]['className'], callbackFunc);
+            return;
+        }
+        if(window.requirejs){
+            // Let require handle multiple async
+            var requires = [];
+            modules.forEach(function(e){requires.push(e.require);});
+            requirejs(requires, callbackFunc);
+        }else{
+            // Load sync and apply the callback manually
+            var loader = new ResourcesManager();
+            modules.forEach(function(element){
+                loader.loadJSResource(element.fileName, element.className, null, false);
+            });
+            callbackFunc();
+        }
+    }
+
+    static detectModuleToLoadAndApply(callbackString, callbackFunc){
+        if(!ResourcesManager.__modules){
+            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
+        }
+        var className = callbackString.split('.',1).shift();
+        if(!window[className] && ResourcesManager.__modules.has(className)){
+            if(window.requirejs){
+                requirejs([ResourcesManager.__modules.get(className).replace('.js','')], callbackFunc);
+            }else{
+                var loader = new ResourcesManager();
+                loader.loadJSResource(ResourcesManager.__modules.get(className), className, callbackFunc, true);
+            }
+        }else{
+            callbackFunc();
+        }
+    }
+
+    static loadWebComponentsAndApply(componentsList, callbackFunc){
+        if(!ResourcesManager.__modules){
+            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
+        }
+        var files = [];
+        componentsList.forEach(function(v){
+            if(ResourcesManager.__components.has(v)) {
+                files.push(ResourcesManager.__components.get(v));
+            }
+        });
+        if(files.length){
+            var manager = new ResourcesManager();
+            manager.loadWebComponents(files, callbackFunc);
+        }
+    }
 }

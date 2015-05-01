@@ -77,7 +77,11 @@ class XMLUtils{
             result = query.evaluate(element, 7, null);
             nodes = [];
             for (i=0; i<result.snapshotLength; i++) {
-                nodes[i] = Element.extend(result.snapshotItem(i));
+                if(Element.extend){
+                    nodes[i] = Element.extend(result.snapshotItem(i));
+                }else{
+                    nodes[i] = result.snapshotItem(i);
+                }
             }
             return nodes;
         }
@@ -109,7 +113,7 @@ class XMLUtils{
         return XMLUtils.getDomNodeText(node);
     }
 
-    static getDomNodeText(node){
+    static getDomNodeText(node, includeCData=false){
         if(!node || !node.nodeType) {
             return null;
         }
@@ -119,7 +123,7 @@ class XMLUtils{
             case 1: // NODE_ELEMENT
                 var i, a=[], nodes = node.childNodes, length = nodes.length;
                 for (i=0; i<length; i++) {
-                    a[i] = XMLUtils.getDomNodeText(nodes[i]);
+                    a[i] = XMLUtils.getDomNodeText(nodes[i], includeCData);
                 }
 
                 return a.join("");
@@ -131,6 +135,9 @@ class XMLUtils{
             case 3: // NODE_TEXT
                 return node.nodeValue;
                 break;
+
+            case 4: // CDATA
+                if(includeCData) return node.nodeValue;
         }
 
         return null;

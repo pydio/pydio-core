@@ -173,7 +173,7 @@ Class.create("LogoWidget", AjxpPane, {
         }
         // Reset height
         this.htmlElement.setStyle({paddingTop:(ajxpBootstrap.parameters.get("theme") == 'orbit' ? 0: '9px')});
-        if(imgH > parseInt(this.htmlElement.getHeight())){
+        if(this.htmlElement.getHeight() && imgH > parseInt(this.htmlElement.getHeight())){
             var elPadding = parseInt(this.htmlElement.getStyle('paddingTop')) + (imgH - parseInt(this.htmlElement.getHeight()));
             if(ajxpBootstrap.parameters.get("theme") == 'orbit'){
                 elPadding += 9;

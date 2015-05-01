@@ -305,6 +305,8 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 		parentElement = Position.offsetParent($(element));
 	}else if(parentElement == "window") {
         parentElement = window;
+    }else if(typeof parentElement == "string"){
+        parentElement = element.up('#' + parentElement);
     }else{
 		parentElement = $(parentElement);
 	}
@@ -354,7 +356,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 		if(element.ajxpPaneObject && listen){
 			element.ajxpPaneObject.resize();
 		}
-		element.fire("resize");
+		element.fire("resize", null, null, false);
 	};
 	
 	observer();

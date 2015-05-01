@@ -118,7 +118,7 @@ class Repository {
 	 * Triggers ResourcesManager.load
 	 */
 	loadResources(){
-		this.resourcesManager.load();
+		this.resourcesManager.load(null, true);
 	}
 	
 	/**

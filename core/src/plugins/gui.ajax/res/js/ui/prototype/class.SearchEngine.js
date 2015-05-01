@@ -140,10 +140,24 @@ Class.create("SearchEngine", AjxpPane, {
                 this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta"></div>'});
             }
             if(this.htmlElement.down('#search_meta')){
-                this.initMetadataForm(this.htmlElement.down('#search_meta'), this._ajxpOptions.metaColumns);
+                this.loadRenderersAndInitMetadataForm(this.htmlElement.down('#search_meta'), this._ajxpOptions.metaColumns);
             }
         }
 
+    },
+
+    loadRenderersAndInitMetadataForm: function(formPanel, metadataColumns){
+        if(!this._ajxpOptions.metaColumnsRenderers) {
+            this.initMetadataForm(formPanel, metadataColumns);
+            return;
+        }
+        var collectClasses = $H();
+        $H(this._ajxpOptions.metaColumnsRenderers).each(function(pair){
+            collectClasses.set(pair.value.split('.', 1).shift(), true);
+        }.bind(this));
+        ResourcesManager.loadClassesAndApply(collectClasses.keys(), function(){
+            this.initMetadataForm(formPanel, metadataColumns);
+        }.bind(this));
     },
 
     initMetadataForm: function(formPanel, metadataColumns){
@@ -329,7 +343,7 @@ Class.create("SearchEngine", AjxpPane, {
 
             var searchMeta = this.htmlElement.down('#search_meta');
             if(searchMeta){
-                this.initMetadataForm(searchMeta, this._ajxpOptions.metaColumns);
+                this.loadRenderersAndInitMetadataForm(searchMeta, this._ajxpOptions.metaColumns);
             }
 
 		}else{

@@ -492,12 +492,16 @@ Class.create("InfoPanel", AjxpPane, {
             }
             this.insertedTemplates.push(registeredTemplates[i]);
 			if(tModifier){
-                try{
-    				var modifierFunc = eval(tModifier);
-                }catch(e){
-                    if(console) console.error('InfoPanel: trying to eval function ' + tModifier + ' failed!', e);
-                }
-                if(modifierFunc) modifierFunc(this.contentContainer, fileNode);
+                var cContainer = this.contentContainer;
+                ResourcesManager.detectModuleToLoadAndApply(tModifier, function(){
+                    if(!cContainer) return;
+                    try{
+                        var modifierFunc = eval(tModifier);
+                    }catch(e){
+                        if(console) console.error('InfoPanel: trying to eval function ' + tModifier + ' failed!', e);
+                    }
+                    if(modifierFunc) modifierFunc(cContainer, fileNode);
+                });
 			}
 		}
         if(this.contentContainer.down('#info_panel_primary') && this.contentContainer.down('div.infoPanelAllMetadata')){

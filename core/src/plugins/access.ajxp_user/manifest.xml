@@ -4,8 +4,8 @@
 		<resources>
 			<i18n namespace="user_dash" path="plugins/access.ajxp_user/i18n" />
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
-            <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js" autoload="true"/>
-            <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js" autoload="true"/>
+            <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js"/>
+            <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js"/>
             <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>

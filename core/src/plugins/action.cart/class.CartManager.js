@@ -284,6 +284,6 @@ Class.create("CartManager", FetchedResultPane, {
 
 if(window.ajxpMinisite){
     document.observe("ajaxplorer:actions_loaded", function(){
-        pydio.getController().actions.unset("send-selection-to-cart");
+        pydio.getController().actions.delete("send-selection-to-cart");
     });
 }

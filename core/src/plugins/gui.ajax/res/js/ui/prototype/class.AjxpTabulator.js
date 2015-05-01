@@ -205,18 +205,29 @@ Class.create("AjxpTabulator", AjxpPane, {
     },
 
     parseComponentConfig: function(domNode){
-        XPathSelectNodes(domNode, "additional_tab").each(function(addNode){
-            var cdataContent = addNode.firstChild.nodeValue;
-            var anchor = this.htmlElement;
-            if(cdataContent && anchor){
-                if(!anchor.down('#'+addNode.getAttribute("id"))){
-                    anchor.insert(cdataContent);
-                    var compReg = $A();
-                    pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
-                    if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
-                }
-                this.addTab(addNode.getAttribute("tabInfo").evalJSON(), addNode.getAttribute("paneInfo").evalJSON());
+        var contentNodes = XMLUtils.XPathSelectNodes(domNode, "additional_tab");
+        // Check additional classes
+        var detectedClasses = $H();
+        contentNodes.each(function(n){
+            var cdataContent = n.firstChild.nodeValue;
+            if(cdataContent){
+                detectedClasses = detectedClasses.merge(pydio.UI.findAjxpClassesInText(cdataContent));
             }
+        });
+        ResourcesManager.loadClassesAndApply(detectedClasses.keys(), function(){
+            contentNodes.each(function(addNode){
+                var cdataContent = addNode.firstChild.nodeValue;
+                var anchor = this.htmlElement;
+                if(cdataContent && anchor){
+                    if(!anchor.down('#'+addNode.getAttribute("id"))){
+                        anchor.insert(cdataContent);
+                        var compReg = $A();
+                        pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                        if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
+                    }
+                    this.addTab(addNode.getAttribute("tabInfo").evalJSON(), addNode.getAttribute("paneInfo").evalJSON());
+                }
+            }.bind(this));
         }.bind(this));
     },
 

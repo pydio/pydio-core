@@ -94,7 +94,11 @@ var XMLUtils = (function () {
                 result = query.evaluate(element, 7, null);
                 nodes = [];
                 for (i = 0; i < result.snapshotLength; i++) {
-                    nodes[i] = Element.extend(result.snapshotItem(i));
+                    if (Element.extend) {
+                        nodes[i] = Element.extend(result.snapshotItem(i));
+                    } else {
+                        nodes[i] = result.snapshotItem(i);
+                    }
                 }
                 return nodes;
             }
@@ -129,6 +133,8 @@ var XMLUtils = (function () {
     }, {
         key: "getDomNodeText",
         value: function getDomNodeText(node) {
+            var includeCData = arguments[1] === undefined ? false : arguments[1];
+
             if (!node || !node.nodeType) {
                 return null;
             }
@@ -141,7 +147,7 @@ var XMLUtils = (function () {
                         nodes = node.childNodes,
                         length = nodes.length;
                     for (i = 0; i < length; i++) {
-                        a[i] = XMLUtils.getDomNodeText(nodes[i]);
+                        a[i] = XMLUtils.getDomNodeText(nodes[i], includeCData);
                     }
 
                     return a.join("");
@@ -155,7 +161,12 @@ var XMLUtils = (function () {
                     // NODE_TEXT
                     return node.nodeValue;
                     break;
-            }
+
+                case 4:
+                    // CDATA
+                    if (includeCData) {
+                        return node.nodeValue;
+                    }}
 
             return null;
         }

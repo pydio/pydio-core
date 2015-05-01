@@ -119,25 +119,36 @@ Class.create("AjxpPane", {
     },
 
     parseComponentConfig: function(domNode){
-        var change = false;
-        XPathSelectNodes(domNode, "additional_content").each(function(addNode){
-            var cdataContent = addNode.firstChild.nodeValue;
-            var anchor = this.htmlElement;
-            if(cdataContent && anchor){
-                if(!anchor.down('#'+addNode.getAttribute("id"))){
-                    anchor.insert(cdataContent);
-                    var compReg = $A();
-                    pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
-                    if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
-                    change = true;
+        var contentNodes = XMLUtils.XPathSelectNodes(domNode, "additional_content");
+        // Check additional classes
+        var detectedClasses = $H();
+        contentNodes.each(function(n){
+            var cdataContent = n.firstChild.nodeValue;
+            if(cdataContent){
+                detectedClasses = detectedClasses.merge(pydio.UI.findAjxpClassesInText(cdataContent));
+            }
+        });
+        ResourcesManager.loadClassesAndApply(detectedClasses.keys(), function(){
+            var change = false;
+            contentNodes.each(function(addNode){
+                var cdataContent = addNode.firstChild.nodeValue;
+                var anchor = this.htmlElement;
+                if(cdataContent && anchor){
+                    if(!anchor.down('#'+addNode.getAttribute("id"))){
+                        anchor.insert(cdataContent);
+                        var compReg = $A();
+                        pydio.UI.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                        if(compReg.length) pydio.UI.initAjxpWidgets(compReg);
+                        change = true;
+                    }
                 }
+            }.bind(this));
+            if(change){
+                this.scanChildrenPanes(this.htmlElement, true);
+                this.resize();
+                this.reorderContents();
             }
         }.bind(this));
-        if(change){
-            this.scanChildrenPanes(this.htmlElement, true);
-            this.resize();
-            this.reorderContents();
-        }
     },
 
     reorderContents: function(){
@@ -226,7 +237,7 @@ Class.create("AjxpPane", {
             var parentWidth = $(this.options.flexTo).getWidth();
             var siblingWidth = 0;
             this.htmlElement.siblings().each(function(s){
-                if(s.hasClassName('skipSibling')) return;
+                if(s.hasClassName('skipSibling') || s.tagName.toLowerCase() == 'style') return;
                 if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
                     siblingWidth+=s.ajxpPaneObject.getActualWidth();
                 }else{
@@ -319,6 +330,20 @@ Class.create("AjxpPane", {
 				this.scanChildrenPanes(c);
 			}
 		}.bind(this));
+        /* WebComponents Tests
+        if(element.shadowRoot && element.shadowRoot.childNodes){
+            $A(element.shadowRoot.childNodes).each(function(c){
+                if(c.ajxpPaneObject) {
+                    if(!this.childrenPanes){
+                        this.childrenPanes = $A();
+                    }
+                    this.childrenPanes.push(c.ajxpPaneObject);
+                }else{
+                    this.scanChildrenPanes(c);
+                }
+            }.bind(this));
+        }
+        */
 	},
 	
 	/**

@@ -1733,7 +1733,14 @@ Class.create("FilesList", SelectableElements, {
             columns.each(function(column){
                 if(column.modifier && !column.modifierFunc) {
                     try{
-                        column.modifierFunc = eval(column.modifier);
+                        column.modifierFunc = function(){
+                            var args = Array.from(arguments);
+                            if(column.modifierFuncWrapped) column.modifierFuncWrapped.apply(null, args);
+                            ResourcesManager.detectModuleToLoadAndApply(column.modifier, function(){
+                                column.modifierFuncWrapped = eval(column.modifier);
+                                column.modifierFuncWrapped.apply(null, args);
+                            });
+                        };
                     }catch (e){}
                 }
                 result.set(column.attributeName, column);
