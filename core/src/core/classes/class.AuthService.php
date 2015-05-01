@@ -68,12 +68,16 @@ class AuthService
      */
     public static function generateSecureToken()
     {
-        if(isSet($_SESSION["FORCE_SECURE_TOKEN"])){
-            $_SESSION["SECURE_TOKEN"] = $_SESSION["FORCE_SECURE_TOKEN"];
-            return $_SESSION["SECURE_TOKEN"];
+        if(!isSet($_SESSION["SECURE_TOKENS"])){
+            $_SESSION["SECURE_TOKENS"] = array();
         }
-        $_SESSION["SECURE_TOKEN"] = AJXP_Utils::generateRandomString(32); //md5(time());
-        return $_SESSION["SECURE_TOKEN"];
+        if(isSet($_SESSION["FORCE_SECURE_TOKEN"])){
+            $_SESSION["SECURE_TOKENS"][] = $_SESSION["FORCE_SECURE_TOKEN"];
+            return $_SESSION["FORCE_SECURE_TOKEN"];
+        }
+        $newToken = AJXP_Utils::generateRandomString(32); //md5(time());
+        $_SESSION["SECURE_TOKENS"][] = $newToken;
+        return $newToken;
     }
     /**
      * Get the secure token from the session
@@ -82,7 +86,11 @@ class AuthService
      */
     public static function getSecureToken()
     {
-        return (isSet($_SESSION["SECURE_TOKEN"])?$_SESSION["SECURE_TOKEN"]:FALSE);
+        if(isSet($_SESSION["SECURE_TOKENS"]) && count($_SESSION["SECURE_TOKENS"])){
+            return true;
+        }
+        return false;
+        //return (isSet($_SESSION["SECURE_TOKENS"])?$_SESSION["SECURE_TOKEN"]:FALSE);
     }
     /**
      * Verify a secure token value from the session
@@ -92,7 +100,7 @@ class AuthService
      */
     public static function checkSecureToken($token)
     {
-        if (isSet($_SESSION["SECURE_TOKEN"]) && $_SESSION["SECURE_TOKEN"] == $token) {
+        if (isSet($_SESSION["SECURE_TOKENS"]) && in_array($token, $_SESSION["SECURE_TOKENS"])) {
             return true;
         }
         return false;

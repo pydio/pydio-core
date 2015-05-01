@@ -83,6 +83,13 @@ Class.create("Ajaxplorer", {
             }
 		}.bind(this));
 
+        this.observe("server_message", function(xml){
+            if(XPathSelectSingleNode(xml, "tree/require_registry_reload")){
+                this.repositoryId = null;
+                this.loadXmlRegistry(false);
+            }
+        }.bind(this));
+
 		modal.setLoadingStepCounts(5);
         if(ajxpBootstrap.parameters.get("PRELOADED_REGISTRY")){
             this._registry = parseXml(ajxpBootstrap.parameters.unset("PRELOADED_REGISTRY")).documentElement;
