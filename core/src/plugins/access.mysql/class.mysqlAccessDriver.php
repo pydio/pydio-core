@@ -89,6 +89,11 @@ class mysqlAccessDriver extends AbstractAccessDriver
         }
         $mess = ConfService::getMessages();
 
+        // Sanitize all httpVars entries
+        foreach($httpVars as $k=>&$value){
+            $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_FILENAME);
+        }
+
         switch ($action) {
 
             //------------------------------------
@@ -324,6 +329,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     foreach ($tables as $tableName) {
                         $size = $this->getSize($tableName);
                         $count = $this->getCount($tableName);
+                        if(AJXP_Utils::detectXSS($tableName)) $tableName = "XSS Detected!";
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
                     }
                     print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
@@ -393,6 +399,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                                 print "$key=\"BLOB$sizeStr\" ";
                             } else {
                                 $value = str_replace("\"", "", $value);
+                                if(AJXP_Utils::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
                                 $value = AJXP_Utils::xmlEntities($value);
                                 print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
                                 if ($result["HAS_PK"]>0) {
@@ -420,6 +427,9 @@ class mysqlAccessDriver extends AbstractAccessDriver
         }
 
         if (isset($logMessage) || isset($errorMessage)) {
+            if(AJXP_Utils::detectXSS($logMessage) || AJXP_Utils::detectXSS($errorMessage)){
+                $xmlBuffer = AJXP_XMLWriter::sendMessage(null, "XSS Detected!", false);
+            }
             $xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
 
