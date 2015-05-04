@@ -226,7 +226,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     } else {
                         $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
                     }
-                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
+                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
                         $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);

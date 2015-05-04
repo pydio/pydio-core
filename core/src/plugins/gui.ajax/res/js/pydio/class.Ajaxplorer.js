@@ -52,6 +52,7 @@ Class.create("Ajaxplorer", {
 	 * Event ajaxplorer:loaded is fired at the end.
 	 */
 	init:function(){
+        this.actionBar = new ActionsManager(this.usersEnabled);
 		document.observe("ajaxplorer:registry_loaded", function(){
             this.refreshExtensionsRegistry();
 			this.logXmlUser(this._registry, false);
@@ -65,11 +66,13 @@ Class.create("Ajaxplorer", {
 				this.refreshTemplateParts();
 				this.refreshGuiComponentConfigs();
                 this.refreshExtensionsRegistry();
-			} else {
+                this.actionBar.loadActionsFromRegistry(this._registry);
+            } else {
 				document.observe("ajaxplorer:gui_loaded", function(){
 					this.refreshTemplateParts();
 					this.refreshGuiComponentConfigs();
                     this.refreshExtensionsRegistry();
+                    this.actionBar.loadActionsFromRegistry(this._registry);
 				}.bind(this));
 			}
             this.loadActiveRepository();
@@ -289,15 +292,16 @@ Class.create("Ajaxplorer", {
 			}			
 		}.bind(protoMenu));
 		
-		this.actionBar = new ActionsManager(this.usersEnabled);
 		if(this._registry){
 			this.actionBar.loadActionsFromRegistry(this._registry);
 		}
+        /*
 		document.observe("ajaxplorer:registry_loaded", function(event){
             if(Prototype.Browser.IE) ResourcesManager.prototype.loadAutoLoadResources(event.memo);
 			this.actionBar.loadActionsFromRegistry(event.memo);
 		}.bind(this) );
-				
+        */
+
 		document.observe("ajaxplorer:context_changed", function(event){
             var path = this.getContextNode().getPath();
             document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
@@ -550,6 +554,12 @@ Class.create("Ajaxplorer", {
                 // Fire top resize event once after all css are loaded.
                 element.ajxpPaneObject.resize();
             }, 500);
+        }
+        if(window.modal && window.modal.tooltip){
+            try{
+                window.modal.tooltip.remove();
+                window.modal.tooltip = null;
+            }catch(e){}
         }
 	},
 	

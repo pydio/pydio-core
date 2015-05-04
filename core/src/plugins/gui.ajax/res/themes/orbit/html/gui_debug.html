@@ -20,7 +20,7 @@ foreach ($lines as $line){
 
     <?php
 $list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot_list.txt";
-if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
     $list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot_protolegacy_list.txt";
 }
 $lines = file($list);
