@@ -116,6 +116,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
      * @param AJXP_Node $node
      * @param $userId
      * @param bool $clearUsers
+     * @param bool $targetUserId
      */
     public function removeWatchFromFolder($node, $userId, $clearUsers = false, $targetUserId = false)
     {
@@ -181,6 +182,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
      * @param AJXP_Node $node
      * @param $userId
      * @param string $ns Watch namespace
+     * @param array $result
      * @return string|bool the type of watch
      */
     public function hasWatchOnNode($node, $userId, $ns = "META_WATCH", &$result = array())
@@ -320,9 +322,22 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
                     continue;
                 }
                 if (!AuthService::userExists($id)) {
-                    $changes = true;
-                    unset($watchMeta[$id]);
                     unset($IDS[$index]);
+                    if(is_array($watchMeta)){
+                        $changes = true;
+                        $watchMeta[$id] = AJXP_VALUE_CLEAR;
+                    }
+                }else{
+                    // Make sure the user is still authorized on this node, otherwise remove it.
+                    $uObject = ConfService::getConfStorageImpl()->createUserObject($id);
+                    $acl = $uObject->mergedRole->getAcl($node->getRepositoryId());
+                    if(empty($acl) || strpos($acl, "r") === FALSE){
+                        unset($IDS[$index]);
+                        if(is_array($watchMeta)){
+                            $changes = true;
+                            $watchMeta[$id] = AJXP_VALUE_CLEAR;
+                        }
+                    }
                 }
             }
             if ($changes) {
