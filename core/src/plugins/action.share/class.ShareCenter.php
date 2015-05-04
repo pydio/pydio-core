@@ -1383,11 +1383,19 @@ class ShareCenter extends AJXP_Plugin
                 $ID = $userId;
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
                 if(empty($loadedGroups)){
-                    $baseGroup = AuthService::filterBaseGroup("/");
+                    $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+                    if($displayAll){
+                        AuthService::setGroupFiltering(false);
+                    }
                     $loadedGroups = AuthService::listChildrenGroups();
-                    foreach($loadedGroups as $loadedG => $loadedLabel){
-                        unset($loadedGroups[$loadedG]);
-                        $loadedGroups[rtrim($baseGroup, "/")."/".ltrim($loadedG, "/")] = $loadedLabel;
+                    if($displayAll){
+                        AuthService::setGroupFiltering(true);
+                    }else{
+                        $baseGroup = AuthService::filterBaseGroup("/");
+                        foreach($loadedGroups as $loadedG => $loadedLabel){
+                            unset($loadedGroups[$loadedG]);
+                            $loadedGroups[rtrim($baseGroup, "/")."/".ltrim($loadedG, "/")] = $loadedLabel;
+                        }
                     }
                 }
                 $groupId = substr($rId, strlen('AJXP_GRP_'));
