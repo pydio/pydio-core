@@ -358,7 +358,7 @@ WebFXTreeAbstractNode.prototype.select = function() {
                 }
             }
         }catch(e){
-            if(console) console.log(e);
+            if(window.console) console.log(e);
         }
 
     }

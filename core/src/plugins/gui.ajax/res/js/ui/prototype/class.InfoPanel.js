@@ -498,7 +498,7 @@ Class.create("InfoPanel", AjxpPane, {
                     try{
                         var modifierFunc = eval(tModifier);
                     }catch(e){
-                        if(console) console.error('InfoPanel: trying to eval function ' + tModifier + ' failed!', e);
+                        if(window.console) console.error('InfoPanel: trying to eval function ' + tModifier + ' failed!', e);
                     }
                     if(modifierFunc) modifierFunc(cContainer, fileNode);
                 });

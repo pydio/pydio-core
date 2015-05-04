@@ -147,7 +147,7 @@ Class.create("PydioUI", {
         if(pydioObject.getXmlRegistry()){
             pydioObject.Controller.loadActionsFromRegistry(pydioObject.getXmlRegistry());
         }
-        document.observe("ajaxplorer:registry_loaded", function(event){
+        pydioObject.observe("registry_loaded", function(event){
             if(Prototype.Browser.IE) ResourcesManager.loadAutoLoadResources(event.memo);
             pydioObject.Controller.loadActionsFromRegistry(event.memo);
         }.bind(this) );
@@ -432,7 +432,7 @@ Class.create("PydioUI", {
             try{
                 this.setGuiComponentConfig(nodes[i]);
             }catch(e){
-                console.error("Error while setting ComponentConfig", e);
+                if(window.console) console.error("Error while setting ComponentConfig", e);
             }
         }
         var element = $(window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));

@@ -1350,7 +1350,7 @@ Class.create("FilesList", SelectableElements, {
                     new Effect.RowFade(item, {afterFinish:function(){
                         try{
                             item.remove();
-                        }catch(e){if(console) console.log(e);}
+                        }catch(e){if(window.console) console.log(e);}
                         delete item;
                         this.initRowsBuffered();
                     }.bind(this), duration:0.2});

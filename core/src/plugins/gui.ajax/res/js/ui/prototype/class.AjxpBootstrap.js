@@ -56,7 +56,7 @@ Class.create("AjxpBootstrap", {
                     startedFromOpener = true;
                 }
             }catch(e){
-                if(console && console.log) console.log(e);
+                if(window.console && console.log) console.log(e);
             }
             if(!startedFromOpener){
                 this.loadBootConfig();
@@ -77,10 +77,10 @@ Class.create("AjxpBootstrap", {
 		}.bind(this));
 		document.observe("ajaxplorer:actions_loaded", function(){
 			if(!this.parameters.get("SELECTOR_DATA") && pydio.getController().actions.get("ext_select")){
-				if(pydio.getController().actions.delete){
-                    pydio.getController().actions.delete("ext_select");
-                }else{
+				if(pydio.getController().actions._object){
                     pydio.getController().actions.unset("ext_select");
+                }else{
+                    pydio.getController().actions.delete("ext_select");
                 }
 				pydio.getController().fireContextChange();
 				pydio.getController().fireSelectionChange();

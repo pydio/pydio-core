@@ -2398,7 +2398,7 @@ Element.Methods = {
               (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') :
                 property] = styles[property];
       }catch(invalid){
-          if(console) console.log('Invalid Styles', styles, element);
+          if(window.console) console.log('Invalid Styles', styles, element);
       }
 
     return element;

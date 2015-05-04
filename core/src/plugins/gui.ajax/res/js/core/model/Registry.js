@@ -2,8 +2,6 @@
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -34,311 +32,295 @@ var Registry = (function () {
         this._pydioObject = pydioObject;
     }
 
-    _createClass(Registry, [{
-        key: "loadFromString",
-        value: function loadFromString(s) {
-            this._registry = XMLUtils.parseXml(s).documentElement;
-        }
-    }, {
-        key: "load",
-        value: function load(sync, xPath, completeFunc) {
-            var onComplete = (function (transport) {
-                if (transport.responseXML == null || transport.responseXML.documentElement == null) return;
-                if (transport.responseXML.documentElement.nodeName == "ajxp_registry") {
-                    this._registry = transport.responseXML.documentElement;
-                    //modal.updateLoadingProgress('XML Registry loaded');
-                    if (!sync && !completeFunc) {
-                        this._pydioObject.fire("registry_loaded", this._registry);
-                    }
-                } else if (transport.responseXML.documentElement.nodeName == "ajxp_registry_part") {
-                    this.refreshXmlRegistryPart(transport.responseXML.documentElement);
-                }
-                if (completeFunc) completeFunc(this._registry);
-            }).bind(this);
-            var params = { get_action: "get_xml_registry" };
-            if (xPath) {
-                params.xPath = xPath;
-            }
-            PydioApi.getClient().request(params, onComplete, null, { async: !sync });
-        }
-    }, {
-        key: "refreshXmlRegistryPart",
+    Registry.prototype.loadFromString = function loadFromString(s) {
+        this._registry = XMLUtils.parseXml(s).documentElement;
+    };
 
-        /**
-         * Inserts a document fragment retrieved from server inside the full tree.
-         * The node must contains the xPath attribute to locate it inside the registry.
-         * Event ajaxplorer:registry_part_loaded is triggerd once this is done.
-         * @param documentElement DOMNode
-         */
-        value: function refreshXmlRegistryPart(documentElement) {
-            var xPath = documentElement.getAttribute("xPath");
-            var existingNode = XMLUtils.XPathSelectSingleNode(this._registry, xPath);
-            var parentNode;
-            if (existingNode && existingNode.parentNode) {
-                parentNode = existingNode.parentNode;
-                parentNode.removeChild(existingNode);
-                if (documentElement.firstChild) {
-                    parentNode.appendChild(documentElement.firstChild.cloneNode(true));
+    Registry.prototype.load = function load(sync, xPath, completeFunc) {
+        var onComplete = (function (transport) {
+            if (transport.responseXML == null || transport.responseXML.documentElement == null) return;
+            if (transport.responseXML.documentElement.nodeName == "ajxp_registry") {
+                this._registry = transport.responseXML.documentElement;
+                //modal.updateLoadingProgress('XML Registry loaded');
+                if (!sync && !completeFunc) {
+                    this._pydioObject.fire("registry_loaded", this._registry);
                 }
-            } else if (xPath.indexOf("/") > -1) {
-                // try selecting parentNode
-                var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
-                parentNode = XMLUtils.XPathSelectSingleNode(this._registry, parentPath);
-                if (parentNode && documentElement.firstChild) {
-                    parentNode.appendChild(documentElement.firstChild.cloneNode(true));
+            } else if (transport.responseXML.documentElement.nodeName == "ajxp_registry_part") {
+                this.refreshXmlRegistryPart(transport.responseXML.documentElement);
+            }
+            if (completeFunc) completeFunc(this._registry);
+        }).bind(this);
+        var params = { get_action: "get_xml_registry" };
+        if (xPath) {
+            params.xPath = xPath;
+        }
+        PydioApi.getClient().request(params, onComplete, null, { async: !sync });
+    };
+
+    /**
+     * Inserts a document fragment retrieved from server inside the full tree.
+     * The node must contains the xPath attribute to locate it inside the registry.
+     * Event ajaxplorer:registry_part_loaded is triggerd once this is done.
+     * @param documentElement DOMNode
+     */
+
+    Registry.prototype.refreshXmlRegistryPart = function refreshXmlRegistryPart(documentElement) {
+        var xPath = documentElement.getAttribute("xPath");
+        var existingNode = XMLUtils.XPathSelectSingleNode(this._registry, xPath);
+        var parentNode;
+        if (existingNode && existingNode.parentNode) {
+            parentNode = existingNode.parentNode;
+            parentNode.removeChild(existingNode);
+            if (documentElement.firstChild) {
+                parentNode.appendChild(documentElement.firstChild.cloneNode(true));
+            }
+        } else if (xPath.indexOf("/") > -1) {
+            // try selecting parentNode
+            var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
+            parentNode = XMLUtils.XPathSelectSingleNode(this._registry, parentPath);
+            if (parentNode && documentElement.firstChild) {
+                parentNode.appendChild(documentElement.firstChild.cloneNode(true));
+            }
+        } else {
+            if (documentElement.firstChild) this._registry.appendChild(documentElement.firstChild.cloneNode(true));
+        }
+        this._pydioObject.fire("registry_part_loaded", xPath);
+    };
+
+    /**
+     * Translate the XML answer to a new User object
+     * @param skipEvent Boolean Whether to skip the sending of ajaxplorer:user_logged event.
+     */
+
+    Registry.prototype.logXmlUser = function logXmlUser(skipEvent) {
+        this._pydioObject.user = null;
+        var userNode;
+        if (this._registry) {
+            userNode = XMLUtils.XPathSelectSingleNode(this._registry, "user");
+        }
+        if (userNode) {
+            var userId = userNode.getAttribute("id");
+            var children = userNode.childNodes;
+            if (userId) {
+                this._pydioObject.user = new User(userId, children);
+            }
+        }
+        if (!skipEvent) {
+            this._pydioObject.fire("user_logged", this._pydioObject.user);
+        }
+    };
+
+    Registry.prototype.getXML = function getXML() {
+        return this._registry;
+    };
+
+    /**
+     * Find Extension initialisation nodes (activeCondition, onInit, etc), parses
+     * the XML and execute JS.
+     * @param xmlNode DOMNode The extension node
+     * @param extensionDefinition Object Information already collected about this extension
+     * @returns Boolean
+     */
+
+    Registry.prototype.initExtension = function initExtension(xmlNode, extensionDefinition) {
+        var activeCondition = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/activeCondition");
+        if (activeCondition && activeCondition.firstChild) {
+            try {
+                var func = new Function(activeCondition.firstChild.nodeValue.trim());
+                if (func() === false) return false;
+            } catch (e) {}
+        }
+        if (xmlNode.nodeName == "editor") {
+            var properties = {
+                openable: xmlNode.getAttribute("openable") == "true",
+                modalOnly: xmlNode.getAttribute("modalOnly") == "true",
+                previewProvider: xmlNode.getAttribute("previewProvider") == "true",
+                order: xmlNode.getAttribute("order") ? parseInt(xmlNode.getAttribute("order")) : 0,
+                formId: xmlNode.getAttribute("formId") || null,
+                text: this._pydioObject.MessageHash[xmlNode.getAttribute("text")],
+                title: this._pydioObject.MessageHash[xmlNode.getAttribute("title")],
+                icon: xmlNode.getAttribute("icon"),
+                icon_class: xmlNode.getAttribute("iconClass"),
+                editorClass: xmlNode.getAttribute("className"),
+                mimes: xmlNode.getAttribute("mimes").split(","),
+                write: xmlNode.getAttribute("write") && xmlNode.getAttribute("write") == "true" ? true : false
+            };
+            for (var k in properties) {
+                if (properties.hasOwnProperty(k)) {
+                    extensionDefinition[k] = properties[k];
                 }
+            }
+        } else if (xmlNode.nodeName == "uploader") {
+            var th = this._pydioObject.Parameters.get("theme");
+            var clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/clientForm[@theme=\"" + th + "\"]");
+            if (!clientForm) {
+                clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/clientForm");
+            }
+            if (clientForm && clientForm.firstChild && clientForm.getAttribute("id")) {
+                extensionDefinition.formId = clientForm.getAttribute("id");
+                this._pydioObject.UI.insertForm(clientForm.getAttribute("id"), clientForm.firstChild.nodeValue);
+            }
+            if (xmlNode.getAttribute("order")) {
+                extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));
             } else {
-                if (documentElement.firstChild) this._registry.appendChild(documentElement.firstChild.cloneNode(true));
+                extensionDefinition.order = 0;
             }
-            this._pydioObject.fire("registry_part_loaded", xPath);
-        }
-    }, {
-        key: "logXmlUser",
-
-        /**
-         * Translate the XML answer to a new User object
-         * @param skipEvent Boolean Whether to skip the sending of ajaxplorer:user_logged event.
-         */
-        value: function logXmlUser(skipEvent) {
-            this._pydioObject.user = null;
-            var userNode;
-            if (this._registry) {
-                userNode = XMLUtils.XPathSelectSingleNode(this._registry, "user");
-            }
-            if (userNode) {
-                var userId = userNode.getAttribute("id");
-                var children = userNode.childNodes;
-                if (userId) {
-                    this._pydioObject.user = new User(userId, children);
-                }
-            }
-            if (!skipEvent) {
-                this._pydioObject.fire("user_logged", this._pydioObject.user);
-            }
-        }
-    }, {
-        key: "getXML",
-        value: function getXML() {
-            return this._registry;
-        }
-    }, {
-        key: "initExtension",
-
-        /**
-         * Find Extension initialisation nodes (activeCondition, onInit, etc), parses
-         * the XML and execute JS.
-         * @param xmlNode DOMNode The extension node
-         * @param extensionDefinition Object Information already collected about this extension
-         * @returns Boolean
-         */
-        value: function initExtension(xmlNode, extensionDefinition) {
-            var activeCondition = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/activeCondition");
-            if (activeCondition && activeCondition.firstChild) {
+            var extensionOnInit = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/extensionOnInit");
+            if (extensionOnInit && extensionOnInit.firstChild) {
                 try {
-                    var func = new Function(activeCondition.firstChild.nodeValue.trim());
-                    if (func() === false) return false;
-                } catch (e) {}
-            }
-            if (xmlNode.nodeName == "editor") {
-                var properties = {
-                    openable: xmlNode.getAttribute("openable") == "true",
-                    modalOnly: xmlNode.getAttribute("modalOnly") == "true",
-                    previewProvider: xmlNode.getAttribute("previewProvider") == "true",
-                    order: xmlNode.getAttribute("order") ? parseInt(xmlNode.getAttribute("order")) : 0,
-                    formId: xmlNode.getAttribute("formId") || null,
-                    text: this._pydioObject.MessageHash[xmlNode.getAttribute("text")],
-                    title: this._pydioObject.MessageHash[xmlNode.getAttribute("title")],
-                    icon: xmlNode.getAttribute("icon"),
-                    icon_class: xmlNode.getAttribute("iconClass"),
-                    editorClass: xmlNode.getAttribute("className"),
-                    mimes: xmlNode.getAttribute("mimes").split(","),
-                    write: xmlNode.getAttribute("write") && xmlNode.getAttribute("write") == "true" ? true : false
-                };
-                for (var k in properties) {
-                    if (properties.hasOwnProperty(k)) {
-                        extensionDefinition[k] = properties[k];
-                    }
-                }
-            } else if (xmlNode.nodeName == "uploader") {
-                var th = this._pydioObject.Parameters.get("theme");
-                var clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/clientForm[@theme=\"" + th + "\"]");
-                if (!clientForm) {
-                    clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/clientForm");
-                }
-                if (clientForm && clientForm.firstChild && clientForm.getAttribute("id")) {
-                    extensionDefinition.formId = clientForm.getAttribute("id");
-                    this._pydioObject.UI.insertForm(clientForm.getAttribute("id"), clientForm.firstChild.nodeValue);
-                }
-                if (xmlNode.getAttribute("order")) {
-                    extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));
-                } else {
-                    extensionDefinition.order = 0;
-                }
-                var extensionOnInit = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/extensionOnInit");
-                if (extensionOnInit && extensionOnInit.firstChild) {
-                    try {
-                        // @TODO: THIS WILL LIKELY TRIGGER PROTOTYPE CODE
-                        eval(extensionOnInit.firstChild.nodeValue);
-                    } catch (e) {
-                        Logger.error("Ignoring Error in extensionOnInit code:");
-                        Logger.error(extensionOnInit.firstChild.nodeValue);
-                    }
-                }
-                var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/dialogOnOpen");
-                if (dialogOnOpen && dialogOnOpen.firstChild) {
-                    extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
-                }
-                var dialogOnComplete = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/dialogOnComplete");
-                if (dialogOnComplete && dialogOnComplete.firstChild) {
-                    extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
+                    // @TODO: THIS WILL LIKELY TRIGGER PROTOTYPE CODE
+                    eval(extensionOnInit.firstChild.nodeValue);
+                } catch (e) {
+                    Logger.error("Ignoring Error in extensionOnInit code:");
+                    Logger.error(extensionOnInit.firstChild.nodeValue);
                 }
             }
-            return true;
-        }
-    }, {
-        key: "refreshExtensionsRegistry",
-
-        /**
-         * Refresh the currently active extensions
-         * Extensions are editors and uploaders for the moment.
-         */
-        value: function refreshExtensionsRegistry() {
-            this._extensionsRegistry = { editor: [], uploader: [] };
-            var extensions = XMLUtils.XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
-            for (var i = 0; i < extensions.length; i++) {
-                var extensionDefinition = {
-                    id: extensions[i].getAttribute("id"),
-                    xmlNode: extensions[i],
-                    resourcesManager: new ResourcesManager()
-                };
-                this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
-                var resourceNodes = XMLUtils.XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
-                for (var j = 0; j < resourceNodes.length; j++) {
-                    var child = resourceNodes[j];
-                    extensionDefinition.resourcesManager.loadFromXmlNode(child);
-                }
-                if (this.initExtension(extensions[i], extensionDefinition)) {
-                    this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);
-                }
+            var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/dialogOnOpen");
+            if (dialogOnOpen && dialogOnOpen.firstChild) {
+                extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
             }
-            ResourcesManager.loadAutoLoadResources(this._registry);
+            var dialogOnComplete = XMLUtils.XPathSelectSingleNode(xmlNode, "processing/dialogOnComplete");
+            if (dialogOnComplete && dialogOnComplete.firstChild) {
+                extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
+            }
         }
-    }, {
-        key: "getActiveExtensionByType",
+        return true;
+    };
 
-        /**
-         * Find the currently active extensions by type
-         * @param extensionType String "editor" or "uploader"
-         * @returns {array}
-         */
-        value: function getActiveExtensionByType(extensionType) {
-            return this._extensionsRegistry[extensionType];
+    /**
+     * Refresh the currently active extensions
+     * Extensions are editors and uploaders for the moment.
+     */
+
+    Registry.prototype.refreshExtensionsRegistry = function refreshExtensionsRegistry() {
+        this._extensionsRegistry = { editor: [], uploader: [] };
+        var extensions = XMLUtils.XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
+        for (var i = 0; i < extensions.length; i++) {
+            var extensionDefinition = {
+                id: extensions[i].getAttribute("id"),
+                xmlNode: extensions[i],
+                resourcesManager: new ResourcesManager()
+            };
+            this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
+            var resourceNodes = XMLUtils.XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
+            for (var j = 0; j < resourceNodes.length; j++) {
+                var child = resourceNodes[j];
+                extensionDefinition.resourcesManager.loadFromXmlNode(child);
+            }
+            if (this.initExtension(extensions[i], extensionDefinition)) {
+                this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);
+            }
         }
-    }, {
-        key: "findEditorById",
+        ResourcesManager.loadAutoLoadResources(this._registry);
+    };
 
-        /**
-         * Find a given editor by its id
-         * @param editorId String
-         * @returns AbstractEditor
-         */
-        value: function findEditorById(editorId) {
-            return this._extensionsRegistry.editor.find(function (el) {
-                return el.id == editorId;
+    /**
+     * Find the currently active extensions by type
+     * @param extensionType String "editor" or "uploader"
+     * @returns {array}
+     */
+
+    Registry.prototype.getActiveExtensionByType = function getActiveExtensionByType(extensionType) {
+        return this._extensionsRegistry[extensionType];
+    };
+
+    /**
+     * Find a given editor by its id
+     * @param editorId String
+     * @returns AbstractEditor
+     */
+
+    Registry.prototype.findEditorById = function findEditorById(editorId) {
+        return this._extensionsRegistry.editor.find(function (el) {
+            return el.id == editorId;
+        });
+    };
+
+    /**
+     * Find Editors that can handle a given mime type
+     * @param mime String
+     * @returns AbstractEditor[]
+     * @param restrictToPreviewProviders
+     */
+
+    Registry.prototype.findEditorsForMime = function findEditorsForMime(mime, restrictToPreviewProviders) {
+        var editors = [];
+        var checkWrite = false;
+        if (this.user != null && !this.user.canWrite()) {
+            checkWrite = true;
+        }
+        this._extensionsRegistry.editor.forEach(function (el) {
+            if (el.mimes.indexOf(mime) !== -1 || el.mimes.indexOf("*") !== -1) {
+                if (restrictToPreviewProviders && !el.previewProvider) return;
+                if (!checkWrite || !el.write) editors.push(el);
+            }
+        });
+        if (editors.length && editors.length > 1) {
+            editors = editors.sort(function (a, b) {
+                return (a.order || 0) - (b.order || 0);
             });
         }
-    }, {
-        key: "findEditorsForMime",
+        return editors;
+    };
 
-        /**
-         * Find Editors that can handle a given mime type
-         * @param mime String
-         * @returns AbstractEditor[]
-         * @param restrictToPreviewProviders
-         */
-        value: function findEditorsForMime(mime, restrictToPreviewProviders) {
-            var editors = [];
-            var checkWrite = false;
-            if (this.user != null && !this.user.canWrite()) {
-                checkWrite = true;
-            }
-            this._extensionsRegistry.editor.forEach(function (el) {
-                if (el.mimes.indexOf(mime) !== -1 || el.mimes.indexOf("*") !== -1) {
-                    if (restrictToPreviewProviders && !el.previewProvider) return;
-                    if (!checkWrite || !el.write) editors.push(el);
-                }
-            });
-            if (editors.length && editors.length > 1) {
-                editors = editors.sort(function (a, b) {
-                    return (a.order || 0) - (b.order || 0);
-                });
-            }
-            return editors;
-        }
-    }, {
-        key: "loadEditorResources",
+    /**
+     * Trigger the load method of the resourcesManager.
+     * @param resourcesManager ResourcesManager
+     */
 
-        /**
-         * Trigger the load method of the resourcesManager.
-         * @param resourcesManager ResourcesManager
-         */
-        value: function loadEditorResources(resourcesManager) {
-            resourcesManager.load(this._resourcesRegistry);
-        }
-    }, {
-        key: "getPluginConfigs",
+    Registry.prototype.loadEditorResources = function loadEditorResources(resourcesManager) {
+        resourcesManager.load(this._resourcesRegistry);
+    };
 
-        /**
-         *
-         * @param pluginQuery
-         * @returns {Map}
-         */
-        value: function getPluginConfigs(pluginQuery) {
-            var xpath = "plugins/*[@id=\"core." + pluginQuery + "\"]/plugin_configs/property | plugins/*[@id=\"" + pluginQuery + "\"]/plugin_configs/property";
-            if (pluginQuery.indexOf(".") == -1) {
-                xpath = "plugins/" + pluginQuery + "/plugin_configs/property |" + xpath;
-            }
-            var properties = XMLUtils.XPathSelectNodes(this._registry, xpath);
-            var configs = new Map();
-            properties.forEach(function (propNode) {
-                configs.set(propNode.getAttribute("name"), JSON.parse(propNode.firstChild.nodeValue));
-            });
-            return configs;
-        }
-    }, {
-        key: "getDefaultImageFromParameters",
+    /**
+     *
+     * @param pluginQuery
+     * @returns {Map}
+     */
 
-        /**
-         *
-         * @param pluginId
-         * @param paramName
-         * @returns {string}
-         */
-        value: function getDefaultImageFromParameters(pluginId, paramName) {
-            var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='" + pluginId + "']/server_settings/global_param[@name='" + paramName + "']");
-            if (!node) {
-                return "";
-            }return node.getAttribute("defaultImage") || "";
+    Registry.prototype.getPluginConfigs = function getPluginConfigs(pluginQuery) {
+        var xpath = "plugins/*[@id=\"core." + pluginQuery + "\"]/plugin_configs/property | plugins/*[@id=\"" + pluginQuery + "\"]/plugin_configs/property";
+        if (pluginQuery.indexOf(".") == -1) {
+            xpath = "plugins/" + pluginQuery + "/plugin_configs/property |" + xpath;
         }
-    }, {
-        key: "hasPluginOfType",
+        var properties = XMLUtils.XPathSelectNodes(this._registry, xpath);
+        var configs = new Map();
+        properties.forEach(function (propNode) {
+            configs.set(propNode.getAttribute("name"), JSON.parse(propNode.firstChild.nodeValue));
+        });
+        return configs;
+    };
 
-        /**
-         *
-         * @param type
-         * @param name
-         * @returns {bool}
-         */
-        value: function hasPluginOfType(type, name) {
-            var node;
-            if (name == null) {
-                node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/ajxp_plugin[contains(@id, \"" + type + ".\")] | plugins/" + type + "[@id]");
-            } else {
-                node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/ajxp_plugin[@id=\"" + type + "." + name + "\"] | plugins/" + type + "[@id=\"" + type + "." + name + "\"]");
-            }
-            return node != undefined;
+    /**
+     *
+     * @param pluginId
+     * @param paramName
+     * @returns {string}
+     */
+
+    Registry.prototype.getDefaultImageFromParameters = function getDefaultImageFromParameters(pluginId, paramName) {
+        var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='" + pluginId + "']/server_settings/global_param[@name='" + paramName + "']");
+        if (!node) {
+            return "";
+        }return node.getAttribute("defaultImage") || "";
+    };
+
+    /**
+     *
+     * @param type
+     * @param name
+     * @returns {bool}
+     */
+
+    Registry.prototype.hasPluginOfType = function hasPluginOfType(type, name) {
+        var node;
+        if (name == null) {
+            node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/ajxp_plugin[contains(@id, \"" + type + ".\")] | plugins/" + type + "[@id]");
+        } else {
+            node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/ajxp_plugin[@id=\"" + type + "." + name + "\"] | plugins/" + type + "[@id=\"" + type + "." + name + "\"]");
         }
-    }]);
+        return node != undefined;
+    };
 
     return Registry;
 })();

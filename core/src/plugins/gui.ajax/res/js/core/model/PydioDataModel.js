@@ -2,10 +2,6 @@
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 /*
@@ -44,7 +40,7 @@ var PydioDataModel = (function (_Observable) {
 
 		_classCallCheck(this, PydioDataModel);
 
-		_get(Object.getPrototypeOf(PydioDataModel.prototype), "constructor", this).call(this);
+		_Observable.call(this);
 		this._currentRep = "/";
 		this._selectedNodes = [];
 		this._bEmpty = true;
@@ -63,773 +59,726 @@ var PydioDataModel = (function (_Observable) {
 
 	_inherits(PydioDataModel, _Observable);
 
-	_createClass(PydioDataModel, [{
-		key: "setAjxpNodeProvider",
+	/**
+  * Sets the data source that will feed the nodes with children.
+  * @param iAjxpNodeProvider IAjxpNodeProvider 
+  */
 
-		/**
-   * Sets the data source that will feed the nodes with children.
-   * @param iAjxpNodeProvider IAjxpNodeProvider 
-   */
-		value: function setAjxpNodeProvider(iAjxpNodeProvider) {
-			this._iAjxpNodeProvider = iAjxpNodeProvider;
+	PydioDataModel.prototype.setAjxpNodeProvider = function setAjxpNodeProvider(iAjxpNodeProvider) {
+		this._iAjxpNodeProvider = iAjxpNodeProvider;
+	};
+
+	/**
+  * Return the current data source provider
+  * @return IAjxpNodeProvider
+  */
+
+	PydioDataModel.prototype.getAjxpNodeProvider = function getAjxpNodeProvider() {
+		return this._iAjxpNodeProvider;
+	};
+
+	/**
+  * Changes the current context node.
+  * @param ajxpNode AjxpNode Target node, either an existing one or a fake one containing the target part.
+  * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
+  */
+
+	PydioDataModel.prototype.requireContextChange = function requireContextChange(ajxpNode, forceReload) {
+		if (ajxpNode == null) {
+			return;
+		}var path = ajxpNode.getPath();
+		if ((path == "" || path == "/") && ajxpNode != this._rootNode) {
+			ajxpNode = this._rootNode;
 		}
-	}, {
-		key: "getAjxpNodeProvider",
-
-		/**
-   * Return the current data source provider
-   * @return IAjxpNodeProvider
-   */
-		value: function getAjxpNodeProvider() {
-			return this._iAjxpNodeProvider;
+		if (ajxpNode.getMetadata().has("paginationData") && ajxpNode.getMetadata().get("paginationData").has("new_page") && ajxpNode.getMetadata().get("paginationData").get("new_page") != ajxpNode.getMetadata().get("paginationData").get("current")) {
+			var paginationPage = ajxpNode.getMetadata().get("paginationData").get("new_page");
+			forceReload = true;
 		}
-	}, {
-		key: "requireContextChange",
-
-		/**
-   * Changes the current context node.
-   * @param ajxpNode AjxpNode Target node, either an existing one or a fake one containing the target part.
-   * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
-   */
-		value: function requireContextChange(ajxpNode, forceReload) {
-			if (ajxpNode == null) {
+		if (ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)) {
+			// Find in arbo or build fake arbo
+			var fakeNodes = [];
+			ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
+			if (fakeNodes.length) {
+				var firstFake = fakeNodes.shift();
+				firstFake.observeOnce("first_load", (function (e) {
+					this.requireContextChange(ajxpNode);
+				}).bind(this));
+				firstFake.observeOnce("error", (function (message) {
+					Logger.error(message);
+					firstFake.notify("node_removed");
+					var parent = firstFake.getParent();
+					parent.removeChild(firstFake);
+					//delete(firstFake);
+					this.requireContextChange(parent);
+				}).bind(this));
+				this.publish("context_loading");
+				firstFake.load(this._iAjxpNodeProvider);
 				return;
-			}var path = ajxpNode.getPath();
-			if ((path == "" || path == "/") && ajxpNode != this._rootNode) {
-				ajxpNode = this._rootNode;
 			}
-			if (ajxpNode.getMetadata().has("paginationData") && ajxpNode.getMetadata().get("paginationData").has("new_page") && ajxpNode.getMetadata().get("paginationData").get("new_page") != ajxpNode.getMetadata().get("paginationData").get("current")) {
-				var paginationPage = ajxpNode.getMetadata().get("paginationData").get("new_page");
-				forceReload = true;
-			}
-			if (ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)) {
-				// Find in arbo or build fake arbo
-				var fakeNodes = [];
-				ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
-				if (fakeNodes.length) {
-					var firstFake = fakeNodes.shift();
-					firstFake.observeOnce("first_load", (function (e) {
-						this.requireContextChange(ajxpNode);
-					}).bind(this));
-					firstFake.observeOnce("error", (function (message) {
-						Logger.error(message);
-						firstFake.notify("node_removed");
-						var parent = firstFake.getParent();
-						parent.removeChild(firstFake);
-						//delete(firstFake);
-						this.requireContextChange(parent);
-					}).bind(this));
-					this.publish("context_loading");
-					firstFake.load(this._iAjxpNodeProvider);
-					return;
-				}
-			}
-			ajxpNode.observeOnce("loaded", (function () {
-				this.setContextNode(ajxpNode, true);
-				this.publish("context_loaded");
-				if (this.getPendingSelection()) {
-					var selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/") + this.getPendingSelection();
-					var selNode = ajxpNode.findChildByPath(selPath);
-					if (selNode) {
-						this.setSelectedNodes([selNode], this);
-					} else {
-						if (ajxpNode.getMetadata().get("paginationData") && arguments.length < 3) {
-							var newPage;
-							var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
-							this.loadPathInfoSync(selPath, function (foundNode) {
-								newPage = foundNode.getMetadata().get("page_position");
-							});
-							if (newPage && newPage != currentPage) {
-								ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
-								this.requireContextChange(ajxpNode, true, true);
-								return;
-							}
+		}
+		ajxpNode.observeOnce("loaded", (function () {
+			this.setContextNode(ajxpNode, true);
+			this.publish("context_loaded");
+			if (this.getPendingSelection()) {
+				var selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/") + this.getPendingSelection();
+				var selNode = ajxpNode.findChildByPath(selPath);
+				if (selNode) {
+					this.setSelectedNodes([selNode], this);
+				} else {
+					if (ajxpNode.getMetadata().get("paginationData") && arguments.length < 3) {
+						var newPage;
+						var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
+						this.loadPathInfoSync(selPath, function (foundNode) {
+							newPage = foundNode.getMetadata().get("page_position");
+						});
+						if (newPage && newPage != currentPage) {
+							ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
+							this.requireContextChange(ajxpNode, true, true);
+							return;
 						}
 					}
-					this.clearPendingSelection();
 				}
-			}).bind(this));
-			ajxpNode.observeOnce("error", (function (message) {
-				Logger.error(message);
-				this.publish("context_loaded");
-			}).bind(this));
-			this.publish("context_loading");
-			try {
-				if (forceReload) {
-					if (paginationPage) {
-						ajxpNode.getMetadata().get("paginationData").set("current", paginationPage);
-					}
-					ajxpNode.reload(this._iAjxpNodeProvider);
-				} else {
-					ajxpNode.load(this._iAjxpNodeProvider);
-				}
-			} catch (e) {
-				this.publish("context_loaded");
+				this.clearPendingSelection();
 			}
+		}).bind(this));
+		ajxpNode.observeOnce("error", (function (message) {
+			Logger.error(message);
+			this.publish("context_loaded");
+		}).bind(this));
+		this.publish("context_loading");
+		try {
+			if (forceReload) {
+				if (paginationPage) {
+					ajxpNode.getMetadata().get("paginationData").set("current", paginationPage);
+				}
+				ajxpNode.reload(this._iAjxpNodeProvider);
+			} else {
+				ajxpNode.load(this._iAjxpNodeProvider);
+			}
+		} catch (e) {
+			this.publish("context_loaded");
 		}
-	}, {
-		key: "requireNodeReload",
-		value: function requireNodeReload(nodeOrPath, completeCallback) {
-			if (nodeOrPath instanceof String) {
-				nodeOrPath = new AjxpNode(nodeOrPath);
-			}
-			var onComplete = null;
-			if (this._selectedNodes.length) {
-				var found = false;
-				this._selectedNodes.each(function (node) {
-					if (node.getPath() == nodeOrPath.getPath()) found = node;
-				});
-				if (found) {
-					// MAKE SURE SELECTION IS OK AFTER RELOAD
-					this._selectedNodes = this._selectedNodes.without(found);
+	};
+
+	PydioDataModel.prototype.requireNodeReload = function requireNodeReload(nodeOrPath, completeCallback) {
+		if (nodeOrPath instanceof String) {
+			nodeOrPath = new AjxpNode(nodeOrPath);
+		}
+		var onComplete = null;
+		if (this._selectedNodes.length) {
+			var found = false;
+			this._selectedNodes.each(function (node) {
+				if (node.getPath() == nodeOrPath.getPath()) found = node;
+			});
+			if (found) {
+				// MAKE SURE SELECTION IS OK AFTER RELOAD
+				this._selectedNodes = this._selectedNodes.without(found);
+				this.publish("selection_changed", this);
+				onComplete = (function (newNode) {
+					this._selectedNodes.push(newNode);
+					this._selectionSource = {};
 					this.publish("selection_changed", this);
-					onComplete = (function (newNode) {
-						this._selectedNodes.push(newNode);
-						this._selectionSource = {};
-						this.publish("selection_changed", this);
-						if (completeCallback) completeCallback(newNode);
-					}).bind(this);
-				}
+					if (completeCallback) completeCallback(newNode);
+				}).bind(this);
 			}
-			this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath, onComplete);
 		}
-	}, {
-		key: "loadPathInfoSync",
-		value: function loadPathInfoSync(path, callback) {
-			this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false);
-		}
-	}, {
-		key: "loadPathInfoAsync",
-		value: function loadPathInfoAsync(path, callback) {
-			this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, true);
-		}
-	}, {
-		key: "setRootNode",
+		this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath, onComplete);
+	};
 
-		/**
-   * Sets the root of the data store
-   * @param ajxpRootNode AjxpNode The parent node
-   */
-		value: function setRootNode(ajxpRootNode) {
-			this._rootNode = ajxpRootNode;
-			this._rootNode.setRoot();
-			this._rootNode.observe("child_added", function (c) {});
-			this.publish("root_node_changed", this._rootNode);
-			this.setContextNode(this._rootNode);
-		}
-	}, {
-		key: "getRootNode",
+	PydioDataModel.prototype.loadPathInfoSync = function loadPathInfoSync(path, callback) {
+		this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false);
+	};
 
-		/**
-   * Gets the current root node
-   * @returns AjxpNode
-   */
-		value: function getRootNode() {
-			return this._rootNode;
-		}
-	}, {
-		key: "setContextNode",
+	PydioDataModel.prototype.loadPathInfoAsync = function loadPathInfoAsync(path, callback) {
+		this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, true);
+	};
 
-		/**
-   * Sets the current context node
-   * @param ajxpDataNode AjxpNode
-   * @param forceEvent Boolean If set to true, event will be triggered even if the current node is already the same.
-   */
-		value: function setContextNode(ajxpDataNode, forceEvent) {
-			if (this._contextNode && this._contextNode == ajxpDataNode && this._currentRep == ajxpDataNode.getPath() && !forceEvent) {
-				return; // No changes
+	/**
+  * Sets the root of the data store
+  * @param ajxpRootNode AjxpNode The parent node
+  */
+
+	PydioDataModel.prototype.setRootNode = function setRootNode(ajxpRootNode) {
+		this._rootNode = ajxpRootNode;
+		this._rootNode.setRoot();
+		this._rootNode.observe("child_added", function (c) {});
+		this.publish("root_node_changed", this._rootNode);
+		this.setContextNode(this._rootNode);
+	};
+
+	/**
+  * Gets the current root node
+  * @returns AjxpNode
+  */
+
+	PydioDataModel.prototype.getRootNode = function getRootNode() {
+		return this._rootNode;
+	};
+
+	/**
+  * Sets the current context node
+  * @param ajxpDataNode AjxpNode
+  * @param forceEvent Boolean If set to true, event will be triggered even if the current node is already the same.
+  */
+
+	PydioDataModel.prototype.setContextNode = function setContextNode(ajxpDataNode, forceEvent) {
+		if (this._contextNode && this._contextNode == ajxpDataNode && this._currentRep == ajxpDataNode.getPath() && !forceEvent) {
+			return; // No changes
+		}
+		if (!ajxpDataNode) {
+			return;
+		}if (this._contextNodeReplacedObserver && this._contextNode) {
+			this._contextNode.stopObserving("node_replaced", this._contextNodeReplacedObserver);
+		}
+		this._contextNode = ajxpDataNode;
+		this._currentRep = ajxpDataNode.getPath();
+		this.publish("context_changed", ajxpDataNode);
+		if (!this._contextNodeReplacedObserver) this._contextNodeReplacedObserver = this.contextNodeReplaced.bind(this);
+		ajxpDataNode.observe("node_replaced", this._contextNodeReplacedObserver);
+	};
+
+	PydioDataModel.prototype.contextNodeReplaced = function contextNodeReplaced(newNode) {
+		this.setContextNode(newNode);
+	};
+
+	/**
+  *
+  */
+
+	PydioDataModel.prototype.publish = function publish(eventName, optionalData) {
+		var args = [];
+		if (this._globalEvents) {
+			if (window.pydio) {
+				args.push(eventName);
+				if (optionalData) args.push(optionalData);
+				pydio.fire.apply(pydio, args);
+			} else if (document.fire) {
+				args.push("ajaxplorer:" + eventName);
+				if (optionalData) args.push(optionalData);
+				document.fire.apply(document, args);
 			}
-			if (!ajxpDataNode) {
-				return;
-			}if (this._contextNodeReplacedObserver && this._contextNode) {
-				this._contextNode.stopObserving("node_replaced", this._contextNodeReplacedObserver);
-			}
-			this._contextNode = ajxpDataNode;
-			this._currentRep = ajxpDataNode.getPath();
-			this.publish("context_changed", ajxpDataNode);
-			if (!this._contextNodeReplacedObserver) this._contextNodeReplacedObserver = this.contextNodeReplaced.bind(this);
-			ajxpDataNode.observe("node_replaced", this._contextNodeReplacedObserver);
-		}
-	}, {
-		key: "contextNodeReplaced",
-		value: function contextNodeReplaced(newNode) {
-			this.setContextNode(newNode);
-		}
-	}, {
-		key: "publish",
-
-		/**
-   *
-   */
-		value: function publish(eventName, optionalData) {
-			var args = [];
-			if (this._globalEvents) {
-				if (window.pydio) {
-					args.push(eventName);
-					if (optionalData) args.push(optionalData);
-					pydio.fire.apply(pydio, args);
-				} else if (document.fire) {
-					args.push("ajaxplorer:" + eventName);
-					if (optionalData) args.push(optionalData);
-					document.fire.apply(document, args);
-				}
-				if (optionalData) {
-					args = [eventName, { memo: optionalData }];
-				} else {
-					args = [eventName];
-				}
-				this.notify.apply(this, args);
+			if (optionalData) {
+				args = [eventName, { memo: optionalData }];
 			} else {
-				if (optionalData) {
-					args = [eventName, { memo: optionalData }];
-				} else {
-					args = [eventName];
-				}
-				this.notify.apply(this, args);
+				args = [eventName];
 			}
-		}
-	}, {
-		key: "getContextNode",
-
-		/**
-   * Get the current context node
-   * @returns AjxpNode
-   */
-		value: function getContextNode() {
-			return this._contextNode;
-		}
-	}, {
-		key: "multipleNodesReload",
-
-		/**
-   * After a copy or move operation, many nodes may have to be reloaded
-   * This function tries to reload them in the right order and if necessary.
-   * @param nodes AjxpNodes[] An array of nodes
-   */
-		value: function multipleNodesReload(nodes) {
-			for (var i = 0; i < nodes.length; i++) {
-				var nodePathOrNode = nodes[i];
-				var node;
-				if (nodePathOrNode instanceof String) {
-					node = new AjxpNode(nodePathOrNode);
-					if (node.getPath() == this._rootNode.getPath()) node = this._rootNode;else node = node.findInArbo(this._rootNode, []);
-				} else {
-					node = nodePathOrNode;
-				}
-				nodes[i] = node;
-			}
-			var children = [];
-			nodes.sort(function (a, b) {
-				if (a.isParentOf(b)) {
-					children.push(b);
-					return -1;
-				}
-				if (a.isChildOf(b)) {
-					children.push(a);
-					return +1;
-				}
-				return 0;
-			});
-			children.each(function (c) {
-				nodes = nodes.without(c);
-			});
-			nodes.each(this.queueNodeReload.bind(this));
-			this.nextNodeReloader();
-		}
-	}, {
-		key: "queueNodeReload",
-
-		/**
-   * Add a node to the queue of nodes to reload.
-   * @param node AjxpNode
-   */
-		value: function queueNodeReload(node) {
-			if (!this.queue) this.queue = [];
-			if (node) {
-				this.queue.push(node);
-			}
-		}
-	}, {
-		key: "nextNodeReloader",
-
-		/**
-   * Queue processor for the nodes to reload
-   */
-		value: function nextNodeReloader() {
-			if (!this.queue.length) {
-				window.setTimeout((function () {
-					this.publish("context_changed", this._contextNode);
-				}).bind(this), 200);
-				return;
-			}
-			var next = this.queue.shift();
-			var observer = this.nextNodeReloader.bind(this);
-			next.observeOnce("loaded", observer);
-			next.observeOnce("error", observer);
-			if (next == this._contextNode || next.isParentOf(this._contextNode)) {
-				this.requireContextChange(next, true);
+			this.notify.apply(this, args);
+		} else {
+			if (optionalData) {
+				args = [eventName, { memo: optionalData }];
 			} else {
-				next.reload(this._iAjxpNodeProvider);
+				args = [eventName];
+			}
+			this.notify.apply(this, args);
+		}
+	};
+
+	/**
+  * Get the current context node
+  * @returns AjxpNode
+  */
+
+	PydioDataModel.prototype.getContextNode = function getContextNode() {
+		return this._contextNode;
+	};
+
+	/**
+  * After a copy or move operation, many nodes may have to be reloaded
+  * This function tries to reload them in the right order and if necessary.
+  * @param nodes AjxpNodes[] An array of nodes
+  */
+
+	PydioDataModel.prototype.multipleNodesReload = function multipleNodesReload(nodes) {
+		for (var i = 0; i < nodes.length; i++) {
+			var nodePathOrNode = nodes[i];
+			var node;
+			if (nodePathOrNode instanceof String) {
+				node = new AjxpNode(nodePathOrNode);
+				if (node.getPath() == this._rootNode.getPath()) node = this._rootNode;else node = node.findInArbo(this._rootNode, []);
+			} else {
+				node = nodePathOrNode;
+			}
+			nodes[i] = node;
+		}
+		var children = [];
+		nodes.sort(function (a, b) {
+			if (a.isParentOf(b)) {
+				children.push(b);
+				return -1;
+			}
+			if (a.isChildOf(b)) {
+				children.push(a);
+				return +1;
+			}
+			return 0;
+		});
+		children.each(function (c) {
+			nodes = nodes.without(c);
+		});
+		nodes.each(this.queueNodeReload.bind(this));
+		this.nextNodeReloader();
+	};
+
+	/**
+  * Add a node to the queue of nodes to reload.
+  * @param node AjxpNode
+  */
+
+	PydioDataModel.prototype.queueNodeReload = function queueNodeReload(node) {
+		if (!this.queue) this.queue = [];
+		if (node) {
+			this.queue.push(node);
+		}
+	};
+
+	/**
+  * Queue processor for the nodes to reload
+  */
+
+	PydioDataModel.prototype.nextNodeReloader = function nextNodeReloader() {
+		if (!this.queue.length) {
+			window.setTimeout((function () {
+				this.publish("context_changed", this._contextNode);
+			}).bind(this), 200);
+			return;
+		}
+		var next = this.queue.shift();
+		var observer = this.nextNodeReloader.bind(this);
+		next.observeOnce("loaded", observer);
+		next.observeOnce("error", observer);
+		if (next == this._contextNode || next.isParentOf(this._contextNode)) {
+			this.requireContextChange(next, true);
+		} else {
+			next.reload(this._iAjxpNodeProvider);
+		}
+	};
+
+	/**
+  * Insert a node somewhere in the datamodel
+  * @param node AjxpNode
+  * @param setSelectedAfterAdd bool
+  */
+
+	PydioDataModel.prototype.addNode = function addNode(node) {
+		var setSelectedAfterAdd = arguments[1] === undefined ? false : arguments[1];
+
+		var parentFake = new AjxpNode(PathUtils.getDirname(node.getPath()));
+		var parent = parentFake.findInArbo(this.getRootNode(), undefined);
+		if (!parent && PathUtils.getDirname(node.getPath()) == "") parent = this.getRootNode();
+		if (parent) {
+			parent.addChild(node);
+			if (setSelectedAfterAdd && this.getContextNode() == parent) {
+				this.setSelectedNodes([node], {});
 			}
 		}
-	}, {
-		key: "addNode",
+	};
 
-		/**
-   * Insert a node somewhere in the datamodel
-   * @param node AjxpNode
-   * @param setSelectedAfterAdd bool
-   */
-		value: function addNode(node) {
-			var setSelectedAfterAdd = arguments[1] === undefined ? false : arguments[1];
+	/**
+  * Remove a node by path somewhere
+  * @param path string
+  */
 
-			var parentFake = new AjxpNode(PathUtils.getDirname(node.getPath()));
-			var parent = parentFake.findInArbo(this.getRootNode(), undefined);
-			if (!parent && PathUtils.getDirname(node.getPath()) == "") parent = this.getRootNode();
-			if (parent) {
-				parent.addChild(node);
-				if (setSelectedAfterAdd && this.getContextNode() == parent) {
-					this.setSelectedNodes([node], {});
-				}
-			}
+	PydioDataModel.prototype.removeNodeByPath = function removeNodeByPath(path) {
+		var fake = new AjxpNode(path);
+		var n = fake.findInArbo(this.getRootNode(), undefined);
+		if (n) {
+			n.getParent().removeChild(n);
+			return true;
 		}
-	}, {
-		key: "removeNodeByPath",
+		return false;
+	};
 
-		/**
-   * Remove a node by path somewhere
-   * @param path string
-   */
-		value: function removeNodeByPath(path) {
-			var fake = new AjxpNode(path);
-			var n = fake.findInArbo(this.getRootNode(), undefined);
+	/**
+  * Update a node somewhere in the datamodel
+  * @param node AjxpNode
+  * @param setSelectedAfterUpdate bool
+  */
+
+	PydioDataModel.prototype.updateNode = function updateNode(node) {
+		var setSelectedAfterUpdate = arguments[1] === undefined ? false : arguments[1];
+
+		var original = node.getMetadata().get("original_path");
+		var fake, n;
+		if (original && original != node.getPath() && PathUtils.getDirname(original) != PathUtils.getDirname(node.getPath())) {
+			// Node was really moved to another folder
+			fake = new AjxpNode(original);
+			n = fake.findInArbo(this.getRootNode(), undefined);
 			if (n) {
 				n.getParent().removeChild(n);
-				return true;
 			}
+			var parentFake = new AjxpNode(getRepName(node.getPath()));
+			var parent = parentFake.findInArbo(this.getRootNode(), undefined);
+			if (!parent && getRepName(node.getPath()) == "") parent = this.getRootNode();
+			if (parent) {
+				node.getMetadata().set("original_path", undefined);
+				parent.addChild(node);
+			}
+		} else {
+			fake = new AjxpNode(original);
+			n = fake.findInArbo(this.getRootNode(), undefined);
+			if (n) {
+				node._isLoaded = n._isLoaded;
+				n.replaceBy(node, "override");
+				if (setSelectedAfterUpdate && this.getContextNode() == n.getParent()) {
+					this.setSelectedNodes([n], {});
+				}
+			}
+		}
+	};
+
+	/**
+  * Sets an array of nodes to be selected after the context is (re)loaded
+  * @param selection AjxpNode[]
+  */
+
+	PydioDataModel.prototype.setPendingSelection = function setPendingSelection(selection) {
+		this._pendingSelection = selection;
+	};
+
+	/**
+  * Gets the array of nodes to be selected after the context is (re)loaded
+  * @returns AjxpNode[]
+  */
+
+	PydioDataModel.prototype.getPendingSelection = function getPendingSelection() {
+		return this._pendingSelection;
+	};
+
+	/**
+  * Clears the nodes to be selected
+  */
+
+	PydioDataModel.prototype.clearPendingSelection = function clearPendingSelection() {
+		this._pendingSelection = null;
+	};
+
+	/**
+  * Set an array of nodes as the current selection
+  * @param ajxpDataNodes AjxpNode[] The nodes to select
+  * @param source String The source of this selection action
+  */
+
+	PydioDataModel.prototype.setSelectedNodes = function setSelectedNodes(ajxpDataNodes, source) {
+		if (!source) {
+			this._selectionSource = {};
+		} else {
+			this._selectionSource = source;
+		}
+		this._selectedNodes = ajxpDataNodes;
+		this._bEmpty = ajxpDataNodes && ajxpDataNodes.length ? false : true;
+		this._bFile = this._bDir = this._isRecycle = false;
+		if (!this._bEmpty) {
+			this._bUnique = ajxpDataNodes.length == 1;
+			for (var i = 0; i < ajxpDataNodes.length; i++) {
+				var selectedNode = ajxpDataNodes[i];
+				if (selectedNode.isLeaf()) this._bFile = true;else this._bDir = true;
+				if (selectedNode.isRecycle()) this._isRecycle = true;
+			}
+		}
+		this.publish("selection_changed", this);
+	};
+
+	/**
+  * Gets the currently selected nodes
+  * @returns AjxpNode[]
+  */
+
+	PydioDataModel.prototype.getSelectedNodes = function getSelectedNodes() {
+		return this._selectedNodes;
+	};
+
+	/**
+  * Gets the source of the last selection action
+  * @returns String
+  */
+
+	PydioDataModel.prototype.getSelectionSource = function getSelectionSource() {
+		return this._selectionSource;
+	};
+
+	/**
+  * Manually sets the source of the selection
+  * @param object
+  */
+
+	PydioDataModel.prototype.setSelectionSource = function setSelectionSource(object) {
+		this._selectionSource = object;
+	};
+
+	/**
+  * DEPRECATED
+  */
+
+	PydioDataModel.prototype.getSelectedItems = function getSelectedItems() {
+		throw new Error("Deprecated : use getSelectedNodes() instead");
+	};
+
+	/**
+  * Select all the children of the current context node
+  */
+
+	PydioDataModel.prototype.selectAll = function selectAll() {
+		this.setSelectedNodes(this._contextNode.getChildren(), "dataModel");
+	};
+
+	/**
+  * Whether the selection is empty
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.isEmpty = function isEmpty() {
+		return this._selectedNodes ? this._selectedNodes.length == 0 : true;
+	};
+
+	PydioDataModel.prototype.hasReadOnly = function hasReadOnly() {
+		var test = false;
+		try {
+			this._selectedNodes.forEach(function (node) {
+				if (node.hasMetadataInBranch("ajxp_readonly", "true")) {
+					test = true;
+					throw $break;
+				}
+			});
+		} catch (e) {}
+		return test;
+	};
+
+	PydioDataModel.prototype.selectionHasRootNode = function selectionHasRootNode() {
+		var found = false;
+		try {
+			this._selectedNodes.forEach(function (el) {
+				if (el.isRoot()) {
+					found = true;
+					throw new Error();
+				}
+			});
+		} catch (e) {}
+	};
+
+	/**
+  * Whether the selection is unique
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.isUnique = function isUnique() {
+		return this._bUnique;
+	};
+
+	/**
+  * Whether the selection has a file selected.
+  * Should be hasLeaf
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.hasFile = function hasFile() {
+		return this._bFile;
+	};
+
+	/**
+  * Whether the selection has a dir selected
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.hasDir = function hasDir() {
+		return this._bDir;
+	};
+
+	/**
+  * Whether the current context is the recycle bin
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.isRecycle = function isRecycle() {
+		return this._isRecycle;
+	};
+
+	/**
+  * Whether the selection has more than one node selected
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.isMultiple = function isMultiple() {
+		return this._selectedNodes && this._selectedNodes.length > 1;
+	};
+
+	/**
+  * Whether the selection has a file with one of the mimes
+  * @param mimeTypes Array Array of mime types
+  * @returns Boolean
+  */
+
+	PydioDataModel.prototype.hasMime = function hasMime(mimeTypes) {
+		if (mimeTypes.length == 1 && mimeTypes[0] == "*") {
+			return true;
+		}var has = false;
+		mimeTypes.each((function (mime) {
+			if (has) return;
+			has = this._selectedNodes.any(function (node) {
+				return getAjxpMimeType(node) == mime;
+			});
+		}).bind(this));
+		return has;
+	};
+
+	/**
+  * Get all selected filenames as an array.
+  * @param separator String Is a separator, will return a string joined
+  * @returns Array|String|bool
+  */
+
+	PydioDataModel.prototype.getFileNames = function getFileNames(separator) {
+		if (!this._selectedNodes.length) {
+			alert("Please select a file!");
 			return false;
 		}
-	}, {
-		key: "updateNode",
-
-		/**
-   * Update a node somewhere in the datamodel
-   * @param node AjxpNode
-   * @param setSelectedAfterUpdate bool
-   */
-		value: function updateNode(node) {
-			var setSelectedAfterUpdate = arguments[1] === undefined ? false : arguments[1];
-
-			var original = node.getMetadata().get("original_path");
-			var fake, n;
-			if (original && original != node.getPath() && PathUtils.getDirname(original) != PathUtils.getDirname(node.getPath())) {
-				// Node was really moved to another folder
-				fake = new AjxpNode(original);
-				n = fake.findInArbo(this.getRootNode(), undefined);
-				if (n) {
-					n.getParent().removeChild(n);
-				}
-				var parentFake = new AjxpNode(getRepName(node.getPath()));
-				var parent = parentFake.findInArbo(this.getRootNode(), undefined);
-				if (!parent && getRepName(node.getPath()) == "") parent = this.getRootNode();
-				if (parent) {
-					node.getMetadata().set("original_path", undefined);
-					parent.addChild(node);
-				}
-			} else {
-				fake = new AjxpNode(original);
-				n = fake.findInArbo(this.getRootNode(), undefined);
-				if (n) {
-					node._isLoaded = n._isLoaded;
-					n.replaceBy(node, "override");
-					if (setSelectedAfterUpdate && this.getContextNode() == n.getParent()) {
-						this.setSelectedNodes([n], {});
-					}
-				}
-			}
+		var tmp = new Array(this._selectedNodes.length);
+		for (var i = 0; i < this._selectedNodes.length; i++) {
+			tmp[i] = this._selectedNodes[i].getPath();
 		}
-	}, {
-		key: "setPendingSelection",
+		if (separator) {
+			return tmp.join(separator);
+		} else {
+			return tmp;
+		}
+	};
 
-		/**
-   * Sets an array of nodes to be selected after the context is (re)loaded
-   * @param selection AjxpNode[]
-   */
-		value: function setPendingSelection(selection) {
-			this._pendingSelection = selection;
-		}
-	}, {
-		key: "getPendingSelection",
+	/**
+  * Get all the filenames of the current context node children
+  * @param separator String If passed, will join the array as a string
+  * @return Array|String|bool
+  */
 
-		/**
-   * Gets the array of nodes to be selected after the context is (re)loaded
-   * @returns AjxpNode[]
-   */
-		value: function getPendingSelection() {
-			return this._pendingSelection;
+	PydioDataModel.prototype.getContextFileNames = function getContextFileNames(separator) {
+		var allItems = this._contextNode.getChildren();
+		if (!allItems.length) {
+			return false;
 		}
-	}, {
-		key: "clearPendingSelection",
+		var names = [];
+		for (var i = 0; i < allItems.length; i++) {
+			names.push(getBaseName(allItems[i].getPath()));
+		}
+		if (separator) {
+			return names.join(separator);
+		} else {
+			return names;
+		}
+	};
 
-		/**
-   * Clears the nodes to be selected
-   */
-		value: function clearPendingSelection() {
-			this._pendingSelection = null;
-		}
-	}, {
-		key: "setSelectedNodes",
+	/**
+  * Whether the context node has a child with this basename
+  * @param newFileName String The name to check
+  * @returns Boolean
+  * @param local
+  * @param contextNode
+  */
 
-		/**
-   * Set an array of nodes as the current selection
-   * @param ajxpDataNodes AjxpNode[] The nodes to select
-   * @param source String The source of this selection action
-   */
-		value: function setSelectedNodes(ajxpDataNodes, source) {
-			if (!source) {
-				this._selectionSource = {};
-			} else {
-				this._selectionSource = source;
-			}
-			this._selectedNodes = ajxpDataNodes;
-			this._bEmpty = ajxpDataNodes && ajxpDataNodes.length ? false : true;
-			this._bFile = this._bDir = this._isRecycle = false;
-			if (!this._bEmpty) {
-				this._bUnique = ajxpDataNodes.length == 1;
-				for (var i = 0; i < ajxpDataNodes.length; i++) {
-					var selectedNode = ajxpDataNodes[i];
-					if (selectedNode.isLeaf()) this._bFile = true;else this._bDir = true;
-					if (selectedNode.isRecycle()) this._isRecycle = true;
-				}
-			}
-			this.publish("selection_changed", this);
+	PydioDataModel.prototype.fileNameExists = function fileNameExists(newFileName, local, contextNode) {
+		if (!contextNode) {
+			contextNode = this._contextNode;
 		}
-	}, {
-		key: "getSelectedNodes",
-
-		/**
-   * Gets the currently selected nodes
-   * @returns AjxpNode[]
-   */
-		value: function getSelectedNodes() {
-			return this._selectedNodes;
-		}
-	}, {
-		key: "getSelectionSource",
-
-		/**
-   * Gets the source of the last selection action
-   * @returns String
-   */
-		value: function getSelectionSource() {
-			return this._selectionSource;
-		}
-	}, {
-		key: "setSelectionSource",
-
-		/**
-   * Manually sets the source of the selection
-   * @param object
-   */
-		value: function setSelectionSource(object) {
-			this._selectionSource = object;
-		}
-	}, {
-		key: "getSelectedItems",
-
-		/**
-   * DEPRECATED
-   */
-		value: function getSelectedItems() {
-			throw new Error("Deprecated : use getSelectedNodes() instead");
-		}
-	}, {
-		key: "selectAll",
-
-		/**
-   * Select all the children of the current context node
-   */
-		value: function selectAll() {
-			this.setSelectedNodes(this._contextNode.getChildren(), "dataModel");
-		}
-	}, {
-		key: "isEmpty",
-
-		/**
-   * Whether the selection is empty
-   * @returns Boolean
-   */
-		value: function isEmpty() {
-			return this._selectedNodes ? this._selectedNodes.length == 0 : true;
-		}
-	}, {
-		key: "hasReadOnly",
-		value: function hasReadOnly() {
-			var test = false;
-			try {
-				this._selectedNodes.forEach(function (node) {
-					if (node.hasMetadataInBranch("ajxp_readonly", "true")) {
-						test = true;
-						throw $break;
-					}
-				});
-			} catch (e) {}
-			return test;
-		}
-	}, {
-		key: "selectionHasRootNode",
-		value: function selectionHasRootNode() {
+		if (local) {
+			var test = (contextNode.getPath() == "/" ? "" : contextNode.getPath()) + "/" + newFileName;
 			var found = false;
 			try {
-				this._selectedNodes.forEach(function (el) {
-					if (el.isRoot()) {
+				contextNode.getChildren().forEach(function (c) {
+					if (c.getPath() == test) {
 						found = true;
 						throw new Error();
 					}
 				});
 			} catch (e) {}
-		}
-	}, {
-		key: "isUnique",
-
-		/**
-   * Whether the selection is unique
-   * @returns Boolean
-   */
-		value: function isUnique() {
-			return this._bUnique;
-		}
-	}, {
-		key: "hasFile",
-
-		/**
-   * Whether the selection has a file selected.
-   * Should be hasLeaf
-   * @returns Boolean
-   */
-		value: function hasFile() {
-			return this._bFile;
-		}
-	}, {
-		key: "hasDir",
-
-		/**
-   * Whether the selection has a dir selected
-   * @returns Boolean
-   */
-		value: function hasDir() {
-			return this._bDir;
-		}
-	}, {
-		key: "isRecycle",
-
-		/**
-   * Whether the current context is the recycle bin
-   * @returns Boolean
-   */
-		value: function isRecycle() {
-			return this._isRecycle;
-		}
-	}, {
-		key: "isMultiple",
-
-		/**
-   * Whether the selection has more than one node selected
-   * @returns Boolean
-   */
-		value: function isMultiple() {
-			return this._selectedNodes && this._selectedNodes.length > 1;
-		}
-	}, {
-		key: "hasMime",
-
-		/**
-   * Whether the selection has a file with one of the mimes
-   * @param mimeTypes Array Array of mime types
-   * @returns Boolean
-   */
-		value: function hasMime(mimeTypes) {
-			if (mimeTypes.length == 1 && mimeTypes[0] == "*") {
-				return true;
-			}var has = false;
-			mimeTypes.each((function (mime) {
-				if (has) return;
-				has = this._selectedNodes.any(function (node) {
-					return getAjxpMimeType(node) == mime;
-				});
-			}).bind(this));
-			return has;
-		}
-	}, {
-		key: "getFileNames",
-
-		/**
-   * Get all selected filenames as an array.
-   * @param separator String Is a separator, will return a string joined
-   * @returns Array|String|bool
-   */
-		value: function getFileNames(separator) {
-			if (!this._selectedNodes.length) {
-				alert("Please select a file!");
-				return false;
-			}
-			var tmp = new Array(this._selectedNodes.length);
-			for (var i = 0; i < this._selectedNodes.length; i++) {
-				tmp[i] = this._selectedNodes[i].getPath();
-			}
-			if (separator) {
-				return tmp.join(separator);
-			} else {
-				return tmp;
-			}
-		}
-	}, {
-		key: "getContextFileNames",
-
-		/**
-   * Get all the filenames of the current context node children
-   * @param separator String If passed, will join the array as a string
-   * @return Array|String|bool
-   */
-		value: function getContextFileNames(separator) {
-			var allItems = this._contextNode.getChildren();
-			if (!allItems.length) {
-				return false;
-			}
-			var names = [];
-			for (var i = 0; i < allItems.length; i++) {
-				names.push(getBaseName(allItems[i].getPath()));
-			}
-			if (separator) {
-				return names.join(separator);
-			} else {
-				return names;
-			}
-		}
-	}, {
-		key: "fileNameExists",
-
-		/**
-   * Whether the context node has a child with this basename
-   * @param newFileName String The name to check
-   * @returns Boolean
-   * @param local
-   * @param contextNode
-   */
-		value: function fileNameExists(newFileName, local, contextNode) {
-			if (!contextNode) {
-				contextNode = this._contextNode;
-			}
-			if (local) {
-				var test = (contextNode.getPath() == "/" ? "" : contextNode.getPath()) + "/" + newFileName;
-				var found = false;
-				try {
-					contextNode.getChildren().forEach(function (c) {
-						if (c.getPath() == test) {
-							found = true;
-							throw new Error();
-						}
-					});
-				} catch (e) {}
-				return found;
-			} else {
-				var nodeExists = false;
-				this.loadPathInfoSync(contextNode.getPath() + "/" + newFileName, function (foundNode) {
-					nodeExists = true;
-				});
-				return nodeExists;
-			}
-		}
-	}, {
-		key: "applyCheckHook",
-		value: function applyCheckHook(node) {
-			"use strict";
-			var client = PydioApi.getClient();
-			var result;
-			client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function (transport) {
-				result = pydio.getController().parseXmlMessage(transport.responseXML);
+			return found;
+		} else {
+			var nodeExists = false;
+			this.loadPathInfoSync(contextNode.getPath() + "/" + newFileName, function (foundNode) {
+				nodeExists = true;
 			});
-			if (result === false) {
-				throw new Error("Check failed");
-			}
+			return nodeExists;
 		}
-	}, {
-		key: "getUniqueFileName",
+	};
 
-		/**
-   * Gets the first name of the current selection
-   * @returns String
-   */
-		value: function getUniqueFileName() {
-			if (this.getFileNames().length) {
-				return this.getFileNames()[0];
-			}return null;
+	PydioDataModel.prototype.applyCheckHook = function applyCheckHook(node) {
+		"use strict";
+		var client = PydioApi.getClient();
+		var result;
+		client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function (transport) {
+			result = pydio.getController().parseXmlMessage(transport.responseXML);
+		});
+		if (result === false) {
+			throw new Error("Check failed");
 		}
-	}, {
-		key: "getUniqueNode",
+	};
 
-		/**
-   * Gets the first node of the selection, or Null
-   * @returns AjxpNode
-   */
-		value: function getUniqueNode() {
-			if (this._selectedNodes.length) {
-				return this._selectedNodes[0];
-			}
-			return null;
+	/**
+  * Gets the first name of the current selection
+  * @returns String
+  */
+
+	PydioDataModel.prototype.getUniqueFileName = function getUniqueFileName() {
+		if (this.getFileNames().length) {
+			return this.getFileNames()[0];
+		}return null;
+	};
+
+	/**
+  * Gets the first node of the selection, or Null
+  * @returns AjxpNode
+  */
+
+	PydioDataModel.prototype.getUniqueNode = function getUniqueNode() {
+		if (this._selectedNodes.length) {
+			return this._selectedNodes[0];
 		}
-	}, {
-		key: "getNode",
+		return null;
+	};
 
-		/**
-   * Gets a node from the current selection
-   * @param i Integer the node index
-   * @returns AjxpNode
-   */
-		value: function getNode(i) {
-			return this._selectedNodes[i];
+	/**
+  * Gets a node from the current selection
+  * @param i Integer the node index
+  * @returns AjxpNode
+  */
+
+	PydioDataModel.prototype.getNode = function getNode(i) {
+		return this._selectedNodes[i];
+	};
+
+	/**
+  * Will add the current selection nodes as serializable data to the element passed : 
+  * either as hidden input elements if it's a form, or as query parameters if it's an url
+  * @param oFormElement HTMLForm The form
+  * @param sUrl String An url to complete
+  * @returns String
+  */
+
+	PydioDataModel.prototype.updateFormOrUrl = function updateFormOrUrl(oFormElement, sUrl) {
+		// CLEAR FROM PREVIOUS ACTIONS!
+		if (oFormElement) {
+			$(oFormElement).select("input[type=\"hidden\"]").each(function (element) {
+				if (element.name == "nodes[]" || element.name == "file") element.remove();
+			});
 		}
-	}, {
-		key: "updateFormOrUrl",
+		// UPDATE THE 'DIR' FIELDS
+		if (oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
+		sUrl += "&dir=" + encodeURIComponent(this._currentRep);
 
-		/**
-   * Will add the current selection nodes as serializable data to the element passed : 
-   * either as hidden input elements if it's a form, or as query parameters if it's an url
-   * @param oFormElement HTMLForm The form
-   * @param sUrl String An url to complete
-   * @returns String
-   */
-		value: function updateFormOrUrl(oFormElement, sUrl) {
-			// CLEAR FROM PREVIOUS ACTIONS!
-			if (oFormElement) {
-				$(oFormElement).select("input[type=\"hidden\"]").each(function (element) {
-					if (element.name == "nodes[]" || element.name == "file") element.remove();
-				});
-			}
-			// UPDATE THE 'DIR' FIELDS
-			if (oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
-			sUrl += "&dir=" + encodeURIComponent(this._currentRep);
-
-			// UPDATE THE 'file' FIELDS
-			if (this.isEmpty()) {
-				return sUrl;
-			}var fileNames = this.getFileNames();
-			for (var i = 0; i < fileNames.length; i++) {
-				sUrl += "&" + "nodes[]=" + encodeURIComponent(fileNames[i]);
-				if (oFormElement) this._addHiddenField(oFormElement, "nodes[]", fileNames[i]);
-			}
-			if (fileNames.length == 1) {
-				sUrl += "&" + "file=" + encodeURIComponent(fileNames[0]);
-				if (oFormElement) this._addHiddenField(oFormElement, "file", fileNames[0]);
-			}
+		// UPDATE THE 'file' FIELDS
+		if (this.isEmpty()) {
 			return sUrl;
+		}var fileNames = this.getFileNames();
+		for (var i = 0; i < fileNames.length; i++) {
+			sUrl += "&" + "nodes[]=" + encodeURIComponent(fileNames[i]);
+			if (oFormElement) this._addHiddenField(oFormElement, "nodes[]", fileNames[i]);
 		}
-	}, {
-		key: "_addHiddenField",
-		value: function _addHiddenField(oFormElement, sFieldName, sFieldValue) {
-			oFormElement.insert(new Element("input", { type: "hidden", name: sFieldName, value: sFieldValue }));
+		if (fileNames.length == 1) {
+			sUrl += "&" + "file=" + encodeURIComponent(fileNames[0]);
+			if (oFormElement) this._addHiddenField(oFormElement, "file", fileNames[0]);
 		}
-	}]);
+		return sUrl;
+	};
+
+	PydioDataModel.prototype._addHiddenField = function _addHiddenField(oFormElement, sFieldName, sFieldValue) {
+		oFormElement.insert(new Element("input", { type: "hidden", name: sFieldName, value: sFieldValue }));
+	};
 
 	return PydioDataModel;
 })(Observable);

@@ -1,4 +1,3 @@
-js/vendor/es6/browser-polyfill.js
 js/core/lang/Observable.js
 js/core/lang/Logger.js
 js/core/util/LangUtils.js

@@ -154,8 +154,8 @@ class User{
                 this._parsedJSONCache.set(prefName, parsed);
                 return parsed;
 	    	}catch(e){
-                if(console){
-                    console.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
+                if(window.console){
+                    Logger.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
                 }else{
                     alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
                 }
