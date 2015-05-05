@@ -61,7 +61,7 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo AuthService::getSecureToken();?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
+var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $httpVars["secure_token"];?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
