@@ -271,8 +271,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
         }
-        $config["zipEnabled"] = ConfService::zipEnabled();
-        $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+        $config["zipEnabled"] = ConfService::zipBrowsingEnabled();
+        $config["multipleFilesDownloadEnabled"] = ConfService::zipCreationEnabled();
         $customIcon = $this->getFilteredOption("CUSTOM_ICON");
         self::filterXml($customIcon);
         $config["customWording"] = array(

@@ -935,9 +935,32 @@ class ConfService
      */
     public static function zipEnabled()
     {
-        if(ConfService::getCoreConf("DISABLE_ZIP_BROWSING") === true) return false;
-        return ((function_exists("gzopen") || function_exists("gzopen64"))?true:false);
+        return (function_exists("gzopen") || function_exists("gzopen64"));
     }
+
+    /**
+     * Check if users are allowed to browse ZIP content
+     * @static
+     * @return bool
+     */
+    public static function zipBrowsingEnabled()
+    {
+        if(!self::zipEnabled()) return false;
+        return !ConfService::getCoreConf("DISABLE_ZIP_BROWSING");
+    }
+
+    /**
+     * Check if users are allowed to create ZIP archive
+     * @static
+     * @return bool
+     */
+    public static function zipCreationEnabled()
+    {
+        if(!self::zipEnabled()) return false;
+        return ConfService::getCoreConf("ZIP_CREATION");
+    }
+
+
     /**
      * Get the list of all "conf" messages
      * @static

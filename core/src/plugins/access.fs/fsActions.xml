@@ -212,7 +212,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
+					if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
 					{
 						if(gaTrackEvent){
 							fileNames = userSelection.getFileNames();
@@ -285,7 +285,7 @@
 					if(ajaxplorer){
 						var userSelection = ajaxplorer.getUserSelection();
 						var action = ajaxplorer.getActionBar().getActionByName("download");
-						if(zipEnabled && multipleFilesDownloadEnabled){
+						if(multipleFilesDownloadEnabled){
 							if(action){
 								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
 									action.setIconSrc('download_manager.png');
@@ -336,7 +336,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((zipEnabled && multipleFilesDownloadEnabled))
+					if((multipleFilesDownloadEnabled))
 					{
 						var loadFunc = function(oForm){
 							var zipName;
@@ -372,7 +372,7 @@
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
 					var action = ajaxplorer.getActionBar().getActionByName("compress");
-					if(!zipEnabled || !multipleFilesDownloadEnabled){
+					if(!multipleFilesDownloadEnabled){
 						if(action){
 							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
 							else action.selectionContext.unique = true;
