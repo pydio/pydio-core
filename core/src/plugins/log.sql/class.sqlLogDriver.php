@@ -254,7 +254,7 @@ class sqlLogDriver extends AbstractLogDriver
     {
         if($prefix == "Log In" && $message="context=API"){
             // Limit the number of logs
-            $test = dibi::query('SELECT [logdate] FROM [ajxp_log] WHERE [user]=%s AND [message]=%s AND [params]=%s ORDER BY [logdate] DESC LIMIT 0,1', $user, $prefix, $message);
+            $test = dibi::query('SELECT [logdate] FROM [ajxp_log] WHERE [user]=%s AND [message]=%s AND [params]=%s ORDER BY [logdate] DESC %lmt %ofs', $user, $prefix, $message, 1, 0);
             $lastInsert = $test->fetchSingle();
             $now = new DateTime('NOW');
             if(is_a($lastInsert, "DibiDateTime")){
