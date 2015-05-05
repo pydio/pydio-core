@@ -23,9 +23,9 @@ Pydio is a web-based browser for managing files on a web server without FTP. Ful
 
 %prep
 
-if [ $1 -gq 1 ]; then
+if [ $1 -gt 1 ]; then
    # For upgrades
-   [ -f %{buildroot}%{pydiodir}/.htaccess ] && cp  -pf  %{buildroot}%{pydiodir}/.htaccess  /tmp/pydio.update.htaccess
+   [ -f ./.htaccess ] && cp -pf ./.htaccess  /tmp/pydio.update.htaccess
 fi
 
 %setup -q -n %{name}-core-%{version}
@@ -101,10 +101,12 @@ touch %{_localstatedir}/cache/%{name}/first_run_passed
 fi
 fi
 
-if [ $1 -gq 1 ]; then
+if [ $1 -gt 1 ]; then
    # For upgrades
-   [ -f /tmp/pydio.update.htaccess ]  &&  cp -p /tmp/pydio.update.htaccess %{buildroot}%{pydiodir}/.htaccess
-else
+   [ -f /tmp/pydio.update.htaccess ]  &&  cp -pf /tmp/pydio.update.htaccess %{buildroot}%{pydiodir}/.htaccess
+fi
+
+if [ $1 -eq 1 ]; then
     # For install
   [ -f %{buildroot}%{pydiodir}/.htaccess ] && cp -p ./plugins/boot.conf/htaccess.tpl.linux %{buildroot}%{pydiodir}/.htaccess
 fi
