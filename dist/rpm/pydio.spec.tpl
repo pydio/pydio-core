@@ -22,7 +22,7 @@ Pydio is a web-based browser for managing files on a web server without FTP. Ful
  it is the perfect tool to replace (drop)box and alikes in the enterprise.
 
 %prep
-[ -f %{buildroot}%{pydiodir}/.htaccess ] && cp -pf %{buildroot}%{pydiodir}/.htaccess %{buildroot}%{_tmppath}/pydio.update.htaccess
+
 
 %setup -q -n %{name}-core-%{version}
 
@@ -77,6 +77,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/%{name}/.htaccess
 %config(noreplace) %{_sysconfdir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}*.conf
+%config(noreplace) %{pydiodir}/.htaccess
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %dir %attr(755,apache,apache) %{_localstatedir}/cache/%{name}
 %{_localstatedir}/cache/%{name}/.htaccess
@@ -89,7 +90,7 @@ rm -rf %{buildroot}
 if [ -f "%{_localstatedir}/cache/%{name}/plugins_cache.ser" ]
 then
 # Upgrading an existing install
-[ -f %{buildroot}%{_tmppath}/pydio.update.htaccess ]  &&  cp -pf %{buildroot}%{_tmppath}/pydio.update.htaccess %{buildroot}%{pydiodir}/.htaccess
+# [ -f %{buildroot}%{_tmppath}/pydio.update.htaccess ]  &&  cp -pf %{buildroot}%{_tmppath}/pydio.update.htaccess %{buildroot}%{pydiodir}/.htaccess
 rm -f %{_localstatedir}/cache/%{name}/i18n/*.ser
 rm -f %{_localstatedir}/cache/%{name}/plugins_*.ser
 if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
