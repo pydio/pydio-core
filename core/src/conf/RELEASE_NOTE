@@ -1,5 +1,50 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Security Update
+
+Pydio 6.0.7 is a Security Update linked to vulnerabilities discovered by Lane Thames. It also fixes various small bugs.
+Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
+Contributors: Cdujeu, Lane Thames, C12simple.
+SMB Auth: include domain name to user name (details)
+Get list of repository automatically (details)
+Massive refactoring of ElasticSearch plugin. Keyword search and indexed fields is working. (details)
+AuthService test userExist and create new (details)
+Add new parameter in ShareCenter to force password on public links. (details)
+InfoPanel: catch modifier evaluation error - CSS: hack transparent backgrounds for IE8 using \9 symbol. (details)
+Correct smb path string (details)
+ShareCenter : fix link pointing to a non-existing repository (details)
+ShareCenter.js: forgotten console calls (details)
+ShareCenter: Catch exceptions when forwarding changes, otherwise it stops the loop. (details)
+AjxpUtils::convertBytes : handle comma - Ajxp_VarsFilter::filter : pass an object or an id as resolve user (details)
+Major update of ElasticSearch implementation / Refactor some method to common parent with Lucene. (details)
+Check userExist to create new user for new sharing (details)
+Add a new dependency type phpExtension to avoid loading plugin that have a strong dependency to one or more php extensions. (details)
+Remove (beta) from sync clients buttons (details)
+ShareCenter: Fix "Preview" checkbox being automagically rechecked. Check template is not ajxp_unique_dl. (details)
+Start refactoring major JS resources. Split into subfolders. (details)
+Display admin Search Results with USER_DISPLAY_NAME (details)
+webdav error on smb workspace (details)
+Shared user watch is not correctly removed when user is removed from "Share with..." list. (details)
+Improve sanitization in Mysql driver and locally in XHRUploader. (details)
+Limit API connection "Login" logs to one per hour, otherwise it fills the log table, and makes the analytics quite slow. (details)
+Better commands sanitization to limit admin rights. (details)
+Fix text logger: was broken due to the clone call on object: refresh the fileHandle resource on clone. (details)
+Fix group listing for shared users when inside a group (cherry picked from commit a9fdc8c) (details)
+Ability to use multiple secure_token in one session, to avoid force reload on new tab. Notify existing windows with <require_registry_reload>. (details)
+IE8 Fixes - Fix #899 : remove tooltip when refreshing templates. (details)
+Make Etherpad more simple: support only .pad extensions, disable hideExtension() hook. (details)
+Refix c0205642045e943c086eb054f3947d5311d9997e : case is different if group listing is allowed on all groups or sub groups only. (details)
+Pass AJXP_VALUE_CLEAR as metadata value to force clearing key after array_merge() (details)
+Fix un-removed notification by checking ACL when listing the watches and updating metadata accordingly. (details)
+Fix Zip options tweaking, by properly separating zipBrowsingEnabled vs. zipCreationEnabled. (details)
+Use Dibi syntax for cross-db limit (details)
+Fix Jumploader not correctly sending node.change event (thus missing indexation) (details)
+Fix PLUploader : new way to get secure_token (details)
+
+
+------------------
+Pydio 6.0.6 - April 9, 2015
+
 Pydio 6.0.6 mostly provides bugfixes and security improvements for the v6 branch, but it also adds some interesting features in the field of metadata and search engine.
 Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
 Contributors: Cdujeu, DepaMarco, C12simple, Ellega, Kluckow, Huzergackl, Raiatea, Garnetius, Svetlemodry. Big up!
