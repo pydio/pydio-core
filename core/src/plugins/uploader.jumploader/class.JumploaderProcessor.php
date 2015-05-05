@@ -391,7 +391,8 @@ class JumploaderProcessor extends AJXP_Plugin
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
                     } else {
-                        $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
+                        $current = $destStreamURL.$httpVars["partitionRealName"];
+                        $newDest = fopen($current, "w");
                         $fileHash = md5($httpVars["partitionRealName"]);
 
                         for ($i = 0; $i < $httpVars["partitionCount"] ; $i++) {
@@ -410,14 +411,17 @@ class JumploaderProcessor extends AJXP_Plugin
                 }
 
                 if (!self::$remote && (!self::$wrapperIsRemote || $relPath != $httpVars["partitionRealName"])) {
-                    $err = copy($current, $target);
+                    if($current != $target){
+                        $err = copy($current, $target);
+                    }
+                    else $err = true;
                 } else {
                     for ($i=0, $count=count($newPartitions); $i<$count; $i++) {
                         $driver->storeFileToCopy($newPartitions[$i]);
                     }
                 }
 
-                if ($err !== false) {
+                if ($current != $target && $err !== false) {
                     if(!self::$remote) unlink($current);
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 } else if ($current == $target) {
