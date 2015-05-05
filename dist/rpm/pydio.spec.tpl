@@ -23,7 +23,6 @@ Pydio is a web-based browser for managing files on a web server without FTP. Ful
 
 %prep
 
-
 %setup -q -n %{name}-core-%{version}
 
 sed -i 's/"zip"/"rpm"/g' base.conf.php
@@ -45,8 +44,6 @@ rm -rf %{buildroot}
 # copy application
 install -d %{buildroot}%{pydiodir}
 cp -pr . %{buildroot}%{pydiodir}
-
-# correct htaccess
 
 # apache conf
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
