@@ -47,7 +47,6 @@ install -d %{buildroot}%{pydiodir}
 cp -pr . %{buildroot}%{pydiodir}
 
 # correct htaccess
-# cp -p ./plugins/boot.conf/htaccess.tpl.linux %{buildroot}%{pydiodir}/.htaccess
 
 # apache conf
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
@@ -90,7 +89,6 @@ rm -rf %{buildroot}
 if [ -f "%{_localstatedir}/cache/%{name}/plugins_cache.ser" ]
 then
 # Upgrading an existing install
-# [ -f %{buildroot}%{_tmppath}/pydio.update.htaccess ]  &&  cp -pf %{buildroot}%{_tmppath}/pydio.update.htaccess %{buildroot}%{pydiodir}/.htaccess
 rm -f %{_localstatedir}/cache/%{name}/i18n/*.ser
 rm -f %{_localstatedir}/cache/%{name}/plugins_*.ser
 if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
@@ -99,7 +97,7 @@ touch %{_localstatedir}/cache/%{name}/first_run_passed
 fi
 else
 # Brand new install
-[ -f %{buildroot}%{pydiodir}/.htaccess ] && cp -p ./plugins/boot.conf/htaccess.tpl.linux %{buildroot}%{pydiodir}/.htaccess
+cp -p %{pydiodir}/plugins/boot.conf/htaccess.tpl.linux %{pydiodir}/.htaccess
 fi
 
 
