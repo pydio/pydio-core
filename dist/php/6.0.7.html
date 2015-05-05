@@ -1,0 +1,47 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 6.0.7 - Security Update</h2>
+
+    Pydio 6.0.7 is a Security Update linked to vulnerabilities discovered by Lane Thames. It also fixes various small bugs.
+    <br>Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
+    <br>Contributors: Cdujeu, Lane Thames, C12simple.
+
+    <ul>
+        <li>SMB Auth: include domain name to user name (<a href="http://github.com/pydio/pydio-core/commit/6ad0370d5a53b394b2887d128cf9f1a661d54cfd">details</a>)</li>
+        <li>Get list of repository automatically (<a href="http://github.com/pydio/pydio-core/commit/28645a12f31ca11213574bc5bf6b5c25e0084943">details</a>)</li>
+        <li>Massive refactoring of ElasticSearch plugin. Keyword search and indexed fields is working. (<a href="http://github.com/pydio/pydio-core/commit/1b3a15edc0ad202e64e6cd0d66b771474e233995">details</a>)</li>
+        <li>AuthService test userExist and create new (<a href="http://github.com/pydio/pydio-core/commit/9a9fa68b90a491e26efd36580ea8374bb6b2e9bb">details</a>)</li>
+        <li>Add new parameter in ShareCenter to force password on public links. (<a href="http://github.com/pydio/pydio-core/commit/36b32ee70b72c9dd862e0855bf146f65e69b4851">details</a>)</li>
+        <li>InfoPanel: catch modifier evaluation error - CSS: hack transparent backgrounds for IE8 using \9 symbol. (<a href="http://github.com/pydio/pydio-core/commit/415772269a3da8ab6dfdcdd0b8de42bf0591d4c2">details</a>)</li>
+        <li>Correct smb path string (<a href="http://github.com/pydio/pydio-core/commit/8cc35a988eac59b4d44969b9d8b0dd303b21117b">details</a>)</li>
+        <li>ShareCenter : fix link pointing to a non-existing repository (<a href="http://github.com/pydio/pydio-core/commit/0f67abcd65fd5d775c2ba869e6d1cd0f180a7ef5">details</a>)</li>
+        <li>ShareCenter.js: forgotten console calls (<a href="http://github.com/pydio/pydio-core/commit/b8a14e9f3c25b7dc4060f67fedfe0172e2dd7695">details</a>)</li>
+        <li>ShareCenter: Catch exceptions when forwarding changes, otherwise it stops the loop. (<a href="http://github.com/pydio/pydio-core/commit/803d7fdea2eb86f61a3252377f11b4c887b8b56a">details</a>)</li>
+        <li>AjxpUtils::convertBytes : handle comma - Ajxp_VarsFilter::filter : pass an object or an id as resolve user (<a href="http://github.com/pydio/pydio-core/commit/d20c545075ad31dbd722397c8272adbc899f3088">details</a>)</li>
+        <li>Major update of ElasticSearch implementation / Refactor some method to common parent with Lucene. (<a href="http://github.com/pydio/pydio-core/commit/b790df3739f69ef1d217950261a6de97937ea0ec">details</a>)</li>
+        <li>Check userExist to create new user for new sharing (<a href="http://github.com/pydio/pydio-core/commit/b81e3d941a8ca92523a398b6f2a30542e99a87d1">details</a>)</li>
+        <li>Add a new dependency type phpExtension to avoid loading plugin that have a strong dependency to one or more php extensions. (<a href="http://github.com/pydio/pydio-core/commit/ba53d8a753fee8e91e15a58095ebe97b8db3758a">details</a>)</li>
+        <li>Remove (beta) from sync clients buttons (<a href="http://github.com/pydio/pydio-core/commit/031cf8a9859b3358bdc974d088950aa9f4835b30">details</a>)</li>
+        <li>ShareCenter: Fix "Preview" checkbox being automagically rechecked. Check template is not ajxp_unique_dl. (<a href="http://github.com/pydio/pydio-core/commit/41517a05575da39153c79663be18798a9addc466">details</a>)</li>
+        <li>Start refactoring major JS resources. Split into subfolders. (<a href="http://github.com/pydio/pydio-core/commit/14e3e969259f0141dc6312fe256e6080e77abf5f">details</a>)</li>
+        <li>Display admin Search Results with USER_DISPLAY_NAME (<a href="http://github.com/pydio/pydio-core/commit/7a4a720c719d24aecd7e18fe270beeb2a5fe8c72">details</a>)</li>
+        <li>webdav error on smb workspace (<a href="http://github.com/pydio/pydio-core/commit/abeff1cc563ab9f347d0d8b3f1db58e1ee4bdfc1">details</a>)</li>
+        <li>Shared user watch is not correctly removed when user is removed from "Share with..." list. (<a href="http://github.com/pydio/pydio-core/commit/073bb63e0a4275df770d2fda058833b26092de16">details</a>)</li>
+        <li>Improve sanitization in Mysql driver and locally in XHRUploader. (<a href="http://github.com/pydio/pydio-core/commit/b0d01aa4c309f3164cc8141d299ef43c325412b2">details</a>)</li>
+        <li>Limit API connection "Login" logs to one per hour, otherwise it fills the log table, and makes the analytics quite slow. (<a href="http://github.com/pydio/pydio-core/commit/8346673be5cba86ab5413e88d170ca913610e9ee">details</a>)</li>
+        <li>Better commands sanitization to limit admin rights. (<a href="http://github.com/pydio/pydio-core/commit/2049254e7a215491019d2646a274a8fb1cf29e3b">details</a>)</li>
+        <li>Fix text logger: was broken due to the clone call on object: refresh the fileHandle resource on clone. (<a href="http://github.com/pydio/pydio-core/commit/f88f00ceee9f2b587026a53b340d2ffa9ce2027c">details</a>)</li>
+        <li>Fix group listing for shared users when inside a group (cherry picked from commit a9fdc8c) (<a href="http://github.com/pydio/pydio-core/commit/c0205642045e943c086eb054f3947d5311d9997e">details</a>)</li>
+        <li>Ability to use multiple secure_token in one session, to avoid force reload on new tab. Notify existing windows with &lt;require_registry_reload&gt;. (<a href="http://github.com/pydio/pydio-core/commit/8c4f662b51894775d297a523eadf694f31d64e61">details</a>)</li>
+        <li>IE8 Fixes - Fix #899 : remove tooltip when refreshing templates. (<a href="http://github.com/pydio/pydio-core/commit/0e704270ce480c2f7f1ec304588e5ecc989b67e2">details</a>)</li>
+        <li>Make Etherpad more simple: support only .pad extensions, disable hideExtension() hook. (<a href="http://github.com/pydio/pydio-core/commit/75a1d476c6b5545c63402e2c6529536ebe485274">details</a>)</li>
+        <li>Refix c0205642045e943c086eb054f3947d5311d9997e : case is different if group listing is allowed on all groups or sub groups only. (<a href="http://github.com/pydio/pydio-core/commit/9eb846fccda14cf14a7914cd2f64f1cdf2a0c33a">details</a>)</li>
+        <li>Pass AJXP_VALUE_CLEAR as metadata value to force clearing key after array_merge() (<a href="http://github.com/pydio/pydio-core/commit/f3d29f1680d7d6de254b5d9346f824e70a3bd513">details</a>)</li>
+        <li>Fix un-removed notification by checking ACL when listing the watches and updating metadata accordingly. (<a href="http://github.com/pydio/pydio-core/commit/49e44e21227095bb96bbe090c0d8d1ba67826a09">details</a>)</li>
+        <li>Fix Zip options tweaking, by properly separating zipBrowsingEnabled vs. zipCreationEnabled. (<a href="http://github.com/pydio/pydio-core/commit/b350869e0e0873070d2a58f150b7764c9cfb0e9b">details</a>)</li>
+        <li>Use Dibi syntax for cross-db limit (<a href="http://github.com/pydio/pydio-core/commit/84b485fa1fe2f9ff9371b005ec600ef91ed7acf5">details</a>)</li>
+        <li>Fix Jumploader not correctly sending node.change event (thus missing indexation) (<a href="http://github.com/pydio/pydio-core/commit/4a49c5559650f7a6d0f4824bbf8b8e4f0d657eba">details</a>)</li>
+        <li>Fix PLUploader : new way to get secure_token (<a href="http://github.com/pydio/pydio-core/commit/f10c115f9a3df40d1fecd9bec86ed6b55f0bcf20">details</a>)</li>
+    </ul>
+</div>
