@@ -25,7 +25,7 @@ Pydio is a web-based browser for managing files on a web server without FTP. Ful
 
 if [ $1 -gt 1 ]; then
    # For upgrades
-   [ -f ./.htaccess ] && cp -pf ./.htaccess  /tmp/pydio.update.htaccess
+   [ -f .htaccess ] && cp -pf .htaccess  /tmp/pydio.update.htaccess
 fi
 
 %setup -q -n %{name}-core-%{version}
