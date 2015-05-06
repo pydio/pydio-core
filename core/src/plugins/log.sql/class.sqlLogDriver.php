@@ -127,6 +127,9 @@ class sqlLogDriver extends AbstractLogDriver
      */
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
+        if(AJXP_Utils::detectXSS($message)){
+            $message = "XSS Detected in message!";
+        }
         $log_row = Array(
             'logdate' => new DateTime('NOW'),
             'remote_ip' => $this->inet_ptod($ip),

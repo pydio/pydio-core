@@ -158,7 +158,7 @@ Class.create("SQLEditor", {
 			columns.each(function(col){
 				col['field_origname'] = col['field_name'];
 			});
-			this.oForm.insert(new Element('input', {type:'hidden',name:'current_table',value:getBaseName(tableName)}));
+			this.oForm.insert(new Element('input', {type:'hidden',name:'current_table',value:getBaseName(tableName.stripTags())}));
 			this.displayTableEditorForm(columns.length, fields, columns);
 		}
 	},
@@ -169,7 +169,7 @@ Class.create("SQLEditor", {
 		var button = chooser.down('input[id="toNext"]');
 		button.observe('click', function(e){
 			Event.stop(e);
-			this.newTableName = chooser.down('input[id="table_name"]').getValue();
+			this.newTableName = chooser.down('input[id="table_name"]').getValue().stripTags();
 			var fieldsNumber = parseInt(chooser.down('input[id="fields_number"]').getValue());
 			if(this.newTableName && fieldsNumber){
 				chooser.remove();

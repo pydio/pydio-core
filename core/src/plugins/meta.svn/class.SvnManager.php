@@ -195,6 +195,7 @@ class SvnManager extends AJXP_Plugin
                 header("Cache-Control: private",false);
             }
             $realFile = escapeshellarg($realFile);
+            $revision = escapeshellarg($revision);
             system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $realFile");
             exit(0);
         } else if ($actionName == "revert_file") {

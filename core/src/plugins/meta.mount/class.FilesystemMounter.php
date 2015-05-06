@@ -122,7 +122,7 @@ class FilesystemMounter extends AJXP_Plugin
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
 
-        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
+        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
         if($this->getOption("MOUNT_ENV_PASSWD") === true){
             putenv("PASSWD=$password");
@@ -159,7 +159,7 @@ class FilesystemMounter extends AJXP_Plugin
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
 
-        system(($MOUNT_SUDO?"sudo":"")." umount ".$MOUNT_POINT);
+        system(($MOUNT_SUDO?"sudo":"")." umount ".escapeshellarg($MOUNT_POINT));
         return true;
     }
 
