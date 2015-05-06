@@ -1,5 +1,15 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a security release.
+
+License: Affero GPL
+Copyright: Charles du Jeu 2014
+Demo: https://demo.pyd.io/
+Date: May 6th, 2015
+Contributors: cdujeu
+
+Pydio 5.2.5
+
 This is a hotfix for a blocking issue introduced by last update (workspace creation).
 
 License: Affero GPL
