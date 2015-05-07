@@ -186,8 +186,7 @@ Class.create("FoldersTree", AjxpPane, {
             fitHeightToBottom(this.treeContainer, this.options['fitParent']);
         }
         if(this.scrollbar){
-            this.scroller.setStyle({height:parseInt(this.treeContainer.getHeight())+'px'});
-            this.scrollbar.recalculateLayout();
+            this.scrollbar.recalculateLayout(parseInt(this.treeContainer.getHeight()));
         }
         document.fire("ajaxplorer:resize-FoldersTree-" + this.htmlElement.id, this.htmlElement.getDimensions());
 	},

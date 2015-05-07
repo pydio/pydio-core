@@ -25,6 +25,9 @@
 #home_left_bar{
     width: 420px;
     background-color: rgba(34, 34, 34, 0.5);
+}
+
+.no-flexbox #home_left_bar{
     float: left;
 }
 
@@ -33,9 +36,16 @@
 }
 
 #home_center_panel {
+    z-index: 1;
+}
+
+.no-flexbox #home_center_panel{
     position: absolute;
     left: 420px;
-    z-index: 1;
+}
+
+.flexbox #home_center_panel{
+    flex: 1;
 }
 
 .repoInfoBadge {

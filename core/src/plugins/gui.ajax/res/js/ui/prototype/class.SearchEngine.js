@@ -171,7 +171,7 @@ Class.create("SearchEngine", AjxpPane, {
             formPanel.insert(searchChooser);
         }
 
-        formPanel.insert('<div>' +
+        formPanel.insert('<div style="height: 100%;">' +
             '<div class="scroller_track"><div class="scroller_handle"></div></div> ' +
             '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[489]+'</div><div class="advanced_search_section search_section_freemeta"></div></div>' +
         '</div>');
@@ -541,7 +541,9 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Resize the widget
 	 */
 	resize: function($super){
+        $(this._resultsBoxId).addClassName('forceComputeFit');
         if(this._ajxpOptions.toggleResultsVisibility){
+            $(this._ajxpOptions.toggleResultsVisibility).addClassName('forceComputeFit');
             fitHeightToBottom($(this._ajxpOptions.toggleResultsVisibility), (this._ajxpOptions.toggleResultsFitTo?$(this._ajxpOptions.toggleResultsFitTo):null), (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
             fitHeightToBottom($(this._resultsBoxId));
             if(this._ajxpOptions.toggleResultsFitTo && $(this._ajxpOptions.toggleResultsFitTo) && $(this._ajxpOptions.toggleResultsVisibility)){
@@ -553,6 +555,7 @@ Class.create("SearchEngine", AjxpPane, {
 
         if(this.htmlElement && this.htmlElement.down('#search_meta')){
             var formPanel = this.htmlElement.down('#search_meta');
+            formPanel.addClassName('forceComputeFit');
             if(formPanel.getStyle('float') == 'left'){
                 fitHeightToBottom(formPanel);
                 formPanel.select('.advanced_search_section').invoke('addClassName', 'visible');
@@ -560,8 +563,7 @@ Class.create("SearchEngine", AjxpPane, {
             }
             fitHeightToBottom(formPanel.down('#search_meta_detailed'), formPanel);
             if(this.scrollbar) {
-                this.scrollbar.track.setStyle({height:formPanel.down('#search_meta_detailed').getHeight()+'px'});
-                this.scrollbar.recalculateLayout();
+                this.scrollbar.recalculateLayout(formPanel.down('#search_meta_detailed').getHeight());
             }
         }
 

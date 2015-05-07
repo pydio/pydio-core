@@ -219,8 +219,11 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		$(this.id + '-cont').insert(node.toString());
 		$(node.id).ajxpNode = node.ajxpNode;
 		if(!node.inZip){
-			AjxpDroppables.add(node.id, node.ajxpNode);
-		}		
+            window.setTimeout(function(){
+                if(!$(node.id)) return;
+			    AjxpDroppables.add(node.id, node.ajxpNode);
+            }, 200);
+		}
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
 			Event.observe(node.id+'','contextmenu', function(event){

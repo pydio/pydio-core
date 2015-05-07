@@ -974,8 +974,7 @@ Class.create("FilesList", SelectableElements, {
                     }else{
                         if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(scrollElement, this.htmlElement);
                     }
-                    this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
-                    this.scrollbar.recalculateLayout();
+                    this.scrollbar.recalculateLayout(parseInt(scrollElement.getHeight()));
                 }.bind(this), 0.01);
             }.bind(this);
             this.observe("resize", this.scrollSizeObserver);
@@ -1245,11 +1244,9 @@ Class.create("FilesList", SelectableElements, {
         this._previewFactory.clear();
         if(this.protoMenu){
             if(this._displayMode == "thumb" || this._displayMode == "detail"){
-                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
-                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex);
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex +', #selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
             }else{
-                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex);
-                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex + ', #table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
             }
         }
         for(var i = 0; i< AllAjxpDroppables.length;i++){
@@ -1287,6 +1284,9 @@ Class.create("FilesList", SelectableElements, {
     makeItemRefreshObserver: function (ajxpNode, item, renderer){
         return function(){
             //try{
+                if(this.loading){
+                    return;
+                }
                 if(item.ajxpNode) {
                     if(item.REMOVE_OBS) item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
                     if(item.REPLACE_OBS) item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
@@ -1302,7 +1302,7 @@ Class.create("FilesList", SelectableElements, {
                 if(ajxpNode.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
                 this.initRows();
                 item.ajxpNode = null;
-                delete item;
+                item = undefined;
                 newItem.REPLACE_OBS = this.makeItemRefreshObserver(ajxpNode, newItem, renderer);
                 newItem.REMOVE_OBS = this.makeItemRemovedObserver(ajxpNode, newItem);
                 ajxpNode.observe("node_replaced", newItem.REPLACE_OBS);
@@ -1343,7 +1343,7 @@ Class.create("FilesList", SelectableElements, {
                 if(Prototype.Browser.IE && Prototype.Version.startsWith('1.6')){
                     window.setTimeout(function(){
                         item.remove();
-                        delete item;
+                        item = undefined;
                         this.initRowsBuffered();
                     }.bind(this), 10);
                 }else{
@@ -1351,7 +1351,7 @@ Class.create("FilesList", SelectableElements, {
                         try{
                             item.remove();
                         }catch(e){if(window.console) console.log(e);}
-                        delete item;
+                        item = undefined;
                         this.initRowsBuffered();
                     }.bind(this), duration:0.2});
                 }
@@ -1990,11 +1990,10 @@ Class.create("FilesList", SelectableElements, {
 					scroll:($('tree_container')?'tree_container':null),
 					containerScroll:this.htmlElement.down(".selectable_div")
 				}, this, 'filesList');
+                if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true )){
+                    AjxpDroppables.add(newRow, ajxpNode);
+                }
 			}.bind(this), 500);
-		}
-		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
-		{
-			AjxpDroppables.add(newRow, ajxpNode);
 		}
 
         this.addInlineToolbar(newRow, ajxpNode);
@@ -2139,11 +2138,10 @@ Class.create("FilesList", SelectableElements, {
 					scroll:($('tree_container')?'tree_container':null),
 					containerScroll:this.htmlElement.down(".selectable_div")
 				}, this, 'filesList');
+                if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true )){
+                    AjxpDroppables.add(largeRow, ajxpNode);
+                }
 			}.bind(this), 500);
-		}
-		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
-		{
-			AjxpDroppables.add(largeRow, ajxpNode);
 		}
 
         this.addInlineToolbar(largeRow, ajxpNode);

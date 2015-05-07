@@ -298,9 +298,24 @@ function fitRectangleToDimension(rectDim, targetDim){
  * @returns Object|null
  */
 function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minOffsetTop)
-{	
+{
 	element = $(element);
 	if(!element) return;
+    if(Modernizr.flexbox && element.parentNode && !element.hasClassName('forceComputeFit') && !element.parentNode.hasClassName('horizontal_layout')){
+        if(!element.hasClassName('vertical_fit')){
+            element.parentNode.addClassName('vertical_layout');
+            element.addClassName('vertical_fit');
+        }
+        if(listen){
+            Event.observe(window, 'resize', function(){
+                if(element.ajxpPaneObject){
+                    element.ajxpPaneObject.resize();
+                }
+                element.fire('resize', null, null, false);
+            });
+        }
+        return;
+    }
 	if(typeof(parentElement) == "undefined" || parentElement == null){
 		parentElement = Position.offsetParent($(element));
 	}else if(parentElement == "window") {

@@ -408,8 +408,7 @@ Class.create("Diaporama", AbstractEditor, {
 			}
 		}
         if(this.scrollbar){
-            this.scrollbar.track.setStyle({height:parseInt(this.imgContainer.getHeight())+"px"});
-            this.scrollbar.recalculateLayout();
+            this.scrollbar.recalculateLayout(parseInt(this.imgContainer.getHeight()));
         }
         this.imageNavigator();
 	},

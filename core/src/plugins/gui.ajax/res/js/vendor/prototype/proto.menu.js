@@ -128,13 +128,12 @@ Proto.Menu = Class.create({
 	
 	removeElements:function(selectorOrObject){
 		if(typeof(selectorOrObject) == "string"){
-			$$(selectorOrObject).invoke('removeClassName', 'protomenu_selector');
-			$$(selectorOrObject).invoke('stopObserving', 
-								this.eventToObserve,
-								this.observerFunctionBound);
+            $$(selectorOrObject).each(function(oc){
+                oc.removeClassName('protomenu_selector');
+                oc.stopObserving(this.eventToObserve, this.observerFunctionBound);
+            }.bind(this));
 		}else{
-			$(selectorOrObject).removeClassName('protomenu_selector');
-			$(selectorOrObject).stopObserving(this.eventToObserve, this.observerFunctionBound);
+			selectorOrObject.removeClassName('protomenu_selector').stopObserving(this.eventToObserve, this.observerFunctionBound);
 		}
 	},
 	

@@ -57,7 +57,12 @@ Class.create("InfoPanel", AjxpPane, {
 		this.registeredMimes = new Hash();
         this.primaryTemplates = new Hash();
 
-		this.updateHandler = this.update.bind(this);
+		//this.updateHandler = this.update.bind(this);
+        this.updateHandler = function(objectOrEvent){
+            bufferCallback('InfoPanelUpdater', 100, function(){
+                this.update(objectOrEvent);
+            }.bind(this));
+        }.bind(this);
 		this.componentConfigHandler = function(event){
 			if(event.memo.className == "InfoPanel"){
 				this.parseComponentConfig(event.memo.classConfig.get('all'));
@@ -363,8 +368,7 @@ Class.create("InfoPanel", AjxpPane, {
 		fitHeightToBottom(this.contentContainer, null);
         previewMaxHeight = Math.min(previewMaxHeight, parseInt(this.contentContainer.getHeight()) - parseInt(this.contentContainer.getStyle('paddingTop')));
         if(this.scrollbar){
-            this.scroller.setStyle({height:parseInt(this.contentContainer.getHeight())+'px'});
-            this.scrollbar.recalculateLayout();
+            this.scrollbar.recalculateLayout(parseInt(this.contentContainer.getHeight()));
         }
 		if(this.htmlElement && this.currentPreviewElement && this.currentPreviewElement.visible()){
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));

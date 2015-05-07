@@ -21,7 +21,7 @@
 webFXTreeConfig.loadingText = "Loading...";
 
 function splitOverlayIcons(ajxpNode){
-    if(!ajxpNode.getMetadata().get("overlay_icon")  || !Modernizr.multiplebgs) return false;
+    if(window.ajaxplorer.currentThemeUsesIconFonts || !ajxpNode.getMetadata().get("overlay_icon")  || !Modernizr.multiplebgs) return false;
     var ret = [];
     $A(ajxpNode.getMetadata().get("overlay_icon").split(",")).each(function(el){
         ret.push(resolveImageSource(el, "/images/overlays/ICON_SIZE", 8));
@@ -130,17 +130,21 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	}.bind(jsNode));
 	ajxpNode.observe("node_replaced", function(newNode){
 		// Should refresh label / icon
-		if(jsNode.updateIcon){ 
+		if(jsNode.updateIcon){
 			var ic = resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 16);
 			var oic = ic;
 			if(ajxpNode.getMetadata().get("openicon")){
 				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
 			}
-			jsNode.updateIcon(ic, oic);
+            if(jsNode.icon != ic || jsNode.openIcon != oic){
+    			jsNode.updateIcon(ic, oic);
+            }
             jsNode.overlayIcon = splitOverlayIcons(ajxpNode);
             jsNode.overlayClasses = splitOverlayClasses(ajxpNode);
 		}
-		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
+		if(jsNode.updateLabel && jsNode.text != ajxpNode.getLabel()) {
+            jsNode.updateLabel(ajxpNode.getLabel());
+        }
 	}.bind(jsNode));
     var remover = function(e){
         jsNode.remove();

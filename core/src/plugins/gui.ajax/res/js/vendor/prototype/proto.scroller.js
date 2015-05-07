@@ -56,7 +56,7 @@ Control.ScrollBar = Class.create({
             onChange: this.onChange.bind(this)
         },this.options.slider_options));
         this.recalculateLayout();
-        Event.observe(window,'resize',this.boundResizeObserver);
+        //Event.observe(window,'resize',this.boundResizeObserver);
         if (this.options.custom_event) {
             if (Object.isFunction(this.options.custom_event_handler)) {
                 this.container.observe(this.options.custom_event, this.options.custom_event_handler);
@@ -71,7 +71,7 @@ Control.ScrollBar = Class.create({
         attachMobileScroll(container, 'vertical');
     },
     destroy: function(){
-        Event.stopObserving(window,'resize',this.boundResizeObserver);
+        //Event.stopObserving(window,'resize',this.boundResizeObserver);
         if(this.options.active_class_name)
             $(this.options.apply_active_class_name_to).removeClassName(this.options.active_class_name);
         if (this.options.custom_event) {
@@ -107,7 +107,10 @@ Control.ScrollBar = Class.create({
     reset: function(){
         this.slider.setValue(0);
     },
-    recalculateLayout: function(){
+    recalculateLayout: function(parentHeight){
+        if(parentHeight && !Modernizr.flexbox){
+            this.track.setStyle({height: parentHeight + 'px'});
+        }
         if(this.scrollLength() <= this.offsetLength())
             this.disable();
         else{

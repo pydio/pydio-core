@@ -93,9 +93,9 @@ Class.create("AjxpPane", {
             }));
             this.htmlElement.insert(this.scroller);
             this.htmlElement.setStyle({overflow:"hidden"});
-            this.scroller.setStyle({
-                height:this.htmlElement.getHeight() + 'px'
-            });
+            if(!Modernizr.flexbox){
+                this.scroller.setStyle({height:this.htmlElement.getHeight() + 'px'});
+            }
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
@@ -227,13 +227,10 @@ Class.create("AjxpPane", {
             }
     		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom, false, minOffsetTop);
             if(this.scrollbar){
-                this.scroller.setStyle({
-                    height:this.htmlElement.getHeight() + 'px'
-                });
-                this.scrollbar.recalculateLayout();
+                this.scrollbar.recalculateLayout(this.htmlElement.getHeight());
             }
     	}
-        if(this.options.flexTo){
+        if(this.options.flexTo && !(Modernizr.flexbox &&  $(this.options.flexTo).hasClassName('horizontal_layout'))){
             var parentWidth = $(this.options.flexTo).getWidth();
             var siblingWidth = 0;
             this.htmlElement.siblings().each(function(s){

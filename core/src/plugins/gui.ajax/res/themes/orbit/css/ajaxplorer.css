@@ -146,6 +146,29 @@ kbd {
     cursor: nwse-resize;
 }
 
+.flexbox body{
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.vertical_layout{
+    display:flex;
+    flex-direction: column;
+}
+
+.horizontal_layout{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.vertical_fit{
+    flex:1;
+}
+
 #sidebar_rootdir_td
 {
     height: 17px;
@@ -194,7 +217,7 @@ kbd {
     background-color: rgba(237, 237, 237, 0.82);
     padding: 8px 3px;
     color: #666;
-    text-shadow: 1px 1px 0px white;
+    text-shadow: 1px 1px 0 white;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
@@ -212,7 +235,7 @@ kbd {
 }
 
 .thumbnail_selectable_cell.detailed {;
-    margin: 0px 0px !important;
+    margin: 0 0 !important;
     margin-bottom: 2px;
     background-color: #ffffff;
     width: 100%;
@@ -243,7 +266,7 @@ kbd {
     font-size: 15px;
     text-align: left;
     padding-top: 9px;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -1136,7 +1159,7 @@ select.SF_input {
 }
 
 .SF_inlineButton.SF_inlineButtonWorking{
-    box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.35);
+    box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
     padding-top: 10px !important;
     padding-bottom: 8px !important;
 }
@@ -1275,7 +1298,7 @@ div.tabbed_editor div.innerTitle{
     text-align:center;
 }
 .captcha_container img{
-    margin: 5 0 0 2px;
+    margin: 5px 0 0 2px;
     border: 1px solid #ddd;
 }
 
@@ -1477,13 +1500,16 @@ div.dialogBox.form-diaporama_box div.dialogContent{
 }
 
 #topPane{
-    float:left;
     width:280px;
     background-color: rgba(50,50,50,0.93);
     background-color: rgb(50,50,50)\9;
 }
 
-#cpane_container {
+.no-flexbox div#topPane{
+    float:left;
+}
+
+.no-flexbox div#cpane_container {
     position: absolute;
     left: 280px;
 }
@@ -2838,7 +2864,7 @@ div#uploader_options_pane {
     display: none;
     margin-bottom: 11px;
     border-bottom: 1px solid #CCCCCC;
-    box-shadow: inset 0px 1px 6px rgba(0,0,0,0.3);
+    box-shadow: inset 0 1px 6px rgba(0,0,0,0.3);
     border-radius: 2px;
     margin-top: 2px;
 }
@@ -3042,7 +3068,7 @@ div#upload_files_list span.item_relative_path{
 {
     vertical-align:top;
     font-size: 11px;
-    letter-spacing: 1;
+    letter-spacing: 1px;
 }
 
 /***** SCROLLER ******/
@@ -3056,6 +3082,9 @@ div#upload_files_list span.item_relative_path{
     opacity: 0.7;
     padding-right: 1px;
     top:0;
+}
+.flexbox div.scroller_track{
+    bottom: 0;
 }
 
 div[ajxpClass="FilesList"].paginated div.scroller_track{
@@ -3108,7 +3137,7 @@ div#topPane div.overlay_icon_div {
 #cpane_tabs > div.tabulatorContainer{
     border-bottom: 0;
     /*transition: height 0.5s ease;*/
-    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.15);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
     background-color: #f7f7f7;
 }
 
@@ -3297,7 +3326,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     width: 18px;
     cursor: pointer;
     font-size: 1em;
-    padding-top: 0px;
+    padding-top: 0;
     color: #555;
     position: absolute;
     right: 13px;
@@ -3325,7 +3354,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 {
     float: right !important;
     margin: 0;
-    margin-top: 0px;
+    margin-top: 0;
     height: 58px;
     background: #f5f5f5;
     border-color: #f5f5f5;
@@ -3635,6 +3664,10 @@ span.search_meta_opt.checked > span {
     width: 100%;
 }
 
+.flexbox div#search_results{
+    display: flex !important;
+}
+
 #search_results_cont span.results_string{
     display: none;
 }
@@ -3703,7 +3736,7 @@ div.class-FetchedResultPane div.ajxpNodeProvider
     border-radius: 6px;
     width:45%;
     margin: 0 1% !important;
-    padding-top: 0px;
+    padding-top: 0;
     padding-bottom: 10px;
     overflow: hidden;
     height: 71px;
@@ -3825,7 +3858,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 #info_panel span[data-ajxpAction]{
     float: right;
     display: inline-block;
-    padding: 0px;
+    padding: 0;
     cursor: pointer;
     font-size: 17px;
     display: none;
@@ -4002,7 +4035,7 @@ div.infoPanelRow
 td.infoPanelValue,
 div.infoPanelValue
 {
-    padding: 0px 0 15px;
+    padding: 0 0 15px;
     font-size: 1.5em;
     color: #555;
     line-height: 1.3em;
@@ -4182,6 +4215,11 @@ div.infoPanelAllMetadata span.meta_user_tag_block {
     clear:left;
     /*background-color: #f5f5f5;*/
     line-height: 18px;
+}
+
+.flexbox div#browser{
+    flex-direction:row;
+    align-items:stretch;
 }
 
 #home_account_pane{
@@ -5249,7 +5287,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu li {
     height: auto;
-    padding-top: 0px;
+    padding-top: 0;
     padding-bottom: 0;
     color: white;
 }
