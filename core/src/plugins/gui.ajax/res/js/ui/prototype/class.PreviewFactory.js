@@ -125,7 +125,7 @@ Class.create("PreviewFactory", {
             img.parentNode.replaceChild(newImg, img);
             oImageToLoad.mainObject.IMAGE_ELEMENT = newImg;
             this.resizeThumbnail(newImg);
-            delete imageLoader;
+            imageLoader = null;
         }.bind(this);
         if(imageLoader.readyState && imageLoader.readyState == "complete"){
             loader();

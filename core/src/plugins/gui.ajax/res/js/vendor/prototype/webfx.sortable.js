@@ -58,7 +58,7 @@
 | Created 2003-01-10 | All changes are in the log above. | Updated 2004-08-26 |
 \----------------------------------------------------------------------------*/
 
-SortableTable = Class.create({
+Class.create('SortableTable', {
 
     groupByData: null,
 

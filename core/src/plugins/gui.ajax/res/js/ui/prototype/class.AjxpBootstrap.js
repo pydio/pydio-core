@@ -80,7 +80,7 @@ Class.create("AjxpBootstrap", {
 				if(pydio.getController().actions._object){
                     pydio.getController().actions.unset("ext_select");
                 }else{
-                    pydio.getController().actions.delete("ext_select");
+                    //pydio.getController().actions.delete("ext_select");
                 }
 				pydio.getController().fireContextChange();
 				pydio.getController().fireSelectionChange();

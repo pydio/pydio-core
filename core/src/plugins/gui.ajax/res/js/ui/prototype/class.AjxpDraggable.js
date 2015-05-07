@@ -34,7 +34,7 @@ document.observe("ajaxplorer:loaded", function(){
 	}});	
 });
 window.AllAjxpDraggables = $A([]);
-var AllAjxpDroppables = $A([]);
+window.AllAjxpDroppables = $A([]);
 Event.observe(window, "unload", function(){
 	Draggables.removeObserver(timerClearObserver);
     window.AllAjxpDraggables.each(function(el){
@@ -211,7 +211,8 @@ Class.create("AjxpDraggable", Draggable, {
 
         var p;
         if (this.options.scroll == window) {
-          with(this._getWindowScroll(this.options.scroll)) { p = [ left, top, left+width, top+height ]; }
+            var obj = this._getWindowScroll(this.options.scroll);
+          if(obj) { p = [ obj.left, obj.top, obj.left+obj.width, obj.top+obj.height ]; }
         } else {
           p = Position.page(this.options.scroll);
           p[0] += /*this.options.scroll.scrollLeft + */Position.deltaX;
@@ -338,10 +339,11 @@ Class.create("AjxpDraggable", Draggable, {
       var delta = current - this.lastScrolled;
       this.lastScrolled = current;
       if(this.options.scroll == window) {
-        with (this._getWindowScroll(this.options.scroll)) {
+          var obj = this._getWindowScroll(this.options.scroll);
+        if (obj) {
           if (this.scrollSpeed[0] || this.scrollSpeed[1]) {
             var d = delta / 1000;
-            this.options.scroll.scrollTo( left + d*this.scrollSpeed[0], top + d*this.scrollSpeed[1] );
+            this.options.scroll.scrollTo( obj.left + d*this.scrollSpeed[0], obj.top + d*this.scrollSpeed[1] );
           }
         }
       } else {
@@ -464,13 +466,20 @@ var AjxpDroppables = {
             return;
         }
 		Droppables.add(element, this.options);
-		AllAjxpDroppables.push($(element));
+        element = $(element);
+		AllAjxpDroppables.push(element);
 
         if(AjxpDroppables.dragOverHook){
-            $(element).select("*").invoke("observe", "dragover", AjxpDroppables.dragOverHook, true);
-            $(element).select("*").invoke("observe", "drop", AjxpDroppables.dropHook, true);
-            $(element).select("*").invoke("observe", "dragenter", AjxpDroppables.dragEnterHook, true);
-            $(element).select("*").invoke("observe", "dragleave", AjxpDroppables.dragLeaveHook, true);
+            element.select("*").each(function(e){
+                e.observe("dragover", AjxpDroppables.dragOverHook);
+                e.observe("drop", AjxpDroppables.dropHook);
+                e.observe("dragenter", AjxpDroppables.dragEnterHook);
+                e.observe("dragleave", AjxpDroppables.dragLeaveHook);
+            });
+                //invoke("observe", "dragover", AjxpDroppables.dragOverHook, true);
+            //$(element).select("*").invoke("observe", "drop", AjxpDroppables.dropHook, true);
+            //$(element).select("*").invoke("observe", "dragenter", AjxpDroppables.dragEnterHook, true);
+            //$(element).select("*").invoke("observe", "dragleave", AjxpDroppables.dragLeaveHook, true);
         }
 
     }

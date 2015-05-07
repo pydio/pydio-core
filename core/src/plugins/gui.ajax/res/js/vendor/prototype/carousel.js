@@ -23,7 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-Carousel = Class.create(Abstract, {
+Class.create('Carousel', Abstract, {
 	initialize: function (scroller, slides, controls, options) {
 		this.scrolling	= false;
 		this.scroller	= $(scroller);

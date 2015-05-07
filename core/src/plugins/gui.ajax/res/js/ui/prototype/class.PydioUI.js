@@ -415,9 +415,10 @@ Class.create("PydioUI", {
 
         obj.__ajxpOptionsString = ajxpOptionsString;
 
+        this._instancesCache.unset(oldObj);
         this._instancesCache.set(ajxpId, obj);
         obj.resize();
-        delete(oldObj);
+        //delete(oldObj);
     },
 
     /**

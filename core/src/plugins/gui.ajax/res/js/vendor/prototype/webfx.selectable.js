@@ -30,7 +30,7 @@
 |-----------------------------------------------------------------------------|
 | Created 2002-09-04 | All changes are in the log above. | Updated 2006-05-28 |
 \----------------------------------------------------------------------------*/
-SelectableElements = Class.create({
+Class.create('SelectableElements', {
 
 	initialize: function(oElement, bMultiple){
 		if (oElement == null)
