@@ -37,7 +37,7 @@
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientListener name="contextChange"><![CDATA[
-                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading){
+                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading && !window.ajxpMinisite){
                             ajaxplorer.mqObserverLoading = true;
                             ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
                                 ajaxplorer.mqObserver = new AjxpMqObserver();
