@@ -75,9 +75,6 @@ class Pydio extends Observable{
         }
 
         this.observe("registry_loaded", function(){
-            // TODO: CAN WE REMOVE THIS? IT IS TRIGGERED TWO TIMES (in PydioUI).
-            this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
-            // END
             this.Registry.refreshExtensionsRegistry();
             this.Registry.logXmlUser(false);
             if(this.user){
@@ -89,10 +86,12 @@ class Pydio extends Observable{
             if(this.UI.guiLoaded) {
                 this.UI.refreshTemplateParts();
                 this.Registry.refreshExtensionsRegistry();
+                this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
             } else {
                 this.observe("gui_loaded", function(){
                     this.UI.refreshTemplateParts();
                     this.Registry.refreshExtensionsRegistry();
+                    this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
                 }.bind(this));
             }
             this.loadActiveRepository();
