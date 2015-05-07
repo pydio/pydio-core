@@ -1,11 +1,5 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-A small glimpse broke the UI on some IE11 configuration.
-
---------
-
-Pydio 6.0.7 - May, 6th 2015
-
 Security Update
 
 Pydio 6.0.7 is a Security Update linked to vulnerabilities discovered by Lane Thames. It also fixes various small bugs.
