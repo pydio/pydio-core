@@ -211,7 +211,10 @@ Class.create("UserDashboardHome", AjxpPane, {
                 var t = Event.findElement(e, 'div.tutorial_load_button');
                 try{
                     var main = t.up('div.tutorial_legend');
-                    main.next('iframe').src = main.readAttribute('data-videoSrc');
+                    if(main.next('img')){
+                        main.insert({after:'<iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="'+main.readAttribute('data-videoSrc')+'"></iframe>'});
+                        main.next('img').remove();
+                    }
                 }catch(e){}
             });
         }
