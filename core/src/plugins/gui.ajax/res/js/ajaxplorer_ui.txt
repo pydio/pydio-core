@@ -1,11 +1,3 @@
-js/core/lang/Observable.js
-js/core/lang/Logger.js
-js/core/util/LangUtils.js
-js/core/util/XMLUtils.js
-js/core/util/PathUtils.js
-js/core/util/HasherUtils.js
-js/core/model/Router.js
-js/core/model/AjxpNode.js
 js/ui/prototype/interfaces/class.IAjxpNodeProvider.js
 js/ui/prototype/interfaces/class.IAjxpWidget.js
 js/ui/prototype/interfaces/class.IActionProvider.js
@@ -19,7 +11,6 @@ js/vendor/prototype/splitter.js
 js/vendor/prototype/cookiejar.js
 js/vendor/prototype/protopass.js
 js/vendor/prototype/resizable.js
-js/vendor/prototype/es6compat.js
 js/vendor/leightbox/lightbox.js
 js/vendor/scriptaculous/src/builder.js
 js/vendor/scriptaculous/src/effects.js
@@ -34,17 +25,6 @@ js/vendor/webfx/xtree.js
 js/vendor/webfx/ajxptree.js
 js/vendor/chosen/event.simulate.js
 js/vendor/chosen/chosen.proto.js
-js/core/model/User.js
-js/core/http/ResourcesManager.js
-js/core/model/RemoteNodeProvider.js
-js/core/model/EmptyNodeProvider.js
-js/core/model/Repository.js
-js/core/model/BackgroundTasksManager.js
-js/core/http/PydioApi.js
-js/core/model/Action.js
-js/core/model/Controller.js
-js/core/model/PydioDataModel.js
-js/core/model/Registry.js
 js/ui/prototype/class.AjxpDraggable.js
 js/ui/prototype/class.AjxpSortable.js
 js/ui/prototype/class.AjxpTabulator.js
@@ -78,4 +58,3 @@ js/ui/prototype/class.DataModelProperty.js
 js/ui/prototype/class.MultiDownloader.js
 js/ui/prototype/class.ActivityMonitor.js
 js/ui/prototype/class.PydioUI.js
-js/core/Pydio.js
