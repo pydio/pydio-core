@@ -83,7 +83,9 @@ var PydioDataModel = (function (_Observable) {
   * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
   */
 
-	PydioDataModel.prototype.requireContextChange = function requireContextChange(ajxpNode, forceReload) {
+	PydioDataModel.prototype.requireContextChange = function requireContextChange(ajxpNode) {
+		var forceReload = arguments[1] === undefined ? false : arguments[1];
+
 		if (ajxpNode == null) {
 			return;
 		}var path = ajxpNode.getPath();

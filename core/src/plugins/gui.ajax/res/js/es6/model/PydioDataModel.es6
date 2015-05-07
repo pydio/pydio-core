@@ -67,7 +67,7 @@ class PydioDataModel extends Observable{
 	 * @param ajxpNode AjxpNode Target node, either an existing one or a fake one containing the target part.
 	 * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
 	 */
-	requireContextChange (ajxpNode, forceReload){
+	requireContextChange (ajxpNode, forceReload=false){
         if(ajxpNode == null) return;
 		var path = ajxpNode.getPath();
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
