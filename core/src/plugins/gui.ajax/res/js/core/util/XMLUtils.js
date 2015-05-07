@@ -147,18 +147,17 @@ var XMLUtils = (function () {
             case 2:
                 // NODE_ATTRIBUTE
                 return node.value;
-                break;
 
             case 3:
                 // NODE_TEXT
                 return node.nodeValue;
-                break;
 
             case 4:
                 // CDATA
                 if (includeCData) {
                     return node.nodeValue;
-                }}
+                }break;
+        }
 
         return null;
     };
