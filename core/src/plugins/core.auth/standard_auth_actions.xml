@@ -80,6 +80,7 @@
 								}
 							};
 							var conn = new Connexion();
+							conn.setMethod('POST');
 							conn.addParameter("get_action", "pass_change");
 							conn.addParameter("old_pass", userOldPass);
 							conn.addParameter("new_pass", userPass);
