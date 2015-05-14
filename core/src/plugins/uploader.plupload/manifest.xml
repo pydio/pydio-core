@@ -18,6 +18,11 @@
     </server_settings>
     <registry_contributions>
         <actions>
+            <action name="nodeChangeCheck">
+                <processing>
+                    <serverCallback methodName="nodeChangeCheck"/>
+                </processing>
+            </action>
             <action name="upload_chunks_unify_plupload">
                 <processing>
                     <serverCallback methodName="unifyChunks"/>
