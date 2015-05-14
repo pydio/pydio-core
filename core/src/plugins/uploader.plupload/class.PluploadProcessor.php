@@ -45,13 +45,10 @@ class PluploadProcessor extends AJXP_Plugin
 
     public function nodeChangeCheck($action, &$httpVars, &$fileVars)
     {
-        $this->logDebug("Preprocessing magic", print_r($httpVars,true));
-        //$this->logDebug("Preprocessing magic");
+        $this->logDebug("Preprocessing nodeChangeCheck");
         $repository = ConfService::getRepository();
         $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
         $streamData = $plugin->detectStreamWrapper(true);
-        //$dir = $httpVars["dir"];
-        //$file = $httpVars["file"];
 	$dir = AJXP_Utils::securePath($httpVars["dir"]);
 	$file = AJXP_Utils::decodeSecureMagic($httpVars["name"]);
         $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/".$file;
