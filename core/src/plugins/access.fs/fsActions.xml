@@ -820,7 +820,7 @@
 			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="change_main" inZip="false">
+					actionBarGroup="change_main,minisite" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/>
             </gui>
