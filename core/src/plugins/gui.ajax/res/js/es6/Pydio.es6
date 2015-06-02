@@ -70,7 +70,8 @@ class Pydio extends Observable{
                 initObjects: function(){},
                 updateI18nTags: function(){},
                 insertForm:function(formId, formCode){},
-                removeForm: function(formId){}
+                removeForm: function(formId){},
+                mountComponents: function(componentsNodes){}
             };
         }
 
@@ -135,8 +136,8 @@ class Pydio extends Observable{
         }
         this.observe("server_message", function(xml){
             if(XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload")){
-                this.repositoryId = null;
                 this.loadXmlRegistry(false);
+                this.repositoryId = null;
             }
         }.bind(this));
     }
@@ -148,7 +149,7 @@ class Pydio extends Observable{
      * @param xPath String An XPath to load only a subpart of the registry
      */
     loadXmlRegistry (sync, xPath=null, completeFunc=null){
-        this.Registry.load(sync, xPath, completeFunc);
+        this.Registry.load(sync, xPath, completeFunc, this.repositoryId);
     }
 
     /**
@@ -342,8 +343,8 @@ class Pydio extends Observable{
             if(transport.responseXML){
                 this.Controller.parseXmlMessage(transport.responseXML);
             }
-            this.repositoryId = null;
             this.loadXmlRegistry();
+            this.repositoryId = null;
         }.bind(this);
         var root = this._contextHolder.getRootNode();
         if(root){
