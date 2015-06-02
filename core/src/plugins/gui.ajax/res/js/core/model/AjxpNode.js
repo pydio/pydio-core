@@ -1,8 +1,8 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var AjxpNode = (function (_Observable) {
 
@@ -69,9 +69,8 @@ var AjxpNode = (function (_Observable) {
      */
 
     AjxpNode.prototype.load = function load(iAjxpNodeProvider) {
-        if (this._isLoading) {
-            return;
-        }if (!iAjxpNodeProvider) {
+        if (this._isLoading) return;
+        if (!iAjxpNodeProvider) {
             if (this._iNodeProvider) {
                 iAjxpNodeProvider = this._iNodeProvider;
             } else {
@@ -321,9 +320,8 @@ var AjxpNode = (function (_Observable) {
      */
 
     AjxpNode.prototype.hasAjxpMimeInBranch = function hasAjxpMimeInBranch(ajxpMime) {
-        if (this.getAjxpMime() == ajxpMime.toLowerCase()) {
-            return true;
-        }var parent,
+        if (this.getAjxpMime() == ajxpMime.toLowerCase()) return true;
+        var parent,
             crt = this;
         while (parent = crt._parentNode) {
             if (parent.getAjxpMime() == ajxpMime.toLowerCase()) {
@@ -390,9 +388,8 @@ var AjxpNode = (function (_Observable) {
      */
 
     AjxpNode.prototype.findInArbo = function findInArbo(rootNode, fakeNodes) {
-        if (!this.getPath()) {
-            return;
-        }var pathParts = this.getPath().split('/');
+        if (!this.getPath()) return;
+        var pathParts = this.getPath().split('/');
         var crtPath = '';
         var crtNode,
             crtParentNode = rootNode;
@@ -403,9 +400,8 @@ var AjxpNode = (function (_Observable) {
             if (node && !(node instanceof String)) {
                 crtNode = node;
             } else {
-                if (fakeNodes === undefined) {
-                    return undefined;
-                }crtNode = new AjxpNode(crtPath, false, PathUtils.getBasename(crtPath));
+                if (fakeNodes === undefined) return undefined;
+                crtNode = new AjxpNode(crtPath, false, PathUtils.getBasename(crtPath));
                 crtNode.fake = true;
                 crtNode.getMetadata().set('text', PathUtils.getBasename(crtPath));
                 fakeNodes.push(crtNode);
@@ -454,11 +450,9 @@ var AjxpNode = (function (_Observable) {
      */
 
     AjxpNode.prototype.getAjxpMime = function getAjxpMime() {
-        if (this._metadata && this._metadata.has('ajxp_mime')) {
-            return this._metadata.get('ajxp_mime').toLowerCase();
-        }if (this._metadata && this.isLeaf()) {
-            return PathUtils.getAjxpMimeType(this._metadata).toLowerCase();
-        }return '';
+        if (this._metadata && this._metadata.has('ajxp_mime')) return this._metadata.get('ajxp_mime').toLowerCase();
+        if (this._metadata && this.isLeaf()) return PathUtils.getAjxpMimeType(this._metadata).toLowerCase();
+        return '';
     };
 
     return AjxpNode;

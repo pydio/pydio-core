@@ -1,7 +1,3 @@
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -26,6 +22,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
  * Implementation of the IAjxpNodeProvider interface based on a remote server access.
  * Default for all repositories.
  */
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var RemoteNodeProvider = (function () {
 
@@ -75,8 +74,8 @@ var RemoteNodeProvider = (function () {
             options: 'al'
         };
         if (recursive) {
-            params.recursive = true;
-            params.depth = depth;
+            params['recursive'] = true;
+            params['depth'] = depth;
         }
         //if(this.discrete) conn.discrete = true;
         var path = node.getPath();
@@ -85,14 +84,14 @@ var RemoteNodeProvider = (function () {
         if (node.getMetadata().has('paginationData')) {
             paginationHash = '%23' + node.getMetadata().get('paginationData').get('current');
             path += paginationHash;
-            params.remote_order = 'true';
+            params['remote_order'] = 'true';
             if (node.getMetadata().get('remote_order')) {
                 node.getMetadata().get('remote_order').forEach(function (value, key) {
                     params[key] = value;
                 });
             }
         }
-        params.dir = path;
+        params['dir'] = path;
         if (this.properties) {
             this.properties.forEach(function (value, key) {
                 params[key] = value + (key == 'dir' && paginationHash ? paginationHash : '');

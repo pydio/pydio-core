@@ -1,7 +1,3 @@
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -21,23 +17,32 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Registry = (function () {
     function Registry(pydioObject) {
         _classCallCheck(this, Registry);
 
         this._registry = null;
-        this._extensionsRegistry = { editor: [], uploader: [] };
+        this._extensionsRegistry = { "editor": [], "uploader": [] };
         this._resourcesRegistry = {};
         this._pydioObject = pydioObject;
+        this._stateLoading = false;
     }
 
     Registry.prototype.loadFromString = function loadFromString(s) {
         this._registry = XMLUtils.parseXml(s).documentElement;
     };
 
-    Registry.prototype.load = function load(sync, xPath, completeFunc) {
+    Registry.prototype.load = function load(sync, xPath, completeFunc, repositoryId) {
+        if (this._stateLoading) {
+            return;
+        }
+        this._stateLoading = true;
         var onComplete = (function (transport) {
+            this._stateLoading = false;
             if (transport.responseXML == null || transport.responseXML.documentElement == null) return;
             if (transport.responseXML.documentElement.nodeName == "ajxp_registry") {
                 this._registry = transport.responseXML.documentElement;
@@ -52,9 +57,15 @@ var Registry = (function () {
         }).bind(this);
         var params = { get_action: "get_xml_registry" };
         if (xPath) {
-            params.xPath = xPath;
+            params["xPath"] = xPath;
         }
-        PydioApi.getClient().request(params, onComplete, null, { async: !sync });
+        if (repositoryId) {
+            params["ws_id"] = repositoryId; // for caching only
+        }
+        PydioApi.getClient().request(params, onComplete, null, {
+            async: !sync,
+            method: "get"
+        });
     };
 
     /**
@@ -193,7 +204,7 @@ var Registry = (function () {
      */
 
     Registry.prototype.refreshExtensionsRegistry = function refreshExtensionsRegistry() {
-        this._extensionsRegistry = { editor: [], uploader: [] };
+        this._extensionsRegistry = { "editor": [], "uploader": [] };
         var extensions = XMLUtils.XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
         for (var i = 0; i < extensions.length; i++) {
             var extensionDefinition = {
@@ -300,9 +311,8 @@ var Registry = (function () {
 
     Registry.prototype.getDefaultImageFromParameters = function getDefaultImageFromParameters(pluginId, paramName) {
         var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='" + pluginId + "']/server_settings/global_param[@name='" + paramName + "']");
-        if (!node) {
-            return "";
-        }return node.getAttribute("defaultImage") || "";
+        if (!node) return "";
+        return node.getAttribute("defaultImage") || "";
     };
 
     /**

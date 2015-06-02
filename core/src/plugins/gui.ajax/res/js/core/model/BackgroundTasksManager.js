@@ -1,9 +1,3 @@
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -27,6 +21,11 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== 'fun
 /**
  * Manage background tasks
  */
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var BackgroundTasksManager = (function (_Observable) {
 
@@ -55,9 +54,9 @@ var BackgroundTasksManager = (function (_Observable) {
 
 	BackgroundTasksManager.prototype.queueAction = function queueAction(actionName, parameters, messageId) {
 		var actionDef = {};
-		actionDef.name = actionName;
-		actionDef.messageId = messageId;
-		actionDef.parameters = parameters;
+		actionDef['name'] = actionName;
+		actionDef['messageId'] = messageId;
+		actionDef['parameters'] = parameters;
 		this.queue.push(actionDef);
 	};
 
@@ -70,21 +69,20 @@ var BackgroundTasksManager = (function (_Observable) {
 			this.finished();
 			return;
 		}
-		if (this.working) {
-			return;
-		}var actionDef = this.queue[0];
-		if (actionDef.name == 'javascript_instruction' && actionDef.parameters.callback) {
-			var cb = actionDef.parameters.callback;
-			this.notify('update_message', actionDef.messageId);
+		if (this.working) return;
+		var actionDef = this.queue[0];
+		if (actionDef['name'] == 'javascript_instruction' && actionDef['parameters']['callback']) {
+			var cb = actionDef['parameters']['callback'];
+			this.notify('update_message', actionDef['messageId']);
 			this.queue.shift();
 			cb();
 			this.working = false;
 			this.next();
 		} else {
 			var client = PydioApi.getClient();
-			var params = { get_action: actionDef.name };
-			for (var k in actionDef.parameters) {
-				if (actionDef.parameters.hasOwnProperty(k)) params[k] = actionDef.parameters[k];
+			var params = { get_action: actionDef['name'] };
+			for (var k in actionDef['parameters']) {
+				if (actionDef['parameters'].hasOwnProperty(k)) params[k] = actionDef['parameters'][k];
 			}
 			client.request(params, (function (transport) {
 				var xmlResponse = transport.responseXML;
@@ -96,7 +94,7 @@ var BackgroundTasksManager = (function (_Observable) {
 				this.parseAnswer(transport.responseXML);
 				this.working = false;
 			}).bind(this), null, { method: 'POST' });
-			this.notify('update_message', actionDef.messageId);
+			this.notify('update_message', actionDef['messageId']);
 			this.queue.shift();
 			this.working = true;
 		}
@@ -142,7 +140,7 @@ var BackgroundTasksManager = (function (_Observable) {
 				} else if (name == 'info_message') {
 					this.notify('update_message', messageId);
 				} else if (name == 'javascript_instruction' && callback) {
-					parameters.callback = callback;
+					parameters['callback'] = callback;
 					this.queueAction('javascript_instruction', parameters, messageId);
 				} else {
 					this.queueAction(name, parameters, messageId);

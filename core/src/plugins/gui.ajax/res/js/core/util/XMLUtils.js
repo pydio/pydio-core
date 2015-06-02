@@ -1,6 +1,6 @@
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var XMLUtils = (function () {
     function XMLUtils() {
@@ -8,9 +8,8 @@ var XMLUtils = (function () {
     }
 
     XMLUtils.loadXPathReplacer = function loadXPathReplacer() {
-        if (document.createExpression) {
-            return;
-        }PydioApi.loadLibrary("plugins/gui.ajax/res/js/vendor/xpath-polyfill/javascript-xpath-cmp.js", null, false);
+        if (document.createExpression) return;
+        PydioApi.loadLibrary("plugins/gui.ajax/res/js/vendor/xpath-polyfill/javascript-xpath-cmp.js", null, false);
     };
 
     /**
@@ -154,9 +153,8 @@ var XMLUtils = (function () {
 
             case 4:
                 // CDATA
-                if (includeCData) {
-                    return node.nodeValue;
-                }break;
+                if (includeCData) return node.nodeValue;
+                break;
         }
 
         return null;

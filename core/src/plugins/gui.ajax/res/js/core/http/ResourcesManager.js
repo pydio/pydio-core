@@ -1,7 +1,3 @@
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -25,6 +21,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 /**
  * A manager that can handle the loading of JS, CSS and checks dependencies
  */
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var ResourcesManager = (function () {
     /**
@@ -112,9 +111,8 @@ var ResourcesManager = (function () {
     ResourcesManager.prototype.load = function load(resourcesRegistry) {
         var jsAutoloadOnly = arguments[1] === undefined ? false : arguments[1];
 
-        if (this.loaded) {
-            return;
-        }if (this.hasDependencies()) {
+        if (this.loaded) return;
+        if (this.hasDependencies()) {
             this.resources.dependencies.forEach((function (el) {
                 if (resourcesRegistry[el]) {
                     resourcesRegistry[el].load(resourcesRegistry);

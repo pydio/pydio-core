@@ -1,9 +1,3 @@
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -27,6 +21,11 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 /**
  * Full container of the data tree. Contains the SelectionModel as well.
  */
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var PydioDataModel = (function (_Observable) {
 
@@ -86,9 +85,8 @@ var PydioDataModel = (function (_Observable) {
 	PydioDataModel.prototype.requireContextChange = function requireContextChange(ajxpNode) {
 		var forceReload = arguments[1] === undefined ? false : arguments[1];
 
-		if (ajxpNode == null) {
-			return;
-		}var path = ajxpNode.getPath();
+		if (ajxpNode == null) return;
+		var path = ajxpNode.getPath();
 		if ((path == "" || path == "/") && ajxpNode != this._rootNode) {
 			ajxpNode = this._rootNode;
 		}
@@ -227,9 +225,8 @@ var PydioDataModel = (function (_Observable) {
 		if (this._contextNode && this._contextNode == ajxpDataNode && this._currentRep == ajxpDataNode.getPath() && !forceEvent) {
 			return; // No changes
 		}
-		if (!ajxpDataNode) {
-			return;
-		}if (this._contextNodeReplacedObserver && this._contextNode) {
+		if (!ajxpDataNode) return;
+		if (this._contextNodeReplacedObserver && this._contextNode) {
 			this._contextNode.stopObserving("node_replaced", this._contextNodeReplacedObserver);
 		}
 		this._contextNode = ajxpDataNode;
@@ -610,9 +607,8 @@ var PydioDataModel = (function (_Observable) {
   */
 
 	PydioDataModel.prototype.hasMime = function hasMime(mimeTypes) {
-		if (mimeTypes.length == 1 && mimeTypes[0] == "*") {
-			return true;
-		}var has = false;
+		if (mimeTypes.length == 1 && mimeTypes[0] == "*") return true;
+		var has = false;
 		mimeTypes.each((function (mime) {
 			if (has) return;
 			has = this._selectedNodes.any(function (node) {
@@ -717,9 +713,8 @@ var PydioDataModel = (function (_Observable) {
   */
 
 	PydioDataModel.prototype.getUniqueFileName = function getUniqueFileName() {
-		if (this.getFileNames().length) {
-			return this.getFileNames()[0];
-		}return null;
+		if (this.getFileNames().length) return this.getFileNames()[0];
+		return null;
 	};
 
 	/**
@@ -760,13 +755,12 @@ var PydioDataModel = (function (_Observable) {
 			});
 		}
 		// UPDATE THE 'DIR' FIELDS
-		if (oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
+		if (oFormElement && oFormElement["rep"]) oFormElement["rep"].value = this._currentRep;
 		sUrl += "&dir=" + encodeURIComponent(this._currentRep);
 
 		// UPDATE THE 'file' FIELDS
-		if (this.isEmpty()) {
-			return sUrl;
-		}var fileNames = this.getFileNames();
+		if (this.isEmpty()) return sUrl;
+		var fileNames = this.getFileNames();
 		for (var i = 0; i < fileNames.length; i++) {
 			sUrl += "&" + "nodes[]=" + encodeURIComponent(fileNames[i]);
 			if (oFormElement) this._addHiddenField(oFormElement, "nodes[]", fileNames[i]);

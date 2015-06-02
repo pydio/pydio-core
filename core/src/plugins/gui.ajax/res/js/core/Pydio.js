@@ -1,8 +1,8 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var Pydio = (function (_Observable) {
 
@@ -81,7 +81,8 @@ var Pydio = (function (_Observable) {
                 initObjects: function initObjects() {},
                 updateI18nTags: function updateI18nTags() {},
                 insertForm: function insertForm(formId, formCode) {},
-                removeForm: function removeForm(formId) {}
+                removeForm: function removeForm(formId) {},
+                mountComponents: function mountComponents(componentsNodes) {}
             };
         }
 
@@ -144,8 +145,8 @@ var Pydio = (function (_Observable) {
         }
         this.observe('server_message', (function (xml) {
             if (XMLUtils.XPathSelectSingleNode(xml, 'tree/require_registry_reload')) {
-                this.repositoryId = null;
                 this.loadXmlRegistry(false);
+                this.repositoryId = null;
             }
         }).bind(this));
     };
@@ -161,7 +162,7 @@ var Pydio = (function (_Observable) {
         var xPath = arguments[1] === undefined ? null : arguments[1];
         var completeFunc = arguments[2] === undefined ? null : arguments[2];
 
-        this.Registry.load(sync, xPath, completeFunc);
+        this.Registry.load(sync, xPath, completeFunc, this.repositoryId);
     };
 
     /**
@@ -221,9 +222,8 @@ var Pydio = (function (_Observable) {
      */
 
     Pydio.prototype.reloadRepositoriesList = function reloadRepositoriesList() {
-        if (!this.user) {
-            return;
-        }this.observeOnce('registry_part_loaded', (function (data) {
+        if (!this.user) return;
+        this.observeOnce('registry_part_loaded', (function (data) {
             if (data != 'user/repositories') return;
             this.Registry.logXmlUser(true);
             document.fire('ajaxplorer:repository_list_refreshed', {
@@ -244,9 +244,9 @@ var Pydio = (function (_Observable) {
             Logger.debug('Repository already loaded, do nothing');
         }
         this._contextHolder.setSelectedNodes([]);
-        if (repository == null) {
-            return;
-        }repository.loadResources();
+        if (repository == null) return;
+
+        repository.loadResources();
         var repositoryId = repository.getId();
         var newIcon = repository.getIcon();
 
@@ -344,8 +344,8 @@ var Pydio = (function (_Observable) {
             if (transport.responseXML) {
                 this.Controller.parseXmlMessage(transport.responseXML);
             }
-            this.repositoryId = null;
             this.loadXmlRegistry();
+            this.repositoryId = null;
         }).bind(this);
         var root = this._contextHolder.getRootNode();
         if (root) {
@@ -479,9 +479,8 @@ var Pydio = (function (_Observable) {
      */
 
     Pydio.prototype.fireContextUp = function fireContextUp() {
-        if (this.getContextNode().isRoot()) {
-            return;
-        }this.updateContextData(this.getContextNode().getParent());
+        if (this.getContextNode().isRoot()) return;
+        this.updateContextData(this.getContextNode().getParent());
     };
 
     return Pydio;

@@ -1,9 +1,3 @@
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -27,6 +21,11 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== 'fun
 /** 
  * A "Command" object, encapsulating its callbacks, display attributes, etc.
  */
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var Action = (function (_Observable) {
 
@@ -137,13 +136,13 @@ var Action = (function (_Observable) {
 				this.prepareSubmenuDynamicBuilder();
 			}
 		}
-		if (this.options.listeners.init) {
+		if (this.options.listeners['init']) {
 			try {
 				window.listenerContext = this;
-				if (typeof this.options.listeners.init == 'string') {
-					this._evalScripts(this.options.listeners.init);
+				if (typeof this.options.listeners['init'] == 'string') {
+					this._evalScripts(this.options.listeners['init']);
 				} else {
-					this.options.listeners.init();
+					this.options.listeners['init']();
 				}
 			} catch (e) {
 				Logger.error('Error while evaluating init script for action ' + this.options.name);
@@ -156,9 +155,8 @@ var Action = (function (_Observable) {
   */
 
 	Action.prototype.apply = function apply() {
-		if (this.deny) {
-			return;
-		}this.manager.publishActionEvent('beforeApply-' + this.options.name);
+		if (this.deny) return;
+		this.manager.publishActionEvent('beforeApply-' + this.options.name);
 		if (this.options.prepareModal) {
 			var modal = this.manager.uiGetModal();
 			if (modal) {
@@ -174,7 +172,7 @@ var Action = (function (_Observable) {
 			} catch (e) {
 				Logger.error(e);
 			}
-		} else if (this.options.callbackDialogNode) {
+		} else if (this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute('dialogOpenForm')) {
 			var node = this.options.callbackDialogNode;
 			var dialogFormId = node.getAttribute('dialogOpenForm');
 			var okButtonOnly = node.getAttribute('dialogOkButtonOnly') === 'true';
@@ -202,6 +200,9 @@ var Action = (function (_Observable) {
 			}).bind(this);
 			this.options.callback();
 			this.options.callbackDialogNode = null;
+		} else if (this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute('components')) {
+			var components = XMLUtils.XPathSelectNodes(this.options.callbackDialogNode, 'component');
+			this.manager.uiMountComponents(components);
 		} else if (this.options.callback) {
 			this.options.callback();
 		}
@@ -219,9 +220,8 @@ var Action = (function (_Observable) {
   */
 
 	Action.prototype.fireContextChange = function fireContextChange() {
-		if (arguments.length < 3) {
-			return;
-		}var usersEnabled = arguments[0];
+		if (arguments.length < 3) return;
+		var usersEnabled = arguments[0];
 		var crtUser = arguments[1];
 
 		var crtIsRecycle = false;
@@ -239,10 +239,10 @@ var Action = (function (_Observable) {
 			crtIsReadOnly = crtNode.hasMetadataInBranch('ajxp_readonly', 'true');
 		}
 
-		if (this.options.listeners.contextChange) {
+		if (this.options.listeners['contextChange']) {
 			window.listenerContext = this;
 			try {
-				this._evalScripts(this.options.listeners.contextChange);
+				this._evalScripts(this.options.listeners['contextChange']);
 			} catch (e) {
 				Logger.error('Error while evaluating script for contextChange event - action ' + this.options.name);
 			}
@@ -299,10 +299,10 @@ var Action = (function (_Observable) {
   */
 
 	Action.prototype.fireSelectionChange = function fireSelectionChange() {
-		if (this.options.listeners.selectionChange) {
+		if (this.options.listeners['selectionChange']) {
 			window.listenerContext = this;
 			try {
-				this._evalScripts(this.options.listeners.selectionChange);
+				this._evalScripts(this.options.listeners['selectionChange']);
 			} catch (e) {
 				Logger.error('Error while evaluating script for selectionChange event - action ' + this.options.name);
 			}
@@ -360,11 +360,7 @@ var Action = (function (_Observable) {
 			return this.disable();
 		}
 		if (selectionContext.allowedMimes.length && userSelection && selectionContext.allowedMimes.indexOf('*') == -1 && !userSelection.hasMime(selectionContext.allowedMimes)) {
-			if (selectionContext.behaviour == 'hidden') {
-				return this.hide();
-			} else {
-				return this.disable();
-			}
+			if (selectionContext.behaviour == 'hidden') return this.hide();else return this.disable();
 		}
 		if (selectionContext.allowedMimes.length && userSelection && selectionContext.allowedMimes.indexOf('^') !== -1) {
 			var forbiddenValueFound = false;
@@ -376,11 +372,7 @@ var Action = (function (_Observable) {
 				}
 			});
 			if (forbiddenValueFound) {
-				if (selectionContext.behaviour == 'hidden') {
-					return this.hide();
-				} else {
-					return this.disable();
-				}
+				if (selectionContext.behaviour == 'hidden') return this.hide();else return this.disable();
 			}
 		}
 		this.show();
@@ -427,7 +419,7 @@ var Action = (function (_Observable) {
 						if (processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == 'true') {
 							this.options.prepareModal = true;
 						}
-						if (processNode.getAttribute('dialogOpenForm')) {
+						if (processNode.getAttribute('dialogOpenForm') || processNode.getAttribute('components')) {
 							this.options.callbackDialogNode = processNode;
 						} else if (processNode.firstChild) {
 							this.options.callbackCode = processNode.firstChild.nodeValue.trim();
@@ -503,9 +495,8 @@ var Action = (function (_Observable) {
 				}
 			}
 		}
-		if (!this.options.hasAccessKey) {
-			return;
-		}if (this.options.accessKey == '' || !this.manager.getMessage(this.options.accessKey) || this.options.text.indexOf(this.manager.getMessage(this.options.accessKey)) == -1) {
+		if (!this.options.hasAccessKey) return;
+		if (this.options.accessKey == '' || !this.manager.getMessage(this.options.accessKey) || this.options.text.indexOf(this.manager.getMessage(this.options.accessKey)) == -1) {
 			this.options.accessKey = this.options.text.charAt(0);
 		} else {
 			this.options.accessKey = this.manager.getMessage(this.options.accessKey);
@@ -561,7 +552,7 @@ var Action = (function (_Observable) {
 							menuItems.push(item);
 							return;
 						}
-						var action = this.manager.actions.get(item.actionId);
+						var action = this.manager.actions.get(item['actionId']);
 						if (action.deny) return;
 						var itemData = {
 							name: action.getKeyedText(),
@@ -738,9 +729,8 @@ var Action = (function (_Observable) {
 		if (!accessKey) {
 			accessKey = this.options.accessKey;
 		}
-		if (!hasAccessKey) {
-			return displayString;
-		}var keyPos = displayString.toLowerCase().indexOf(accessKey.toLowerCase());
+		if (!hasAccessKey) return displayString;
+		var keyPos = displayString.toLowerCase().indexOf(accessKey.toLowerCase());
 		if (keyPos == -1) {
 			return displayString + ' (<u>' + accessKey + '</u>)';
 		}

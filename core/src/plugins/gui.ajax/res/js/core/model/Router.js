@@ -1,13 +1,13 @@
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Router = function Router(pydioObject) {
     _classCallCheck(this, Router);
 
-    if (!window.Backbone || !window.Backbone.Router) {
-        return;
-    }var WorkspaceRouter = Backbone.Router.extend({
+    if (!window.Backbone || !window.Backbone.Router) return;
+
+    var WorkspaceRouter = Backbone.Router.extend({
         routes: {
             ":workspace/*path": "switchToWorkspace"
         },
@@ -25,9 +25,9 @@ var Router = function Router(pydioObject) {
                     object = value;
                 }
             });
-            if (!object) {
-                return;
-            }if (pydioObject.repositoryId != object.getId()) {
+            if (!object) return;
+
+            if (pydioObject.repositoryId != object.getId()) {
                 if (path) {
                     pydioObject._initLoadRep = path;
                 }

@@ -1,6 +1,6 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var PydioApi = (function () {
     function PydioApi() {
@@ -24,8 +24,8 @@ var PydioApi = (function () {
         var onError = arguments[2] === undefined ? null : arguments[2];
         var settings = arguments[3] === undefined ? {} : arguments[3];
 
-        parameters.secure_token = this._secureToken;
         if (window.Connexion) {
+            // Connexion already handles secure_token
             var c = new Connexion();
             c.setParameters($H(parameters));
             if (settings.method) {
@@ -38,6 +38,7 @@ var PydioApi = (function () {
                 c.sendAsync();
             }
         } else if (window.jQuery) {
+            parameters['secure_token'] = this._secureToken;
             jQuery.ajax(this._baseUrl, {
                 method: settings.method || 'post',
                 data: parameters,
@@ -48,10 +49,60 @@ var PydioApi = (function () {
         }
     };
 
+    PydioApi.prototype.loadFile = function loadFile(filePath) {
+        var onComplete = arguments[1] === undefined ? null : arguments[1];
+        var onError = arguments[2] === undefined ? null : arguments[2];
+
+        if (window.Connexion) {
+            var c = new Connexion(filePath);
+            c.setMethod('GET');
+            c.onComplete = onComplete;
+            c.sendAsync();
+        } else if (window.jQuery) {
+            jQuery.ajax(filePath, {
+                method: 'GET',
+                async: true,
+                complete: onComplete,
+                error: onError
+            });
+        }
+    };
+
+    PydioApi.prototype.uploadFile = function uploadFile(file, fileParameterName) {
+        var queryStringParams = arguments[2] === undefined ? '' : arguments[2];
+        var onComplete = arguments[3] === undefined ? function () {} : arguments[3];
+        var onError = arguments[4] === undefined ? function () {} : arguments[4];
+        var onProgress = arguments[5] === undefined ? function () {} : arguments[5];
+
+        if (window.Connexion) {
+            var c = new Connexion();
+            c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
+        } else if (window.jQuery) {
+            var formData = new FormData();
+            formData.append(fileParameterName, file);
+            queryStringParams += '&secure_token' + this._secureToken;
+            jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
+                method: 'POST',
+                data: formData,
+                complete: onComplete,
+                error: onError,
+                progress: onProgress
+            });
+        }
+    };
+
+    PydioApi.supportsUpload = function supportsUpload() {
+        if (window.Connexion) {
+            return window.FormData || window.FileReader;
+        } else if (window.jQuery) {
+            return window.FormData;
+        }
+        return false;
+    };
+
     PydioApi.getClient = function getClient() {
-        if (PydioApi._PydioClient) {
-            return PydioApi._PydioClient;
-        }var client = new PydioApi();
+        if (PydioApi._PydioClient) return PydioApi._PydioClient;
+        var client = new PydioApi();
         PydioApi._PydioClient = client;
         return client;
     };
@@ -206,9 +257,8 @@ var PydioApi = (function () {
      */
 
     PydioApi.prototype.parseXmlMessage = function parseXmlMessage(xmlResponse) {
-        if (xmlResponse == null || xmlResponse.documentElement == null) {
-            return null;
-        }var childs = xmlResponse.documentElement.childNodes;
+        if (xmlResponse == null || xmlResponse.documentElement == null) return null;
+        var childs = xmlResponse.documentElement.childNodes;
 
         var reloadNodes = [];
         var error = false;
@@ -380,7 +430,7 @@ var PydioApi = (function () {
             }
         });
         if (this._pydioObject.getContextNode()) {
-            params.dir = this._pydioObject.getContextNode().getPath();
+            params['dir'] = this._pydioObject.getContextNode().getPath();
         }
         var onComplete;
         if (completeCallback) {

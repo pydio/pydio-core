@@ -1,6 +1,6 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var LangUtils = (function () {
     function LangUtils() {
@@ -45,6 +45,50 @@ var LangUtils = (function () {
         // 3) enleve tout les caratères non alphanumeriques
         // 4) enlève les doubles tirets
         return value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/\-{2,}/g, '-');
+    };
+
+    LangUtils.forceJSONArrayToObject = function forceJSONArrayToObject(container, value) {
+        if (container[value] instanceof Array) {
+            // Clone
+            var copy = container[value].slice(0);
+            container[value] = {};
+            for (var i = 0; i < copy.length; i++) {
+                container[value][i] = copy[i];
+            }
+        }
+    };
+
+    LangUtils.mergeObjectsRecursive = function mergeObjectsRecursive(source, destination) {
+        var newObject = {},
+            property;
+        for (property in source) {
+            if (source.hasOwnProperty(property)) {
+                //if (source[property] === null) continue;
+                if (destination.hasOwnProperty(property)) {
+                    if (source[property] instanceof Object && destination instanceof Object) {
+                        newObject[property] = LangUtils.mergeObjectsRecursive(source[property], destination[property]);
+                    } else {
+                        newObject[property] = destination[property];
+                    }
+                } else {
+                    if (source[property] instanceof Object) {
+                        newObject[property] = LangUtils.mergeObjectsRecursive(source[property], {});
+                    } else {
+                        newObject[property] = source[property];
+                    }
+                }
+            }
+        }
+        for (property in destination) {
+            if (destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) /*&& destination[property] !== null*/) {
+                if (destination[property] instanceof Object) {
+                    newObject[property] = LangUtils.mergeObjectsRecursive(destination[property], {});
+                } else {
+                    newObject[property] = destination[property];
+                }
+            }
+        }
+        return newObject;
     };
 
     return LangUtils;

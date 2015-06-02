@@ -1,7 +1,3 @@
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -26,6 +22,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
  * Abstraction of the currently logged user. Can be a "fake" user when users management
  * system is disabled
  */
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var User = (function () {
 
@@ -159,9 +158,7 @@ var User = (function () {
 	User.prototype.getPreference = function getPreference(prefName, fromJSON) {
 		if (fromJSON) {
 			var test = this._parsedJSONCache.get(prefName);
-			if (test !== undefined) {
-				return test;
-			}
+			if (test !== undefined) return test;
 		}
 		var value = this.preferences.get(prefName);
 		if (fromJSON && value) {
@@ -295,9 +292,8 @@ var User = (function () {
   */
 
 	User.prototype.savePreference = function savePreference(prefName) {
-		if (!this.preferences.has(prefName)) {
-			return;
-		}var prefValue = this.preferences.get(prefName);
+		if (!this.preferences.has(prefName)) return;
+		var prefValue = this.preferences.get(prefName);
 		window.setTimeout(function () {
 			PydioApi.getClient().userSavePreference(prefName, prefValue);
 		}, 250);

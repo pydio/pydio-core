@@ -1,7 +1,3 @@
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -25,6 +21,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 /** 
  * Container for a Repository.
  */
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var Repository = (function () {
 
@@ -78,9 +77,8 @@ var Repository = (function () {
 	};
 
 	Repository.prototype.getHtmlBadge = function getHtmlBadge() {
-		if (!this.label) {
-			return '';
-		}if (!this.badge) {
+		if (!this.label) return '';
+		if (!this.badge) {
 			var letters = this.label.split(' ').map(function (word) {
 				return word.substr(0, 1);
 			}).join('');

@@ -1,9 +1,3 @@
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -27,6 +21,11 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 /**
  * Singleton class that manages all actions. Can be called directly using pydio.getController().
  */
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var Controller = (function (_Observable) {
 
@@ -171,6 +170,12 @@ var Controller = (function (_Observable) {
             return this._pydioObject.UI.modal;
         }
         return null;
+    };
+
+    Controller.prototype.uiMountComponents = function uiMountComponents(componentsNodes) {
+        if (this._pydioObject && this._pydioObject.UI) {
+            return this._pydioObject.UI.mountComponents(componentsNodes);
+        }
     };
 
     /**
@@ -431,10 +436,10 @@ var Controller = (function (_Observable) {
             }
         }
         var params = {};
-        params.get_action = this.defaultActions.get(copy ? "ctrldragndrop" : "dragndrop");
+        params["get_action"] = this.defaultActions.get(copy ? "ctrldragndrop" : "dragndrop");
         params["nodes[]"] = fileNames;
-        params.dest = destDir;
-        params.dir = this._dataModel.getContextNode().getPath();
+        params["dest"] = destDir;
+        params["dir"] = this._dataModel.getContextNode().getPath();
         PydioApi.getClient().request(params, (function (transport) {
             this.parseXmlMessage(transport.responseXML);
         }).bind(PydioApi.getClient()));

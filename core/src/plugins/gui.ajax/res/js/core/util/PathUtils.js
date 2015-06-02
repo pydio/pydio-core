@@ -1,6 +1,6 @@
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var PathUtils = (function () {
     function PathUtils() {
@@ -8,9 +8,8 @@ var PathUtils = (function () {
     }
 
     PathUtils.getBasename = function getBasename(fileName) {
-        if (fileName == null) {
-            return null;
-        }var separator = "/";
+        if (fileName == null) return null;
+        var separator = "/";
         if (fileName.indexOf("\\") != -1) separator = "\\";
         return fileName.substr(fileName.lastIndexOf(separator) + 1, fileName.length);
     };
@@ -20,9 +19,8 @@ var PathUtils = (function () {
     };
 
     PathUtils.getAjxpMimeType = function getAjxpMimeType(item) {
-        if (!item) {
-            return "";
-        }if (item instanceof Map) {
+        if (!item) return "";
+        if (item instanceof Map) {
             return item.get("ajxp_mime") || PathUtils.getFileExtension(item.get("filename"));
         } else if (item.getMetadata) {
             return item.getMetadata().get("ajxp_mime") || PathUtils.getFileExtension(item.getPath());
@@ -32,12 +30,10 @@ var PathUtils = (function () {
     };
 
     PathUtils.getFileExtension = function getFileExtension(fileName) {
-        if (!fileName || fileName == "") {
-            return "";
-        }var split = PathUtils.getBasename(fileName).split(".");
-        if (split.length > 1) {
-            return split[split.length - 1].toLowerCase();
-        }return "";
+        if (!fileName || fileName == "") return "";
+        var split = PathUtils.getBasename(fileName).split(".");
+        if (split.length > 1) return split[split.length - 1].toLowerCase();
+        return "";
     };
 
     PathUtils.roundFileSize = function roundFileSize(filesize) {
@@ -64,11 +60,10 @@ var PathUtils = (function () {
 
     PathUtils.formatModifDate = function formatModifDate(dateObject, format) {
         if (!format && window && window.pydio && pydio.MessageHash) {
-            format = pydio.MessageHash.date_format;
+            format = pydio.MessageHash["date_format"];
         }
-        if (!format) {
-            return "no format";
-        }format = format.replace("d", dateObject.getDate() < 10 ? "0" + dateObject.getDate() : dateObject.getDate());
+        if (!format) return "no format";
+        format = format.replace("d", dateObject.getDate() < 10 ? "0" + dateObject.getDate() : dateObject.getDate());
         format = format.replace("D", dateObject.getDay());
         format = format.replace("Y", dateObject.getFullYear());
         format = format.replace("y", dateObject.getYear());
