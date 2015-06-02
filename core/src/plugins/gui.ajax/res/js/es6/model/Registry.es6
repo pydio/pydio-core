@@ -24,14 +24,20 @@ class Registry{
         this._extensionsRegistry = {"editor":[], "uploader":[]};
         this._resourcesRegistry = {};
         this._pydioObject = pydioObject;
+        this._stateLoading = false;
     }
 
     loadFromString(s){
         this._registry = XMLUtils.parseXml(s).documentElement;
     }
 
-    load(sync, xPath, completeFunc){
+    load(sync, xPath, completeFunc, repositoryId){
+        if(this._stateLoading){
+            return;
+        }
+        this._stateLoading = true;
         var onComplete = function(transport){
+            this._stateLoading = false;
             if(transport.responseXML == null || transport.responseXML.documentElement == null) return;
             if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
                 this._registry = transport.responseXML.documentElement;
@@ -48,7 +54,13 @@ class Registry{
         if(xPath){
             params['xPath'] = xPath;
         }
-        PydioApi.getClient().request(params, onComplete, null, {async:!sync});
+        if(repositoryId){
+            params['ws_id'] = repositoryId; // for caching only
+        }
+        PydioApi.getClient().request(params, onComplete, null, {
+            async:!sync,
+            method:'get'
+        });
     }
 
     /**
