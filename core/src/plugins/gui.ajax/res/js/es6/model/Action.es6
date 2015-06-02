@@ -165,7 +165,7 @@ class Action extends Observable{
 			}catch(e){
 				Logger.error(e);
 			}
-		}else if(this.options.callbackDialogNode){
+		}else if(this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute("dialogOpenForm")){
 			var node = this.options.callbackDialogNode;
 			var dialogFormId = node.getAttribute("dialogOpenForm");
 			var okButtonOnly = (node.getAttribute("dialogOkButtonOnly") === "true") ;
@@ -193,7 +193,10 @@ class Action extends Observable{
             }.bind(this);
 			this.options.callback();
 			this.options.callbackDialogNode = null;
-		}else if(this.options.callback){
+		}else if(this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute("components")){
+            var components = XMLUtils.XPathSelectNodes(this.options.callbackDialogNode, "component");
+            this.manager.uiMountComponents(components);
+        }else if(this.options.callback){
 			this.options.callback();
 		}
 		if(this.options.subMenu && arguments[0] && arguments[0][0]){
@@ -418,7 +421,7 @@ class Action extends Observable{
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
 							this.options.prepareModal = true;						
 						}
-						if(processNode.getAttribute('dialogOpenForm')){
+						if(processNode.getAttribute('dialogOpenForm') || processNode.getAttribute("components")){
 							this.options.callbackDialogNode = processNode;
 						}else if(processNode.firstChild){
 							this.options.callbackCode = processNode.firstChild.nodeValue.trim();

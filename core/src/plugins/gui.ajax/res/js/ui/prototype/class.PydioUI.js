@@ -111,6 +111,38 @@ Class.create("PydioUI", {
         if(existing) existing.remove();
     },
 
+    mountComponents: function(componentsNodes){
+        $A(componentsNodes).each(function(node){
+            if(node.getAttribute('type') == 'react' && React){
+                var namespace = node.getAttribute('namespace');
+                var compName= node.getAttribute('name');
+                var hookElement = $(node.getAttribute('element'));
+                var unMountFunc = null;
+                if(!hookElement){
+                    hookElement = new Element('div', {id:node.getAttribute('element')});
+                    $(document.body).insert(hookElement);
+                    // TODO: ADD THIS AS A MIXIN?
+                    unMountFunc = function(){hookElement.remove();};
+                }
+                if(namespace){
+                    ResourcesManager.loadClassesAndApply([namespace], function(){
+                        React.render(
+                            React.createElement(window[namespace][compName], {}),
+                            hookElement
+                        )
+                    });
+                }else{
+                    ResourcesManager.loadClassesAndApply([compName], function(){
+                        React.render(
+                            React.createElement(window[compName], {}),
+                            hookElement
+                        )
+                    });
+                }
+            }
+        });
+    },
+
     /**
      * Initialize GUI Objects
      */
@@ -400,13 +432,13 @@ Class.create("PydioUI", {
 
         if(Class.objectImplements(obj, "IFocusable")){
             obj.setFocusBehaviour();
-            this._pydio.registerFocusable(obj);
+            this.registerFocusable(obj);
         }
         if(Class.objectImplements(obj, "IContextMenuable")){
             obj.setContextualMenu(this.contextMenu);
         }
         if(Class.objectImplements(obj, "IActionProvider")){
-            this._pydio.Controller.updateGuiActions(obj.getActions());
+            this._pydio.Controller.updateGuiActions(ProtoCompat.hash2map(obj.getActions()));
         }
 
         if($(ajxpId).up('[ajxpClass]') && $(ajxpId).up('[ajxpClass]').ajxpPaneObject && $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes){

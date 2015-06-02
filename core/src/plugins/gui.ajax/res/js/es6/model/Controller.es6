@@ -161,6 +161,12 @@ class Controller extends Observable{
         return null;
     }
 
+    uiMountComponents(componentsNodes){
+        if(this._pydioObject && this._pydioObject.UI){
+            return this._pydioObject.UI.mountComponents(componentsNodes);
+        }
+    }
+
     /**
      * COMPATIBILITY METHD
      * @param xmlDoc
