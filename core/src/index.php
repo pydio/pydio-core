@@ -65,8 +65,8 @@ if (!isSet($OVERRIDE_SESSION)) {
 }
 session_start();
 
-if (isSet($_GET["tmp_repository_id"])) {
-    ConfService::switchRootDir($_GET["tmp_repository_id"], true);
+if (isSet($_GET["tmp_repository_id"]) || isSet($_POST["tmp_repository_id"])) {
+    ConfService::switchRootDir(isset($_GET["tmp_repository_id"])?$_GET["tmp_repository_id"]:$_POST["tmp_repository_id"], true);
 } else if (isSet($_SESSION["SWITCH_BACK_REPO_ID"])) {
     ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
     unset($_SESSION["SWITCH_BACK_REPO_ID"]);
