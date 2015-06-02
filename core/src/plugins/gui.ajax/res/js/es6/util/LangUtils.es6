@@ -44,6 +44,49 @@ class LangUtils{
             .replace(/\-{2,}/g,'-');
     }
 
+    static forceJSONArrayToObject(container, value){
+        if(container[value] instanceof Array){
+            // Clone
+            var copy = container[value].slice(0);
+            container[value] = {};
+            for(var i = 0; i<copy.length; i++){
+                container[value][i] = copy[i];
+            }
+        }
+    }
+
+    static mergeObjectsRecursive(source, destination) {
+        var newObject = {}, property;
+        for (property in source) {
+            if (source.hasOwnProperty(property)) {
+                //if (source[property] === null) continue;
+                if (destination.hasOwnProperty(property)) {
+                    if (source[property] instanceof Object && destination instanceof Object) {
+                        newObject[property] = LangUtils.mergeObjectsRecursive(source[property], destination[property]);
+                    } else {
+                        newObject[property] = destination[property];
+                    }
+                } else {
+                    if (source[property] instanceof Object) {
+                        newObject[property] = LangUtils.mergeObjectsRecursive(source[property], {});
+                    } else {
+                        newObject[property] = source[property];
+                    }
+                }
+            }
+        }
+        for (property in destination) {
+            if (destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) /*&& destination[property] !== null*/) {
+                if (destination[property] instanceof Object) {
+                    newObject[property] = LangUtils.mergeObjectsRecursive(destination[property], {});
+                } else {
+                    newObject[property] = destination[property];
+                }
+            }
+        }
+        return newObject;
+    }
+
 }
 
 LangUtils.slugTable = [
