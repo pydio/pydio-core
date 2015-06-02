@@ -196,14 +196,25 @@ class sqlConfDriver extends AbstractConfDriver
      */
     protected function initRepoArrayFromDbFetch($array){
         $repositories = array();
-        foreach ($array as $repo_row) {
-            if($this->sqlDriver["driver"] == "postgre"){
-                dibi::query("SET bytea_output=escape");
-            }
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repo = $this->repoFromDb($repo_row, $opts);
-
+        if(!count($array)){
+            return $repositories;
+        }
+        // Load all at once
+        $ids = array();
+        $allOpts = array();
+        foreach($array as $row) {
+            $ids[] = $row['uuid'];
+            $allOpts[$row['uuid']] = array("ROW" => $row, "OPTIONS" => array());
+        }
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
+        $dbres = dibi::query("SELECT [uuid], [name], [val] FROM [ajxp_repo_options] WHERE [uuid] IN (%s)", $ids);
+        foreach($dbres as $row){
+            $allOpts[$row['uuid']]["OPTIONS"][$row['name']] = $row['val'];
+        }
+        foreach($allOpts as $repoId => $repoOptions){
+            $repo = $this->repoFromDb($repoOptions["ROW"], $repoOptions["OPTIONS"]);
             $repositories[$repo->getUniqueId()] = $repo;
         }
         return $repositories;
