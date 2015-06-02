@@ -15,8 +15,8 @@ class PydioApi{
     }
 
     request(parameters, onComplete=null, onError=null, settings={}){
-        parameters['secure_token'] = this._secureToken;
         if(window.Connexion){
+            // Connexion already handles secure_token
             var c = new Connexion();
             c.setParameters($H(parameters));
             if(settings.method){
@@ -29,6 +29,7 @@ class PydioApi{
                 c.sendAsync();
             }
         }else if(window.jQuery){
+            parameters['secure_token'] = this._secureToken;
             jQuery.ajax(this._baseUrl,{
                 method:settings.method ||'post',
                 data: parameters,
@@ -37,6 +38,51 @@ class PydioApi{
                 error:onError
             });
         }
+    }
+
+    loadFile(filePath, onComplete=null, onError=null){
+        if(window.Connexion){
+            var c = new Connexion(filePath);
+            c.setMethod('GET');
+            c.onComplete = onComplete;
+            c.sendAsync();
+        }else if(window.jQuery){
+            jQuery.ajax(filePath, {
+                method:'GET',
+                async:true,
+                complete:onComplete,
+                error:onError
+            });
+        }
+    }
+
+    uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}){
+
+        if(window.Connexion){
+            var c = new Connexion();
+            c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
+        }else if(window.jQuery){
+            var formData = new FormData();
+            formData.append(fileParameterName, file);
+            queryStringParams += '&secure_token' + this._secureToken;
+            jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
+                method:'POST',
+                data:formData,
+                complete:onComplete,
+                error:onError,
+                progress:onProgress
+            });
+        }
+
+    }
+
+    static supportsUpload(){
+        if(window.Connexion){
+            return (window.FormData || window.FileReader);
+        }else if(window.jQuery){
+            return window.FormData;
+        }
+        return false;
     }
 
     static getClient(){

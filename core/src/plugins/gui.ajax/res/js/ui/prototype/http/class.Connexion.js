@@ -35,7 +35,7 @@ Class.create("Connexion", {
 		if(baseUrl) this._baseUrl = baseUrl;
 		this._libUrl = window.ajxpResourcesFolder+'/js';
 		this._parameters = new Hash();
-		this._method = 'get';
+		this._method = 'post';
 	},
 	
 	/**
@@ -76,7 +76,15 @@ Class.create("Connexion", {
 	addSecureToken : function(){
 		if(Connexion.SECURE_TOKEN && this._baseUrl.indexOf('secure_token') == -1 && !this._parameters.get('secure_token')){
 			this.addParameter('secure_token', Connexion.SECURE_TOKEN);
-		}
+		}else if(this._baseUrl.indexOf('secure_token=') !== -1){
+            // Remove from baseUrl and set inside params
+            var parts = this._baseUrl.split('secure_token=');
+            var toks = parts[1].split('&');
+            var token = toks.shift();
+            var rest = toks.join('&');
+            this._baseUrl = parts[0] + (rest ? '&' + rest : '');
+            this._parameters.set('secure_token', token);
+        }
 	},
 
     /**
@@ -208,7 +216,70 @@ Class.create("Connexion", {
 		}
 		document.fire("ajaxplorer:server_answer", this);
 	},
-	
+
+    uploadFile: function(file, fileParameterName, queryStringParams, onComplete, onError, onProgress){
+
+        if(!onComplete) onComplete = function(){};
+        if(!onError) onError = function(){};
+        if(!onProgress) onProgress = function(){};
+        var url = pydio.Parameters.get('ajxpServerAccess') + '&' +  queryStringParams;
+        var xhr = this.initializeXHRForUpload(url, onComplete, onError, onProgress);
+        if(window.FormData){
+            this.sendFileUsingFormData(xhr, file, fileParameterName);
+        }else if(window.FileReader){
+            var fileReader = new FileReader();
+            fileReader.onload = function(e){
+                this.xhrSendAsBinary(xhr, file.name, e.target.result, fileParameterName);
+            }.bind(this);
+            fileReader.readAsBinaryString(file);
+        }else if(file.getAsBinary){
+            this.xhrSendAsBinary(xhr, file.name, file.getAsBinary(), fileParameterName)
+        }
+
+    },
+
+    initializeXHRForUpload : function(url, onComplete, onError, onProgress){
+        var xhr = new XMLHttpRequest();
+        var upload = xhr.upload;
+        upload.addEventListener("progress", function(e){
+            if (!e.lengthComputable) return;
+            onProgress(e);
+        }, false);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status === 200) {
+                    onComplete(xhr);
+                } else {
+                    onError(xhr);
+                }
+            }
+        }.bind(this);
+        upload.onerror = function(){
+            onError(xhr);
+        };
+        xhr.open("POST", url, true);
+        return xhr;
+    },
+
+    sendFileUsingFormData : function(xhr, file, fileParameterName){
+        var formData = new FormData();
+        formData.append(fileParameterName, file);
+        xhr.send(formData);
+    },
+
+    xhrSendAsBinary : function(xhr, fileName, fileData, fileParameterName){
+        var boundary = '----MultiPartFormBoundary' + (new Date()).getTime();
+        xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary);
+
+        var body = "--" + boundary + "\r\n";
+        body += "Content-Disposition: form-data; name='"+fileParameterName+"'; filename='" + unescape(encodeURIComponent(fileName)) + "'\r\n";
+        body += "Content-Type: application/octet-stream\r\n\r\n";
+        body += fileData + "\r\n";
+        body += "--" + boundary + "--\r\n";
+
+        xhr.sendAsBinary(body);
+    },
+
 	/**
 	 * Load a javascript library
 	 * @param fileName String
