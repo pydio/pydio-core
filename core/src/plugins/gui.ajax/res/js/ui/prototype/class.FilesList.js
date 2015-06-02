@@ -1124,7 +1124,7 @@ Class.create("FilesList", SelectableElements, {
                 }
                 pydio.UI.focusOn(this);
             }
-            this.htmlElement.setStyle({display:'block'});
+            this.htmlElement.setStyle({display:this.htmlElement.hasClassName('vertical_fit')?'flex':'block'});
         }else{
             this.blur();
             if(!this._dataModel && ajaxplorer){
