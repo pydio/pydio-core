@@ -366,16 +366,34 @@ class ConfService
      */
     private function getLoadedRepositories()
     {
+        if (isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])){
+            $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
+            return $_SESSION["REPOSITORIES"];
+        }
         if (isSet($this->configs["REPOSITORIES"])) {
             return $this->configs["REPOSITORIES"];
         }
         $this->configs["REPOSITORIES"] = $this->initRepositoriesListInst();
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
         return $this->configs["REPOSITORIES"];
     }
 
     private function invalidateLoadedRepositories()
     {
+        if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
+    }
+
+    private function cacheRepository($repoId, $repository){
+        if(!is_array($this->configs["REPOSITORIES"])) return;
+        $this->configs["REPOSITORIES"][$repoId] = $repository;
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
+    }
+
+    private function removeRepositoryFromCache($repositoryId){
+        if(!is_array($this->configs["REPOSITORIES"]) || !isSet($this->configs["REPOSITORIES"][$repositoryId])) return;
+        unset($this->configs["REPOSITORIES"][$repositoryId]);
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
     }
 
     /**
@@ -1304,7 +1322,7 @@ class ConfService
             $crtRepository->driverInstance = $plugInstance;
         } catch (Exception $e) {
             // Remove repositories from the lists
-            unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
+            $this->removeRepositoryFromCache($crtRepository->getId());
             if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
                 $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
             } else {
@@ -1341,7 +1359,7 @@ class ConfService
         if (count($this->errors)>0) {
             $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
             // Remove repositories from the lists
-            unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
+            $this->removeRepositoryFromCache($crtRepository->getId());
             if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
                 $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
             } else {
@@ -1443,9 +1461,7 @@ class ConfService
         $repository->driverInstance = $plugInstance;
         if (isSet($_SESSION["REPO_ID"]) && $_SESSION["REPO_ID"] == $repository->getId()) {
             $this->configs["REPOSITORY"] = $repository;
-            if(is_array($this->configs["REPOSITORIES"])){
-                $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']] = $repository;
-            }
+            $this->cacheRepository($_SESSION['REPO_ID'], $repository);
         }
         return $plugInstance;
     }
