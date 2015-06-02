@@ -517,20 +517,28 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             $prefs[$pref] = array("value" => $userObject->getPref($pref), "type" => "json" );
         }
 
-        $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
-        if (is_array($paramNodes) && count($paramNodes)) {
-            foreach ($paramNodes as $xmlNode) {
-                if ($xmlNode->getAttribute("expose") == "true") {
-                    $parentNode = $xmlNode->parentNode->parentNode;
-                    $pluginId = $parentNode->getAttribute("id");
-                    if (empty($pluginId)) {
-                        $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
-                    }
-                    $name = $xmlNode->getAttribute("name");
-                    $value = $userObject->mergedRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "");
-                    $prefs[$name] = array("value" => $value, "type" => "string", "pluginId" => $pluginId);
+
+        $exposed = array();
+        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
+        if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
+            $exposed = $cacheHasExposed;
+        } else {
+            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+            foreach($exposed_props as $exposed_prop){
+                $parentNode = $exposed_prop->parentNode->parentNode;
+                $pluginId = $parentNode->getAttribute("id");
+                if (empty($pluginId)) {
+                    $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
                 }
+                $paramName = $exposed_prop->getAttribute("name");
+                $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName);
             }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $exposed);
+        }
+
+        foreach ($exposed as $exposedProp) {
+            $value = $userObject->mergedRole->filterParameterValue($exposedProp["PLUGIN_ID"], $exposedProp["NAME"], AJXP_REPO_SCOPE_ALL, "");
+            $prefs[$exposedProp["NAME"]] = array("value" => $value, "type" => "string", "pluginId" => $exposedProp["PLUGIN_ID"]);
         }
 
         return $prefs;
@@ -617,7 +625,16 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         echo json_encode($data);
                     }else{
                         header('Content-Type: application/xml; charset=UTF-8');
-                        print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML()));
+                        $string = AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+                        $etag = md5($string);
+                        $match = isSet($_SERVER["HTTP_IF_NONE_MATCH"])?$_SERVER["HTTP_IF_NONE_MATCH"]:'';
+                        if($match == $etag){
+                            header('HTTP/1.1 304 Not Modified');
+                        }else{
+                            header('Cache-Control:public, max-age=31536000');
+                            header('ETag: '.$etag);
+                            print($string);
+                        }
                     }
                 }
 
