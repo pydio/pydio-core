@@ -79,18 +79,13 @@ class sqlLogDriver extends AbstractLogDriver
         return false;
     }
 
-    public function processQuery($actionName, &$httpVars, &$fileVars){
+    protected function processOneQuery($queryName, $start, $count){
 
-        $query_name = AJXP_Utils::sanitize($httpVars["query_name"], AJXP_SANITIZE_ALPHANUM);
-        $query = $this->getQuery($query_name);
+        $query = $this->getQuery($queryName);
         if($query === false){
-            throw new Exception("Cannot find query ".$query_name);
+            throw new Exception("Cannot find query ".$queryName);
         }
         $pg = ($this->sqlDriver["driver"] == "postgre");
-        $start = 0;
-        $count = 30;
-        if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
-        if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
 
         $mess = ConfService::getMessages();
 
@@ -153,6 +148,28 @@ class sqlLogDriver extends AbstractLogDriver
             $all[0] = array($query["FIGURE"] => $f);
         }
 
+        return $all;
+
+    }
+
+    public function processQuery($actionName, &$httpVars, &$fileVars){
+
+        $query_name = $httpVars["query_name"];
+        $start = 0;
+        $count = 30;
+        if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
+        if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
+
+        $queries = explode(",", $query_name);
+        if(count($queries) == 1){
+            $all = $this->processOneQuery(AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM), $start, $count);
+        }else{
+            $all = array();
+            foreach($queries as $qName){
+                $qName = AJXP_Utils::sanitize($qName, AJXP_SANITIZE_ALPHANUM);
+                $all[$qName] = $this->processOneQuery($qName, $start, $count);
+            }
+        }
 
         //$qry = "SELECT FOUND_ROWS() AS NbRows";
         //$res = dibi::query($qry);
