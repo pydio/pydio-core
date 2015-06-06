@@ -79,7 +79,7 @@ class sqlLogDriver extends AbstractLogDriver
         return false;
     }
 
-    protected function processOneQuery($queryName, $start, $count){
+    protected function processOneQuery($queryName, $start, $count, $frequency="day"){
 
         $query = $this->getQuery($queryName);
         if($query === false){
@@ -108,12 +108,25 @@ class sqlLogDriver extends AbstractLogDriver
         $res = dibi::query($q);
         $all = $res->fetchAll();
         $allDates = array();
+
+        if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
+            $groupedSums = array();
+            if($frequency == "week"){
+                $groupByFormat = "W";
+            } else if ($frequency == "month"){
+                $groupByFormat = "n";
+            }
+        }
+
         foreach($all as $row => &$data){
             // PG: Recapitalize keys
             if($pg){
                 foreach($data as $k => $v){
                     $data[ucfirst($k)] = $v;
                 }
+            }
+            if(isSet($data["File"])){
+                $data["File"] = AJXP_Utils::safeBasename($data["File"]);
             }
             if(isSet($data["Date"])){
                 if(is_a($data["Date"], "DibiDateTime")){
@@ -125,9 +138,15 @@ class sqlLogDriver extends AbstractLogDriver
                 $data["Date_sortable"] = $tStamp;
                 $data["Date"] = $key;
                 $allDates[$key] = true;
-            }
-            if(isSet($data["File"])){
-                $data["File"] = AJXP_Utils::safeBasename($data["File"]);
+                if(isSet($groupByFormat)){
+                    $newKey = date($groupByFormat, $tStamp);
+                    if(!isSet($groupedSums[$newKey])){
+                        $groupedSums[$newKey] = $data;
+                    }else{
+                        $valueKey = $query["AXIS"]["y"];
+                        $groupedSums[$newKey][$valueKey] += $data[$valueKey];
+                    }
+                }
             }
         }
 
@@ -136,8 +155,15 @@ class sqlLogDriver extends AbstractLogDriver
                 $dateCurs = $start + $i;
                 $timeDate = strtotime("-$dateCurs day", $ref);
                 $dateK = date($dKeyFormat, $timeDate);
-                if(!isSet($dKeyFormat[$dateK])){
-                    array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
+                if(isSet($groupByFormat)){
+                    $newKey = date($groupByFormat, $timeDate);
+                    if(!isSet($groupedSums[$newKey])){
+                        array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
+                    }
+                }else{
+                    if(!isSet($all[$dateK])){
+                        array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
+                    }
                 }
             }
         }
@@ -148,7 +174,11 @@ class sqlLogDriver extends AbstractLogDriver
             $all[0] = array($query["FIGURE"] => $f);
         }
 
-        return $all;
+        if(isSet($groupByFormat) && isSet($groupedSums)){
+            return array_values($groupedSums);
+        }else{
+            return $all;
+        }
 
     }
 
@@ -162,7 +192,12 @@ class sqlLogDriver extends AbstractLogDriver
 
         $queries = explode(",", $query_name);
         if(count($queries) == 1){
-            $all = $this->processOneQuery(AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM), $start, $count);
+            $all = $this->processOneQuery(
+                AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM),
+                $start,
+                $count,
+                (isSet($httpVars["frequency"])?$httpVars["frequency"]:"day")
+            );
         }else{
             $all = array();
             foreach($queries as $qName){
