@@ -449,8 +449,13 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getUserSelection();
-					var node = userSelection.getUniqueNode();
+				    var userSelection;
+				    if(window.actionArguments && window.actionArguments.length){
+				        userSelection = window.actionArguments[0];
+                    }else{
+                        userSelection =  ajaxplorer.getUserSelection();
+				    }
+				    var node = userSelection.getUniqueNode();
 					var meta = node.getMetadata();
 					var deleteMessage, fieldName, fieldValue;
 					if(meta.get("ajxp_mime") == "user_editable"){

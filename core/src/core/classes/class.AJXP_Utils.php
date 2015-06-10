@@ -1637,6 +1637,36 @@ class AJXP_Utils
         return $password;
     }
 
+    public static function filterFormElementsFromMeta($metadata, &$nestedData, $userId=null, $binariesContext=null, $cypheredPassPrefix=""){
+        foreach($metadata as $key => $level){
+            if(!array_key_exists($key, $nestedData)) continue;
+            if(!is_array($level)) continue;
+            if(isSet($level["ajxp_form_element"])){
+                // filter now
+                $type = $level["type"];
+                if($type == "binary" && $binariesContext != null){
+                    $value = $nestedData[$key];
+                    if ($value == "ajxp-remove-original") {
+                        if (!empty($level["original_binary"])) {
+                            ConfService::getConfStorageImpl()->deleteBinary($binariesContext, $level["original_binary"]);
+                        }
+                        $value = "";
+                    } else {
+                        $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                        if (file_exists($file)) {
+                            $id= !empty($level["original_binary"]) ? $level["original_binary"] : null;
+                            $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                            $value = $id;
+                        }
+                    }
+                    $nestedData[$key] = $value;
+                }
+            }else{
+                self::filterFormElementsFromMeta($level, $nestedData[$key], $userId, $binariesContext, $cypheredPassPrefix);
+            }
+        }
+    }
+
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null, $cypheredPassPrefix = "")
     {
         if ($binariesContext === null) {
