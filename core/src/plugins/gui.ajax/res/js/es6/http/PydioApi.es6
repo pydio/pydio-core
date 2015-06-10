@@ -18,6 +18,9 @@ class PydioApi{
         if(window.Connexion){
             // Connexion already handles secure_token
             var c = new Connexion();
+            if(settings.discrete){
+                c.discrete = true;
+            }
             c.setParameters($H(parameters));
             if(settings.method){
                 c.setMethod(settings.method);

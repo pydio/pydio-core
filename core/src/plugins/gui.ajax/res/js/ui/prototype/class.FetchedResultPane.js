@@ -151,7 +151,7 @@ Class.create("FetchedResultPane", FilesList, {
     /**
      * Can be overriden by the children.
      * @param ajxpOptions
-     * @returns AjxpDataModel
+     * @returns PydioDataModel
      */
     initDataModel: function(ajxpOptions){
 
