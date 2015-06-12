@@ -41,5 +41,5 @@ $mess=array(
     "folder.move" => "The folder AJXP_NODE_LABEL was moved to from AJXP_SOURCE_FOLDER to AJXP_PARENT_PATH AJXP_DATE, by AJXP_USER.",
     "folder.move_to" => "The folder AJXP_NODE_LABEL was moved to AJXP_TARGET_FOLDER AJXP_DATE, by AJXP_USER.",
     "folder.move_from" => "The folder AJXP_NODE_LABEL was moved from AJXP_SOURCE_FOLDER AJXP_DATE, by AJXP_USER.",
-    "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+    "ajxp_link" => "Click here to go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
 );
