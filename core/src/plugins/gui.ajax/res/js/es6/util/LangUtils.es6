@@ -1,5 +1,15 @@
 class LangUtils{
 
+    static arrayWithout(array, key){
+        if(!array.length) return array;
+        if(key >= array.length) return array;
+        var newArray;
+        if(key == 0) newArray = array.slice(1);
+        else if(key == array.length-1) newArray = array.slice(0, -1);
+        else newArray = array.slice(0,key).concat(array.slice(key+1));
+        return newArray;
+    }
+
     static objectMerge(obj1, obj2){
         for(var k in obj2){
             if(obj2.hasOwnProperty(k)){
@@ -53,6 +63,20 @@ class LangUtils{
                 container[value][i] = copy[i];
             }
         }
+    }
+
+    static deepCopy(source){
+        return LangUtils.mergeObjectsRecursive({}, source);
+    }
+
+    static simpleCopy(source){
+        var copy = {};
+        for (var property in source) {
+            if (source.hasOwnProperty(property)) {
+                copy[property] = source[property];
+            }
+        }
+        return copy;
     }
 
     static mergeObjectsRecursive(source, destination) {
