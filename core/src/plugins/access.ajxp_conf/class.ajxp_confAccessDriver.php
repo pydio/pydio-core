@@ -33,6 +33,95 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     protected $listSpecialRoles = AJXP_SERVER_DEBUG;
     protected $currentBookmarks = array();
 
+    protected $rootNodes = array(
+        "data" => array(
+            "LABEL" => "ajxp_conf.110",
+            "ICON" => "user.png",
+            "DESCRIPTION" => "ajxp_conf.137",
+            "CHILDREN" => array(
+                "repositories" => array(
+                    "AJXP_MIME" => "workspaces_zone",
+                    "LABEL" => "ajxp_conf.3",
+                    "DESCRIPTION" => "ajxp_conf.138",
+                    "ICON" => "hdd_external_unmount.png",
+                    "LIST" => "listRepositories"),
+                "users" => array(
+                    "AJXP_MIME" => "users_zone",
+                    "LABEL" => "ajxp_conf.2",
+                    "DESCRIPTION" => "ajxp_conf.139",
+                    "ICON" => "users-folder.png",
+                    "LIST" => "listUsers"
+                ),
+                "roles" => array(
+                    "AJXP_MIME" => "roles_zone",
+                    "LABEL" => "ajxp_conf.69",
+                    "DESCRIPTION" => "ajxp_conf.140",
+                    "ICON" => "user-acl.png",
+                    "LIST" => "listRoles"),
+            )
+        ),
+        "config" => array(
+            "AJXP_MIME" => "plugins_zone",
+            "LABEL" => "ajxp_conf.109",
+            "ICON" => "preferences_desktop.png",
+            "DESCRIPTION" => "ajxp_conf.136",
+            "CHILDREN" => array(
+                "core"	   	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_conf.98",
+                    "DESCRIPTION" => "ajxp_conf.133",
+                    "ICON" => "preferences_desktop.png",
+                    "LIST" => "listPlugins"),
+                "plugins"	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_conf.99",
+                    "DESCRIPTION" => "ajxp_conf.134",
+                    "ICON" => "folder_development.png",
+                    "LIST" => "listPlugins"),
+                "core_plugins" => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_conf.123",
+                    "DESCRIPTION" => "ajxp_conf.135",
+                    "ICON" => "folder_development.png",
+                    "LIST" => "listPlugins"),
+            )
+        ),
+        "admin" => array(
+            "LABEL" => "ajxp_conf.111",
+            "ICON" => "toggle_log.png",
+            "DESCRIPTION" => "ajxp_conf.141",
+            "CHILDREN" => array(
+                "logs" => array(
+                    "LABEL" => "ajxp_conf.4",
+                    "DESCRIPTION" => "ajxp_conf.142",
+                    "ICON" => "toggle_log.png",
+                    "LIST" => "listLogFiles"),
+                "diagnostic" => array(
+                    "LABEL" => "ajxp_conf.5",
+                    "DESCRIPTION" => "ajxp_conf.143",
+                    "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
+            )
+        ),
+        "developer" => array(
+            "LABEL" => "ajxp_conf.144",
+            "ICON" => "applications_engineering.png",
+            "DESCRIPTION" => "ajxp_conf.145",
+            "CHILDREN" => array(
+                "actions" => array(
+                    "LABEL" => "ajxp_conf.146",
+                    "DESCRIPTION" => "ajxp_conf.147",
+                    "ICON" => "book.png",
+                    "LIST" => "listActions"),
+                "hooks" => array(
+                    "LABEL" => "ajxp_conf.148",
+                    "DESCRIPTION" => "ajxp_conf.149",
+                    "ICON" => "book.png",
+                    "LIST" => "listHooks")
+            )
+        )
+    );
+
+
     protected function filterReservedRoles($key){
         return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
     }
@@ -288,6 +377,49 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
+    protected function getMainTree(){
+        $rootNodes = $this->rootNodes;
+        if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/") {
+            // Group Admin
+            unset($rootNodes["config"]);
+            unset($rootNodes["admin"]);
+            unset($rootNodes["developer"]);
+        }
+        AJXP_Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
+        return $rootNodes;
+    }
+
+    protected function renderNode($path, $data, $messages){
+        if(isSet($messages[$data["LABEL"]])) $data["LABEL"] = $messages[$data["LABEL"]];
+        if(isSet($messages[$data["DESCRIPTION"]])) $data["DESCRIPTION"] = $messages[$data["DESCRIPTION"]];
+        $nodeLabel = $data["LABEL"];
+        $attributes = array(
+            "description" => $data["DESCRIPTION"],
+            "icon"        => $data["ICON"]
+        );
+        if(in_array($path, $this->currentBookmarks)) {
+            $attributes["ajxp_bookmarked"]="true";
+            $attributes["overlay_icon"] = "bookmark.png";
+        }
+        if(basename($path) == "users") {
+            $attributes["remote_indexation"] = "admin_search";
+        }
+        if(isSet($data["AJXP_MIME"])) {
+            $attributes["ajxp_mime"] = $data["AJXP_MIME"];
+        }
+        if(isSet($data["METADATA"]) && is_array($data["METADATA"])){
+            $attributes = array_merge($attributes, $data["METADATA"]);
+        }
+        $hasChildren = isSet($data["CHILDREN"]);
+        AJXP_XMLWriter::renderNode($path, $nodeLabel, false, $attributes, false);
+        if($hasChildren){
+            foreach($data["CHILDREN"] as $cKey => $cData){
+                $this->renderNode($path."/".$cKey, $cData, $messages);
+            }
+        }
+        AJXP_XMLWriter::close();
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
@@ -319,99 +451,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //------------------------------------
             case "ls":
 
-                $rootNodes = array(
-                    "data" => array(
-                        "LABEL" => $mess["ajxp_conf.110"],
-                        "ICON" => "user.png",
-                        "DESCRIPTION" => $mess["ajxp_conf.137"],
-                        "CHILDREN" => array(
-                            "repositories" => array(
-                                "AJXP_MIME" => "workspaces_zone",
-                                "LABEL" => $mess["ajxp_conf.3"],
-                                "DESCRIPTION" => $mess["ajxp_conf.138"],
-                                "ICON" => "hdd_external_unmount.png",
-                                "LIST" => "listRepositories"),
-                            "users" => array(
-                                "AJXP_MIME" => "users_zone",
-                                "LABEL" => $mess["ajxp_conf.2"],
-                                "DESCRIPTION" => $mess["ajxp_conf.139"],
-                                "ICON" => "users-folder.png",
-                                "LIST" => "listUsers"
-                            ),
-                            "roles" => array(
-                                "AJXP_MIME" => "roles_zone",
-                                "LABEL" => $mess["ajxp_conf.69"],
-                                "DESCRIPTION" => $mess["ajxp_conf.140"],
-                                "ICON" => "user-acl.png",
-                                "LIST" => "listRoles"),
-                        )
-                    ),
-                    "config" => array(
-                        "AJXP_MIME" => "plugins_zone",
-                        "LABEL" => $mess["ajxp_conf.109"],
-                        "ICON" => "preferences_desktop.png",
-                        "DESCRIPTION" => $mess["ajxp_conf.136"],
-                        "CHILDREN" => array(
-                            "core"	   	   => array(
-                                "AJXP_MIME" => "plugins_zone",
-                                "LABEL" => $mess["ajxp_conf.98"],
-                                "DESCRIPTION" => $mess["ajxp_conf.133"],
-                                "ICON" => "preferences_desktop.png",
-                                "LIST" => "listPlugins"),
-                            "plugins"	   => array(
-                                "AJXP_MIME" => "plugins_zone",
-                                "LABEL" => $mess["ajxp_conf.99"],
-                                "DESCRIPTION" => $mess["ajxp_conf.134"],
-                                "ICON" => "folder_development.png",
-                                "LIST" => "listPlugins"),
-                            "core_plugins" => array(
-                                "AJXP_MIME" => "plugins_zone",
-                                "LABEL" => $mess["ajxp_conf.123"],
-                                "DESCRIPTION" => $mess["ajxp_conf.135"],
-                                "ICON" => "folder_development.png",
-                                "LIST" => "listPlugins"),
-                        )
-                    ),
-                    "admin" => array(
-                        "LABEL" => $mess["ajxp_conf.111"],
-                        "ICON" => "toggle_log.png",
-                        "DESCRIPTION" => $mess["ajxp_conf.141"],
-                        "CHILDREN" => array(
-                            "logs" => array(
-                                "LABEL" => $mess["ajxp_conf.4"],
-                                "DESCRIPTION" => $mess["ajxp_conf.142"],
-                                "ICON" => "toggle_log.png",
-                                "LIST" => "listLogFiles"),
-                            "diagnostic" => array(
-                                "LABEL" => $mess["ajxp_conf.5"],
-                                "DESCRIPTION" => $mess["ajxp_conf.143"],
-                                "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
-                        )
-                    ),
-                    "developer" => array(
-                        "LABEL" => $mess["ajxp_conf.144"],
-                        "ICON" => "applications_engineering.png",
-                        "DESCRIPTION" => $mess["ajxp_conf.145"],
-                        "CHILDREN" => array(
-                            "actions" => array(
-                                "LABEL" => $mess["ajxp_conf.146"],
-                                "DESCRIPTION" => $mess["ajxp_conf.147"],
-                                "ICON" => "book.png",
-                                "LIST" => "listActions"),
-                            "hooks" => array(
-                                "LABEL" => $mess["ajxp_conf.148"],
-                                "DESCRIPTION" => $mess["ajxp_conf.149"],
-                                "ICON" => "book.png",
-                                "LIST" => "listHooks")
-                        )
-                    )
-                );
-                if ($currentUserIsGroupAdmin) {
-                    unset($rootNodes["config"]);
-                    unset($rootNodes["admin"]);
-                    unset($rootNodes["developer"]);
-                }
-                AJXP_Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
+                $rootNodes = $this->getMainTree();
                 $parentName = "";
                 $dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
                 if ($dir != "") {
@@ -465,23 +505,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::header();
                     if(!isSet($httpVars["file"])) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.102" attributeName="description" sortType="String"/></columns>');
                     foreach ($nodes as $key => $data) {
-                        $bmString = '';
-                        if(in_array($parentName.$key, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
-                        if($key == "users") $bmString .= ' remote_indexation="admin_search"';
-                        if(isSet($data["AJXP_MIME"])) $bmString .= ' ajxp_mime="'.$data["AJXP_MIME"].'"';
-                        if (empty($data["CHILDREN"])) {
-                            print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'/>';
-                        } else {
-                            print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'>';
-                            foreach ($data["CHILDREN"] as $cKey => $cData) {
-                                $bmString = '';
-                                if(in_array($parentName.$key."/".$cKey, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
-                                if($cKey == "users") $bmString .= ' remote_indexation="admin_search"';
-                                if(isSet($cData["AJXP_MIME"])) $bmString .= ' ajxp_mime="'.$cData["AJXP_MIME"].'"';
-                                print '<tree text="'.AJXP_Utils::xmlEntities($cData["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($cData["DESCRIPTION"]).'" icon="'.$cData["ICON"].'" filename="'.$parentName.$key.'/'.$cKey.'" '.$bmString.'/>';
-                            }
-                            print '</tree>';
-                        }
+                        $this->renderNode($parentName.$key, $data, $mess);
                     }
                     AJXP_XMLWriter::close();
 
