@@ -472,13 +472,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             if ($child == "users") {
                                 $atts["remote_indexation"] = "admin_search";
                             }
-                            $callback = $rootNodes[$root]["CHILDREN"][$child]["LIST"];
+                            $childData = $rootNodes[$root]["CHILDREN"][$child];
+                            $callback = $childData["LIST"];
+                            if(isSet($childData["ALIAS"])){
+                                $reSplits = explode("/", ltrim($childData["ALIAS"], "/"));
+                                $root = array_shift($reSplits);
+                                // additional part?
+                                array_shift($splits);
+                                foreach($splits as $vS) $reSplits[] = $vS;
+                                $splits = $reSplits;
+                            }
                             if (is_string($callback) && method_exists($this, $callback)) {
                                 if(!$returnNodes) AJXP_XMLWriter::header("tree", $atts);
-                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'');
+                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir);
                                 if(!$returnNodes) AJXP_XMLWriter::close();
                             } else if (is_array($callback)) {
-                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'');
+                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir);
                             }
                             if ($returnNodes) {
                                 AJXP_XMLWriter::header("tree", $atts);
@@ -1824,9 +1833,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 
-    public function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false)
+    public function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false, $file="", $aliasedDir=null)
     {
         $dir = "/$dir";
+        if($aliasedDir != null && $aliasedDir != "/".$root.$dir){
+            $baseDir = $aliasedDir;
+        }else{
+            $baseDir = "/".$root.$dir;
+        }
         $allNodes = array();
         $this->logInfo("Listing plugins",""); // make sure that the logger is started!
         $pServ = AJXP_PluginsService::getInstance();
@@ -1834,9 +1848,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $mess = ConfService::getMessages();
         $uniqTypes = array("core");
         $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
-        if ($dir == "/plugins" || $dir == "/core_plugins") {
+        if ($dir == "/plugins" || $dir == "/core_plugins" || $dir=="/all") {
             if($dir == "/core_plugins") $uniqTypes = $coreTypes;
-            else $uniqTypes = array_diff(array_keys($types), $coreTypes);
+            else if($dir == "/plugins") $uniqTypes = array_diff(array_keys($types), $coreTypes);
+            else if($dir == "/all") $uniqTypes = array_keys($types);
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins_folder">
             <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
             <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
@@ -1846,7 +1861,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             foreach ($types as $t => $tPlugs) {
                 if(!in_array($t, $uniqTypes))continue;
                 if($t == "core") continue;
-                $nodeKey = "/".$root.$dir."/".$t;
+                $nodeKey = $baseDir."/".$t;
                 $meta = array(
                     "icon" 		=> "folder_development.png",
                     "plugin_id" => $t,
@@ -1878,7 +1893,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     // Check if there are actually any parameters to display!
                     if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
                     $label =  $pObject->getManifestLabel();
-                    $nodeKey = "/$root".$dir."/".$pObject->getId();
+                    $nodeKey = $baseDir."/".$pObject->getId();
                     if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                     $nodeString =AJXP_XMLWriter::renderNode($nodeKey, $label, true, $meta, true, false);
                     if($returnNodes) $allNodes[$nodeKey] = $nodeString;
@@ -1917,7 +1932,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     "plugin_id" => $pObject->getId(),
                     "plugin_description" => $pObject->getManifestDescription()
                 );
-                $nodeKey = "/$root".$dir."/".$pObject->getId();
+                $nodeKey = $baseDir."/".$pObject->getId();
                 if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                 $xml = AJXP_XMLWriter::renderNode($nodeKey, $pObject->getManifestLabel(), true, $meta, true, false);
                 if($returnNodes) $allNodes[$nodeKey] = $xml;
