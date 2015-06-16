@@ -331,7 +331,8 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
                     // Make sure the user is still authorized on this node, otherwise remove it.
                     $uObject = ConfService::getConfStorageImpl()->createUserObject($id);
                     $acl = $uObject->mergedRole->getAcl($node->getRepositoryId());
-                    if(empty($acl) || strpos($acl, "r") === FALSE){
+                    $isOwner = ($node->getRepository()->getOwner() == $uObject->getId());
+                    if(!$isOwner && (empty($acl) || strpos($acl, "r") === FALSE)){
                         unset($IDS[$index]);
                         if(is_array($watchMeta)){
                             $changes = true;
