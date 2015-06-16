@@ -87,9 +87,12 @@ Class.create("Ajaxplorer", {
 		}.bind(this));
 
         this.observe("server_message", function(xml){
-            if(XPathSelectSingleNode(xml, "tree/require_registry_reload")){
-                this.repositoryId = null;
-                this.loadXmlRegistry(false);
+            var reload = XPathSelectSingleNode(xml, "tree/require_registry_reload");
+            if(reload){
+                if(reload.getAttribute("repositoryId") != this.repositoryId){
+                    this.repositoryId = null;
+                    this.loadXmlRegistry(false);
+                }
             }
         }.bind(this));
 
