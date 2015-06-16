@@ -3,7 +3,6 @@
 <head>
     <title></title>
     <!-- 1. Load platform support before any code that touches the DOM. -->
-    <script src="vendor/webcomponents/bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <script src="vendor/jquery/jquery-1.11.2.min.js"></script>
     <script src="vendor/es6/browser-polyfill.js"></script>
     <script src="vendor/xpath-polyfill/javascript-xpath-cmp.js"></script>
@@ -16,9 +15,6 @@
         }
         echo '<script type="text/javascript" language="javascript" src="core/Pydio.js"></script>';
     ?>
-    <link rel="import" href="vendor/webcomponents/bower_components/paper-shadow/paper-shadow.html"/>
-    <link rel="import" href="vendor/webcomponents/bower_components/core-selector/core-selector.html"/>
-    <link rel="import" href="vendor/webcomponents/bower_components/paper-item/paper-item.html"/>
     <!--
     <script language="JavaScript">
         jQuery.noConflict();
@@ -28,9 +24,7 @@
 </head>
 <body>
 
-<paper-shadow>
-    <core-selector id="children"></core-selector>
-</paper-shadow>
+<ul id="children"></ul>
 
 <script>
 
@@ -51,7 +45,7 @@
             ul.removeChild(cN);
         });
         if(ctx.getParent()){
-            var el = document.createElement('paper-item');
+            var el = document.createElement('li');
             el.innerHTML = '.. Parent Directory';
             el.onclick = function(){
                 pydio.getContextHolder().requireContextChange(ctx.getParent());
@@ -59,7 +53,7 @@
             ul.appendChild(el);
         }
         ctx.getChildren().forEach(function(c){
-            var el = document.createElement('paper-item');
+            var el = document.createElement('li');
             el.innerHTML = c.getPath();
             el.onclick = function(){
                 pydio.getContextHolder().requireContextChange(c);
