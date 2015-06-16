@@ -132,7 +132,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             }
         }
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
-        $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
+        $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password, false);
 
         $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
