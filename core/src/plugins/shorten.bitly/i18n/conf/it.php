@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"MQ SQL" => "MQ SQL",
-"Store persistant and worker queues in database" => "Store persistant and worker queues in database",
-"Install SQL Tables" => "Install SQL Tables",
-"SQL Tables" => "SQL Tables",
-"SQL Driver" => "SQL Driver",
-"SQL Connexion Parameters" => "SQL Connection Parameters",
+"Bit.ly URL Shortener" => "Abbreviatore URL Bit.ly",
+"Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Abbrevia i link di download prima di mostrarli all'utente. Richiede un account su 'Bit.ly'.",
+"User Name" => "Nome Utente",
+"Bit.ly account user name" => "Nome utente per Bit.ly",
+"API Key" => "Chiave API",
+"Bit.ly account API Key" => "Chiave API per Bit.ly",
 );
