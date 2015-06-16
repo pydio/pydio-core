@@ -1189,7 +1189,7 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			var adjusted = this.resizeThumbnails();
-			if(this.protoMenu) {
+			if(this.protoMenu && !this.options.noContextualMenu) {
                 this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
                 this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
             }
@@ -1201,7 +1201,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			if(this.protoMenu){
+			if(this.protoMenu&& !this.options.noContextualMenu){
                 this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
                 this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
             }
@@ -1240,7 +1240,7 @@ Class.create("FilesList", SelectableElements, {
 
     empty : function(skipFireChange){
         this._previewFactory.clear();
-        if(this.protoMenu){
+        if(this.protoMenu && !this.options.noContextualMenu){
             if(this._displayMode == "thumb" || this._displayMode == "detail"){
                 this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
                 this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex);
@@ -1839,7 +1839,7 @@ Class.create("FilesList", SelectableElements, {
                                 this,
                                 'filesList'
                             );
-                            if(this.protoMenu) this.protoMenu.addElements(innerSpan);
+                            if(this.protoMenu && !this.options.noContextualMenu) this.protoMenu.addElements(innerSpan);
                         }
                         if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
                         {
