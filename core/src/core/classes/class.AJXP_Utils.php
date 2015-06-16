@@ -861,7 +861,6 @@ class AJXP_Utils
     /**
      * Build the current server URL
      * @param bool $withURI
-     * @internal param bool $witchURI
      * @static
      * @return string
      */
