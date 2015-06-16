@@ -327,9 +327,14 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
-                        $size = $this->getSize($tableName);
-                        $count = $this->getCount($tableName);
-                        if(AJXP_Utils::detectXSS($tableName)) $tableName = "XSS Detected!";
+                        if(AJXP_Utils::detectXSS($tableName)) {
+                            $tableName = "XSS Detected!";
+                            $size = 'N/A';
+                            $count = 'N/A';
+                        }else{
+                            $size = $this->getSize($tableName);
+                            $count = $this->getCount($tableName);
+                        }
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
                     }
                     print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
