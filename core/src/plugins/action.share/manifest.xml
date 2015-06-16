@@ -393,7 +393,9 @@
                             if(!pydio.getController().shareCenter) {
                                 pydio.getController().shareCenter = new ShareCenter();
                             }
-                            if(window.actionManager){
+                            if(window.actionArguments){
+                                pydio.getController().shareCenter.performShareAction(window.actionArguments[0]);
+                            }else if(window.actionManager){
                                 pydio.getController().shareCenter.performShareAction(window.actionManager.getDataModel());
                             }
                         });
@@ -542,6 +544,6 @@
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user|access.ajxp_conf"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user|access.ajxp_conf|access.admin"/>
     </dependencies>
 </ajxp_plugin>
