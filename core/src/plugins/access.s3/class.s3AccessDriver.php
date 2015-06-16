@@ -66,6 +66,10 @@ class s3AccessDriver extends fsAccessDriver
             }else{
                 $options["region"] = $this->repository->getOption("REGION");
             }
+            $proxy = $this->repository->getOption("PROXY");
+            if(!empty($proxy)){
+                $options['request.options'] = array('proxy' => $proxy);
+            }
             $this->s3Client = S3Client::factory($options);
             $this->s3Client->registerStreamWrapper();
         }
@@ -86,6 +90,16 @@ class s3AccessDriver extends fsAccessDriver
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+
+        if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
+            @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
+            if(!is_dir($this->urlBase. "/" . $recycle . "/")) {
+                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+            } else {
+                $this->setHiddenAttribute(new AJXP_Node($this->urlBase. "/" . $recycle . "/"));
+            }
+        }
+
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
