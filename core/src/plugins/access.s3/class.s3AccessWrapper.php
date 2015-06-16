@@ -192,7 +192,21 @@ class s3AccessWrapper extends fsAccessWrapper
     public static function changeMode($path, $chmodValue){}
 
     public function rename($from, $to){
-        if(is_dir($from)){
+
+        $fromUrl = parse_url($from);
+        $repoId = $fromUrl["host"]; 
+        $repoObject = ConfService::getRepositoryById($repoId);
+        $isViPR = $repoObject->getOption("IS_VIPR");
+        $isDir = false;
+        if($isViPR === true) {
+            if(is_dir($from . "/")) {
+                $from .= '/';
+                $to .= '/';
+                $isDir = true;
+            }
+        }
+
+        if($isDir === true || is_dir($from)){
             AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Renaming dir $from to $to");
             require_once("aws.phar");
 
@@ -215,12 +229,24 @@ class s3AccessWrapper extends fsAccessWrapper
             }else{
                 $options["region"] = $repoObject->getOption("REGION");
             }
+            $proxy = $repoObject->getOption("PROXY");
+            if(!empty($proxy)){
+                $options['request.options'] = array('proxy' => $proxy);
+            }
             $s3Client = S3Client::factory($options);
 
             $bucket = $repoObject->getOption("CONTAINER");
             $basePath = $repoObject->getOption("PATH");
             $fromKeyname   = trim(str_replace("//", "/", $basePath.parse_url($from, PHP_URL_PATH)),'/');
             $toKeyname   = trim(str_replace("//", "/", $basePath.parse_url($to, PHP_URL_PATH)), '/');
+            if($isViPR) {
+                $toKeyname .= '/';
+                $parts = explode('/', $bucket);
+                $bucket = $parts[0];
+                if(isset($parts[1])) {
+                    $fromKeyname = $parts[1] . "/" . $fromKeyname;
+                }
+            }
 
             // Perform a batch of CopyObject operations.
             $batch = array();
@@ -234,6 +260,11 @@ class s3AccessWrapper extends fsAccessWrapper
 
                 $currentFrom = $object['Key'];
                 $currentTo = $toKeyname.substr($currentFrom, strlen($fromKeyname));
+                if($isViPR) {
+                    if(isset($parts[1])) {
+                        $currentTo = $parts[1] . "/" . $currentTo;
+                    }
+                }
                 AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Should move one object ".$currentFrom. " to  new key :".$currentTo);
                 $batch[] = $s3Client->getCommand('CopyObject', array(
                     'Bucket'     => $bucket,
