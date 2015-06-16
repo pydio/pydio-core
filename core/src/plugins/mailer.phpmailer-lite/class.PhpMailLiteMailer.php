@@ -58,7 +58,7 @@ class PhpMailLiteMailer extends AjxpMailer
         $mail->WordWrap = 50;                                 // set word wrap to 50 characters
         $mail->IsHTML(true);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
-        $mail->Encoding = "quoted-printable";
+        $mail->Encoding = $this->getFilteredOption("MAIL_ENCODING");
         foreach ($images as $image) {
             $mail->AddEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
         }
