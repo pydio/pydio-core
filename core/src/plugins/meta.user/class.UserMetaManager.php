@@ -306,6 +306,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             // @todo : Should be UTF8-IZED at output only !!??
             // array_map(array("SystemTextEncoding", "toUTF8"), $metadata);
         }
+        if(empty($metadata)) $metadata = array();
         $ajxpNode->mergeMetadata($metadata);
 
     }
