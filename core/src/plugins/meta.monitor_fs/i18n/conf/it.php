@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,10 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"MQ SQL" => "MQ SQL",
-"Store persistant and worker queues in database" => "Store persistant and worker queues in database",
-"Install SQL Tables" => "Install SQL Tables",
-"SQL Tables" => "SQL Tables",
-"SQL Driver" => "SQL Driver",
-"SQL Connexion Parameters" => "SQL Connection Parameters",
+"FileSystem Monitoring" => "Monitoraggio FileSystem",
+"If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes" => "Se il workspace viene modificato direttamente mediante filesystem, abilitare questo plugin per monitorarne i cambiamenti",
 );

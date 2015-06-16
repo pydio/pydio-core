@@ -19,10 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"MQ SQL" => "MQ SQL",
-"Store persistant and worker queues in database" => "Store persistant and worker queues in database",
-"Install SQL Tables" => "Install SQL Tables",
-"SQL Tables" => "SQL Tables",
-"SQL Driver" => "SQL Driver",
-"SQL Connexion Parameters" => "SQL Connection Parameters",
+"MQ Serial" => "MQ Seriale",
+"Store persistant and worker queues in serial files" => "Salva code persistenti e temporanee in file seriali",
 );

@@ -22,7 +22,7 @@ RUN wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 RUN wget -q -O – http://www.atomicorp.com/installers/atomic | sh
 RUN rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
 RUN yum -y update
-RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml mod_ssl openssl mysql-server mysql php-ioncube-loader
+RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml mod_ssl openssl mysql-server mysql php-ioncube-loader php-ldap
 RUN chmod 0777 /etc/create.mysql
 RUN chmod +x /etc/gencert.sh
 RUN chmod +x /etc/pre_conf_pydio.sh
