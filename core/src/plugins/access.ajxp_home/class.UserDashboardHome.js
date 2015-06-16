@@ -27,8 +27,8 @@ Class.create("UserDashboardHome", AjxpPane, {
     initialize: function($super, oFormObject, editorOptions){
 
         $super(oFormObject, editorOptions);
-        this._repoInfos = $H();
-        this._repoInfosLoading = $H();
+
+        /*
         var dashLogo = pydio.Registry.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
         if(!dashLogo)
             dashLogo = pydio.Registry.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
@@ -41,32 +41,31 @@ Class.create("UserDashboardHome", AjxpPane, {
             }
             oFormObject.down("#logo_div").down("img").src = url;
         }
-        oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
-
         var wsElement = oFormObject.down('#workspaces_list');
-        attachMobileScroll(oFormObject.down('#list_cont'), 'vertical');
+        */
 
+        //attachMobileScroll(oFormObject.down('#list_cont'), 'vertical');
+
+        /*
         var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
 
-        var switchToRepo = function(repoId){
+        var switchToRepo = function(repoId, save){
             if(!repoId) return;
-            if(oFormObject.down('#save_ws_choice').checked){
-                // Save this preference now!
-                var params = $H({
+            if(save){
+                PydioApi.getClient().request({
                     'PREFERENCES_DEFAULT_START_REPOSITORY':repoId,
                     'get_action':'custom_data_edit'
+                }, function(){
+                    pydio.user.setPreference('DEFAULT_START_REPOSITORY', repoId, false);
                 });
-                var conn = new Connexion();
-                conn.setParameters(params);
-                conn.setMethod("POST");
-                conn.onComplete = function(transport){
-                    ajaxplorer.user.setPreference('DEFAULT_START_REPOSITORY', repoId, false);
-                };
-                conn.sendAsync();
             }
-            ajaxplorer.triggerRepositoryChange(repoId);
+            pydio.triggerRepositoryChange(repoId);
         };
+        */
 
+        /*
+         this._repoInfos = $H();
+         this._repoInfosLoading = $H();
         var updateRepoInfo = function(block, repoId){
             var data = this._repoInfos.get(repoId);
             var blocks = 0;
@@ -140,7 +139,8 @@ Class.create("UserDashboardHome", AjxpPane, {
                 updateRepoInfo(legendBlock.down(".repoInfo"), repoId);
             }
         }.bind(this);
-
+        */
+        /*
         var renderElement = function(repoObject){
 
             var repoId = repoObject.getId();
@@ -206,6 +206,13 @@ Class.create("UserDashboardHome", AjxpPane, {
             sharedWS.each(function(pair){renderElement(pair.value);});
         }
 
+        oFormObject.down('#go_to_ws').observe("click", function(e){
+            var target = e.target;
+            switchToRepo(target.CURRENT_REPO_ID);
+        });
+        */
+
+        /*
         if($('videos_pane')){
             $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
                 var t = Event.findElement(e, 'div.tutorial_load_button');
@@ -218,11 +225,10 @@ Class.create("UserDashboardHome", AjxpPane, {
                 }catch(e){}
             });
         }
+        */
 
-        oFormObject.down('#go_to_ws').observe("click", function(e){
-            var target = e.target;
-            switchToRepo(target.CURRENT_REPO_ID);
-        });
+        /*
+        oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
 
         if(pydio.getController().getActionByName("logout") && ajaxplorer.user.id != "guest"){
             oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
@@ -236,7 +242,6 @@ Class.create("UserDashboardHome", AjxpPane, {
                 pydio.getController().fireAction("login");
             });
         }
-
         if(ajaxplorer.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED")){
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
@@ -244,14 +249,28 @@ Class.create("UserDashboardHome", AjxpPane, {
             span.down('a').observe('click', function(){ pydio.getController().fireAction("open_tutorial_pane"); });
             obj.insert(span);
         }
+        */
 
 
-        try{
-            window.setTimeout(function(){
-                if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
-                else if($("browser")) $("browser").ajxpPaneObject.resize();
-            }, 50);
-        }catch(e){}
+        if(!Modernizr.flexbox){
+            try{
+                window.setTimeout(function(){
+                    if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
+                    else if($("browser")) $("browser").ajxpPaneObject.resize();
+                }, 50);
+            }catch(e){}
+        }
+        fitHeightToBottom($('home_account_pane'));
+
+        ResourcesManager.loadClassesAndApply(['PydioReactComponents'], function(){
+            React.render(
+                React.createElement(PydioReactComponents.UserDashboard, {
+                    pydio:pydio
+                }),
+                document.getElementById('home_account_pane')
+            );
+        });
+
 
     },
 
@@ -260,7 +279,10 @@ Class.create("UserDashboardHome", AjxpPane, {
         $super(size);
 
         //fitHeightToBottom(this.htmlElement.down('#workspaces_center'), this.htmlElement, 0);
-    }
+    },
 
+    destroy: function(){
+        React.unmountComponentAtNode(document.getElementById('home_account_pane'));
+    }
 
 });
