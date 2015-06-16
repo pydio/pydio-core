@@ -978,9 +978,9 @@ class ShareCenter extends AJXP_Plugin
         RewriteBase '.$path.'
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^([a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
-        RewriteRule ^([a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
-        RewriteRule ^([a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
+        RewriteRule ^([.a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
+        RewriteRule ^([.a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+        RewriteRule ^([.a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
         </IfModule>
         ';
         file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
@@ -1051,7 +1051,7 @@ class ShareCenter extends AJXP_Plugin
         if(isSet($_GET["dl"]) && isSet($_GET["file"])){
             AuthService::$useSession = false;
         }else{
-            session_name("AjaXplorer_Shared".$hash);
+            session_name("AjaXplorer_Shared".str_replace(".","_",$hash));
             session_start();
             AuthService::disconnect();
         }

@@ -24,5 +24,5 @@ if(isSet($_GET['minisite_session'])){
     $h = $_GET['minisite_session'];
 }
 
-session_name("AjaXplorer_Shared".$h);
+session_name("AjaXplorer_Shared".str_replace(".","_",$h));
 include("index.php");
