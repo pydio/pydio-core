@@ -205,7 +205,7 @@ class MqManager extends AJXP_Plugin
                 $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
                 if($channelRepository != $currentRepository){
                     AJXP_XMLWriter::header();
-                    echo "<require_registry_reload/>";
+                    echo "<require_registry_reload repositoryId=\"$currentRepository\"/>";
                     AJXP_XMLWriter::close();
                     return;
                 }
