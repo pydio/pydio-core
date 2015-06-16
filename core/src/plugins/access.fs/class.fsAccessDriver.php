@@ -233,7 +233,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $selection = new UserSelection($this->repository);
-        $dir = $httpVars["dir"] OR "";
+        $dir = AJXP_Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
         if ($this->wrapperClassName == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
