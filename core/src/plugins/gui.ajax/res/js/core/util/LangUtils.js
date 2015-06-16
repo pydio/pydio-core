@@ -7,6 +7,14 @@ var LangUtils = (function () {
         _classCallCheck(this, LangUtils);
     }
 
+    LangUtils.arrayWithout = function arrayWithout(array, key) {
+        if (!array.length) return array;
+        if (key >= array.length) return array;
+        var newArray;
+        if (key == 0) newArray = array.slice(1);else if (key == array.length - 1) newArray = array.slice(0, -1);else newArray = array.slice(0, key).concat(array.slice(key + 1));
+        return newArray;
+    };
+
     LangUtils.objectMerge = function objectMerge(obj1, obj2) {
         for (var k in obj2) {
             if (obj2.hasOwnProperty(k)) {
@@ -56,6 +64,20 @@ var LangUtils = (function () {
                 container[value][i] = copy[i];
             }
         }
+    };
+
+    LangUtils.deepCopy = function deepCopy(source) {
+        return LangUtils.mergeObjectsRecursive({}, source);
+    };
+
+    LangUtils.simpleCopy = function simpleCopy(source) {
+        var copy = {};
+        for (var property in source) {
+            if (source.hasOwnProperty(property)) {
+                copy[property] = source[property];
+            }
+        }
+        return copy;
     };
 
     LangUtils.mergeObjectsRecursive = function mergeObjectsRecursive(source, destination) {

@@ -144,9 +144,12 @@ var Pydio = (function (_Observable) {
             this.loadXmlRegistry(false, null, starterFunc);
         }
         this.observe('server_message', (function (xml) {
-            if (XMLUtils.XPathSelectSingleNode(xml, 'tree/require_registry_reload')) {
-                this.loadXmlRegistry(false);
-                this.repositoryId = null;
+            var reload = XMLUtils.XPathSelectSingleNode(xml, 'tree/require_registry_reload');
+            if (reload) {
+                if (reload.getAttribute('repositoryId') != this.repositoryId) {
+                    this.loadXmlRegistry(false);
+                    this.repositoryId = null;
+                }
             }
         }).bind(this));
     };
