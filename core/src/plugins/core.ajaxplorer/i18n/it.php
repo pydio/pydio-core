@@ -19,15 +19,15 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 //
-//      Updated for Pydio 4.0.2
-//      Italian transalation version: 4.0.2-001
-//
-//      Maintained by Michele Beltrame
-//      http://www.cattlegrid.info/
-//      mb [AT] italpro [DOT] net
+//      Maintained by DepaMarco
+//	http://github.com/DepaMarco
 //
 //      Previous maintainers:
 //
+//          Michele Beltrame
+//          http://www.cattlegrid.info/
+//          mb [AT] italpro [DOT] net
+
 //          Updates for Pydio 2.5.5 by
 //          Davide Cavalca <davide at cavalca dot name>
 //
@@ -646,11 +646,11 @@ $mess=array(
 "plugtype.desc.mailer" => "Strumenti per consentire all'applicazione di inviare email",
 "plugtype.title.mq" => "Messaggistica Istantanea",
 "plugtype.desc.mq" => "Implementazione di un semplice server PUB/SUB",
-    "537" => "File is too large! Maximum authorized size is %i",
-    "538" => "Upload error: no file found on server!",
-    "539" => "Upload error: file is partial",
-    "540" => "Upload error: cannot find the temporary directory",
-    "541" => "Upload error: cannot write into the temporary directory",
-    "542" => "Upload error: a PHP extension stopped the upload process."
+"537" => "Il file è troppo grande! La dimensione massima autorizzata è %i",
+"538" => "Errore caricamento: nessun file trovato sul server!",
+"539" => "Errore caricamento: il file è parziale",
+"540" => "Errore caricamento: impossibile trovare la cartella temporanea",
+"541" => "Errore caricamento: non è possibile scrivere nella cartella temporanea",
+"542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento"
 /* END SENTENCE */
 );
