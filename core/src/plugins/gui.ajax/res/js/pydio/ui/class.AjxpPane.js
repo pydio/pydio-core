@@ -455,6 +455,14 @@ Class.create("AjxpPane", {
             return;
         }
 
+        this.staticApplyBackgroundFromConfigs(this.htmlElement, configName);
+
+    },
+
+    staticApplyBackgroundFromConfigs:function(element, configName, additionalStyles, important){
+
+        var bgrounds,paramPrefix,bStyles,index, i;
+
         var exp = configName.split("/");
         var plugin = exp[0];
         paramPrefix = exp[1];
@@ -487,8 +495,14 @@ Class.create("AjxpPane", {
         if (bStyles.length) {
             i = Math.floor( Math.random() * bStyles.length);
             var bg = bStyles[i];
+            if(important){
+                bg = bg.replace(';', ' !important;');
+            }
+            if(additionalStyles){
+                bg += additionalStyles;
+            }
             if(Modernizr.backgroundsize) bg = bg.replace('background-size:100%','background-size:cover').replace('background-size:140%','background-size:cover');
-            this.htmlElement.setAttribute("style", bg);
+            element.setAttribute("style", bg);
         }
 
     }
