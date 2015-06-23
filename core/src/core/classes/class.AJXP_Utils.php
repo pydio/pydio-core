@@ -1488,6 +1488,16 @@ class AJXP_Utils
         return false;
     }
     /**
+     * Detect Windows Phone
+     * @static
+     * @return bool
+     */
+    public static function userAgentIsWindowsPhone()
+    {
+        if (stripos($_SERVER["HTTP_USER_AGENT"], "IEMobile") !== false) return true;
+        return false;
+    }
+    /**
      * Detect Android UA
      * @static
      * @return bool
