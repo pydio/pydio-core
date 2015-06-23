@@ -91,12 +91,15 @@ Class.create("RemoteNodeProvider", {
    	 * @param nodeCallback Function On node loaded
      * @param aSync bool
    	 */
-   	loadLeafNodeSync : function(node, nodeCallback, aSync){
+   	loadLeafNodeSync : function(node, nodeCallback, aSync, getPage){
    		var conn = new Connexion();
    		conn.addParameter("get_action", "ls");
    		conn.addParameter("options", "al");
    		conn.addParameter("dir", getRepName(node.getPath()));
         conn.addParameter("file", getBaseName(node.getPath()));
+        if(getPage){
+            conn.addParameter("page_position", "true");
+        }
    		if(this.properties){
    			$H(this.properties).each(function(pair){
    				conn.addParameter(pair.key, pair.value);

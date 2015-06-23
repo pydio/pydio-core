@@ -116,7 +116,7 @@ Class.create("AjxpDataModel", {
                         var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
-                        });
+                        }, true);
                         if(newPage && newPage != currentPage){
                             ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
                             this.requireContextChange(ajxpNode, true, true);
@@ -171,12 +171,12 @@ Class.create("AjxpDataModel", {
         this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath, onComplete);
     },
 
-    loadPathInfoSync: function (path, callback){
-        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback);
+    loadPathInfoSync: function (path, callback, getPage){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false, getPage);
     },
 
-    loadPathInfoAsync: function (path, callback){
-        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, true);
+    loadPathInfoAsync: function (path, callback, getPage){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, true, getPage);
     },
 
 	/**

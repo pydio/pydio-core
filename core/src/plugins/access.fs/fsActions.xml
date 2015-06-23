@@ -41,6 +41,7 @@
                     <input_param description="Trigger remote order" name="remote_order" type="boolean" mandatory="false" default="false"/>
                     <input_param description="Remote order column" name="order_column" type="string" mandatory="false"/>
                     <input_param description="Remote order direction" name="order_direction" type="string" mandatory="false"/>
+                    <input_param description="Find page position of required file for multipage listing" name="page_position" type="boolean" mandatory="false"/>
                     <output type="AJXP_NODE[]"/>
 				</serverCallback>
 			</processing>
