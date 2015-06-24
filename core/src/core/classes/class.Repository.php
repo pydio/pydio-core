@@ -616,6 +616,12 @@ class Repository implements AjxpGroupPathProvider
      */
     public function securityScope()
     {
+        $path = $this->getOption("CONTAINER", true);
+        if(!empty($path)){
+            if(strpos($path, "AJXP_USER") !== false) return "USER";
+            if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
+            if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
+        }
         $path = $this->getOption("PATH", true);
         if($this->accessType == "ajxp_conf") return "USER";
         if(empty($path)) return false;
