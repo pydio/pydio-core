@@ -178,6 +178,10 @@ class Repository implements AjxpGroupPathProvider
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
         $newOptions = array_merge($this->options, $newOptions);
+        $newOptions["CREATION_TIME"] = time();
+        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
         $repo->options = $newOptions;
         if ($parentId == null) {
             $parentId = $this->getId();
@@ -197,6 +201,10 @@ class Repository implements AjxpGroupPathProvider
     public function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
+        $newOptions["CREATION_TIME"] = time();
+        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
         $repo->options = $newOptions;
         $repo->setOwnerData($this->getId(), $owner, $uniqueUser);
         $repo->setInferOptionsFromParent(true);
