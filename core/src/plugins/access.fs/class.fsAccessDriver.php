@@ -378,7 +378,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
                     copy($file, $tmpFNAME);
                     try {
-                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
+                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), $this->filesystemFileSize($tmpFNAME)));
                     } catch (Exception $e) {
                         @unlink($tmpFNAME);
                         throw $e;
@@ -397,6 +397,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header("Content-type:application/json");
                 if($selection->isUnique()){
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
+                    $this->filesystemFileSize(null, $stat);
                     if (!$stat) {
                         print '{}';
                     } else {
@@ -407,6 +408,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     print '{';
                     foreach($files as $index => $path){
                         $stat = @stat($this->urlBase.$path);
+                        $this->filesystemFileSize(null, $stat);
                         if(!$stat) $stat = '{}';
                         else $stat = json_encode($stat);
                         print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
@@ -1548,10 +1550,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
-    public function filesystemFileSize($filePath)
+    public function filesystemFileSize($filePath, &$stat = null)
     {
         $bytesize = "-";
-        $bytesize = @filesize($filePath);
+        if($stat != null && is_array($stat)){
+            $bytesize = $stat[7];
+        }else{
+            $bytesize = @filesize($filePath);
+        }
         if (method_exists($this->wrapperClassName, "getLastRealSize")) {
             $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
             if ($last !== false) {
@@ -1561,7 +1567,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($bytesize < 0) {
             $bytesize = sprintf("%u", $bytesize);
         }
-
+        if($stat != null && is_array($stat)){
+            $stat["size"] = $stat[7] = $bytesize;
+        }
         return $bytesize;
     }
 

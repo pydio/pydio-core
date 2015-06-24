@@ -47,7 +47,11 @@ class VideoReader extends AJXP_Plugin
             $file = $selection->getUniqueFile();
             $node = new AJXP_Node($destStreamURL.$file);
             session_write_close();
-            $filesize = filesize($destStreamURL.$file);
+            if(method_exists($node->getDriver(), "filesystemFileSize")){
+                $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
+            }else{
+                $filesize = filesize($node->getUrl());
+            }
              $filename = $destStreamURL.$file;
 
             //$fp = fopen($destStreamURL.$file, "r");

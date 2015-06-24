@@ -209,7 +209,9 @@ class AbstractAccessDriver extends AJXP_Plugin
             return ;
         }
         if (!$move) {
-            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), filesize($realSrcFile)));
+            if(method_exists($this, "filesystemFileSize")) $size = $this->filesystemFileSize($realSrcFile);
+            else $size = filesize($realSrcFile);
+            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
         }
         if (dirname($realSrcFile)==dirname($destFile)) {
             if ($move) {

@@ -61,7 +61,12 @@ class FileMimeSender extends AJXP_Plugin
                 return false;
             }
 
-            $filesize = filesize($destStreamURL . $file);
+            $node = new AJXP_Node($destStreamURL.$file);
+            if(method_exists($node->getDriver(), "filesystemFileSize")){
+                $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
+            }else{
+                $filesize = filesize($node->getUrl());
+            }
             $fp = fopen($destStreamURL . $file, "rb");
             $fileMime = "application/octet-stream";
 
