@@ -1,5 +1,64 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio 6.0.8 - Security Update & Bug Fixes
+
+[06.26.2015] Pydio 6.0.8 is another security update fixing XSS vulnerabilities discovered by Lane Thames and William Sörderberg. It also fixes various issues with indexation, sorting, and reverts some changes from previous version.
+Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
+
+Contributors: cdujeu, Lane Thames, William Sörderberg, c12simple, DepaMarco, FireFoxIXI, Sandoracs
+
+Minor update of german translation (mainly to unify the strings)
+Small fixes for the german translation of access.ajxp_conf
+Add LDAP support.
+Italian translation for plugin 'meta.monitor_fs'
+Italian translation for plugin 'mq.serial'
+Italian translation for plugin 'mq.sql' and FIXED English one
+Italian translation for plugin 'shorten.bitly'
+Italian translation for plugin 'shorten.multi'
+Italian translation for plugin 'uploader.flex'
+Italian translation for plugin 'uploader.html'
+Italian translation for plugin 'uploader.http'
+Add delete button on minisite
+Fix meta.mount fs on 6.0.7
+Fix wording error
+Fix wording error
+Fix wording error
+Reload_registry message: make sure to trigger only if required. This can end up in a loop.
+Mysql: Tablename may create an error when getting size and count
+Added minor tweaks for getting the S3 driver working with EMC ViPR
+Add new DIRNAME mode for sanitization, same as filenames except that it lets the / pass through. Use strpos() instead of deprecated ereg() function.
+Should fix #912 (alert on watch broken in some cases)
+Fix #919 - Disable right click in FetchedResultPane
+Tweaks to support "dot" character in custom links handle - Fix #905
+ShareCenter: Fix authorization checking for various share types. Make sure to register the REQUIRES_INDEXATION flag on syncable shared workspaces to trigger indexation at first changes API call (should fix #913)
+UserMetaManager: check metadata is not empty. (cherry picked from commit ac99bf4)
+Add a MAIL_ENCODING parameter in the phpmailer plugin to eventually switch to 7bit for old Exchange+Outlook configs. (cherry picked from commit 98eebeb)
+Perf: load repositories with a unique query instead of many small queries (cherry picked from commit c955991)
+Slight doc issue
+Italian translation for plugin 'uploader.jumploader'
+Italian translation for plugin 'uploader.plupload'
+Updated Italian translation for plugin 'core.ajaxplorer'
+Hide Native App download panel on Windows Phone
+Fix minisite login background by loading configs via JS.
+Clean listing code for sorting, get page_position on demand when listing unique file, fixes search results not going to correct page when pagination is on.
+Antivirus: make sure to do nothing when node is a folder, do not scan it!
+Repository Creation Time was overriden by parent repo when created for sharing.
+Fix 2G limitation on windows in many places ( do not use filesize directly )
+Repository securityScope() : check the CONTAINER option if it exists for object-based drivers.
+Fix auto update via proxy
+revert cef1688f1e38830badefa1d147b48400cd09d7f2
+Add a default sorting field and direction for server sorting. Set this params via the filesystem mixin instead of access.fs only.
+Fix SearchEngine template configuration issue on various remote drivers.
+Catch an OpenLayer error.
+Fix and improve various sorting aspects. Deselect everything on blur in search engine and fetchedresultpane, otherwise further click on the same item does nothing.
+Catch Zip decompression errors.
+Fix workspaces securityScope() for templates that predefine a Path (or Container) value.
+Make sure to not propagate a share event to a workspace parent if it's a template.
+
+
+--------------------
+Pydio 6.0.7
+
 Security Update
 
 Pydio 6.0.7 is a Security Update linked to vulnerabilities discovered by Lane Thames. It also fixes various small bugs.
