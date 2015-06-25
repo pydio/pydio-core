@@ -537,11 +537,11 @@ SelectableElements = Class.create({
 			}
 		}
 	},
-	
+
 	isItem: function (node) {
 		return node != null && node.up('#' + this._htmlElement.id);
 	},
-	
+
 	findSelectableParent : function(el, setSelected){
 		while (el != null && !this.isItem(el)){
 			el = el.parentNode;
@@ -596,15 +596,7 @@ SelectableElements = Class.create({
 	/* Indexable Collection Interface */
 	
 	getItems: function () {
-		var tmp = [];
-		var j = 0;
-		var cs = this._htmlElement.select('.ajxpNodeProvider');
-		var l = cs.length;
-		for (var i = 0; i < l; i++) {
-			if (cs[i].nodeType == 1)
-				tmp[j++] = cs[i] ;
-		}
-		return tmp;
+        return this._htmlElement.select('.ajxpNodeProvider');
 	},
 	
 	getItem: function (nIndex) {

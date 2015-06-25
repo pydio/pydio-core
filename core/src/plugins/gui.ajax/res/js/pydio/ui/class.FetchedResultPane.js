@@ -198,6 +198,11 @@ Class.create("FetchedResultPane", FilesList, {
         }
 	},
 
+    blur: function($super){
+        $super();
+        this._dataModel.setSelectedNodes([]);
+    },
+
     getActions : function(){
         return $H();
     }

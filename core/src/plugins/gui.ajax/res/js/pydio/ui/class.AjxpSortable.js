@@ -80,7 +80,8 @@ Class.create("AjxpSortable", SortableTable, {
 			var column = this.columnsDefs[cellColumn];
 			params.set('order_column', column['attributeName'] || cellColumn);
 			params.set('order_direction', (this.descending?'desc':'asc'));
-			this.paginationLoaderFunc(params);
+            this.sortColumn = cellColumn;
+            this.paginationLoaderFunc(params);
 		}else{
 			this.sort(cellColumn);
 		}

@@ -105,7 +105,7 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	ajxpNode.observe("child_added", function(childPath){
-		if(ajxpNode.getMetadata().get('paginationData')){
+		if(ajxpNode.getMetadata().get('paginationData') && parseInt(ajxpNode.getMetadata().get('paginationData').get('total')) > 1){
 			var pData = ajxpNode.getMetadata().get('paginationData');
 			if(!this.paginated){
 				this.paginated = true;
