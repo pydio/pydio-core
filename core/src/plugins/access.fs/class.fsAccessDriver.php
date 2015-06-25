@@ -922,11 +922,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     break;
                 }
                 $orderField = $orderDirection = null;
-                if ($this->getFilteredOption("REMOTE_SORTING")) {
-                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):"asc";
-                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:null;
+                $defaultOrder = $this->repository->getOption("REMOTE_SORTING_DEFAULT_COLUMN");
+                $defaultDirection = $this->repository->getOption("REMOTE_SORTING_DEFAULT_DIRECTION");
+                if ($this->repository->getOption("REMOTE_SORTING")) {
+                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):$defaultDirection;
+                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:$defaultOrder;
                     if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
-                        $orderField = "ajxp_label";
+                        $orderField = $defaultOrder;
                     }
                 }
                 if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
@@ -945,6 +947,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(isSet($crt_nodes)){
                     $crt_nodes += $countFiles;
                 }
+                $totalPages = $crtPage = 1;
                 if (isSet($threshold) && isSet($limitPerPage) && $countFiles > $threshold) {
                     $offset = 0;
                     $crtPage = 1;
@@ -969,13 +972,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 } else {
                     AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                 }
-                if (isSet($totalPages) && isSet($crtPage)) {
+                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! AJXP_Utils::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
                     if ($this->getFilteredOption("REMOTE_SORTING")) {
                         $remoteOptions = array(
                             "remote_order" => "true",
-                            "currentOrderCol" => isSet($orderField)?$orderField:"ajxp_label",
-                            "currentOrderDir"=> isSet($orderDirection)?$orderDirection:"asc"
+                            "currentOrderCol" => isSet($orderField)?$orderField:$defaultOrder,
+                            "currentOrderDir"=> isSet($orderDirection)?$orderDirection:$defaultDirection
                         );
                     }
                     AJXP_XMLWriter::renderPaginationData(
@@ -987,7 +990,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     );
                     if (!$lsOptions["f"]) {
                         AJXP_XMLWriter::close();
-                        exit(1);
+                        break;
                     }
                 }
 
@@ -1127,13 +1130,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     protected function orderNodes($nodes, $path, $orderField, $orderDirection){
 
         usort($nodes, "strcasecmp");
-        if (isSet($orderField) && isSet($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
+        if (!empty($orderField) && !empty($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
             $nodes = array_reverse($nodes);
         }
         if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
             usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
         }
-        if (isSet($orderField) && isSet($orderDirection) && $orderField != "ajxp_label") {
+        if (!empty($orderField) && !empty($orderDirection) && $orderField != "ajxp_label") {
             $toSort = array();
             foreach ($nodes as $node) {
                 if($orderField == "filesize") $toSort[$node] = is_file($path."/".$node) ? $this->filesystemFileSize($path."/".$node) : 0;
