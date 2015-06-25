@@ -298,9 +298,12 @@ Class.create("OLViewer", AbstractEditor, {
             var offset = new OpenLayers.Pixel(0, -size.h);
             var icon = new OpenLayers.Icon('plugins/editor.openlayer/services.png',size,offset);
             markers.addMarker(new OpenLayers.Marker(projectedCenter,icon));
-			
-			map.setCenter(projectedCenter, 10);
-		}		
+			try{
+    			map.setCenter(projectedCenter, 10);
+            }catch(e){
+                if(console) console.error(e);
+            }
+		}
 		return {MAP: map, LAYERS:layers};
 	},		
 	
