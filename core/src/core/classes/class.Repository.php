@@ -616,6 +616,15 @@ class Repository implements AjxpGroupPathProvider
      */
     public function securityScope()
     {
+        if($this->hasParent()){
+            $parentRepo = ConfService::getRepositoryById($this->getParentId());
+            if(!empty($parentRepo) && $parentRepo->isTemplate){
+                $path = $parentRepo->getOption("PATH", true);
+                $container = $parentRepo->getOption("CONTAINER", true);
+                // If path is set in the template, compute identifier from the template path.
+                if(!empty($path) || !empty($container)) return $parentRepo->securityScope();
+            }
+        }
         $path = $this->getOption("CONTAINER", true);
         if(!empty($path)){
             if(strpos($path, "AJXP_USER") !== false) return "USER";
