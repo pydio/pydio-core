@@ -157,7 +157,7 @@ class HTMLWriter
      */
     public static function generateAttachmentsHeader(&$attachmentName, $dataSize, $isFile=true, $gzip=false)
     {
-        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])) {
+        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT']) || preg_match(‘/ Trident/’,$_SERVER[‘HTTP_USER_AGENT’])) {
              $attachmentName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($attachmentName)));
          }
 
