@@ -632,7 +632,7 @@ class AuthService
     {
         if (!$userObject->hasParent()) {
             $changes = false;
-            $repoList = ConfService::getRepositoriesList();
+            $repoList = ConfService::getRepositoriesList("all");
             foreach ($repoList as $repositoryId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
                 if($repoObject->isTemplate) continue;

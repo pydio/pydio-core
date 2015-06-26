@@ -78,7 +78,7 @@ class AjxpScheduler extends AJXP_Plugin
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
         $sVals = array();
-        $repos = ConfService::getRepositoriesList();
+        $repos = ConfService::getRepositoriesList("all");
         foreach ($repos as $repoId => $repoObject) {
             $sVals[] = $repoId."|". AJXP_Utils::xmlEntities($repoObject->getDisplay());
         }
@@ -189,7 +189,7 @@ class AjxpScheduler extends AJXP_Plugin
                 $data["user_id"] = "queue:".$tmpQueue;
             }
             if ($data["repository_id"] == "*") {
-                $data["repository_id"] = implode(",", array_keys(ConfService::getRepositoriesList()));
+                $data["repository_id"] = implode(",", array_keys(ConfService::getRepositoriesList("all")));
             }
             $process = AJXP_Controller::applyActionInBackground(
                 $data["repository_id"],
