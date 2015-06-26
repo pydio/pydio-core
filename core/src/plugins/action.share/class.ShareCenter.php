@@ -942,8 +942,14 @@ class ShareCenter extends AJXP_Plugin
     {
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if ($dlURL != "") {
-            return rtrim($dlURL, "/");
+        if (!empty($dlURL)) {
+            $parts = parse_url($dlURL);
+            if($parts['scheme']) {
+                return rtrim($dlURL, "/");
+            } else {
+                $host = AJXP_Utils::detectServerURL();
+                return rtrim($host, "/")."/".trim($dlURL, "/");
+            }
         } else {
             $fullUrl = AJXP_Utils::detectServerURL(true);
             return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
