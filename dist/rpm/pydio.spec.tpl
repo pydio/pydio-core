@@ -35,6 +35,7 @@ sed -i 's/\/\/ define("AJXP_FORCE_LOGPATH/define("AJXP_FORCE_LOGPATH/g' conf/boo
 
 # Update Share URL
 sed -i 's/"AJXP_INSTALL_PATH\/data\/public"/"\/var\/lib\/pydio\/public"/g' plugins/core.ajaxplorer/manifest.xml
+sed -i 's/name="PUBLIC_DOWNLOAD_URL" default=""/name="PUBLIC_DOWNLOAD_URL" default="\/pydio_public"/g' plugins/core.ajaxplorer/manifest.xml
 
 %build
 
