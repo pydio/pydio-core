@@ -1126,9 +1126,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case  "get_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                $count = 0;
+                $repositories = ConfService::listRepositoriesWithCriteria(array(
                     "isTemplate" => '1'
-                ));
+                ), $count);
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     $repoId = $repo->getUniqueId();
@@ -2035,7 +2036,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
             $r = array();
             if(!AuthService::canAdministrate($roleObject)) continue;
-            $repos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array("role" => $roleObject));
+            $count = 0;
+            $repos = ConfService::listRepositoriesWithCriteria(array("role" => $roleObject), $count);
             foreach ($repos as $repoId => $repository) {
                 if($repository->getAccessType() == "ajxp_shared") continue;
                 if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;

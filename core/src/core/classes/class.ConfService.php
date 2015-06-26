@@ -350,6 +350,7 @@ class ConfService
      * See instance method
      * @static
      * @param String $scope "user" or "all"
+     * @param bool $includeShared
      * @return Repository[]
      */
     public static function getRepositoriesList($scope = "user", $includeShared = true)

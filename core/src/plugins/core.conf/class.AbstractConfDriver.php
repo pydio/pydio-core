@@ -940,9 +940,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case  "get_user_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                $count = 0;
+                $repositories = ConfService::listRepositoriesWithCriteria(array(
                     "isTemplate" => 1
-                ));
+                ), $count);
                 $pServ = AJXP_PluginsService::getInstance();
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
