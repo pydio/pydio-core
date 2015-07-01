@@ -465,7 +465,7 @@ class sqlLogDriver extends AbstractLogDriver
         $end_time = mktime(0,0,0,date('m', $start_time), date('d', $start_time) + 1, date('Y', $start_time));
 
         try {
-            $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t';
+            $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t ORDER BY [logdate] DESC';
             $result = dibi::query($q, $start_time, $end_time);
             $log_items = "";
             $currentCount = 1;
