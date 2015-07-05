@@ -144,18 +144,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if($pId == "ajxpdriver.") $pId = "access.";
                 $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
             }
-            //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
             if(!is_array($actions[$pId])) $actions[$pId] = array();
             $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-            $messId = $node->attributes->getNamedItem("label")->nodeValue;
             $attributes = array();
             for( $i = 0; $i < $node->attributes->length; $i ++){
                 $att = $node->attributes->item($i);
                 $value = $att->nodeValue;
-                if($att->nodeName == "choices") $value = AJXP_XMLWriter::replaceAjxpXmlKeywords($value);
+                if(in_array($att->nodeName, array("choices", "description", "group", "label"))) {
+                    $value = AJXP_XMLWriter::replaceAjxpXmlKeywords($value);
+                }
                 $attributes[$att->nodeName] = $value;
             }
-            $attributes["label"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($messId);
             if($withLabel){
                 $actions[$pId][$actionName] = array(
                     "parameter" => $actionName ,
@@ -2025,7 +2024,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
             $meta = array(
                 "icon" => "users-folder.png",
-                "icon_class" => "icon-folder-open-alt",
+                "icon_class" => "icon-folder-close",
                 "ajxp_mime" => "group",
                 "object_id" => $groupId
             );
