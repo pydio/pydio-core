@@ -485,6 +485,12 @@ class ConfService
                 return false;
             }
         }
+        $res = null;
+        $args = array($repositoryId, $repositoryObject, $userObject, &$res);
+        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
+        if($res === false){
+            return false;
+        }
         return true;
     }
 
@@ -671,6 +677,7 @@ class ConfService
                 $objList[$key] = $value;
             }
         }
+        AJXP_Controller::applyHook("sec.filter_ws_access", array(&$objList));
         return $objList;
     }
     /**
