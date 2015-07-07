@@ -1544,7 +1544,10 @@ class AJXP_Utils
             'Apple iPad' => 'iPad',
             'Apple iPhone' => 'iPhone',
             'OS2' => 'os\/2',
-            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)'
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)',
+            'Pydio iOS Native Application' => 'ajaxplorer-ios',
+            'Pydio Android Native Application' => 'Apache-HttpClient',
+            'Pydio Sync Client' => 'python-requests'
         );
 
         if($useragent == null){

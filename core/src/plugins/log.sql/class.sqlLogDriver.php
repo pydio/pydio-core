@@ -305,13 +305,15 @@ class sqlLogDriver extends AbstractLogDriver
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
         $log_row = Array(
-            'logdate'   => new DateTime('NOW'),
-            'remote_ip' => $this->inet_ptod($ip),
-            'severity'  => strtoupper((string) $level),
-            'user'      => $user,
-            'source'    => $source,
-            'message'   => $prefix,
-            'params'    => $message
+            'logdate'       => new DateTime('NOW'),
+            'remote_ip'     => $this->inet_ptod($ip),
+            'severity'      => strtoupper((string) $level),
+            'user'          => $user,
+            'source'        => $source,
+            'message'       => $prefix,
+            'params'        => $message,
+            'repository_id' => ConfService::getCurrentRepositoryId(),
+            'device'        => $_SERVER['HTTP_USER_AGENT']
         );
         //we already handle exception for write2 in core.log
         dibi::query('INSERT INTO [ajxp_log]', $log_row);
