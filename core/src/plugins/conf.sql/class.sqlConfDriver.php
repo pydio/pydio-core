@@ -416,6 +416,8 @@ class sqlConfDriver extends AbstractConfDriver
             $options = $repository_array['options'];
             if($repositoryObject->hasContentFilter()){
                 $options["content_filter"] = $repositoryObject->getContentFilter();
+            }else if(isSet($options["content_filter"])){
+                unset($options["content_filter"]);
             }
             unset($repository_array['options']);
             if (!$update) {
