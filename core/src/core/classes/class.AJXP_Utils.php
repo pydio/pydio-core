@@ -754,7 +754,7 @@ class AJXP_Utils
 
         }
         $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
-        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && class_exists("IntlDateFormatter")){
+        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && extension_loaded("intl")){
             $intl = IntlDateFormatter::create($messages["date_intl_locale"], IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, "MMMM");
             $localizedMonth = $intl->format($time ? $time : time());
             $dateFuncMonth = date("F", $time ? $time : time());
