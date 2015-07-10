@@ -274,7 +274,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         $yubi = new Auth_Yubico($this->yubicoClientId, $this->yubicoSecretKey);
         $auth = $yubi->verify($yotp);
 
-        return (!PEAR::isError($auth));
+        return (!(new PEAR)->isError($auth));
     }
 
 }
