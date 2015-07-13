@@ -483,10 +483,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             }
                             if (is_string($callback) && method_exists($this, $callback)) {
                                 if(!$returnNodes) AJXP_XMLWriter::header("tree", $atts);
-                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir);
+                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir, $httpVars);
                                 if(!$returnNodes) AJXP_XMLWriter::close();
                             } else if (is_array($callback)) {
-                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir);
+                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir, $httpVars);
                             }
                             if ($returnNodes) {
                                 AJXP_XMLWriter::header("tree", $atts);
@@ -1452,7 +1452,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = array();
                     $existing = $repo->getOptionsDefined();
                     $existingValues = array();
-                    foreach($existing as $exK) $existingValues[$exK] = $repo->getOption($exK, true);
+                    if(!$repo->isTemplate){
+                        foreach($existing as $exK) $existingValues[$exK] = $repo->getOption($exK, true);
+                    }
                     $this->parseParameters($httpVars, $options, null, true, $existingValues);
                     if (count($options)) {
                         foreach ($options as $key=>$value) {
@@ -1469,6 +1471,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 continue;
                             }
                             $repo->addOption($key, $value);
+                        }
+                    }
+                    if($repo->isTemplate){
+                        foreach($existing as $definedOption){
+                            if($definedOption == "META_SOURCES" || $definedOption == "CREATION_TIME" || $definedOption == "CREATION_USER"){
+                                continue;
+                            }
+                            if(!isSet($options[$definedOption]) && isSet($repo->options[$definedOption])){
+                                unset($repo->options[$definedOption]);
+                            }
                         }
                     }
                     if ($repo->getOption("DEFAULT_RIGHTS")) {
@@ -2157,7 +2169,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 
-    public function listRepositories($root, $child, $hashValue = null, $returnNodes = false){
+    public function listRepositories($root, $child, $hashValue = null, $returnNodes = false, $file="", $aliasedDir=null, $httpVars){
         $REPOS_PER_PAGE = 50;
         $allNodes = array();
         if($hashValue == null) $hashValue = 1;
@@ -2165,23 +2177,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         $count = null;
         // Load all repositories = normal, templates, and templates children
+        $criteria = array(
+            "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
+            "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
+        );
         $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
         if($currentUserIsGroupAdmin){
-            $repos = ConfService::listRepositoriesWithCriteria(array(
+            $criteria = array_merge($criteria, array(
                     "owner_user_id" => AJXP_FILTER_EMPTY,
                     "groupPath"     => "regexp:/^".str_replace("/", "\/", AuthService::getLoggedUser()->getGroupPath()).'/',
-                    "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
-                    "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
-                ), $count
-            );
+                ));
         }else{
-            $repos = ConfService::listRepositoriesWithCriteria(array(
-                    "parent_uuid"   => AJXP_FILTER_EMPTY,
-                    "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
-                    "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
-                ), $count
-            );
+            $criteria["parent_uuid"] = AJXP_FILTER_EMPTY;
         }
+        if(isSet($httpVars) && is_array($httpVars) && isSet($httpVars["template_children_id"])){
+            $criteria["parent_uuid"] = AJXP_Utils::sanitize($httpVars["template_children_id"], AJXP_SANITIZE_ALPHANUM);
+        }
+        $repos = ConfService::listRepositoriesWithCriteria($criteria, $count);
         if(!$returnNodes){
             AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
             AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
