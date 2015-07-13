@@ -677,7 +677,8 @@ class ConfService
                 $objList[$key] = $value;
             }
         }
-        AJXP_Controller::applyHook("sec.filter_ws_access", array(&$objList));
+        $args = array(&$objList);
+        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
         return $objList;
     }
     /**
