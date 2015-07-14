@@ -290,7 +290,7 @@ class fsAccessWrapper implements AjxpWrapper
 
     public function stream_seek($offset , $whence = SEEK_SET)
     {
-        fseek($this->fp, $offset, SEEK_SET);
+        fseek($this->fp, $offset, $whence);
     }
 
     public function stream_tell()
