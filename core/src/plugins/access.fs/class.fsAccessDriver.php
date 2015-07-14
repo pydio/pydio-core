@@ -474,8 +474,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	COPY / MOVE
             //------------------------------------
-            case "copy";
-            case "move";
+            case "copy":
+            case "move":
 
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
@@ -530,7 +530,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	DELETE
             //------------------------------------
-            case "delete";
+            case "delete":
 
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
@@ -567,7 +567,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	RENAME
             //------------------------------------
-            case "rename";
+            case "rename":
 
                 $file = $selection->getUniqueFile();
                 $filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
@@ -591,7 +591,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CREER UN REPERTOIRE / CREATE DIR
             //------------------------------------
-            case "mkdir";
+            case "mkdir":
 
                 $messtmp="";
                 $files = $selection->getFiles();
@@ -641,7 +641,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CREER UN FICHIER / CREATE FILE
             //------------------------------------
-            case "mkfile";
+            case "mkfile":
 
                 $messtmp="";
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
@@ -678,7 +678,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CHANGE FILE PERMISSION
             //------------------------------------
-            case "chmod";
+            case "chmod":
 
                 $files = $selection->getFiles();
                 $changedFiles = array();
