@@ -221,12 +221,12 @@ Class.create("InfoPanel", AjxpPane, {
             if(this.registeredMimes.get('generic_multiple')){
                 var i, selectedSize = 0, selectedNodes = userSelection.getSelectedNodes();
                 for (i=0; i < selectedNodes.length; i++) {
-                    selectedSize += parseInt(selectedNodes[i]._metadata._object.bytesize);
+                    selectedSize += parseInt(selectedNodes[i].getMetadata().get("bytesize"));
                 }
 
                 userSelection._selectedNodes[0]._metadata._object.bytesize
                 this.evalTemplateForMime('generic_multiple', null, {
-                    selectedCountSentence:userSelection.getFileNames().length + ' '+MessageHash[128] + ' ( ' + this.humanFileSize(selectedSize, true) + ' )'
+                    selectedCountSentence:userSelection.getFileNames().length + ' '+MessageHash[128] + ' ( ' + roundSize(selectedSize, MessageHash["byte_unit_symbol"]) + ' )'
                 }, userSelection.getSelectedNodes());
             }
 			//this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
@@ -638,21 +638,6 @@ Class.create("InfoPanel", AjxpPane, {
                 }
 			}.bind(this));
 		}
-	},
-        humanFileSize: function(bytes, si){
-            var thresh = si ? 1000 : 1024;
-            if(Math.abs(bytes) < thresh) {
-                return bytes + ' B';
-            }
-            var units = si
-                ? ['Kb','Mb','Gb','Tb','Pb','Eb','Zb','Yb']
-                : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
-            var u = -1;
-            do {
-                bytes /= thresh;
-                ++u;
-            } while(Math.abs(bytes) >= thresh && u < units.length - 1);
-            return bytes.toFixed(1)+' '+units[u];
-        }
-	
+	}
+
 });
