@@ -125,7 +125,7 @@ var i=0;while(Kc=$c[i++]){if(ad!='*'||Kc.tagName!='!'){Zc.push(Kc);}}
 return Zc;}
 for(var i=0,Kc=Kc.firstChild;Kc;i++,Kc=Kc.nextSibling){if(wa.attrMatch(Kc,Lc,Mc)){if(Yc.match(Kc))Zc.push(Kc);}}
 return Zc;}
-catch(e){@*/for(var Kc=Kc.firstChild;Kc;Kc=Kc.nextSibling){if(wa.attrMatch(Kc,Lc,Mc)){if(Yc.match(Kc))Zc.push(Kc);}}
+catch(e){@*/if(!Kc){return Zc;} for(var Kc=Kc.firstChild;Kc;Kc=Kc.nextSibling){if(wa.attrMatch(Kc,Lc,Mc)){if(Yc.match(Kc))Zc.push(Kc);}}
 return Zc; /*@cc_on }@*/}}; /*@cc_on 
 var cd=function(dd,ed,fd){this.node=dd;this.nodeType=2;this.nodeValue=dd.nodeValue;this.nodeName=dd.nodeName;this.parentNode=ed;this.ownerElement=ed;this.parentSourceIndex=fd;};@*/if(!window.Step&&window.defaultConfig)window.Step=null;za=function(gd,hd){this.axis=gd;this.reverse=za.axises[gd][0];this.func=za.axises[gd][1];this.test=hd;this.predicates=[];this._quickAttr=za.axises[gd][2]};za.axises={ancestor:[true,function(jd,kd,ld,_,md,od,pd){while(kd=kd.parentNode){if(od&&kd.nodeType==1){od.reserveDelByNode(kd,pd,true);}
 if(jd.match(kd))ld.unshift(kd);}

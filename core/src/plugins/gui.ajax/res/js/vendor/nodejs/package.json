@@ -1,0 +1,11 @@
+{
+  "name": "pydio-dependencies",
+  "version": "6.0.8",
+  "dependencies": {
+    "material-ui": "^0.10.1",
+    "react": "^0.13.3",
+    "react-charts": "0.0.1",
+    "react-grid-layout": "^0.8.3",
+    "react-tap-event-plugin": "^0.1.7"
+  }
+}
