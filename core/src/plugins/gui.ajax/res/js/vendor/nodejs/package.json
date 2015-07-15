@@ -3,11 +3,11 @@
   "version": "6.0.8",
   "dependencies": {
     "chart.js": "^1.0.2",
-    "material-ui": "^0.10.1",
+    "material-ui": "^0.7.5",
     "react": "^0.13.3",
     "react-chartjs": "^0.6.0",
     "react-grid-layout": "^0.8.3",
-    "react-infinite": "^0.4.0",
+    "react-infinite": "^0.3.4",
     "react-tap-event-plugin": "^0.1.7",
     "reactify": "^1.1.1"
   }
