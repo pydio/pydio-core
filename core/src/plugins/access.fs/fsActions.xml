@@ -604,11 +604,11 @@
 						conn.addParameter('filename_new', newValue);
 						conn.onComplete = function(transport){
 							pydio.getController().parseXmlMessage(transport.responseXML);
+							if(orig && ajaxplorer.getUserSelection()){
+								ajaxplorer.getUserSelection().setSelectionSource(orig);
+							}
 						};
-						conn.sendSync();
-						if(orig && ajaxplorer.getUserSelection()){
-						    ajaxplorer.getUserSelection().setSelectionSource(orig);
-						}
+						conn.sendAsync();
 					};
 					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
 					    ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);

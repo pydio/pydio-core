@@ -602,7 +602,7 @@ Class.create("PydioUI", {
                 }
             }
         };
-        connexion.sendSync();
+        connexion.sendAsync();
     },
 
 
