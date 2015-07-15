@@ -199,7 +199,6 @@
             }
         </style>
         <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
-        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_core.js"></script>
         <script type="text/javascript">
             var ajaxplorer, MessageHash={};
             var startParameters = {

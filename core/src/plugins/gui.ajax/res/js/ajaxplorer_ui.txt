@@ -1,3 +1,5 @@
+js/ui/prototype/util/ajxp_utils.js
+js/vendor/modernizr/modernizr.min.js
 js/ui/prototype/interfaces/class.IAjxpNodeProvider.js
 js/ui/prototype/interfaces/class.IAjxpWidget.js
 js/ui/prototype/interfaces/class.IActionProvider.js

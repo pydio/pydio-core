@@ -204,11 +204,10 @@ Class.create("AjxpBootstrap", {
             window.ajaxplorer.init();
         }.bind(this);
         if(!this.parameters.get("debugMode")){
-            connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"), masterClassLoaded, true);
+            connexion.loadLibrary("pydio.min.js?v="+this.parameters.get("ajxpVersion"), masterClassLoaded, true);
         }else{
             masterClassLoaded();
         }
-
     },
 	
 	/**
@@ -393,7 +392,7 @@ Class.create("AjxpBootstrap", {
             elem.update('Pydio, open source file sharing - Free / Non supported edition - <a target="_blank" style="color: #7a7a7a;" href="https://pyd.io/">https://pyd.io/</a>');
         }
         $(desktopNode).insert({after:elem});
-        disableTextSelection(elem);
+        //disableTextSelection(elem);
 		if($('all_forms')) return;
 		$(desktopNode).insert({after:
 			'<div id="all_forms">\
