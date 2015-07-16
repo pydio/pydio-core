@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ChangesTracker extends AJXP_AbstractMetaSource
+class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
 {
     private $sqlDriver;
 

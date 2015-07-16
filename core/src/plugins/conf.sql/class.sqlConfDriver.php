@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Conf
  */
-class sqlConfDriver extends AbstractConfDriver
+class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 {
     public $sqlDriver = array();
 

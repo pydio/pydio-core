@@ -166,11 +166,15 @@ class BootConfLoader extends AbstractConfDriver
                 "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
             ));
 
-            // INSTALL ALL SQL TABLES
-            $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "meta.syncable");
-            foreach ($sqlPlugs as $plugId) {
-                $plug = AJXP_PluginsService::findPluginById($plugId);
-                $plug->installSQLTables(array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]));
+            // DETECT REQUIRED SQL TABLES AND INSTALL THEM
+            $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
+            $driverData = array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]);
+            foreach($registry as $type => $plugins){
+                foreach($plugins as $plugObject){
+                    if($plugObject instanceof SqlTableProvider){
+                        $plugObject->installSQLTables($driverData);
+                    }
+                }
             }
 
         } else {

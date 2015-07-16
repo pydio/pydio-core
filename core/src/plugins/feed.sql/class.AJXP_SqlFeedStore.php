@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Feed
  */
-class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
+class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableProvider
 {
 
     private $sqlDriver;

@@ -59,7 +59,15 @@ ConfService::start();
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
-//new AjxpSessionHandler();
+
+// Custom Session Handler
+if(defined("AJXP_SESSION_HANDLER_PATH") && defined("AJXP_SESSION_HANDLER_CLASSNAME") && file_exists(AJXP_SESSION_HANDLER_PATH)){
+    require_once(AJXP_SESSION_HANDLER_PATH);
+    $sessionHandlerClass = AJXP_SESSION_HANDLER_CLASSNAME;
+    $sessionHandler = new $sessionHandlerClass();
+    session_set_save_handler($sessionHandler, false);
+}
+
 if (!isSet($OVERRIDE_SESSION)) {
     session_name("AjaXplorer");
 }
