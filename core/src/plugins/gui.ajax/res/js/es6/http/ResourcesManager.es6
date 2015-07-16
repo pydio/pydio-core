@@ -125,12 +125,32 @@ class ResourcesManager{
 
 		if(!window[className]){
 			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
-                PydioApi.loadLibrary(fileName, callback, aSync);
+                var registry = ResourcesManager.__asyncCallbacks;
+                if(aSync && registry && registry.get(fileName) && registry.get(fileName)){
+                    // Already loading, just register a callback and return
+                    this.wrapCallback(callback?callback:function(){}, fileName);
+                    return;
+                }
+                PydioApi.loadLibrary(fileName, (aSync && callback)?this.wrapCallback(callback, fileName):callback, aSync);
 			}
 		}else if(callback){
             callback();
         }
 	}
+
+    wrapCallback(callback, fileName){
+        if(!ResourcesManager.__asyncCallbacks) ResourcesManager.__asyncCallbacks = new Map();
+        var registry = ResourcesManager.__asyncCallbacks;
+        if(!registry.get(fileName)) registry.set(fileName, []);
+        registry.get(fileName).push(callback);
+        return function(){
+            while(registry.get(fileName).length){
+                var cb = registry.get(fileName).pop();
+                cb();
+            }
+        };
+
+    }
 
     loadWebComponents(fileNames, callback){
         if(!Polymer){
