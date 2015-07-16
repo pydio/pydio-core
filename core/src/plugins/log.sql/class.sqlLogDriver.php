@@ -184,6 +184,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 
     public function processQuery($actionName, &$httpVars, &$fileVars){
 
+        session_write_close();
         $query_name = $httpVars["query_name"];
         $start = 0;
         $count = 30;
