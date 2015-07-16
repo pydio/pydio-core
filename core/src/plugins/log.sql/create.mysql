@@ -6,5 +6,9 @@ CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`user`		VARCHAR(255),
   `source`  VARCHAR(255),
 	`message`	TEXT,
-	`params`	TEXT
-);
+	`params`	TEXT,
+	`repository_id` VARCHAR(32),
+	`device` VARCHAR(255),
+	KEY `source` (`source`),
+  KEY `repository_id` (`repository_id`)
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
