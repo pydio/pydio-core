@@ -32,8 +32,8 @@ $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
 ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
-//session_name("AjaXplorer");
-//session_start();
+session_name("AjaXplorer");
+session_start();
 AuthService::$useSession = false;
 
 AJXP_PluginsService::getInstance()->initActivePlugins();
