@@ -180,12 +180,12 @@ var RemoteNodeProvider = (function () {
 
     RemoteNodeProvider.prototype.parseNodes = function parseNodes(origNode, transport, nodeCallback, childCallback, childrenOnly) {
         if (!transport.responseXML || !transport.responseXML.documentElement) {
+            Logger.debug('Loading node ' + origNode.getPath() + ' has wrong response: ' + transport.responseText);
+            if (nodeCallback) nodeCallback(origNode);
+            origNode.setLoaded(false);
             if (!transport.responseText) {
                 throw new Error('Empty response!');
             }
-            Logger.debug(transport.responseText);
-            if (nodeCallback) nodeCallback(origNode);
-            origNode.setLoaded(false);
             throw new Error('Invalid XML Document (see console)');
         }
         var rootNode = transport.responseXML.documentElement;
