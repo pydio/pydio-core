@@ -28,8 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ConfService
 {
     private static $instance;
+    public static $useSession = true;
+
     private $errors = array();
     private $configs = array();
+
+    private $contextRepositoryId;
+    private $contextCharset;
 
     /**
      * @param AJXP_PluginsService $ajxpPluginService
@@ -119,6 +124,35 @@ class ConfService
     public static function getErrors()
     {
         return self::getInstance()->errors;
+    }
+
+    public static function getContextCharset(){
+        if(self::$useSession) {
+            if(isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
+            else return null;
+        }else {
+            return self::getInstance()->contextCharset;
+        }
+    }
+
+    public static function setContextCharset($value){
+        if(self::$useSession){
+            $_SESSION["AJXP_CHARSET"] = $value;
+        }else{
+            self::getInstance()->contextCharset = $value;
+        }
+    }
+
+    public static function clearContextCharset(){
+        if(self::$useSession && isSet($_SESSION["AJXP_CHARSET"])){
+            unset($_SESSION["AJXP_CHARSET"]);
+        }else{
+            self::getInstance()->contextCharset = null;
+        }
+    }
+
+    private function getContextRepositoryId(){
+        return self::$useSession ? $_SESSION["REPO_ID"] : $this->contextRepositoryId;
     }
 
     /**
@@ -289,8 +323,8 @@ class ConfService
     {
         if ($rootDirIndex == -1) {
             $ok = false;
-            if (isSet($_SESSION['REPO_ID'])) {
-                $sessionId = $_SESSION['REPO_ID'];
+            if (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null) {
+                $sessionId = self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 $object = self::getRepositoryById($sessionId);
                 if($object != null && self::repositoryIsAccessible($sessionId, $object)){
                     $this->configs["REPOSITORY"] = $object;
@@ -301,7 +335,11 @@ class ConfService
                 $currentRepos = $this->getLoadedRepositories();
                 $keys = array_keys($currentRepos);
                 $this->configs["REPOSITORY"] = $currentRepos[$keys[0]];
-                $_SESSION['REPO_ID'] = $keys[0];
+                if(self::$useSession){
+                    $_SESSION['REPO_ID'] = $keys[0];
+                }else{
+                    $this->contextRepositoryId = $keys[0];
+                }
             }
         } else {
             /*
@@ -309,14 +347,14 @@ class ConfService
                 return;
             }
             */
-            if ($temporary && isSet($_SESSION['REPO_ID'])) {
-                $crtId = $_SESSION['REPO_ID'];
+            if ($temporary && (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null)) {
+                $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 if ($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])) {
                     $_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
                     //AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
                 }
             } else {
-                $crtId = $_SESSION['REPO_ID'];
+                $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 $_SESSION['PREVIOUS_REPO_ID'] = $crtId;
                 //AJXP_Logger::debug("switching back to $rootDirIndex");
             }
@@ -325,16 +363,18 @@ class ConfService
             } else {
                 $this->configs["REPOSITORY"] = ConfService::getRepositoryById($rootDirIndex);
             }
-            $_SESSION['REPO_ID'] = $rootDirIndex;
+            if(self::$useSession){
+                $_SESSION['REPO_ID'] = $rootDirIndex;
+            }else{
+                $this->contextRepositoryId = $rootDirIndex;
+            }
             if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
         }
 
         if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getOption("CHARSET")!="") {
-            $_SESSION["AJXP_CHARSET"] = $this->configs["REPOSITORY"]->getOption("CHARSET");
+            self::setContextCharset($this->configs["REPOSITORY"]->getOption("CHARSET"));
         } else {
-            if (isSet($_SESSION["AJXP_CHARSET"])) {
-                unset($_SESSION["AJXP_CHARSET"]);
-            }
+            self::clearContextCharset();
         }
 
 
@@ -518,10 +558,11 @@ class ConfService
      */
     public function getCurrentRepositoryIdInst()
     {
-        if(isSet($_SESSION['REPO_ID'])){
-            $object = self::getRepositoryById($_SESSION['REPO_ID']);
-            if($object != null && self::repositoryIsAccessible($_SESSION['REPO_ID'], $object)){
-                return $_SESSION['REPO_ID'];
+        $ctxId = $this->getContextRepositoryId();
+        if(!empty($ctxId)){
+            $object = self::getRepositoryById($ctxId);
+            if($object != null && self::repositoryIsAccessible($ctxId, $object)){
+                return $ctxId;
             }
         }
         $currentRepos = $this->getLoadedRepositories();
@@ -542,8 +583,9 @@ class ConfService
     public function getCurrentRootDirDisplayInst()
     {
         $currentRepos = $this->getLoadedRepositories();
-        if (isSet($currentRepos[$_SESSION['REPO_ID']])) {
-            $repo = $currentRepos[$_SESSION['REPO_ID']];
+        $ctxId = $this->getContextRepositoryId();
+        if (isSet($currentRepos[$ctxId])) {
+            $repo = $currentRepos[$ctxId];
             return $repo->getDisplay();
         }
         return "";
@@ -1266,8 +1308,9 @@ class ConfService
      */
     public function getRepositoryInst()
     {
-        if (isSet($_SESSION['REPO_ID']) && isSet($this->configs["REPOSITORIES"])  &&  isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']])) {
-            return $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']];
+        $ctxId = $this->getContextRepositoryId();
+        if (!empty($ctxId) && isSet($this->configs["REPOSITORIES"])  &&  isSet($this->configs["REPOSITORIES"][$ctxId])) {
+            return $this->configs["REPOSITORIES"][$ctxId];
         }
         return $this->configs["REPOSITORY"];
     }
@@ -1467,9 +1510,10 @@ class ConfService
         }
 
         $repository->driverInstance = $plugInstance;
-        if (isSet($_SESSION["REPO_ID"]) && $_SESSION["REPO_ID"] == $repository->getId()) {
+        $ctxId = $this->getContextRepositoryId();
+        if (!empty($ctxId) && $ctxId == $repository->getId()) {
             $this->configs["REPOSITORY"] = $repository;
-            $this->cacheRepository($_SESSION['REPO_ID'], $repository);
+            $this->cacheRepository($ctxId, $repository);
         }
         return $plugInstance;
     }

@@ -233,7 +233,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                     if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
                         // TODO: OFFICIALLY DROP IE7 SUPPORT?
-                        //$content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
+                        // $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
