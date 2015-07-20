@@ -37,6 +37,11 @@ class ConfService
     private $contextCharset;
 
     /**
+     * @var AJXP_KeyValueCache
+     */
+    private $keyValueCache;
+
+    /**
      * @param AJXP_PluginsService $ajxpPluginService
      * @return AbstractConfDriver
      */
@@ -151,8 +156,15 @@ class ConfService
         }
     }
 
-    private function getContextRepositoryId(){
+    public function getContextRepositoryId(){
         return self::$useSession ? $_SESSION["REPO_ID"] : $this->contextRepositoryId;
+    }
+
+    public function getKeyValueCache(){
+        if(!isSet($this->keyValueCache)){
+            $this->keyValueCache = new AJXP_KeyValueCache();
+        }
+        return $this->keyValueCache;
     }
 
     /**
@@ -882,14 +894,20 @@ class ConfService
         if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
+        $test = $this->getKeyValueCache()->fetch("repository:".$repoId);
+        if($test !== false){
+            return $test;
+        }
         $test =  $this->getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
+            $this->getKeyValueCache()->save("repository:".$repoId, $test);
             return $test;
         }
         // Finally try to search in default repositories
         if (isSet($this->configs["DEFAULT_REPOSITORIES"]) && isSet($this->configs["DEFAULT_REPOSITORIES"][$repoId])) {
             $repo = self::createRepositoryFromArray($repoId, $this->configs["DEFAULT_REPOSITORIES"][$repoId]);
             $repo->setWriteable(false);
+            $this->keyValueCache->save("repository:".$repoId, $repo);
             return $repo;
         }
     }

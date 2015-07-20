@@ -47,16 +47,41 @@ class AJXP_Controller
      * @static
      * @return DOMXPath
      */
-    private static function initXPath()
+    private static function initXPath($rest = false)
     {
         if (!isSet(self::$xPath)) {
-
+            if($rest){
+                $kvCache = ConfService::getInstance()->getKeyValueCache();
+                $cacheKey = self::getRestRegistryCacheKey();
+                $cachedXml = $kvCache->fetch($cacheKey);
+                if($cachedXml !== false){
+                    $registry = new DOMDocument("1.0", "utf-8");
+                    $registry->loadXML($cachedXml);
+                    AJXP_PluginsService::updateXmlRegistry($registry);
+                    self::$xPath = new DOMXPath($registry);
+                    return self::$xPath;
+                }
+            }
             $registry = AJXP_PluginsService::getXmlRegistry( false );
             $changes = self::filterRegistryFromRole($registry);
             if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
             self::$xPath = new DOMXPath($registry);
+
+            if(isSet($kvCache) && isSet($cacheKey)){
+                $kvCache->save($cacheKey, $registry->saveXML());
+            }
         }
         return self::$xPath;
+    }
+
+    private static function getRestRegistryCacheKey(){
+
+        $logged = AuthService::getLoggedUser();
+        $u = $logged == null ? "shared" : $logged->getId();
+        $r = ConfService::getRepository();
+        $a = $r->getSlug();
+        return "xml_registry:".$u.":".$a;
+
     }
 
     public static function registryReset(){
@@ -122,7 +147,7 @@ class AJXP_Controller
      */
     public static function findRestActionAndApply($actionName, $path)
     {
-        $xPath = self::initXPath();
+        $xPath = self::initXPath(true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
             self::$lastActionNeedsAuth = true;
