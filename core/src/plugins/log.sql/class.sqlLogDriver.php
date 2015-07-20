@@ -313,7 +313,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             'source'        => $source,
             'message'       => $prefix,
             'params'        => $message,
-            'repository_id' => ConfService::getCurrentRepositoryId(),
+            'repository_id' => ConfService::getInstance()->getContextRepositoryId(),
             'device'        => $_SERVER['HTTP_USER_AGENT']
         );
         //we already handle exception for write2 in core.log

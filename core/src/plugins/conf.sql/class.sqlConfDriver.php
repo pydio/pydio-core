@@ -323,21 +323,8 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function getRepositoryById($repositoryId)
     {
-        $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
+        return $this->_loadRepository("uuid", $repositoryId);
 
-        $repo_row = $res->fetchAll();
-        if (count($repo_row) > 0) {
-            $repo_row = $repo_row[0];
-            if($this->sqlDriver["driver"] == "postgre"){
-                dibi::nativeQuery("SET bytea_output=escape");
-            }
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repository = $this->repoFromDb($repo_row, $opts);
-            return $repository;
-        }
-
-        return null;
     }
 
     /**
@@ -348,20 +335,27 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function getRepositoryByAlias($repositorySlug)
     {
-        $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
+        return $this->_loadRepository("slug", $repositorySlug);
+    }
 
-        $repo_row = $res->fetchAll();
-        if (count($repo_row) > 0) {
-            $repo_row = $repo_row[0];
-            if($this->sqlDriver["driver"] == "postgre"){
-                dibi::nativeQuery("SET bytea_output=escape");
-            }
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repository = $this->repoFromDb($repo_row, $opts);
+
+    protected function _loadRepository($slugOrAlias, $value){
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::nativeQuery("SET bytea_output=escape");
+        }
+        $keyName = ($slugOrAlias=="slug"?"slug":"uuid");
+        $res = dibi::query("SELECT * FROM [ajxp_repo],[ajxp_repo_options] WHERE [ajxp_repo].[uuid] = [ajxp_repo_options].[uuid] AND [ajxp_repo].[$keyName] = %s", $value);
+
+        $options = array();
+        foreach($res as $row){
+            $options[$row->name] = $row->val;
+        }
+        if(isSet($row)){
+            unset($row->name);
+            unset($row->val);
+            $repository = $this->repoFromDb($row, $options);
             return $repository;
         }
-
         return null;
     }
 
