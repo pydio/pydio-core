@@ -40,7 +40,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         // BACKWARD COMPATIBILIY PREVIOUS CONFIG VIA OPTIONS
         if (isSet($options["CUSTOM_DATA"])) {
             $custom = $options["CUSTOM_DATA"];
-            $serverSettings = $this->xPath->query('//server_settings')->item(0);
+            $serverSettings = $this->getXPath()->query('//server_settings')->item(0);
             foreach ($custom as $key => $value) {
                 $n = $this->manifestDoc->createElement("param");
                 $n->setAttribute("name", $key);
@@ -383,6 +383,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function createUserObject($userId)
     {
+        $kvCache = ConfService::getInstance()->getKeyValueCache();
+        $test = $kvCache->fetch("pydio:user:".$userId);
+        if($test !== false && is_a($test, "AbstractAjxpUser")){
+            if($test->personalRole == null){
+                $test->personalRole = $test->roles["AJXP_USR_/".$userId];
+            }
+            return $test;
+        }
         $userId = AuthService::filterUserSensitivity($userId);
         $abstractUser = $this->instantiateAbstractUserImpl($userId);
         if (!$abstractUser->storageExists()) {
@@ -390,6 +398,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         }
         AuthService::updateAutoApplyRole($abstractUser);
         AuthService::updateAuthProvidedData($abstractUser);
+        $kvCache->save("pydio:user:".$userId, $abstractUser);
         return $abstractUser;
     }
 

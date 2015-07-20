@@ -52,7 +52,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
-            $el = $this->xPath->query("/indexer")->item(0);
+            $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
                 $data = array("indexed_meta_fields" => $metaFields,

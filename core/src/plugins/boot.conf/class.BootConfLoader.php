@@ -61,7 +61,7 @@ class BootConfLoader extends AbstractConfDriver
     {
         parent::loadManifest();
         if (!AJXP_Utils::detectApplicationFirstRun()) {
-            $actions = $this->xPath->query("server_settings|registry_contributions");
+            $actions = $this->getXPath()->query("server_settings|registry_contributions");
             foreach ($actions as $ac) {
                 $ac->parentNode->removeChild($ac);
             }

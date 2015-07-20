@@ -72,7 +72,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $cdataFoot = '</div>';
         $cdataParts = "";
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
         $contrib = $selection->item(0);
         $even = false;
         $searchables = array();
@@ -131,7 +131,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
         if (!empty($this->fieldsAdditionalData)) {
@@ -139,12 +139,12 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         }
         $contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
 
-        $htmlSel = $this->xPath->query('html', $contrib);
+        $htmlSel = $this->getXPath()->query('html', $contrib);
         $html = $htmlSel->item(0);
         $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
         $html->appendChild($cdata);
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
         foreach ($selection as $tag) {
             $v = $tag->attributes->getNamedItem("ajxpOptions")->nodeValue;
             $metaV = count($searchables)? '"metaColumns":'.json_encode($searchables): "";

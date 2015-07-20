@@ -206,7 +206,7 @@ class ImagePreviewer extends AJXP_Plugin
 
     protected function handleMime($filename)
     {
-        $mimesAtt = explode(",", $this->xPath->query("@mimes")->item(0)->nodeValue);
+        $mimesAtt = explode(",", $this->getXPath()->query("@mimes")->item(0)->nodeValue);
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         return in_array($ext, $mimesAtt);
     }

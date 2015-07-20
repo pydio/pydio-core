@@ -32,7 +32,7 @@ class ftpAccessDriver extends fsAccessDriver
     {
         parent::loadManifest();
         // BACKWARD COMPATIBILITY!
-        $res = $this->xPath->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
+        $res = $this->getXPath()->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
         foreach ($res as $node) {
             if ($node->getAttribute("name") == "USER") {
                 $node->setAttribute("name", "FTP_USER");

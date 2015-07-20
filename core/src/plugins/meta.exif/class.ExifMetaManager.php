@@ -63,11 +63,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
         $contrib->setAttribute("modifier", "ExifCellRenderer.prototype.infoPanelModifier");
-        $htmlSel = $this->xPath->query('html', $contrib);
+        $htmlSel = $this->getXPath()->query('html', $contrib);
         $html = $htmlSel->item(0);
         $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
         $html->appendChild($cdata);
