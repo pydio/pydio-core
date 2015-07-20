@@ -52,15 +52,22 @@ class AJXP_PluginsService
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
             $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
             if (count($reqs)) {
-                foreach ($reqs as $filename) {
-                    if (!is_file($filename)) {
+                foreach ($reqs as $fileName) {
+                    if (!is_file($fileName)) {
                         // Cache is out of sync
                         return false;
                     }
-                    require_once($filename);
+                    require_once($fileName);
                 }
-                $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                $this->registry = $res;
+                $kvCache = ConfService::getInstance()->getKeyValueCache();
+                $test = $kvCache->fetch("plugins_registry");
+                if($test !== FALSE) {
+                    $this->registry = $test;
+                }else{
+                    $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $this->registry = $res;
+                    $kvCache->save("plugins_registry", $res);
+                }
                 // Refresh streamWrapperPlugins
                 foreach ($this->registry as $plugs) {
                     foreach ($plugs as $plugin) {
@@ -161,8 +168,10 @@ class AJXP_PluginsService
         if (!isSet($this->registry[$plugType])) {
             $this->registry[$plugType] = array();
         }
-        $plugin = $this->instanciatePluginClass($plugin);
         $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+        if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
+            $plugin = $this->instanciatePluginClass($plugin);
+        }
         $plugin->loadConfigs($options);
         $this->registry[$plugType][$plugin->getName()] = $plugin;
         $plugin->loadingState = "loaded";
@@ -237,7 +246,7 @@ class AJXP_PluginsService
             require_once($filename);
             $newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
             $newPlugin->loadManifest();
-            $this->required_files[] = $filename;
+            $this->required_files[$filename] = $filename;
             return $newPlugin;
         } else {
             return $plugin;
