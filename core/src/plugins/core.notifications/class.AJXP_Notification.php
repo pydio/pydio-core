@@ -93,11 +93,17 @@ class AJXP_Notification
         }
         $uLabel = "";
         if (array_key_exists($this->getAuthor(), self::$usersCaches)) {
-            $uLabel = self::$usersCaches[$this->getAuthor()];
-        } else if (strstr($tplString, "AJXP_USER") !== false && AuthService::userExists($this->getAuthor())) {
-            $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
-            $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-            self::$usersCaches[$this->getAuthor()] = $uLabel;
+            if(self::$usersCaches[$this->getAuthor()] != 'AJXP_USER_DONT_EXISTS'){
+                $uLabel = self::$usersCaches[$this->getAuthor()];
+            }
+        } else if (strstr($tplString, "AJXP_USER") !== false) {
+            if(AuthService::userExists($this->getAuthor())){
+                $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
+                $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+                self::$usersCaches[$this->getAuthor()] = $uLabel;
+            }else{
+                self::$usersCaches[$this->getAuthor()] = 'AJXP_USER_DONT_EXISTS';
+            }
         }
         if (empty($uLabel)) {
             $uLabel = $this->getAuthor();
@@ -220,11 +226,15 @@ class AJXP_Notification
 
     public function getAuthorLabel(){
         if (array_key_exists($this->getAuthor(), self::$usersCaches)) {
-            $uLabel = self::$usersCaches[$this->getAuthor()];
-        } if (AuthService::userExists($this->getAuthor())) {
+            if(self::$usersCaches[$this->getAuthor()] != 'AJXP_USER_DONT_EXISTS'){
+                $uLabel = self::$usersCaches[$this->getAuthor()];
+            }
+        } else if (AuthService::userExists($this->getAuthor())) {
             $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
             $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             self::$usersCaches[$this->getAuthor()] = $uLabel;
+        } else{
+            self::$usersCaches[$this->getAuthor()] = 'AJXP_USER_DONT_EXISTS';
         }
         if(!empty($uLabel)) return $uLabel;
         else return $this->getAuthor();
