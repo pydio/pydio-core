@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="imap" label="CONF_MESSAGE[Mailbox (Imap or POP)]" description="CONF_MESSAGE[This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver enabled="false" name="imap" label="CONF_MESSAGE[Mailbox (Imap or POP)]" description="CONF_MESSAGE[This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png">
 		<resources>
             <i18n namespace="imap_access" path="plugins/access.imap/resources/i18n"/>

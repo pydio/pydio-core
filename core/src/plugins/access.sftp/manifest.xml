@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver name="sftp" enabled="false" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings icon="plugins/access.sftp/icon.png">
         <resources>
             <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>

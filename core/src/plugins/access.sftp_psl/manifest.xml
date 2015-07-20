@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver
 	name="sftp_psl"
+	enabled="false"
 	label="CONF_MESSAGE[SSH File Transfer Protocol (SFTP)]"
 	description="CONF_MESSAGE[The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2.]"
 	mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"
