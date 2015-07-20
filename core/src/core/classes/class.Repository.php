@@ -312,7 +312,7 @@ class Repository implements AjxpGroupPathProvider
     public function getOption($oName, $safe=false, $resolveUser = null)
     {
         if (!$safe && $this->inferOptionsFromParent) {
-            if (!isset($this->parentTemplateObject)) {
+            if (!isset($this->parentTemplateObject) || !is_a($this->parentTemplateObject, "Repository")) {
                 $this->parentTemplateObject = ConfService::getRepositoryById($this->parentId);
             }
             if (isSet($this->parentTemplateObject)) {
