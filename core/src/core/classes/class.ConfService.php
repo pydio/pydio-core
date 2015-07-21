@@ -180,8 +180,6 @@ class ConfService
      * @static
      * @param $globalsArray
      * @param string $interfaceCheck
-     * @internal param string $bootstrapConfigKey
-     * @internal param string $bootstrapConfigType
      * @return AJXP_Plugin|null
      */
     public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "")
