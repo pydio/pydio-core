@@ -375,8 +375,8 @@ class AuthService
         else self::$currentUser = $user;
 
         if ($user->isAdmin()) {
-            //$user = self::updateAdminRights($user);
-            //self::updateUser($user);
+            $user = self::updateAdminRights($user);
+            self::updateUser($user);
         }
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
