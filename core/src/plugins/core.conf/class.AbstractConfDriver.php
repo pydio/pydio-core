@@ -381,6 +381,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             if($test->personalRole == null){
                 $test->personalRole = $test->roles["AJXP_USR_/".$userId];
             }
+            $test->recomputeMergedRole();
             return $test;
         }
         $userId = AuthService::filterUserSensitivity($userId);

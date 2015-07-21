@@ -541,6 +541,7 @@ class ConfService
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
+        $this->getKeyValueCache()->deleteAll();
     }
 
     private function cacheRepository($repoId, $repository){

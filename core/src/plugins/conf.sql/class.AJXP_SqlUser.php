@@ -452,7 +452,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * @param String $context
      * @see AbstractAjxpUser#save()
      */
-    public function save($context = "superuser")
+    protected function _save($context = "superuser")
     {
         if ($context != "superuser") {
             // Nothing specific to do, prefs and bookmarks are saved on-the-fly.

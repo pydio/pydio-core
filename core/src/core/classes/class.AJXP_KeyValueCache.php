@@ -96,7 +96,7 @@ class AJXP_KeyValueCache {
      */
     public function deleteAll(){
         if(function_exists('apc_clear_cache')){
-            apc_clear_cache();
+            apc_clear_cache('user');
         }
     }
 
