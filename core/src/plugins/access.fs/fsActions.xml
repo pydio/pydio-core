@@ -717,8 +717,8 @@
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
 							action.rightsContext.write = false;
-							pydio.getController().defaultActions.unset('ctrldragndrop');
-							pydio.getController().defaultActions.unset('dragndrop');
+							pydio.getController().defaultActions['delete']('ctrldragndrop');
+							pydio.getController().defaultActions['delete']('dragndrop');
 						}
 						if(ajxpUser && ajxpUser.canWrite() && ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 						    action.rightsContext.write = false;
