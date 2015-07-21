@@ -71,7 +71,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
         // WEBDAV ACTION
         if (!ConfService::getCoreConf("WEBDAV_ENABLE")) {
-            unset($this->actions["webdav_preferences"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -89,7 +88,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             if(empty($acl)) $access = false;
         }
         if(!$access){
-            unset($this->actions["switch_to_user_dashboard"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="switch_to_user_dashboard"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -114,7 +112,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
 
         if (!$hasExposed) {
-            unset($this->actions["custom_data_edit"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="custom_data_edit"]', $contribNode);
             $publicUrlNode = $publicUrlNodeList->item(0);
@@ -123,14 +120,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
         // CREATE A NEW REPOSITORY
         if (!ConfService::getCoreConf("USER_CREATE_REPOSITORY", "conf")) {
-            unset($this->actions["user_create_repository"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
             if ($publicUrlNodeList->length) {
                 $publicUrlNode = $publicUrlNodeList->item(0);
                 $contribNode->removeChild($publicUrlNode);
             }
-            unset($this->actions["user_delete_repository"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_delete_repository"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -141,21 +136,18 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
         // CREATE A NEW USER
         if (!ConfService::getCoreConf("USER_CREATE_USERS", "conf")) {
-            unset($this->actions["user_create_user"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_create_user"]', $contribNode);
             if ($publicUrlNodeList->length) {
                 $publicUrlNode = $publicUrlNodeList->item(0);
                 $contribNode->removeChild($publicUrlNode);
             }
-            unset($this->actions["user_update_user"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_update_user"]', $contribNode);
             if ($publicUrlNodeList->length) {
                 $publicUrlNode = $publicUrlNodeList->item(0);
                 $contribNode->removeChild($publicUrlNode);
             }
-            unset($this->actions["user_delete_user"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_delete_user"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -555,7 +547,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        //if(!isSet($this->actions[$action])) return;
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = AJXP_Utils::securePath($getValue);

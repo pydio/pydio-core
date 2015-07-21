@@ -222,7 +222,6 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     public function editMeta($actionName, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$actionName])) return;
         if (is_a($this->accessDriver, "demoAccessDriver")) {
             throw new Exception("Write actions are disabled in demo mode!");
         }

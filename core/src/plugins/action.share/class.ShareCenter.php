@@ -51,52 +51,50 @@ class ShareCenter extends AJXP_Plugin
     protected function parseSpecificContributions(&$contribNode)
     {
         parent::parseSpecificContributions($contribNode);
-        if (isSet($this->actions["share"])) {
-            $disableSharing = false;
-            $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-            if ($downloadFolder == "") {
-                $disableSharing = true;
-            } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-                $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
-                $disableSharing = true;
-            } else {
-                if (AuthService::usersEnabled()) {
-                    $loggedUser = AuthService::getLoggedUser();
-                    if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
-                        $disableSharing = true;
-                    }
-                } else {
+        $disableSharing = false;
+        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        if ($downloadFolder == "") {
+            $disableSharing = true;
+        } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
+            $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
+            $disableSharing = true;
+        } else {
+            if (AuthService::usersEnabled()) {
+                $loggedUser = AuthService::getLoggedUser();
+                if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
                     $disableSharing = true;
                 }
-            }
-            $repo = ConfService::getRepository();
-            // Hacky but necessary to edit roles...
-            if(!is_a($repo->driverInstance, "AjxpWrapperProvider")
-                && !(isset($_GET["get_action"]) && $_GET["get_action"]=="list_all_plugins_actions")){
+            } else {
                 $disableSharing = true;
             }
-            $xpathesToRemove = array();
-            if ($disableSharing) {
-                // All share- actions
-                $xpathesToRemove[] = 'action[contains(@name, "share-")]';
-            }else{
-                $folderSharingAllowed = $this->getAuthorization("folder", "any"); // $this->pluginConf["ENABLE_FOLDER_SHARING"];
-                $fileSharingAllowed = $this->getAuthorization("file"); //$this->pluginConf["ENABLE_FILE_PUBLIC_LINK"];
-                if($fileSharingAllowed === false){
-                    // Share file button
-                    $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
-                }
-                if(!$folderSharingAllowed){
-                    // Share folder button
-                    $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
-                }
+        }
+        $repo = ConfService::getRepository();
+        // Hacky but necessary to edit roles...
+        if(!is_a($repo->driverInstance, "AjxpWrapperProvider")
+            && !(isset($_GET["get_action"]) && $_GET["get_action"]=="list_all_plugins_actions")){
+            $disableSharing = true;
+        }
+        $xpathesToRemove = array();
+        if ($disableSharing) {
+            // All share- actions
+            $xpathesToRemove[] = 'action[contains(@name, "share-")]';
+        }else{
+            $folderSharingAllowed = $this->getAuthorization("folder", "any"); // $this->pluginConf["ENABLE_FOLDER_SHARING"];
+            $fileSharingAllowed = $this->getAuthorization("file"); //$this->pluginConf["ENABLE_FILE_PUBLIC_LINK"];
+            if($fileSharingAllowed === false){
+                // Share file button
+                $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
             }
-            foreach($xpathesToRemove as $xpath){
-                $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                $nodeList = $actionXpath->query($xpath, $contribNode);
-                foreach($nodeList as $shareActionNode){
-                    $contribNode->removeChild($shareActionNode);
-                }
+            if(!$folderSharingAllowed){
+                // Share folder button
+                $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
+            }
+        }
+        foreach($xpathesToRemove as $xpath){
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $nodeList = $actionXpath->query($xpath, $contribNode);
+            foreach($nodeList as $shareActionNode){
+                $contribNode->removeChild($shareActionNode);
             }
         }
     }

@@ -176,7 +176,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $compressNodeList = $actionXpath->query('action[@name="compress"]', $contribNode);
         if(!$compressNodeList->length) return ;
-        unset($this->actions["compress"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
         // Disable "download" if selection is multiple
@@ -230,7 +229,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $selection = new UserSelection($this->repository);
         $dir = $httpVars["dir"] OR "";

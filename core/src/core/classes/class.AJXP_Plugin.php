@@ -48,7 +48,6 @@ class AJXP_Plugin implements Serializable
     protected $manifestLoaded = false;
     protected $externalFilesAppended = false;
     protected $enabled;
-    protected $actions;
     protected $registryContributions = array();
     protected $contributionsLoaded = false;
     protected $options; // can be passed at init time
@@ -82,7 +81,6 @@ class AJXP_Plugin implements Serializable
         "manifestLoaded",
         "externalFilesAppended",
         "enabled",
-        "actions",
         "registryContributions",
         "contributionsLoaded",
         "mixins",
@@ -102,7 +100,6 @@ class AJXP_Plugin implements Serializable
         $split = explode(".", $id);
         $this->type = $split[0];
         $this->name = $split[1];
-        $this->actions = array();
         $this->dependencies = array();
         $this->extensionsDependencies = array();
     }
@@ -351,16 +348,6 @@ class AJXP_Plugin implements Serializable
             $attr = $callback->ownerDocument->createAttribute("pluginId");
             $attr->value = $this->id;
             $callback->appendChild($attr);
-        }
-        if ($contribNode->nodeName == "actions") {
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            foreach ($contribNode->childNodes as $actionNode) {
-                if($actionNode->nodeType!=XML_ELEMENT_NODE) continue;
-                $names = $actionXpath->query("@name", $actionNode);
-                $name = $names->item(0)->value;
-                $this->actions[$name] = $name;
-                continue;
-            }
         }
     }
 

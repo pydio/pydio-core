@@ -48,7 +48,6 @@ class UserDashboardDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $loggedUser = AuthService::getLoggedUser();
         if(!AuthService::usersEnabled()) return ;

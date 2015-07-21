@@ -32,8 +32,6 @@ class ImagePreviewer extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;

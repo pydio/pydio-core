@@ -53,7 +53,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return null;
         if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
             // Force legacy theme for the moment
             $this->pluginConf["GUI_THEME"] = "oxygen";

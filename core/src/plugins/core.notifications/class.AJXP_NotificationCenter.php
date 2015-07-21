@@ -57,7 +57,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
            // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
                if($contribNode->nodeName == "actions"){
-                   unset($this->actions["get_my_feed"]);
                    $actionXpath=new DOMXPath($contribNode->ownerDocument);
                    $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
                    $publicUrlNode = $publicUrlNodeList->item(0);

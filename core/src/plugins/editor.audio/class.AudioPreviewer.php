@@ -38,8 +38,6 @@ class AudioPreviewer extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $postProcessData)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(false)) {
             return false;

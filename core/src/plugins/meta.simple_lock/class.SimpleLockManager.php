@@ -52,7 +52,6 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
      */
     public function applyChangeLock($actionName, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$actionName])) return;
         if (is_a($this->accessDriver, "demoAccessDriver")) {
             throw new Exception("Write actions are disabled in demo mode!");
         }

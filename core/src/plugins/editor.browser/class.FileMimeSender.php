@@ -30,9 +30,6 @@ class FileMimeSender extends AJXP_Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action]))
-            return false;
-
         $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
 
         if(!$repository->detectStreamWrapper(true))
