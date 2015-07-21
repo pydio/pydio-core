@@ -74,6 +74,7 @@ class AJXP_KeyValueCache {
      */
     public function save($id, $data, $lifeTime = 0){
         if(!function_exists('apc_store')) return false;
+        if(defined("AJXP_KVCACHE_IGNORE") && AJXP_KVCACHE_IGNORE) return false;
         $res = apc_store($this->makeId($id), $data, $lifeTime);
         if($res !== false) return true;
         return false;
