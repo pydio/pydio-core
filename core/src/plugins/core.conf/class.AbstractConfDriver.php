@@ -555,7 +555,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
+        //if(!isSet($this->actions[$action])) return;
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = AJXP_Utils::securePath($getValue);
@@ -599,11 +599,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case "get_xml_registry" :
             case "state" :
 
-                $regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
-                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
-
-                $clone = $regDoc->cloneNode(true);
+                $clone = ConfService::getFilteredXMLRegistry(true, true);
                 $clonePath = new DOMXPath($clone);
                 $serverCallbacks = $clonePath->query("//serverCallback|hooks");
                 foreach ($serverCallbacks as $callback) {

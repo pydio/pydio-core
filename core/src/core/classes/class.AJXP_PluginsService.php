@@ -637,10 +637,11 @@ class AJXP_PluginsService
      * @param $registry
      * @return void
      */
-    public static function updateXmlRegistry($registry)
+    public static function updateXmlRegistry($registry, $extendedVersion = true)
     {
         $self = self::getInstance();
         $self->xmlRegistry = $registry;
+        $self->registryVersion = ($extendedVersion? "extended" : "light");
     }
 
     /**

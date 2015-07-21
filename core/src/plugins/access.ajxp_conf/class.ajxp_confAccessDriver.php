@@ -531,13 +531,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "clear_plugins_cache":
                 AJXP_XMLWriter::header();
-                // Clear plugins cache if they exist
-                AJXP_PluginsService::clearPluginsCache();
-                ConfService::clearMessagesCache();
-                ConfService::getInstance()->getKeyValueCache()->deleteAll();
-                if(function_exists('opcache_reset')){
-                    opcache_reset();
-                }
+                ConfService::clearAllCaches();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".(AJXP_SKIP_CACHE?"132":"131")], null);
                 AJXP_XMLWriter::reloadDataNode();
                 AJXP_XMLWriter::close();
@@ -1815,7 +1809,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $existing = $confStorage->loadPluginConfig($pType, $pName);
                 $this->mergeExistingParameters($options, $existing);
                 $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
-                AJXP_PluginsService::clearPluginsCache();
+                ConfService::clearAllCaches();
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
                 AJXP_XMLWriter::close();

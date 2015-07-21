@@ -167,6 +167,15 @@ class ConfService
         return $this->keyValueCache;
     }
 
+    public static function clearAllCaches(){
+        AJXP_PluginsService::clearPluginsCache();
+        self::clearMessagesCache();
+        self::getInstance()->getKeyValueCache()->deleteAll();
+        if(function_exists('opcache_reset')){
+            opcache_reset();
+        }
+    }
+
     /**
      * @static
      * @param $globalsArray
@@ -280,6 +289,104 @@ class ConfService
         if(isSet(self::$tmpAuthStorageImpl)) return self::$tmpAuthStorageImpl;
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
+
+    public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
+
+        if($useCache){
+            $kvCache = ConfService::getInstance()->getKeyValueCache();
+            $cacheKey = self::getRegistryCacheKey($extendedVersion);
+            $cachedXml = $kvCache->fetch($cacheKey);
+            if($cachedXml !== false){
+                $registry = new DOMDocument("1.0", "utf-8");
+                $registry->loadXML($cachedXml);
+                AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
+                if($clone){
+                    return $registry->cloneNode(true);
+                }else{
+                    return $registry;
+                }
+            }
+        }
+
+        $registry = AJXP_PluginsService::getXmlRegistry($extendedVersion);
+        $changes = self::filterRegistryFromRole($registry);
+        if($changes){
+            AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
+        }
+
+        if($useCache && isSet($kvCache) && isSet($cacheKey)){
+            $kvCache->save($cacheKey, $registry->saveXML());
+        }
+
+        if($clone){
+            $cloneDoc = $registry->cloneNode(true);
+            $registry = $cloneDoc;
+        }
+        return $registry;
+
+    }
+
+    private static function getRegistryCacheKey($extendedVersion = true){
+
+        $logged = AuthService::getLoggedUser();
+        $u = $logged == null ? "shared" : $logged->getId();
+        $r = ConfService::getRepository();
+        $a = $r->getSlug();
+        $v = $extendedVersion ? "extended":"light";
+        return "xml_registry:".$v.":".$u.":".$a;
+
+    }
+
+    /**
+     * Check the current user "specificActionsRights" and filter the full registry actions with these.
+     * @static
+     * @param DOMDocument $registry
+     * @return bool
+     */
+    public static function filterRegistryFromRole(&$registry)
+    {
+        if(!AuthService::usersEnabled()) return false ;
+        $loggedUser = AuthService::getLoggedUser();
+        if($loggedUser == null) return false;
+        $crtRepo = ConfService::getRepository();
+        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
+        if ($crtRepo != null && is_a($crtRepo, "Repository")) {
+            $crtRepoId = $crtRepo->getId();
+        }
+        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
+        $changes = false;
+        $xPath = new DOMXPath($registry);
+        foreach ($actionRights as $pluginName => $actions) {
+            foreach ($actions as $actionName => $enabled) {
+                if($enabled !== false) continue;
+                $actions = $xPath->query("actions/action[@name='$actionName']");
+                if (!$actions->length) {
+                    continue;
+                }
+                $action = $actions->item(0);
+                $action->parentNode->removeChild($action);
+                $changes = true;
+            }
+        }
+        $parameters = $loggedUser->mergedRole->listParameters();
+        foreach ($parameters as $scope => $paramsPlugs) {
+            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
+                foreach ($paramsPlugs as $plugId => $params) {
+                    foreach ($params as $name => $value) {
+                        // Search exposed plugin_configs, replace if necessary.
+                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
+                        if(!$searchparams->length) continue;
+                        $param = $searchparams->item(0);
+                        $newCdata = $registry->createCDATASection(json_encode($value));
+                        $param->removeChild($param->firstChild);
+                        $param->appendChild($newCdata);
+                    }
+                }
+            }
+        }
+        return $changes;
+    }
+
 
     /**
      * @param AbstractAjxpUser $loggedUser

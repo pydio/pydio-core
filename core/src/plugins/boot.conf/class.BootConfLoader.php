@@ -307,7 +307,7 @@ class BootConfLoader extends AbstractConfDriver
         }
 
 
-        AJXP_PluginsService::clearPluginsCache();
+        ConfService::clearAllCaches();
         AJXP_Utils::setApplicationFirstRunPassed();
 
         if(isSet($htAccessToUpdate)){

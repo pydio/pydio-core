@@ -193,10 +193,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
                 // PRECOMPUTE REGISTRY
                 if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
-                    $regDoc = AJXP_PluginsService::getXmlRegistry();
-                    $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
-                    if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
-                    $clone = $regDoc->cloneNode(true);
+                    $clone = ConfService::getFilteredXMLRegistry(true, true);
                     $clonePath = new DOMXPath($clone);
                     $serverCallbacks = $clonePath->query("//serverCallback|hooks");
                     foreach ($serverCallbacks as $callback) {
