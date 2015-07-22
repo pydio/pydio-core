@@ -958,11 +958,12 @@ class AuthService
      * Count the number of users who have either read or write access to a repository
      * @param $repositoryId
      * @param bool $details
+     * @param bool $admin True if called in an admin context
      * @return Array|int
      */
-    public static function countUsersForRepository($repositoryId, $details = false)
+    public static function countUsersForRepository($repositoryId, $details = false, $admin = false)
     {
-        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details);
+        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details, $admin);
     }
 
     /**

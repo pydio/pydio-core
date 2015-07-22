@@ -633,12 +633,14 @@ class BootConfLoader extends AbstractConfDriver
         // TODO: Implement getUsersForRepository() method.
 
     }
+
     /**
      * @param string $repositoryId
      * @param boolean $details
-     * @return array('internal' => count, 'external' => count)
+     * @param bool $admin
+     * @return array
      */
-    public function countUsersForRepository($repositoryId, $details = false){
+    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
 
     }
 

@@ -572,18 +572,21 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * @param string $repositoryId
      * @param boolean $details
-     * @return Integer|Array
+     * @param bool $admin
+     * @return Array|int
      */
-    public function countUsersForRepository($repositoryId, $details = false){
+    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
         $object = ConfService::getRepositoryById($repositoryId);
-        if($object->securityScope() == "USER"){
-            if($details) return array('internal' => 1);
-            else return 1;
-        }else if($object->securityScope() == "GROUP"){
-            // Count users from current group
-            $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
-            if($details) return array('internal' => $groupUsers);
-            else return $groupUsers;
+        if(!$admin){
+            if($object->securityScope() == "USER"){
+                if($details) return array('internal' => 1);
+                else return 1;
+            }else if($object->securityScope() == "GROUP"){
+                // Count users from current group
+                $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
+                if($details) return array('internal' => $groupUsers);
+                else return $groupUsers;
+            }
         }
         // Users from roles
         $internal = 0;

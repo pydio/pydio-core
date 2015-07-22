@@ -440,9 +440,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @abstract
      * @param string $repositoryId
      * @param boolean $details
+     * @param boolean $admin
      * @return Integer|Array
      */
-    abstract public function countUsersForRepository($repositoryId, $details = false);
+    abstract public function countUsersForRepository($repositoryId, $details = false, $admin = false);
 
 
     /**

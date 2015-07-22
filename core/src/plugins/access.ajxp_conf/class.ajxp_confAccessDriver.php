@@ -1409,7 +1409,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $manifest = $plug->getManifestRawContent("server_settings/param");
                 $manifest = AJXP_XMLWriter::replaceAjxpXmlKeywords($manifest);
-                print("<ajxpdriver name=\"".$repository->accessType."\" label=\"".AJXP_Utils::xmlEntities($plug->getManifestLabel())."\" description=\"".AJXP_Utils::xmlEntities($plug->getManifestDescription())."\">$manifest</ajxpdriver>");
+                $clientSettings = $plug->getManifestRawContent("client_settings", "xml");
+                $iconClass = "";$descriptionTemplate = "";
+                if($clientSettings->length){
+                    $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
+                    $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
+                }
+                print("<ajxpdriver name=\"".$repository->accessType."\" label=\"".AJXP_Utils::xmlEntities($plug->getManifestLabel())."\" iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" description=\"".AJXP_Utils::xmlEntities($plug->getManifestDescription())."\">$manifest</ajxpdriver>");
                 print("<metasources>");
                 $metas = $pServ->getPluginsByType("metastore");
                 $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
@@ -1422,6 +1428,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     print("</meta>");
                 }
                 print("</metasources>");
+                if(!$repository->isTemplate){
+                    print "<additional_info>";
+                    $users = AuthService::countUsersForRepository($repId, false, true);
+                    $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", null, "", "serial", '', $repId);
+                    print('<users total="'.$users.'"/>');
+                    print('<shares total="'.count($shares).'"/>');
+                    print "</additional_info>";
+                }
                 AJXP_XMLWriter::close("admin_data");
                 return ;
             break;
