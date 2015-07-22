@@ -7,7 +7,7 @@
     <server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Wms Server]" description="CONF_MESSAGE[Wms server url]" mandatory="true"/>
 	</server_settings>
-	<client_settings icon="plugins/access.wms/images/world.png">
+	<client_settings icon="plugins/access.wms/images/world.png" description_template="{HOST}" iconClass="icon-globe">
 		<resources>
 			<i18n namespace="wms" path="plugins/access.wms/i18n" />
 			<img_library alias="wms_images" path="plugins/access.wms/images"/>

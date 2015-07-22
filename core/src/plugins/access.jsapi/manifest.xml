@@ -4,7 +4,7 @@
         <core_relation packaged="false" tested_version="4.0.4"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
-	<client_settings icon="plugins/access.jsapi/admin.png">
+	<client_settings icon="plugins/access.jsapi/admin.png" description_template=""  iconClass="icon-cogs">
 		<resources>
 			<i18n namespace="jsapi" path="plugins/access.jsapi/i18n" />
 			<img_library alias="jsapi_images" path="plugins/access.jsapi/icons"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="remote_fs" enabled="false" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the Pydio API (most commonly a remote server with another Pydio installed)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png">
+	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png" description_template="{HOST}{URI}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="remote_fs_access" path="plugins/access.remote_fs/i18n"/>
         </resources>
