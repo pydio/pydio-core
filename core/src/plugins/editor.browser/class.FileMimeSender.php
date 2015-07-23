@@ -72,9 +72,10 @@ class FileMimeSender extends AJXP_Plugin
 
             //Get mimetype with fileinfo PECL extension
             if (class_exists("finfo")) {
-                $finfo = new finfo(FILEINFO_MIME);
-                $fileMime = $finfo->buffer(fread($fp, 100));
-            }
+				$finfo = finfo_open(FILEINFO_MIME);
+				$fileMime = finfo_file($finfo, $repository->options['PATH'] . $repository->getDisplay());
+				finfo_close($finfo);
+			}
             //Get mimetype with (deprecated) mime_content_type
             if (strpos($fileMime, "application/octet-stream")===0 && function_exists("mime_content_type")) {
                 $fileMime = @mime_content_type($fp);
