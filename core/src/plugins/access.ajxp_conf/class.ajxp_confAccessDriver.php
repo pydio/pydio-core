@@ -1593,21 +1593,46 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (!is_object($repo)) {
                     throw new Exception("Invalid workspace id! $repId");
                 }
-                $metaSourceId = $httpVars["plugId"];
-                $repoOptions = $repo->getOption("META_SOURCES");
-                if (!is_array($repoOptions)) {
-                    $repoOptions = array();
+                if(isSet($httpVars["plugId"])){
+                    $metaSourceId = $httpVars["plugId"];
+                    $repoOptions = $repo->getOption("META_SOURCES");
+                    if (!is_array($repoOptions)) {
+                        $repoOptions = array();
+                    }
+                    if (isSet($httpVars["json_data"])) {
+                        $options = json_decode(SystemTextEncoding::magicDequote($httpVars["json_data"]), true);
+                    } else {
+                        $options = array();
+                        $this->parseParameters($httpVars, $options, null, true);
+                    }
+                    if(isset($repoOptions[$metaSourceId])){
+                        $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
+                    }
+                    $repoOptions[$metaSourceId] = $options;
+                }else if(isSet($httpVars["bulk_data"])){
+                    $bulkData = json_decode(SystemTextEncoding::magicDequote($httpVars["bulk_data"]), true);
+                    $repoOptions = $repo->getOption("META_SOURCES");
+                    if (!is_array($repoOptions)) {
+                        $repoOptions = array();
+                    }
+                    if(isSet($bulkData["delete"]) && count($bulkData["delete"])){
+                        foreach($bulkData["delete"] as $key){
+                            if(isSet($repoOptions[$key])) unset($repoOptions[$key]);
+                        }
+                    }
+                    if(isSet($bulkData["add"]) && count($bulkData["add"])){
+                        foreach($bulkData["add"] as $key => $value){
+                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
+                            $repoOptions[$key] = $value;
+                        }
+                    }
+                    if(isSet($bulkData["edit"]) && count($bulkData["edit"])){
+                        foreach($bulkData["edit"] as $key => $value){
+                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
+                            $repoOptions[$key] = $value;
+                        }
+                    }
                 }
-                if (isSet($httpVars["json_data"])) {
-                    $options = json_decode(SystemTextEncoding::magicDequote($httpVars["json_data"]), true);
-                } else {
-                    $options = array();
-                    $this->parseParameters($httpVars, $options, null, true);
-                }
-                if(isset($repoOptions[$metaSourceId])){
-                    $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
-                }
-                $repoOptions[$metaSourceId] = $options;
                 uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                 $repo->addOption("META_SOURCES", $repoOptions);
                 ConfService::replaceRepository($repId, $repo);
