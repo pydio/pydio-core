@@ -91,7 +91,8 @@ Class.create("UserWidget", {
                     img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
                     label = '<i>' + img + displayName + '</i>';
                 }
-				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="icon-reorder"></span> '+label+' </div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0 5px 5px 0;border-radius: 0 5px 5px 0;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+				var icon = this.options.iconClass || "icon-reorder";
+				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="'+icon+'"></span> '+label+' </div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0 5px 5px 0;border-radius: 0 5px 5px 0;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');
 				if(!oUser.lock && oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
