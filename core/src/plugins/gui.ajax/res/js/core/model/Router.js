@@ -37,7 +37,7 @@ var Router = function Router(pydioObject) {
                 window.setTimeout(function () {
                     //hideLightBox();
                     pydioObject.goTo(path);
-                }, 1000);
+                }, 100);
             }
         }
 

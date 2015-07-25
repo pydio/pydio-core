@@ -33,7 +33,7 @@ class Router{
                     window.setTimeout(function(){
                         //hideLightBox();
                         pydioObject.goTo(path);
-                    }, 1000);
+                    }, 100);
                 }
             }
 
