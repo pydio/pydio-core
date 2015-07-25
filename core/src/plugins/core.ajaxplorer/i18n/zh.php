@@ -33,7 +33,7 @@
 $mess=array(
 "languageLabel" => "简体中文",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "zh-CN",
 "0" => "上一版本",
 "1" => "名称",

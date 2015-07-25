@@ -25,7 +25,7 @@
 $mess=array(
 "languageLabel" => "Português Brasileiro",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "pt-BR",
 "0" => "Última versão",
 "1" => "Nome do arquivo",
