@@ -2203,6 +2203,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return strcasecmp($a->getDisplay(), $b->getDisplay());
     }
 
+    protected function getDriverLabel($pluginId, &$labels){
+        if(isSet($labels[$pluginId])){
+            return $labels[$pluginId];
+        }
+        $plugin = AJXP_PluginsService::findPluginById("access.".$pluginId);
+        if(!is_object($plugin)) {
+            $label = "access.$plugin (plugin disabled!)";
+        }else{
+            $label = $plugin->getManifestLabel();
+        }
+        $labels[$pluginId] = $label;
+        return $label;
+    }
+
 
     public function listRepositories($root, $child, $hashValue = null, $returnNodes = false, $file="", $aliasedDir=null, $httpVars){
         $REPOS_PER_PAGE = 50;
@@ -2238,6 +2252,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             </columns>');
         }
 
+        $driverLabels = array();
+
         foreach ($repos as $repoIndex => $repoObject) {
 
             if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
@@ -2252,9 +2268,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $editable = false;
                 }
             }
+            $accessType = $repoObject->getAccessType();
+            $accessLabel = $this->getDriverLabel($accessType, $driverLabels);
             $meta = array(
                 "repository_id" => $repoIndex,
                 "accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
+                "accessLabel"	=> $accessLabel,
                 "icon"			=> $icon,
                 "owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
                 "openicon"		=> $icon,
@@ -2265,10 +2284,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             );
 
             $nodeKey = "/data/repositories/$repoIndex";
+            $label = $repoObject->getDisplay();
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = AJXP_XMLWriter::renderNode(
                 $nodeKey,
-                AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay())),
+                AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($label)),
                 true,
                 $meta,
                 true,
@@ -2286,11 +2306,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $meta = array(
                         "repository_id" => $childId,
                         "accessType"	=> $childObject->getAccessType(),
+                        "accessLabel"	=> $this->getDriverLabel($childObject->getAccessType(), $driverLabels),
                         "icon"			=> "repo_child.png",
+                        "slug"          => $childObject->getSlug(),
                         "owner"			=> ($childObject->hasOwner()?$childObject->getOwner():""),
                         "openicon"		=> "repo_child.png",
                         "parentname"	=> "/repositories",
-                        "ajxp_mime" 	=> "repository_editable"
+                        "ajxp_mime" 	=> "repository_editable",
+                        "template_name" => $label
                     );
                     $cNodeKey = "/data/repositories/$childId";
                     if(in_array($cNodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
