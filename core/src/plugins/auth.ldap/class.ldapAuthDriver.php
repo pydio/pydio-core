@@ -711,7 +711,7 @@ class ldapAuthDriver extends AbstractAuthDriver
 
                         $memberValues = array();
 
-                        if ($key == "memberof") {
+                        if ($key == "memberof" || $key == "ibm-allgroups") {
                             // get CN from value
                             foreach ($entry[$key] as $possibleValue) {
                                 $hnParts = array();
@@ -747,7 +747,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                 } else if (!empty($filter)) {
                                     $valueFilters = array_map("trim", explode(",", $filter));
                                 }
-                                if ($key == "memberof") {
+                                if ($key == "memberof" || $key == "ibm-allgroups") {
 
                                     if ($this->mappedRolePrefix) {
                                         $rolePrefix = $this->mappedRolePrefix;
@@ -791,7 +791,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                 }
                                 break;
                             case "group_path":
-                                if ($key == "memberof") {
+                                if ($key == "memberof" || $key == "ibm-allgroups") {
                                     $filter = $params["MAPPING_LOCAL_PARAM"];
                                     if (strpos($filter, "preg:") !== false) {
                                         $matchFilter = "/" . str_replace("preg:", "", $filter) . "/i";
