@@ -867,6 +867,30 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles(array($dir . "/" . $selection->getUniqueFile()));
                 }
+
+                $orderField = $orderDirection = null;
+                $threshold = 500; $limitPerPage = 200;
+                $defaultOrder = $this->repository->getOption("REMOTE_SORTING_DEFAULT_COLUMN");
+                $defaultDirection = $this->repository->getOption("REMOTE_SORTING_DEFAULT_DIRECTION");
+                if ($this->repository->getOption("REMOTE_SORTING")) {
+                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):$defaultDirection;
+                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:$defaultOrder;
+                    if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
+                        $orderField = $defaultOrder;
+                    }
+                }
+                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
+                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
+                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
+                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
+                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
+                }else{
+                    $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
+                    if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
+                    $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
+                    if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
+                }
+
                 if(!$selection->isEmpty()){
                     $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
@@ -899,14 +923,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             // Detect page position: we have to loading "siblings"
                             $parentPath = AJXP_Utils::safeDirname($node->getPath());
                             $siblings = scandir($this->urlBase.$parentPath);
-                            $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-                            $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
                             foreach($siblings as $i => $s){
                                 if($this->filterFile($s, true)) unset($siblings[$i]);
                                 if($this->filterFolder($s)) unset($siblings[$i]);
                             }
                             if(count($siblings) > $threshold){
-                                usort($siblings, "strcasecmp");
+                                //usort($siblings, "strcasecmp");
+                                $siblings = $this->orderNodes($siblings, $this->urlBase.$parentPath, $orderField, $orderDirection);
                                 $index = array_search($node->getLabel(), $siblings);
                                 $node->mergeMetadata(array("page_position" => floor($index / $limitPerPage) +1));
                             }
@@ -920,27 +943,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                     AJXP_XMLWriter::close();
                     break;
-                }
-                $orderField = $orderDirection = null;
-                $defaultOrder = $this->repository->getOption("REMOTE_SORTING_DEFAULT_COLUMN");
-                $defaultDirection = $this->repository->getOption("REMOTE_SORTING_DEFAULT_DIRECTION");
-                if ($this->repository->getOption("REMOTE_SORTING")) {
-                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):$defaultDirection;
-                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:$defaultOrder;
-                    if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
-                        $orderField = $defaultOrder;
-                    }
-                }
-                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
-                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
-                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
-                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
-                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
-                }else{
-                    $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-                    if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
-                    $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
-                    if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
                 }
 
                 $countFiles = $this->countFiles($path, !$lsOptions["f"]);

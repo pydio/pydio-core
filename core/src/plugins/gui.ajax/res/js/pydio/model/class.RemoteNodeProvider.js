@@ -85,12 +85,13 @@ Class.create("RemoteNodeProvider", {
 		conn.sendAsync();
 	},
 
-    /**
-   	 * Load a node
-   	 * @param node AjxpNode
-   	 * @param nodeCallback Function On node loaded
-     * @param aSync bool
-   	 */
+	/**
+	 * Load a node
+	 * @param node AjxpNode
+	 * @param nodeCallback Function On node loaded
+	 * @param aSync bool
+	 * @param getPage bool or Object {order_column:'', order_direction:''}
+	 */
    	loadLeafNodeSync : function(node, nodeCallback, aSync, getPage){
    		var conn = new Connexion();
    		conn.addParameter("get_action", "ls");
@@ -99,6 +100,10 @@ Class.create("RemoteNodeProvider", {
         conn.addParameter("file", getBaseName(node.getPath()));
         if(getPage){
             conn.addParameter("page_position", "true");
+			if(typeof getPage == 'object' && getPage._object){
+				conn.addParameter("order_column", getPage.get('order_column'));
+				conn.addParameter("order_direction", getPage.get('order_direction'));
+			}
         }
    		if(this.properties){
    			$H(this.properties).each(function(pair){

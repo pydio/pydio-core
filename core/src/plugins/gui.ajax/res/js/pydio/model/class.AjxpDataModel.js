@@ -112,11 +112,13 @@ Class.create("AjxpDataModel", {
                     this.setSelectedNodes([selNode], this);
                 }else{
                     if(ajxpNode.getMetadata().get("paginationData") && arguments.length < 3){
-                        var newPage;
+                        var newPage, getPage=true;
                         var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
+						var remoteOrderData = ajxpNode.getMetadata().get("remote_order");
+						if(remoteOrderData) getPage = remoteOrderData;
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
-                        }, true);
+                        }, getPage);
                         if(newPage && newPage != currentPage){
                             ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
                             this.requireContextChange(ajxpNode, true, true);
