@@ -641,6 +641,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
+                            "PLUGINS_SCOPES" => array("GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui")),
                             "REPOSITORIES" => $repos,
                             "REPOSITORIES_DETAILS" => $repoDetailed
                         )
@@ -652,13 +653,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $data["ALL"]["PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
                         $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
                         $data["ALL"]["ROLES"] = array_keys(AuthService::getRolesList(array(), true));
-                        $data["ALL"]["PLUGINS_SCOPES"] = array("GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui"));
                         if (isSet($userObject->parentRole)) {
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
                         }
                     } else if (isSet($groupPath)) {
                         $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
                     }
+
 
                     $scope = "role";
                     if($roleGroup) $scope = "group";
@@ -808,8 +809,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                     if ($lock) {
                         $userObject->setLock($lockType);
+                        AJXP_XMLWriter::header();
+                        AJXP_XMLWriter::sendMessage("Successfully set lock on user ($lockType)", null);
+                        AJXP_XMLWriter::close();
                     } else {
                         $userObject->removeLock();
+                        AJXP_XMLWriter::header();
+                        AJXP_XMLWriter::sendMessage("Successfully unlocked user", null);
+                        AJXP_XMLWriter::close();
                     }
                     $userObject->save("superuser");
                 }

@@ -79,7 +79,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         return false;
     }
 
-    protected function processOneQuery($queryName, $start, $count, $frequency="day"){
+    protected function processOneQuery($queryName, $start, $count, $frequency="day", $additionalFilters=array()){
 
         $query = $this->getQuery($queryName);
         if($query === false){
@@ -97,6 +97,9 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $startDate = date($format, strtotime("-$last day", $ref));
         $endDate =  date($endFormat, strtotime("-$start day", $ref));
         $dateCursor = "logdate > '$startDate' AND logdate <= '$endDate'";
+        foreach($additionalFilters as $filterField => $filterValue){
+            $dateCursor .= " AND [".AJXP_Utils::sanitize($filterField, AJXP_SANITIZE_ALPHANUM)."] = '".AJXP_Utils::sanitize($filterValue, AJXP_SANITIZE_EMAILCHARS)."'";
+        }
 
         $q = $query["SQL"];
         $q = str_replace("AJXP_CURSOR_DATE", $dateCursor, $q);
@@ -161,7 +164,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                         array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
                     }
                 }else{
-                    if(!isSet($all[$dateK])){
+                    if(!isSet($allDates[$dateK])){
                         array_push($all, array("Date" => $dateK, "Date_sortable" => $timeDate));
                     }
                 }
@@ -188,22 +191,21 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $query_name = $httpVars["query_name"];
         $start = 0;
         $count = 30;
+        $frequency = (isSet($httpVars["frequency"])?AJXP_Utils::sanitize($httpVars["frequency"], AJXP_SANITIZE_ALPHANUM):"day");
         if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
         if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
+        $additionalFilters = array();
+        if(isSet($httpVars["user"])) $additionalFilters["user"] = AJXP_Utils::sanitize($httpVars["user"], AJXP_SANITIZE_EMAILCHARS);
+        if(isSet($httpVars["ws_id"])) $additionalFilters["repository_id"] = AJXP_Utils::sanitize($httpVars["ws_id"], AJXP_SANITIZE_ALPHANUM);
 
         $queries = explode(",", $query_name);
         if(count($queries) == 1){
-            $all = $this->processOneQuery(
-                AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM),
-                $start,
-                $count,
-                (isSet($httpVars["frequency"])?$httpVars["frequency"]:"day")
-            );
+            $all = $this->processOneQuery(AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM), $start, $count, $frequency, $additionalFilters);
         }else{
             $all = array();
             foreach($queries as $qName){
                 $qName = AJXP_Utils::sanitize($qName, AJXP_SANITIZE_ALPHANUM);
-                $all[$qName] = $this->processOneQuery($qName, $start, $count);
+                $all[$qName] = $this->processOneQuery($qName, $start, $count, $frequency, $additionalFilters);
             }
         }
 
