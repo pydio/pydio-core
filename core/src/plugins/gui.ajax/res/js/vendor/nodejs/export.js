@@ -6,4 +6,5 @@ window.Infinite = require('react-infinite');
 window.injectTapEventPlugin = require("react-tap-event-plugin");
 window.ReactGridLayout = require('react-grid-layout');
 window.ReactChart = require('react-chartjs');
+window.ReactSelect = require('react-select');
 window.injectTapEventPlugin();

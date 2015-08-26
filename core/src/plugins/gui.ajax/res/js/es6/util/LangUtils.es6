@@ -111,6 +111,15 @@ class LangUtils{
         return newObject;
     }
 
+    static objectValues(object) {
+        var results = [];
+        for (var property in object)
+            if(object.hasOwnProperty(property)){
+                results.push(object[property]);
+            }
+        return results;
+    }
+
 }
 
 LangUtils.slugTable = [

@@ -9,6 +9,7 @@
     "react-grid-layout": "^0.8.3",
     "react-infinite": "^0.3.4",
     "react-tap-event-plugin": "^0.1.7",
-    "reactify": "^1.1.1"
+    "reactify": "^1.1.1",
+    "react-select":"^0.6.5"
   }
 }
