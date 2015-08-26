@@ -1025,7 +1025,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             continue;
                         }
                         foreach($roles as $roleId){
-                            if(strpos($roleId, "AJXP_USR_/") === 0 || strpos($roleId,"AJXP_GRP_/" === 0)){
+                            if(strpos($roleId, "AJXP_USR_/") === 0 || strpos($roleId,"AJXP_GRP_/") === 0){
                                 continue;
                             }
                             $roleId = AJXP_Utils::sanitize($roleId, AJXP_SANITIZE_FILENAME);
