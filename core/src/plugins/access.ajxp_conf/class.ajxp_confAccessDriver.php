@@ -643,14 +643,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "ALL"  => array(
                             "PLUGINS_SCOPES" => array("GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui")),
                             "REPOSITORIES" => $repos,
-                            "REPOSITORIES_DETAILS" => $repoDetailed
+                            "REPOSITORIES_DETAILS" => $repoDetailed,
+                            "PROFILES" => array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest")
                         )
                     );
                     if (isSet($userObject)) {
                         $data["USER"] = array();
                         $data["USER"]["LOCK"] = $userObject->getLock();
                         $data["USER"]["PROFILE"] = $userObject->getProfile();
-                        $data["ALL"]["PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
                         $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
                         $data["ALL"]["ROLES"] = array_keys(AuthService::getRolesList(array(), true));
                         if (isSet($userObject->parentRole)) {
@@ -1007,6 +1007,45 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"], null);
                 AJXP_XMLWriter::close();
                 return ;
+
+            break;
+
+            case "users_bulk_update_roles":
+
+                $data = json_decode($httpVars["json_data"], true);
+                $userIds = $data["users"];
+                $rolesOperations = $data["roles"];
+                foreach($userIds as $userId){
+                    $userId = AJXP_Utils::sanitize($userId, AJXP_SANITIZE_EMAILCHARS);
+                    if(!AuthService::userExists($userId)) continue;
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    if(!AuthService::canAdministrate($userObject)) continue;
+                    foreach($rolesOperations as $addOrRemove => $roles){
+                        if(!in_array($addOrRemove, array("add", "remove"))) {
+                            continue;
+                        }
+                        foreach($roles as $roleId){
+                            if(strpos($roleId, "AJXP_USR_/") === 0 || strpos($roleId,"AJXP_GRP_/" === 0)){
+                                continue;
+                            }
+                            $roleId = AJXP_Utils::sanitize($roleId, AJXP_SANITIZE_FILENAME);
+                            if ($addOrRemove == "add") {
+                                $roleObject = AuthService::getRole($roleId);
+                                $userObject->addRole($roleObject);
+                            } else {
+                                $userObject->removeRole($roleId);
+                            }
+                        }
+                    }
+                    $userObject->save("superuser");
+                    $loggedUser = AuthService::getLoggedUser();
+                    if ($loggedUser->getId() == $userObject->getId()) {
+                        AuthService::updateUser($userObject);
+                    }
+                }
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage("Successfully updated roles", null);
+                AJXP_XMLWriter::close();
 
             break;
 
@@ -2092,8 +2131,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $mess = ConfService::getMessages();
         $loggedUser = AuthService::getLoggedUser();
         $userArray = array();
+        $logger = AJXP_Logger::getInstance();
+        if(method_exists($logger, "usersLastConnection")){
+            $allUserIds = array();
+        }
         foreach ($users as $userObject) {
             $label = $userObject->getId();
+            if(isSet($allUserIds)) $allUserIds[] = $label;
             if ($userObject->hasParent()) {
                 $label = $userObject->getParent()."000".$label;
             }else{
@@ -2104,14 +2148,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             }
             $userArray[$label] = $userObject;
         }
+        if(isSet($allUserIds)){
+            $connections = $logger->usersLastConnection($allUserIds);
+        }
         ksort($userArray);
         foreach ($userArray as $userObject) {
             $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
             $isAdmin = $userObject->isAdmin();
             $userId = $userObject->getId();
             $icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
+            $iconClass = "icon-user";
             if ($userObject->hasParent()) {
                 $icon = "user_child";
+                $iconClass = "icon-angle-right";
             }
             if ($isAdmin) {
                 $rightsString = $mess["ajxp_conf.63"];
@@ -2135,7 +2184,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $meta = array(
                 "isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
                 "icon" => $icon.".png",
-                "icon_class" => "icon-user",
+                "icon_class" => $iconClass,
                 "object_id" => $userId,
                 "auth_scheme" => ($scheme != null? $scheme : ""),
                 "rights_summary" => $rightsString,
@@ -2143,6 +2192,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":""),
                 "json_merged_role" => json_encode($userObject->mergedRole->getDataArray(true))
             );
+            if($userObject->hasParent()) $meta["shared_user"] = "true";
+            if(isSet($connections) && isSet($connections[$userObject->getId()]) && !empty($connections[$userObject->getId()])) {
+                $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
+                $meta["last_connection_readable"] = AJXP_Utils::relativeDate($meta["last_connection"], $mess);
+            }
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = AJXP_XMLWriter::renderNode($nodeKey, $nodeLabel, true, $meta, true, false);
             if(!$returnNodes) print($xml);

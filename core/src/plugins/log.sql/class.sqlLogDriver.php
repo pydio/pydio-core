@@ -65,6 +65,12 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }
     }
 
+    public function usersLastConnection($userIds){
+        $res = dibi::query("SELECT [user], MAX([logdate]) AS date_max FROM [ajxp_log] WHERE [user] IN (%s) GROUP BY [user]", $userIds);
+        $all = $res->fetchPairs("user", "date_max");
+        return $all;
+    }
+
     public function exposeQueries($actionName, &$httpVars, &$fileVars){
 
         header('Content-type: application/json');
