@@ -5,7 +5,7 @@
     "chart.js": "^1.0.2",
     "material-ui": "^0.7.5",
     "react": "^0.13.3",
-    "react-chartjs": "^0.6.0",
+    "react-chartjs":"git://github.com/dehbmarques/react-chartjs.git#master",
     "react-grid-layout": "^0.8.3",
     "react-infinite": "^0.3.4",
     "react-tap-event-plugin": "^0.1.7",
