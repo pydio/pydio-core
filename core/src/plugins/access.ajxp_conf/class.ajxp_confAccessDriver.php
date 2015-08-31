@@ -582,14 +582,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (strpos($roleId, "AJXP_GRP_") === 0) {
                     $groupPath = substr($roleId, strlen("AJXP_GRP_"));
                     $filteredGroupPath = AuthService::filterBaseGroup($groupPath);
-                    $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
-                    $key = "/".basename($groupPath);
-                    if (!array_key_exists($key, $groups)) {
-                        throw new Exception("Cannot find group with this id!");
+                    if($filteredGroupPath == "/"){
+                        $roleId = "AJXP_GRP_/";
+                        $groupLabel = "Root Group";
+                        $roleGroup = true;
+                    }else{
+                        $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
+                        $key = "/".basename($groupPath);
+                        if (!array_key_exists($key, $groups)) {
+                            throw new Exception("Cannot find group with this id!");
+                        }
+                        $roleId = "AJXP_GRP_".$filteredGroupPath;
+                        $groupLabel = $groups[$key];
+                        $roleGroup = true;
                     }
-                    $roleId = "AJXP_GRP_".$filteredGroupPath;
-                    $groupLabel = $groups[$key];
-                    $roleGroup = true;
                 }
                 if (strpos($roleId, "AJXP_USR_") === 0) {
                     $usrId = str_replace("AJXP_USR_/", "", $roleId);
@@ -690,12 +696,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $groupPath = substr($roleId, strlen("AJXP_GRP_"));
                     $filteredGroupPath = AuthService::filterBaseGroup($groupPath);
                     $roleId = "AJXP_GRP_".$filteredGroupPath;
-                    $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
-                    $key = "/".basename($groupPath);
-                    if (!array_key_exists($key, $groups)) {
-                        throw new Exception("Cannot find group with this id!");
+                    if($roleId != "AJXP_GRP_/"){
+                        $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
+                        $key = "/".basename($groupPath);
+                        if (!array_key_exists($key, $groups)) {
+                            throw new Exception("Cannot find group with this id!");
+                        }
+                        $groupLabel = $groups[$key];
+                    }else{
+                        $groupLabel = "Root Group";
                     }
-                    $groupLabel = $groups[$key];
                     $roleGroup = true;
                 }
                 if (strpos($roleId, "AJXP_USR_") === 0) {
@@ -1396,6 +1406,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 print("<repository index=\"$repId\"");
                 foreach ($repository as $name => $option) {
                     if(strstr($name, " ")>-1) continue;
+                    if ($name == "driverInstance") continue;
                     if (!is_array($option)) {
                         if (is_bool($option)) {
                             $option = ($option?"true":"false");
@@ -1517,6 +1528,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             if ($key == "AJXP_SLUG") {
                                 $repo->setSlug($value);
                                 continue;
+                            } else if ($key == "WORKSPACE_LABEL"){
+                                $newLabel = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
+                                if($repo->getDisplay() != $newLabel){
+                                    if ($this->repositoryExists($newLabel)) {
+                                        throw new Exception($mess["ajxp_conf.50"]);
+                                    }else{
+                                        $repo->setDisplay($newLabel);
+                                    }
+                                }
                             } elseif ($key == "AJXP_GROUP_PATH_PARAMETER") {
                                 $basePath = "/";
                                 if (AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null) {
@@ -1542,7 +1562,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if ($repo->getOption("DEFAULT_RIGHTS")) {
                         $gp = $repo->getGroupPath();
                         if (empty($gp) || $gp == "/") {
-                            $defRole = AuthService::getRole("ROOT_ROLE");
+                            $defRole = AuthService::getRole("AJXP_GRP_/");
                         } else {
                             $defRole = AuthService::getRole("AJXP_GRP_".$gp, true);
                         }
@@ -2216,7 +2236,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return array();
         $roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
         ksort($roles);
-        foreach ($roles as $roleId => $roleObject) {
+        if(!$this->listSpecialRoles){
+            $rootGroupRole = AuthService::getRole("AJXP_GRP_/", true);
+            if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
+                $rootGroupRole->setLabel("Root Group");
+                AuthService::updateRole($rootGroupRole);
+            }
+            array_unshift($roles, $rootGroupRole);
+        }
+        foreach ($roles as $roleObject) {
             //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
             $r = array();
             if(!AuthService::canAdministrate($roleObject)) continue;
@@ -2229,16 +2257,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $r[] = $repository->getDisplay()." (".$rs.")";
             }
             $rightsString = implode(", ", $r);
-            $nodeKey = "/data/roles/".$roleId;
+            $nodeKey = "/data/roles/".$roleObject->getId();
             $meta = array(
                 "icon" => "user-acl.png",
                 "rights_summary" => $rightsString,
                 "is_default"    => implode(",", $roleObject->listAutoApplies()), //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
                 "ajxp_mime" => "role",
+                "role_id"   => $roleObject->getId(),
                 "text"      => $roleObject->getLabel()
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = AJXP_XMLWriter::renderNode($nodeKey, $roleId, true, $meta, true, false);
+            $xml = AJXP_XMLWriter::renderNode($nodeKey, $roleObject->getId(), true, $meta, true, false);
             if(!$returnNodes) echo $xml;
             else $allNodes[$nodeKey] = $xml;
         }
@@ -2675,7 +2704,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             if (is_array($value)) {
                 $this->flattenKeyValues($result, $definitions, $value, $parent."/".$key);
             } else {
-                if ($key == "group_switch_value" || $key == "instance_name") {
+                if ($key == "instance_name") {
+                    $result[$parent] = $value;
+                }
+                if ($key == "group_switch_value") {
                     $result[$parent] = $value;
                 } else {
                     $result[$parent.'/'.$key] = $value;
