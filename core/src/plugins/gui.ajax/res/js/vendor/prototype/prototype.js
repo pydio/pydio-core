@@ -441,16 +441,19 @@ Object.extend(Function.prototype, (function() {
     };
   }
 
-  return {
+  var res = {
     argumentNames:       argumentNames,
-    bind:                bind,
     bindAsEventListener: bindAsEventListener,
     curry:               curry,
     delay:               delay,
     defer:               defer,
     wrap:                wrap,
     methodize:           methodize
+  };
+  if(!Function.prototype.bind){
+    res['bind'] = bind;
   }
+  return res;
 })());
 
 
