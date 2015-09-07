@@ -145,7 +145,7 @@
                                 <h3 class="colorcode-bookmark" ajxp_message_id="147">AJXP_MESSAGE[147]
                                     <small id="bookmarks_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>AJXP_MESSAGE[513]</small>
                                 </h3>
-                                <div style="display:none;" id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content", "silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true, "containerDroppableAction":"bookmark", "emptyChildrenMessage":515}'></div>
+                                <div style="display:none;" id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content", "silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true, "containerDroppableAction":"bookmark", "emptyChildrenMessage":515,"clearSelectionOnBlur":true}'></div>
                             </div>
                             <div id="navigation_folders" ajxp_position="3">
                                 <h3 class="colorcode-folder" ajxp_message_id="130">AJXP_MESSAGE[130]
