@@ -205,13 +205,25 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         if(isSet($httpVars["ws_id"])) $additionalFilters["repository_id"] = AJXP_Utils::sanitize($httpVars["ws_id"], AJXP_SANITIZE_ALPHANUM);
 
         $queries = explode(",", $query_name);
+        $meta = array();
         if(count($queries) == 1){
-            $all = $this->processOneQuery(AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM), $start, $count, $frequency, $additionalFilters);
+            $qName = AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM);
+            $all = $this->processOneQuery($qName, $start, $count, $frequency, $additionalFilters);
+            $qDef = $this->getQuery($qName);
+            if($qDef !== false && isSet($qDef['AXIS'])) {
+                unset($qDef["SQL"]);
+                $meta[$qName] = $qDef;
+            }
         }else{
             $all = array();
             foreach($queries as $qName){
                 $qName = AJXP_Utils::sanitize($qName, AJXP_SANITIZE_ALPHANUM);
                 $all[$qName] = $this->processOneQuery($qName, $start, $count, $frequency, $additionalFilters);
+                $qDef = $this->getQuery($qName);
+                if($qDef !== false && isSet($qDef['AXIS'])) {
+                    unset($qDef["SQL"]);
+                    $meta[$qName] = $qDef;
+                }
             }
         }
 
@@ -243,7 +255,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }
         header('Link: '.implode(",", $hLinks));
 
-        $envelope = array("links" => $links, "data" => $all);
+        $envelope = array("links" => $links, "data" => $all, "meta" => $meta);
         echo json_encode($envelope);
 
     }
