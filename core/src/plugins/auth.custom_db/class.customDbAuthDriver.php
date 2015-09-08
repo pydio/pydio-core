@@ -158,7 +158,7 @@ class customDbAuthDriver extends AbstractAuthDriver
         if($hashAlgo == "pbkdf2"){
             return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);
         }else if($hashAlgo == "md5"){
-            return md5($pass) == $userStoredPass;
+            return md5($pass) === $userStoredPass;
         }else if($hashAlgo == "clear"){
             return $pass == $userStoredPass;
         }

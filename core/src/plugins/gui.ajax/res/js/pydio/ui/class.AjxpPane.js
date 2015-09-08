@@ -82,6 +82,11 @@ Class.create("AjxpPane", {
         }.bind(this);
         document.observe("ajaxplorer:component_config_changed", this.configObserver);
 
+        if(this.options.replaceScroller && window.ajxpMobile){
+            this.options.replaceScroller = false;
+            this.htmlElement.setStyle({overflowY:"auto"});
+        }
+
         if(this.options.replaceScroller){
             this.scroller = new Element('div', {
                 id:'scroller_'+this.htmlElement.id,

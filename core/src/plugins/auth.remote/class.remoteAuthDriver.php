@@ -167,7 +167,7 @@ class remoteAuthDriver extends AbstractAuthDriver
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
                 return  AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
             } else {
-                return (md5($userStoredPass.$seed) == $pass);
+                return (md5($userStoredPass.$seed) === $pass);
             }
         } else {
             $crtSessionId = session_id();
@@ -218,7 +218,7 @@ class remoteAuthDriver extends AbstractAuthDriver
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
                 $res = AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
             } else {
-                $res = (md5($userStoredPass.$seed) == $pass);
+                $res = (md5($userStoredPass.$seed) === $pass);
             }
             if ($res) {
                 session_id($crtSessionId);

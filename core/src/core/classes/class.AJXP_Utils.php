@@ -160,7 +160,7 @@ class AJXP_Utils
             '#(<[^>]+[\x00-\x20\"\'\/])style=[^>]*>?#iUu',
 
             // Match unneeded tags
-            '#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+            '#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base|svg)[^>]*>?#i'
         );
 
         foreach($patterns as $pattern) {
