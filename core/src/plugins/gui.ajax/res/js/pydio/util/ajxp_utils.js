@@ -791,43 +791,11 @@ function scrollByTouch(event, direction, targetId){
 }
 
 function attachMobileScroll(targetId, direction){
-	if(!window.ajxpMobile) return;
-    var target;
-	if(typeof (targetId) == "string"){
-		target = $(targetId);
-	}else{
-		target = targetId;
-		targetId = target.id;
-        if(!target.id){
-            targetId = "scroll-pane-"+Math.floor(Math.random()*1000);
-            target.setAttribute('id', targetId);
-        }
-	}
-	if(!target) return;
-	target.addEventListener("touchmove", function(event){ scrollByTouch(event, direction, targetId); });
-	target.addEventListener("touchstart", function(event){ scrollByTouch(event, direction, targetId); });
-	target.addEventListener("touchend", function(event){ scrollByTouch(event, direction, targetId); });
-}
-
-function attachMobilTouchForClick(oElement, callback){
-
-    oElement.observe("touchstart", function(event){
-        var touchData = event.changedTouches[0];
-        oElement.selectableTouchStart = touchData["clientY"];
-    });
-    oElement.observe("touchend", function(event){
-        if(oElement.selectableTouchStart) {
-            var touchData = event.changedTouches[0];
-            var delta = touchData['clientY'] - oElement.selectableTouchStart;
-            if(Math.abs(delta) > 2){
-                return;
-            }
-        }
-        oElement.selectableTouchStart = null;
-        callback(event);
-    } );
-
-
+	if(!window.ajxpMobile || !$(targetId)) return;
+    var overflow = {};
+    if(direction == 'vertical' || direction == 'both') overflow['overflowY'] = 'auto';
+    if(direction == 'horizontal' || direction == 'both') overflow['overflowX'] = 'auto';
+    $(targetId).setStyle(overflow);
 }
 
 function bufferCallback(name, time, callback){

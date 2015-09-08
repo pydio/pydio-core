@@ -42,11 +42,6 @@
 				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
 				<script type="text/javascript">
 					window.ajxpMobile = true;
-					if(!window.getAjxpMobileActions){
-                        var conn = new Connexion();
-                        conn._libUrl = '';
-                        conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
-                    }
 				</script>
 			]]></template>
 			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[

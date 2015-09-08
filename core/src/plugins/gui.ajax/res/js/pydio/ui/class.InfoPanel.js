@@ -78,6 +78,10 @@ Class.create("InfoPanel", AjxpPane, {
      * @param node
      */
     open : function($super, node){
+        // We should not have the observers
+        document.stopObserving("ajaxplorer:actions_refreshed", this.updateHandler );
+        document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );
+        document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
         this.htmlElement.up('div.dialogBox').setStyle({width:Math.min(450, document.viewport.getWidth())+'px'});
         this.htmlElement.up('div.dialogContent').setStyle({padding:0});
         this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});

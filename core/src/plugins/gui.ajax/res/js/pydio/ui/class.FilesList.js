@@ -79,9 +79,10 @@ Class.create("FilesList", SelectableElements, {
                 this._instanciatedToolbars = $A();
             }
 		}
-        if(this.options.fit && this.options.fit == "content"){
+        if((this.options.fit && this.options.fit == "content") || window.ajxpMobile){
             this.options.replaceScroller = false;
         }
+
         if(!FilesList.staticIndex) {
             FilesList.staticIndex = 1;
         }else{
@@ -731,11 +732,6 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 }
             );
-            if(this.options.horizontalScroll){
-                attachMobileScroll(this.htmlElement, "horizontal");
-            }else{
-                attachMobileScroll(contentContainer, "vertical");
-            }
             scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
@@ -832,11 +828,6 @@ Class.create("FilesList", SelectableElements, {
 			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
-            if(this.options.horizontalScroll){
-                attachMobileScroll(this.htmlElement, "horizontal");
-            }else{
-                attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
-            }
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.addClassName("paginated");
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
@@ -918,7 +909,6 @@ Class.create("FilesList", SelectableElements, {
             }.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
             if(parseInt(this.paginationData.get('total')) == 1) this._sortableTable.paginationLoaderFunc = null;
         }
-
 
         if(this.options.replaceScroller){
             this.scroller = new Element('div', {id:'filelist_scroller'+this.__currentInstanceIndex, className:'scroller_track', style:"right:0px"});

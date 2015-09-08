@@ -158,7 +158,6 @@ Class.create("UserDashboardHome", AjxpPane, {
                     switchToRepo(repoId);
                 }
             };
-            attachMobilTouchForClick(repoEl, select);
             disableTextSelection(repoEl);
             if(simpleClickOpen){
                 repoEl.observe("click", function(e){

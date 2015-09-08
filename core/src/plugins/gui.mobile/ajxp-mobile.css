@@ -185,6 +185,7 @@ div.detailed div.FL-inlineToolbar {
     margin-bottom: 7px;
     text-align: left;
     margin-top: 5px;
+    overflow: visible;
 }
 
 .selected div.FL-inlineToolbar a {
@@ -197,12 +198,12 @@ div.detailed div.FL-inlineToolbar {
 
 div.detailed .FL-inlineToolbar a#ls_inline_button {
     position: absolute;
-    top: 15px;
-    right: 12px;
-    border: 0;
-    padding: 4px 11px !important;
-    background-color: rgba(255, 255, 255, 0);
+    top: 24px;
+    right: 16px;
+    padding: 4px 10px 2px 12px !important;
+    background-color: rgb(255, 255, 255);
     border-radius: 30px;
+    color: #FB725C;
 }
 
 div.detailed .FL-inlineToolbar a#ls_inline_button > span.ajxp_icon_span{
