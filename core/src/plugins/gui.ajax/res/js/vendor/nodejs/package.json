@@ -10,6 +10,8 @@
     "react-infinite": "^0.3.4",
     "react-tap-event-plugin": "^0.1.7",
     "reactify": "^1.1.1",
-    "react-select":"^0.6.5"
+    "react-select":"^0.6.5",
+    "react-dnd":"^1.1.5",
+    "lodash":"^3.10.1"
   }
 }

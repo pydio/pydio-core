@@ -7,4 +7,7 @@ window.injectTapEventPlugin = require("react-tap-event-plugin");
 window.ReactGridLayout = require('react-grid-layout');
 window.ReactChart = require('react-chartjs');
 window.ReactSelect = require('react-select');
+window.ReactDND = require('react-dnd');
+window.ReactDND.HTML5Backend = require('react-dnd/modules/backends/HTML5');
+window.ReactDND.flow = require('lodash/function/flow');
 window.injectTapEventPlugin();
