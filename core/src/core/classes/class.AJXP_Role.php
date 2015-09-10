@@ -33,12 +33,30 @@ define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 class AJXP_Role implements AjxpGroupPathProvider
 {
 
+    /**
+     * @var String path of this role, default is root path
+     */
     protected $groupPath;
+    /**
+     * @var String Role identifier
+     */
     protected $roleId;
 
+    /**
+     * @var array List of access rights for each workspaces (wsId => "r", "w", "rw", "d")
+     */
     protected $acls = array();
+    /**
+     * @var array List of plugins parameters values, (SCOPE => PLUGIN NAME => PARAM NAME => value)
+     */
     protected $parameters = array();
+    /**
+     * @var array List of plugin actions that can be disabled/enabled (SCOPE => PLUGIN NAME => ACTION NAME => status)
+     */
     protected $actions = array();
+    /**
+     * @var array Automatically applies to a given list of profiles
+     */
     protected $autoApplies = array();
 
     static $cypheredPassPrefix = '$pydio_password$';
@@ -146,6 +164,7 @@ class AJXP_Role implements AjxpGroupPathProvider
 
     /**
      * Send all role informations as an associative array
+     * @param bool $blurPasswords
      * @return array
      */
     public function getDataArray($blurPasswords = false)
@@ -383,6 +402,11 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $arr;
     }
 
+    /**
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
     public function array_merge_recursive2($array1, $array2)
     {
         $arrays = func_get_args();
@@ -447,6 +471,11 @@ class AJXP_Role implements AjxpGroupPathProvider
         $test = $this->filterParameterValue("core.conf", "ROLE_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $this->roleId);
         if(!empty($test)) return $test;
         return $this->roleId;
+   }
+
+    public function alwaysOverrides()
+    {
+        return $this->filterParameterValue("core.conf", "ROLE_FORCE_OVERRIDE", AJXP_REPO_SCOPE_ALL, false);
    }
 
     /**

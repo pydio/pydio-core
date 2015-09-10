@@ -168,6 +168,12 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             $this->rights["ajxp.roles.order"] = array();
         }
         $this->rights["ajxp.roles.order"][$roleObject->getId()] = count($this->rights["ajxp.roles"]);
+        if($roleObject->alwaysOverrides()){
+            if(!isSet($this->rights["ajxp.roles.sticky"])){
+                $this->rights["ajxp.roles.sticky"] = array();
+            }
+            $this->rights["ajxp.roles.sticky"][$roleObject->getId()] = true;
+        }
         uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
         $this->roles[$roleObject->getId()] = $roleObject;
         $this->recomputeMergedRole();
@@ -177,8 +183,10 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     {
         if (isSet($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])) {
             unset($this->rights["ajxp.roles"][$roleId]);
-            uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
             if(isSet($this->roles[$roleId])) unset($this->roles[$roleId]);
+            if(isSet($this->rights["ajxp.roles.sticky"]) && isSet($this->rights["ajxp.roles.sticky"][$roleId])){
+                unset($this->rights["ajxp.roles.sticky"][$roleId]);
+            }
             if(isset($this->rights["ajxp.roles.order"]) && isset($this->rights["ajxp.roles.order"][$roleId])){
                 $previousPos = $this->rights["ajxp.roles.order"][$roleId];
                 $ordered = array_flip($this->rights["ajxp.roles.order"]);
@@ -192,6 +200,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
                 }
                 $this->rights["ajxp.roles.order"] = $reordered;
             }
+            uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
         }
         $this->recomputeMergedRole();
     }
@@ -526,6 +535,17 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         // Two groups, sort by string, will magically keep group hierarchy
         if(strpos($r1, "AJXP_GRP_") === 0 && strpos($r2, "AJXP_GRP_") === 000) {
             return strcmp($r1,$r2);
+        }
+
+        // Two roles: if sticky and something else, always last.
+        if(isSet($this->rights["ajxp.roles.sticky"])){
+            $sticky = $this->rights["ajxp.roles.sticky"];
+            if(isSet($sticky[$r1]) && !isSet($sticky[$r2])){
+                return 1;
+            }
+            if(isSet($sticky[$r2]) && !isSet($sticky[$r1])){
+                return -1;
+            }
         }
 
         // Two roles - Try to get sorting order

@@ -417,6 +417,13 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 if (isSet($allRoles[$roleId])) {
                     $this->roles[$roleId] = $allRoles[$roleId];
                     $this->rights["ajxp.roles"][$roleId] = true;
+                    $roleObject = $allRoles[$roleId];
+                    if($roleObject->alwaysOverrides()){
+                        if(!isSet($this->rights["ajxp.roles.sticky"]) || !is_array($this->rights["ajxp.roles.sticky"])) {
+                            $this->rights["ajxp.roles.sticky"] = array();
+                        }
+                        $this->rights["ajxp.roles.sticky"][$roleId] = true;
+                    }
                 } else if (is_array($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])) {
                     unset($this->rights["ajxp.roles"][$roleId]);
                 }
@@ -485,6 +492,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
         // UPDATE TABLE
         dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]=%s", $this->getId());
         foreach ($this->rights as $rightKey => $rightValue) {
+            if ($rightKey == "ajxp.roles.sticky") {
+                continue;
+            }
             if ($rightKey == "ajxp.roles" || $rightKey == "ajxp.roles.order") {
                 if (is_array($rightValue) && count($rightValue)) {
                     $rightValue = $this->filterRolesForSaving($rightValue, $rightKey == "ajxp.roles" ? true: false);
