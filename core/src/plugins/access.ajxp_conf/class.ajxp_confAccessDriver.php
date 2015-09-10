@@ -665,7 +665,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $data["ALL"]["ROLES"] = array_keys($rolesList);
                         $data["ALL"]["ROLES_DETAILS"] = array();
                         foreach($rolesList as $rId => $rObj){
-                            $data["ALL"]["ROLES_DETAILS"][$rId] = $rObj->getLabel();
+                            $data["ALL"]["ROLES_DETAILS"][$rId] = array("label" => $rObj->getLabel(), "sticky" => $rObj->alwaysOverrides());
                         }
                         if (isSet($userObject->parentRole)) {
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
@@ -2202,7 +2202,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             }
             $userArray[$label] = $userObject;
         }
-        if(isSet($allUserIds)){
+        if(isSet($allUserIds) && count($allUserIds)){
             $connections = $logger->usersLastConnection($allUserIds);
         }
         ksort($userArray);
