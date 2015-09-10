@@ -427,16 +427,16 @@ class AuthService
     {
         if(AJXP_Utils::detectApplicationFirstRun()) return;
         if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
-        $rootRole = self::getRole("ROOT_ROLE", false);
+        $rootRole = self::getRole("AJXP_GRP_/", false);
         if ($rootRole === false) {
-            $rootRole = new AJXP_Role("ROOT_ROLE");
-            $rootRole->setLabel("Root Role");
-            $rootRole->setAutoApplies(array("standard", "admin"));
-            $dashId = "";
+            $rootRole = new AJXP_Role("AJXP_GRP_/");
+            $rootRole->setLabel("Root Group");
+            //$rootRole->setAutoApplies(array("standard", "admin"));
+            //$dashId = "";
             $allRepos = ConfService::getRepositoriesList("all", false);
             foreach ($allRepos as $repositoryId => $repoObject) {
                 if($repoObject->isTemplate) continue;
-                if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
+                //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
                 $gp = $repoObject->getGroupPath();
                 if (empty($gp) || $gp == "/") {
                     if ($repoObject->getDefaultRight() != "") {
@@ -444,7 +444,7 @@ class AuthService
                     }
                 }
             }
-            if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
+            //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
             $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {

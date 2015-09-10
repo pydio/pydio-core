@@ -647,7 +647,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
-                            "PLUGINS_SCOPES" => array("GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui")),
+                            "PLUGINS_SCOPES" => array(
+                                "GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui", "sec"),
+                                "GLOBAL_PLUGINS" => array("action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater")
+                            ),
                             "REPOSITORIES" => $repos,
                             "REPOSITORIES_DETAILS" => $repoDetailed,
                             "PROFILES" => array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest")
@@ -658,7 +661,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $data["USER"]["LOCK"] = $userObject->getLock();
                         $data["USER"]["PROFILE"] = $userObject->getProfile();
                         $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
-                        $data["ALL"]["ROLES"] = array_keys(AuthService::getRolesList(array(), true));
+                        $rolesList = AuthService::getRolesList(array(), true);
+                        $data["ALL"]["ROLES"] = array_keys($rolesList);
+                        $data["ALL"]["ROLES_DETAILS"] = array();
+                        foreach($rolesList as $rId => $rObj){
+                            $data["ALL"]["ROLES_DETAILS"][$rId] = $rObj->getLabel();
+                        }
                         if (isSet($userObject->parentRole)) {
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
                         }
@@ -668,7 +676,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 
                     $scope = "role";
-                    if($roleGroup) $scope = "group";
+                    if($roleGroup) {
+                        $scope = "group";
+                        if($roleId == "AJXP_GRP_/") $scope = "role";
+                    }
                     else if(isSet($userObject)) $scope = "user";
                     $data["SCOPE_PARAMS"] = array();
                     $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
@@ -1016,7 +1027,30 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"], null);
                 AJXP_XMLWriter::close();
-                return ;
+
+            break;
+
+            case "user_reorder_roles":
+
+                if (!isSet($httpVars["user_id"]) || !AuthService::userExists($httpVars["user_id"]) || !isSet($httpVars["roles"])) {
+                    throw new Exception($mess["ajxp_conf.61"]);
+                }
+                $roles = json_decode($httpVars["roles"], true);
+                $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+                $confStorage = ConfService::getConfStorageImpl();
+                $user = $confStorage->createUserObject($userId);
+                if(!AuthService::canAdministrate($user)){
+                    throw new Exception("Cannot update user data for ".$userId);
+                }
+                $user->updateRolesOrder($roles);
+                $user->save("superuser");
+                $loggedUser = AuthService::getLoggedUser();
+                if ($loggedUser->getId() == $user->getId()) {
+                    AuthService::updateUser($user);
+                }
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage("Roles reordered for user ".$httpVars["user_id"], null);
+                AJXP_XMLWriter::close();
 
             break;
 

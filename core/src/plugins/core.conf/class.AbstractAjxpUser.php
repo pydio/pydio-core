@@ -164,6 +164,10 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         }
         if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
         $this->rights["ajxp.roles"][$roleObject->getId()] = true;
+        if(!isSet($this->rights["ajxp.roles.order"])){
+            $this->rights["ajxp.roles.order"] = array();
+        }
+        $this->rights["ajxp.roles.order"][$roleObject->getId()] = count($this->rights["ajxp.roles"]);
         uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
         $this->roles[$roleObject->getId()] = $roleObject;
         $this->recomputeMergedRole();
@@ -175,8 +179,33 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             unset($this->rights["ajxp.roles"][$roleId]);
             uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
             if(isSet($this->roles[$roleId])) unset($this->roles[$roleId]);
+            if(isset($this->rights["ajxp.roles.order"]) && isset($this->rights["ajxp.roles.order"][$roleId])){
+                $previousPos = $this->rights["ajxp.roles.order"][$roleId];
+                $ordered = array_flip($this->rights["ajxp.roles.order"]);
+                ksort($ordered);
+                unset($ordered[$previousPos]);
+                $reordered = array();
+                $p = 0;
+                foreach($ordered as $id) {
+                    $reordered[$id] = $p;
+                    $p++;
+                }
+                $this->rights["ajxp.roles.order"] = $reordered;
+            }
         }
         $this->recomputeMergedRole();
+    }
+
+    /**
+     * @param $orderedRolesIds Ordered array of roles ids
+     */
+    public function updateRolesOrder($orderedRolesIds){
+        // check content
+        $saveRoleOrders = array();
+        foreach($orderedRolesIds as $position => $rId){
+            if(isSet($this->rights["ajxp.roles"][$rId])) $saveRoleOrders[$rId] = $position;
+        }
+        $this->rights["ajxp.roles.order"] = $saveRoleOrders;
     }
 
     public function getRoles()
@@ -486,9 +515,25 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     protected function orderRoles($r1, $r2)
     {
+        // One group and something else
+        if(strpos($r1, "AJXP_GRP_") === 0 && strpos($r2, "AJXP_GRP_") === FALSE) return -1;
+        if(strpos($r2, "AJXP_GRP_") === 0 && strpos($r1, "AJXP_GRP_") === FALSE) return 1;
+
+        // Usr role and something else
         if(strpos($r1, "AJXP_USR_") === 0) return 1;
         if(strpos($r2, "AJXP_USR_") === 0) return -1;
-        return strcmp($r1,$r2);
+
+        // Two groups, sort by string, will magically keep group hierarchy
+        if(strpos($r1, "AJXP_GRP_") === 0 && strpos($r2, "AJXP_GRP_") === 000) {
+            return strcmp($r1,$r2);
+        }
+
+        // Two roles - Try to get sorting order
+        if(isSet($this->rights["ajxp.roles.order"])){
+            return $this->rights["ajxp.roles.order"][$r1] - $this->rights["ajxp.roles.order"][$r2];
+        }else{
+            return strcmp($r1,$r2);
+        }
     }
 
     public function setResolveAsParent($resolveAsParent)
@@ -503,15 +548,16 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     /**
      * @param array $roles
+     * @param boolean $checkBoolean
      * @return array
      */
-    protected function filterRolesForSaving($roles)
+    protected function filterRolesForSaving($roles, $checkBoolean)
     {
         $res = array();
         foreach ($roles as $rName => $status) {
-            if(!$status) continue;
+            if($checkBoolean &&  !$status) continue;
             if(strpos($rName, "AJXP_GRP_/") === 0) continue;
-            $res[$rName] = true;
+            $res[$rName] = $status;
         }
         return $res;
     }

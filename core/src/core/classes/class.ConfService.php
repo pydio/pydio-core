@@ -1436,7 +1436,7 @@ class ConfService
         if (!empty($ctxId) && isSet($this->configs["REPOSITORIES"])  &&  isSet($this->configs["REPOSITORIES"][$ctxId])) {
             return $this->configs["REPOSITORIES"][$ctxId];
         }
-        return $this->configs["REPOSITORY"];
+        return isSet($this->configs["REPOSITORY"])?$this->configs["REPOSITORY"]:null;
     }
 
     /**
