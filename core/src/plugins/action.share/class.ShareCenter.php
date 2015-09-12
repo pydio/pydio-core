@@ -1399,6 +1399,10 @@ class ShareCenter extends AJXP_Plugin
                     );
                 }
                 $ID = $userId;
+            }else if($rId == "AJXP_GRP_/"){
+                $rId = "AJXP_GRP_/";
+                $TYPE = "group";
+                $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
                 if(empty($loadedGroups)){
                     $baseGroup = AuthService::filterBaseGroup("/");
@@ -1417,10 +1421,6 @@ class ShareCenter extends AJXP_Plugin
                 }
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
-            }else if($rId == "ROOT_ROLE"){
-                $rId = "AJXP_GRP_/";
-                $TYPE = "group";
-                $LABEL = $mess["447"];
             }else{
                 $role = AuthService::getRole($rId);
                 $LABEL = $role->getLabel();
@@ -2063,9 +2063,9 @@ class ShareCenter extends AJXP_Plugin
 
         foreach ($groups as $group) {
             $r = $uRights[$group];
-            if($group == "AJXP_GRP_/") {
+            /*if($group == "AJXP_GRP_/") {
                 $group = "ROOT_ROLE";
-            }
+            }*/
             $grRole = AuthService::getRole($group, true);
             $grRole->setAcl($newRepo->getUniqueId(), $r);
             AuthService::updateRole($grRole);
@@ -2125,6 +2125,7 @@ class ShareCenter extends AJXP_Plugin
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
+        $parent = ConfService::getRepositoryById($parentRepositoryId);
 
         foreach($shares as $hash => $shareData){
 
@@ -2159,8 +2160,8 @@ class ShareCenter extends AJXP_Plugin
                     $meta["copy_url"]  = $this->buildPublicletLink($hash);
                 }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
-                $parent = ConfService::getRepositoryById($repoObject->getParentId());
                 if(!empty($parent)){
+                    $parentPath = $parent->getOption("PATH", false, $meta["owner"]);
                     $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
                 }else{
                     $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
@@ -2169,11 +2170,18 @@ class ShareCenter extends AJXP_Plugin
                     if($repoObject->hasContentFilter()){
                         $meta["ajxp_shared_minisite"] = "file";
                         $meta["icon"] = "mime_empty.png";
+                        $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
                     }else{
                         $meta["ajxp_shared_minisite"] = "public";
                         $meta["icon"] = "folder.png";
+                        $meta["original_path"] = $repoObject->getOption("PATH");
                     }
                     $meta["icon"] = $repoObject->hasContentFilter() ? "mime_empty.png" : "folder.png";
+                }else{
+                    $meta["original_path"] = $repoObject->getOption("PATH");
+                }
+                if(isSet($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
+                    $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
                 }
 
             }else if(is_a($shareData["REPOSITORY"], "Repository") && !empty($shareData["FILE_PATH"])){
