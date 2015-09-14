@@ -50,9 +50,8 @@ class sftpAccessDriver extends fsAccessDriver
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         restore_error_handler();
         if (!file_exists($this->urlBase)) {
             if ($this->repository->getOption("CREATE")) {
@@ -81,9 +80,9 @@ class sftpAccessDriver extends fsAccessDriver
     }
 
 
-    protected function filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName)
+    protected function filecopy($srcFile, $destFile)
     {
-        if ($srcWrapperName == $destWrapperName && $srcWrapperName == $this->wrapperClassName) {
+        if (AJXP_MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
             $srcFilePath = str_replace($this->urlBase, "", $srcFile);
             $destFilePath = str_replace($this->urlBase, "", $destFile);
             $destDirPath = dirname($destFilePath);
@@ -94,19 +93,10 @@ class sftpAccessDriver extends fsAccessDriver
             ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
             AJXP_Controller::applyHook("node.change", array(new AJXP_Node($srcFile), new AJXP_Node($destFile), true));
         } else {
-            parent::filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName);
+            parent::filecopy($srcFile, $destFile);
         }
     }
 
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        if ($bytesize < 0) {
-            $bytesize = sprintf("%u", $bytesize);
-        }
-        return $bytesize;
-    }
 
     /**
      * @param $src

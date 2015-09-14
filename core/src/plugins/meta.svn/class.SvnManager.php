@@ -50,12 +50,10 @@ class SvnManager extends AJXP_AbstractMetaSource
 
     protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
         $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper();
-        $wrapperData = $repo->streamData;
-        $urlBase = $wrapperData["protocol"]."://".$repo->getId();
+        $repo->detectStreamWrapper(true);
+        $userSelection = new UserSelection($repo, $httpVars);
+        $urlBase = $userSelection->currentBaseUrl();
         $result = array();
 
         if ($testRecycle) {
@@ -69,24 +67,24 @@ class SvnManager extends AJXP_AbstractMetaSource
                 $sessionKey = "AJXP_SVN_".$repo->getId()."_RECYCLE_CHECKED";
                 if (isSet($_SESSION[$sessionKey])) {
                     $file = RecycleBinManager::getRelativeRecycle()."/".RecycleBinManager::getCacheFileName();
-                    $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$file);
+                    $realFile = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$file);
                     $this->addIfNotVersionned($file, $realFile);
                     $_SESSION[$sessionKey] = true;
                 }
             }
         }
 
-        $result["DIR"] = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.AJXP_Utils::decodeSecureMagic($httpVars["dir"]));
+        $result["DIR"] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.AJXP_Utils::decodeSecureMagic($httpVars["dir"]));
         $result["ORIGINAL_SELECTION"] = $userSelection;
         $result["SELECTION"] = array();
         if (!$userSelection->isEmpty()) {
             $files = $userSelection->getFiles();
             foreach ($files as $selected) {
-                $result["SELECTION"][] = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$selected);
+                $result["SELECTION"][] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$selected);
             }
         }
         foreach ($additionnalPathes as $parameter => $path) {
-            $result[$parameter] = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$path);
+            $result[$parameter] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$path);
         }
         return $result;
     }
@@ -115,15 +113,14 @@ class SvnManager extends AJXP_AbstractMetaSource
     {
         $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
-        $wrapperData = $repo->streamData;
-        $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $file);
+        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($file);
 
         $res = ExecSvnCmd("svn status ", $realFile);
         if (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?") {
             $res2 = ExecSvnCmd("svn add", "$realFile");
         }
         if ($ajxpNode != null) {
-            $nodeRealFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $ajxpNode->getUrl());
+            $nodeRealFile = AJXP_MetaStreamWrapper::getRealFSReference($ajxpNode->getUrl());
             try {
                 ExecSvnCmd("svn propset metachange ".time(), $nodeRealFile);
             } catch (Exception $e) {

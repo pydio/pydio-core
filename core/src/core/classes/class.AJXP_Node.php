@@ -414,8 +414,8 @@ class AJXP_Node
     public function getRealFile()
     {
         if (!isset($this->realFilePointer)) {
-            $this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
-            $isRemote = call_user_func(array($this->_wrapperClassName, "isRemote"));
+        $this->realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($this->_url, true);
+            $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
                 register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $this->realFilePointer);
             }
@@ -564,6 +564,8 @@ class AJXP_Node
         if (strstr($this->urlParts["scheme"], "ajxp.")!==false) {
             $pServ = AJXP_PluginsService::getInstance();
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
+        }else if($this->urlParts["scheme"] == "pydio"){
+            $this->_wrapperClassName = "AJXP_PermissionWrapper";
         }
     }
 

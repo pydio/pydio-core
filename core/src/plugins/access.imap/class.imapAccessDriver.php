@@ -43,9 +43,8 @@ class imapAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         if ($this->repository->getOption("MAILBOX") != "") {
             //$this->urlBase .= "/INBOX";
         }

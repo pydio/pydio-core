@@ -1617,7 +1617,7 @@ class ShareCenter extends AJXP_Plugin
             $userSelection = new UserSelection($repository, $httpVars);
             $setFilter = false;
             if($userSelection->isUnique()){
-                $node = $userSelection->getUniqueNode($this->accessDriver);
+                $node = $userSelection->getUniqueNode();
                 $node->loadNodeInfo();
                 if($node->isLeaf()){
                     $setFilter = true;
@@ -1626,7 +1626,7 @@ class ShareCenter extends AJXP_Plugin
             }else{
                 $setFilter = true;
             }
-            $nodes = $userSelection->buildNodes($this->accessDriver);
+            $nodes = $userSelection->buildNodes();
             $hasDir = false; $hasFile = false;
             foreach($nodes as $n){
                 $n->loadNodeInfo();
@@ -1640,7 +1640,7 @@ class ShareCenter extends AJXP_Plugin
                 $httpVars["filter_nodes"] = $nodes;
             }
             if(!isSet($httpVars["repo_label"])){
-                $first = $userSelection->getUniqueNode($this->accessDriver);
+                $first = $userSelection->getUniqueNode();
                 $httpVars["repo_label"] = SystemTextEncoding::toUTF8($first->getLabel());
             }
         }

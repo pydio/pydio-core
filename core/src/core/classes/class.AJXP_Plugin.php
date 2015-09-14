@@ -860,10 +860,12 @@ class AJXP_Plugin implements Serializable
         }
         if ($register) {
             $pServ = AJXP_PluginsService::getInstance();
-            if (!in_array($streamData["protocol"], stream_get_wrappers())) {
+            $wrappers = stream_get_wrappers();
+            if (!in_array($streamData["protocol"], $wrappers)) {
                 stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
                 $pServ->registerWrapperClass($streamData["protocol"], $streamData["classname"]);
             }
+            AJXP_MetaStreamWrapper::register($wrappers);
         }
         return $streamData;
     }

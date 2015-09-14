@@ -60,19 +60,14 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
-        $selection = new UserSelection();
-        $selection->initFromHttpVars($httpVars);
-        $currentFile = $selection->getUniqueFile();
-        $wrapperData = $this->accessDriver->detectStreamWrapper(false);
-        $urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
+        $selection = new UserSelection($repo, $httpVars);
 
         $unlock = (isSet($httpVars["unlock"])?true:false);
-        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
         if ($unlock) {
-            $this->metaStore->removeMetadata($ajxpNode, self::METADATA_LOCK_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
+            $this->metaStore->removeMetadata($selection->getUniqueNode(), self::METADATA_LOCK_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
         } else {
             $this->metaStore->setMetadata(
-                $ajxpNode,
+                $selection->getUniqueNode(),
                 SimpleLockManager::METADATA_LOCK_NAMESPACE,
                 array("lock_user" => AuthService::getLoggedUser()->getId()),
                 false,

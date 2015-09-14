@@ -118,11 +118,6 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
-            <action name="get_xml_registry">
-                <post_processing>
-                    <serverCallback methodName="switchAction"></serverCallback>
-                </post_processing>
-            </action>
 		</actions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>

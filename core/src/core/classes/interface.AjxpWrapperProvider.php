@@ -29,10 +29,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 interface AjxpWrapperProvider
 {
     /**
-     * @return string
-     */
-    public function getWrapperClassName();
-    /**
      * Convert a path (from the repository root) to a fully
      * qualified ajaxplorer url like ajxp.protocol://repoId/path/to/node
      * @param String $path
