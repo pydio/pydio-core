@@ -470,8 +470,12 @@ class fsAccessWrapper implements AjxpWrapper
         }
     }
 
+    /**
+     * @return bool|float
+     */
     public static function getLastRealSize()
     {
+        if(empty(self::$lastRealSize)) return false;
         return self::$lastRealSize;
     }
 
