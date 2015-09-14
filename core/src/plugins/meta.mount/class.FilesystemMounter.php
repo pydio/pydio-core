@@ -103,7 +103,10 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         if( is_dir($MOUNT_POINT) ){
-            if( stat(dirname($MOUNT_POINT))[0] == stat($MOUNT_POINT)[0] ){
+            $statParent = stat(dirname($MOUNT_POINT));
+            $statMount = stat($MOUNT_POINT);
+            // Compare device id's
+            if( $statParent[0] == $statMount[0] ){
                 return false;
             }else{
                 return true;
@@ -169,9 +172,6 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         if (!$success) {
             throw new Exception("Error while mounting file system!");
         } else {
-            if (!is_file($MOUNT_POINT."/.ajxp_mount")) {
-                @file_put_contents($MOUNT_POINT."/.ajxp_mount", "");
-            }
             if ($recycle !== false && !is_dir($recycle)) {
                 @mkdir($recycle, 0755);
             }
