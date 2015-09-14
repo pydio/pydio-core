@@ -39,8 +39,7 @@ class EtherpadClient extends AJXP_Plugin
         if (!$repository->detectStreamWrapper(false)) {
             return false;
         }
-        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-        $selectedNode = $userSelection->getUniqueNode($plugin);
+        $selectedNode = $userSelection->getUniqueNode();
         $selectedNode->loadNodeInfo();
         if(!$selectedNode->isLeaf()){
             throw new Exception("Cannot handle folders, please select a file!");

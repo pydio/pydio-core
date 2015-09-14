@@ -115,7 +115,7 @@ class dropboxWrapper implements AjxpWrapper
         return true;
     }
 
-    public static function getRealFSReference($path)
+    public static function getRealFSReference($path, $persistent = false)
     {
         $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".rand();
         $path = self::staticInitPath($path);

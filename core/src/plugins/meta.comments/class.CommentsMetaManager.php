@@ -99,9 +99,8 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
      */
     public function switchActions($actionName, $httpVars, $fileVars)
     {
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
-        $uniqNode = $userSelection->getUniqueNode($this->accessDriver);
+        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
+        $uniqNode = $userSelection->getUniqueNode();
         $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {

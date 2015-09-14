@@ -235,7 +235,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $selection->initFromHttpVars($httpVars);
         $currentFile = $selection->getUniqueFile();
 
-        $nodes = $selection->buildNodes($this->accessDriver);
+        $nodes = $selection->buildNodes();
         $nodesDiffs = array();
         $def = $this->getMetaDefinition();
         foreach($nodes as $ajxpNode){

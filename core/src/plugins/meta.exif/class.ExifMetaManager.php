@@ -100,15 +100,13 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     public function extractExif($actionName, $httpVars, $fileVars)
     {
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
         $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper();
-        $wrapperData = $repo->streamData;
-        $urlBase = $wrapperData["protocol"]."://".$repo->getId();
-        $selection = new UserSelection($repo, $httpVars);
-        $decoded = $selection->getUniqueFile();
-        $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
+        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
+        $repo->detectStreamWrapper(true);
+
+        $selectedNode = $userSelection->getUniqueNode();
+        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+
         AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
         if($exifData === false || !is_array($exifData)) return;
@@ -120,7 +118,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $exifData["IPTC"] = $iptc;
         }
         $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
-        AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
+        AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
         foreach ($exifData as $section => $data) {
             print("<exifSection name='$section'>");
             foreach ($data as $key => $value) {

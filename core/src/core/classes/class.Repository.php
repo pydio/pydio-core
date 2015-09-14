@@ -287,7 +287,12 @@ class Repository implements AjxpGroupPathProvider
      */
     public function detectStreamWrapper($register = false, &$streams=null)
     {
-        $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+        if(isSet($this->driverInstance) && is_a($this->driverInstance, "AJXP_Plugin")){
+            $plugin = $this->driverInstance;
+        }else{
+            $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+            $this->driverInstance = $plugin;
+        }
         if(!$plugin) return(false);
         $streamData = $plugin->detectStreamWrapper($register);
         if (!$register && $streamData !== false && is_array($streams)) {

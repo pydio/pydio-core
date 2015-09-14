@@ -44,7 +44,7 @@ class CoreIndexer extends AJXP_Plugin {
             if($userSelection->isEmpty()){
                 $userSelection->addFile("/");
             }
-            $nodes = $userSelection->buildNodes($repository->driverInstance);
+            $nodes = $userSelection->buildNodes();
 
             if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
                 $this->verboseIndexation = true;

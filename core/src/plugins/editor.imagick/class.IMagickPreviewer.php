@@ -58,11 +58,9 @@ class IMagickPreviewer extends AJXP_Plugin
         if (empty($convert)) {
             return false;
         }
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
-        $selection = new UserSelection($repository);
-        $selection->initFromHttpVars($httpVars);
+        $selection = new UserSelection($repository, $httpVars);
+        $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "imagick_data_proxy") {
             $this->extractAll = false;

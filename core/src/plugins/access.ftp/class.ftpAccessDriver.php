@@ -62,9 +62,8 @@ class ftpAccessDriver extends fsAccessDriver
         } else {
             $this->driverConf = array();
         }
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);

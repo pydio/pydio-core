@@ -41,13 +41,8 @@ class ImagePreviewer extends AJXP_Plugin
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
-        $selection = new UserSelection($repository);
-        $selection->initFromHttpVars($httpVars);
-
-
-        $streamData = $repository->streamData;
-        $this->streamData = $streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
+        $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "preview_data_proxy") {
             $file = $selection->getUniqueFile();
@@ -90,7 +85,8 @@ class ImagePreviewer extends AJXP_Plugin
 
                 $class = $streamData["classname"];
                 $stream = fopen("php://output", "a");
-                call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+                //call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+                AJXP_MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
                 fflush($stream);
                 fclose($stream);
                 AJXP_Controller::applyHook("node.read", array($node));
@@ -126,7 +122,7 @@ class ImagePreviewer extends AJXP_Plugin
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
         $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
         if (!$pThumb->isError()) {
-            $pThumb->remote_wrapper = $this->streamData["classname"];
+            $pThumb->remote_wrapper = "AJXP_MetaStreamWrapper";
             //$this->logDebug("Will fit thumbnail");
             $sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
             //$this->logDebug("Will print thumbnail");

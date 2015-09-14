@@ -434,12 +434,7 @@ class imapAccessWrapper implements AjxpWrapper
     }
 
 
-    /**
-     * Get a "usable" reference to a file : the real file or a tmp copy.
-     *
-     * @param unknown_type $path
-     */
-    public static function getRealFSReference($path)
+    public static function getRealFSReference($path, $persistent = false)
     {
         return $path;
     }

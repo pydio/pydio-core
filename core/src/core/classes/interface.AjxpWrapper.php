@@ -31,23 +31,24 @@ interface AjxpWrapper
     /**
      * Get a "usable" reference to a file : the real file or a tmp copy.
      *
-     * @param unknown_type $path
+     * @param string $path
+     * @param bool $persistent
      */
-    public static function getRealFSReference($path);
+    public static function getRealFSReference($path, $persistent = false);
 
     /**
      * Read a file (by chunks) and copy the data directly inside the given stream.
      *
-     * @param unknown_type $path
-     * @param unknown_type $stream
+     * @param string $path
+     * @param resource $stream
      */
     public static function copyFileInStream($path, $stream);
 
     /**
      * Chmod implementation for this type of access.
      *
-     * @param unknown_type $path
-     * @param unknown_type $chmodValue
+     * @param string $path
+     * @param number $chmodValue
      */
     public static function changeMode($path, $chmodValue);
 

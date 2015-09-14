@@ -125,14 +125,14 @@ class SimpleUploadProcessor extends AJXP_Plugin
     public function unifyChunks($action, $httpVars, $fileVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(false)) {
+        if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-        $streamData = $plugin->detectStreamWrapper(true);
+        $selection = new UserSelection($repository);
         $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+        $destStreamURL = $selection->currentBaseUrl().$dir."/";
         $filename = AJXP_Utils::decodeSecureMagic($httpVars["file_name"]);
+
         $chunks = array();
         $index = 0;
         while (isSet($httpVars["chunk_".$index])) {

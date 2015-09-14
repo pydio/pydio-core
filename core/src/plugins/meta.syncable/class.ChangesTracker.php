@@ -458,9 +458,6 @@ class ChangesTracker extends AJXP_AbstractMetaSource
             } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
-                if(method_exists($newNode->getDriver(), "filesystemFileSize")){
-                    $newNode->getDriver()->filesystemFileSize(null, $stat);
-                }
                 $newNode->setLeaf(!($stat['mode'] & 040000));
                 $this->logDebug('INSERT', $newNode->getUrl());
                 dibi::query("INSERT INTO [ajxp_index]", array(
@@ -476,9 +473,6 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                     // CONTENT CHANGE
                     clearstatcache();
                     $stat = stat($newNode->getUrl());
-                    if(method_exists($newNode->getDriver(), "filesystemFileSize")){
-                        $newNode->getDriver()->filesystemFileSize(null, $stat);
-                    }
                     $this->logDebug("Content changed", "current stat size is : " . $stat["size"]);
                     $this->logDebug('UPDATE CONTENT', $newNode->getUrl());
                     dibi::query("UPDATE [ajxp_index] SET ", array(

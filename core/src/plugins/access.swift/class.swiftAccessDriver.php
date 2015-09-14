@@ -75,9 +75,8 @@ class swiftAccessDriver extends fsAccessDriver
         $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
@@ -105,12 +104,6 @@ class swiftAccessDriver extends fsAccessDriver
         if (!$node->isLeaf()) {
             $node->setLabel(rtrim($node->getLabel(), "/"));
         }
-    }
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        return $bytesize;
     }
 
     public function isRemote()
