@@ -45,7 +45,11 @@ class VideoReader extends AJXP_Plugin
             $file = $selection->getUniqueFile();
             $node = new AJXP_Node($destStreamURL.$file);
             session_write_close();
-            $filesize = filesize($destStreamURL.$file);
+            if(method_exists($node->getDriver(), "filesystemFileSize")){
+                $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
+            }else{
+                $filesize = filesize($node->getUrl());
+            }
              $filename = $destStreamURL.$file;
 
             //$fp = fopen($destStreamURL.$file, "r");
@@ -69,7 +73,8 @@ class VideoReader extends AJXP_Plugin
                     $this->logInfo('Preview', 'Streaming content of '.$file);
                 }
 
-                $length = floatval($offsets[1]) - $offset;
+                $length = floatval($offsets[1]) - $offset + 1;
+
                 if (!$length) $length = $filesize - $offset;
                 if ($length + $offset > $filesize || $length < 0) $length = $filesize - $offset;
                 header('HTTP/1.1 206 Partial Content');
@@ -92,7 +97,12 @@ class VideoReader extends AJXP_Plugin
                 while(ob_get_level()) ob_end_flush();
                 $readSize = 0.0;
                 while (!feof($file) && $readSize < $length && connection_status() == 0) {
-                    echo fread($file, 2048);
+                    if ($length < 2048){
+                        echo fread($file, $length);
+                    } else {
+                        echo fread($file, 2048);
+                    }
+
                     $readSize += 2048.0;
                     flush();
                 }

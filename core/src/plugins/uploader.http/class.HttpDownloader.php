@@ -161,7 +161,13 @@ class HttpDownloader extends AJXP_Plugin
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 header("text/plain");
                 if (is_file($destStreamURL.$file)) {
-                    echo filesize($destStreamURL.$file);
+                    $node = new AJXP_Node($destStreamURL.$file);
+                    if(method_exists($node->getDriver(), "filesystemFileSize")){
+                        $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
+                    }else{
+                        $filesize = filesize($node->getUrl());
+                    }
+                    echo $filesize;
                 } else {
                     echo "stop";
                 }

@@ -79,9 +79,10 @@ Class.create("FilesList", SelectableElements, {
                 this._instanciatedToolbars = $A();
             }
 		}
-        if(this.options.fit && this.options.fit == "content"){
+        if((this.options.fit && this.options.fit == "content") || window.ajxpMobile){
             this.options.replaceScroller = false;
         }
+
         if(!FilesList.staticIndex) {
             FilesList.staticIndex = 1;
         }else{
@@ -620,10 +621,25 @@ Class.create("FilesList", SelectableElements, {
                         icon_class:(isSorted?'icon-caret-'+(this._sortableTable.descending?'down':'up'):''),
                         isDefault:false,
                         callback:function(e){
+                            var sortable = this._sortableTable;
                             var clickIndex = this.columnsDef.indexOf(column);
-                            var sorted = (this._sortableTable.sortColumn == clickIndex);
-                            if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
-                            this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                            if(sortable.paginationLoaderFunc){
+                                var params = $H({});
+                                if (sortable.sortColumn != clickIndex){
+                                    sortable.descending = sortable.defaultDescending;
+                                }else{
+                                    sortable.descending = !sortable.descending;
+                                }
+                                var columnData = this.columnsDef[clickIndex];
+                                params.set('order_column', columnData['attributeName'] || clickIndex);
+                                params.set('order_direction', (sortable.descending?'desc':'asc'));
+                                sortable.paginationLoaderFunc(params);
+                            }else{
+                                var sorted = (sortable.sortColumn == clickIndex);
+                                if(sorted) sortable.descending = !sortable.descending;
+                                sortable.sort(clickIndex, sortable.descending);
+                            }
+
                         }.bind(this)
                     });
                     index++;
@@ -663,7 +679,7 @@ Class.create("FilesList", SelectableElements, {
                 this.htmlElement.removeClassName('fl-displayMode-' + f);
             }
         }.bind(this));
-        var scrollElement, buffer;
+        var scrollElement, buffer, sortContainer, sortTypes, metaSortTypes, sortHeader;
 		if(this._displayMode == "list")
 		{
             this.hiddenColumns = $A();
@@ -719,11 +735,6 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 }
             );
-            if(this.options.horizontalScroll){
-                attachMobileScroll(this.htmlElement, "horizontal");
-            }else{
-                attachMobileScroll(contentContainer, "vertical");
-            }
             scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
@@ -765,25 +776,10 @@ Class.create("FilesList", SelectableElements, {
                 if(event.metaValue) this.addMetadataFilter(event.metaName, event.metaValue+'*');
                 else this.removeMetadataFilter(event.metaName);
             }.bind(this));
-			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
-            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
-			this._sortableTable.onsort = function(){
-				this.redistributeBackgrounds();
-				var ctxt = this.getCurrentContextNode();
-				ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
-				ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
-			}.bind(this);
-			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
-				this._sortableTable.setPaginationBehaviour(function(params){
-                    this.getCurrentContextNode().getMetadata().set("remote_order", params);
-                    var oThis = this;
-                    this.crtContext.observeOnce("loaded", function(){
-                        oThis.crtContext = this ;
-                        oThis.fill(oThis.crtContext);
-                    });
-                    this.getCurrentContextNode().reload();
-				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
-			}
+
+            sortContainer = oElement;
+            sortTypes = this.getVisibleSortTypes();
+            sortHeader = this.htmlElement.down('div.sort-table');
 
 			this.observer = function(e){
                 if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
@@ -835,11 +831,6 @@ Class.create("FilesList", SelectableElements, {
 			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
-            if(this.options.horizontalScroll){
-                attachMobileScroll(this.htmlElement, "horizontal");
-            }else{
-                attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
-            }
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.addClassName("paginated");
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
@@ -863,49 +854,8 @@ Class.create("FilesList", SelectableElements, {
 				this._thumbSize = parseInt(this._fixedThumbSize);
 			}
 
-            this._sortableTable = new AjxpSortable(scrollElement, null, null);
-            this._sortableTable.setMetaSortType(this.columnsDef);
-            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
-            this._sortableTable.onsort = function(){
-                var ctxt = this.getCurrentContextNode();
-                ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
-                ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
-            }.bind(this);
-            if(!this.options.noContextualMenu){
-                if(this.headerMenu){
-                    this.headerMenu.destroy();
-                    delete this.headerMenu;
-                }
-                this.headerMenu = new Proto.Menu({
-                    selector: '#content_pane div.panelHeader',
-                    className: 'menu desktop',
-                    menuItems: [],
-                    fade:true,
-                    zIndex:2000,
-                    beforeShow : function(){
-                        var items = $A([]);
-                        var index = 0;
-                        this.columnsDef.each(function(column){
-                            var isSorted = this._sortableTable.sortColumn == index;
-                            items.push({
-                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                                image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-                                isDefault:false,
-                                callback:function(e){
-                                    var clickIndex = this.columnsDef.indexOf(column);
-                                    var sorted = (this._sortableTable.sortColumn == clickIndex);
-                                    if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
-                                    this._sortableTable.sort(clickIndex, this._sortableTable.descending);
-                                }.bind(this)
-                            });
-                            index++;
-                        }.bind(this) );
-                        this.headerMenu.options.menuItems = items;
-                        this.headerMenu.refreshList();
-                    }.bind(this)
-                });
-            }
+            sortContainer = scrollElement;
+            metaSortTypes = this.columnsDef;
 
             if(this._displayMode == 'thumb'){
                 if(this.slider){
@@ -930,13 +880,38 @@ Class.create("FilesList", SelectableElements, {
                 });
             }
 
-			//this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){
 			    this.initSelectableItems(scrollElement, true, scrollElement, true);
             }else{
                 this.initNonSelectableItems(scrollElement);
             }
 		}
+
+        this._sortableTable = new AjxpSortable(sortContainer, sortTypes, sortHeader);
+        if(metaSortTypes){
+            this._sortableTable.setMetaSortType(metaSortTypes);
+        }
+        if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
+        this._sortableTable.onsort = function(){
+            if(this._displayMode == 'list') {
+                this.redistributeBackgrounds();
+            }
+            var ctxt = this.getCurrentContextNode();
+            ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
+            ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
+        }.bind(this);
+        if(this.paginationData && this.paginationData.get('remote_order')){
+            this._sortableTable.setPaginationBehaviour(function(params){
+                this.getCurrentContextNode().getMetadata().set("remote_order", params);
+                var oThis = this;
+                this.crtContext.observeOnce("loaded", function(){
+                    oThis.crtContext = this ;
+                    oThis.fill(oThis.crtContext);
+                });
+                this.getCurrentContextNode().reload();
+            }.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
+            if(parseInt(this.paginationData.get('total')) == 1) this._sortableTable.paginationLoaderFunc = null;
+        }
 
         if(this.options.replaceScroller){
             this.scroller = new Element('div', {id:'filelist_scroller'+this.__currentInstanceIndex, className:'scroller_track', style:"right:0px"});
@@ -1191,7 +1166,7 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			var adjusted = this.resizeThumbnails();
-			if(this.protoMenu) {
+			if(this.protoMenu && !this.options.noContextualMenu) {
                 this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
                 this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
             }
@@ -1203,7 +1178,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			if(this.protoMenu){
+			if(this.protoMenu&& !this.options.noContextualMenu){
                 this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
                 this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
             }
@@ -1242,7 +1217,7 @@ Class.create("FilesList", SelectableElements, {
 
     empty : function(skipFireChange){
         this._previewFactory.clear();
-        if(this.protoMenu){
+        if(this.protoMenu && !this.options.noContextualMenu){
             if(this._displayMode == "thumb" || this._displayMode == "detail"){
                 this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex +', #selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
             }else{
@@ -1487,7 +1462,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-        if(this.options.fixedSortColumn && this.options.fixedSortDirection){
+        if(this.options.fixedSortColumn && this.options.fixedSortDirection && !contextNode.getMetadata().get("filesList.sortColumn") && !this.paginationData){
             var col = this.columnsDef.detect(function(c){
                 return c.attributeName == this.options.fixedSortColumn;
             }.bind(this));
@@ -1849,7 +1824,7 @@ Class.create("FilesList", SelectableElements, {
                                 this,
                                 'filesList'
                             );
-                            if(this.protoMenu) this.protoMenu.addElements(innerSpan);
+                            if(this.protoMenu && !this.options.noContextualMenu) this.protoMenu.addElements(innerSpan);
                         }
                         if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
                         {
@@ -2716,8 +2691,8 @@ Class.create("FilesList", SelectableElements, {
 			}
 			return null;
 		}
-	},	
-	
+	},
+
 	/**
 	 * Check if a domnode is indeed an item of the list
 	 * @param node DOMNode
@@ -2736,30 +2711,8 @@ Class.create("FilesList", SelectableElements, {
 				node.parentNode == this._htmlElement;
 		}
 	},
-	
+
 	/* Indexable Collection Interface */
-	/**
-	 * Get all items
-	 * @returns Array
-	 */
-	getItems: function () {
-		if(this._displayMode == "list")
-		{
-			return this._htmlElement.rows || [];
-		}
-		else
-		{
-			var tmp = [];
-			var j = 0;
-			var cs = this._htmlElement.childNodes;
-			var l = cs.length;
-			for (var i = 0; i < l; i++) {
-				if (cs[i].nodeType == 1)
-					tmp[j++] = cs[i];
-			}
-			return tmp;
-		}
-	},
 	/**
 	 * Find an item index
 	 * @param el HTMLElement
@@ -2773,7 +2726,7 @@ Class.create("FilesList", SelectableElements, {
 		else
 		{
 			var j = 0;
-			var cs = this._htmlElement.childNodes;
+			var cs = this._htmlElement.select('.ajxpNodeProvider');
 			var l = cs.length;
 			for (var i = 0; i < l; i++) {
 				if (cs[i] == el)
@@ -2781,7 +2734,7 @@ Class.create("FilesList", SelectableElements, {
 				if (cs[i].nodeType == 1)
 					j++;
 			}
-			return -1;		
+			return -1;
 		}
 	},
 	/**
@@ -2797,7 +2750,7 @@ Class.create("FilesList", SelectableElements, {
 		else
 		{
 			var j = 0;
-			var cs = this._htmlElement.childNodes;
+			var cs = this._htmlElement.select('.ajxpNodeProvider');
 			var l = cs.length;
 			for (var i = 0; i < l; i++) {
 				if (cs[i].nodeType == 1) {

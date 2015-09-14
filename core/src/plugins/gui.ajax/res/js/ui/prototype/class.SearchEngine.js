@@ -477,6 +477,7 @@ Class.create("SearchEngine", AjxpPane, {
     },
 
     openSearchInput: function(withResult){
+        if(this.searchInputIsOpen()) return;
         var container = this.htmlElement;
         container.absolutize();
         var leftPos = 285;
@@ -525,6 +526,7 @@ Class.create("SearchEngine", AjxpPane, {
         }
         if(this._fileList) {
             this._fileList.showElement(show);
+            this._dataModel.setSelectedNodes([]);
         }
     },
 
@@ -755,7 +757,8 @@ Class.create("SearchEngine", AjxpPane, {
                 });
             }
             if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){
-                $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
+                $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(e){
+                    Event.stop(e);
                     if(this._ajxpOptions.openSearchInput) this.closeSearchInput();
                     else this.showToggleResult(false);
                     if(this._closeAdvancedPanel) this._closeAdvancedPanel();

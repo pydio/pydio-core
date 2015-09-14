@@ -24,5 +24,5 @@ $mess=array(
 "Install SQL Tables" => "Install SQL Tables",
 "SQL Tables" => "SQL Tables",
 "SQL Driver" => "SQL Driver",
-"SQL Connexion Parameters" => "SQL Connexion Parameters",
+"SQL Connexion Parameters" => "SQL Connection Parameters",
 );

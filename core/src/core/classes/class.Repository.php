@@ -178,6 +178,10 @@ class Repository implements AjxpGroupPathProvider
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
         $newOptions = array_merge($this->options, $newOptions);
+        $newOptions["CREATION_TIME"] = time();
+        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
         $repo->options = $newOptions;
         if ($parentId == null) {
             $parentId = $this->getId();
@@ -197,6 +201,10 @@ class Repository implements AjxpGroupPathProvider
     public function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
+        $newOptions["CREATION_TIME"] = time();
+        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
         $repo->options = $newOptions;
         $repo->setOwnerData($this->getId(), $owner, $uniqueUser);
         $repo->setInferOptionsFromParent(true);
@@ -608,6 +616,21 @@ class Repository implements AjxpGroupPathProvider
      */
     public function securityScope()
     {
+        if($this->hasParent()){
+            $parentRepo = ConfService::getRepositoryById($this->getParentId());
+            if(!empty($parentRepo) && $parentRepo->isTemplate){
+                $path = $parentRepo->getOption("PATH", true);
+                $container = $parentRepo->getOption("CONTAINER", true);
+                // If path is set in the template, compute identifier from the template path.
+                if(!empty($path) || !empty($container)) return $parentRepo->securityScope();
+            }
+        }
+        $path = $this->getOption("CONTAINER", true);
+        if(!empty($path)){
+            if(strpos($path, "AJXP_USER") !== false) return "USER";
+            if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
+            if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
+        }
         $path = $this->getOption("PATH", true);
         if($this->accessType == "ajxp_conf") return "USER";
         if(empty($path)) return false;

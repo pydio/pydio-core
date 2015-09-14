@@ -79,23 +79,6 @@ Class.create('SelectableElements', {
 			oElement.attachEvent("onclick", this._onclick);
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
-        if(addTouch){
-            oElement.observe("touchstart", function(event){
-                var touchData = event.changedTouches[0];
-                  oElement.selectableTouchStart = touchData["clientY"];
-            }.bind(this));
-            oElement.observe("touchend", function(event){
-                if(oElement.selectableTouchStart) {
-                    var touchData = event.changedTouches[0];
-                    var delta = touchData['clientY'] - oElement.selectableTouchStart;
-                    if(Math.abs(delta) > 2){
-                        return;
-                    }
-                }
-                oElement.selectableTouchStart = null;
-                this._onclick(event);
-            }.bind(this) );
-        }
 
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
 		this.eventMouseDown = this.dragStart.bindAsEventListener(this);
@@ -537,11 +520,11 @@ Class.create('SelectableElements', {
 			}
 		}
 	},
-	
+
 	isItem: function (node) {
 		return node != null && node.up('#' + this._htmlElement.id);
 	},
-	
+
 	findSelectableParent : function(el, setSelected){
 		while (el != null && !this.isItem(el)){
 			el = el.parentNode;
@@ -596,15 +579,7 @@ Class.create('SelectableElements', {
 	/* Indexable Collection Interface */
 	
 	getItems: function () {
-		var tmp = [];
-		var j = 0;
-		var cs = this._htmlElement.select('.ajxpNodeProvider');
-		var l = cs.length;
-		for (var i = 0; i < l; i++) {
-			if (cs[i].nodeType == 1)
-				tmp[j++] = cs[i] ;
-		}
-		return tmp;
+        return this._htmlElement.select('.ajxpNodeProvider');
 	},
 	
 	getItem: function (nIndex) {

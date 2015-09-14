@@ -69,11 +69,13 @@ class UserGuiController extends AJXP_Plugin
                 $uri = trim(str_replace(rtrim($realUri, "/")."/user", "", $requestURI), "/");
                 $uriParts = explode("/", $uri);
                 $action = array_shift($uriParts);
+                $key = ($action == "reset-password" && count($uriParts)) ? array_shift($uriParts) : "";
                 try{
                     $this->processSubAction($action, $uriParts);
                     $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
                         "REBASE"=>"../../",
-                        "USER_GUI_ACTION" => $action
+                        "USER_GUI_ACTION" => $action,
+                        "USER_ACTION_KEY" => $key
                     );
                 }catch(Exception $e){
                     $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(

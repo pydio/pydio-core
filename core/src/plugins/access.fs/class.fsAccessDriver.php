@@ -231,7 +231,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $selection = new UserSelection($this->repository);
-        $dir = $httpVars["dir"] OR "";
+        $dir = AJXP_Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
         if ($this->wrapperClassName == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
@@ -376,7 +376,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
                     copy($file, $tmpFNAME);
                     try {
-                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
+                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), $this->filesystemFileSize($tmpFNAME)));
                     } catch (Exception $e) {
                         @unlink($tmpFNAME);
                         throw $e;
@@ -395,6 +395,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header("Content-type:application/json");
                 if($selection->isUnique()){
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
+                    $this->filesystemFileSize(null, $stat);
                     if (!$stat) {
                         print '{}';
                     } else {
@@ -405,6 +406,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     print '{';
                     foreach($files as $index => $path){
                         $stat = @stat($this->urlBase.$path);
+                        $this->filesystemFileSize(null, $stat);
                         if(!$stat) $stat = '{}';
                         else $stat = json_encode($stat);
                         print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
@@ -470,8 +472,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	COPY / MOVE
             //------------------------------------
-            case "copy";
-            case "move";
+            case "copy":
+            case "move":
 
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
@@ -526,7 +528,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	DELETE
             //------------------------------------
-            case "delete";
+            case "delete":
 
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
@@ -563,7 +565,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	RENAME
             //------------------------------------
-            case "rename";
+            case "rename":
 
                 $file = $selection->getUniqueFile();
                 $filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
@@ -587,7 +589,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CREER UN REPERTOIRE / CREATE DIR
             //------------------------------------
-            case "mkdir";
+            case "mkdir":
 
                 $messtmp="";
                 $files = $selection->getFiles();
@@ -637,7 +639,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CREER UN FICHIER / CREATE FILE
             //------------------------------------
-            case "mkfile";
+            case "mkfile":
 
                 $messtmp="";
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
@@ -674,7 +676,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             //	CHANGE FILE PERMISSION
             //------------------------------------
-            case "chmod";
+            case "chmod":
 
                 $files = $selection->getFiles();
                 $changedFiles = array();
@@ -863,6 +865,30 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles(array($dir . "/" . $selection->getUniqueFile()));
                 }
+
+                $orderField = $orderDirection = null;
+                $threshold = 500; $limitPerPage = 200;
+                $defaultOrder = $this->repository->getOption("REMOTE_SORTING_DEFAULT_COLUMN");
+                $defaultDirection = $this->repository->getOption("REMOTE_SORTING_DEFAULT_DIRECTION");
+                if ($this->repository->getOption("REMOTE_SORTING")) {
+                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):$defaultDirection;
+                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:$defaultOrder;
+                    if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
+                        $orderField = $defaultOrder;
+                    }
+                }
+                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
+                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
+                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
+                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
+                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
+                }else{
+                    $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
+                    if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
+                    $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
+                    if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
+                }
+
                 if(!$selection->isEmpty()){
                     $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
@@ -891,54 +917,45 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         if (!empty($node->metaData["mimestring_id"]) && array_key_exists($node->metaData["mimestring_id"], $mess)) {
                             $node->mergeMetadata(array("mimestring" =>  $mess[$node->metaData["mimestring_id"]]));
                         }
+                        if(isSet($httpVars["page_position"]) && $httpVars["page_position"] == "true"){
+                            // Detect page position: we have to loading "siblings"
+                            $parentPath = AJXP_Utils::safeDirname($node->getPath());
+                            $siblings = scandir($this->urlBase.$parentPath);
+                            foreach($siblings as $i => $s){
+                                if($this->filterFile($s, true)) unset($siblings[$i]);
+                                if($this->filterFolder($s)) unset($siblings[$i]);
+                            }
+                            if(count($siblings) > $threshold){
+                                //usort($siblings, "strcasecmp");
+                                $siblings = $this->orderNodes($siblings, $this->urlBase.$parentPath, $orderField, $orderDirection);
+                                $index = array_search($node->getLabel(), $siblings);
+                                $node->mergeMetadata(array("page_position" => floor($index / $limitPerPage) +1));
+                            }
+                        }
                         if($this->repository->hasContentFilter()){
                             $externalPath = $this->repository->getContentFilter()->externalPath($node);
                             $node->setUrl($this->urlBase.$externalPath);
                         }
+
                         AJXP_XMLWriter::renderAjxpNode($node);
                     }
                     AJXP_XMLWriter::close();
                     break;
-                }/*else if (!$selection->isEmpty() && $selection->isUnique()){
-                    $uniqueFile = $selection->getUniqueFile();
-                }*/
-
-                if ($this->getFilteredOption("REMOTE_SORTING")) {
-                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):"asc";
-                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:null;
-                    if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
-                        $orderField = "ajxp_label";
-                    }
-                }
-                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
-                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
-                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
-                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
-                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
-                }else{
-                    $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-                    if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
-                    $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
-                    if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
                 }
 
                 $countFiles = $this->countFiles($path, !$lsOptions["f"]);
                 if(isSet($crt_nodes)){
                     $crt_nodes += $countFiles;
                 }
+                $totalPages = $crtPage = 1;
                 if (isSet($threshold) && isSet($limitPerPage) && $countFiles > $threshold) {
-                    if (isSet($uniqueFile)) {
-                        $originalLimitPerPage = $limitPerPage;
-                        $offset = $limitPerPage = 0;
-                    } else {
-                        $offset = 0;
-                        $crtPage = 1;
-                        if (isSet($page)) {
-                            $offset = (intval($page)-1)*$limitPerPage;
-                            $crtPage = $page;
-                        }
-                        $totalPages = floor($countFiles / $limitPerPage) + 1;
+                    $offset = 0;
+                    $crtPage = 1;
+                    if (isSet($page)) {
+                        $offset = (intval($page)-1)*$limitPerPage;
+                        $crtPage = $page;
                     }
+                    $totalPages = floor($countFiles / $limitPerPage) + 1;
                 } else {
                     $offset = $limitPerPage = 0;
                 }
@@ -955,13 +972,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 } else {
                     AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                 }
-                if (isSet($totalPages) && isSet($crtPage)) {
+                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! AJXP_Utils::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
                     if ($this->getFilteredOption("REMOTE_SORTING")) {
                         $remoteOptions = array(
                             "remote_order" => "true",
-                            "currentOrderCol" => isSet($orderField)?$orderField:"ajxp_label",
-                            "currentOrderDir"=> isSet($orderDirection)?$orderDirection:"asc"
+                            "currentOrderCol" => isSet($orderField)?$orderField:$defaultOrder,
+                            "currentOrderDir"=> isSet($orderDirection)?$orderDirection:$defaultDirection
                         );
                     }
                     AJXP_XMLWriter::renderPaginationData(
@@ -973,7 +990,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     );
                     if (!$lsOptions["f"]) {
                         AJXP_XMLWriter::close();
-                        exit(1);
+                        break;
                     }
                 }
 
@@ -986,33 +1003,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $fullList = array("d" => array(), "z" => array(), "f" => array());
 
                 $nodes = scandir($path);
-                usort($nodes, "strcasecmp");
-                if (isSet($orderField) && isSet($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
-                    $nodes = array_reverse($nodes);
-                }
-                if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
-                    usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
-                }
-                if (isSet($orderField) && isSet($orderDirection) && $orderField != "ajxp_label") {
-                    $toSort = array();
-                    foreach ($nodes as $node) {
-                        if($orderField == "filesize") $toSort[$node] = is_file($nonPatchedPath."/".$node) ? $this->filesystemFileSize($nonPatchedPath."/".$node) : 0;
-                        else if($orderField == "ajxp_modiftime") $toSort[$node] = filemtime($nonPatchedPath."/".$node);
-                        else if($orderField == "mimestring") $toSort[$node] = pathinfo($node, PATHINFO_EXTENSION);
-                    }
-                    if($orderDirection == "asc") asort($toSort);
-                    else arsort($toSort);
-                    $nodes = array_keys($toSort);
-                }
-                //while (strlen($nodeName = readdir($handle)) > 0) {
+                $nodes = $this->orderNodes($nodes, $nonPatchedPath, $orderField, $orderDirection);
+
                 foreach ($nodes as $nodeName) {
-                    if($nodeName == "." || $nodeName == "..") continue;
-                    if (isSet($uniqueFile) && $nodeName != $uniqueFile) {
-                        $cursor ++;
-                        continue;
-                    }
-                    if ($offset > 0 && $cursor < $offset) {
-                        $cursor ++;
+                    if($nodeName == "." || $nodeName == "..") {
                         continue;
                     }
                     $isLeaf = "";
@@ -1020,6 +1014,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         continue;
                     }
                     if (RecycleBinManager::recycleEnabled() && $dir == "" && "/".$nodeName == RecycleBinManager::getRecyclePath()) {
+                        continue;
+                    }
+                    if ($offset > 0 && $cursor < $offset) {
+                        $cursor ++;
                         continue;
                     }
 
@@ -1066,9 +1064,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                     $fullList[$nodeType][$nodeName] = $node;
                     $cursor ++;
-                    if (isSet($uniqueFile) && $nodeName != $uniqueFile) {
-                        break;
-                    }
                 }
                 if (isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true") {
                     $breakNow = false;
@@ -1097,7 +1092,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
-                if ($dir == ""  && !$uniqueFile && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository->getId()) !== true) {
+                if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository->getId()) !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     if (file_exists($this->urlBase.$recycleBinOption)) {
                         $recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
@@ -1130,6 +1125,30 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
 
         return $xmlBuffer;
+    }
+
+    protected function orderNodes($nodes, $path, $orderField, $orderDirection){
+
+        usort($nodes, "strcasecmp");
+        if (!empty($orderField) && !empty($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
+            $nodes = array_reverse($nodes);
+        }
+        if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
+            usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
+        }
+        if (!empty($orderField) && !empty($orderDirection) && $orderField != "ajxp_label") {
+            $toSort = array();
+            foreach ($nodes as $node) {
+                if($orderField == "filesize") $toSort[$node] = is_file($path."/".$node) ? $this->filesystemFileSize($path."/".$node) : 0;
+                else if($orderField == "ajxp_modiftime") $toSort[$node] = filemtime($path."/".$node);
+                else if($orderField == "mimestring") $toSort[$node] = pathinfo($node, PATHINFO_EXTENSION);
+            }
+            if($orderDirection == "asc") asort($toSort);
+            else arsort($toSort);
+            $nodes = array_keys($toSort);
+        }
+        return $nodes;
+
     }
 
     public function parseLsOptions($optionString)
@@ -1534,10 +1553,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
-    public function filesystemFileSize($filePath)
+    public function filesystemFileSize($filePath, &$stat = null)
     {
         $bytesize = "-";
-        $bytesize = @filesize($filePath);
+        if($stat != null && is_array($stat)){
+            $bytesize = $stat[7];
+        }else{
+            $bytesize = @filesize($filePath);
+        }
         if (method_exists($this->wrapperClassName, "getLastRealSize")) {
             $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
             if ($last !== false) {
@@ -1547,7 +1570,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($bytesize < 0) {
             $bytesize = sprintf("%u", $bytesize);
         }
-
+        if($stat != null && is_array($stat)){
+            $stat["size"] = $stat[7] = $bytesize;
+        }
         return $bytesize;
     }
 

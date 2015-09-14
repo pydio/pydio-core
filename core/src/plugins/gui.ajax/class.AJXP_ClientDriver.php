@@ -227,9 +227,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     } else {
                         $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
                     }
-                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
-                        // TODO: OFFICIALLY DROP IE7 SUPPORT?
-                        // $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
+                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
+                        $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
@@ -273,8 +272,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
         }
-        $config["zipEnabled"] = ConfService::zipEnabled();
-        $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+        $config["zipEnabled"] = ConfService::zipBrowsingEnabled();
+        $config["multipleFilesDownloadEnabled"] = ConfService::zipCreationEnabled();
         $customIcon = $this->getFilteredOption("CUSTOM_ICON");
         self::filterXml($customIcon);
         $config["customWording"] = array(

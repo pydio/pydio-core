@@ -41,7 +41,7 @@
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         var userSelection = ajaxplorer.getUserSelection();
-                        if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
+                        if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
                         {
                             if(gaTrackEvent){
                                 fileNames = userSelection.getFileNames();

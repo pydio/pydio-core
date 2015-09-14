@@ -102,7 +102,18 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
     {
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
-        return is_file($MOUNT_POINT."/.ajxp_mount");
+        if( is_dir($MOUNT_POINT) ){
+            $statParent = stat(dirname($MOUNT_POINT));
+            $statMount = stat($MOUNT_POINT);
+            // Compare device id's
+            if( $statParent[0] == $statMount[0] ){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
     }
 
     public function mountFS()
@@ -132,9 +143,9 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             }
         }
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
-        $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
+        $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password, false);
 
-        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
+        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
         if($this->getOption("MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
@@ -161,9 +172,6 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         if (!$success) {
             throw new Exception("Error while mounting file system!");
         } else {
-            if (!is_file($MOUNT_POINT."/.ajxp_mount")) {
-                @file_put_contents($MOUNT_POINT."/.ajxp_mount", "");
-            }
             if ($recycle !== false && !is_dir($recycle)) {
                 @mkdir($recycle, 0755);
             }
@@ -177,8 +185,8 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
 
-        system(($MOUNT_SUDO?"sudo":"")." umount ".$MOUNT_POINT, $res);
-        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !is_file($MOUNT_POINT."/.ajxp_mount")){
+        system(($MOUNT_SUDO?"sudo":"")." umount ".escapeshellarg($MOUNT_POINT), $res);
+        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted() ){
             // Remove mount point
             $testRm = @rmdir($MOUNT_POINT);
             if($testRm === false){

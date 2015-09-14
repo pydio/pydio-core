@@ -41,6 +41,7 @@
                     <input_param description="Trigger remote order" name="remote_order" type="boolean" mandatory="false" default="false"/>
                     <input_param description="Remote order column" name="order_column" type="string" mandatory="false"/>
                     <input_param description="Remote order direction" name="order_direction" type="string" mandatory="false"/>
+                    <input_param description="Find page position of required file for multipage listing" name="page_position" type="boolean" mandatory="false"/>
                     <output type="AJXP_NODE[]"/>
 				</serverCallback>
 			</processing>
@@ -216,7 +217,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
+					if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
 					{
 						if(gaTrackEvent){
 							var fileNames = userSelection.getFileNames();
@@ -340,7 +341,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((zipEnabled && multipleFilesDownloadEnabled))
+					if((multipleFilesDownloadEnabled))
 					{
 						var loadFunc = function(oForm){
 							var zipName;
@@ -824,7 +825,7 @@
 			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="change_main" inZip="false">
+					actionBarGroup="change_main,minisite" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/>
             </gui>

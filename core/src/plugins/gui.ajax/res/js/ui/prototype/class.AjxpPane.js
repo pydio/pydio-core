@@ -82,6 +82,11 @@ Class.create("AjxpPane", {
         }.bind(this);
         document.observe("ajaxplorer:component_config_changed", this.configObserver);
 
+        if(this.options.replaceScroller && window.ajxpMobile){
+            this.options.replaceScroller = false;
+            this.htmlElement.setStyle({overflowY:"auto"});
+        }
+
         if(this.options.replaceScroller){
             this.scroller = new Element('div', {
                 id:'scroller_'+this.htmlElement.id,
@@ -477,6 +482,14 @@ Class.create("AjxpPane", {
             return;
         }
 
+        this.staticApplyBackgroundFromConfigs(this.htmlElement, configName);
+
+    },
+
+    staticApplyBackgroundFromConfigs:function(element, configName, additionalStyles, important){
+
+        var bgrounds,paramPrefix,bStyles,index, i;
+
         var exp = configName.split("/");
         var plugin = exp[0];
         paramPrefix = exp[1];
@@ -509,8 +522,14 @@ Class.create("AjxpPane", {
         if (bStyles.length) {
             i = Math.floor( Math.random() * bStyles.length);
             var bg = bStyles[i];
+            if(important){
+                bg = bg.replace(';', ' !important;');
+            }
+            if(additionalStyles){
+                bg += additionalStyles;
+            }
             if(Modernizr.backgroundsize) bg = bg.replace('background-size:100%','background-size:cover').replace('background-size:140%','background-size:cover');
-            this.htmlElement.setAttribute("style", bg);
+            element.setAttribute("style", bg);
         }
 
     }

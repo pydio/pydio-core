@@ -297,7 +297,7 @@ Class.create("XHRUploader", {
 			<b>'+MessageHash[339]+'</b> <input type="radio" name="uploader_existing" id="uploader_existing_overwrite" value="overwrite"> '+MessageHash[263]+' \
 			<input type="radio" name="uploader_existing" id="uploader_existing_rename" value="rename"> '+MessageHash[6]+' \
 			<input type="radio" name="uploader_existing" id="uploader_existing_alert" value="alert"> '+MessageHash[340]+' <br>\
-			<b>Options</b> <input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; \
+			<b>'+MessageHash[312]+'</b> <input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; \
 			<input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'\
 			</div>');
 		optionPane.hide();
@@ -472,7 +472,7 @@ Class.create("XHRUploader", {
 			alert(MessageHash[365].replace("%s", this.max));
 			return;
 		}
-		
+
 		var basename = getBaseName(file.name);
 		if(basename.length > this.namesMaxLength){
 			alert(MessageHash[393].replace("%s", this.namesMaxLength));
@@ -515,7 +515,7 @@ Class.create("XHRUploader", {
 
 		// Add button & text
 		item.insert( delButton );
-		item.insert( label );
+		item.insert( label.stripTags() );
         if(relativePath){
             item.relativePath = relativePath;
             item.insert( '<span class="item_relative_path">'+getRepName(relativePath)+'</span>' );
@@ -588,7 +588,7 @@ Class.create("XHRUploader", {
                 status = window.MessageHash[messageIds[status]];
             }catch(e){}
             if(oThis.currentBackgroundPanel){
-                oThis.currentBackgroundPanel.update(item.file.name + ' ['+status+']');
+                oThis.currentBackgroundPanel.update(item.file.name.stripTags() + ' ['+status+']');
             }
             this.statusText.innerHTML = "["+status+"]";
 		}.bind(item);
@@ -631,7 +631,7 @@ Class.create("XHRUploader", {
             this.statusText.removeClassName('error');
             this.statusText.addClassName(this.status);
             if(oThis.currentBackgroundPanel){
-                oThis.currentBackgroundPanel.update(item.file.name + ' ['+status+']');
+                oThis.currentBackgroundPanel.update(item.file.name.stripTags() + ' ['+status+']');
             }
 		}.bind(item);
 	},

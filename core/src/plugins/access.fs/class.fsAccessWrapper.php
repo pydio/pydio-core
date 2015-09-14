@@ -102,11 +102,13 @@ class fsAccessWrapper implements AjxpWrapper
                        register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
                     $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                     $content = $crtZip->listContent();
-                    foreach ($content as $item) {
-                        $fName = AJXP_Utils::securePath($item["stored_filename"]);
-                        if ($fName == $localPath || "/".$fName == $localPath) {
-                            $localPath = $fName;
-                            break;
+                    if(is_array($content)){
+                        foreach ($content as $item) {
+                            $fName = AJXP_Utils::securePath($item["stored_filename"]);
+                            if ($fName == $localPath || "/".$fName == $localPath) {
+                                $localPath = $fName;
+                                break;
+                            }
                         }
                     }
                     $res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
@@ -125,6 +127,7 @@ class fsAccessWrapper implements AjxpWrapper
                } else {
                 $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                 $liste = $crtZip->listContent();
+                   if(!is_array($liste)) $liste = array();
                 if($storeOpenContext) self::$crtZip = $crtZip;
                 $folders = array(); $files = array();$builtFolders = array();
                 if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
@@ -287,7 +290,7 @@ class fsAccessWrapper implements AjxpWrapper
 
     public function stream_seek($offset , $whence = SEEK_SET)
     {
-        fseek($this->fp, $offset, SEEK_SET);
+        fseek($this->fp, $offset, $whence);
     }
 
     public function stream_tell()
@@ -467,8 +470,12 @@ class fsAccessWrapper implements AjxpWrapper
         }
     }
 
+    /**
+     * @return bool|float
+     */
     public static function getLastRealSize()
     {
+        if(empty(self::$lastRealSize)) return false;
         return self::$lastRealSize;
     }
 

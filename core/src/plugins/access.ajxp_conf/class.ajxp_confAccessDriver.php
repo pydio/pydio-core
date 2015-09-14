@@ -355,8 +355,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user_editable"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            echo AJXP_XMLWriter::renderNode($nodeKey, $userId, true, $meta, true, false);
-
+            $userDisplayName = $userObject->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", "ajxp_user", $userId);
+            echo AJXP_XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
         }
 
     }
@@ -1280,9 +1280,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case  "get_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                $count = 0;
+                $repositories = ConfService::listRepositoriesWithCriteria(array(
                     "isTemplate" => '1'
-                ));
+                ), $count);
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     $repoId = $repo->getUniqueId();
@@ -1315,6 +1316,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (count($options)) {
                     $repDef["DRIVER_OPTIONS"] = $options;
                     unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
+                    if(isSet($options["AJXP_SLUG"])){
+                        $repDef["AJXP_SLUG"] = $options["AJXP_SLUG"];
+                        unset($repDef["DRIVER_OPTIONS"]["AJXP_SLUG"]);
+                    }
                 }
                 if (strstr($repDef["DRIVER"], "ajxp_template_") !== false) {
                     $templateId = substr($repDef["DRIVER"], 14);
@@ -2282,7 +2287,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
             $r = array();
             if(!AuthService::canAdministrate($roleObject)) continue;
-            $repos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array("role" => $roleObject));
+            $count = 0;
+            $repos = ConfService::listRepositoriesWithCriteria(array("role" => $roleObject), $count);
             foreach ($repos as $repoId => $repository) {
                 if($repository->getAccessType() == "ajxp_shared") continue;
                 if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;

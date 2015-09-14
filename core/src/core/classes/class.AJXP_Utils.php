@@ -25,6 +25,7 @@ define('AJXP_SANITIZE_HTML_STRICT', 2);
 define('AJXP_SANITIZE_ALPHANUM', 3);
 define('AJXP_SANITIZE_EMAILCHARS', 4);
 define('AJXP_SANITIZE_FILENAME', 5);
+define('AJXP_SANITIZE_DIRNAME', 6);
 
 // THESE ARE DEFINED IN bootstrap_context.php
 // REPEAT HERE FOR BACKWARD COMPATIBILITY.
@@ -159,7 +160,7 @@ class AJXP_Utils
             '#(<[^>]+[\x00-\x20\"\'\/])style=[^>]*>?#iUu',
 
             // Match unneeded tags
-            '#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+            '#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base|svg)[^>]*>?#i'
         );
 
         foreach($patterns as $pattern) {
@@ -189,7 +190,7 @@ class AJXP_Utils
             return preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
         } else if ($level == AJXP_SANITIZE_EMAILCHARS) {
             return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
-        } else if ($level == AJXP_SANITIZE_FILENAME) {
+        } else if ($level == AJXP_SANITIZE_FILENAME || $level == AJXP_SANITIZE_DIRNAME) {
             // Convert Hexadecimals
             $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('AJXP_Utils', 'clearHexaCallback'), $s);
             // Clean up entities
@@ -199,9 +200,11 @@ class AJXP_Utils
             // Strip whitespace characters
             $s = trim($s);
             $s = str_replace(chr(0), "", $s);
-            $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
+            if($level == AJXP_SANITIZE_FILENAME) $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
+            else $s = preg_replace("/[\"\|\?\\\]/", "", $s);
             if(self::detectXSS($s)){
-                $s = "XSS Detected - Rename Me";
+                if(strpos($s, "/") === 0) $s = "/XSS Detected - Rename Me";
+                else $s = "XSS Detected - Rename Me";
             }
             return $s;
         }
@@ -337,7 +340,7 @@ class AJXP_Utils
             $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, $mess[542]);
             if ($userfile_error == UPLOAD_ERR_NO_FILE) {
                 // OPERA HACK, do not display "no file found error"
-                if (!ereg('Opera', $_SERVER['HTTP_USER_AGENT'])) {
+                if (strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') === false) {
                     $data = $errorsArray[$userfile_error];
                     if($throwException) throw new Exception($data[1], $data[0]);
                     return $data;
@@ -557,7 +560,7 @@ class AJXP_Utils
         } else if ($keyword == "audio") {
             return "mp3";
         } else if ($keyword == "zip") {
-            if (ConfService::zipEnabled()) {
+            if (ConfService::zipBrowsingEnabled()) {
                 return "zip,ajxp_browsable_archive";
             } else {
                 return "none_allowed";
@@ -858,7 +861,6 @@ class AJXP_Utils
     /**
      * Build the current server URL
      * @param bool $withURI
-     * @internal param bool $witchURI
      * @static
      * @return string
      */
@@ -1483,6 +1485,16 @@ class AJXP_Utils
         if (stripos($_SERVER["HTTP_USER_AGENT"], "iphone") !== false) return true;
         if (stripos($_SERVER["HTTP_USER_AGENT"], "ipad") !== false) return true;
         if (stripos($_SERVER["HTTP_USER_AGENT"], "ipod") !== false) return true;
+        return false;
+    }
+    /**
+     * Detect Windows Phone
+     * @static
+     * @return bool
+     */
+    public static function userAgentIsWindowsPhone()
+    {
+        if (stripos($_SERVER["HTTP_USER_AGENT"], "IEMobile") !== false) return true;
         return false;
     }
     /**

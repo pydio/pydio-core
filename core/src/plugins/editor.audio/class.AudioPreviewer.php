@@ -62,16 +62,21 @@ class AudioPreviewer extends AJXP_Plugin
             $cType = "audio/".array_pop(explode(".", $file));
 
             $localName = basename($file);
+            $node = new AJXP_Node($destStreamURL.$file);
+            if(method_exists($node->getDriver(), "filesystemFileSize")){
+                $size = $node->getDriver()->filesystemFileSize($node->getUrl());
+            }else{
+                $size = filesize($node->getUrl());
+            }
 
             header("Content-Type: ".$cType."; name=\"".$localName."\"");
-            header("Content-Length: ".filesize($destStreamURL.$file));
+            header("Content-Length: ".$size);
 
             $stream = fopen("php://output", "a");
             call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
             fflush($stream);
             fclose($stream);
 
-            $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
             $this->logInfo('Preview', 'Read content of '.$node->getUrl());
             //exit(1);

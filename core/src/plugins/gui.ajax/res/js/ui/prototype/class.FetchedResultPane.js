@@ -60,6 +60,7 @@ Class.create("FetchedResultPane", FilesList, {
             fit:'height',
             detailThumbSize:22,
             updateGlobalContext:false,
+            clearSelectionOnBlur:false,
             selectionChangeCallback:function(){
                 if(!this._dataLoaded) return;
                 var selectedNode = this._dataModel.getSelectedNodes()[0];
@@ -197,6 +198,13 @@ Class.create("FetchedResultPane", FilesList, {
             this.htmlElement.hide();
         }
 	},
+
+    blur: function($super){
+        $super();
+        if(this.options.clearSelectionOnBlur){
+            this._dataModel.setSelectedNodes([]);
+        }
+    },
 
     getActions : function(){
         return $H();
