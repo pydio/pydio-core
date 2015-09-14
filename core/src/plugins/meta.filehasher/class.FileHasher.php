@@ -197,7 +197,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                     if(method_exists($this->accessDriver, "filesystemFileSize")){
                         $this->accessDriver->filesystemFileSize(null, $stat);
                     }
-                    if (!$stat) {
+                    if (!$stat || !is_readable($node->getUrl())) {
                         print '{}';
                     } else {
                         if($node->isLeaf()) {
@@ -227,8 +227,9 @@ class FileHasher extends AJXP_AbstractMetaSource
                         if(method_exists($this->accessDriver, "filesystemFileSize")){
                             $this->accessDriver->filesystemFileSize(null, $stat);
                         }
-                        if(!$stat) $stat = '{}';
-                        else {
+                        if(!$stat || !is_readable($node->getUrl())) {
+                            $stat = '{}';
+                        } else {
                             if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
                             else $hash = 'directory';
                             $stat[13] = $stat["hash"] = $hash;

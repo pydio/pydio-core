@@ -200,7 +200,7 @@ class AuthService
         $loginArray[$serverAddress] = $login;
         if ($login["count"] > 3) {
             if (AJXP_SERVER_DEBUG || ConfService::getCoreConf("DISABLE_BRUTE_FORCE_CHECK", "auth") === true) {
-                AJXP_Logger::debug("Warning: failed login 3 time for $login from address $serverAddress! Captcha is disabled.");
+                AJXP_Logger::debug("Warning: failed login 3 time from address $serverAddress, but ignored because captcha is disabled.");
                 return true;
             }
             return FALSE;
@@ -916,6 +916,10 @@ class AuthService
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
         if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
+        $currentGroups = self::listChildrenGroups($baseGroup);
+        if(array_key_exists("/".$groupName, $currentGroups)){
+            throw new Exception("Group with this name already exists, please pick another name!");
+        }
         if(empty($groupLabel)) $groupLabel = $groupName;
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
