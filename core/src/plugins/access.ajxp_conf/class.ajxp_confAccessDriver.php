@@ -1162,6 +1162,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (count($options)) {
                     $repDef["DRIVER_OPTIONS"] = $options;
                     unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
+                    if(isSet($options["AJXP_SLUG"])){
+                        $repDef["AJXP_SLUG"] = $options["AJXP_SLUG"];
+                        unset($repDef["DRIVER_OPTIONS"]["AJXP_SLUG"]);
+                    }
                 }
                 if (strstr($repDef["DRIVER"], "ajxp_template_") !== false) {
                     $templateId = substr($repDef["DRIVER"], 14);
