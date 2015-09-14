@@ -102,7 +102,15 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
     {
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
-        return is_file($MOUNT_POINT."/.ajxp_mount");
+        if( is_dir($MOUNT_POINT) ){
+            if( stat(dirname($MOUNT_POINT))[0] == stat($MOUNT_POINT)[0] ){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
     }
 
     public function mountFS()
@@ -178,7 +186,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
 
         system(($MOUNT_SUDO?"sudo":"")." umount ".escapeshellarg($MOUNT_POINT), $res);
-        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !is_file($MOUNT_POINT."/.ajxp_mount")){
+        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted() ){
             // Remove mount point
             $testRm = @rmdir($MOUNT_POINT);
             if($testRm === false){
