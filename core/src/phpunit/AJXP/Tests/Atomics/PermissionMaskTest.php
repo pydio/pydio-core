@@ -522,6 +522,12 @@ class AJXP_PermissionMaskTest extends \PHPUnit_Framework_TestCase
         $randomRole = new \AJXP_PermissionMask();
         $randomRole->updateBranch("/Services/Admin/Requests/Secrets", new \AJXP_Permission("d"));
 
+        $randomRole1 = new \AJXP_PermissionMask();
+        $randomRole1->updateBranch("/Services/Admin/Requests", new \AJXP_Permission("wr"));
+
+        $randomRole2 = new \AJXP_PermissionMask();
+        $randomRole2->updateBranch("/Services/Admin/Requests/Secrets", new \AJXP_Permission("r"));
+
         echo "================================\n";
         echo "Service Admin Request User 0: \n";
         $ServiceAdminRequestsUser->toStr($ServiceAdminRequestsUser->getTree(), 1);
@@ -551,18 +557,30 @@ class AJXP_PermissionMaskTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($ServiceAdminRequestsUser->match("/Public/write", \AJXP_Permission::WRITE));
         $this->assertFalse($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::WRITE));
+        $this->assertTrue($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::DENY));
 
         echo "Service Admin Request User 6: \n";
         $ServiceAdminRequestsUser->toStr($ServiceAdminRequestsUser->getTree(), 1);
 
-
-        $randomRole2 = new \AJXP_PermissionMask();
-        $randomRole2->updateBranch("/Services/Admin/Requests/Secrets", new \AJXP_Permission("r"));
-        $ServiceAdminRequestsUser = $randomRole2->override($ServiceAdminRequestsUser);
+        $ServiceAdminRequestsUser = $ServiceAdminRequestsUser->override($randomRole2);
         echo "Service Admin Request User 7: \n";
         $ServiceAdminRequestsUser->toStr($ServiceAdminRequestsUser->getTree(), 1);
 
+        $this->assertTrue($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::READ));
+        $this->assertFalse($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::WRITE));
+        $this->assertFalse($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::DENY));
+
+        $ServiceAdminRequestsUser = $ServiceAdminRequestsUser->override($randomRole1);
+        echo "Service Admin Request User 8: \n";
+        $ServiceAdminRequestsUser->toStr($ServiceAdminRequestsUser->getTree(), 1);
+
+
+        $this->assertTrue($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::READ));
+        $this->assertTrue($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::WRITE));
+        $this->assertFalse($ServiceAdminRequestsUser->match("/Services/Admin/Requests/Secrets", \AJXP_Permission::DENY));
+
     }
 }
+
 
 
