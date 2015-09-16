@@ -230,9 +230,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
-        $selection = new UserSelection();
-        $selection->initFromHttpVars($httpVars);
-        $currentFile = $selection->getUniqueFile();
+        $selection = new UserSelection($repo, $httpVars);
 
         $nodes = $selection->buildNodes();
         $nodesDiffs = array();
@@ -263,29 +261,6 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             $nodesDiffs[$ajxpNode->getPath()] = $ajxpNode;
 
         }
-        /*
-        $urlBase = $this->accessDriver->getResourceUrl($currentFile);
-        $ajxpNode = new AJXP_Node($urlBase);
-
-        $newValues = array();
-        $def = $this->getMetaDefinition();
-        $ajxpNode->setDriver($this->accessDriver);
-        AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
-        foreach ($def as $key => $data) {
-            if (isSet($httpVars[$key])) {
-                $newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
-            } else {
-                if (!isset($original)) {
-                    $original = $ajxpNode->retrieveMetadata("users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
-                }
-                if (isSet($original) && isset($original[$key])) {
-                    $newValues[$key] = $original[$key];
-                }
-            }
-        }
-        $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
-        AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
-        */
         AJXP_XMLWriter::header();
         AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
         AJXP_XMLWriter::close();
