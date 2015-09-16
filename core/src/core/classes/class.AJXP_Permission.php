@@ -83,7 +83,7 @@ class AJXP_Permission
     }
 
     function testPermission($numPerm){
-        if(is_integer($numPerm) && ($numPerm < 15)){
+        if(is_integer($numPerm) && ($numPerm < self::MASK)){
             $numPerm = $numPerm & self::MASK;
             if (($this->value !== 0) && $numPerm === 0) return false;
             if (($this->value === 0) && $numPerm === self::DENY) return true;
