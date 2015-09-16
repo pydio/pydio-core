@@ -159,11 +159,6 @@ class AJXP_PermissionMask
         return $result;
     }
 
-
-    private function mergeTrees2($t1, $t2){
-
-
-    }
     /**
      * @param string $path
      * @param AJXP_Permission $permission
