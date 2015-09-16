@@ -29,7 +29,13 @@ class AJXP_PermissionMask
      */
     private $permissionTree;
 
-    function __construct(){}
+    function __construct($path = null){
+        /*if(!empty($path)) {
+            $permission = new AJXP_Permission();
+            $this->permissionTree = $this->pathToBranch($path, $permission);
+        }
+        */
+    }
 
     /**
      * @return array
@@ -78,6 +84,15 @@ class AJXP_PermissionMask
     }
 
     /**
+     * @param AJXP_PermissionMask $mask
+     * @return AJXP_PermissionMask
+     */
+
+    function copyMask($mask){
+        $this->updateTree($mask->getTree());
+    }
+
+    /**
      * @param string $test
      * @param  string $permission
      * @return bool
@@ -86,17 +101,17 @@ class AJXP_PermissionMask
         // Check if a path has the given permission
 
         $pathes = $this->flattenTree();
-        //var_dump($pathes);
+        //print_r($pathes);
         foreach($pathes as $path => $permObject){
             if(strpos($test, $path) === 0){
-                var_dump("Test $test starts with existing path ".$path.":".$permObject);
+//                var_dump("Test $test starts with existing path ".$path.":".$permObject);
                 return $permObject->testPermission($permission);
             }
         }
         // test is not under a defined permission, check if it needs traversal
         foreach($pathes as $path => $permObject){
             if(strpos($path, $test) === 0 && !$permObject->denies()){
-                var_dump("Existing path starts with test ($test) >> ".$path.":".$permObject);
+//                var_dump("Existing path starts with test ($test) >> ".$path.":".$permObject);
                 return $permObject->testPermission($permission);
             }
         }
@@ -144,6 +159,11 @@ class AJXP_PermissionMask
         return $result;
     }
 
+
+    private function mergeTrees2($t1, $t2){
+
+
+    }
     /**
      * @param string $path
      * @param AJXP_Permission $permission
@@ -186,4 +206,31 @@ class AJXP_PermissionMask
         return $pathes;
     }
 
+
+
+    public function toStr($permissionTree, $level)
+    {
+        $level = $level + 1;
+        foreach ($permissionTree as $key => $node) {
+
+            $this->printSpace($level);
+            echo "[" . $key . "]";
+            if ($node instanceof AJXP_Permission) echo "(".$node.")";
+
+            echo "\n";
+            if (is_array($node) && count($node) > 0) {
+                $permissionTree = $node;
+                $this->toStr($permissionTree, $level);
+            }
+
+        }
+        $level = $level - 1;
+        //echo "\n";
+    }
+
+    public function printSpace($number){
+        for ($i = 0; $i < $number; $i++){
+            echo "--";
+        }
+    }
 }
