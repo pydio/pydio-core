@@ -24,15 +24,19 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class AJXP_Permission
 {
-    const READ = "r";
-    const WRITE = "w";
-    const DENY = "d";
+    /**
+     * Use an integer number to store permission
+     *  |r|w|d|t|....|..
+     *  |0|1|0|0|....|..
+     */
 
-    private $value = array(
-        self::WRITE => false,
-        self::READ => false,
-        self::DENY => false
-    );
+    const MASK = 15; // 0000..001111 means use 4 first bits for encoding permission. The rest will be cut off.
+    const READ = 1; // 0001
+    const WRITE = 2; // 0010
+    const DENY = 4; // 0100
+    const TRAVEL = 8; //1000
+
+    private $value = 0;
 
     /**
      * @param array|null $value
@@ -40,7 +44,10 @@ class AJXP_Permission
     function __construct($value = null){
         if($value != null){
             if(is_array($value)) $this->value = $value;
-            else if(is_string($value)){
+            elseif(is_integer($value)) {
+                $this->value = $value & self::MASK;
+            }
+            elseif(is_string($value)){
                 if(strpos($value, "r") !== false) $this->setRead();
                 if(strpos($value, "w") !== false) $this->setWrite();
                 if(strpos($value, "d") !== false) $this->setDeny();
@@ -56,47 +63,56 @@ class AJXP_Permission
      * @return bool
      */
     function canRead(){
-        return $this->value[self::READ];
+        return ($this->value & self::READ) === self::READ;
     }
 
     /**
      * @return bool
      */
     function canWrite(){
-        return $this->value[self::WRITE];
+        return ($this->value & self::WRITE) === self::WRITE;
     }
 
     /**
      * @return bool
      */
     function denies(){
-        if($this->value[self::DENY]) return true;
-        if(!$this->value[self::DENY] && !$this->value[self::READ] && !$this->value[self::WRITE]){
-            return true;
-        }
+        if ($this->value === self::DENY) return true;
+        if ($this->value === 0) return true;
         return false;
     }
 
-    function testPermission($stringPerm){
-        if($stringPerm == self::READ) return $this->canRead();
-        else if($stringPerm == self::WRITE) return $this->canWrite();
+    function testPermission($numPerm){
+        if(is_integer($numPerm) && ($numPerm < self::MASK)){
+            $numPerm = $numPerm & self::MASK;
+            if (($this->value !== 0) && $numPerm === 0) return false;
+            if (($this->value === 0) && $numPerm === self::DENY) return true;
+            return (($this->value & $numPerm) === $numPerm);
+        }
         else{
-            throw new Exception("Unimplemented permission : " . $stringPerm);
+            throw new Exception("Unimplemented permission : " . $numPerm);
         }
     }
 
     function setRead($value = true){
-        $this->value[self::READ] = $value;
+        if($value)
+            $this->value = $this->value | self::READ;
+        else{
+            $this->value = $this->value & (self::READ ^ self::MASK);
+        }
     }
     function setWrite($value = true){
-        $this->value[self::WRITE] = $value;
+        if($value)
+            $this->value = $this->value | self::WRITE;
+        else{
+            $this->value = $this->value & (self::WRITE ^ self::MASK);
+        }
     }
     function setDeny($value = true){
-        if($value){
-            $this->value[self::WRITE] = $this->value[self::READ] = false;
-            $this->value[self::DENY] = true;
-        }else{
-            $this->value[self::DENY] = false;
+        if($value)
+            $this->value = $this->value & self::DENY;
+        else{
+            $this->value = $this->value & (self::DENY ^ self::MASK);
         }
     }
 
@@ -109,8 +125,10 @@ class AJXP_Permission
         if($this->denies()){
             $newPerm->setDeny();
         }else{
-            if($this->canRead()) $newPerm->setRead();
-            if($this->canWrite()) $newPerm->setWrite();
+            if($this->canRead())
+                $newPerm->setRead();
+            if($this->canWrite())
+                $newPerm->setWrite();
         }
         return $newPerm;
     }
@@ -126,5 +144,4 @@ class AJXP_Permission
             return "READ WRITE";
         }
     }
-
 }
