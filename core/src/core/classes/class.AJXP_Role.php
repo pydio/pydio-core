@@ -58,6 +58,10 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @var array Automatically applies to a given list of profiles
      */
     protected $autoApplies = array();
+    /**
+     * @var AJXP_PermissionMask[]
+     */
+    protected $masks = array();
 
     static $cypheredPassPrefix = '$pydio_password$';
 
@@ -163,6 +167,46 @@ class AJXP_Role implements AjxpGroupPathProvider
     }
 
     /**
+     * @param String $repositoryId
+     * @param AJXP_PermissionMask $mask
+     */
+    public function setMask($repositoryId, $mask){
+        $this->masks[$repositoryId] = $mask;
+    }
+
+    /**
+     * @param string $repositoryId
+     */
+    public function clearMask($repositoryId){
+        if(isSet($this->masks[$repositoryId])){
+            unset($this->masks[$repositoryId]);
+        }
+    }
+
+    /**
+     * @param string $repositoryId
+     * @return bool
+     */
+    public function hasMask($repositoryId){
+        return isSet($this->masks[$repositoryId]);
+    }
+
+    /**
+     * @param $repositoryId
+     * @return AJXP_PermissionMask|null
+     */
+    public function getMask($repositoryId){
+        return (isSet($this->masks[$repositoryId]) ? $this->masks[$repositoryId] : null);
+    }
+
+    /**
+     * @return AJXP_PermissionMask[]
+     */
+    public function listMasks(){
+        return $this->masks;
+    }
+
+    /**
      * Send all role informations as an associative array
      * @param bool $blurPasswords
      * @return array
@@ -171,6 +215,7 @@ class AJXP_Role implements AjxpGroupPathProvider
     {
         $roleData = array();
         $roleData["ACL"] = $this->listAcls();
+        $roleData["MASKS"] = $this->listMasks();
         $roleData["ACTIONS"] = $this->listActionsStates();
         $roleData["PARAMETERS"] = $this->listParameters(false, $blurPasswords);
         $roleData["APPLIES"] = $this->listAutoApplies();
@@ -188,6 +233,9 @@ class AJXP_Role implements AjxpGroupPathProvider
         $this->actions = $roleData["ACTIONS"];
         $this->parameters = $roleData["PARAMETERS"];
         $this->autoApplies = $roleData["APPLIES"];
+        if(isSet($roleData["MASKS"])){
+            $this->masks = $roleData["MASKS"];
+        }
 
     }
 
@@ -369,6 +417,18 @@ class AJXP_Role implements AjxpGroupPathProvider
                 foreach ($action as $actionName => $actionState) {
                     $newRole->setActionState($pluginId, $actionName, $repoId, $actionState);
                 }
+            }
+        }
+
+        $roleMasks = $role->listMasks();
+        $allKeys = array_merge(array_keys($this->masks), array_keys($roleMasks));
+        foreach($allKeys as $repoId){
+            if(isSet($roleMasks[$repoId]) && isSet($this->masks[$repoId])){
+                $newRole->setMask($repoId, $this->masks[$repoId]->override($roleMasks[$repoId]));
+            }else if(isSet($roleMasks[$repoId])){
+                $newRole->setMask($repoId, $roleMasks[$repoId]);
+            }else{
+                $newRole->setMask($repoId, $this->masks[$repoId]);
             }
         }
 
