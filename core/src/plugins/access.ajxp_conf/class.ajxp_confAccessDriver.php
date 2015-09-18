@@ -800,6 +800,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $roleData["ACTIONS"] = $originalRole->listActionsStates();
                 }
 
+                if(isSet($roleData["MASKS"])){
+                    foreach($roleData["MASKS"] as $repoId => $serialMask){
+                        $roleData["MASKS"][$repoId] = new AJXP_PermissionMask($serialMask);
+                    }
+                }
+
                 try {
                     $originalRole->bunchUpdate($roleData);
                     if (isSet($userObject)) {
@@ -1530,10 +1536,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", null, "", "serial", '', $repId);
                     print('<users total="'.$users.'"/>');
                     print('<shares total="'.count($shares).'"/>');
+                    $rootGroup = AuthService::getRole("AJXP_GRP_/");
+                    if($rootGroup->hasMask($repId)){
+                        print("<mask><![CDATA[".json_encode($rootGroup->getMask($repId))."]]></mask>");
+                    }
                     print "</additional_info>";
                 }
                 AJXP_XMLWriter::close("admin_data");
-                return ;
+
             break;
 
             case "edit_repository_label" :
@@ -1623,7 +1633,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             return;
                         }
                     }
-
+                    // TODO : WHAT TO DO FOR SUB ADMINS ?
+                    if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
+                        $mask = json_decode($httpVars["permission_mask"], true);
+                        $perm = new AJXP_PermissionMask($mask);
+                        $rootGroup = AuthService::getRole("AJXP_GRP_/");
+                        $rootGroup->setMask($repId, $perm);
+                        AuthService::updateRole($rootGroup);
+                    }
                     ConfService::replaceRepository($repId, $repo);
                 }
                 AJXP_XMLWriter::header();
