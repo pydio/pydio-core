@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class AJXP_Permission
+class AJXP_Permission implements JsonSerializable
 {
     /**
      * Use an integer number to store permission
@@ -110,7 +110,7 @@ class AJXP_Permission
     }
     function setDeny($value = true){
         if($value)
-            $this->value = $this->value & self::DENY;
+            $this->value = self::DENY;
         else{
             $this->value = $this->value & (self::DENY ^ self::MASK);
         }
@@ -143,5 +143,17 @@ class AJXP_Permission
         }else{
             return "READ WRITE";
         }
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return array("read" => $this->canRead(), "write" => $this->canWrite(), "deny" => $this->denies());
     }
 }
