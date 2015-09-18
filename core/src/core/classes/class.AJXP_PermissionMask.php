@@ -22,25 +22,35 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class AJXP_PermissionMask
+class AJXP_PermissionMask implements JsonSerializable
 {
     /**
      * @var array
      */
-    private $permissionTree;
+    private $permissionTree = array();
 
-    function __construct($path = null){
-        /*if(!empty($path)) {
-            $permission = new AJXP_Permission();
-            $this->permissionTree = $this->pathToBranch($path, $permission);
+    /**
+     * @param array|null $serializedForm
+     */
+    function __construct($serializedForm = null){
+        if($serializedForm != null){
+            foreach($serializedForm as $path => $permissionValue){
+                $path = AJXP_Utils::sanitize(AJXP_Utils::securePath($path), AJXP_SANITIZE_DIRNAME);
+                if(!is_array($permissionValue) || $permissionValue["children"]) continue;
+                $perm = new AJXP_Permission();
+                if($permissionValue["read"]) $perm->setRead();
+                if($permissionValue["write"]) $perm->setWrite();
+                if($permissionValue["deny"]) $perm->setDeny();
+                $this->updateBranch($path, $perm);
+            }
         }
-        */
     }
 
     /**
      * @return array
      */
     function getTree(){
+        if($this->permissionTree == null) return array();
         return $this->permissionTree;
     }
 
@@ -79,8 +89,9 @@ class AJXP_PermissionMask
      */
     function override($mask){
         // Return a new mask
-        $this->permissionTree = $this->mergeTrees($this->permissionTree, $mask->getTree());
-        return $this;
+        $newMask = new AJXP_PermissionMask();
+        $newMask->updateTree($this->mergeTrees($this->permissionTree, $mask->getTree()));
+        return $newMask;
     }
 
     /**
@@ -189,7 +200,7 @@ class AJXP_PermissionMask
     private function flattenTree($tree = null, &$pathes = null, $currentRoot=""){
         if($tree == null) $tree = $this->getTree();
         if($pathes == null) $pathes = array();
-
+        if(!is_array($tree) || $tree == null) $tree = array();
         foreach($tree as $pathPart => $value){
             if(is_a($value, "AJXP_Permission")){
                 $pathes[$currentRoot."/".$pathPart] = $value;
@@ -227,5 +238,17 @@ class AJXP_PermissionMask
         for ($i = 0; $i < $number; $i++){
             echo "--";
         }
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return $this->flattenTree();
     }
 }
