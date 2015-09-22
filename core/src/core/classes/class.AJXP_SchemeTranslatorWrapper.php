@@ -97,7 +97,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
         $newPath = AJXP_MetaStreamWrapper::translateScheme($path);
         $this->handle = opendir($newPath);
         if($this->handle !== false){
-            $this->currentDirPath = parse_url($path, PHP_URL_PATH);
+            $this->currentDirPath = $path;
             return true;
         }else{
             return false;
@@ -112,12 +112,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
     public function dir_readdir()
     {
         if(isSet($this->handle) && is_resource($this->handle)){
-            $value = readdir($this->handle);
-            if($this->currentDirPath."/".$value == "/inbox") {
-                return ".";
-            } else {
-                return $value;
-            }
+            return readdir($this->handle);
         }
         return false;
     }
