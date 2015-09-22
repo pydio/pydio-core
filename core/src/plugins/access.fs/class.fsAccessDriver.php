@@ -1048,7 +1048,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         } else $nodeType = "f";
                     }
                     // There is a special sorting, cancel the reordering of files & folders.
-                    if(isSet($orderField) && $orderField != "ajxp_label") $nodeType = "f";
+                    if(isSet($orderField) && $orderField != "ajxp_label" && !(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true" )) {
+                        $nodeType = "f";
+                    }
 
                     if($this->repository->hasContentFilter()){
                         $externalPath = $this->repository->getContentFilter()->externalPath($node);
