@@ -833,6 +833,10 @@ class ConfService
                     $repoObject->setId($repoId);
                     $drvList[$repoId] = $repoObject;
                 }
+                if($repoObject->hasParent() && !ConfService::findRepositoryByIdOrAlias($repoObject->getParentId())){
+                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Disabling repository ".$repoObject->getSlug()." as parent cannot be correctly loaded.");
+                    unset($drvList[$repoId]);
+                }
             }
             foreach($drvList as $key => $value){
                 $objList[$key] = $value;

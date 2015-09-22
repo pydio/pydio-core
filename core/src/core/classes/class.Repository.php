@@ -324,12 +324,15 @@ class Repository implements AjxpGroupPathProvider
      */
     public function getOption($oName, $safe=false, $resolveUser = null)
     {
-        if (!$safe && $this->inferOptionsFromParent) {
-            if (!isset($this->parentTemplateObject) || !is_a($this->parentTemplateObject, "Repository")) {
-                $this->parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+        if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
+            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
+                throw new Exception("Option should be loaded from parent repository, but it was not found");
             }
-            if (isSet($this->parentTemplateObject)) {
-                $value = $this->parentTemplateObject->getOption($oName, $safe);
+        }
+        if (!$safe && $this->inferOptionsFromParent) {
+            if (isSet($parentTemplateObject)) {
+                $value = $parentTemplateObject->getOption($oName, $safe);
                 if (is_string($value) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) {
                     $val = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $value), "/")."/".$this->options[$oName];
                     return AJXP_Utils::securePath($val);
@@ -342,11 +345,11 @@ class Repository implements AjxpGroupPathProvider
             return $value;
         }
         if ($this->inferOptionsFromParent) {
-            if (!isset($this->parentTemplateObject)) {
-                $this->parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            if (!isset($parentTemplateObject)) {
+                $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
             }
-            if (isSet($this->parentTemplateObject)) {
-                return $this->parentTemplateObject->getOption($oName, $safe);
+            if (isSet($parentTemplateObject)) {
+                return $parentTemplateObject->getOption($oName, $safe);
             }
         }
         return "";
