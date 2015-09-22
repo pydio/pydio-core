@@ -165,7 +165,11 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
      */
     public function rmdir($path, $options)
     {
-        return rmdir(AJXP_MetaStreamWrapper::translateScheme($path), $options);
+        if(is_resource($options)){
+            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path), $options);
+        }else{
+            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path));
+        }
     }
 
     /**

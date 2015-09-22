@@ -267,7 +267,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      */
     public function rmdir($path, $options)
     {
-        return rmdir($this->translateScheme($path), $options);
+        if(is_resource($options)){
+            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path), $options);
+        }else{
+            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path));
+        }
     }
 
     /**
