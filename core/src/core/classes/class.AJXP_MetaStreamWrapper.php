@@ -51,6 +51,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
     }
 
+    public static function appendMetaWrapper($name, $className){
+        self::$metaWrappers[$name] = $className;
+        self::register();
+    }
+
     protected static function getNextScheme($url){
         $parts = parse_url($url);
         $metaWrapperKeys = array_keys(self::$metaWrappers);
