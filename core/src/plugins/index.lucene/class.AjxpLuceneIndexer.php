@@ -207,6 +207,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     $commitIndex = true;
                     continue;
                 }
+                if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
                 if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;

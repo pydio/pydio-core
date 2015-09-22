@@ -391,7 +391,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header("Content-type:application/json");
                 if($selection->isUnique()){
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
-                    if (!$stat) {
+                    if (!$stat || !is_readable($selection->getUniqueNode()->getUrl())) {
                         print '{}';
                     } else {
                         print json_encode($stat);
@@ -401,7 +401,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     print '{';
                     foreach($files as $index => $path){
                         $stat = @stat($this->urlBase.$path);
-                        if(!$stat) $stat = '{}';
+                        if(!$stat || !is_readable($this->urlBase.$path)) $stat = '{}';
                         else $stat = json_encode($stat);
                         print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
                     }
@@ -854,6 +854,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
+                if(!is_readable($path) && !is_writeable($path)){
+                    throw new Exception("You are not allowed to access folder " . $path);
+                }
                 // Backward compat
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles(array($dir . "/" . $selection->getUniqueFile()));
@@ -892,7 +895,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                     }
                     foreach($uniqueNodes as $node){
-                        if(!file_exists($node->getUrl())) continue;
+                        if(!file_exists($node->getUrl()) || (!is_readable($node->getUrl()) && !is_writable($node->getUrl()))) continue;
                         $nodeName = $node->getLabel();
                         if (!$this->filterNodeName($node->getPath(), $nodeName, $isLeaf, $lsOptions)) {
                             continue;
@@ -1212,6 +1215,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
         $crtPath = $ajxpNode->getPath();
         $vRoots = $this->repository->listVirtualRoots();
+        $metaData["ajxp_readonly"] = "false";
         if (!empty($crtPath)) {
             if (!@$this->isWriteable($ajxpNode->getUrl())) {
                $metaData["ajxp_readonly"] = "true";
@@ -1655,7 +1659,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $mess = ConfService::getMessages();
         $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-        $old=$this->urlBase."/$filePath";
+        $old=$this->urlBase.$filePath;
         if (!$this->isWriteable($old)) {
             throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
         }
