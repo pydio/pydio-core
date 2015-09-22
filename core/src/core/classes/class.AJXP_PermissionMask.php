@@ -110,19 +110,25 @@ class AJXP_PermissionMask implements JsonSerializable
      */
     function match($test, $permission){
         // Check if a path has the given permission
-
         $pathes = $this->flattenTree();
-        //print_r($pathes);
+
+        if(empty($test) || $test == "/" || $test == "/." || $test == "/..") {
+            if(!count($pathes)) return true;
+            if($permission == AJXP_Permission::READ) return true;
+            else if($permission == AJXP_Permission::WRITE) return false;
+            return true;
+        }
+
         foreach($pathes as $path => $permObject){
-            if(strpos($test, $path) === 0){
-//                var_dump("Test $test starts with existing path ".$path.":".$permObject);
+            if(strpos($test, rtrim($path, "/")."/") === 0 || $test === $path){
                 return $permObject->testPermission($permission);
             }
         }
         // test is not under a defined permission, check if it needs traversal
         foreach($pathes as $path => $permObject){
             if(strpos($path, $test) === 0 && !$permObject->denies()){
-//                var_dump("Existing path starts with test ($test) >> ".$path.":".$permObject);
+                if($permission == AJXP_Permission::READ) return true;
+                else if($permission == AJXP_Permission::WRITE) return false;
                 return $permObject->testPermission($permission);
             }
         }

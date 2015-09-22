@@ -87,6 +87,7 @@ class AJXP_Permission implements JsonSerializable
             $numPerm = $numPerm & self::MASK;
             if (($this->value !== 0) && $numPerm === 0) return false;
             if (($this->value === 0) && $numPerm === self::DENY) return true;
+            if ( ($this->value & self::DENY ) === self::DENY) return false;
             return (($this->value & $numPerm) === $numPerm);
         }
         else{
