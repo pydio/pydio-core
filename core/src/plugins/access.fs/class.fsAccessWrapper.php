@@ -61,15 +61,17 @@ class fsAccessWrapper implements AjxpWrapper
      * @param string $path
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
-    protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
+    protected static function initPath($inputPath, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $path = self::unPatchPathForBaseDir($path);
-        $url = parse_url($path);
+        $inputPath = self::unPatchPathForBaseDir($inputPath);
+        $url = parse_url($inputPath);
         $repoId = $url["host"];
         $test = trim($url["path"], "/");
         $atRoot = empty($test);
         if (isSet($url["fragment"]) && strlen($url["fragment"]) > 0) {
             $url["path"] .= "#".$url["fragment"];
+        } elseif (substr($inputPath, -1) == "#") {
+            $path .= "#";
         }
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
