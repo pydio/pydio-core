@@ -325,7 +325,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      */
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
-        if($prefix == "Log In" && $message="context=API"){
+        if($prefix == "Log In" && $message=="context=API"){
             // Limit the number of logs
             $test = dibi::query('SELECT [logdate] FROM [ajxp_log] WHERE [user]=%s AND [message]=%s AND [params]=%s ORDER BY [logdate] DESC %lmt %ofs', $user, $prefix, $message, 1, 0);
             $lastInsert = $test->fetchSingle();
