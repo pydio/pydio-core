@@ -162,6 +162,23 @@ class AJXP_PermissionMaskTest extends \PHPUnit_Framework_TestCase
 
         //$this->assertTrue($mask->match("/a1", \AJXP_Permission::DENY));
 
+        // Test that a deny is cutting the sub branches
+        $mask1 = new \AJXP_PermissionMask();
+        $mask1->updateBranch("/a1/b1", new \AJXP_Permission("rw"));
+        $mask1->updateBranch("/a1/b2", new \AJXP_Permission("rw"));
+        $mask1->updateBranch("/a1/b3/c1", new \AJXP_Permission("rw"));
+        $mask1->updateBranch("/a1/b3/c2", new \AJXP_Permission("rw"));
+
+        $mask2 = new \AJXP_PermissionMask();
+        $mask2->updateBranch("/a1", new \AJXP_Permission("d"));
+
+        $result = $mask1->override($mask2);
+        $this->assertFalse($result->match("/a1", \AJXP_Permission::READ));
+        $this->assertFalse($result->match("/a1/b2", \AJXP_Permission::READ));
+        $this->assertFalse($result->match("/a1/b3", \AJXP_Permission::READ));
+        $this->assertFalse($result->match("/a1/b3/c1", \AJXP_Permission::READ));
+        $this->assertFalse($result->match("/a1/any", \AJXP_Permission::READ));
+
     }
 
 }

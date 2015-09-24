@@ -207,39 +207,44 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     echo json_encode(array("LIST" => array(), "HAS_GROUPS" => true));
                     return;
                 }
+                if(isSet($_SESSION["ALL_ACTIONS_CACHE"])){
+                    $actions = $_SESSION["ALL_ACTIONS_CACHE"];
+                }else{
 
-                $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
-                $actions = array();
-                foreach ($nodes as $node) {
-                    $xPath = new DOMXPath($node->ownerDocument);
-                    $proc = $xPath->query("processing", $node);
-                    if(!$proc->length) continue;
-                    $txt = $xPath->query("gui/@text", $node);
-                    if ($txt->length) {
-                        $messId = $txt->item(0)->nodeValue;
-                    } else {
-                        $messId = "";
-                    }
-                    $parentPlugin = $node->parentNode->parentNode->parentNode;
-                    $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
-                    if (empty($pId)) {
-                        $pId = $parentPlugin->nodeName .".";
-                        if($pId == "ajxpdriver.") $pId = "access.";
-                        $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
-                    }
-                    //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
-                    if(!is_array($actions[$pId])) $actions[$pId] = array();
-                    $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-                    $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
+                    $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
+                    $actions = array();
+                    foreach ($nodes as $node) {
+                        $xPath = new DOMXPath($node->ownerDocument);
+                        $proc = $xPath->query("processing", $node);
+                        if(!$proc->length) continue;
+                        $txt = $xPath->query("gui/@text", $node);
+                        if ($txt->length) {
+                            $messId = $txt->item(0)->nodeValue;
+                        } else {
+                            $messId = "";
+                        }
+                        $parentPlugin = $node->parentNode->parentNode->parentNode;
+                        $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
+                        if (empty($pId)) {
+                            $pId = $parentPlugin->nodeName .".";
+                            if($pId == "ajxpdriver.") $pId = "access.";
+                            $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
+                        }
+                        //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
+                        if(!is_array($actions[$pId])) $actions[$pId] = array();
+                        $actionName = $node->attributes->getNamedItem("name")->nodeValue;
+                        $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
 
-                }
-                ksort($actions, SORT_STRING);
-                foreach ($actions as $actPid => $actionGroup) {
-                    ksort($actionGroup, SORT_STRING);
-                    $actions[$actPid] = array();
-                    foreach ($actionGroup as $v) {
-                        $actions[$actPid][] = $v;
                     }
+                    ksort($actions, SORT_STRING);
+                    foreach ($actions as $actPid => $actionGroup) {
+                        ksort($actionGroup, SORT_STRING);
+                        $actions[$actPid] = array();
+                        foreach ($actionGroup as $v) {
+                            $actions[$actPid][] = $v;
+                        }
+                    }
+                    $_SESSION["ALL_ACTIONS_CACHE"] = $actions;
                 }
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
@@ -247,7 +252,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "list_all_plugins_parameters":
 
-                $actions = $this->getEditableParameters(true);
+                if(isSet($_SESSION["ALL_PARAMS_CACHE"])){
+                    $actions = $_SESSION["ALL_PARAMS_CACHE"];
+                }else{
+                    $actions = $this->getEditableParameters(true);
+                    $_SESSION["ALL_PARAMS_CACHE"] = $actions;
+                }
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
                 break;
@@ -640,6 +650,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $repoDetailed[$repositoryId] = array(
                             "label"  => SystemTextEncoding::toUTF8($repositoryObject->getDisplay()),
                             "driver" => $repositoryObject->getAccessType(),
+                            "scope"  => $repositoryObject->securityScope(),
                             "meta"   => $meta
                         );
                     }
@@ -1448,7 +1459,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $nested = array();
                 $definitions = $plug->getConfigsDefinitions();
-                print("<repository index=\"$repId\"");
+                print("<repository index=\"$repId\" securityScope=\"".$repository->securityScope()."\"");
                 foreach ($repository as $name => $option) {
                     if(strstr($name, " ")>-1) continue;
                     if ($name == "driverInstance") continue;
@@ -1636,9 +1647,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     // TODO : WHAT TO DO FOR SUB ADMINS ?
                     if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
                         $mask = json_decode($httpVars["permission_mask"], true);
-                        $perm = new AJXP_PermissionMask($mask);
                         $rootGroup = AuthService::getRole("AJXP_GRP_/");
-                        $rootGroup->setMask($repId, $perm);
+                        if(count($mask)){
+                            $perm = new AJXP_PermissionMask($mask);
+                            $rootGroup->setMask($repId, $perm);
+                        }else{
+                            $rootGroup->clearMask($repId);
+                        }
                         AuthService::updateRole($rootGroup);
                     }
                     ConfService::replaceRepository($repId, $repo);

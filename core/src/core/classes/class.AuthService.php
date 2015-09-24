@@ -610,7 +610,7 @@ class AuthService
             $allRepoList = ConfService::getRepositoriesList("all", false);
             foreach ($allRepoList as $repoId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
-                if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
+                if($repoObject->hasOwner() && $repoObject->getOwner() != $adminUser->getId()) continue;
                 $adminUser->personalRole->setAcl($repoId, "rw");
             }
             $adminUser->recomputeMergedRole();

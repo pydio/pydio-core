@@ -82,6 +82,10 @@ class AJXP_Permission implements JsonSerializable
         return false;
     }
 
+    function isEmpty(){
+        return $this->value === 0;
+    }
+
     function testPermission($numPerm){
         if(is_integer($numPerm) && ($numPerm < self::MASK)){
             $numPerm = $numPerm & self::MASK;

@@ -424,7 +424,8 @@ class AJXP_Role implements AjxpGroupPathProvider
         $allKeys = array_merge(array_keys($this->masks), array_keys($roleMasks));
         foreach($allKeys as $repoId){
             if(isSet($roleMasks[$repoId]) && isSet($this->masks[$repoId])){
-                $newRole->setMask($repoId, $this->masks[$repoId]->override($roleMasks[$repoId]));
+                //$newRole->setMask($repoId, $this->masks[$repoId]->override($roleMasks[$repoId]));
+                $newRole->setMask($repoId, $roleMasks[$repoId]->override($this->masks[$repoId]));
             }else if(isSet($roleMasks[$repoId])){
                 $newRole->setMask($repoId, $roleMasks[$repoId]);
             }else{

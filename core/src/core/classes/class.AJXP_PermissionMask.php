@@ -41,6 +41,7 @@ class AJXP_PermissionMask implements JsonSerializable
                 if($permissionValue["read"]) $perm->setRead();
                 if($permissionValue["write"]) $perm->setWrite();
                 if($permissionValue["deny"]) $perm->setDeny();
+                if($perm->isEmpty()) continue;
                 $this->updateBranch($path, $perm);
             }
         }
@@ -114,6 +115,12 @@ class AJXP_PermissionMask implements JsonSerializable
 
         if(empty($test) || $test == "/" || $test == "/." || $test == "/..") {
             if(!count($pathes)) return true;
+            if(isSet($pathes["/"])) {
+                $permObject = $pathes["/"];
+                // If not read or write, must be read at least for root
+                if($permObject->denies()) $permObject->setRead(true);
+                return $permObject->testPermission($permission);
+            }
             if($permission == AJXP_Permission::READ) return true;
             else if($permission == AJXP_Permission::WRITE) return false;
             return true;
