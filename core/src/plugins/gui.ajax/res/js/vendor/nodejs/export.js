@@ -11,4 +11,5 @@ window.ReactSelect = require('react-select');
 window.ReactDND = require('react-dnd');
 window.ReactDND.HTML5Backend = require('react-dnd/modules/backends/HTML5');
 window.ReactDND.flow = require('lodash/function/flow');
+window.classNames = require('classnames');
 window.injectTapEventPlugin();
