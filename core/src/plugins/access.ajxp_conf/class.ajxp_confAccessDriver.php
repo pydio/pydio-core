@@ -683,6 +683,26 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                     } else if (isSet($groupPath)) {
                         $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
+                        if($roleId != "AJXP_GRP_/"){
+                            $parentGroupRoles = array();
+                            $parentPath = AJXP_Utils::forwardSlashDirname($roleId);
+                            while($parentPath != "AJXP_GRP_"){
+                                $parentRole = AuthService::getRole($parentPath);
+                                if($parentRole != null) {
+                                    array_unshift($parentGroupRoles, $parentRole);
+                                }
+                                $parentPath = AJXP_Utils::forwardSlashDirname($parentPath);
+                            }
+                            $rootGroup = AuthService::getRole("AJXP_GRP_/");
+                            if($rootGroup != null) array_unshift($parentGroupRoles, $rootGroup);
+                            if(count($parentGroupRoles)){
+                                $parentRole = clone array_shift($parentGroupRoles);
+                                foreach($parentGroupRoles as $pgRole){
+                                    $parentRole = $pgRole->override($parentRole);
+                                }
+                                $data["PARENT_ROLE"] = $parentRole->getDataArray();
+                            }
+                        }
                     }
 
 
@@ -1562,7 +1582,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if(!$repo->isWriteable()){
-                    throw new Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
+                    if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
+                        $mask = json_decode($httpVars["permission_mask"], true);
+                        $rootGroup = AuthService::getRole("AJXP_GRP_/");
+                        if(count($mask)){
+                            $perm = new AJXP_PermissionMask($mask);
+                            $rootGroup->setMask($repId, $perm);
+                        }else{
+                            $rootGroup->clearMask($repId);
+                        }
+                        AuthService::updateRole($rootGroup);
+                        AJXP_XMLWriter::header();
+                        AJXP_XMLWriter::sendMessage("The permission mask was updated for this workspace", null);
+                        AJXP_XMLWriter::close();
+                        break;
+                    }else{
+                        throw new Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
+                    }
                 }
                 $res = 0;
                 if (isSet($httpVars["newLabel"])) {
@@ -2203,6 +2239,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
+
+        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1){
+            $nodeKey = "/data/".$root."/";
+            $meta = array(
+                "icon" => "users-folder.png",
+                "icon_class" => "icon-home",
+                "ajxp_mime" => "group",
+                "object_id" => "/"
+            );
+            $xml = AJXP_XMLWriter::renderNode($nodeKey, "Root Group", true, $meta, true, false);
+            if(!$returnNodes) print($xml);
+            else $allNodes[$nodeKey] = $xml;
+        }
+
         foreach ($groups as $groupId => $groupLabel) {
 
             $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
@@ -2307,7 +2357,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return array();
         $roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
         ksort($roles);
-        if(!$this->listSpecialRoles){
+        if(!$this->listSpecialRoles && !$this->getName() == "ajxp_admin"){
             $rootGroupRole = AuthService::getRole("AJXP_GRP_/", true);
             if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
                 $rootGroupRole->setLabel("Root Group");
