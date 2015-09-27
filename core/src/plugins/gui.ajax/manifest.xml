@@ -3,6 +3,7 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"/>
         </resources>
     </client_settings>
 	<server_settings>

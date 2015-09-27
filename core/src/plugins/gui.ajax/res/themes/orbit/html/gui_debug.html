@@ -8,7 +8,11 @@
     }?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="icon" type="image/x-png" href="<?php print(AJXP_THEME_FOLDER);?>/images/html-folder.png">
-    <script src="plugins/gui.ajax/res/js/vendor/nodejs/bundle.js"></script>
+    <!--[if IE 8]>
+    <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
+    <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
+    <![endif]-->
+<!--    <script src="plugins/gui.ajax/res/js/vendor/nodejs/bundle.js"></script>-->
     <?php
     print($ADDITIONAL_FRAMEWORKS);
 
@@ -79,12 +83,12 @@ foreach ($lines as $line){
         </form>
         </div>
         <script type="text/javascript">
-            React.initializeTouchEvents(true);
-        document.observe("ajaxplorer:before_gui_load", function(e){
-            ajaxplorer.currentThemeUsesIconFonts = true;
-            pydio.Parameters.set('currentThemeUsesIconFonts', true);
-            document.documentElement.className += " ajxp_theme_orbit";
-        });
+            if(window.React) React.initializeTouchEvents(true);
+            document.observe("ajaxplorer:before_gui_load", function(e){
+                ajaxplorer.currentThemeUsesIconFonts = true;
+                pydio.Parameters.set('currentThemeUsesIconFonts', true);
+                document.documentElement.className += " ajxp_theme_orbit";
+            });
     </script>
 
     </body>
