@@ -62,6 +62,42 @@ body, html
     padding: 0;
 }
 
+
+.flexbox body{
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.vertical_layout{
+    display:-webkit-flex;
+    display:flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.vertical_layout > *{
+    flex-shrink: 0;
+}
+
+.horizontal_layout{
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    align-items: stretch;
+    -webkit-align-items: stretch;
+}
+
+.vertical_fit{
+    flex:1;
+    -webkit-flex: 1;
+    overflow-y: hidden;
+}
+
+
 input, textarea, select
 {
     margin-top: 1px;
@@ -2555,6 +2591,15 @@ div#upload_files_list span.item_relative_path{
     opacity: 0.7;
     padding-right: 1px;
 }
+.flexbox div.scroller_track{
+    top:0;
+    bottom: 0;
+}
+
+div#folder_pane{
+    position: relative;
+}
+
 .scroller_handle{
     -webkit-border-radius: 5px;
     border-radius: 5px;

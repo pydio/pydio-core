@@ -237,7 +237,7 @@
 				</div>
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars" ajxpClass="AjxpPane">
+				<div id="toolbars" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'>
 					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
