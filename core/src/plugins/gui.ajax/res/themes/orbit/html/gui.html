@@ -23,7 +23,9 @@
 		var ajaxplorer, startParameters = {}, MessageHash={};
 		//AJXP_JSON_START_PARAMETERS
         document.observe("ajaxplorer:before_gui_load", function(e){
-			React.initializeTouchEvents(true);
+			if(window.React){
+                React.initializeTouchEvents(true);
+            }
             ajaxplorer.currentThemeUsesIconFonts = true;
             pydio.Parameters.set('currentThemeUsesIconFonts', true);
             document.documentElement.className += " ajxp_theme_orbit";
