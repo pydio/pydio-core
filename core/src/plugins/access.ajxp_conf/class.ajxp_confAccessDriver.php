@@ -717,6 +717,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     foreach ($nodes as $node) {
                         $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
                         $origName = $node->attributes->getNamedItem("name")->nodeValue;
+                        if($roleId == "AJXP_GRP_/" && strpos($origName, "ROLE_") ===0 ) continue;
                         $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
                         $nArr = array();
                         foreach ($node->attributes as $attrib) {
