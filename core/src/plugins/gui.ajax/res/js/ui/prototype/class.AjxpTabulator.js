@@ -52,6 +52,14 @@ Class.create("AjxpTabulator", AjxpPane, {
 		// tab Element must implement : showElement() and resize() methods.
 		// Add drop shadow here, otherwise the negative value gets stuck in the CSS compilation...
 		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
+        if(htmlElement.hasClassName('horizontal_tabulator') && Modernizr.flexbox){
+            var panelsCont = new Element('div', {className:'tabulatorPanelsContainer'});
+            this.htmlElement.insert(panelsCont);
+            this.htmlElement.select('> div').each(function(d){
+                if(d.hasClassName('tabulatorPanelsContainer')) return ;
+                panelsCont.insert(d);
+            });
+        }
 		$(this.htmlElement).insert({top:div});
         var shortener = this.shortenLabel;
 
@@ -218,6 +226,9 @@ Class.create("AjxpTabulator", AjxpPane, {
             contentNodes.each(function(addNode){
                 var cdataContent = addNode.firstChild.nodeValue;
                 var anchor = this.htmlElement;
+                if(this.htmlElement && this.htmlElement.down('.tabulatorPanelsContainer')){
+                    anchor = this.htmlElement.down('.tabulatorPanelsContainer');
+                }
                 if(cdataContent && anchor){
                     if(!anchor.down('#'+addNode.getAttribute("id"))){
                         anchor.insert(cdataContent);
@@ -234,6 +245,8 @@ Class.create("AjxpTabulator", AjxpPane, {
     /**
      *
      * @param tabInfo
+     * @param paneInfo
+     * @param skipStateSave
      */
     addTab: function(tabInfo, paneInfo, skipStateSave){
 
@@ -274,7 +287,9 @@ Class.create("AjxpTabulator", AjxpPane, {
             tabInfo.element = "dynamic-panel-" + randomId;
         }
 
-        $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
+        if(!$(this.htmlElement).down('#'+tabInfo.element)){
+            $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
+        }
         fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element), null, this.options.fitMarginBottom);
         var shortener = this.shortenLabel;
 
@@ -476,8 +491,10 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(this.htmlElement.hasClassName('horizontal_tabulator')){
             var tabContainer = this.htmlElement.down('div.tabulatorContainer');
             fitHeightToBottom(tabContainer, null, this.options.fitMarginBottom);
-            var pWidth = this.htmlElement.getWidth() - tabContainer.getWidth();
-            this.htmlElement.select('> div:not(.tabulatorContainer)').invoke('setStyle', {width:pWidth+'px'});
+            if(!Modernizr.flexbox){
+                var pWidth = this.htmlElement.getWidth() - tabContainer.getWidth();
+                this.htmlElement.select('> div:not(.tabulatorContainer)').invoke('setStyle', {width:pWidth+'px'});
+            }
         }
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject && !ajxpObject.fullScreenMode){

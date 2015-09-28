@@ -6127,6 +6127,18 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     background-color: #30383A;
 }
 
+.flexbox div.horizontal_tabulator{
+    flex-direction: row;
+    -webkit-flex-direction: row;
+
+}
+.flexbox div.horizontal_tabulator div.tabulatorContainer {
+    float: none;
+    height: auto;
+    flex:0 0 240px;
+    -webkit-flex:0 0 240px;
+}
+
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
     padding-top: 62px;
 }
@@ -6138,7 +6150,7 @@ div#userdashboard_myparams_title{
     padding: 22px;
     height: 17px;
     font-size: 13px;
-    width: 257px;
+    width: 196px;
     left: 0;
     background-color: #222;
     letter-spacing: 1px;
@@ -6205,10 +6217,15 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
     text-shadow: none;
 }
 
-div.horizontal_tabulator > div:not(.tabulatorContainer){
+.no-flexbox div.horizontal_tabulator > div:not(.tabulatorContainer){
     float: left;
     padding: 0 !important;
     width:78%;
+}
+
+.flexbox div.horizontal_tabulator > div.tabulatorPanelsContainer{
+    flex:1;
+    -webkit-flex: 1;
 }
 
 #breadcrumb{
