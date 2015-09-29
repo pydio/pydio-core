@@ -1216,10 +1216,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $crtPath = $ajxpNode->getPath();
         $vRoots = $this->repository->listVirtualRoots();
         $metaData["ajxp_readonly"] = "false";
+        if (!@$this->isWriteable($ajxpNode->getUrl())) {
+           $metaData["ajxp_readonly"] = "true";
+        }
         if (!empty($crtPath)) {
-            if (!@$this->isWriteable($ajxpNode->getUrl())) {
-               $metaData["ajxp_readonly"] = "true";
-            }
             if (isSet($vRoots[ltrim($crtPath, "/")])) {
                 $metaData["ajxp_readonly"] = $vRoots[ltrim($crtPath, "/")]["right"] == "r" ? "true" : "false";
             }
