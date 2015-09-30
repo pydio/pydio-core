@@ -197,6 +197,11 @@
                     padding: inherit !important;
                 }
             }
+            #browser{
+                flex-direction:column !important;
+                -webkit-flex-direction:column !important;
+            }
+
         </style>
         <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
         <script type="text/javascript">
