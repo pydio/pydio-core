@@ -44,6 +44,7 @@ $mess=array(
 "20" => "Käyttäjä",
 "21" => "Toiminto",
 "22" => "Parametrit",
+"22a"=> "Parametrit",
 "23" => "Testin nimi",
 "24" => "Sisältö",
 "25" => "Oikeudet kansioihin",

@@ -42,6 +42,7 @@ $mess=array(
 "20" => "Uporabnik",
 "21" => "Ukrep",
 "22" => "Parametri",
+"22a"=> "Parametri",
 "23" => "Preizkus",
 "24" => "Izid",
 "25" => "Dostop do zbirke",
