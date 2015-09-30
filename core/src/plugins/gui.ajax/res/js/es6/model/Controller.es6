@@ -174,6 +174,9 @@ class Controller extends Observable{
      */
     parseXmlMessage(xmlDoc){
         Logger.log("Controller.parseXmlMessage() is deprecated, use PydioApi instead");
+        if(window.console && window.console.trace){
+            Logger.log(console.trace());
+        }
         return PydioApi.getClient().parseXmlMessage(xmlDoc);
     }
 
