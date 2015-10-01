@@ -223,8 +223,14 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!passedNode && !userSelection.isUnique())
 		{
             if(this.registeredMimes.get('generic_multiple')){
+                var i, selectedSize = 0, selectedNodes = userSelection.getSelectedNodes();
+                for (i=0; i < selectedNodes.length; i++) {
+                    selectedSize += parseInt(selectedNodes[i].getMetadata().get("bytesize"));
+                }
+
+                userSelection._selectedNodes[0]._metadata._object.bytesize
                 this.evalTemplateForMime('generic_multiple', null, {
-                    selectedCountSentence:userSelection.getFileNames().length + ' '+MessageHash[128]
+                    selectedCountSentence:userSelection.getFileNames().length + ' '+MessageHash[128] + ' ( ' + roundSize(selectedSize, MessageHash["byte_unit_symbol"]) + ' )'
                 }, userSelection.getSelectedNodes());
             }
 			//this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
@@ -637,5 +643,5 @@ Class.create("InfoPanel", AjxpPane, {
 			}.bind(this));
 		}
 	}
-	
+
 });

@@ -121,6 +121,12 @@ class s3AccessDriver extends fsAccessDriver
         $client = $this->getS3Service();
         $bucket = (isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
         $path   = (isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
+        $isViPR = $this->repository->getOption("IS_VIPR");
+        if($isViPR === true) {
+            $parts = explode('/', $bucket);
+            $bucket = $parts[0];
+            $path = isset($parts[1]) ? $parts[1] : '/';
+        }
         $objects = $client->getIterator('ListObjects', array(
             'Bucket' => $bucket,
             'Prefix' => $path
@@ -209,6 +215,33 @@ class s3AccessDriver extends fsAccessDriver
         $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
         $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
         return $newOptions;
+    }
+
+    public function date_modif($file)
+    {
+        if($this->repository->getOption("IS_VIPR")) {
+            if(is_dir($file . '/')) {
+                $file .= '/';
+                $client = $this->getS3Service();
+                $container = $this->repository->getOption("CONTAINER");
+                $parts = explode('/', $container);
+                $bucket = $parts[0];
+                $key = parse_url($file, PHP_URL_PATH); 
+                if(isset($parts[1])) {
+                    $key = '/' . $parts[1] . $key;
+                }
+                $obj = $client->getObject(array(
+                    'Bucket' => $bucket,
+                    'Key'    => $key
+                ));
+                $lastMod = new DateTime($obj['LastModified']);
+
+                return $lastMod->getTimestamp();
+            }
+        }
+
+        $tmp = @filemtime($file) or 0;
+        return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
 }
