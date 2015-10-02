@@ -506,6 +506,8 @@ class ShareCenter extends AJXP_Plugin
                 $currentUser = true;
                 if($userContext == "global" && AuthService::getLoggedUser()->isAdmin()){
                     $currentUser = false;
+                }else if($userContext == "user" && AuthService::getLoggedUser()->isAdmin() && !empty($httpVars["user_id"])){
+                    $currentUser = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 }
                 $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
@@ -2124,18 +2126,30 @@ class ShareCenter extends AJXP_Plugin
         return $this->getShareStore()->findSharesForRepo($repositoryId);
     }
 
+    /**
+     * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
+     * @param string $parentRepositoryId
+     * @param null $cursor
+     * @return array
+     */
     public function listShares($currentUser = true, $parentRepositoryId="", $cursor = null){
-        if(AuthService::usersEnabled()){
-            $crtUser = ($currentUser?AuthService::getLoggedUser()->getId():'');
+        if($currentUser === false){
+            $crtUser = "";
+        }else if(AuthService::usersEnabled()){
+            if($currentUser === true){
+                $crtUser = AuthService::getLoggedUser()->getId();
+            }else{
+                $crtUser = $currentUser;
+            }
         }else{
-            $crtUser = ($currentUser?'shared':'');
+            $crtUser = "shared";
         }
         return $this->getShareStore()->listShares($crtUser, $parentRepositoryId, $cursor);
     }
 
     /**
      * @param $rootPath
-     * @param bool $currentUser
+     * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
      * @param null $cursor
      * @param bool $xmlPrint
@@ -2180,11 +2194,16 @@ class ShareCenter extends AJXP_Plugin
                     $meta["copy_url"]  = $this->buildPublicletLink($hash);
                 }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
-                if(!empty($parent)){
+                if(!empty($parent)) {
                     $parentPath = $parent->getOption("PATH", false, $meta["owner"]);
                     $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
                 }else{
-                    $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+                    $crtParent = ConfService::getRepositoryById($repoObject->getParentId());
+                    if(!empty($crtParent)){
+                        $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
+                    }else {
+                        $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+                    }
                 }
                 if($shareType != "repository"){
                     if($repoObject->hasContentFilter()){
@@ -2200,7 +2219,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $meta["original_path"] = $repoObject->getOption("PATH");
                 }
-                if(isSet($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
+                if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
                     $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
                 }
 

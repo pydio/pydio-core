@@ -624,6 +624,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray(true);
                     $allReps = ConfService::getRepositoriesList("all", false);
+                    $sharedRepos = array();
+                    if(isSet($userObject)){
+                        // Add User shared Repositories as well
+                        $acls = $userObject->mergedRole->listAcls();
+                        if(count($acls)) {
+                            $sharedRepos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                                "uuid" => array_keys($acls),
+                                "parent_uuid" => AJXP_FILTER_NOT_EMPTY,
+                                "owner_user_id" => AJXP_FILTER_NOT_EMPTY
+                                ));
+                            $allReps = array_merge($allReps, $sharedRepos);
+                        }
+                    }
+
                     $repos = array();
                     $repoDetailed = array();
                     // USER
@@ -642,7 +656,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             )){
                             continue;
                         }
-                        $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
                         $meta = array();
                         if($repositoryObject->getOption("META_SOURCES") != null){
                             $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
@@ -653,6 +666,28 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             "scope"  => $repositoryObject->securityScope(),
                             "meta"   => $meta
                         );
+
+                        if(array_key_exists($repositoryId, $sharedRepos)){
+                            $sharedRepos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                            $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
+                            $repoOwnerLabel = $repoOwnerId = $repositoryObject->getOwner();
+                            if(isSet($allReps[$repoParentId])){
+                                $repoParentLabel = SystemTextEncoding::toUTF8($allReps[$repoParentId]->getDisplay());
+                            }
+                            $ownerObject = ConfService::getConfStorageImpl()->createUserObject($repoOwnerId);
+                            if(isSet($ownerObject)){
+                                $repoOwnerLabel = $ownerObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $repoOwnerId);
+                            }
+                            $repoDetailed[$repositoryId]["share"] = array(
+                                "parent_user" => $repoOwnerId,
+                                "parent_user_label" => $repoOwnerLabel,
+                                "parent_repository" => $repoParentId,
+                                "parent_repository_label" => $repoParentLabel
+                            );
+                        }else{
+                            $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                        }
+
                     }
                     // Make sure it's utf8
                     $data = array(
@@ -663,6 +698,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 "GLOBAL_PLUGINS" => array("action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater")
                             ),
                             "REPOSITORIES" => $repos,
+                            "SHARED_REPOSITORIES" => $sharedRepos,
                             "REPOSITORIES_DETAILS" => $repoDetailed,
                             "PROFILES" => array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest")
                         )
