@@ -535,13 +535,14 @@ Class.create("HeaderResizer", {
 	 * @param message String
 	 */
 	log : function(message){
-		return;
+		/*
 		if(window.console){
 			console.log(message);
 		}else if($('info_panel')){			
 			$('info_panel').insert('<div>'+message+'</div>');
 			$('info_panel').scrollTop = $('info_panel').scrollHeight;
 		}
+		*/
 	}	
 
 });

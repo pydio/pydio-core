@@ -1373,13 +1373,17 @@ Class.create("FilesList", SelectableElements, {
                 sortCache.sort(sortFunction);
                 for(var i=0;i<sortCache.length;i++){
                     if(sortCache[i].element == newItem){
-                        if(i == 0) $(newItem.parentNode).insert({top:newItem});
-                        else {
-                            if(sortCache[i-1].element.ajxpNode.getPath() == newItem.ajxpNode.getPath()){
+                        if(i == 0) {
+                            $(newItem.parentNode).insert({top: newItem});
+                        }else if (i == sortCache.length -1){
+                            $(newItem.parentNode).insert({bottom: newItem});
+                        } else {
+                            var otherIndex = (descending ? i+1 : i-1);
+                            if(sortCache[otherIndex].element.ajxpNode.getPath() == newItem.ajxpNode.getPath()){
                                 $(newItem.parentNode).remove(newItem);
                                 break;
                             }
-                            sortCache[i-1].element.insert({after:newItem});
+                            sortCache[otherIndex].element.insert({after:newItem});
                         }
                         break;
                     }
@@ -1589,7 +1593,6 @@ Class.create("FilesList", SelectableElements, {
             };
         }
 		var pos = posSpan.cumulativeOffset();
-		var text = span.innerHTML;
         if(!item.ajxpNode){
             item.ajxpNode = $(item.id).ajxpNode;
         }

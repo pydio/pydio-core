@@ -440,7 +440,6 @@ Autocompleter.Local = Class.create(Autocompleter.Base, {
         var ret       = []; // Beginning matches
         var partial   = []; // Inside matches
         var entry     = instance.getToken();
-        var count     = 0;
 
         for (var i = 0; i < instance.options.array.length &&  
           ret.length < instance.options.choices ; i++) { 
@@ -874,9 +873,9 @@ Ajax.InPlaceEditor.prototype.initialize.dealWithDeprecatedOptions = function(opt
     options[name] = expr;
   };
   fallback('cancelControl', (options.cancelLink ? 'link' : (options.cancelButton ? 'button' :
-    options.cancelLink == options.cancelButton == false ? false : undefined)));
+    options.cancelLink == options.cancelButton === false ? false : undefined)));
   fallback('okControl', (options.okLink ? 'link' : (options.okButton ? 'button' :
-    options.okLink == options.okButton == false ? false : undefined)));
+    options.okLink == options.okButton === false ? false : undefined)));
   fallback('highlightColor', options.highlightcolor);
   fallback('highlightEndColor', options.highlightendcolor);
 };

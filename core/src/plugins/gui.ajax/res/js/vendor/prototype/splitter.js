@@ -115,12 +115,10 @@ Class.create("Splitter", AjxpPane, {
         if(!this.initBorderB) this.initBorderB = 0;
 
 		this.splitbar = new Element('div', {unselectable:'on'});
-        var zIndex = (this.options.invisibleBar?parseInt(this.group.getStyle('zIndex'))+1:'inherit') || '10000';
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({
             position:'absolute',
             cursor:this.options.cursor,
-            fontSize:'1px'/*,
-            zIndex:zIndex*/
+            fontSize:'1px'
         });
 		this.paneA.insert({after:this.splitbar});
 
@@ -131,16 +129,17 @@ Class.create("Splitter", AjxpPane, {
 
 		this.initCaches();
 
-		this.paneA._init = (this.options.initA==true?parseInt(this.options.getAdjust(this.paneA)):this.options.initA) || 0;
-		this.paneB._init = (this.options.initB==true?parseInt(this.options.getAdjust(this.paneB)):this.options.initB) || 0;
+		this.paneA._init = (this.options.initA===true?parseInt(this.options.getAdjust(this.paneA)):this.options.initA) || 0;
+		this.paneB._init = (this.options.initB===true?parseInt(this.options.getAdjust(this.paneB)):this.options.initB) || 0;
+        var startB;
 		if(this.paneB._init){
 			this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.paneB._init));
+            startB = this.group[this.options.offsetAdjust] - this.group._borderAdjust-this.splitbar._adjust - this.paneB._init;
 		}
 		if(this.paneA._init){
 			this.paneA.setStyle(this.makeStyleObject(this.options.adjust, this.paneA._init));
 		}
-		//Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
-		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
+		this.resizeGroup(null, startB || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
         this.userLoggedObs = function(){
             var sizePref = this.getUserPreference("size");
@@ -246,7 +245,7 @@ Class.create("Splitter", AjxpPane, {
             subMenu:false,
             subMenuUpdateImage:false,
             callback: function(){
-                var state = oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
+                oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
             },
             listeners : {
                 init:function(){
@@ -279,7 +278,7 @@ Class.create("Splitter", AjxpPane, {
                 subMenu:false,
                 subMenuUpdateImage:false,
                 callback: function(){
-                    var state = oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
+                    oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
                     oThis.getFoldingAction().enable();
                 },
                 listeners : {
@@ -585,8 +584,6 @@ Class.create("Splitter", AjxpPane, {
 		np = Math.max(minPaneA+this.paneA._padAdjust, this.group._adjust - (this.paneB._max||9999), minSize,
 				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust -
 				Math.max(minPaneB + this.paneB._padAdjust, minSize)));
-		var optNameSet = this.options.set;
-		var optNameAdjust = this.options.adjust;
         if(!np) np = this.paneA._init;
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, (np + this.splitbar._reAdjust) +'px'));
 		var borderAdjA = 0;

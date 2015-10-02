@@ -175,11 +175,11 @@ Class.create("AjxpPane", {
         "use strict";
         if(!$(this.options.bindSizeTo.width.id) || !this.htmlElement) return;
         var min = this.options.bindSizeTo.width.min;
-        if(Object.isString(min) && min.indexOf("%") != false) min = this.htmlElement.parentNode.getWidth() * min / 100;
+        if(Object.isString(min) && min.indexOf("%") !== false) min = this.htmlElement.parentNode.getWidth() * min / 100;
         var w = Math.max($(this.options.bindSizeTo.width.id).getWidth() + this.options.bindSizeTo.width.offset, min);
         if(this.options.bindSizeTo.width.max) {
             var max = this.options.bindSizeTo.width.max;
-            if(Object.isString(max) && max.indexOf("%") != false) max = this.htmlElement.parentNode.getWidth() * max / 100;
+            if(Object.isString(max) && max.indexOf("%") !== false) max = this.htmlElement.parentNode.getWidth() * max / 100;
             w = Math.min(max, w);
         }
         if(this.options.bindSizeTo.width.checkSiblings){

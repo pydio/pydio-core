@@ -35,7 +35,7 @@ class ResourcesManager{
 	 * @param fileName String
 	 * @param className String
 	 */
-	addJSResource(fileName, className, autoload=false){
+	addJSResource(fileName, className){
 		if(!this.resources.js){
 			this.resources.js = [];
 		}

@@ -106,7 +106,6 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             afterUpdateElement: function(element, selectedLi){
                 if(listElement){
 
-                    var id = Math.random();
                     var label = selectedLi.getAttribute("data-label");
                     var entryId = selectedLi.getAttribute("data-entry_id");
                     if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){

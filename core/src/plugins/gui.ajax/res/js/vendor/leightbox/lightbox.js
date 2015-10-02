@@ -163,10 +163,6 @@ function displayLightBoxById(id, overlayStyle, overlayClass)
     if(overlayClass) valid.overlayClass = overlayClass;
 	valid.activate();
 	currentLightBox = valid;	
-	if(id != 'copymove_div')
-	{
-		
-	}
 }
 
 function hideLightBox(onFormSubmit)

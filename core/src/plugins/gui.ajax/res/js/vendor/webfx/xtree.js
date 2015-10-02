@@ -109,7 +109,7 @@ var webFXTreeHandler = {
 	blur      : function (oItem) { if(this.all[oItem.id.replace('-anchor','')]) this.all[oItem.id.replace('-anchor','')].blur();},
 	setFocus  : function (bFocus){ this.hasFocus = bFocus;},
 	keydown   : function (oItem, e) { return this.all[oItem.id].keydown(e.keyCode); },
-	linkKeyPress : function(oItem, e){if(!this.hasFocus || e.keyCode == 9) return false;return true;},
+	linkKeyPress : function(oItem, e){return !(!this.hasFocus || e.keyCode == 9)},
 	cookies   : new WebFXCookie(),
 	insertHTMLBeforeEnd	:	function (oElement, sHTML) {
 		if(!oElement) return;
@@ -182,7 +182,6 @@ function WebFXTreeBufferTreeChange(){
 
 WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	node.parentNode = this;	
-	var url = node.parentNode.url;
 	if(node.parentNode.inZip) node.inZip = true;
 	else{		
 		if(webFXTreeConfig.zipRegexp.test(node.text) !== false){
@@ -604,13 +603,10 @@ WebFXTreeItem.prototype.updateIcon = function(icon, openIcon){
 
 WebFXTreeItem.prototype.remove = function() {
 	if(!$(this.id+'-plus')) return;
-	var iconSrc = $(this.id + '-plus').src;
 	var parentNode = this.parentNode;
 	var prevSibling = this.getPreviousSibling(true);
 	var nextSibling = this.getNextSibling(true);
-	var folder = this.parentNode.folder;
 	var last = ((nextSibling) && (nextSibling.parentNode) && (nextSibling.parentNode.id == parentNode.id))?false:true;
-	//this.getPreviousSibling().focus();
 	this._remove();
 	Droppables.remove($(this.id));
 	if(webFXTreeHandler.contextMenu) webFXTreeHandler.contextMenu.removeElements('#'+this.id);

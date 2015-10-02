@@ -281,9 +281,6 @@ Class.create("AbstractEditor" , {
 	 * @param title String
 	 */
 	updateTitle : function(title){
-		if(title != ""){
-			//title = " - " + title;
-		}
 		if(this.filenameSpan) {
             this.filenameSpan.update(title);
         }

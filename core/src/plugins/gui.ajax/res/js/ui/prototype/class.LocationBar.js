@@ -57,7 +57,7 @@ Class.create("LocationBar", {
 		this.initCurrentPath();
 		this.element.insert(locDiv);
 		locDiv.insert(this.currentPath);
-		var inputDims = this.currentPath.getDimensions();
+		this.currentPath.getDimensions();
 		this.currentPath.hide();
 		this.label = new Element('div', {className:'location_bar_label'}).update("/test");
 		this.label.setStyle({

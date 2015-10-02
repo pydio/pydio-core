@@ -313,7 +313,6 @@ Class.create("FoldersTree", AjxpPane, {
         scrollTop = this.treeContainer.scrollTop;
 
    		var pos = item.cumulativeOffset();
-   		var text = span.innerHTML;
    		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
    			zIndex:5000,
    			position:'absolute',

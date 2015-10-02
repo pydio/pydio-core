@@ -110,7 +110,7 @@ class PydioApi{
         if(window.pydio && pydio.Parameters.get('SERVER_PREFIX_URI')){
             PydioApi._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
         }
-        var path = (PydioApi._libUrl?PydioApi._libUrl+'/'+fileName:fileName);
+        //var path = (PydioApi._libUrl?PydioApi._libUrl+'/'+fileName:fileName);
 
         /*if(window.jQuery && window.jQuery.ajax){
             jQuery.ajax(path,

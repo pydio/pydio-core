@@ -45,8 +45,6 @@ var ResourcesManager = (function () {
      */
 
     ResourcesManager.prototype.addJSResource = function addJSResource(fileName, className) {
-        var autoload = arguments[2] === undefined ? false : arguments[2];
-
         if (!this.resources.js) {
             this.resources.js = [];
         }
