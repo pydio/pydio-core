@@ -42,8 +42,14 @@ Class.create("AjxpMqObserver", {
 
             var repoId;
             var data = event.memo;
-            if(data.active) repoId = data.active;
-            else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
+            if(data.active) {
+                repoId = data.active;
+            } else if(pydio.repositoryId) {
+                repoId = pydio.repositoryId;
+            }
+            if(this.currentRepo && this.currentRepo == repoId){ // Ignore, repoId did not change!
+                return;
+            }
             this.initForRepoId(repoId);
 
         }.bind(this));

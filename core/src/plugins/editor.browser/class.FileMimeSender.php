@@ -54,7 +54,7 @@ class FileMimeSender extends AJXP_Plugin
             $selectedNode = $selection->getUniqueNode();
             $selectedNodeUrl = $selectedNode->getUrl();
 
-            if (!file_exists($selectedNodeUrl)) {
+            if (!file_exists($selectedNodeUrl) || !is_readable($selectedNodeUrl)) {
                 echo("File does not exist");
                 return false;
             }

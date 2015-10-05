@@ -62,13 +62,16 @@ class IMagickPreviewer extends AJXP_Plugin
 
         if ($action == "imagick_data_proxy") {
             $this->extractAll = false;
-            $file = $selection->getUniqueFile();
+            $file = $selection->getUniqueNode()->getUrl();
+            if(!file_exists($file) || !is_readable($file)){
+                throw new Exception("Cannot find file");
+            }
             if(isSet($httpVars["all"])) {
                 $this->logInfo('Preview', 'Preview content of '.$file);
                 $this->extractAll = true;
             }
 
-            if (($size = filesize($destStreamURL.$file)) === false) {
+            if (($size = filesize($file)) === false) {
                 return false;
             } else {
                 if($size > $flyThreshold) $this->useOnTheFly = true;
@@ -76,24 +79,24 @@ class IMagickPreviewer extends AJXP_Plugin
             }
 
             if ($this->extractAll) {
-                $node = new AJXP_Node($destStreamURL.$file);
+                $node = new AJXP_Node($file);
                 AJXP_Controller::applyHook("node.read", array($node));
             }
 
-            $cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $destStreamURL.$file, array($this, "generateJpegsCallback"));
+            $cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, array($this, "generateJpegsCallback"));
             $cacheData = $cache->getData();
 
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
-                $files = $this->listExtractedJpg($destStreamURL.$file, $prefix);
+                $files = $this->listExtractedJpg($file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
                 return false;
             } else if ($this->extractAll) { // on the fly extract mode
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
-                $files = $this->listPreviewFiles($destStreamURL.$file, $prefix);
+                $files = $this->listPreviewFiles($file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
                 return false;

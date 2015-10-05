@@ -44,7 +44,7 @@ class ImagePreviewer extends AJXP_Plugin
 
         if ($action == "preview_data_proxy") {
             $file = $selection->getUniqueFile();
-            if (!file_exists($destStreamURL.$file)) {
+            if (!file_exists($destStreamURL.$file) || !is_readable($destStreamURL.$file)) {
                 header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;
@@ -81,9 +81,7 @@ class ImagePreviewer extends AJXP_Plugin
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
                 header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
 
-                $class = $streamData["classname"];
                 $stream = fopen("php://output", "a");
-                //call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
                 AJXP_MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
                 fflush($stream);
                 fclose($stream);
