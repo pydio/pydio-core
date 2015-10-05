@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class AJXP_PermissionMask implements JsonSerializable
+class AJXP_PermissionMask implements JsonSerializable, Serializable
 {
     /**
      * @var array
@@ -210,7 +210,7 @@ class AJXP_PermissionMask implements JsonSerializable
      * @param string $currentRoot
      * @return AJXP_Permission[]
      */
-    private function flattenTree($tree = null, &$pathes = null, $currentRoot=""){
+    public function flattenTree($tree = null, &$pathes = null, $currentRoot=""){
         if($tree == null) $tree = $this->getTree();
         if($pathes == null) $pathes = array();
         if(!is_array($tree) || $tree == null) $tree = array();
@@ -263,5 +263,30 @@ class AJXP_PermissionMask implements JsonSerializable
     function jsonSerialize()
     {
         return $this->flattenTree();
+    }
+
+    /**
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     * @since 5.1.0
+     */
+    public function serialize()
+    {
+        return serialize($this->permissionTree);
+    }
+
+    /**
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     * @since 5.1.0
+     */
+    public function unserialize($serialized)
+    {
+        $this->permissionTree = unserialize($serialized);
     }
 }
