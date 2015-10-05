@@ -436,6 +436,7 @@ class PydioDataModel extends Observable{
 		this._selectedNodes = ajxpDataNodes;
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
 		this._bFile = this._bDir = this._isRecycle = false;
+        this._bUnique = false;
 		if(!this._bEmpty)
 		{
 			this._bUnique = (ajxpDataNodes.length == 1);
@@ -485,7 +486,10 @@ class PydioDataModel extends Observable{
 	 * Select all the children of the current context node
 	 */
 	selectAll (){
-		this.setSelectedNodes(this._contextNode.getChildren(), "dataModel");
+        var nodes = [];
+        var childrenMap = this._contextNode.getChildren();
+        childrenMap.forEach(function(child){nodes.push(child)});
+		this.setSelectedNodes(nodes, "dataModel");
 	}
 	
 	/**
