@@ -119,7 +119,7 @@ Class.create("LogoWidget", AjxpPane, {
             }
             if(!this.image){
                 this.image  = new Image();
-                this.image.addClassName('custom_logo_image');
+                $(this.image).addClassName('custom_logo_image');
                 this.image.src = url;
                 this.image.onload = function(){
                     this.resizeImage(configs, true);
