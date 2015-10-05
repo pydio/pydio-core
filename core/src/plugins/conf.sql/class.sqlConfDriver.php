@@ -683,6 +683,9 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $object = unserialize($serialized);
             if (is_a($object, "AjxpRole") || is_a($object, "AJXP_Role")) {
                 $roles[$id] = $object;
+                if(is_a($object, "AJXP_Role")){
+                    $object->setLastUpdated($role_row["last_updated"]);
+                }
             }
         }
 
@@ -704,7 +707,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), serialize($roleObject->listAcls()));
                     break;
                 case "mysql":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $roleId, serialize($roleObject));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)", $roleId, serialize($roleObject),time());
                     break;
                 default:
                     return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
@@ -714,6 +717,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * @param AJXP_Role $role
+     * @return string|void
      */
     public function updateRole($role, $userObject = null)
     {
@@ -732,7 +736,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 }
                 break;
             case "mysql":
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role])", $role->getId(), serialize($role));
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])", $role->getId(), serialize($role), time());
                 break;
             default:
                 return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
@@ -751,9 +755,20 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $roleId);
     }
 
+    /**
+     * Compute the most recent date where one of these roles where updated.
+     *
+     * @param $rolesIdsList
+     * @return int
+     */
+    public function rolesLastUpdated($rolesIdsList){
+        $res = dibi::query("SELECT MAX([last_updated]) FROM [ajxp_roles] WHERE [role_id] IN (%s)", $rolesIdsList);
+        return $res->fetchSingle();
+    }
+
     public function countAdminUsers()
     {
-        $rows = dibi::query("SELECT COUNT(*) FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
+        $rows = dibi::query("SELECT COUNT(*) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
         return $rows->fetchSingle();
     }
 
