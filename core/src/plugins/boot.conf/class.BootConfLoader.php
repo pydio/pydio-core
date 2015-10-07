@@ -69,19 +69,9 @@ class BootConfLoader extends AbstractConfDriver
         }
     }
 
-    /**
-     * Transmit to the ajxp_conf load_plugin_manifest action
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     */
-    public function loadInstallerForm($action, $httpVars, $fileVars)
-    {
-        if(isSet($httpVars["lang"])){
-            ConfService::setLanguage($httpVars["lang"]);
-        }
+    public function printFormFromServerSettings($fullManifest){
+
         AJXP_XMLWriter::header("admin_data");
-        $fullManifest = $this->getManifestRawContent("", "xml");
         $xPath = new DOMXPath($fullManifest->ownerDocument);
         $addParams = "";
         $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
@@ -132,6 +122,21 @@ class BootConfLoader extends AbstractConfDriver
      * @param $httpVars
      * @param $fileVars
      */
+    public function loadInstallerForm($action, $httpVars, $fileVars)
+    {
+        if(isSet($httpVars["lang"])){
+            ConfService::setLanguage($httpVars["lang"]);
+        }
+        $fullManifest = $this->getManifestRawContent("", "xml");
+        $this->printFormFromServerSettings($fullManifest);
+    }
+
+    /**
+     * Transmit to the ajxp_conf load_plugin_manifest action
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     */
     public function applyInstallerForm($action, $httpVars, $fileVars)
     {
         $data = array();
@@ -145,50 +150,36 @@ class BootConfLoader extends AbstractConfDriver
         if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
         $coreConf["AJXP_CLI_SECRET_KEY"] = AJXP_Utils::generateRandomString(24, true);
 
-        $storageType = $data["STORAGE_TYPE"]["type"];
-        if ($storageType == "db") {
-            // REWRITE BOOTSTRAP.JSON
-            $coreConf["DIBI_PRECONFIGURATION"] = $data["STORAGE_TYPE"]["db_type"];
-            if (isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])) {
-                $dbFile = AJXP_VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
-                if (!file_exists(dirname($dbFile))) {
-                    mkdir(dirname($dbFile), 0755, true);
-                }
+        // REWRITE BOOTSTRAP.JSON
+        $coreConf["DIBI_PRECONFIGURATION"] = $data["db_type"];
+        if (isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])) {
+            $dbFile = AJXP_VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
+            if (!file_exists(dirname($dbFile))) {
+                mkdir(dirname($dbFile), 0755, true);
             }
-            $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
-                "instance_name"=> "conf.sql",
-                "group_switch_value"=> "conf.sql",
-                "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
-            ));
-            $coreAuth["MASTER_INSTANCE_CONFIG"] = array_merge($coreAuth["MASTER_INSTANCE_CONFIG"], array(
-                "instance_name"=> "auth.sql",
-                "group_switch_value"=> "auth.sql",
-                "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
-            ));
-
-            // DETECT REQUIRED SQL TABLES AND INSTALL THEM
-            $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
-            $driverData = array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]);
-            foreach($registry as $type => $plugins){
-                foreach($plugins as $plugObject){
-                    if($plugObject instanceof SqlTableProvider){
-                        $plugObject->installSQLTables($driverData);
-                    }
-                }
-            }
-
-        } else {
-
-            $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
-                "instance_name"=> "conf.serial",
-                "group_switch_value"=> "conf.serial"
-            ));
-            $coreAuth["MASTER_INSTANCE_CONFIG"] = array_merge($coreAuth["MASTER_INSTANCE_CONFIG"], array(
-                "instance_name"=> "auth.serial",
-                "group_switch_value"=> "auth.serial"
-            ));
-
         }
+        $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
+            "instance_name"=> "conf.sql",
+            "group_switch_value"=> "conf.sql",
+            "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+        ));
+        $coreAuth["MASTER_INSTANCE_CONFIG"] = array_merge($coreAuth["MASTER_INSTANCE_CONFIG"], array(
+            "instance_name"=> "auth.sql",
+            "group_switch_value"=> "auth.sql",
+            "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+        ));
+
+        // DETECT REQUIRED SQL TABLES AND INSTALL THEM
+        $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
+        $driverData = array("SQL_DRIVER" => $data["db_type"]);
+        foreach($registry as $type => $plugins){
+            foreach($plugins as $plugObject){
+                if($plugObject instanceof SqlTableProvider){
+                    $plugObject->installSQLTables($driverData);
+                }
+            }
+        }
+
 
         $oldBoot = $this->getPluginWorkDir(true)."/bootstrap.json";
         if (is_file($oldBoot)) {
@@ -200,10 +191,9 @@ class BootConfLoader extends AbstractConfDriver
 
 
         // Write new bootstrap and reload conf plugin!
-        if ($storageType == "db") {
-            $coreConf["UNIQUE_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
-            $coreAuth["MASTER_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
-        }
+        $coreConf["UNIQUE_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
+        $coreAuth["MASTER_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
+
         $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
 
@@ -224,14 +214,12 @@ class BootConfLoader extends AbstractConfDriver
             $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
         }
 
-        if ($storageType == "db") {
-            $sqlPlugs = array(
-                "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
-                "core.log/UNIQUE_PLUGIN_INSTANCE" => "log.sql",
-                "core.mq/UNIQUE_MS_INSTANCE" => "mq.sql"
-            );
-            $data["ENABLE_NOTIF"] = $data["STORAGE_TYPE"]["notifications"];
-        }
+        $sqlPlugs = array(
+            "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
+            "core.log/UNIQUE_PLUGIN_INSTANCE" => "log.sql",
+            "core.mq/UNIQUE_MS_INSTANCE" => "mq.sql"
+        );
+        $data["ENABLE_NOTIF"] = true;
 
 
         // Prepare plugins configs
@@ -328,7 +316,7 @@ class BootConfLoader extends AbstractConfDriver
 
         if ($action == "boot_test_sql_connexion") {
 
-            $p = AJXP_Utils::cleanDibiDriverParameters($data["STORAGE_TYPE"]["db_type"]);
+            $p = AJXP_Utils::cleanDibiDriverParameters($data["db_type"]);
             if ($p["driver"] == "sqlite3") {
                 $dbFile = AJXP_VarsFilter::filter($p["database"]);
                 if (!file_exists(dirname($dbFile))) {

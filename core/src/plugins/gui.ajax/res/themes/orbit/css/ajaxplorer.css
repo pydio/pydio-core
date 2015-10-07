@@ -1028,7 +1028,6 @@ div.accordion_toggle{
 
 div.accordion_content div.dialogLegend{
     text-align: justify;
-    /*opacity: 0.7;*/
     color: rgb(117, 128, 139);
 }
 
@@ -1067,11 +1066,12 @@ div.wizard-pane.wizard-panel-active{
 }
 
 div.wizard_panel_title{
-    font-size: 16px;
+    font-size: 24px;
+    margin: 5px 0;
 }
 div.wizard_buttons{
     text-align: center;
-    margin-top: 20px ;
+    margin-top: 30px;
 }
 div.wizard_buttons div{
     float: none !important;
@@ -1379,6 +1379,62 @@ div.tabbed_editor div.innerTitle{
     margin: 10px !important;
     padding: 8px !important;
     letter-spacing: 1px !important;
+}
+
+/**********************************************
+/* STANDARD FORM BUT IN A MORE "MATERIAL" WAY
+/*********************************************/
+
+.dialogContent div.SF_material div.SF_element{
+    width: auto;
+    margin: 0;
+}
+
+.dialogContent div.SF_material div.SF_label{
+    line-height: 14px !important;
+    letter-spacing: 0;
+    margin-top: 17px;
+    margin-left: 0;
+    font-size: 11px;
+    color: rgb(140, 140, 140);
+    text-transform: none;
+}
+
+.dialogContent div.SF_material input,
+.dialogContent div.SF_material textarea,
+.dialogContent div.SF_material select{
+    margin:1px 0 0 0;
+    border: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    font-size: 14px;
+    border-bottom: 1px solid #e2e2e2;
+    padding: 4px 1% 0 0 !important;
+}
+
+.dialogContent div.SF_material select.SF_input{
+    width: 98% !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    border: 0;
+}
+
+.dialogContent div.SF_material *.dialogLegend{
+    padding: 7px 0;
+    font-size: 12px;
+    line-height: inherit;
+}
+
+.dialogContent div.SF_material div.SF_element span.select-styler {
+    display: block;
+    border-top: 1px solid #E2E2E2;
+    width: 98%;
+}
+
+.dialogContent div.SF_material .SF_failed{
+    border: 0 !important;
+    border-bottom: 1px solid #D8B0B0 !important;
 }
 
 /****************

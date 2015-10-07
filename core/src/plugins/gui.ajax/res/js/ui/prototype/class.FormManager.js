@@ -254,7 +254,7 @@ Class.create("FormManager", {
                     }
                     element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
                 }
-                element += '</select>';
+                element += '</select><span class="select-styler"></span>';
             }else if(type == "image" && param.get("uploadAction")){
                 if(defaultValue){
                     var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
@@ -320,6 +320,7 @@ Class.create("FormManager", {
                 });
                 selector.SWITCH_VALUES = $H(switchValues);
                 element = new Element("div").update(selector);
+                element.insert({bottom:'<span class="select-styler"></span>'});
                 var subFields = new Element("div");
                 element.insert(subFields);
                 if(form.ajxpPaneObject) subFields.ajxpPaneObject = form.ajxpPaneObject;
@@ -359,7 +360,7 @@ Class.create("FormManager", {
             var div;
             // INSERT LABEL
             if(type != "legend"){
-                div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
+                div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"" + " form-element-"+name)});
                 if(type == "hidden") div.setStyle({display:"none"});
 
                 div.insert(new Element('div', {className:"SF_label"}).update('<span>'+label+(mandatory?'*':'')+'</span>'));
@@ -471,24 +472,17 @@ Class.create("FormManager", {
                 div = repGroup;
             }
 
-            if(skipAccordion){
-			    form.insert({'bottom':div});
+            var gDiv;
+            if(skipAccordion === true) {
+                form.insert({'bottom': div});
+            }else if(skipAccordion == "wizard"){
+                gDiv = groupDivs.get(group) || new Element('div', {className:'wizard-pane', 'data-groupName': group.stripTags()});
+                gDiv.insert(div);
+                groupDivs.set(group, gDiv);
             }else{
-                var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
+                gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
                 b.insert(div);
-                var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
-                if(ref > (Prototype.Browser.IE?40:0)){
-                    var lab = div.down('.SF_label');
-                    if(lab && lab.getStyle('float') == 'left'){
-                        var fontSize = lab.getStyle('fontSize');
-                        lab.setStyle({fontSize:fontSize});
-                        lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                        if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
-                            lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
-                        }
-                        lab.setStyle({width:'39%'});
-                    }
-                }
+                this.fixFloatingLabel(form, div);
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);
             }
@@ -520,30 +514,18 @@ Class.create("FormManager", {
                 }
             }.bind(this));
         }
-        if(!groupDivs.size()) return;
-        groupDivs.each(function(pair){
-            var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(pair.key);
-            title.observe('focus', function(){
-                if(form.SF_accordion && form.SF_accordion.showAccordion!=title.next(0)) {
-                    form.SF_accordion.activate(title);
-                }
-            });
-            form.insert(title);
-            form.insert(pair.value);
-        });
-        form.SF_accordion = new accordion(form, {
-            classNames : {
-                toggle : 'accordion_toggle',
-                toggleActive : 'accordion_toggle_active',
-                content : 'accordion_content'
-            },
-            defaultSize : {
-                width : '360px',
-                height: null
-            },
-            direction : 'vertical'
-        });
-        if(!startAccordionClosed) form.SF_accordion.activate(form.down('div.accordion_toggle'));
+        //if(!groupDivs.size()) return;
+
+        if(skipAccordion == "wizard"){
+
+            this.initAsWizard(form, groupDivs);
+
+        }else if(!skipAccordion){
+
+            this.initAsAccordion(form, groupDivs, startAccordionClosed);
+
+        }
+
         if(addFieldCheckbox){
             form.select("input.SF_fieldCheckBox").each(function(cb){
                 cb.observe("click", function(event){
@@ -569,6 +551,138 @@ Class.create("FormManager", {
             });
         }
 	},
+
+    fixFloatingLabel: function(form, div){
+
+        document.body.insert(div);
+        var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
+        if(ref > (Prototype.Browser.IE?40:0)){
+            var lab = div.down('.SF_label');
+            if(lab && lab.getStyle('float') == 'left'){
+                var fontSize = lab.getStyle('fontSize');
+                lab.setStyle({fontSize:fontSize});
+                lab.setStyle({width:parseInt(39*ref/100)+'px'});
+                if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
+                    lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                }
+                lab.setStyle({width:'39%'});
+            }
+        }
+
+    },
+
+    initAsAccordion: function(form, groupDivs, startAccordionClosed){
+        groupDivs.each(function(pair){
+            var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(pair.key);
+            title.observe('focus', function(){
+                if(form.SF_accordion && form.SF_accordion.showAccordion!=title.next(0)) {
+                    form.SF_accordion.activate(title);
+                }
+            });
+            form.insert(title);
+            form.insert(pair.value);
+        });
+        form.SF_accordion = new accordion(form, {
+            classNames : {
+                toggle : 'accordion_toggle',
+                toggleActive : 'accordion_toggle_active',
+                content : 'accordion_content'
+            },
+            defaultSize : {
+                width : '360px',
+                height: null
+            },
+            direction : 'vertical'
+        });
+        if(!startAccordionClosed) {
+            form.SF_accordion.activate(form.down('div.accordion_toggle'));
+        }
+
+    },
+
+    initAsWizard: function(form, groupDivs){
+
+        var buttonsForm = new Element('div', {className:'wizard_buttons'});
+        var previous = new Element('div', {className:'SF_input SF_inlineButton wizard_previous'}).update('<span class="icon-chevron-left"></span><span class="icon-chevron-left"></span>');
+        var next = new Element('div', {className:'SF_input SF_inlineButton wizard_next'}).update('<span class="icon-chevron-right"></span><span class="icon-chevron-right"></span>');
+        buttonsForm.insert(previous);
+        buttonsForm.insert(next);
+
+        var progressBox = new Element('div', {className:'wizard_progress'});
+        form.insert(progressBox);
+
+        var gKeys = [];
+        var index = 1;
+        groupDivs.each(function(pair){
+            gKeys.push(pair.key.stripTags());
+            var title = new Element('div',{className:'wizard_panel_title', tabIndex:0}).update(pair.key);
+            pair.value.insert({top:title});
+            form.insert(pair.value);
+
+            progressBox.insert(new Element('span', {
+                className:'wizard_progress_element',
+                'data-progressName':pair.key.stripTags()
+            }).update('<span class="progress_number">'+index+'</span>' + pair.key.stripTags()));
+
+            index ++;
+        });
+
+        function getNextKey(value){ // +1 or -1
+            var key = form.getAttribute("data-wizard-panel-active");
+            var newKey = gKeys.indexOf(key) + value;
+            return gKeys[newKey];
+        }
+
+        function refreshWizard(){
+            var key = form.getAttribute("data-wizard-panel-active");
+            previous.removeClassName("disabled");
+            next.removeClassName("disabled");
+            var isFirst = (gKeys.indexOf(key) === 0);
+            var isLast = (gKeys.indexOf(key) === gKeys.length-1);
+            if(isFirst) {
+                previous.addClassName("disabled");
+            }
+            if(isLast) {
+                next.addClassName("disabled");
+            }
+            form.select("[data-groupName]").each(function(wizardPane){
+                if(wizardPane.getAttribute("data-groupName") == key){
+                    wizardPane.addClassName("wizard-panel-active");
+                }else{
+                    wizardPane.removeClassName("wizard-panel-active");
+                }
+            });
+            var progressPassed = true;
+            form.select("[data-progressName]").invoke('removeClassName', 'wizard_progress_passed');
+            form.select("[data-progressName]").each(function(wizardPane){
+                if(progressPassed){
+                    wizardPane.addClassName("wizard_progress_passed");
+                }
+                if(wizardPane.getAttribute("data-progressName") == key){
+                    progressPassed = false;
+                }
+            });
+            form.fire("wizard:refreshed", {isFirst:isFirst, isLast:isLast});
+        }
+
+        previous.observe("click", function(){
+            if(previous.hasClassName("disabled")) return;
+            form.setAttribute("data-wizard-panel-active", getNextKey(-1));
+            refreshWizard();
+        });
+
+        next.observe("click", function(){
+            if(next.hasClassName("disabled")) return;
+            form.setAttribute("data-wizard-panel-active", getNextKey(+1));
+            refreshWizard();
+        });
+
+        form.insert(buttonsForm);
+        form.setAttribute("data-wizard-panel-active", gKeys[0]);
+
+        refreshWizard();
+
+    },
 
     createUploadForm : function(modalParent, imgSrc, param){
         if(this.modalParent) modalParent = this.modalParent;
