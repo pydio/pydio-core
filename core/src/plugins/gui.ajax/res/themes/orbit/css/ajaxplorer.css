@@ -1000,6 +1000,9 @@ html.boxshadow div.errorMessage{
     margin-top: -5px;
 }
 
+/*********************/
+/* ACCORDION CONTENT */
+/*********************/
 div.accordion_toggle,
 div.dialogContentMainTitle{
     color: rgb(117, 128, 139);
@@ -1051,6 +1054,83 @@ div.oneFieldForm input.SF_input{
     background: white !important;
 }
 
+
+/*********************/
+/* WIZARD STYLE FORM */
+/*********************/
+div.wizard-pane{
+    display: none !important;
+}
+
+div.wizard-pane.wizard-panel-active{
+    display: block !important;
+}
+
+div.wizard_panel_title{
+    font-size: 16px;
+}
+div.wizard_buttons{
+    text-align: center;
+    margin-top: 20px ;
+}
+div.wizard_buttons div{
+    float: none !important;
+    width:70px;
+    display: inline-block !important;
+    margin-left: 10px !important;
+}
+
+.SF_input.SF_inlineButton.wizard_previous.disabled,
+.SF_input.SF_inlineButton.wizard_next.disabled
+{
+    display: none !important;
+}
+
+div.wizard_progress{
+    display: -webkit-flex !important;
+    display: flex !important;
+
+}
+
+.wizard_previous, .wizard_next{
+    background-color:#F47561 !important;
+}
+
+
+span.wizard_progress_element {
+    padding: 28px 0 14px;
+    background-color: #FFFFFF;
+    font-size: 11px;
+    flex: 1;
+    border-bottom: 3px solid #D8D7D7;
+    position: relative;
+    text-align: center;
+    color: #555555;
+}
+
+span.wizard_progress_element.wizard_progress_passed {
+    border-bottom: 3px solid #F47561;
+    color: #F47561;
+}
+
+span.progress_number {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: #ABAAAA;
+    text-align: center;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    position: absolute;
+    bottom: -9px;
+    left: 43%;
+}
+
+.wizard_progress_passed span.progress_number {
+    background-color: #F47561;
+}
 /********************/
 /* PROGRESS BAR     */
 /********************/
