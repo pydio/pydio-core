@@ -51,7 +51,10 @@ class BootConfLoader extends AbstractConfDriver
     {
         parent::init($options);
         try {
-            $this->getPluginWorkDir(true);
+            $dir = $this->getPluginWorkDir(true);
+            if(!is_file($dir.DIRECTORY_SEPARATOR."server_uuid")){
+                file_put_contents($dir.DIRECTORY_SEPARATOR."server_uuid", md5(json_encode($_SERVER)));
+            }
         } catch (Exception $e) {
             die("Impossible write into the AJXP_DATA_PATH folder: Make sure to grant write access to this folder for your webserver!");
         }
@@ -67,6 +70,10 @@ class BootConfLoader extends AbstractConfDriver
             }
             $this->reloadXPath();
         }
+    }
+
+    public function getServerUuid(){
+        return file_get_contents($this->getPluginWorkDir().DIRECTORY_SEPARATOR."server_uuid");
     }
 
     public function printFormFromServerSettings($fullManifest){
