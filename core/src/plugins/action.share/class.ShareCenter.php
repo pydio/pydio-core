@@ -198,12 +198,12 @@ class ShareCenter extends AJXP_Plugin
                         $httpVars["simple_right_read"] = $httpVars["simple_right_download"] = "true";
                     }
                 }
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
+                $file = $userSelection->getUniqueFile();
+                $ajxpNode = $userSelection->getUniqueNode();
                 if (!file_exists($ajxpNode->getUrl())) {
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
-                //$metadata = null;
                 $newMeta = null;
                 $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
                 $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
