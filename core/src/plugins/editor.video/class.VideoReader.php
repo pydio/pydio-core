@@ -39,6 +39,9 @@ class VideoReader extends AJXP_Plugin
         $node = $selection->getUniqueNode();
 
         if ($action == "read_video_data") {
+            if(!file_exists($node->getUrl()) || !is_readable($node->getUrl())){
+                throw new Exception("Cannot find file!");
+            }
             $this->logDebug("Reading video");
             session_write_close();
             $filesize = filesize($node->getUrl());

@@ -105,8 +105,7 @@ class ShareCenter extends AJXP_Plugin
             return;
         }
         $this->accessDriver = $this->repository->driverInstance;
-        $this->urlBase = $this->repository->driverInstance->getResourceUrl("/");
-        $this->baseProtocol = array_shift(explode("://", $this->urlBase));
+        $this->urlBase = "pydio://". $this->repository->getId();
         if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
             $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
         }
@@ -309,7 +308,7 @@ class ShareCenter extends AJXP_Plugin
                 $shNode = new AJXP_Node($this->urlBase.$file);
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
-                    $node = new AJXP_Node($this->baseProtocol."://".$httpVars["repository_id"]."/");
+                    $node = new AJXP_Node("pydio://".$httpVars["repository_id"]."/");
                 } else {
                     $node = new AJXP_Node($this->urlBase.$file);
                 }
@@ -1638,7 +1637,7 @@ class ShareCenter extends AJXP_Plugin
             if( ( $hasDir && !$this->getAuthorization("folder", "minisite") ) || ($hasFile && !$this->getAuthorization("file"))){
                 return 103;
             }
-            if($setFilter){
+            if($setFilter){ // Either it's a file, or many nodes are shared
                 $httpVars["filter_nodes"] = $nodes;
             }
             if(!isSet($httpVars["repo_label"])){
@@ -1955,6 +1954,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $newRepoUniqueId = $newRepo->getUniqueId();
 
         if (isSet($editingRepo)) {
 
@@ -1965,7 +1965,7 @@ class ShareCenter extends AJXP_Plugin
                 foreach ($removeUsers as $user) {
                     if (AuthService::userExists($user)) {
                         $userObject = $confDriver->createUserObject($user);
-                        $userObject->personalRole->setAcl($newRepo->getUniqueId(), "");
+                        $userObject->personalRole->setAcl($newRepoUniqueId, "");
                         $userObject->save("superuser");
                     }
                     $this->watcher->removeWatchFromFolder(
@@ -1981,7 +1981,7 @@ class ShareCenter extends AJXP_Plugin
                 foreach ($removeGroups as $groupId) {
                     $role = AuthService::getRole($groupId);
                     if ($role !== false) {
-                        $role->setAcl($newRepo->getUniqueId(), "");
+                        $role->setAcl($newRepoUniqueId, "");
                         AuthService::updateRole($role);
                     }
                 }
@@ -2024,14 +2024,36 @@ class ShareCenter extends AJXP_Plugin
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
             // CREATE USER WITH NEW REPO RIGHTS
-            $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
+            $userObject->personalRole->setAcl($newRepoUniqueId, $uRights[$userName]);
+            // FORK MASK IF THERE IS ANY
+            if($file != "/" && $loggedUser->mergedRole->hasMask($repository->getId())){
+                $parentTree = $loggedUser->mergedRole->getMask($repository->getId())->getTree();
+                // Try to find a branch on the current selection
+                $parts = explode("/", trim($file, "/"));
+                while( ($next = array_shift($parts))  !== null){
+                    if(isSet($parentTree[$next])) {
+                        $parentTree = $parentTree[$next];
+                    }else{
+                        $parentTree = null;
+                        break;
+                    }
+                }
+                if($parentTree != null){
+                    $newMask = new AJXP_PermissionMask();
+                    $newMask->updateTree($parentTree);
+                }
+                if(isset($newMask)){
+                    $userObject->personalRole->setMask($newRepoUniqueId, $newMask);
+                }
+            }
+
             if (isSet($httpVars["minisite"])) {
                 if(isset($editingRepo)){
                     try{
-                        AuthService::deleteRole("AJXP_SHARED-".$newRepo->getUniqueId());
+                        AuthService::deleteRole("AJXP_SHARED-".$newRepoUniqueId);
                     }catch (Exception $e){}
                 }
-                $newRole = new AJXP_Role("AJXP_SHARED-".$newRepo->getUniqueId());
+                $newRole = new AJXP_Role("AJXP_SHARED-".$newRepoUniqueId);
                 $r = AuthService::getRole("MINISITE");
                 if (is_a($r, "AJXP_Role")) {
                     if ($httpVars["disable_download"]) {
@@ -2042,8 +2064,8 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $allData = $r->getDataArray();
                     $newData = $newRole->getDataArray();
-                    if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$newRepo->getUniqueId()] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
-                    if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$newRepo->getUniqueId()] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
+                    if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$newRepoUniqueId] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
+                    if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$newRepoUniqueId] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
                     $newRole->bunchUpdate($newData);
                     AuthService::updateRole($newRole);
                     $userObject->addRole($newRole);
@@ -2073,12 +2095,12 @@ class ShareCenter extends AJXP_Plugin
             // Register a watch on the new repository root for current user
             if ($httpVars["self_watch_folder"] == "true") {
                 $this->watcher->setWatchOnFolder(
-                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                     AuthService::getLoggedUser()->getId(),
                     MetaWatchRegister::$META_WATCH_BOTH);
             } else {
                 $this->watcher->removeWatchFromFolder(
-                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                     AuthService::getLoggedUser()->getId());
             }
         }
@@ -2089,7 +2111,7 @@ class ShareCenter extends AJXP_Plugin
                 $group = "ROOT_ROLE";
             }*/
             $grRole = AuthService::getRole($group, true);
-            $grRole->setAcl($newRepo->getUniqueId(), $r);
+            $grRole->setAcl($newRepoUniqueId, $r);
             AuthService::updateRole($grRole);
         }
 
@@ -2564,7 +2586,7 @@ class ShareCenter extends AJXP_Plugin
             }
             if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
-                    new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                    new AJXP_Node("pydio://".$repoId."/"),
                     AuthService::getLoggedUser()->getId(),
                     MetaWatchRegister::$META_WATCH_NAMESPACE
                 );

@@ -85,7 +85,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         return false;
     }
 
-    protected function processOneQuery($queryName, $start, $count, $frequency="day", $additionalFilters=array()){
+    protected function processOneQuery($queryName, $start, $count, $frequency="auto", $additionalFilters=array()){
 
         $query = $this->getQuery($queryName);
         if($query === false){
@@ -119,6 +119,10 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $allDates = array();
 
         if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
+            if($frequency == "auto"){
+                if($count > 70) $frequency = "month";
+                else if($count > 21) $frequency = "week";
+            }
             $groupedSums = array();
             if($frequency == "week"){
                 $groupByFormat = "W";
@@ -197,7 +201,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $query_name = $httpVars["query_name"];
         $start = 0;
         $count = 30;
-        $frequency = (isSet($httpVars["frequency"])?AJXP_Utils::sanitize($httpVars["frequency"], AJXP_SANITIZE_ALPHANUM):"day");
+        $frequency = (isSet($httpVars["frequency"])?AJXP_Utils::sanitize($httpVars["frequency"], AJXP_SANITIZE_ALPHANUM):"auto");
         if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
         if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
         $additionalFilters = array();

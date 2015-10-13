@@ -114,6 +114,10 @@ class ZohoEditor extends AJXP_Plugin
             }else{
                 $file = $selection->getUniqueFile();
             }
+            if(!is_readable($destStreamURL.$file)){
+                throw new Exception("Cannot find file!");
+            }
+
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($destStreamURL.$file);
             $tmp = SystemTextEncoding::fromUTF8($tmp);

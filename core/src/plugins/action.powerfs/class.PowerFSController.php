@@ -44,7 +44,7 @@ class PowerFSController extends AJXP_Plugin
         if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
-        $urlBase = "ajxp.fs://". ConfService::getRepository()->getId();
+        $urlBase = "pydio://". ConfService::getRepository()->getId();
         $mess = ConfService::getMessages();
         switch ($action) {
 

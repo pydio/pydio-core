@@ -46,6 +46,7 @@ class AJXP_KeyValueCache {
      */
     public function fetch($id){
         if(!function_exists('apc_fetch')) return FALSE;
+        if(defined('AJXP_KVCACHE_IGNORE') && AJXP_KVCACHE_IGNORE) return FALSE;
         $result = apc_fetch($this->makeId($id), $success);
         if($success) return $result;
         else return false;
@@ -59,6 +60,7 @@ class AJXP_KeyValueCache {
      */
     public function contains($id){
         if(!function_exists('apc_fetch')) return FALSE;
+        if(defined('AJXP_KVCACHE_IGNORE') && AJXP_KVCACHE_IGNORE) return FALSE;
         apc_fetch($this->makeId($id), $success);
         return $success;
     }

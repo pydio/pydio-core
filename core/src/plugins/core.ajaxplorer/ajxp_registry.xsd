@@ -634,6 +634,7 @@
             <xs:attribute name="autoload" type="xs:boolean"/>
             <xs:attribute name="className" use="required" type="xs:NCName"/>
             <xs:attribute name="file" use="required"/>
+            <xs:attribute name="depends"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="node_provider">

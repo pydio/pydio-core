@@ -536,7 +536,7 @@ class ConfService
         return $this->configs["REPOSITORIES"];
     }
 
-    private function invalidateLoadedRepositories()
+    public function invalidateLoadedRepositories()
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;

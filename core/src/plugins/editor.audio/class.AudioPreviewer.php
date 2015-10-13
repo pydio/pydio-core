@@ -59,7 +59,9 @@ class AudioPreviewer extends AJXP_Plugin
                     $node = new AJXP_Node($destStreamURL.$file);
                 }
             }
-
+            if(!is_readable($node->getUrl())){
+                throw new Exception("Cannot find file!");
+            }
 
             $fileUrl = $node->getUrl();
             $localName = basename($fileUrl);

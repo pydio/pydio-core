@@ -347,7 +347,7 @@ Class.create("NotificationLoader", {
 
     },
 
-    loaderTimer: null,
+    loaderTimer: null
 
 });
 

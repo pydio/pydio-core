@@ -418,6 +418,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                 $node = $selection->getUniqueNode();
                 $dlFile = $node->getUrl();
+                if(!is_readable($dlFile)){
+                    throw new Exception("Cannot access file!");
+                }
                 $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
                 if (AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false) {
                     $this->readFile($node->getUrl(), "stream_content");
@@ -432,15 +435,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isset($httpVars["content"])) break;
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
                 $code = $httpVars["content"];
-                $file = $selection->getUniqueFile();
-                $this->logInfo("Online Edition", array("file"=>$this->addSlugToPath($file)));
+                $currentNode = $selection->getUniqueNode();
+                $fileName = $currentNode->getUrl();
+                $this->logInfo("Online Edition", array("file"=>$fileName));
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
                     $code=str_replace("&lt;","<",SystemTextEncoding::magicDequote($code));
                 }
-                $fileName = $this->urlBase.$file;
-                $currentNode = new AJXP_Node($fileName);
                 try {
                     AJXP_Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
                 } catch (Exception $e) {

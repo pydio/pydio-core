@@ -303,6 +303,16 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     abstract public function deleteRole($role);
 
     /**
+     * Compute the most recent date where one of these roles where updated.
+     *
+     * @param $rolesIdsList
+     * @return int
+     */
+    public function rolesLastUpdated($rolesIdsList){
+        return 0;
+    }
+
+    /**
      * Specific queries
      */
     abstract public function countAdminUsers();
@@ -682,7 +692,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         $title = AJXP_Utils::decodeSecureMagic($httpVars["bm_title"]);
                         $bmUser->renameBookmark($bmPath, $title);
                     }
-                    AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", ConfService::getRepository()->getId()));
+                    AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
+                            ConfService::getRepository()->getId(),
+                            AuthService::getLoggedUser()->getId())
+                    );
 
                     if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
                         $bmUser->save("user");

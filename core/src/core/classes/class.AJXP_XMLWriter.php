@@ -627,7 +627,8 @@ class AJXP_XMLWriter
             AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
         }
 
-        foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
+        $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
+        foreach ($accessible as $repoId => $repoObject) {
             $toLast = false;
             if ($repoObject->getAccessType()=="ajxp_conf") {
                 if(AuthService::usersEnabled() && !$loggedUser->isAdmin())continue;

@@ -582,4 +582,31 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         return $res;
     }
 
+    protected $lastSessionSerialization = 0;
+
+    public function __sleep(){
+        $this->lastSessionSerialization = time();
+        return array("id", "hasAdmin", "rights", "prefs", "bookmarks", "version", "roles", "parentUser", "resolveAsParent", "hidden", "groupPath", "personalRole", "lastSessionSerialization");
+    }
+
+    public function __wakeup(){
+        $this->storage = ConfService::getConfStorageImpl();
+        $this->recomputeMergedRole();
+    }
+
+    public function reloadRolesIfRequired(){
+        if($this->lastSessionSerialization && count($this->roles)
+            && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
+
+            $newRoles = AuthService::getRolesList(array_keys($this->roles));
+            foreach($newRoles as $rId => $newRole){
+                $this->roles[$rId] = $newRoles[$rId];
+            }
+            $this->recomputeMergedRole();
+            return true;
+
+        }
+        return false;
+    }
+
 }

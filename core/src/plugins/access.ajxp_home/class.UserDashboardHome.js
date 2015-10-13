@@ -24,6 +24,78 @@ Class.create("UserDashboardHome", AjxpPane, {
     _repoInfos: null,
     _repoInfosLoading:null,
 
+    _loadWsList: function(oFormObject, updateWsLegend, switchToRepo){
+
+        var wsElement = oFormObject.down('#workspaces_list');
+        var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
+        if(!wsElement) return;
+
+        var renderElement = function(repoObject){
+
+            var repoId = repoObject.getId();
+            var repoEl = new Element('li').update(repoObject.getHtmlBadge() + "<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
+            wsElement.insert(repoEl);
+            var select = function(e){
+                var target = Event.findElement(e, "li");
+                target.nextSiblings().invoke('removeClassName', 'selected');
+                target.previousSiblings().invoke('removeClassName', 'selected');
+                target.addClassName('selected');
+                oFormObject.down('#go_to_ws').removeClassName("disabled");
+                oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
+                oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
+                if(window.ajxpMobile){
+                    switchToRepo(repoId);
+                }
+            };
+            disableTextSelection(repoEl);
+            if(simpleClickOpen){
+                repoEl.observe("click", function(e){
+                    repoEl.stopObserving("click");
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }else{
+                repoEl.observe("click", select);
+                repoEl.observe("dblclick", function(e){
+                    repoEl.stopObserving("dblclick");
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }
+            repoEl.observe("mouseover", function(){
+                updateWsLegend(repoObject);
+            });
+            repoEl.observe("mouseout", function(){
+                updateWsLegend(null);
+            });
+
+        };
+
+        var myWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
+            return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
+        });
+        var sharedWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
+            return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
+        });
+
+        if(myWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[468]+"</h3>"));
+            myWS.each(function(pair){renderElement(pair.value);});
+        }
+
+        if(sharedWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[469]+"</h3>"));
+            sharedWS.each(function(pair){renderElement(pair.value);});
+        }
+
+    },
+
     initialize: function($super, oFormObject, editorOptions){
 
         $super(oFormObject, editorOptions);
@@ -42,10 +114,6 @@ Class.create("UserDashboardHome", AjxpPane, {
             oFormObject.down("#logo_div").down("img").src = url;
         }
         oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
-
-        var wsElement = oFormObject.down('#workspaces_list');
-
-        var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
 
         var switchToRepo = function(repoId){
             if(!repoId) return;
@@ -140,69 +208,14 @@ Class.create("UserDashboardHome", AjxpPane, {
             }
         }.bind(this);
 
-        var renderElement = function(repoObject){
+        this._loadWsList(oFormObject, updateWsLegend, switchToRepo);
 
-            var repoId = repoObject.getId();
-            var repoEl = new Element('li').update(repoObject.getHtmlBadge() + "<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
-            wsElement.insert(repoEl);
-            var select = function(e){
-                var target = Event.findElement(e, "li");
-                target.nextSiblings().invoke('removeClassName', 'selected');
-                target.previousSiblings().invoke('removeClassName', 'selected');
-                target.addClassName('selected');
-                oFormObject.down('#go_to_ws').removeClassName("disabled");
-                oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
-                oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
-                if(window.ajxpMobile){
-                    switchToRepo(repoId);
-                }
-            };
-            disableTextSelection(repoEl);
-            if(simpleClickOpen){
-                repoEl.observe("click", function(e){
-                    repoEl.stopObserving("click");
-                    select(e);
-                    Event.findElement(e, "li").setOpacity(0.7);
-                    switchToRepo(repoId);
-                });
-            }else{
-                repoEl.observe("click", select);
-                repoEl.observe("dblclick", function(e){
-                    repoEl.stopObserving("dblclick");
-                    select(e);
-                    Event.findElement(e, "li").setOpacity(0.7);
-                    switchToRepo(repoId);
-                });
+        document.observe("ajaxplorer:repository_list_refreshed", function(){
+            if(oFormObject.down('#workspaces_list')) {
+                $A(oFormObject.down('#workspaces_list').childElements()).invoke("remove");
             }
-            repoEl.observe("mouseover", function(){
-                updateWsLegend(repoObject);
-            });
-            repoEl.observe("mouseout", function(){
-                updateWsLegend(null);
-            });
-
-        };
-
-        var myWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
-            return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
-        }).sortBy(function(pair){
-            return (pair.value.getLabel());
-        });
-        var sharedWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
-            return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
-        }).sortBy(function(pair){
-            return (pair.value.getLabel());
-        });
-
-        if(myWS.size()){
-            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[468]+"</h3>"));
-            myWS.each(function(pair){renderElement(pair.value);});
-        }
-
-        if(sharedWS.size()){
-            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[469]+"</h3>"));
-            sharedWS.each(function(pair){renderElement(pair.value);});
-        }
+            this._loadWsList(oFormObject, updateWsLegend, switchToRepo);
+        }.bind(this));
 
         if($('videos_pane')){
             $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){

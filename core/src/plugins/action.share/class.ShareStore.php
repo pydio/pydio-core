@@ -299,7 +299,6 @@ class ShareStore {
      * @param String $type
      * @param String $element
      * @throws Exception
-     * @internal param String $ownerId
      * @return bool
      */
     public function deleteShare($type, $element)

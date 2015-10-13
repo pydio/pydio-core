@@ -31,6 +31,7 @@ class AuthService
     public static $roles;
     public static $useSession = true;
     private static $currentUser;
+    public static $bufferedMessage = null;
     /**
      * Whether the whole users management system is enabled or not.
      * @static
@@ -320,7 +321,18 @@ class AuthService
         $confDriver = ConfService::getConfStorageImpl();
         if ($user_id == null) {
             if (self::$useSession) {
-                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
+                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) {
+                    /**
+                     * @var AbstractAjxpUser $u
+                     */
+                    $u = $_SESSION["AJXP_USER"];
+                    if($u->reloadRolesIfRequired()){
+                        ConfService::getInstance()->invalidateLoadedRepositories();
+                        self::$bufferedMessage = AJXP_XMLWriter::reloadRepositoryList(false);
+                        $_SESSION["AJXP_USER"] = $u;
+                    }
+                    return 1;
+                }
             } else {
                 if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
             }

@@ -220,11 +220,12 @@ Class.create("RepositorySelect", {
                 });
             });
             if(menuItems.length){
-                actions.push({separator:true});
-                actions = actions.concat(menuItems);
+                menuItems = [{separator:true,additionalActions:true}].concat(menuItems);
+                if(!this.repoMenu.options.menuItems.detect(function(item){return item.additionalActions})){
+                    this.repoMenu.options.menuItems = this.repoMenu.options.menuItems.concat(menuItems);
+                    this.repoMenu.refreshList();
+                }
             }
-            this.repoMenu.options.menuItems = actions;
-            this.repoMenu.refreshList();
         }.bind(this);
 
 		if(this.repoMenu){

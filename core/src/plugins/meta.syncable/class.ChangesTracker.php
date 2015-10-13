@@ -192,7 +192,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             dibi::connect($this->sqlDriver);
         }
         $filter = null;
+        $masks = array();
         $currentRepo = $this->accessDriver->repository;
+        AJXP_Controller::applyHook("role.masks", array($currentRepo->getId(), &$masks, AJXP_Permission::READ));
         $recycle = $currentRepo->getOption("RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
 
@@ -237,26 +239,32 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
 
 
-        if(isSet($httpVars["filter"])){
+        $ands = array();
+        $ands[] = array("[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($currentRepo));
+        $ands[]= array("[seq] > %i", $seqId);
+        if(isSet($httpVars["filter"])) {
             $filter = AJXP_Utils::decodeSecureMagic($httpVars["filter"]);
-            $res = dibi::query("SELECT
-                [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
-                FROM [ajxp_changes]
-                LEFT JOIN [ajxp_index]
-                    ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
-                WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
-                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier($currentRepo), rtrim($filter, "/")."/", rtrim($filter, "/")."/", $seqId);
-        }else{
-            $res = dibi::query("SELECT
-                [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
-                FROM [ajxp_changes]
-                LEFT JOIN [ajxp_index]
-                    ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
-                WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
-                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier($currentRepo), $seqId);
+            $filterLike = rtrim($filter, "/") . "/";
+            $ands[] = array("[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike);
         }
+        if(count($masks)){
+            $ors = array();
+            foreach($masks as $mask){
+                $filterLike = rtrim($mask, "/") . "/";
+                $ors[] = array("[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike);
+            }
+            if(count($ors)){
+                $ands[] = array("%or", $ors);
+            }
+        }
+        $res = dibi::query("SELECT
+            [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
+            FROM [ajxp_changes]
+            LEFT JOIN [ajxp_index]
+                ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
+            WHERE %and
+            ORDER BY [ajxp_changes].[node_id], [seq] ASC",
+            $ands);
 
         if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
@@ -273,7 +281,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             if(!empty($recycle)) $this->cancelRecycleNodes($row, $recycle);
             if(!isSet($httpVars["flatten"]) || $httpVars["flatten"] == "false"){
 
-                if(!$this->filterRow($row, $filter)){
+                if(!$this->filterMasks($row, $masks) && !$this->filterRow($row, $filter)){
                     if ($valuesSent) {
                         echo $separator;
                     }
@@ -291,7 +299,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     }
                 } else {
                     if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
-                        if($this->filterRow($previousRow, $filter)){
+                        if($this->filterMasks($previousRow, $masks) || $this->filterRow($previousRow, $filter)){
                             $previousRow = $row;
                             $previousNodeId = $row->node_id;
                             $lastSeq = $row->seq;
@@ -378,6 +386,42 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }else if(strpos($previousRow->node['node_path'], $filter) !== 0){
             $previousRow->node['node_path'] = false;
         }
+        return false;
+    }
+
+    protected function filterMasks(&$previousRow, $masks = array()){
+        if(!count($masks)) return false;
+        $regexps = array();
+        foreach($masks as $path){
+            $regexps[] = '^'.preg_quote($path, '/');
+        }
+        $regexp = '/'.implode("|", $regexps).'/';
+
+        $srcInFilter = preg_match($regexp, $previousRow->source);
+        $targetInFilter = preg_match($regexp, $previousRow->target);
+        if(!$srcInFilter && !$targetInFilter){
+            return true;
+        }
+        if($previousRow->type == 'path'){
+            if(!$srcInFilter){
+                $previousRow->type = 'create';
+                $previousRow->source = 'NULL';
+            }else if(!$targetInFilter){
+                $previousRow->type = 'delete';
+                $previousRow->target = 'NULL';
+            }
+        }else if($previousRow->type == 'delete'){
+            if(preg_match($regexp, $previousRow->node['node_path'])){
+                $previousRow->node['node_path'] = false;
+            }
+        }
+        /*
+        if($previousRow->type != 'delete'){
+            $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
+        }else if(strpos($previousRow->node['node_path'], $filter) !== 0){
+            $previousRow->node['node_path'] = false;
+        }
+        */
         return false;
     }
 
