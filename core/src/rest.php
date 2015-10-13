@@ -79,7 +79,7 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
     $confDriver = ConfService::getConfStorageImpl();
     $Driver = ConfService::loadDriverForRepository($repo);
 }
-//AJXP_PluginsService::getInstance()->initActivePlugins();
+AJXP_PluginsService::getInstance()->initActivePlugins();
 
 $xmlResult = AJXP_Controller::findRestActionAndApply($action, $path);
 if (!empty($xmlResult) && !headers_sent()) {
