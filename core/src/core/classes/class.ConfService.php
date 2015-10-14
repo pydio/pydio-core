@@ -1475,105 +1475,6 @@ class ConfService
     {
         return self::getInstance()->loadRepositoryDriverInst();
     }
-    /**
-     * See static method
-     * @throws Exception
-     * @return AJXP_Plugin
-     */
-    public function loadRepositoryDriverInst()
-    {
-        if (isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")) {
-            return $this->configs["ACCESS_DRIVER"];
-        }
-        $this->switchRootDirInst();
-        $crtRepository = $this->getRepositoryInst();
-        if($crtRepository == null){
-            throw new Exception("No active repository found for user!");
-        }
-        $accessType = $crtRepository->getAccessType();
-        $pServ = AJXP_PluginsService::getInstance();
-        $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
-
-        // TRIGGER BEFORE INIT META
-        $metaSources = $crtRepository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $split = explode(".", $plugId);
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                if (!method_exists($instance, "beforeInitMeta")) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
-                    $instance->beforeInitMeta($plugInstance, $crtRepository);
-                } catch (Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-            }
-        }
-
-        // INIT MAIN DRIVER
-        $plugInstance->init($crtRepository);
-        try {
-            $plugInstance->initRepository();
-            $crtRepository->driverInstance = $plugInstance;
-        } catch (Exception $e) {
-            // Remove repositories from the lists
-            $this->removeRepositoryFromCache($crtRepository->getId());
-            if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
-                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-            } else {
-                $this->switchRootDir();
-            }
-            throw $e;
-        }
-        $pServ->setPluginUniqueActiveForType("access", $accessType);
-
-        // TRIGGER INIT META
-        $metaSources = $crtRepository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $split = explode(".", $plugId);
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
-                    if (!method_exists($instance, "initMeta")) {
-                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
-                    }
-                    $instance->initMeta($plugInstance);
-                } catch (Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-                $pServ->setPluginActive($split[0], $split[1]);
-            }
-        }
-        if (count($this->errors)>0) {
-            $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
-            // Remove repositories from the lists
-            $this->removeRepositoryFromCache($crtRepository->getId());
-            if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
-                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-            } else {
-                $this->switchRootDir();
-            }
-            throw $e;
-        }
-
-        $this->configs["ACCESS_DRIVER"] = $plugInstance;
-        return $this->configs["ACCESS_DRIVER"];
-    }
 
     /**
      * @static
@@ -1582,20 +1483,36 @@ class ConfService
      */
     public static function loadDriverForRepository(&$repository)
     {
-        return self::getInstance()->loadRepositoryDriverREST($repository);
+        return self::getInstance()->loadRepositoryDriverInst($repository);
     }
 
     /**
      * See static method
-     * @param Repository $repository
+     * @param Repository|null $repository
      * @throws AJXP_Exception|Exception
      * @return AbstractAccessDriver
      */
-    public function loadRepositoryDriverREST(&$repository)
+    private function loadRepositoryDriverInst(&$repository = null)
     {
-        if (isset($repository->driverInstance)) {
-            return $repository->driverInstance;
+        $rest = false;
+        if($repository == null){
+            if (isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")) {
+                return $this->configs["ACCESS_DRIVER"];
+            }
+            $this->switchRootDirInst();
+            $repository = $this->getRepositoryInst();
+            if($repository == null){
+                throw new Exception("No active repository found for user!");
+            }
+        }else{
+            $rest = true;
+            if (isset($repository->driverInstance)) {
+                return $repository->driverInstance;
+            }
         }
+        /**
+         * @var AbstractAccessDriver $plugInstance
+         */
         $accessType = $repository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
         $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
@@ -1627,9 +1544,20 @@ class ConfService
         $plugInstance->init($repository);
         try {
             $plugInstance->initRepository();
+            $repository->driverInstance = $plugInstance;
         } catch (Exception $e) {
+            if(!$rest){
+                // Remove repositories from the lists
+                $this->removeRepositoryFromCache($repository->getId());
+                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
+                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+                } else {
+                    $this->switchRootDir();
+                }
+            }
             throw $e;
         }
+
         AJXP_PluginsService::deferBuildingRegistry();
         $pServ->setPluginUniqueActiveForType("access", $accessType);
 
@@ -1646,7 +1574,9 @@ class ConfService
                 }
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
-                    if(!method_exists($instance, "initMeta")) throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                    if(!method_exists($instance, "initMeta")) {
+                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                    }
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
@@ -1658,14 +1588,25 @@ class ConfService
         AJXP_PluginsService::flushDeferredRegistryBuilding();
         if (count($this->errors)>0) {
             $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
+            if(!$rest){
+                // Remove repositories from the lists
+                $this->removeRepositoryFromCache($repository->getId());
+                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
+                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+                } else {
+                    $this->switchRootDir();
+                }
+            }
             throw $e;
         }
-
-        $repository->driverInstance = $plugInstance;
-        $ctxId = $this->getContextRepositoryId();
-        if (!empty($ctxId) && $ctxId == $repository->getId()) {
-            $this->configs["REPOSITORY"] = $repository;
-            $this->cacheRepository($ctxId, $repository);
+        if($rest){
+            $ctxId = $this->getContextRepositoryId();
+            if (!empty($ctxId) && $ctxId == $repository->getId()) {
+                $this->configs["REPOSITORY"] = $repository;
+                $this->cacheRepository($ctxId, $repository);
+            }
+        } else {
+            $this->configs["ACCESS_DRIVER"] = $plugInstance;
         }
         return $plugInstance;
     }
