@@ -882,7 +882,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     } else {
                         AuthService::updateRole($originalRole);
                     }
-                    $output = array("ROLE" => $originalRole->getDataArray(true), "SUCCESS" => true);
+                    // Reload Role
+                    $savedValue = AuthService::getRole($originalRole->getId());
+                    $output = array("ROLE" => $savedValue->getDataArray(true), "SUCCESS" => true);
                 } catch (Exception $e) {
                     $output = array("ERROR" => $e->getMessage());
                 }
