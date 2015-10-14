@@ -302,21 +302,19 @@ class ShareCenter extends AJXP_Plugin
 
             case "toggle_link_watch":
 
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $userSelection = new UserSelection($this->repository, $httpVars);
+                $shareNode = $selectedNode = $userSelection->getUniqueNode();
                 $watchValue = $httpVars["set_watch"] == "true" ? true : false;
                 $folder = false;
-                $shNode = new AJXP_Node($this->urlBase.$file);
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
-                    $node = new AJXP_Node("pydio://".$httpVars["repository_id"]."/");
-                } else {
-                    $node = new AJXP_Node($this->urlBase.$file);
+                    $selectedNode = new AJXP_Node("pydio://". AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
                 }
-
-                $this->getSharesFromMeta($shNode, $shares, false);
+                $this->getSharesFromMeta($shareNode, $shares, false);
                 if(!count($shares)){
                     break;
                 }
+
                 if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
                     $elementId = $httpVars["element_id"];
                 }else{
@@ -328,14 +326,14 @@ class ShareCenter extends AJXP_Plugin
                     if (!$folder) {
                         if ($watchValue) {
                             $this->watcher->setWatchOnFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 MetaWatchRegister::$META_WATCH_USERS_READ,
                                 array($elementId)
                             );
                         } else {
                             $this->watcher->removeWatchFromFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 true,
                                 $elementId
@@ -344,13 +342,13 @@ class ShareCenter extends AJXP_Plugin
                     } else {
                         if ($watchValue) {
                             $this->watcher->setWatchOnFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 MetaWatchRegister::$META_WATCH_BOTH
                             );
                         } else {
                             $this->watcher->removeWatchFromFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId());
                         }
                     }
@@ -404,8 +402,8 @@ class ShareCenter extends AJXP_Plugin
 
                 }else{
 
-                    $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $ajxpNode = $userSelection->getUniqueNode();
                     $this->getSharesFromMeta($ajxpNode, $shares, false);
                     if(count($shares)){
                         if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
@@ -442,8 +440,8 @@ class ShareCenter extends AJXP_Plugin
 
                 }else{
 
-                    $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $ajxpNode = $userSelection->getUniqueNode();
                     $metadata = $ajxpNode->retrieveMetadata(
                         "ajxp_shared",
                         true,
@@ -471,10 +469,10 @@ class ShareCenter extends AJXP_Plugin
                     return null;
                 }
                 $hash = AJXP_Utils::decodeSecureMagic($httpVars["element_id"]);
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $userSelection = new UserSelection($this->repository, $httpVars);
+                $ajxpNode = $userSelection->getUniqueNode();
                 if($this->getShareStore()->shareIsLegacy($hash)){
                     // Store in metadata
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
                     $metadata = $ajxpNode->retrieveMetadata(
                         "ajxp_shared",
                         true,
@@ -535,7 +533,8 @@ class ShareCenter extends AJXP_Plugin
 
             case "sharelist-clearExpired":
 
-                $currentUser  = (ConfService::getRepository()->getAccessType() != "ajxp_conf");
+                $accessType = ConfService::getRepository()->getAccessType();
+                $currentUser  = ($accessType != "ajxp_conf" && $accessType != "ajxp_admin");
                 $count = $this->clearExpiredFiles($currentUser);
                 AJXP_XMLWriter::header();
                 if($count){
@@ -1623,6 +1622,7 @@ class ShareCenter extends AJXP_Plugin
                 if($node->isLeaf()){
                     $setFilter = true;
                     $httpVars["file"] = "/";
+                    $httpVars["nodes"] = array("/");
                 }
             }else{
                 $setFilter = true;
@@ -1953,7 +1953,8 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $sel = new UserSelection($this->repository, $httpVars);
+        $file = $sel->getUniqueFile();
         $newRepoUniqueId = $newRepo->getUniqueId();
 
         if (isSet($editingRepo)) {

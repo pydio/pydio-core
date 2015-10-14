@@ -343,7 +343,7 @@
             </action>
             <action name="unshare">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Stop sharing a folder, or remove a public link from a file.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Stop sharing a folder, or remove a public link from a file.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <input_param description="If the resource is a file, send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
@@ -352,7 +352,7 @@
             </action>
             <action name="toggle_link_watch">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Toggle a shared element status for being watched or not.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Toggle a shared element status for being watched or not.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <input_param description="If the resource is a file, send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
@@ -361,7 +361,7 @@
             </action>
             <action name="reset_counter">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Reset download counter for a given link generated on a file.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Reset download counter for a given link generated on a file.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
                     </serverCallback>
@@ -414,7 +414,7 @@
                     ]]></clientCallback>
                 </processing>
                 <processing>
-                    <serverCallback methodName="switchAction" sdkMethodName="loadShareList">
+                    <serverCallback restParams="/" methodName="switchAction" sdkMethodName="loadShareList">
                         <input_param description="Parent repository ID" name="parent_repository_id" type="string" mandatory="false"/>
                         <input_param name="user_context" type="string" description="Either global (all users, requires admin right) or current (current user)" default="current"/>
                     </serverCallback>
@@ -443,22 +443,6 @@
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
                 </processing>
             </action>
-            <!--
-            <action name="sharelist-migrate">
-                <gui src="share.png" iconClass="icon-sort-by-attributes-alt" text="share_center.127" title="share_center.128">
-                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
-                </gui>
-                <rightsContext adminOnly="true" noUser="false" read="false" userLogged="true" write="false"/>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(window.actionManager){
-                            var id = window.actionManager.getDataModel().getRootNode().getPath();
-                        }
-                    ]]></clientCallback>
-                    <serverCallback methodName="switchAction" developerComment="Migrate old publiclets to new format"/>
-                </processing>
-            </action>
-            -->
             <action name="share_current_page">
                 <gui src="" iconClass="icon-share" text="share_center.110" title="share_center.110">
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>
