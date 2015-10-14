@@ -640,7 +640,7 @@ class Repository implements AjxpGroupPathProvider
             if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
         }
         $path = $this->getOption("PATH", true);
-        if($this->accessType == "ajxp_conf") return "USER";
+        if($this->accessType == "ajxp_conf" || $this->accessType == "ajxp_admin") return "USER";
         if(empty($path)) return false;
         if(strpos($path, "AJXP_USER") !== false) return "USER";
         if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";

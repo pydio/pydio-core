@@ -603,7 +603,7 @@ class ConfService
         if ($repositoryObject->isTemplate) {
             return false;
         }
-        if ($repositoryObject->getAccessType()=="ajxp_conf" && $userObject != null) {
+        if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
             if (AuthService::usersEnabled() && !$userObject->isAdmin()) {
                 return false;
             }
@@ -1612,7 +1612,7 @@ class ConfService
     }
 
     /**
-     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_conf & ajxp_shared
+     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
      * @static
      * @param string $filterByTagName
      * @param string $filterByDriverName
@@ -1626,7 +1626,7 @@ class ConfService
         foreach ($nodeList as $node) {
             $dName = $node->getAttribute("name");
             if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
-            if($dName == "ajxp_conf" || $dName == "ajxp_shared") continue;
+            if(strpos($dName, "ajxp_") === 0) continue;
             if ($filterByTagName == "") {
                 $xmlBuffer .= $node->ownerDocument->saveXML($node);
                 continue;
