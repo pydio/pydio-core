@@ -64,7 +64,7 @@
                             };
                             var closeFunc = function(){
                                 userSelection.updateFormOrUrl(modal.getForm());
-                                pydio.actionBar.submitForm(modal.getForm(), true);
+                                pydio.Controller.submitForm(modal.getForm(), true);
                                 hideLightBox();
                             };
                             modal.showDialogForm('Compress selection to ...', 'compression_form', loadFunc, closeFunc);
@@ -109,7 +109,7 @@
                             connexion.setParameters({get_action : "extraction", file : file, currentDir : dir});
 				   		    connexion.sendAsync();
                             connexion.onComplete=function(transport){
-                                pydio.actionBar.parseXmlMessage(transport.responseXML);
+                                pydio.Controller.parseXmlMessage(transport.responseXML);
                             };
                         }
                     ]]></clientCallback>
