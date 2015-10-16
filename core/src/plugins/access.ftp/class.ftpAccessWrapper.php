@@ -210,6 +210,7 @@ class ftpAccessWrapper implements AjxpWrapper
         $parts = $this->parseUrl($path);
         $link = $this->createFTPLink();
         $serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+        if(empty($parts["path"])) $parts["path"] = "/";
         if ($parts["path"] == "/") {
             $basename = ".";
         } else {

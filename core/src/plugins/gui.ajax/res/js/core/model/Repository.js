@@ -81,7 +81,7 @@ var Repository = (function () {
 		if (!this.badge) {
 			var letters = this.label.split(' ').map(function (word) {
 				return word.substr(0, 1);
-			}).join('');
+			}).slice(0, 3).join('');
 			this.badge = '<span class=\'letter_badge\'>' + letters + '</span>';
 		}
 		return this.badge;

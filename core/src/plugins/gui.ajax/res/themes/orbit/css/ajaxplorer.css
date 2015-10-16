@@ -6567,6 +6567,14 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
     font-weight: lighter;
 }
 
+span.first-bread em {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .breadcrumbs-one i.ajxp-goto{
     display: inline-block;
     cursor: pointer;
