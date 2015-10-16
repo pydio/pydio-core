@@ -73,8 +73,8 @@ class PluginCompression extends AJXP_Plugin
                 throw new AJXP_Exception($messages["compression.16"]);
             }
             $typeArchive = $httpVars["type_archive"];
-            //if we can run in background we do it ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()
-            if (1 == 2) {
+            //if we can run in background we do it
+            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 $archivePath = $currentDirPath.$archiveName;
                 file_put_contents($progressCompressionFileName, $messages["compression.5"]);
                 AJXP_Controller::applyActionInBackground($repository->getId(), "compression", $httpVars);
@@ -112,6 +112,10 @@ class PluginCompression extends AJXP_Plugin
                         array_push($tabAllRecursiveFiles, $file->getPathname());
                         array_push($tabFilesNames, substr($file->getPathname(), $currentDirUrlLength));
                     }
+                }
+                //WE STOP IF IT'S JUST AN EMPTY FOLDER OR NO FILES
+                if (empty($tabFilesNames)) {
+                    throw new AJXP_Exception($messages["compression.17"]);
                 }
                 try {
                     $tmpArchiveName = tempnam(AJXP_Utils::getAjxpTmpDir(), "tar-compression") . ".tar";
