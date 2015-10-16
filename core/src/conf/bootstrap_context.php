@@ -68,6 +68,9 @@ define("ADMIN_PASSWORD", "admin");
 // example in log.serial. Do not forget the trailing slash
 // define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
 
+// KEY-VALUE-CACHE
+define("AJXP_KVCACHE_PREFIX", "pydio-unique-id");
+define("AJXP_KVCACHE_IGNORE", false);
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
