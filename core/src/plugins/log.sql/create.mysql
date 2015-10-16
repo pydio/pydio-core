@@ -9,9 +9,8 @@ CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`params`	TEXT,
   `repository_id` VARCHAR(32),
   `device` VARCHAR(255),
-  KEY `source` (`source`),
-  KEY `repository_id` (`repository_id`),
-  KEY `logdate` (`logdate`),
-  KEY `severity` (`severity`)
+  INDEX `source` (`source`),
+  INDEX `repository_id` (`repository_id`),
+  INDEX `logdate` (`logdate`),
+  INDEX `severity` (`severity`)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-);

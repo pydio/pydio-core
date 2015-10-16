@@ -38,10 +38,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
     public function loadConfigs($configData)
     {
         parent::loadConfigs($configData);
-        if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
-            // Force legacy theme for the moment
-             $this->pluginConf["GUI_THEME"] = "oxygen";
-        }
         if (!defined("AJXP_THEME_FOLDER")) {
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
@@ -53,10 +49,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
-            // Force legacy theme for the moment
-            $this->pluginConf["GUI_THEME"] = "oxygen";
-        }
         if (!defined("AJXP_THEME_FOLDER")) {
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
@@ -227,8 +219,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     } else {
                         $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
                     }
-                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
-                        $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
+                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
+                        $ADDITIONAL_FRAMEWORKS = "";
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
