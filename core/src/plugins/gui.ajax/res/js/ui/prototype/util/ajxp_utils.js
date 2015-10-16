@@ -301,7 +301,10 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 {
 	element = $(element);
 	if(!element) return;
-    if(Modernizr.flexbox && element.parentNode && !element.hasClassName('forceComputeFit') && !element.parentNode.hasClassName('horizontal_layout')){
+    if(Modernizr.flexbox && element.parentNode && !element.hasClassName('forceComputeFit')
+        && !element.parentNode.hasClassName('horizontal_layout')
+        && !element.hasClassName('dialogContent') && !element.up(".dialogContent")
+){
         if(!element.hasClassName('vertical_fit')){
             element.parentNode.addClassName('vertical_layout');
             element.addClassName('vertical_fit');
