@@ -19,7 +19,7 @@
 }
 
 #workspaces_list span.letter_badge {
-    margin: 9px 13px 2px 50px;
+    margin: 12px 13px 16px 50px;
 }
 
 #home_left_bar{
@@ -99,6 +99,7 @@
     font-size: 19px;
     letter-spacing: 1px;
     margin: 0;
+    line-height: 21px;
 }
 
 #workspaces_list h4{
@@ -114,7 +115,7 @@
 
 #workspaces_list li {
     cursor: pointer;
-    padding: 5px 9px;
+    padding: 1px 9px 5px;
     clear: left;
     font-weight: normal;
 }
