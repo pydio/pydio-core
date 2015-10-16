@@ -15,7 +15,7 @@ var Router = function Router(pydioObject) {
             if (!pydioObject.user) {
                 return;
             }
-            if (path) path = "/" + path;else path = "/";
+            if (path) path = '/' + path;else path = '/';
             var repos = pydioObject.user.getRepositoriesList();
             workspace = workspace.replace("ws-", "");
 
@@ -44,7 +44,7 @@ var Router = function Router(pydioObject) {
     });
 
     this.router = new WorkspaceRouter();
-    var appRoot = pydioObject.Parameters.get("APPLICATION_ROOT");
+    var appRoot = pydioObject.Parameters.get('APPLICATION_ROOT');
     if (appRoot && appRoot != "/") {
         Backbone.history.start({
             pushState: true,

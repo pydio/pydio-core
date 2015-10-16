@@ -23,11 +23,16 @@
  */
 'use strict';
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var BackgroundTasksManager = (function (_Observable) {
+	_inherits(BackgroundTasksManager, _Observable);
 
 	/**
   * Constructor
@@ -37,13 +42,11 @@ var BackgroundTasksManager = (function (_Observable) {
 	function BackgroundTasksManager(actionManager) {
 		_classCallCheck(this, BackgroundTasksManager);
 
-		_Observable.call(this);
+		_get(Object.getPrototypeOf(BackgroundTasksManager.prototype), 'constructor', this).call(this);
 		this.queue = [];
 		this.actionManager = actionManager;
 		this.working = false;
 	}
-
-	_inherits(BackgroundTasksManager, _Observable);
 
 	/**
   * Add an action to the queue
@@ -52,136 +55,144 @@ var BackgroundTasksManager = (function (_Observable) {
   * @param messageId String An i18n id of the message to be displayed during the action
   */
 
-	BackgroundTasksManager.prototype.queueAction = function queueAction(actionName, parameters, messageId) {
-		var actionDef = {};
-		actionDef['name'] = actionName;
-		actionDef['messageId'] = messageId;
-		actionDef['parameters'] = parameters;
-		this.queue.push(actionDef);
-	};
-
-	/**
-  * Processes the next action in the queue
-  */
-
-	BackgroundTasksManager.prototype.next = function next() {
-		if (!this.queue.length) {
-			this.finished();
-			return;
+	_createClass(BackgroundTasksManager, [{
+		key: 'queueAction',
+		value: function queueAction(actionName, parameters, messageId) {
+			var actionDef = {};
+			actionDef['name'] = actionName;
+			actionDef['messageId'] = messageId;
+			actionDef['parameters'] = parameters;
+			this.queue.push(actionDef);
 		}
-		if (this.working) return;
-		var actionDef = this.queue[0];
-		if (actionDef['name'] == 'javascript_instruction' && actionDef['parameters']['callback']) {
-			var cb = actionDef['parameters']['callback'];
-			this.notify('update_message', actionDef['messageId']);
-			this.queue.shift();
-			cb();
-			this.working = false;
-			this.next();
-		} else {
-			var client = PydioApi.getClient();
-			var params = { get_action: actionDef['name'] };
-			for (var k in actionDef['parameters']) {
-				if (actionDef['parameters'].hasOwnProperty(k)) params[k] = actionDef['parameters'][k];
+
+		/**
+   * Processes the next action in the queue
+   */
+	}, {
+		key: 'next',
+		value: function next() {
+			if (!this.queue.length) {
+				this.finished();
+				return;
 			}
-			client.request(params, (function (transport) {
-				var xmlResponse = transport.responseXML;
-				if (xmlResponse == null || xmlResponse.documentElement == null) {
-					this.working = false;
-					this.next();
-					return;
-				}
-				this.parseAnswer(transport.responseXML);
+			if (this.working) return;
+			var actionDef = this.queue[0];
+			if (actionDef['name'] == "javascript_instruction" && actionDef['parameters']['callback']) {
+				var cb = actionDef['parameters']['callback'];
+				this.notify("update_message", actionDef['messageId']);
+				this.queue.shift();
+				cb();
 				this.working = false;
-			}).bind(this), null, { method: 'POST' });
-			this.notify('update_message', actionDef['messageId']);
-			this.queue.shift();
-			this.working = true;
-		}
-	};
-
-	/**
-  * Parses the response. Should probably use the actionBar parser instead.
-  * @param xmlResponse XMLDocument
-  */
-
-	BackgroundTasksManager.prototype.parseAnswer = function parseAnswer(xmlResponse) {
-		var childs = xmlResponse.documentElement.childNodes;
-		var delay = 0;
-		for (var i = 0; i < childs.length; i++) {
-			if (childs[i].tagName == 'message') {
-				var type = childs[i].getAttribute('type');
-				if (type != 'SUCCESS') {
-					this.interruptOnError(childs[i].firstChild.nodeValue);
+				this.next();
+			} else {
+				var client = PydioApi.getClient();
+				var params = { get_action: actionDef['name'] };
+				for (var k in actionDef['parameters']) {
+					if (actionDef['parameters'].hasOwnProperty(k)) params[k] = actionDef['parameters'][k];
 				}
-			} else if (childs[i].nodeName == 'trigger_bg_action') {
-				var name = childs[i].getAttribute('name');
-				var messageId = childs[i].getAttribute('messageId');
-				delay = parseInt(childs[i].getAttribute('delay'));
-				var parameters = {};
-				for (var j = 0; j < childs[i].childNodes.length; j++) {
-					var paramChild = childs[i].childNodes[j];
-					if (paramChild.tagName == 'param') {
-						parameters[paramChild.getAttribute('name')] = paramChild.getAttribute('value');
-					} else if (paramChild.tagName == 'clientCallback') {
-						var callbackCode = paramChild.firstChild.nodeValue;
-						var callback = new Function(callbackCode);
-					}
-				}
-				if (name == 'reload_node') {
-					if (delay) {
-						window.setTimeout((function () {
-							this.actionManager.getDataModel().requireContextChange(this.actionManager.getDataModel().getContextNode(), true);
-							this.next();
-						}).bind(this), delay * 1000);
+				client.request(params, (function (transport) {
+					var xmlResponse = transport.responseXML;
+					if (xmlResponse == null || xmlResponse.documentElement == null) {
+						this.working = false;
+						this.next();
 						return;
 					}
-					this.actionManager.getDataModel().requireContextChange(this.actionManager.getDataModel().getContextNode(), true);
-				} else if (name == 'info_message') {
-					this.notify('update_message', messageId);
-				} else if (name == 'javascript_instruction' && callback) {
-					parameters['callback'] = callback;
-					this.queueAction('javascript_instruction', parameters, messageId);
-				} else {
-					this.queueAction(name, parameters, messageId);
-				}
+					this.parseAnswer(transport.responseXML);
+					this.working = false;
+				}).bind(this), null, { method: 'POST' });
+				this.notify("update_message", actionDef['messageId']);
+				this.queue.shift();
+				this.working = true;
 			}
 		}
-		this.working = false;
-		if (delay) {
-			window.setTimeout(this.next.bind(this), delay * 1000);
-		} else {
-			this.next();
+
+		/**
+   * Parses the response. Should probably use the actionBar parser instead.
+   * @param xmlResponse XMLDocument
+   */
+	}, {
+		key: 'parseAnswer',
+		value: function parseAnswer(xmlResponse) {
+			var childs = xmlResponse.documentElement.childNodes;
+			var delay = 0;
+			for (var i = 0; i < childs.length; i++) {
+				if (childs[i].tagName == "message") {
+					var type = childs[i].getAttribute('type');
+					if (type != 'SUCCESS') {
+						this.interruptOnError(childs[i].firstChild.nodeValue);
+					}
+				} else if (childs[i].nodeName == "trigger_bg_action") {
+					var name = childs[i].getAttribute("name");
+					var messageId = childs[i].getAttribute("messageId");
+					delay = parseInt(childs[i].getAttribute("delay"));
+					var parameters = {};
+					for (var j = 0; j < childs[i].childNodes.length; j++) {
+						var paramChild = childs[i].childNodes[j];
+						if (paramChild.tagName == 'param') {
+							parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
+						} else if (paramChild.tagName == 'clientCallback') {
+							var callbackCode = paramChild.firstChild.nodeValue;
+							var callback = new Function(callbackCode);
+						}
+					}
+					if (name == "reload_node") {
+						if (delay) {
+							window.setTimeout((function () {
+								this.actionManager.getDataModel().requireContextChange(this.actionManager.getDataModel().getContextNode(), true);
+								this.next();
+							}).bind(this), delay * 1000);
+							return;
+						}
+						this.actionManager.getDataModel().requireContextChange(this.actionManager.getDataModel().getContextNode(), true);
+					} else if (name == "info_message") {
+						this.notify("update_message", messageId);
+					} else if (name == "javascript_instruction" && callback) {
+						parameters["callback"] = callback;
+						this.queueAction('javascript_instruction', parameters, messageId);
+					} else {
+						this.queueAction(name, parameters, messageId);
+					}
+				}
+			}
+			this.working = false;
+			if (delay) {
+				window.setTimeout(this.next.bind(this), delay * 1000);
+			} else {
+				this.next();
+			}
 		}
-	};
 
-	/**
-  * Interrupt the task on error
-  * @param errorMessage String
-  */
+		/**
+   * Interrupt the task on error
+   * @param errorMessage String
+   */
+	}, {
+		key: 'interruptOnError',
+		value: function interruptOnError(errorMessage) {
+			if (this.queue.length) this.queue = [];
+			this.notify("update_message_error", errorMessage);
+			this.working = false;
+		}
 
-	BackgroundTasksManager.prototype.interruptOnError = function interruptOnError(errorMessage) {
-		if (this.queue.length) this.queue = [];
-		this.notify('update_message_error', errorMessage);
-		this.working = false;
-	};
+		/**
+   * All tasks are processed
+   */
+	}, {
+		key: 'finished',
+		value: function finished() {
+			this.working = false;
+			this.notify("tasks_finished");
+		}
 
-	/**
-  * All tasks are processed
-  */
-
-	BackgroundTasksManager.prototype.finished = function finished() {
-		this.working = false;
-		this.notify('tasks_finished');
-	};
-
-	/**
-  * Create a stub action with not parameter.
-  */
-
-	BackgroundTasksManager.prototype.addStub = function addStub() {
-		this.queueAction('local_to_remote', {}, 'Stubing a 10s bg action');
-	};
+		/**
+   * Create a stub action with not parameter.
+   */
+	}, {
+		key: 'addStub',
+		value: function addStub() {
+			this.queueAction('local_to_remote', {}, 'Stubing a 10s bg action');
+		}
+	}]);
 
 	return BackgroundTasksManager;
 })(Observable);

@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 					mangle: false,
 					compress: {
 						hoist_funs: false			
-				},
+				}
 			},
 			js: {
 				files: {
@@ -93,10 +93,10 @@ module.exports = function(grunt) {
 						'res/js/ui/prototype/class.ActivityMonitor.js',
 						'res/js/ui/prototype/class.AjxpReactComponent.js',
 						'res/js/ui/prototype/class.PydioUI.js',
-						'res/js/core/Pydio.js',
+						'res/js/core/Pydio.js'
 						]
-				},
-			},
+				}
+			}
 		},
 
 	    babel: {
@@ -106,23 +106,23 @@ module.exports = function(grunt) {
 	        dist: {
 				files: [
 					{
-						mode: { loose : true, },
+						mode: { loose : true },
 					    expand: true,
 					    cwd: 'res/js/es6/',
 					    src: ['**/*.es6'],
 					    dest: 'res/js/core/',
 					    ext: '.js'
-					},
-				],
-	        },
+					}
+				]
+	        }
 	    },
 
 	    browserify: {
     		dist: {
     			files: {
-    				'bundle.js': 'export.js'
-    			},
-    		},
+    				'res/js/vendor/nodejs/bundle.js': 'res/js/vendor/nodejs/export.js'
+    			}
+    		}
 
 	    },
 
@@ -212,20 +212,20 @@ module.exports = function(grunt) {
 					'res/js/ui/prototype/class.ActivityMonitor.js',
 					'res/js/ui/prototype/class.AjxpReactComponent.js',
 					'res/js/ui/prototype/class.PydioUI.js',
-					'res/js/core/Pydio.js',
+					'res/js/core/Pydio.js'
 				],
 				tasks: ['uglify'],
 				options: {
-					spawn: false,
-				},
-			},
-		},
-    })
+					spawn: false
+				}
+			}
+		}
+    });
 
-	grunt.loadNpmTasks('grunt-browserify')
-	grunt.loadNpmTasks('grunt-babel')
-    grunt.loadNpmTasks('grunt-contrib-uglify')
-    grunt.loadNpmTasks('grunt-contrib-watch')
-    grunt.registerTask('default', ['babel','uglify'])
-}
+	grunt.loadNpmTasks('grunt-browserify');
+	grunt.loadNpmTasks('grunt-babel');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.registerTask('default', ['babel','uglify', 'browserify']);
+};
 
