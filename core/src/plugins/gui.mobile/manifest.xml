@@ -153,7 +153,7 @@
                     </div>
                 </div>
                 <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "flexTo":"browser"}'>
-                    <div id="files_list_pane" ajxpClass="AjxpPane">
+                    <div id="files_list_pane" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height","fitParent":"cpane_container"}'>
                         <div id="files_list_header" ajxpClass="AjxpPane">
                             <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30}'>
                                 <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "info_panel_share","put"],"groupOtherToolbars":["more", "change_main", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

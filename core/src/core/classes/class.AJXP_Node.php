@@ -565,7 +565,7 @@ class AJXP_Node
             $pServ = AJXP_PluginsService::getInstance();
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
-            $this->_wrapperClassName = "AJXP_PermissionWrapper";
+            $this->_wrapperClassName = "AJXP_MetaStreamWrapper";
         }
     }
 

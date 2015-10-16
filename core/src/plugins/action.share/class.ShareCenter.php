@@ -1208,7 +1208,7 @@ class ShareCenter extends AJXP_Plugin
         }
         if($repoLoaded){
             AJXP_Controller::registryReset();
-            $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
+            $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
         }
         $this->getShareStore()->deleteShare("file", $elementId);
         if(isSet($ajxpNode)){
