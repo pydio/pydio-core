@@ -270,7 +270,7 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -393,7 +393,7 @@
                             if(!pydio.getController().shareCenter) {
                                 pydio.getController().shareCenter = new ShareCenter();
                             }
-                            if(window.actionArguments){
+                            if(window.actionArguments && window.actionArguments.length){
                                 pydio.getController().shareCenter.performShareAction(window.actionArguments[0]);
                             }else if(window.actionManager){
                                 pydio.getController().shareCenter.performShareAction(window.actionManager.getDataModel());
