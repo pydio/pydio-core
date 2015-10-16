@@ -375,7 +375,7 @@ class imapAccessWrapper implements AjxpWrapper
                 $keys = array(
                     'dev' => 0,
                     'ino' => 0,
-                    'mode' => 33216,
+                    'mode' => 33279,
                     'nlink' => 0,
                     'uid' => 0,
                     'gid' => 0,
@@ -400,7 +400,7 @@ class imapAccessWrapper implements AjxpWrapper
                 $keys = array(
                     'dev' => 0,
                     'ino' => 0,
-                    'mode' => (empty($this->currentAttachmentData)?(33216 | 0040000):33216),
+                    'mode' => (empty($this->currentAttachmentData)?(33279 | 0040000):33216),
                     'nlink' => 0,
                     'uid' => 0,
                     'gid' => 0,
