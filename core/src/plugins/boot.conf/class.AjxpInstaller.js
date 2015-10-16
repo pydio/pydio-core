@@ -54,10 +54,16 @@ Class.create("AjxpInstaller", AjxpPane, {
         connexion.setParameters(params);
         connexion.onComplete = function(transport){
             var params = this.formManager.parseParameters(transport.responseXML, "//global_param");
-            this.formManager.createParametersInputs(this.formElement,  params, true, false, false, false, false, true);
-            this.formElement.SF_accordion.observe("animation-finished", function(){
+            this.formManager.createParametersInputs(this.formElement,  params, true, false, false, "wizard", false, true);
+            var saveButton = this.htmlElement.select('.SF_inlineButton').last();
+            this.formElement.observe("wizard:refreshed", function(event){
                 modal.refreshDialogPosition();
-            });
+                if(event.memo && event.memo.isLast){
+                    this.formElement.down(".wizard_buttons").insert({bottom:saveButton});
+                }else{
+                    this.htmlElement.insert({bottom:saveButton});
+                }
+            }.bind(this));
             this.formElement.select("select").invoke("observe", "change", function(){
                 modal.refreshDialogPosition();
             });
@@ -79,7 +85,7 @@ Class.create("AjxpInstaller", AjxpPane, {
                 }
 
                 var missing = this.formManager.serializeParametersInputs(this.formElement, new Hash(), '', true);
-                missing = (missing > 0 || !this.formElement.down('select[name="STORAGE_TYPE"]').getValue() || !passValidating);
+                missing = (missing > 0 || !passValidating);
 
                 if(!missing){
                     this.htmlElement.select('.SF_inlineButton').last().removeClassName("disabled");
@@ -91,29 +97,28 @@ Class.create("AjxpInstaller", AjxpPane, {
             this.formElement.select('select').invoke("observe", "change", function(){
                 this.formManager.observeFormChanges(this.formElement, observer, 50);
             }.bind(this));
-            this.updateAndBindButton(this.htmlElement.select('.SF_inlineButton').last());
-            this.bindPassword(this.formElement.down('input[name="ADMIN_USER_PASS"]').up('div.accordion_content'));
+            saveButton.hide();
+            this.updateAndBindButton(saveButton);
+            this.bindPassword(this.formElement.down('input[name="ADMIN_USER_PASS"]').up('div.wizard-pane'));
             this.formElement.ajxpPaneObject.observe("after_replicate_row", function(newRow){
                 this.bindPassword(newRow);
             }.bind(this));
             this.htmlElement.down("#start_button").observe("click", function(){
-                new Effect.Morph(this.htmlElement.down(".install_pydio_logo"), {
-                    style:'height:60px',
-                    duration:0.5
-                });
+                this.htmlElement.down(".install_pydio_logo").hide();
                 this.htmlElement.down(".installerLang").hide();
-                this.htmlElement.down(".installerWelcome").update(MessageHash["installer.8"]);
+                this.htmlElement.down(".installerWelcome").hide();
                 new Effect.Appear(this.formElement, {afterFinish : function(){
-                    this.formElement.SF_accordion.activate(this.formElement.down('.accordion_toggle'));
+                    modal.refreshDialogPosition();
                 }.bind(this)});
             }.bind(this));
+            document.fire("ajaxplorer:installer_loaded");
         }.bind(this);
         connexion.sendAsync();
     },
 
     bindPassword : function(contentDiv){
         var passes = contentDiv.select('input[type="password"]');
-        var container = new Element("div", {className:'SF_element'});
+        var container = new Element("div", {className:'SF_element passStrengthContainer'});
         passes[1].up('div.SF_element').insert({after:container});
         var p = new Protopass(passes[0], {
             barContainer:container,

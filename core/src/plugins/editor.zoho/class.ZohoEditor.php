@@ -92,15 +92,13 @@ class ZohoEditor extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
 
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
+        $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "post_to_zohoserver") {
 
@@ -110,16 +108,18 @@ class ZohoEditor extends AJXP_Plugin
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
-
-            $selection = new UserSelection($repository, $httpVars);
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
                 $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
             }else{
                 $file = $selection->getUniqueFile();
             }
+            if(!is_readable($destStreamURL.$file)){
+                throw new Exception("Cannot find file!");
+            }
+
             $target = base64_decode($httpVars["parent_url"]);
-            $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
+            $tmp = AJXP_MetaStreamWrapper::getRealFSReference($destStreamURL.$file);
             $tmp = SystemTextEncoding::fromUTF8($tmp);
 
             $node = new AJXP_Node($destStreamURL.$file);

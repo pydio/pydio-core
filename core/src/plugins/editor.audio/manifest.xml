@@ -24,9 +24,9 @@
 				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 				<processing>
 					<clientCallback><![CDATA[
-					var editor = ajaxplorer.findEditorById('editor.audio');
+					var editor = pydio.Registry.findEditorById('editor.audio');
 					if(editor){
-						ajaxplorer.loadEditorResources(editor.resourcesManager);
+						pydio.Registry.loadEditorResources(editor.resourcesManager);
 						var editorClass = Class.getByName(editor.editorClass);
 						if(editorClass){
 							editorClass.prototype.createFolderPlayer(ajaxplorer.getContextNode());

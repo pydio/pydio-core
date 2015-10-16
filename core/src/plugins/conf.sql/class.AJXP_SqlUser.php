@@ -398,6 +398,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 $rolesToLoad = array_keys($this->rights["ajxp.roles"]);
             }
         }
+        $rolesToLoad[] = "AJXP_GRP_/";
         if ($this->groupPath != null) {
             $base = "";
             $exp = explode("/", $this->groupPath);
@@ -416,10 +417,29 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 if (isSet($allRoles[$roleId])) {
                     $this->roles[$roleId] = $allRoles[$roleId];
                     $this->rights["ajxp.roles"][$roleId] = true;
+                    $roleObject = $allRoles[$roleId];
+                    if($roleObject->alwaysOverrides()){
+                        if(!isSet($this->rights["ajxp.roles.sticky"]) || !is_array($this->rights["ajxp.roles.sticky"])) {
+                            $this->rights["ajxp.roles.sticky"] = array();
+                        }
+                        $this->rights["ajxp.roles.sticky"][$roleId] = true;
+                    }
                 } else if (is_array($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])) {
                     unset($this->rights["ajxp.roles"][$roleId]);
                 }
             }
+        }
+
+        if(!isSet($this->rights["ajxp.roles.order"]) && is_array($this->rights["ajxp.roles"])){
+            // Create sample order
+            $this->rights["ajxp.roles.order"] = array();
+            $index = 0;
+            foreach($this->rights["ajxp.roles"] as $id => $rBool){
+                $this->rights["ajxp.roles.order"][$id] = $index;
+                $index++;
+            }
+        }else{
+            $this->rights["ajxp.roles.order"] = unserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles.order"]));
         }
 
         // CHECK USER PERSONAL ROLE
@@ -452,7 +472,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * @param String $context
      * @see AbstractAjxpUser#save()
      */
-    public function save($context = "superuser")
+    protected function _save($context = "superuser")
     {
         if ($context != "superuser") {
             // Nothing specific to do, prefs and bookmarks are saved on-the-fly.
@@ -472,9 +492,12 @@ class AJXP_SqlUser extends AbstractAjxpUser
         // UPDATE TABLE
         dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]=%s", $this->getId());
         foreach ($this->rights as $rightKey => $rightValue) {
-            if ($rightKey == "ajxp.roles") {
+            if ($rightKey == "ajxp.roles.sticky") {
+                continue;
+            }
+            if ($rightKey == "ajxp.roles" || $rightKey == "ajxp.roles.order") {
                 if (is_array($rightValue) && count($rightValue)) {
-                    $rightValue = $this->filterRolesForSaving($rightValue);
+                    $rightValue = $this->filterRolesForSaving($rightValue, $rightKey == "ajxp.roles" ? true: false);
                     $rightValue = '$phpserial$'.serialize($rightValue);
                 } else {
                     continue;

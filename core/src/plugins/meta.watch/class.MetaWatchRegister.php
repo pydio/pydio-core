@@ -359,9 +359,8 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
 
             case "toggle_watch":
 
-                $us = new UserSelection();
-                $us->initFromHttpVars($httpVars);
-                $node = $us->getUniqueNode($this->accessDriver);
+                $us = new UserSelection($this->accessDriver->repository, $httpVars);
+                $node = $us->getUniqueNode();
                 $node->loadNodeInfo();
                 $cmd = $httpVars["watch_action"];
 

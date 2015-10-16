@@ -63,11 +63,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
         $contrib->setAttribute("modifier", "ExifCellRenderer.prototype.infoPanelModifier");
-        $htmlSel = $this->xPath->query('html', $contrib);
+        $htmlSel = $this->getXPath()->query('html', $contrib);
         $html = $htmlSel->item(0);
         $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
         $html->appendChild($cdata);
@@ -100,15 +100,13 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     public function extractExif($actionName, $httpVars, $fileVars)
     {
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
         $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper();
-        $wrapperData = $repo->streamData;
-        $urlBase = $wrapperData["protocol"]."://".$repo->getId();
-        $selection = new UserSelection($repo, $httpVars);
-        $decoded = $selection->getUniqueFile();
-        $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
+        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
+        $repo->detectStreamWrapper(true);
+
+        $selectedNode = $userSelection->getUniqueNode();
+        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+
         AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
         if($exifData === false || !is_array($exifData)) return;
@@ -120,7 +118,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $exifData["IPTC"] = $iptc;
         }
         $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
-        AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
+        AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
         foreach ($exifData as $section => $data) {
             print("<exifSection name='$section'>");
             foreach ($data as $key => $value) {

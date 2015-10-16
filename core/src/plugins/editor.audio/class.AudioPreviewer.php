@@ -38,44 +38,41 @@ class AudioPreviewer extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $postProcessData)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(false)) {
             return false;
         }
-        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-        $streamData = $plugin->detectStreamWrapper(true);
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
 
         if ($action == "audio_proxy") {
 
             $selection = new UserSelection($repository, $httpVars);
+            $destStreamURL = $selection->currentBaseUrl();
+
+            $node = new AJXP_Node($destStreamURL."/".$selection->getUniqueFile());
             // Backward compat
-            $file = $selection->getUniqueFile();
-            if(!file_exists($destStreamURL.$file) && strpos($httpVars["file"], "base64encoded:") === false){
-                // May be a backward compatibility problem, try to base64decode the filepath
+            // May be a backward compatibility problem, try to base64decode the filepath
+            if(!file_exists($node->getUrl()) && strpos($httpVars["file"], "base64encoded:") === false){
                 $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
                 if(!file_exists($destStreamURL.$file)){
                     throw new Exception("Cannot find file!");
+                }else{
+                    $node = new AJXP_Node($destStreamURL.$file);
                 }
             }
-
-            $cType = "audio/".array_pop(explode(".", $file));
-
-            $localName = basename($file);
-            $node = new AJXP_Node($destStreamURL.$file);
-            if(method_exists($node->getDriver(), "filesystemFileSize")){
-                $size = $node->getDriver()->filesystemFileSize($node->getUrl());
-            }else{
-                $size = filesize($node->getUrl());
+            if(!is_readable($node->getUrl())){
+                throw new Exception("Cannot find file!");
             }
+
+            $fileUrl = $node->getUrl();
+            $localName = basename($fileUrl);
+            $cType = "audio/".array_pop(explode(".", $localName));
+            $size = filesize($node->getUrl());
 
             header("Content-Type: ".$cType."; name=\"".$localName."\"");
             header("Content-Length: ".$size);
 
             $stream = fopen("php://output", "a");
-            call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+            AJXP_MetaStreamWrapper::copyFileInStream($fileUrl, $stream);
             fflush($stream);
             fclose($stream);
 
@@ -87,7 +84,7 @@ class AudioPreviewer extends AJXP_Plugin
             if (!isSet($httpVars["playlist"])) {
                 // This should not happen anyway, because of the applyCondition.
                 AJXP_Controller::passProcessDataThrough($postProcessData);
-                return ;
+                return false;
             }
             // We transform the XML into XSPF
             $xmlString = $postProcessData["ob_output"];

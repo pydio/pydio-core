@@ -96,6 +96,31 @@ class AJXP_XMLWriter
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
         AJXP_XMLWriter::write($string, true);
     }
+
+    /**
+     * Convert an arbitrary list of data (array of associative array) as standard XML list.
+     * @param $data
+     * @param $rootPath
+     * @param $idKey
+     * @param $labelKey
+     */
+    public static function renderSimpleListAsNodes($data, $rootPath, $idKey, $labelKey){
+
+        self::header();
+
+        foreach($data as $item){
+
+            $nodeName = rtrim($rootPath, "/")."/".$item[$idKey];
+            $nodeLabel = $item[$labelKey];
+            $isLeaf = true;
+            $metaData = $item;
+            self::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData);
+
+        }
+
+        self::close();
+    }
+
     /**
      * Prints out the XML headers and preamble, then an open node
      * @static
@@ -602,12 +627,8 @@ class AJXP_XMLWriter
             AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
         }
 
-        foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
-            $toLast = false;
-            if ($repoObject->getAccessType()=="ajxp_conf") {
-                if(AuthService::usersEnabled() && !$loggedUser->isAdmin())continue;
-                $toLast = true;
-            }
+        $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
+        foreach ($accessible as $repoId => $repoObject) {
             $rightString = "";
             $streamString = "";
             if (in_array($repoObject->accessType, $streams)) {
@@ -622,13 +643,11 @@ class AJXP_XMLWriter
                 $slugString = "repositorySlug=\"$slug\"";
             }
             $isSharedString = "";
-            $ownerLabel = null;
             if ($repoObject->hasOwner()) {
                 $uId = $repoObject->getOwner();
                 $uObject = ConfService::getConfStorageImpl()->createUserObject($uId);
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
                 if(empty($label)) $label = $uId;
-                $ownerLabel = $label;
                 $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
             }
             $descTag = "";
@@ -660,17 +679,9 @@ class AJXP_XMLWriter
                 }
                 $roleString.='acl="'.$merged->getAcl($repoId).'"';
             }
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
-            if ($toLast) {
-                $lastString = $xmlString;
-            } else {
-                $st .= $xmlString;
-            }
+            $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
         }
 
-        if (isSet($lastString)) {
-            $st.= $lastString;
-        }
         $st .= "</repositories>";
         return $st;
     }

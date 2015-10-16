@@ -78,7 +78,7 @@ class s3AccessDriver extends fsAccessDriver
 
     public function initRepository()
     {
-        $wrapperData = $this->detectStreamWrapper(true);
+        $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -88,8 +88,7 @@ class s3AccessDriver extends fsAccessDriver
 
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->urlBase = "pydio://".$this->repository->getId();
 
         if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
             @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
@@ -196,12 +195,6 @@ class s3AccessDriver extends fsAccessDriver
         if (!$node->isLeaf()) {
             $node->setLabel(rtrim($node->getLabel(), "/"));
         }
-    }
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        return $bytesize;
     }
 
     public function makeSharedRepositoryOptions($httpVars, $repository)

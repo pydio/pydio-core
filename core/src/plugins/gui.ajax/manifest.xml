@@ -3,6 +3,7 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"/>
         </resources>
     </client_settings>
 	<server_settings>
@@ -236,7 +237,7 @@
 				</div>
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars" ajxpClass="AjxpPane">
+				<div id="toolbars" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'>
 					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -533,7 +534,7 @@
                             var dm = ajaxplorer.getContextHolder();
                             var nodes = dm.getSelectedNodes();
                             if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                             }
                         }catch(e){}
                     });
@@ -547,10 +548,10 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -665,13 +666,13 @@
                                     return;
                                 }
                                 var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    var first = root.getChildren().first();
+                                var first = root.getFirstChildIfExists();
+                                if(first){
                                     if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
                                         return;
                                     }
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -778,9 +779,9 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
                                     p.stop();
                                     return;
                                 }

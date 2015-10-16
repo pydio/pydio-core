@@ -36,7 +36,6 @@ class PowerFSController extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
         $dir = AJXP_Utils::decodeSecureMagic($dir);
@@ -45,7 +44,7 @@ class PowerFSController extends AJXP_Plugin
         if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
-        $urlBase = "ajxp.fs://". ConfService::getRepository()->getId();
+        $urlBase = "pydio://". ConfService::getRepository()->getId();
         $mess = ConfService::getMessages();
         switch ($action) {
 

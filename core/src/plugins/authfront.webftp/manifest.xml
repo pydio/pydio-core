@@ -22,7 +22,7 @@
                             });
 							modal.showDialogForm('Log In', 'ftp_login_form',
 							function(oForm){
-                                ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							},
 							function(){
 								var oForm = modal.getForm();
@@ -35,10 +35,10 @@
 									}
 								});
 								connexion.onComplete = function(transport){
-									ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
-                                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+									pydio.getController().submitForm(oForm, true, function(transport){
+                                        pydio.getController().parseXmlMessage(transport.responseXML);
                                         if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-                                            ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                            ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                         }
                                     });
 									oForm.reset();

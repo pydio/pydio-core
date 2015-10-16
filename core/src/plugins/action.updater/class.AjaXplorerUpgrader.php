@@ -386,8 +386,7 @@ class AjaXplorerUpgrader
 
     public function clearCache()
     {
-        AJXP_PluginsService::clearPluginsCache();
-        ConfService::clearMessagesCache();
+        ConfService::clearAllCaches();
         return "Ok";
     }
 

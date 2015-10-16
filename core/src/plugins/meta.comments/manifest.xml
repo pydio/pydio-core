@@ -5,7 +5,7 @@
 		<resources>
 			<i18n namespace="meta.comments" path="plugins/meta.comments/i18n" />
             <css file="plugins/meta.comments/comments_feed.css" autoload="true"/>
-			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel" autoload="true"/>
+			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel"/>
 		</resources>
 	</client_settings>
     <server_settings>

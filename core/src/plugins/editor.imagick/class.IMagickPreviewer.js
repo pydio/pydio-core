@@ -140,7 +140,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 				theImage.setStyle({cursor:'pointer'});
 				theImage.openBehaviour = true;
 				theImage.observe("click", function(event){
-					ajaxplorer.actionBar.fireAction('open_with');
+					pydio.getController().fireAction('open_with');
 				});
 			}
             var off = theImage.positionedOffset();

@@ -42,6 +42,7 @@ $mess=array(
 "20" => "Benutzer",
 "21" => "Aktion",
 "22" => "Param.",
+"22a"=> "Mehr...",
 "23" => "Test",
 "24" => "Ergebnis",
 "25" => "Arbeitsumgebung-Zugriffe",

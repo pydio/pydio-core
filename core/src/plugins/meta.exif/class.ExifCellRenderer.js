@@ -72,7 +72,7 @@ Class.create("ExifCellRenderer", {
 
         }
 
-        var editors = ajaxplorer.findEditorsForMime("ol_layer");
+        var editors = pydio.Registry.findEditorsForMime("ol_layer");
         var editorData;
         if(editors.length){
             editorData = editors[0];
@@ -80,13 +80,11 @@ Class.create("ExifCellRenderer", {
         if(editorData){
             var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
             var metadata = ajxpNode.getMetadata();
-            ajxpNode.setMetadata(metadata.merge({
-                'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
-                'ol_center' : {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))}
-            }));
+            metadata.set('ol_layers', [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}]);
+            metadata.set('ol_center', {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))});
             var  id = "small_map_" + Math.random();
             latiCell.up('div.infoPanelTable').insert({top:'<div id="'+id+'" style="height: 250px;"></div>'});
-            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+            pydio.Registry.loadEditorResources(editorData.resourcesManager);
             OLViewer.prototype.createOLMap(ajxpNode, id, false, false);
         }
 
@@ -96,7 +94,7 @@ Class.create("ExifCellRenderer", {
 		// console.log(latitude, longitude);
 		// Call openLayer editor!
 		// TEST : WestHausen : longitude=10.2;latitude = 48.9;
-		var editors = ajaxplorer.findEditorsForMime("ol_layer");
+		var editors = pydio.Registry.findEditorsForMime("ol_layer");
         var editorData;
 		if(editors.length){
 			editorData = editors[0];							
@@ -105,11 +103,9 @@ Class.create("ExifCellRenderer", {
 			// Update ajxpNode with Google Layer!
 			var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
 			var metadata = ajxpNode.getMetadata();
-			ajxpNode.setMetadata(metadata.merge({
-				'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
-				'ol_center' : {latitude:parseFloat(latitude),longitude:parseFloat(longitude)}
-			}));
-            ajaxplorer.openCurrentSelectionInEditor(editorData);
+            metadata.set('ol_layers', [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}]);
+            metadata.set('ol_center', {latitude:parseFloat(latitude),longitude:parseFloat(longitude)});
+            pydio.UI.openCurrentSelectionInEditor(editorData);
 		}
 		
 	}

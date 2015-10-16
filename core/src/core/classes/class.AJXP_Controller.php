@@ -45,15 +45,13 @@ class AJXP_Controller
     /**
      * Initialize the queryable xPath object
      * @static
+     * @param bool $useCache Whether to cache the registry version in a memory cache.
      * @return DOMXPath
      */
-    private static function initXPath()
+    private static function initXPath($useCache = false)
     {
         if (!isSet(self::$xPath)) {
-
-            $registry = AJXP_PluginsService::getXmlRegistry( false );
-            $changes = self::filterRegistryFromRole($registry);
-            if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
+            $registry = ConfService::getFilteredXMLRegistry(false, false, $useCache);
             self::$xPath = new DOMXPath($registry);
         }
         return self::$xPath;
@@ -65,64 +63,13 @@ class AJXP_Controller
     }
 
     /**
-     * Check the current user "specificActionsRights" and filter the full registry actions with these.
-     * @static
-     * @param DOMDocument $registry
-     * @return bool
-     */
-    public static function filterRegistryFromRole(&$registry)
-    {
-        if(!AuthService::usersEnabled()) return false ;
-        $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null) return false;
-        $crtRepo = ConfService::getRepository();
-        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
-        if ($crtRepo != null && is_a($crtRepo, "Repository")) {
-            $crtRepoId = $crtRepo->getId();
-        }
-        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
-        $changes = false;
-        $xPath = new DOMXPath($registry);
-        foreach ($actionRights as $pluginName => $actions) {
-            foreach ($actions as $actionName => $enabled) {
-                if($enabled !== false) continue;
-                $actions = $xPath->query("actions/action[@name='$actionName']");
-                if (!$actions->length) {
-                    continue;
-                }
-                $action = $actions->item(0);
-                $action->parentNode->removeChild($action);
-                $changes = true;
-            }
-        }
-        $parameters = $loggedUser->mergedRole->listParameters();
-        foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
-                foreach ($paramsPlugs as $plugId => $params) {
-                    foreach ($params as $name => $value) {
-                        // Search exposed plugin_configs, replace if necessary.
-                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
-                        if(!$searchparams->length) continue;
-                        $param = $searchparams->item(0);
-                        $newCdata = $registry->createCDATASection(json_encode($value));
-                        $param->removeChild($param->firstChild);
-                        $param->appendChild($newCdata);
-                    }
-                }
-            }
-        }
-        return $changes;
-    }
-
-
-    /**
      * @param $actionName
      * @param $path
      * @return bool
      */
     public static function findRestActionAndApply($actionName, $path)
     {
-        $xPath = self::initXPath();
+        $xPath = self::initXPath(true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
             self::$lastActionNeedsAuth = true;

@@ -64,10 +64,10 @@ Class.create("TextEditor", AbstractEditor, {
             //ajaxplorer.fireNodeRefresh(nodeOrNodes);
         });
         this.textarea.observe("focus", function(){
-            ajaxplorer.disableAllKeyBindings()
+            pydio.UI.disableAllKeyBindings()
         });
         this.textarea.observe("blur", function(){
-            ajaxplorer.enableAllKeyBindings()
+            pydio.UI.enableAllKeyBindings()
         });
 	},
 	

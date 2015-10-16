@@ -33,7 +33,7 @@ websocket.onmessage = function(event){console.log(event.data);};
  *     new PeriodicalExecuter(function(pe){
      var conn = new Connexion();
      conn.setParameters($H({get_action:'client_consume_channel',channel:'nodes:0',client_id:'toto'}));
-     conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+     conn.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
      conn.sendAsync();
      }, 5);
  *
@@ -59,6 +59,10 @@ class MqManager extends AJXP_Plugin
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try {
             $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
+            if(AuthService::$bufferedMessage != null && AuthService::getLoggedUser() != null){
+                $this->sendInstantMessage(AuthService::$bufferedMessage, ConfService::getCurrentRepositoryId(), AuthService::getLoggedUser()->getId());
+                AuthService::$bufferedMessage = null;
+            }
         } catch (Exception $e) {}
     }
 
@@ -92,11 +96,12 @@ class MqManager extends AJXP_Plugin
      */
     public function publishNodeChange($origNode = null, $newNode = null, $copy = false)
     {
-        $content = "";$repo = "";$targetUserId=null;
+        $content = "";$repo = "";$targetUserId=null; $nodePathes = array();
         $update = false;
         if ($newNode != null) {
             $repo = $newNode->getRepositoryId();
             $targetUserId = $newNode->getUser();
+            $nodePathes[] = $newNode->getPath();
             $update = false;
             $data = array();
             if ($origNode != null && !$copy) {
@@ -108,19 +113,22 @@ class MqManager extends AJXP_Plugin
             $content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
         }
         if ($origNode != null && ! $update && !$copy) {
+
             $repo = $origNode->getRepositoryId();
             $targetUserId = $origNode->getUser();
+            $nodePathes[] = $origNode->getPath();
             $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
+
         }
         if (!empty($content) && $repo != "") {
 
-            $this->sendInstantMessage($content, $repo, $targetUserId);
+            $this->sendInstantMessage($content, $repo, $targetUserId, null, $nodePathes);
 
         }
 
     }
 
-    public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null)
+    public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
         if ($repositoryId == AJXP_REPO_SCOPE_ALL) {
             $userId = $targetUserId;
@@ -141,8 +149,15 @@ class MqManager extends AJXP_Plugin
         // Publish for pollers
         $message = new stdClass();
         $message->content = $xmlContent;
-        if(isSet($userId)) $message->userId = $userId;
-        if(isSet($gPath)) $message->groupPath = $gPath;
+        if(isSet($userId)) {
+            $message->userId = $userId;
+        }
+        if(isSet($gPath)) {
+            $message->groupPath = $gPath;
+        }
+        if(count($nodePathes)) {
+            $message->nodePathes = $nodePathes;
+        }
 
         if ($this->msgExchanger) {
             $this->msgExchanger->publishInstantMessage("nodes:$repositoryId", $message);
@@ -155,8 +170,14 @@ class MqManager extends AJXP_Plugin
             require_once($this->getBaseDir()."/vendor/phpws/websocket.client.php");
             // Publish for websockets
             $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
-            if(isSet($userId)) $input["USER_ID"] = $userId;
-            else if(isSet($gPath)) $input["GROUP_PATH"] = $gPath;
+            if(isSet($userId)){
+                $input["USER_ID"] = $userId;
+            } else if(isSet($gPath)) {
+                $input["GROUP_PATH"] = $gPath;
+            }
+            if(count($nodePathes)) {
+                $input["NODE_PATHES"] = $nodePathes;
+            }
             $input = serialize($input);
             $msg = WebSocketMessage::create($input);
             if (!isset($this->wsClient)) {
@@ -202,6 +223,15 @@ class MqManager extends AJXP_Plugin
                     $uId = 'shared';
                 }
                 $currentRepository = ConfService::getCurrentRepositoryId();
+                $currentRepoMasks = array(); $regexp = null;
+                AJXP_Controller::applyHook("role.masks", array($currentRepository, &$currentRepoMasks, AJXP_Permission::READ));
+                if(count($currentRepoMasks)){
+                    $regexps = array();
+                    foreach($currentRepoMasks as $path){
+                        $regexps[] = '^'.preg_quote($path, '/');
+                    }
+                    $regexp = '/'.implode("|", $regexps).'/';
+                }
                 $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
                 if($channelRepository != $currentRepository){
                     AJXP_XMLWriter::header();
@@ -209,30 +239,26 @@ class MqManager extends AJXP_Plugin
                     AJXP_XMLWriter::close();
                     return;
                 }
-               //session_write_close();
 
-               $startTime = time();
-               $maxTime = $startTime + (30 - 3);
-
-//               while (true) {
-
-                   $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
-                   if (count($data)) {
-                       AJXP_XMLWriter::header();
-                       ksort($data);
-                       foreach ($data as $messageObject) {
-                           echo $messageObject->content;
+                $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
+                if (count($data)) {
+                   AJXP_XMLWriter::header();
+                   ksort($data);
+                   foreach ($data as $messageObject) {
+                       if(isSet($regexp) && isSet($messageObject->nodePathes)){
+                           $pathIncluded = false;
+                           foreach($messageObject->nodePathes as $nodePath){
+                               if(preg_match($regexp, $nodePath)){
+                                   $pathIncluded = true;
+                                   break;
+                               }
+                           }
+                           if(!$pathIncluded) continue;
                        }
-                       AJXP_XMLWriter::close();
+                       echo $messageObject->content;
                    }
-//                       break;
-//                   } else if (time() >= $maxTime) {
-//                       break;
-//                   }
-//
-//                   sleep(3);
-//               }
-
+                   AJXP_XMLWriter::close();
+                }
 
                 break;
             default:

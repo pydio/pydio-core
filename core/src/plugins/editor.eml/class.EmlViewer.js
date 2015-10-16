@@ -24,7 +24,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		$super(oFormObject, options);
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return false;
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
+			pydio.Controller.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
 	},
@@ -103,7 +103,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 			var firstKey = '';
 			var reposList = new Hash();
-			user.getCrossRepositories().each(function(pair){
+            ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 				if(!firstKey) firstKey = pair.key;
 				reposList.set(pair.key, pair.value.getLabel());								
 			}.bind(this));
@@ -174,7 +174,7 @@ Class.create("EmlViewer", AbstractEditor, {
                 console.log(connexion._parameters);
 			}
 			connexion.onComplete = function(transport){
-				ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+				pydio.getController().parseXmlMessage(transport.responseXML);
 			};
 			connexion.sendAsync();
 			hideSelector();

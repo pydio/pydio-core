@@ -57,7 +57,9 @@ CREATE TABLE IF NOT EXISTS ajxp_repo_options (
 
 CREATE TABLE IF NOT EXISTS ajxp_roles (
 	role_id VARCHAR(255) PRIMARY KEY,
-	serial_role TEXT(500) NOT NULL
+	serial_role TEXT(500) NOT NULL,
+  last_updated INT(11) NOT NULL DEFAULT 0,
+  INDEX `last_updated` (`last_updated`)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS ajxp_groups (

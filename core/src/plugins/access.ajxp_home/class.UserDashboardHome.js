@@ -24,14 +24,86 @@ Class.create("UserDashboardHome", AjxpPane, {
     _repoInfos: null,
     _repoInfosLoading:null,
 
+    _loadWsList: function(oFormObject, updateWsLegend, switchToRepo){
+
+        var wsElement = oFormObject.down('#workspaces_list');
+        var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
+        if(!wsElement) return;
+
+        var renderElement = function(repoObject){
+
+            var repoId = repoObject.getId();
+            var repoEl = new Element('li').update(repoObject.getHtmlBadge() + "<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
+            wsElement.insert(repoEl);
+            var select = function(e){
+                var target = Event.findElement(e, "li");
+                target.nextSiblings().invoke('removeClassName', 'selected');
+                target.previousSiblings().invoke('removeClassName', 'selected');
+                target.addClassName('selected');
+                oFormObject.down('#go_to_ws').removeClassName("disabled");
+                oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
+                oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
+                if(window.ajxpMobile){
+                    switchToRepo(repoId);
+                }
+            };
+            disableTextSelection(repoEl);
+            if(simpleClickOpen){
+                repoEl.observe("click", function(e){
+                    repoEl.stopObserving("click");
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }else{
+                repoEl.observe("click", select);
+                repoEl.observe("dblclick", function(e){
+                    repoEl.stopObserving("dblclick");
+                    select(e);
+                    Event.findElement(e, "li").setOpacity(0.7);
+                    switchToRepo(repoId);
+                });
+            }
+            repoEl.observe("mouseover", function(){
+                updateWsLegend(repoObject);
+            });
+            repoEl.observe("mouseout", function(){
+                updateWsLegend(null);
+            });
+
+        };
+
+        var myWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
+            return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
+        });
+        var sharedWS = ProtoCompat.map2hash(ajaxplorer.user.repositories).filter(function(pair){
+            return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
+        });
+
+        if(myWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[468]+"</h3>"));
+            myWS.each(function(pair){renderElement(pair.value);});
+        }
+
+        if(sharedWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[469]+"</h3>"));
+            sharedWS.each(function(pair){renderElement(pair.value);});
+        }
+
+    },
+
     initialize: function($super, oFormObject, editorOptions){
 
         $super(oFormObject, editorOptions);
         this._repoInfos = $H();
         this._repoInfosLoading = $H();
-        var dashLogo = ajaxplorer.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
+        var dashLogo = pydio.Registry.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
         if(!dashLogo)
-            dashLogo = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
+            dashLogo = pydio.Registry.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
         if(dashLogo){
             var url;
             if(dashLogo.indexOf('plugins/') === 0){
@@ -42,11 +114,6 @@ Class.create("UserDashboardHome", AjxpPane, {
             oFormObject.down("#logo_div").down("img").src = url;
         }
         oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
-
-        var wsElement = oFormObject.down('#workspaces_list');
-        attachMobileScroll(oFormObject.down('#list_cont'), 'vertical');
-
-        var simpleClickOpen = ajaxplorer.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
 
         var switchToRepo = function(repoId){
             if(!repoId) return;
@@ -141,76 +208,24 @@ Class.create("UserDashboardHome", AjxpPane, {
             }
         }.bind(this);
 
-        var renderElement = function(repoObject){
+        this._loadWsList(oFormObject, updateWsLegend, switchToRepo);
 
-            var repoId = repoObject.getId();
-            var repoEl = new Element('li').update(repoObject.getHtmlBadge() + "<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
-            wsElement.insert(repoEl);
-            var select = function(e){
-                var target = Event.findElement(e, "li");
-                target.nextSiblings().invoke('removeClassName', 'selected');
-                target.previousSiblings().invoke('removeClassName', 'selected');
-                target.addClassName('selected');
-                oFormObject.down('#go_to_ws').removeClassName("disabled");
-                oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
-                oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
-                if(window.ajxpMobile){
-                    switchToRepo(repoId);
-                }
-            };
-            disableTextSelection(repoEl);
-            if(simpleClickOpen){
-                repoEl.observe("click", function(e){
-                    repoEl.stopObserving("click");
-                    select(e);
-                    Event.findElement(e, "li").setOpacity(0.7);
-                    switchToRepo(repoId);
-                });
-            }else{
-                repoEl.observe("click", select);
-                repoEl.observe("dblclick", function(e){
-                    repoEl.stopObserving("dblclick");
-                    select(e);
-                    Event.findElement(e, "li").setOpacity(0.7);
-                    switchToRepo(repoId);
-                });
+        document.observe("ajaxplorer:repository_list_refreshed", function(){
+            if(oFormObject.down('#workspaces_list')) {
+                $A(oFormObject.down('#workspaces_list').childElements()).invoke("remove");
             }
-            repoEl.observe("mouseover", function(){
-                updateWsLegend(repoObject);
-            });
-            repoEl.observe("mouseout", function(){
-                updateWsLegend(null);
-            });
-
-        };
-
-        var myWS = ajaxplorer.user.repositories.filter(function(pair){
-            return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
-        }).sortBy(function(pair){
-            return (pair.value.getLabel());
-        });
-        var sharedWS = ajaxplorer.user.repositories.filter(function(pair){
-            return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
-        }).sortBy(function(pair){
-            return (pair.value.getLabel());
-        });
-
-        if(myWS.size()){
-            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[468]+"</h3>"));
-            myWS.each(function(pair){renderElement(pair.value);});
-        }
-
-        if(sharedWS.size()){
-            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[469]+"</h3>"));
-            sharedWS.each(function(pair){renderElement(pair.value);});
-        }
+            this._loadWsList(oFormObject, updateWsLegend, switchToRepo);
+        }.bind(this));
 
         if($('videos_pane')){
             $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
                 var t = Event.findElement(e, 'div.tutorial_load_button');
                 try{
                     var main = t.up('div.tutorial_legend');
-                    main.next('iframe').src = main.readAttribute('data-videoSrc');
+                    if(main.next('img')){
+                        main.insert({after:'<iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="'+main.readAttribute('data-videoSrc')+'"></iframe>'});
+                        main.next('img').remove();
+                    }
                 }catch(e){}
             });
         }
@@ -220,16 +235,16 @@ Class.create("UserDashboardHome", AjxpPane, {
             switchToRepo(target.CURRENT_REPO_ID);
         });
 
-        if(ajaxplorer.actionBar.getActionByName("logout") && ajaxplorer.user.id != "guest"){
+        if(pydio.getController().getActionByName("logout") && ajaxplorer.user.id != "guest"){
             oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
-            oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
+            oFormObject.down('#disconnect_link').update("<a>"+pydio.getController().getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
-                ajaxplorer.actionBar.fireAction("logout");
+                pydio.getController().fireAction("logout");
             });
-        }else if(ajaxplorer.user.id == "guest" && ajaxplorer.actionBar.getActionByName("login")){
+        }else if(ajaxplorer.user.id == "guest" && pydio.getController().getActionByName("login")){
             oFormObject.down("#welcome").insert("<small>You can <a id='disconnect_link'>login</a> if you are not guest.</small>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
-                ajaxplorer.actionBar.fireAction("login");
+                pydio.getController().fireAction("login");
             });
         }
 
@@ -237,17 +252,17 @@ Class.create("UserDashboardHome", AjxpPane, {
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
-            span.down('a').observe('click', function(){ ajaxplorer.getActionBar().fireAction("open_tutorial_pane"); });
+            span.down('a').observe('click', function(){ pydio.getController().fireAction("open_tutorial_pane"); });
             obj.insert(span);
         }
 
 
-        try{
-            window.setTimeout(function(){
-                if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
-                else if($("browser")) $("browser").ajxpPaneObject.resize();
-            }, 50);
-        }catch(e){}
+            try{
+                window.setTimeout(function(){
+                    if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
+                    else if($("browser")) $("browser").ajxpPaneObject.resize();
+                }, 50);
+            }catch(e){}
 
     },
 

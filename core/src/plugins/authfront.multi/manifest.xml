@@ -46,7 +46,7 @@
                                         $('auth_source').insert(new Element("option", {value:pair.key}).update(pair.value));
                                     });
                                 }
-                                ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                 if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
                                     oForm.select('input').invoke("observe", "keydown", function(event){
                                         if(event.keyCode == Event.KEY_RETURN){
@@ -74,7 +74,7 @@
                                         oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link">AJXP_MESSAGE[479]</a></div>'});
                                         oForm.down('a.forgot-password-link').observe("click", function(e){
                                             Event.stop(e);
-                                            ajaxplorer.actionBar.fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
+                                            pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
                                         });
                                     }catch(e){ if(console) console.log(e); }
                                 }
@@ -94,7 +94,7 @@
                                 connexion.addParameter('auth_source', selectedSource);
                                 connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
                                 if(oForm.login_seed.value != '-1'){
-                                    connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+                                    connexion.addParameter('password', HasherUtils.hex_md5(HasherUtils.hex_md5(oForm.password.value)+oForm.login_seed.value));
                                 }else{
                                     connexion.addParameter('password', oForm.password.value);
                                 }
@@ -102,9 +102,9 @@
                                     connexion.addParameter('captcha_code', oForm.captcha_code.value);
                                 }
                                 connexion.onComplete = function(transport){
-                                    var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                    var success = pydio.getController().parseXmlMessage(transport.responseXML);
                                     if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-                                        ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                        ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                     }
                                     if(success){
                                         $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");

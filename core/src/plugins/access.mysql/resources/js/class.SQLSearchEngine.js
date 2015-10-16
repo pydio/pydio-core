@@ -25,13 +25,13 @@ Class.create("SQLSearchEngine", SearchEngine, {
 		this.sqlQuery = $('sql_query');
 		
 		this.sqlQuery.observe("focus", function(e){
-			ajaxplorer.disableShortcuts();
+			pydio.UI.disableShortcuts();
 			this.hasFocus = true;
 			//this.sqlQuery.select();
 			Event.stop(e);
 		}.bind(this));
 		this.sqlQuery.observe("blur", function(e){
-			ajaxplorer.enableShortcuts();
+			pydio.UI.enableShortcuts();
 			this.hasFocus = false;
 		}.bind(this) );
 		this.sqlQuery.observe("keydown", function(e){

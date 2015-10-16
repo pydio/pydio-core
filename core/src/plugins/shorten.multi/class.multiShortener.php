@@ -159,9 +159,8 @@ class multiShortener extends AJXP_Plugin
     }
     protected function updateMetaShort($file, $elementId, $shortUrl)
     {
-        $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
-        $streamData = $driver->detectStreamWrapper(false);
-        $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
+        $context = new UserSelection(ConfService::getRepository());
+        $baseUrl = $context->currentBaseUrl();
         $node = new AJXP_Node($baseUrl.$file);
         if ($node->hasMetaStore()) {
             $metadata = $node->retrieveMetadata(

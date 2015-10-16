@@ -71,7 +71,7 @@ Class.create("NotificationLoader", {
         var newNotifs = $A();
         var currentLastAlert = 0, currentLastEvent = 0;
 
-        this.ajxpNode.getChildren().each(function(el){
+        this.ajxpNode.getChildren().forEach(function(el){
 
             // REPLACE REAL PATH NOW
             el._path = el.getMetadata().get("real_path");
@@ -333,7 +333,7 @@ Class.create("NotificationLoader", {
                 },0.2);
             }
             if(container.down('#ajxp_activity_panel > div.panelHeader')){
-                if(!fRp._rootNode.getChildren().length){
+                if(!fRp._rootNode.getChildren().size){
                     container.down('#ajxp_activity_panel > div.panelHeader').hide();
                 }else{
                     container.down('#ajxp_activity_panel > div.panelHeader').show();
@@ -347,7 +347,7 @@ Class.create("NotificationLoader", {
 
     },
 
-    loaderTimer: null,
+    loaderTimer: null
 
 });
 

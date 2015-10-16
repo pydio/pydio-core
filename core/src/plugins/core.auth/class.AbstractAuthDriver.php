@@ -37,8 +37,6 @@ class AbstractAuthDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
-
         switch ($action) {
 
             case "get_secure_token" :
@@ -122,7 +120,6 @@ class AbstractAuthDriver extends AJXP_Plugin
         if(!isSet($actionXpath)) $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $passChangeNodeList = $actionXpath->query('action[@name="pass_change"]', $contribNode);
         if(!$passChangeNodeList->length) return ;
-        unset($this->actions["pass_change"]);
         $passChangeNode = $passChangeNodeList->item(0);
         $contribNode->removeChild($passChangeNode);
     }

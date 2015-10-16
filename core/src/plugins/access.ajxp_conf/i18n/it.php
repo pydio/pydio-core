@@ -41,6 +41,7 @@ $mess=array(
 "20" => "Utente",
 "21" => "Azione",
 "22" => "Parametri",
+"22a"=> "Parametri",
 "23" => "Nome Test",
 "24" => "Data Test",
 "25" => "Accesso Workspaces",

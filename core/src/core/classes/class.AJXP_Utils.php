@@ -757,7 +757,7 @@ class AJXP_Utils
 
         }
         $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
-        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && class_exists("IntlDateFormatter")){
+        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && extension_loaded("intl")){
             $intl = IntlDateFormatter::create($messages["date_intl_locale"], IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, "MMMM");
             $localizedMonth = $intl->format($time ? $time : time());
             $dateFuncMonth = date("F", $time ? $time : time());
@@ -1556,7 +1556,10 @@ class AJXP_Utils
             'Apple iPad' => 'iPad',
             'Apple iPhone' => 'iPhone',
             'OS2' => 'os\/2',
-            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)'
+            'SearchBot'=>'(nuhk)|(googlebot)|(yammybot)|(openbot)|(slurp)|(msnbot)|(ask jeeves\/teoma)|(ia_archiver)',
+            'Pydio iOS Native Application' => 'ajaxplorer-ios',
+            'Pydio Android Native Application' => 'Apache-HttpClient',
+            'Pydio Sync Client' => 'python-requests'
         );
 
         if($useragent == null){
@@ -1647,6 +1650,36 @@ class AJXP_Utils
             $password = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($userId."\1CDAFx¨op#"), base64_decode($password), MCRYPT_MODE_ECB), "\0");
         }
         return $password;
+    }
+
+    public static function filterFormElementsFromMeta($metadata, &$nestedData, $userId=null, $binariesContext=null, $cypheredPassPrefix=""){
+        foreach($metadata as $key => $level){
+            if(!array_key_exists($key, $nestedData)) continue;
+            if(!is_array($level)) continue;
+            if(isSet($level["ajxp_form_element"])){
+                // filter now
+                $type = $level["type"];
+                if($type == "binary" && $binariesContext != null){
+                    $value = $nestedData[$key];
+                    if ($value == "ajxp-remove-original") {
+                        if (!empty($level["original_binary"])) {
+                            ConfService::getConfStorageImpl()->deleteBinary($binariesContext, $level["original_binary"]);
+                        }
+                        $value = "";
+                    } else {
+                        $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                        if (file_exists($file)) {
+                            $id= !empty($level["original_binary"]) ? $level["original_binary"] : null;
+                            $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                            $value = $id;
+                        }
+                    }
+                    $nestedData[$key] = $value;
+                }
+            }else{
+                self::filterFormElementsFromMeta($level, $nestedData[$key], $userId, $binariesContext, $cypheredPassPrefix);
+            }
+        }
     }
 
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null, $cypheredPassPrefix = "")

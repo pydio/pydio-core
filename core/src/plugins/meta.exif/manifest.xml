@@ -4,7 +4,7 @@
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />
-			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" autoload="true"/>
+			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" depends="OLViewer"/>
 		</resources>
 	</client_settings>
 	<server_settings>

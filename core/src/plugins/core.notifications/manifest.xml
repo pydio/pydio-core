@@ -11,6 +11,7 @@
             <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
             <css file="plugins/core.notifications/res/css/notification_center.css" autoload="true"/>
             <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
+            <js className="NotificationLoader" file="plugins/core.notifications/class.NotificationLoader.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -29,9 +30,11 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
-                            NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
-                        });
+                        if(!window.ajxpMinisite){
+                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
+                                NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
+                            });
+                        }
                     ]]></dynamicBuilder>
                 </subMenu>
                 <processing>
@@ -42,7 +45,7 @@
                         </div>
                     ]]></clientForm>
                     <clientListener name="contextChange"><![CDATA[
-                        if(!window.NotificationLoader && ajaxplorer.user){
+                        if(!window.NotificationLoader && ajaxplorer.user && !window.ajxpMinisite){
                             ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
                         }
                     ]]></clientListener>

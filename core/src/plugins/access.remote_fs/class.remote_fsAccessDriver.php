@@ -40,7 +40,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                 $tmpDoc = new DOMDocument();
                 $tmpDoc->loadXML($xml);
                 $newNode = $this->manifestDoc->importNode($tmpDoc->documentElement, true);
-                $this->xPath->query("registry_contributions/actions")->item(0)->appendChild($newNode);
+                $this->getXPath()->query("registry_contributions/actions")->item(0)->appendChild($newNode);
             }
         }
         parent::init($repository, $options);

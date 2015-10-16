@@ -52,7 +52,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
-            $el = $this->xPath->query("/indexer")->item(0);
+            $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
                 $data = array("indexed_meta_fields" => $metaFields,
@@ -189,6 +189,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $limit = intval($httpVars['limit']);
             }
             foreach ($hits as $hit) {
+                // Backward compatibility
+                $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
@@ -205,6 +207,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (!file_exists($tmpNode->getUrl())) {
                     $index->delete($hit->id);
                     $commitIndex = true;
+                    continue;
+                }
+                if (!is_readable($tmpNode->getUrl())){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -264,6 +269,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 AJXP_XMLWriter::header();
             }
             foreach ($hits as $hit) {
+                // Backward compat with old protocols
+                $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
@@ -274,6 +281,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (!file_exists($tmpNode->getUrl())) {
                     $index->delete($hit->id);
                     $commitIndex = true;
+                    continue;
+                }
+                if (!is_readable($tmpNode->getUrl())){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);

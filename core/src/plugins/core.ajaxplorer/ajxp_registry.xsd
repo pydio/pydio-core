@@ -587,6 +587,8 @@
                 <xs:element ref="resources"/>
                 <xs:element minOccurs="0" ref="node_provider"/>
             </xs:sequence>
+            <xs:attribute name="iconClass"/>
+            <xs:attribute name="description_template"/>
             <xs:attribute name="icon"/>
             <xs:attribute name="icon_tpl_id"/>
         </xs:complexType>
@@ -632,6 +634,7 @@
             <xs:attribute name="autoload" type="xs:boolean"/>
             <xs:attribute name="className" use="required" type="xs:NCName"/>
             <xs:attribute name="file" use="required"/>
+            <xs:attribute name="depends"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="node_provider">

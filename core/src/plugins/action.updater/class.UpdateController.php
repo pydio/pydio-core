@@ -50,20 +50,17 @@ class UpdateController extends AJXP_Plugin
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $compressNodeList = $actionXpath->query('action[@name="import_from_324"]', $contribNode);
         if(!$compressNodeList->length) return ;
-        unset($this->actions["import_from_324"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
 
         $compressNodeList = $actionXpath->query('action[@name="migrate_metaserial"]', $contribNode);
         if(!$compressNodeList->length) return ;
-        unset($this->actions["import_from_324"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
     }
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");

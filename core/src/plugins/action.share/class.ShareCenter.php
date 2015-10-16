@@ -51,28 +51,20 @@ class ShareCenter extends AJXP_Plugin
     protected function parseSpecificContributions(&$contribNode)
     {
         parent::parseSpecificContributions($contribNode);
-        if (isSet($this->actions["share"])) {
-            $disableSharing = false;
-            $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-            if ($downloadFolder == "") {
-                $disableSharing = true;
-            } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-                $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
-                $disableSharing = true;
-            } else {
-                if (AuthService::usersEnabled()) {
-                    $loggedUser = AuthService::getLoggedUser();
-                    if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
-                        $disableSharing = true;
-                    }
-                } else {
+        $disableSharing = false;
+        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        if ($downloadFolder == "") {
+            $disableSharing = true;
+        } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
+            $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
+            $disableSharing = true;
+        } else {
+            if (AuthService::usersEnabled()) {
+                $loggedUser = AuthService::getLoggedUser();
+                if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
                     $disableSharing = true;
                 }
-            }
-            $repo = ConfService::getRepository();
-            // Hacky but necessary to edit roles...
-            if(!is_a($repo->driverInstance, "AjxpWrapperProvider")
-                && !(isset($_GET["get_action"]) && $_GET["get_action"]=="list_all_plugins_actions")){
+            } else {
                 $disableSharing = true;
             }
             $xpathesToRemove = array();
@@ -91,12 +83,16 @@ class ShareCenter extends AJXP_Plugin
                     $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
                 }
             }
-            foreach($xpathesToRemove as $xpath){
-                $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                $nodeList = $actionXpath->query($xpath, $contribNode);
-                foreach($nodeList as $shareActionNode){
-                    $contribNode->removeChild($shareActionNode);
-                }
+            if(!$folderSharingAllowed){
+                // Share folder button
+                $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
+            }
+        }
+        foreach($xpathesToRemove as $xpath){
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $nodeList = $actionXpath->query($xpath, $contribNode);
+            foreach($nodeList as $shareActionNode){
+                $contribNode->removeChild($shareActionNode);
             }
         }
     }
@@ -109,8 +105,7 @@ class ShareCenter extends AJXP_Plugin
             return;
         }
         $this->accessDriver = $this->repository->driverInstance;
-        $this->urlBase = $this->repository->driverInstance->getResourceUrl("/");
-        $this->baseProtocol = array_shift(explode("://", $this->urlBase));
+        $this->urlBase = "pydio://". $this->repository->getId();
         if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
             $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
         }
@@ -203,12 +198,12 @@ class ShareCenter extends AJXP_Plugin
                         $httpVars["simple_right_read"] = $httpVars["simple_right_download"] = "true";
                     }
                 }
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
+                $file = $userSelection->getUniqueFile();
+                $ajxpNode = $userSelection->getUniqueNode();
                 if (!file_exists($ajxpNode->getUrl())) {
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
-                //$metadata = null;
                 $newMeta = null;
                 $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
                 $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
@@ -307,21 +302,19 @@ class ShareCenter extends AJXP_Plugin
 
             case "toggle_link_watch":
 
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $userSelection = new UserSelection($this->repository, $httpVars);
+                $shareNode = $selectedNode = $userSelection->getUniqueNode();
                 $watchValue = $httpVars["set_watch"] == "true" ? true : false;
                 $folder = false;
-                $shNode = new AJXP_Node($this->urlBase.$file);
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
-                    $node = new AJXP_Node($this->baseProtocol."://".$httpVars["repository_id"]."/");
-                } else {
-                    $node = new AJXP_Node($this->urlBase.$file);
+                    $selectedNode = new AJXP_Node("pydio://". AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
                 }
-
-                $this->getSharesFromMeta($shNode, $shares, false);
+                $this->getSharesFromMeta($shareNode, $shares, false);
                 if(!count($shares)){
                     break;
                 }
+
                 if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
                     $elementId = $httpVars["element_id"];
                 }else{
@@ -333,14 +326,14 @@ class ShareCenter extends AJXP_Plugin
                     if (!$folder) {
                         if ($watchValue) {
                             $this->watcher->setWatchOnFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 MetaWatchRegister::$META_WATCH_USERS_READ,
                                 array($elementId)
                             );
                         } else {
                             $this->watcher->removeWatchFromFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 true,
                                 $elementId
@@ -349,13 +342,13 @@ class ShareCenter extends AJXP_Plugin
                     } else {
                         if ($watchValue) {
                             $this->watcher->setWatchOnFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId(),
                                 MetaWatchRegister::$META_WATCH_BOTH
                             );
                         } else {
                             $this->watcher->removeWatchFromFolder(
-                                $node,
+                                $selectedNode,
                                 AuthService::getLoggedUser()->getId());
                         }
                     }
@@ -409,8 +402,8 @@ class ShareCenter extends AJXP_Plugin
 
                 }else{
 
-                    $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $ajxpNode = $userSelection->getUniqueNode();
                     $this->getSharesFromMeta($ajxpNode, $shares, false);
                     if(count($shares)){
                         if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
@@ -447,8 +440,8 @@ class ShareCenter extends AJXP_Plugin
 
                 }else{
 
-                    $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $ajxpNode = $userSelection->getUniqueNode();
                     $metadata = $ajxpNode->retrieveMetadata(
                         "ajxp_shared",
                         true,
@@ -476,10 +469,10 @@ class ShareCenter extends AJXP_Plugin
                     return null;
                 }
                 $hash = AJXP_Utils::decodeSecureMagic($httpVars["element_id"]);
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $userSelection = new UserSelection($this->repository, $httpVars);
+                $ajxpNode = $userSelection->getUniqueNode();
                 if($this->getShareStore()->shareIsLegacy($hash)){
                     // Store in metadata
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
                     $metadata = $ajxpNode->retrieveMetadata(
                         "ajxp_shared",
                         true,
@@ -510,6 +503,8 @@ class ShareCenter extends AJXP_Plugin
                 $currentUser = true;
                 if($userContext == "global" && AuthService::getLoggedUser()->isAdmin()){
                     $currentUser = false;
+                }else if($userContext == "user" && AuthService::getLoggedUser()->isAdmin() && !empty($httpVars["user_id"])){
+                    $currentUser = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 }
                 $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
@@ -538,7 +533,8 @@ class ShareCenter extends AJXP_Plugin
 
             case "sharelist-clearExpired":
 
-                $currentUser  = (ConfService::getRepository()->getAccessType() != "ajxp_conf");
+                $accessType = ConfService::getRepository()->getAccessType();
+                $currentUser  = ($accessType != "ajxp_conf" && $accessType != "ajxp_admin");
                 $count = $this->clearExpiredFiles($currentUser);
                 AJXP_XMLWriter::header();
                 if($count){
@@ -1212,7 +1208,7 @@ class ShareCenter extends AJXP_Plugin
         }
         if($repoLoaded){
             AJXP_Controller::registryReset();
-            $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
+            $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
         }
         $this->getShareStore()->deleteShare("file", $elementId);
         if(isSet($ajxpNode)){
@@ -1410,6 +1406,10 @@ class ShareCenter extends AJXP_Plugin
                     );
                 }
                 $ID = $userId;
+            }else if($rId == "AJXP_GRP_/"){
+                $rId = "AJXP_GRP_/";
+                $TYPE = "group";
+                $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
                 if(empty($loadedGroups)){
                     $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
@@ -1436,10 +1436,6 @@ class ShareCenter extends AJXP_Plugin
                 }
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
-            }else if($rId == "ROOT_ROLE"){
-                $rId = "AJXP_GRP_/";
-                $TYPE = "group";
-                $LABEL = $mess["447"];
             }else{
                 $role = AuthService::getRole($rId);
                 $LABEL = $role->getLabel();
@@ -1621,16 +1617,17 @@ class ShareCenter extends AJXP_Plugin
             $userSelection = new UserSelection($repository, $httpVars);
             $setFilter = false;
             if($userSelection->isUnique()){
-                $node = $userSelection->getUniqueNode($this->accessDriver);
+                $node = $userSelection->getUniqueNode();
                 $node->loadNodeInfo();
                 if($node->isLeaf()){
                     $setFilter = true;
                     $httpVars["file"] = "/";
+                    $httpVars["nodes"] = array("/");
                 }
             }else{
                 $setFilter = true;
             }
-            $nodes = $userSelection->buildNodes($this->accessDriver);
+            $nodes = $userSelection->buildNodes();
             $hasDir = false; $hasFile = false;
             foreach($nodes as $n){
                 $n->loadNodeInfo();
@@ -1640,11 +1637,11 @@ class ShareCenter extends AJXP_Plugin
             if( ( $hasDir && !$this->getAuthorization("folder", "minisite") ) || ($hasFile && !$this->getAuthorization("file"))){
                 return 103;
             }
-            if($setFilter){
+            if($setFilter){ // Either it's a file, or many nodes are shared
                 $httpVars["filter_nodes"] = $nodes;
             }
             if(!isSet($httpVars["repo_label"])){
-                $first = $userSelection->getUniqueNode($this->accessDriver);
+                $first = $userSelection->getUniqueNode();
                 $httpVars["repo_label"] = SystemTextEncoding::toUTF8($first->getLabel());
             }
         }
@@ -1956,7 +1953,9 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $sel = new UserSelection($this->repository, $httpVars);
+        $file = $sel->getUniqueFile();
+        $newRepoUniqueId = $newRepo->getUniqueId();
 
         if (isSet($editingRepo)) {
 
@@ -1967,7 +1966,7 @@ class ShareCenter extends AJXP_Plugin
                 foreach ($removeUsers as $user) {
                     if (AuthService::userExists($user)) {
                         $userObject = $confDriver->createUserObject($user);
-                        $userObject->personalRole->setAcl($newRepo->getUniqueId(), "");
+                        $userObject->personalRole->setAcl($newRepoUniqueId, "");
                         $userObject->save("superuser");
                     }
                     $this->watcher->removeWatchFromFolder(
@@ -1983,7 +1982,7 @@ class ShareCenter extends AJXP_Plugin
                 foreach ($removeGroups as $groupId) {
                     $role = AuthService::getRole($groupId);
                     if ($role !== false) {
-                        $role->setAcl($newRepo->getUniqueId(), "");
+                        $role->setAcl($newRepoUniqueId, "");
                         AuthService::updateRole($role);
                     }
                 }
@@ -2026,14 +2025,36 @@ class ShareCenter extends AJXP_Plugin
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
             // CREATE USER WITH NEW REPO RIGHTS
-            $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
+            $userObject->personalRole->setAcl($newRepoUniqueId, $uRights[$userName]);
+            // FORK MASK IF THERE IS ANY
+            if($file != "/" && $loggedUser->mergedRole->hasMask($repository->getId())){
+                $parentTree = $loggedUser->mergedRole->getMask($repository->getId())->getTree();
+                // Try to find a branch on the current selection
+                $parts = explode("/", trim($file, "/"));
+                while( ($next = array_shift($parts))  !== null){
+                    if(isSet($parentTree[$next])) {
+                        $parentTree = $parentTree[$next];
+                    }else{
+                        $parentTree = null;
+                        break;
+                    }
+                }
+                if($parentTree != null){
+                    $newMask = new AJXP_PermissionMask();
+                    $newMask->updateTree($parentTree);
+                }
+                if(isset($newMask)){
+                    $userObject->personalRole->setMask($newRepoUniqueId, $newMask);
+                }
+            }
+
             if (isSet($httpVars["minisite"])) {
                 if(isset($editingRepo)){
                     try{
-                        AuthService::deleteRole("AJXP_SHARED-".$newRepo->getUniqueId());
+                        AuthService::deleteRole("AJXP_SHARED-".$newRepoUniqueId);
                     }catch (Exception $e){}
                 }
-                $newRole = new AJXP_Role("AJXP_SHARED-".$newRepo->getUniqueId());
+                $newRole = new AJXP_Role("AJXP_SHARED-".$newRepoUniqueId);
                 $r = AuthService::getRole("MINISITE");
                 if (is_a($r, "AJXP_Role")) {
                     if ($httpVars["disable_download"]) {
@@ -2044,8 +2065,8 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $allData = $r->getDataArray();
                     $newData = $newRole->getDataArray();
-                    if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$newRepo->getUniqueId()] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
-                    if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$newRepo->getUniqueId()] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
+                    if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$newRepoUniqueId] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
+                    if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$newRepoUniqueId] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
                     $newRole->bunchUpdate($newData);
                     AuthService::updateRole($newRole);
                     $userObject->addRole($newRole);
@@ -2075,23 +2096,23 @@ class ShareCenter extends AJXP_Plugin
             // Register a watch on the new repository root for current user
             if ($httpVars["self_watch_folder"] == "true") {
                 $this->watcher->setWatchOnFolder(
-                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                     AuthService::getLoggedUser()->getId(),
                     MetaWatchRegister::$META_WATCH_BOTH);
             } else {
                 $this->watcher->removeWatchFromFolder(
-                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                     AuthService::getLoggedUser()->getId());
             }
         }
 
         foreach ($groups as $group) {
             $r = $uRights[$group];
-            if($group == "AJXP_GRP_/") {
+            /*if($group == "AJXP_GRP_/") {
                 $group = "ROOT_ROLE";
-            }
+            }*/
             $grRole = AuthService::getRole($group, true);
-            $grRole->setAcl($newRepo->getUniqueId(), $r);
+            $grRole->setAcl($newRepoUniqueId, $r);
             AuthService::updateRole($grRole);
         }
 
@@ -2128,18 +2149,30 @@ class ShareCenter extends AJXP_Plugin
         return $this->getShareStore()->findSharesForRepo($repositoryId);
     }
 
+    /**
+     * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
+     * @param string $parentRepositoryId
+     * @param null $cursor
+     * @return array
+     */
     public function listShares($currentUser = true, $parentRepositoryId="", $cursor = null){
-        if(AuthService::usersEnabled()){
-            $crtUser = ($currentUser?AuthService::getLoggedUser()->getId():'');
+        if($currentUser === false){
+            $crtUser = "";
+        }else if(AuthService::usersEnabled()){
+            if($currentUser === true){
+                $crtUser = AuthService::getLoggedUser()->getId();
+            }else{
+                $crtUser = $currentUser;
+            }
         }else{
-            $crtUser = ($currentUser?'shared':'');
+            $crtUser = "shared";
         }
         return $this->getShareStore()->listShares($crtUser, $parentRepositoryId, $cursor);
     }
 
     /**
      * @param $rootPath
-     * @param bool $currentUser
+     * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
      * @param null $cursor
      * @param bool $xmlPrint
@@ -2149,6 +2182,7 @@ class ShareCenter extends AJXP_Plugin
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
+        $parent = ConfService::getRepositoryById($parentRepositoryId);
 
         foreach($shares as $hash => $shareData){
 
@@ -2183,21 +2217,33 @@ class ShareCenter extends AJXP_Plugin
                     $meta["copy_url"]  = $this->buildPublicletLink($hash);
                 }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
-                $parent = ConfService::getRepositoryById($repoObject->getParentId());
-                if(!empty($parent)){
+                if(!empty($parent)) {
+                    $parentPath = $parent->getOption("PATH", false, $meta["owner"]);
                     $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
                 }else{
-                    $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+                    $crtParent = ConfService::getRepositoryById($repoObject->getParentId());
+                    if(!empty($crtParent)){
+                        $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
+                    }else {
+                        $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+                    }
                 }
                 if($shareType != "repository"){
                     if($repoObject->hasContentFilter()){
                         $meta["ajxp_shared_minisite"] = "file";
                         $meta["icon"] = "mime_empty.png";
+                        $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
                     }else{
                         $meta["ajxp_shared_minisite"] = "public";
                         $meta["icon"] = "folder.png";
+                        $meta["original_path"] = $repoObject->getOption("PATH");
                     }
                     $meta["icon"] = $repoObject->hasContentFilter() ? "mime_empty.png" : "folder.png";
+                }else{
+                    $meta["original_path"] = $repoObject->getOption("PATH");
+                }
+                if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
+                    $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
                 }
 
             }else if(is_a($shareData["REPOSITORY"], "Repository") && !empty($shareData["FILE_PATH"])){
@@ -2541,7 +2587,7 @@ class ShareCenter extends AJXP_Plugin
             }
             if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
-                    new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                    new AJXP_Node("pydio://".$repoId."/"),
                     AuthService::getLoggedUser()->getId(),
                     MetaWatchRegister::$META_WATCH_NAMESPACE
                 );

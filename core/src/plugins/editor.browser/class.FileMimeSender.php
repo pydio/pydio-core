@@ -30,13 +30,11 @@ class FileMimeSender extends AJXP_Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action]))
-            return false;
-
         $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
 
-        if(!$repository->detectStreamWrapper(true))
+        if(!$repository->detectStreamWrapper(true)){
             return false;
+        }
 
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
@@ -50,30 +48,25 @@ class FileMimeSender extends AJXP_Plugin
             }
         }
 
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"] . "://" . $repository->getId();
         $selection = new UserSelection($repository, $httpVars);
 
         if ($action == "open_file") {
-            $file = $selection->getUniqueFile();
-            if (!file_exists($destStreamURL . $file)) {
+            $selectedNode = $selection->getUniqueNode();
+            $selectedNodeUrl = $selectedNode->getUrl();
+
+            if (!file_exists($selectedNodeUrl) || !is_readable($selectedNodeUrl)) {
                 echo("File does not exist");
                 return false;
             }
 
-            $node = new AJXP_Node($destStreamURL.$file);
-            if(method_exists($node->getDriver(), "filesystemFileSize")){
-                $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
-            }else{
-                $filesize = filesize($node->getUrl());
-            }
-            $fp = fopen($destStreamURL . $file, "rb");
+            $filesize = filesize($selectedNodeUrl);
+            $fp = fopen($selectedNodeUrl, "rb");
             $fileMime = "application/octet-stream";
 
             //Get mimetype with fileinfo PECL extension
             if (class_exists("finfo")) {
                 $finfo = new finfo(FILEINFO_MIME);
-                $fileMime = $finfo->buffer(fread($fp, 100));
+                $fileMime = $finfo->buffer(fread($fp, 2000));
             }
             //Get mimetype with (deprecated) mime_content_type
             if (strpos($fileMime, "application/octet-stream")===0 && function_exists("mime_content_type")) {
@@ -81,7 +74,7 @@ class FileMimeSender extends AJXP_Plugin
             }
             //Guess mimetype based on file extension
             if (strpos($fileMime, "application/octet-stream")===0 ) {
-                $fileExt = substr(strrchr(basename($file), '.'), 1);
+                $fileExt = substr(strrchr(basename($selectedNodeUrl), '.'), 1);
                 if(empty($fileExt))
                     $fileMime = "application/octet-stream";
                 else {
@@ -103,17 +96,15 @@ class FileMimeSender extends AJXP_Plugin
                 $fileMime = "application/octet-stream";
 
             //Send headers
-            HTMLWriter::generateInlineHeaders(basename($file), $filesize, $fileMime);
+            HTMLWriter::generateInlineHeaders(basename($selectedNodeUrl), $filesize, $fileMime);
 
-            $class = $streamData["classname"];
             $stream = fopen("php://output", "a");
-            call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL . $file, $stream);
+            AJXP_MetaStreamWrapper::copyFileInStream($selectedNodeUrl, $stream);
             fflush($stream);
             fclose($stream);
 
-            $node = new AJXP_Node($destStreamURL.$file);
-            AJXP_Controller::applyHook("node.read", array($node));
-            $this->logInfo('Download', 'Read content of '.$node->getUrl());
+            AJXP_Controller::applyHook("node.read", array($selectedNode));
+            $this->logInfo('Download', 'Read content of '.$selectedNodeUrl);
 
         }
     }

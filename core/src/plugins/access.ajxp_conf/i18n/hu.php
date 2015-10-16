@@ -43,6 +43,7 @@ $mess=array(
 "20" => "Felhasználó",
 "21" => "Művelet",
 "22" => "Paraméterek",
+"22a"=> "Paraméterek",
 "23" => "Teszt név",
 "24" => "Teszt adat",
 "25" => "Gyűjtemény hozzáférés",

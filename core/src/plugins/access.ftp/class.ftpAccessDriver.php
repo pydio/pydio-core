@@ -32,7 +32,7 @@ class ftpAccessDriver extends fsAccessDriver
     {
         parent::loadManifest();
         // BACKWARD COMPATIBILITY!
-        $res = $this->xPath->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
+        $res = $this->getXPath()->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
         foreach ($res as $node) {
             if ($node->getAttribute("name") == "USER") {
                 $node->setAttribute("name", "FTP_USER");
@@ -62,9 +62,8 @@ class ftpAccessDriver extends fsAccessDriver
         } else {
             $this->driverConf = array();
         }
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);

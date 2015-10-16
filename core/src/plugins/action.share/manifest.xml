@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
-        <global_param name="FORK_EVENT_FORWARDING" type="boolean" label="CONF_MESSAGE[Fork Events Forwarding]" description="CONF_MESSAGE[If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.]" default="false"/>
         <global_param name="ENABLE_FILE_PUBLIC_LINK" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Enable public link generation for files]" label="CONF_MESSAGE[Enable public links for files]" type="boolean" default="true" expose="true"/>
         <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="true"/>
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
@@ -13,7 +12,8 @@
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="false" expose="true"/>
         <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="select" choices="both|CONF_MESSAGE[Minisites and Workspaces],minisite|CONF_MESSAGE[Minisites only],workspace|CONF_MESSAGE[Workspaces only],disable|CONF_MESSAGE[Disable Folder Sharing]" mandatory="true" default="both" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
-        <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
+        <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
+        <global_param name="FORK_EVENT_FORWARDING" group="CONF_MESSAGE[Folder Sharing]" type="boolean" label="CONF_MESSAGE[Fork Events Forwarding]" description="CONF_MESSAGE[If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.]" default="false"/>
         <global_param name="CUSTOM_SHAREPAGE_TITLE" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Page Title]" description="CONF_MESSAGE[Share page title. Use AJXP_FILENAME keyword to display the file name.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text]" description="CONF_MESSAGE[Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND_PASS" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text w/ Pass]" description="CONF_MESSAGE[Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
@@ -31,8 +31,8 @@
     <client_settings>
         <resources>
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
-            <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="true"/>
-            <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="true"/>
+            <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
+            <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
         </resources>
     </client_settings>
     <registry_contributions>
@@ -45,8 +45,12 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShareAction();
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            pydio.getController().shareCenter.performShareAction();
+                        });
                     ]]></clientCallback>
                     <clientForm id="share_form"><![CDATA[
                         <div id="share_form" box_width="420" action="share">
@@ -241,7 +245,7 @@
                     </clientForm>
                     <clientListener name="init"><![CDATA[
                         if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") == "disable" ){
-                            var action = ajaxplorer.getActionBar().getActionByName('share');
+                            var action = pydio.getController().getActionByName('share');
                             if(action) action.selectionContext.dir = false;
                         }
                     ]]></clientListener>
@@ -266,13 +270,17 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShareAction();
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            pydio.getController().shareCenter.performShareAction();
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -283,8 +291,12 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            pydio.getController().shareCenter.performShare('minisite-public');
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -295,8 +307,12 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            pydio.getController().shareCenter.performShare('minisite-public');
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -307,14 +323,18 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('minisite-public');
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            pydio.getController().shareCenter.performShare('minisite-public');
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
             <action name="load_shared_element_data">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
                         <input_param description="Path of the resource to share" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <output type="application/json"/>
@@ -323,7 +343,7 @@
             </action>
             <action name="unshare">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Stop sharing a folder, or remove a public link from a file.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Stop sharing a folder, or remove a public link from a file.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <input_param description="If the resource is a file, send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
@@ -332,7 +352,7 @@
             </action>
             <action name="toggle_link_watch">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Toggle a shared element status for being watched or not.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Toggle a shared element status for being watched or not.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Type of element to load (file or folder)" name="element_type" type="file|repository" mandatory="true"/>
                         <input_param description="If the resource is a file, send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
@@ -341,7 +361,7 @@
             </action>
             <action name="reset_counter">
                 <processing>
-                    <serverCallback methodName="switchAction" developerComment="Reset download counter for a given link generated on a file.">
+                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Reset download counter for a given link generated on a file.">
                         <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
                         <input_param description="Send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
                     </serverCallback>
@@ -369,10 +389,16 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        if(window.actionManager){
-                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel());
-                        }
+                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
+                            if(!pydio.getController().shareCenter) {
+                                pydio.getController().shareCenter = new ShareCenter();
+                            }
+                            if(window.actionArguments && window.actionArguments.length){
+                                pydio.getController().shareCenter.performShareAction(window.actionArguments[0]);
+                            }else if(window.actionManager){
+                                pydio.getController().shareCenter.performShareAction(window.actionManager.getDataModel());
+                            }
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -388,7 +414,7 @@
                     ]]></clientCallback>
                 </processing>
                 <processing>
-                    <serverCallback methodName="switchAction" sdkMethodName="loadShareList">
+                    <serverCallback restParams="/" methodName="switchAction" sdkMethodName="loadShareList">
                         <input_param description="Parent repository ID" name="parent_repository_id" type="string" mandatory="false"/>
                         <input_param name="user_context" type="string" description="Either global (all users, requires admin right) or current (current user)" default="current"/>
                     </serverCallback>
@@ -407,7 +433,7 @@
 						conn.addParameter("get_action", "sharelist-clearExpired");
 						var dm = window.actionManager.getDataModel();
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
                             if(window.actionManager){
                                 dm.requireContextChange(dm.getRootNode(), true);
                             }
@@ -417,22 +443,6 @@
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
                 </processing>
             </action>
-            <!--
-            <action name="sharelist-migrate">
-                <gui src="share.png" iconClass="icon-sort-by-attributes-alt" text="share_center.127" title="share_center.128">
-                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
-                </gui>
-                <rightsContext adminOnly="true" noUser="false" read="false" userLogged="true" write="false"/>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(window.actionManager){
-                            var id = window.actionManager.getDataModel().getRootNode().getPath();
-                        }
-                    ]]></clientCallback>
-                    <serverCallback methodName="switchAction" developerComment="Migrate old publiclets to new format"/>
-                </processing>
-            </action>
-            -->
             <action name="share_current_page">
                 <gui src="" iconClass="icon-share" text="share_center.110" title="share_center.110">
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>
@@ -441,10 +451,10 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
+                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && pydio.getController().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
-                                var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                                var editors = pydio.Registry.findEditorsForMime(node.getAjxpMime(), true);
                                 if(editors.length && Class.getByName(editors[0].editorClass)){
                                     var staticClass = Class.getByName(editors[0].editorClass).prototype;
                                     if(staticClass.getRESTPreviewLinks){
@@ -518,6 +528,6 @@
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user|access.ajxp_conf"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user|access.ajxp_conf|access.ajxp_admin"/>
     </dependencies>
 </ajxp_plugin>

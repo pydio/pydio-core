@@ -1,4 +1,3 @@
-
 #team_pane, #parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
     /* background-color: #f8f8f8; */
 }
@@ -7,6 +6,7 @@
     width: 100%;
     margin-top: 0;
     transition:margin 0.5s ease;
+    overflow-y: auto;
 }
 
 #list_cont{
@@ -19,12 +19,15 @@
 }
 
 #workspaces_list span.letter_badge {
-    margin: 9px 13px 2px 50px;
+    margin: 12px 13px 16px 50px;
 }
 
 #home_left_bar{
     width: 420px;
     background-color: rgba(34, 34, 34, 0.5);
+}
+
+.no-flexbox #home_left_bar{
     float: left;
 }
 
@@ -33,9 +36,16 @@
 }
 
 #home_center_panel {
+    z-index: 1;
+}
+
+.no-flexbox #home_center_panel{
     position: absolute;
     left: 420px;
-    z-index: 1;
+}
+
+.flexbox #home_center_panel{
+    flex: 1;
 }
 
 .repoInfoBadge {
@@ -62,7 +72,7 @@
     margin-bottom: 9px;
 }
 
-.repoInfoBadge span {
+.repoInfoBadge span[class^="icon-"] {
     display: block;
     font-size: 50px;
     float: left;
@@ -89,6 +99,7 @@
     font-size: 19px;
     letter-spacing: 1px;
     margin: 0;
+    line-height: 21px;
 }
 
 #workspaces_list h4{
@@ -104,7 +115,7 @@
 
 #workspaces_list li {
     cursor: pointer;
-    padding: 5px 9px;
+    padding: 1px 9px 5px;
     clear: left;
     font-weight: normal;
 }
@@ -206,7 +217,13 @@
     color: white;
     margin: 8% 20px;
     line-height: 55px;
+    transition: opacity ease 0.4s;
 }
+
+#home_account_pane div#ws_legend.empty_ws_legend{
+    opacity: 0;
+}
+
 
 #logo_div{
     text-align: center;
@@ -320,11 +337,86 @@ div.legend_visible div#ws_legend{
     overflow: auto;
     opacity: 1;
     box-shadow: -5px -8px 9px rgba(0, 0, 0, 0.36);
-    display: none;
+    /*display: none;*/
     max-width: 930px;
     -webkit-font-smoothing: antialiased;
     z-index:20000;
+    overflow-y: scroll;
 }
+
+#videos_pane div.icon-remove-sign{
+    float: left;font-size: 1.5em;margin-left: 16px;margin-top: 16px;cursor: pointer;
+}
+#videos_pane div.tutorial_title{
+    clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;
+}
+#videos_pane div#dl_pydio_cont{
+    width: 750px; margin: 0 auto;
+}
+#videos_pane div#dl_pydio_for{
+    float: left;margin: 44px 18px;font-size: 21px;
+}
+
+div#dl_pydio_android{
+    width: 81px; float:left;
+}
+div#dl_pydio_android a.icon-mobile-phone{
+    font-size: 96px;
+}
+div#dl_pydio_android a.icon-android{
+    font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);
+}
+div#dl_pydio_android div{
+    font-size: 11px;top: -15px;position: relative;left: -13px;
+}
+
+div#dl_pydio_ios{
+    width: 91px; float:left;
+}
+div#dl_pydio_ios a.icon-tablet{
+    font-size: 96px;
+}
+div#dl_pydio_ios a.icon-apple{
+    font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);
+}
+div#dl_pydio_ios div{
+    font-size: 11px;top: -15px;position: relative;left: 2px;
+}
+
+div#dl_pydio_mac{
+    width: 110px; float:left;padding-top: 14px;
+}
+div#dl_pydio_mac a.icon-desktop{
+    font-size: 74px;
+}
+div#dl_pydio_mac a.icon-apple{
+    font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);
+}
+div#dl_pydio_mac div{
+    font-size: 11px;top: -6px;position: relative;left: 6px;
+}
+
+div#dl_pydio_win{
+    width: 100px; float:left;padding-top: 8px;
+}
+div#dl_pydio_win a.icon-laptop{
+    font-size: 87px;
+}
+div#dl_pydio_win a.icon-windows{
+    font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);
+}
+div#dl_pydio_win div{
+    font-size: 11px;top: -40px;position: relative;left: 12px;
+}
+
+div.tutorial_more_videos_cont{
+    clear:left; text-align:center;
+}
+a.tutorial_more_videos_button{
+    text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;
+}
+
+
 
 #tutorials_pane h2{
     font-weight: normal;
@@ -368,6 +460,8 @@ div.tutorial_load_button {
     float: right;
     cursor: pointer;
 }
+
+
 
 @media only screen
 and (max-width : 980px){

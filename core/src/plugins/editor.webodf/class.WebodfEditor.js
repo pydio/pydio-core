@@ -42,7 +42,7 @@ Class.create("WebodfEditor", AbstractEditor, {
         if(options.context.__className == "Modal"){
             this.actions.get("downloadFileButton").observe('click', function(){
                 if(!this.currentFile) return false;
-                ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
+                pydio.Controller.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
                 return false;
             }.bind(this));
         }else{

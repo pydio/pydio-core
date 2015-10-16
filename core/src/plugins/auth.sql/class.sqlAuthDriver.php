@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class sqlAuthDriver extends AbstractAuthDriver
+class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 {
     public $sqlDriver;
     public $driverName = "sql";

@@ -36,7 +36,6 @@ class demoAccessDriver extends fsAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         $errorMessage = "This is a demo, all 'write' actions are disabled!";
         switch ($action) {
             //------------------------------------

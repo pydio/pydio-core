@@ -57,9 +57,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $path = SystemTextEncoding::toStorageEncoding($this->repository->getOption("PATH"));
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         $chmod = $this->repository->getOption("CHMOD_VALUE");
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
+
 
         if ($create == true) {
             if(!is_dir($path)) @mkdir($path, 0755, true);
@@ -77,7 +77,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
             if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")) {
                 $errs = array();$succ = array();
-                $repoData = array('base_url' => $this->urlBase, 'wrapper_name' => $this->wrapperClassName, 'chmod' => $chmod, 'recycle' => $recycle);
+                $repoData = array('base_url' => $this->urlBase, 'chmod' => $chmod, 'recycle' => $recycle);
                 $this->dircopy($dataTemplate, $path, $succ, $errs, false, false, $repoData, $repoData);
                 touch($path."/.ajxp_template");
             }
@@ -94,11 +94,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function getResourceUrl($path)
     {
         return $this->urlBase.$path;
-    }
-
-    public function getWrapperClassName()
-    {
-        return $this->wrapperClassName;
     }
 
     /**
@@ -176,7 +171,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $compressNodeList = $actionXpath->query('action[@name="compress"]', $contribNode);
         if(!$compressNodeList->length) return ;
-        unset($this->actions["compress"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
         // Disable "download" if selection is multiple
@@ -230,11 +224,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $selection = new UserSelection($this->repository);
         $dir = AJXP_Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
-        if ($this->wrapperClassName == "fsAccessWrapper") {
+        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
         $dir = AJXP_Utils::securePath($dir);
@@ -284,7 +277,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             throw new Exception("Cannot find file!");
                         }
                     }
-                    $node = $selection->getUniqueNode($this);
+                    $node = $selection->getUniqueNode();
                 } else {
                     $zip = true;
                 }
@@ -305,7 +298,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $this->readFile($file, "force-download", $localName, false, false, true);
                 } else {
                     $localName = "";
-                    AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName, $this->wrapperClassName));
+                    AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName));
                     $this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download", $localName);
                 }
                 if (isSet($node)) {
@@ -318,11 +311,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "prepare_chunk_dl" :
 
                 $chunkCount = intval($httpVars["chunk_count"]);
-                $fileId = $this->urlBase.$selection->getUniqueFile();
+                $node = $selection->getUniqueNode();
+
+                $fileId = $node->getUrl();
                 $sessionKey = "chunk_file_".md5($fileId.time());
-                $totalSize = $this->filesystemFileSize($fileId);
+                $totalSize = filesize($fileId);
                 $chunkSize = intval ( $totalSize / $chunkCount );
-                $realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId, true);
+                $realFile  = AJXP_MetaStreamWrapper::getRealFSReference($fileId, true);
                 $chunkData = array(
                     "localname"	  => basename($fileId),
                     "chunk_count" => $chunkCount,
@@ -335,7 +330,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 HTMLWriter::charsetHeader("application/json");
                 print(json_encode($chunkData));
 
-                $node = $selection->getUniqueNode($this);
                 AJXP_Controller::applyHook("node.read", array(&$node));
 
                 break;
@@ -351,7 +345,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if ($chunkIndex == $sessData["chunk_count"]-1) {
                     // Compute the last chunk real length
                     $chunkSize = $sessData["total_size"] - ($chunkSize * ($sessData["chunk_count"]-1));
-                    if (call_user_func(array($this->wrapperClassName, "isRemote"))) {
+                    if (AJXP_MetaStreamWrapper::wrapperIsRemote($this->urlBase)) {
                         register_shutdown_function("unlink", $realFile);
                     }
                 }
@@ -378,7 +372,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
                     copy($file, $tmpFNAME);
                     try {
-                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), $this->filesystemFileSize($tmpFNAME)));
+                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
                     } catch (Exception $e) {
                         @unlink($tmpFNAME);
                         throw $e;
@@ -397,8 +391,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header("Content-type:application/json");
                 if($selection->isUnique()){
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
-                    $this->filesystemFileSize(null, $stat);
-                    if (!$stat) {
+                    if (!$stat || !is_readable($selection->getUniqueNode()->getUrl())) {
                         print '{}';
                     } else {
                         print json_encode($stat);
@@ -408,8 +401,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     print '{';
                     foreach($files as $index => $path){
                         $stat = @stat($this->urlBase.$path);
-                        $this->filesystemFileSize(null, $stat);
-                        if(!$stat) $stat = '{}';
+                        if(!$stat || !is_readable($this->urlBase.$path)) $stat = '{}';
                         else $stat = json_encode($stat);
                         print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
                     }
@@ -424,14 +416,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             case "get_content":
 
-                $dlFile = $this->urlBase.$selection->getUniqueFile();
+                $node = $selection->getUniqueNode();
+                $dlFile = $node->getUrl();
+                if(!is_readable($dlFile)){
+                    throw new Exception("Cannot access file!");
+                }
                 $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
                 if (AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false) {
-                    $this->readFile($this->urlBase.$selection->getUniqueFile(), "stream_content");
+                    $this->readFile($node->getUrl(), "stream_content");
                 } else {
-                    $this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
+                    $this->readFile($node->getUrl(), "plain");
                 }
-                $node = $selection->getUniqueNode($this);
                 AJXP_Controller::applyHook("node.read", array(&$node));
 
                 break;
@@ -440,15 +435,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isset($httpVars["content"])) break;
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
                 $code = $httpVars["content"];
-                $file = $selection->getUniqueFile();
-                $this->logInfo("Online Edition", array("file"=>$this->addSlugToPath($file)));
+                $currentNode = $selection->getUniqueNode();
+                $fileName = $currentNode->getUrl();
+                $this->logInfo("Online Edition", array("file"=>$fileName));
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
                     $code=str_replace("&lt;","<",SystemTextEncoding::magicDequote($code));
                 }
-                $fileName = $this->urlBase.$file;
-                $currentNode = new AJXP_Node($fileName);
                 try {
                     AJXP_Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
                 } catch (Exception $e) {
@@ -691,7 +685,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
                 $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
-                $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes($this));
+                $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes());
 
             break;
 
@@ -702,7 +696,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                 $repoData = array(
                     'base_url' => $this->urlBase,
-                    'wrapper_name' => $this->wrapperClassName,
                     'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
                     'recycle'     => $this->repository->getOption('RECYCLE_BIN')
                 );
@@ -860,8 +853,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $dir = AJXP_Utils::securePath($dir);
                 $path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
-                if ($this->wrapperClassName == "fsAccessWrapper") {
+                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
+                }
+                if(!is_readable($path) && !is_writeable($path)){
+                    throw new Exception("You are not allowed to access folder " . $path);
                 }
                 // Backward compat
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
@@ -892,7 +888,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
 
                 if(!$selection->isEmpty()){
-                    $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
+                    $uniqueNodes = $selection->buildNodes();
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
                     AJXP_Controller::applyHook("node.read", array(&$parentAjxpNode));
                     if (AJXP_XMLWriter::$headerSent == "tree") {
@@ -901,7 +897,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                     }
                     foreach($uniqueNodes as $node){
-                        if(!file_exists($node->getUrl())) continue;
+                        if(!file_exists($node->getUrl()) || (!is_readable($node->getUrl()) && !is_writable($node->getUrl()))) continue;
                         $nodeName = $node->getLabel();
                         if (!$this->filterNodeName($node->getPath(), $nodeName, $isLeaf, $lsOptions)) {
                             continue;
@@ -1057,7 +1053,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         } else $nodeType = "f";
                     }
                     // There is a special sorting, cancel the reordering of files & folders.
-                    if(isSet($orderField) && $orderField != "ajxp_label") $nodeType = "f";
+                    if(isSet($orderField) && $orderField != "ajxp_label" && !(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true" )) {
+                        $nodeType = "f";
+                    }
 
                     if($this->repository->hasContentFilter()){
                         $externalPath = $this->repository->getContentFilter()->externalPath($node);
@@ -1141,7 +1139,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if (!empty($orderField) && !empty($orderDirection) && $orderField != "ajxp_label") {
             $toSort = array();
             foreach ($nodes as $node) {
-                if($orderField == "filesize") $toSort[$node] = is_file($path."/".$node) ? $this->filesystemFileSize($path."/".$node) : 0;
+                if($orderField == "filesize") $toSort[$node] = is_file($path."/".$node) ? filesize($path."/".$node) : 0;
                 else if($orderField == "ajxp_modiftime") $toSort[$node] = filemtime($path."/".$node);
                 else if($orderField == "mimestring") $toSort[$node] = pathinfo($node, PATHINFO_EXTENSION);
             }
@@ -1219,10 +1217,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
         $crtPath = $ajxpNode->getPath();
         $vRoots = $this->repository->listVirtualRoots();
+        $metaData["ajxp_readonly"] = "false";
+        if (!@$this->isWriteable($ajxpNode->getUrl())) {
+           $metaData["ajxp_readonly"] = "true";
+        }
         if (!empty($crtPath)) {
-            if (!@$this->isWriteable($ajxpNode->getUrl())) {
-               $metaData["ajxp_readonly"] = "true";
-            }
             if (isSet($vRoots[ltrim($crtPath, "/")])) {
                 $metaData["ajxp_readonly"] = $vRoots[ltrim($crtPath, "/")]["right"] == "r" ? "true" : "false";
             }
@@ -1243,7 +1242,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ".AJXP_Utils::relativeDate($datemodif, $mess);
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
-            $metaData["bytesize"] = $this->filesystemFileSize($ajxpNode->getUrl());
+            $metaData["bytesize"] = filesize($ajxpNode->getUrl());
         }
         $metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
         if (AJXP_Utils::isBrowsableArchive($nodeName)) {
@@ -1293,7 +1292,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         } else {
             $result = @move_uploaded_file($uploadData["tmp_name"], "$destination/".$filename);
             if (!$result) {
-                $realPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"),"$destination/".$filename);
+                $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
                 $result = move_uploaded_file($uploadData["tmp_name"], $realPath);
             }
             if (!$result) {
@@ -1342,7 +1341,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($gzip === null) {
             $gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
         }
-        if (!$realfileSystem && $this->wrapperClassName == "fsAccessWrapper") {
+        if (!$realfileSystem && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
             $originalFilePath = $filePathOrData;
             $filePathOrData = fsAccessWrapper::patchPathForBaseDir($filePathOrData);
         }
@@ -1365,7 +1364,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             } else if ($realfileSystem) {
                 $size = sprintf("%u", filesize($filePathOrData));
             } else {
-                $size = $this->filesystemFileSize($filePathOrData);
+                $size = filesize($filePathOrData);
             }
         } else {
             $size = $byteLength;
@@ -1390,9 +1389,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             // Check if we have a range header (we are resuming a transfer)
             if ( isset($_SERVER['HTTP_RANGE']) && $isFile && $size != 0 ) {
                 if ($headerType == "stream_content") {
-                    if (extension_loaded('fileinfo')  && $this->wrapperClassName == "fsAccessWrapper") {
+                    if (extension_loaded('fileinfo')  && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                         $fInfo = new fInfo( FILEINFO_MIME );
-                        $realfile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $filePathOrData);
+                        $realfile = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
                         $mimeType = $fInfo->file( $realfile);
                         $splitChar = explode(";", $mimeType);
                         $mimeType = trim($splitChar[0]);
@@ -1457,7 +1456,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($data) {
             print($filePathOrData);
         } else {
-            if ($this->getFilteredOption("USE_XSENDFILE", $this->repository->getId()) && $this->wrapperClassName == "fsAccessWrapper") {
+            if ($this->getFilteredOption("USE_XSENDFILE", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                 if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
                 $server_name = $_SERVER["SERVER_SOFTWARE"];
@@ -1471,7 +1470,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
-    if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && $this->wrapperClassName == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
+    if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
         if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
         $filePathOrData = str_replace("\\", "/", $filePathOrData);
         $filePathOrData = SystemTextEncoding::toUTF8($filePathOrData);
@@ -1515,7 +1514,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
                 fclose($fp);
             } else {
-                call_user_func(array($this->wrapperClassName, "copyFileInStream"), $filePathOrData, $stream);
+                AJXP_MetaStreamWrapper::copyFileInStream($filePathOrData, $stream);
             }
             fflush($stream);
             fclose($stream);
@@ -1528,9 +1527,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($handle === false) {
             throw new Exception("Error while trying to open directory ".$dirName);
         }
-        if ($foldersOnly && !call_user_func(array($this->wrapperClassName, "isRemote"))) {
+        if ($foldersOnly && !AJXP_MetaStreamWrapper::wrapperIsRemote($dirName)) {
             closedir($handle);
-            $path = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $dirName);
+            $path = AJXP_MetaStreamWrapper::getRealFSReference($dirName, true);
             $dirs = glob($path."/*", GLOB_ONLYDIR|GLOB_NOSORT);
             if($dirs === false) return 0;
             return count($dirs);
@@ -1555,34 +1554,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
-    public function filesystemFileSize($filePath, &$stat = null)
-    {
-        $bytesize = "-";
-        if($stat != null && is_array($stat)){
-            $bytesize = $stat[7];
-        }else{
-            $bytesize = @filesize($filePath);
-        }
-        if (method_exists($this->wrapperClassName, "getLastRealSize")) {
-            $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
-            if ($last !== false) {
-                $bytesize = $last;
-            }
-        }
-        if ($bytesize < 0) {
-            $bytesize = sprintf("%u", $bytesize);
-        }
-        if($stat != null && is_array($stat)){
-            $stat["size"] = $stat[7] = $bytesize;
-        }
-        return $bytesize;
-    }
-
     public static $currentZipOperationHandler;
     public function extractArchiveItemPreCallback($status, $data){
         $fullname = $data['filename'];
         $size = $data['size'];
-        $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
+        $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
         $repoName = $this->urlBase.str_replace($realBase, "", $fullname);
 
         $toNode = new AJXP_Node($repoName);
@@ -1597,7 +1573,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function extractArchiveItemPostCallback($status, $data){
         $fullname = $data['filename'];
-        $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
+        $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
         $repoName = str_replace($realBase, "", $fullname);
         $toNode = new AJXP_Node($this->urlBase.$repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
@@ -1621,7 +1597,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if(strlen($zipLocalPath)>1 && $zipLocalPath[0] == "/") $zipLocalPath = substr($zipLocalPath, 1)."/";
         $files = $selection->getFiles();
 
-        $realZipFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$zipPath);
+        $realZipFile = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase.$zipPath);
         $archive = new PclZip($realZipFile);
         $content = $archive->listContent();
         foreach ($files as $key => $item) {// Remove path
@@ -1637,7 +1613,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             }
         }
         $this->logDebug("Archive", $this->addSlugToPath($files));
-        $realDestination = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$destDir);
+        $realDestination = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase.$destDir);
         $this->logDebug("Extract", array($realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath));
         self::$currentZipOperationHandler = &$this;
         $result = $archive->extract(PCLZIP_OPT_BY_NAME,     $files,
@@ -1666,7 +1642,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
         $repoData = array(
             'base_url' => $this->urlBase,
-            'wrapper_name' => $this->wrapperClassName,
             'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
@@ -1686,7 +1661,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $mess = ConfService::getMessages();
         $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-        $old=$this->urlBase."/$filePath";
+        $old=$this->urlBase.$filePath;
         if (!$this->isWriteable($old)) {
             throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
         }
@@ -1779,7 +1754,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
         $repoData = array(
             'base_url' => $this->urlBase,
-            'wrapper_name' => $this->wrapperClassName,
             'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
@@ -1803,7 +1777,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         $repoData = array(
             'base_url' => $this->urlBase,
-            'wrapper_name' => $this->wrapperClassName,
             'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
@@ -1836,9 +1809,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function isWriteable($dir, $type="dir")
     {
         if ( $this->getFilteredOption("USE_POSIX", $this->repository->getId()) == true && extension_loaded('posix')) {
-            $real = call_user_func(array( $this->wrapperClassName, "getRealFSReference"), $dir);
+            $real = AJXP_MetaStreamWrapper::getRealFSReference($dir);
             return posix_access($real, POSIX_W_OK);
         }
+        //clearstatcache();
         return is_writable($dir);
     }
 
@@ -1857,12 +1831,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $realValue = octdec(ltrim($chmodValue, "0"));
         if (is_file($this->urlBase.$path)) {
             if ($nodeType=="both" || $nodeType=="file") {
-                call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $realValue);
+                AJXP_MetaStreamWrapper::changeMode($this->urlBase.$path, $realValue);
                 $changedFiles[] = $path;
             }
         } else {
             if ($nodeType=="both" || $nodeType=="dir") {
-                call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $realValue);
+                AJXP_MetaStreamWrapper::changeMode($this->urlBase.$path, $realValue);
                 $changedFiles[] = $path;
             }
             if ($recursive) {
@@ -1924,7 +1898,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
         $filePaths = array();
         foreach ($src as $item) {
-            $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);
+            $realFile = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase."/".$item);
             $realFile = AJXP_Utils::securePath($realFile);
             if (basename($item) == "") {
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
@@ -1945,7 +1919,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if($basedir == "__AJXP_ZIP_FLAT__/"){
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
         }else{
-            $basedir = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase).trim($basedir);
+            $basedir = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase).trim($basedir);
             $this->logDebug("Basedir", array($basedir));
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
         }
@@ -1996,8 +1970,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param AJXP_Node $node
      */
     public function setHiddenAttribute($node){
-        if($this->getWrapperClassName() == "fsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
-            $realPath =  call_user_func(array($this->wrapperClassName, "getRealFSReference"),$node->getUrl());
+        if(AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node->getRepositoryId()) == "fsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
+            $realPath =  AJXP_MetaStreamWrapper::getRealFSReference($node->getUrl());
             @shell_exec("attrib +H " . escapeshellarg($realPath));
         }
     }
