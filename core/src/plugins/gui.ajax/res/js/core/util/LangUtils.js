@@ -27,18 +27,18 @@ var LangUtils = (function () {
     LangUtils.parseUrl = function parseUrl(data) {
         var matches = $A();
         //var e=/((http|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+\.[^#?\s]+)(#[\w\-]+)?/;
-        var detect = /(((ajxp\.)(\w+)):\/)?\/?([^:\/\s]+)((\/\w+)*\/)(.*)(#[\w\-]+)?/g;
+        var detect = /(pydio:\/)?\/?([^:\/\s]+)((\/\w+)*\/)(.*)(#[\w\-]+)?/g;
         var results = data.match(detect);
         if (results && results.length) {
-            var e = /^((ajxp\.(\w+)):\/)?\/?([^:\/\s]+)((\/\w+)*\/)(.*)(#[\w\-]+)?$/;
+            var e = /^((pydio):\/)?\/?([^:\/\s]+)((\/\w+)*\/)(.*)(#[\w\-]+)?$/;
             for (var i = 0; i < results.length; i++) {
                 if (results[i].match(e)) {
                     matches.push({ url: RegExp['$&'],
                         protocol: RegExp.$2,
-                        host: RegExp.$4,
-                        path: RegExp.$5,
-                        file: RegExp.$7,
-                        hash: RegExp.$8 });
+                        host: RegExp.$3,
+                        path: RegExp.$4,
+                        file: RegExp.$6,
+                        hash: RegExp.$7 });
                 }
             }
         }
