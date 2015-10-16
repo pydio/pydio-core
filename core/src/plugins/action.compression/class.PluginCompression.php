@@ -126,7 +126,7 @@ class PluginCompression extends AJXP_Plugin
                     try {
                         $archive->addFile(AJXP_MetaStreamWrapper::getRealFSReference($fullPath), $fileName);
                         $counterCompression++;
-                        file_put_contents($progressCompressionFileName, sprintf($messages["compression.6"], round(($counterCompression / count($tabAllFiles)) * 100, 2) . " %"));
+                        file_put_contents($progressCompressionFileName, sprintf($messages["compression.6"], round(($counterCompression / count($tabAllFiles)) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                     } catch (Exception $e) {
                         unlink($tmpArchiveName);
                         throw $e;
@@ -155,7 +155,7 @@ class PluginCompression extends AJXP_Plugin
                 file_put_contents($progressCompressionFileName, "SUCCESS");
             }
         }
-        elseif ($action == "check_compression_status") {
+    elseif ($action == "check_compression_status") {
             $archivePath = AJXP_Utils::decodeSecureMagic($httpVars["archive_path"]);
             $progressCompression = file_get_contents($progressCompressionFileName);
             if ($progressCompression != "SUCCESS") {
@@ -186,7 +186,7 @@ class PluginCompression extends AJXP_Plugin
             $counterExtract = 0;
             $currentAllPydioPath = $currentDirUrl . $fileArchive;
             $pharCurrentAllPydioPath = "phar://" . AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath);
-            $pathInfoCurrentAllPydioPath = pathinfo($currentAllPydioPath)["extension"];
+            $pathInfoCurrentAllPydioPath = pathinfo($currentAllPydioPath, PATHINFO_EXTENSION);
             //WE TAKE ONLY TAR, TAR.GZ AND TAR.BZ2 ARCHIVES
             foreach ($authorizedExtension as $extension => $strlenExtension) {
                 if ($pathInfoCurrentAllPydioPath == $extension) {
@@ -239,7 +239,7 @@ class PluginCompression extends AJXP_Plugin
                     $newNode = new AJXP_Node($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
                     AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                     $counterExtract++;
-                    file_put_contents($progressExtractFileName, sprintf($messages["compression.12"], round(($counterExtract / $archive->count()) * 100, 2) . " %"));
+                    file_put_contents($progressExtractFileName, sprintf($messages["compression.12"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
             } catch (Exception $e) {
                 throw new AJXP_Exception($e);
