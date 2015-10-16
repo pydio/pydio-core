@@ -35,7 +35,6 @@
                                         tmpFileName = name;
                                         compteurFileName = 1;
                                     }
-                                    //METTRE EN ARRAY LE FOLDERS QUI ONT PRESQUE LE MEME NOM
                                     while(userSelection.fileNameExists(name + extension)){
                                         name = tmpFileName + "-" + compteurFileName;
                                         compteurFileName ++;
@@ -47,7 +46,7 @@
                                 var archiveTypeSelect = oForm.down('select[id="type_archive"]');
                                 var archiveExtension = archiveTypeSelect.getValue();
                                 if (userSelection.isUnique()) {
-                                    archiveName = getBaseName(userSelection.getUniqueFileName());
+                                    archiveName = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
                                 } else if (crtDir.length == 1) {
                                     archiveName = "Archive";
                                 } else {
