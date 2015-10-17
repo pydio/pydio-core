@@ -429,23 +429,32 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     {
         require_once("Zend/Search/Lucene.php");
         if (isSet($this->currentIndex)) {
-            $index = $this->currentIndex;
+            $oldIndex = $newIndex = $this->currentIndex;
         } else {
             if($oldNode == null){
-                $index =  $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+            }else if($newNode == null){
+                $oldIndex = $newIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
             }else{
-                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                $newId = $newNode->getRepositoryId();
+                $oldId = $oldNode->getRepositoryId();
+                if($newId == $oldId){
+                    $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                }else{
+                    $newIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                    $oldIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                }
             }
         }
         $this->setDefaultAnalyzer();
         if ($oldNode != null && $copy == false) {
-            $oldDocId = $this->getIndexedDocumentId($index, $oldNode);
+            $oldDocId = $this->getIndexedDocumentId($oldIndex, $oldNode);
             if ($oldDocId != null) {
-                $index->delete($oldDocId);
+                $oldIndex->delete($oldDocId);
                 if ($newNode == null) { // DELETION
-                    $childrenHits = $this->getIndexedChildrenDocuments($index, $oldNode);
+                    $childrenHits = $this->getIndexedChildrenDocuments($oldIndex, $oldNode);
                     foreach ($childrenHits as $hit) {
-                        $index->delete($hit->id);
+                        $oldIndex->delete($hit->id);
                     }
                 }
             }
@@ -453,38 +462,41 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
         if ($newNode != null) {
             // Make sure it does not already exists anyway
-            $newDocId = $this->getIndexedDocumentId($index, $newNode);
+            $newDocId = $this->getIndexedDocumentId($newIndex, $newNode);
             if ($newDocId != null) {
-                $index->delete($newDocId);
-                $childrenHits = $this->getIndexedChildrenDocuments($index, $newNode);
+                $newIndex->delete($newDocId);
+                $childrenHits = $this->getIndexedChildrenDocuments($newIndex, $newNode);
                 foreach ($childrenHits as $hit) {
-                    $index->delete($hit->id);
+                    $newIndex->delete($hit->id);
                 }
             }
-            $this->createIndexedDocument($newNode, $index);
+            $this->createIndexedDocument($newNode, $newIndex);
             if ( $recursive && $oldNode == null && is_dir($newNode->getUrl())) {
                 $this->recursiveIndexation($newNode->getUrl());
             }
         }
 
-        if ($oldNode != null && $newNode != null && is_dir($newNode->getUrl())) { // Copy / Move / Rename
+        if ($oldNode != null && $newNode != null && is_dir($newNode->getUrl()) && ($newIndex == $oldIndex)) { // Copy / Move / Rename
             // Get old node children docs, and update them manually, no need to scan real directory
-            $childrenHits = $this->getIndexedChildrenDocuments($index, $oldNode);
+            $childrenHits = $this->getIndexedChildrenDocuments($oldIndex, $oldNode);
             foreach ($childrenHits as $hit) {
-                $oldChildURL = $index->getDocument($hit->id)->node_url;
+                $oldChildURL = $oldIndex->getDocument($hit->id)->node_url;
                 if ($copy == false) {
-                    $index->delete($hit->id);
+                    $oldIndex->delete($hit->id);
                 }
                 $newChildURL = str_replace(SystemTextEncoding::toUTF8($oldNode->getUrl()),
                                            SystemTextEncoding::toUTF8($newNode->getUrl()),
                                            $oldChildURL);
                 $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
-                $this->createIndexedDocument(new AJXP_Node($newChildURL), $index);
+                $this->createIndexedDocument(new AJXP_Node($newChildURL), $oldIndex);
             }
         }
 
         if (!isSet($this->currentIndex)) {
-            $index->commit();
+            $oldIndex->commit();
+            if($newIndex != $oldIndex){
+                $newIndex->commit();
+            }
         }
     }
 
