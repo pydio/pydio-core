@@ -347,7 +347,7 @@ Class.create("MetaCellRenderer", {
 
     },
 
-    displayTagsAsBlocks: function(element, value, ajxpNode){
+    displayTagsAsBlocks: function(metaName, element, value, ajxpNode){
         if(!value) return;
         var values = $A(value.split(",")).invoke("strip");
         element.update('');
@@ -359,9 +359,9 @@ Class.create("MetaCellRenderer", {
                 var conn = new Connexion();
                 conn.setParameters($H({
                     get_action:"edit_user_meta",
-                    file: ajxpNode.getPath(),
-                    tags: values.without(v).join(", ")
+                    file: ajxpNode.getPath()
                 }));
+                conn.addParameter(metaName, values.without(v).join(", "));
                 conn.onComplete = function(transport){
                     pydio.getController().parseXmlMessage(transport.responseXML);
                 };
@@ -413,7 +413,7 @@ Class.create("MetaCellRenderer", {
                 break;
                 case "tags":
                     var value = td.innerHTML.strip();
-                    this.displayTagsAsBlocks(td, value, ajxpNode);
+                    this.displayTagsAsBlocks(metaName, td, value, ajxpNode);
                 break;
                 case "text":
                 case "string":
