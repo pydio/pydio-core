@@ -102,7 +102,7 @@
                                 <span class="mode-minipub no_share_leaf">AJXP_MESSAGE[share_center.138]</span>
                                 <span class="mode-ws no_share_leaf">AJXP_MESSAGE[share_center.139]</span>
                                 <span class="mode-minipub only_share_leaf">AJXP_MESSAGE[share_center.140]</span>
-                                <a><span class="params_view">AJXP_MESSAGE[share_center.141]</span><span class="params_hide">AJXP_MESSAGE[share_center.142]</span></a>
+                                <a><span class="params_view">AJXP_MESSAGE[share_center.141]</span><span class="params_hide">AJXP_MESSAGE[share_center.142]</span><span class="params_view_readonly">AJXP_MESSAGE[share_center.177]</span></a>
                                 <div class="SF_horizontal_actions SF_horizontal_pastilles"></div>
                             </div>
                             <div style="display:none;position:relative;margin:10px;min-height:85px;" id="share_result" class="">

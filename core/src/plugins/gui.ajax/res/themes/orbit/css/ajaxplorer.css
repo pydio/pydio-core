@@ -540,7 +540,7 @@ div.shadow_class
 .dialogContent input:disabled,
 .dialogContent input[type="text"]:disabled,
 .dialogContent input[type="password"]:disabled,
-.dialogContent option:disabled
+.dialogContent option:disabled,
 .dialogContent textarea:disabled
 {
     background: #eee;
@@ -5133,8 +5133,19 @@ form.share_expired div.macos_only{
     display: block !important;
 }
 
+div#target_repository_toggle span.params_view_readonly
+{
+    display: none;
+}
+
+.readonly_mode div#target_repository_toggle span.params_view_readonly{
+    display: inline;
+}
+
 #target_repository_toggle span.params_hide,
-.edit_parameters div#target_repository_toggle span.params_view
+.edit_parameters div#target_repository_toggle span.params_view,
+.readonly_mode div#target_repository_toggle span.params_view,
+.edit_parameters div#target_repository_toggle span.params_view_readonly
 {
     display: none !important;
 }
@@ -5142,7 +5153,10 @@ form.share_expired div.macos_only{
     display: inline !important;
 }
 
-.share_edit.type-ws span.params_hide, .share_edit.type-ws span.params_view{
+.share_edit.type-ws span.params_hide,
+.share_edit.type-ws span.params_view,
+.share_edit.type-ws span.params_view_readonly
+{
     display: none !important;
 }
 
