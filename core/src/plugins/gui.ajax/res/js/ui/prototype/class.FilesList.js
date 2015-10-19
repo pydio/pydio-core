@@ -829,7 +829,7 @@ Class.create("FilesList", SelectableElements, {
 				delete this.headerMenu;
 			}
 			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
-			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
+			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow-y:auto;overflow-x:hidden;">';
 			this.htmlElement.update(buffer);
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.addClassName("paginated");
