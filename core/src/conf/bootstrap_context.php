@@ -70,7 +70,7 @@ define("ADMIN_PASSWORD", "admin");
 
 // KEY-VALUE-CACHE
 define("AJXP_KVCACHE_PREFIX", "pydio-unique-id");
-define("AJXP_KVCACHE_IGNORE", false);
+define("AJXP_KVCACHE_IGNORE", true);
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);

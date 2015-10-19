@@ -36,7 +36,6 @@ class ShareCenter extends AJXP_Plugin
      */
     private $repository;
     private $urlBase;
-    private $baseProtocol;
 
     /**
      * @var ShareStore
@@ -53,41 +52,46 @@ class ShareCenter extends AJXP_Plugin
         parent::parseSpecificContributions($contribNode);
         $disableSharing = false;
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if ($downloadFolder == "") {
-            $disableSharing = true;
-        } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-            $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
-            $disableSharing = true;
-        } else {
-            if (AuthService::usersEnabled()) {
-                $loggedUser = AuthService::getLoggedUser();
-                if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
-                    $disableSharing = true;
-                }
-            } else {
+        if ( empty($downloadFolder) || (!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
+            $this->logError("Warning on public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
+        }
+
+        $xpathesToRemove = array();
+
+        if( strpos(ConfService::getRepository()->getAccessType(), "ajxp_") === 0){
+
+            $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
+            $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
+            $xpathesToRemove[] = 'action[@name="share-edit-shared"]';
+
+        }else if (AuthService::usersEnabled()) {
+
+            $loggedUser = AuthService::getLoggedUser();
+            if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
                 $disableSharing = true;
             }
-            $xpathesToRemove = array();
-            if ($disableSharing) {
-                // All share- actions
-                $xpathesToRemove[] = 'action[contains(@name, "share-")]';
-            }else{
-                $folderSharingAllowed = $this->getAuthorization("folder", "any"); // $this->pluginConf["ENABLE_FOLDER_SHARING"];
-                $fileSharingAllowed = $this->getAuthorization("file"); //$this->pluginConf["ENABLE_FILE_PUBLIC_LINK"];
-                if($fileSharingAllowed === false){
-                    // Share file button
-                    $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
-                }
-                if(!$folderSharingAllowed){
-                    // Share folder button
-                    $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
-                }
+
+        } else {
+
+            $disableSharing = true;
+
+        }
+        if ($disableSharing) {
+            // All share- actions
+            $xpathesToRemove[] = 'action[contains(@name, "share-")]';
+        }else{
+            $folderSharingAllowed = $this->getAuthorization("folder", "any");
+            $fileSharingAllowed = $this->getAuthorization("file");
+            if($fileSharingAllowed === false){
+                // Share file button
+                $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
             }
             if(!$folderSharingAllowed){
                 // Share folder button
                 $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
             }
         }
+
         foreach($xpathesToRemove as $xpath){
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $nodeList = $actionXpath->query($xpath, $contribNode);

@@ -224,7 +224,7 @@ class ShareStore {
             if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
                 continue;
             }
-            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
+            if(!$parentRepository != "" && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
                     || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
                 continue;
             }
@@ -255,8 +255,8 @@ class ShareStore {
             }
             // Find repositories that would have a parent
             $criteria = array();
-            $criteria["parent_uuid"] = (empty($parentRepository) ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
-            $criteria["owner_user_id"] = (empty($limitToUser) ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
+            $criteria["parent_uuid"] = ($parentRepository == "" ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+            $criteria["owner_user_id"] = ($limitToUser == "" ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
             if(count($storedIds)){
                 $criteria["!uuid"] = $storedIds;
             }
