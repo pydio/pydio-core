@@ -288,7 +288,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
 
         if(!$(this.htmlElement).down('#'+tabInfo.element)){
-            $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
+            $(this.htmlElement).insert(new Element("div", {id:tabInfo.element, className:'vertical_layout'}));
         }
         fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element), null, this.options.fitMarginBottom);
         var shortener = this.shortenLabel;
@@ -315,6 +315,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                     context: this,
                     editorData: editorData
                 };
+                if(Modernizr.flexbox) oForm.addClassName('vertical_fit');
                 var editor = eval ( 'new '+editorData.editorClass+'(oForm, editorOptions)' );
                 editor.getDomNode().observe("editor:updateTitle", function(event){
                     tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
