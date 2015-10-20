@@ -59,16 +59,17 @@ class AJXP_Logger extends AJXP_Plugin
     /**
      * Use current logger instance and write a message at the desired loglevel
      * @static
-     * @param string $level   The log level
-     * @param string $source  The source of the message (plugin id or classname)
-     * @param string $prefix  A quick description
+     * @param string $level The log level
+     * @param string $source The source of the message (plugin id or classname)
+     * @param string $prefix A quick description
      * @param array $messages An array of messages (string or array).
-     * @return void
+     * @param array $nodePathes Optional array of pathes
      */
     public static function log2($level, $source, $prefix, $messages = array())
     {
         $res = "";
         $i = 0;
+        $nodePathes = array();
         foreach ($messages as $value) {
             if($i > 0) $res .= "\t";
             $i++;
@@ -77,6 +78,10 @@ class AJXP_Logger extends AJXP_Plugin
                 $res .= $value;
             } else if (is_array($value) && count($value)) {
                 $res .= self::arrayToString($value);
+                if(isSet($value["files"])) {
+                    if(is_array($value["files"])) $nodePathes = $value["files"];
+                    else $nodePathes[] = $value["files"];
+                }
             } else if (!empty($value)) {
                 $res .= print_r($value, true);
             }
@@ -87,7 +92,7 @@ class AJXP_Logger extends AJXP_Plugin
         $logger = self::getInstance();
         if ($logger != null) {
             try {
-                $logger->write2($level, $ip, $user, $source, $prefix, $res);
+                $logger->write2($level, $ip, $user, $source, $prefix, $res, $nodePathes);
                 if ( $level == LOG_LEVEL_ERROR && self::$globalOptions["ERROR_TO_ERROR_LOG"] === true) {
                     error_log("[PYDIO] IP $ip | user $user | $level | $prefix | from $source | ".$res);
                 }

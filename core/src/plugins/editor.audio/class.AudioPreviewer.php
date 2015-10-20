@@ -77,7 +77,7 @@ class AudioPreviewer extends AJXP_Plugin
             fclose($stream);
 
             AJXP_Controller::applyHook("node.read", array($node));
-            $this->logInfo('Preview', 'Read content of '.$node->getUrl());
+            $this->logInfo('Preview', 'Read content of '.$node->getUrl(), array("files" => $node->getUrl()));
             //exit(1);
 
         } else if ($action == "ls") {

@@ -51,7 +51,7 @@ class PixlrEditor extends AJXP_Plugin
             $target = rtrim(base64_decode($httpVars["parent_url"]), '/') ."/plugins/editor.pixlr";
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($selectedNodeUrl);
             $tmp = SystemTextEncoding::fromUTF8($tmp);
-            $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.');
+            $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
             AJXP_Controller::applyHook("node.read", array($selectedNode));
 
 
@@ -100,7 +100,7 @@ class PixlrEditor extends AJXP_Plugin
             $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
             $selectedNode = new AJXP_Node($selection->currentBaseUrl() . $file);
             $selectedNode->loadNodeInfo();
-            $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.');
+            $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));
             AJXP_Controller::applyHook("node.before_change", array(&$selectedNode));
             $url = $httpVars["new_url"];
             $urlParts = parse_url($url);

@@ -157,7 +157,7 @@ class textLogDriver extends AbstractLogDriver
      * @throws Exception
      * @return void
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message)
+    public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
     {
         if(AJXP_Utils::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";

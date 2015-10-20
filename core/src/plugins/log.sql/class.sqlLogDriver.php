@@ -104,7 +104,8 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $endDate =  date($endFormat, strtotime("-$start day", $ref));
         $dateCursor = "logdate > '$startDate' AND logdate <= '$endDate'";
         foreach($additionalFilters as $filterField => $filterValue){
-            $dateCursor .= " AND [".AJXP_Utils::sanitize($filterField, AJXP_SANITIZE_ALPHANUM)."] = '".AJXP_Utils::sanitize($filterValue, AJXP_SANITIZE_EMAILCHARS)."'";
+            $comparator = (strpos($filterValue, "%") !== false ? "LIKE" : "=");
+            $dateCursor .= " AND [".AJXP_Utils::sanitize($filterField, AJXP_SANITIZE_ALPHANUM)."] $comparator '".AJXP_Utils::sanitize($filterValue, AJXP_SANITIZE_EMAILCHARS)."'";
         }
 
         $q = $query["SQL"];
@@ -207,6 +208,13 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $additionalFilters = array();
         if(isSet($httpVars["user"])) $additionalFilters["user"] = AJXP_Utils::sanitize($httpVars["user"], AJXP_SANITIZE_EMAILCHARS);
         if(isSet($httpVars["ws_id"])) $additionalFilters["repository_id"] = AJXP_Utils::sanitize($httpVars["ws_id"], AJXP_SANITIZE_ALPHANUM);
+        if(isSet($httpVars["filename_filter"])){
+            $additionalFilters["basename"] = str_replace("*", "%", AJXP_Utils::sanitize($httpVars["filename_filter"], AJXP_SANITIZE_FILENAME));
+        }
+        if(isSet($httpVars["dirname_filter"])){
+            $additionalFilters["dirname"] = str_replace("*", "%", AJXP_Utils::sanitize($httpVars["dirname_filter"], AJXP_SANITIZE_DIRNAME));
+        }
+
 
         $queries = explode(",", $query_name);
         $meta = array();
@@ -323,11 +331,11 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      * @param String $ip The client ip
      * @param String $user The user login
      * @param String $source The source of the message
-     * @param String $prefix  The prefix of the message
+     * @param String $prefix The prefix of the message
      * @param String $message The message to log
-     *
+     * @param array $nodesPathes
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message)
+    public function write2($level, $ip, $user, $source, $prefix, $message, $nodesPathes = array())
     {
         if($prefix == "Log In" && $message=="context=API"){
             // Limit the number of logs
@@ -344,22 +352,33 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 return;
             }
         }
+        $files = array(array("dirname"=>"", "basename"=>""));
         if(AJXP_Utils::detectXSS($message)){
             $message = "XSS Detected in Message!";
+        }else if(count($nodesPathes)){
+            $files = array();
+            foreach($nodesPathes as $path){
+                $parts = pathinfo($path);
+                $files[] = array("dirname"=>$parts["dirname"], "basename"=>$parts["basename"]);
+            }
         }
-        $log_row = Array(
-            'logdate'       => new DateTime('NOW'),
-            'remote_ip'     => $this->inet_ptod($ip),
-            'severity'      => strtoupper((string) $level),
-            'user'          => $user,
-            'source'        => $source,
-            'message'       => $prefix,
-            'params'        => $message,
-            'repository_id' => ConfService::getInstance()->getContextRepositoryId(),
-            'device'        => $_SERVER['HTTP_USER_AGENT']
-        );
-        //we already handle exception for write2 in core.log
-        dibi::query('INSERT INTO [ajxp_log]', $log_row);
+        foreach($files as $fileDef){
+            $log_row = Array(
+                'logdate'       => new DateTime('NOW'),
+                'remote_ip'     => $this->inet_ptod($ip),
+                'severity'      => strtoupper((string) $level),
+                'user'          => $user,
+                'source'        => $source,
+                'message'       => $prefix,
+                'params'        => $message,
+                'repository_id' => ConfService::getInstance()->getContextRepositoryId(),
+                'device'        => $_SERVER['HTTP_USER_AGENT'],
+                'dirname'       => $fileDef["dirname"],
+                'basename'      => $fileDef["basename"]
+            );
+            //we already handle exception for write2 in core.log
+            dibi::query('INSERT INTO [ajxp_log]', $log_row);
+        }
     }
 
     /**

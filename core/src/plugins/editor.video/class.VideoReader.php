@@ -66,7 +66,7 @@ class VideoReader extends AJXP_Plugin
                 $offsets = explode('-', $ranges[1]);
                 $offset = floatval($offsets[0]);
                 if($offset == 0){
-                    $this->logInfo('Preview', 'Streaming content of '.$filename);
+                    $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 }
 
                 $length = floatval($offsets[1]) - $offset + 1;
@@ -104,7 +104,7 @@ class VideoReader extends AJXP_Plugin
                 }
                 fclose($file);
             } else {
-                $this->logInfo('Preview', 'Streaming content of '.$filename);
+                $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 header("Content-Length: ".$filesize);
                 header("Content-Range: bytes 0-" . ($filesize - 1) . "/" . $filesize. ";");
                 header('Cache-Control: public');

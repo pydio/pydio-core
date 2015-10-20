@@ -67,7 +67,7 @@ class IMagickPreviewer extends AJXP_Plugin
                 throw new Exception("Cannot find file");
             }
             if(isSet($httpVars["all"])) {
-                $this->logInfo('Preview', 'Preview content of '.$file);
+                $this->logInfo('Preview', 'Preview content of '.$file, array("files" => $file));
                 $this->extractAll = true;
             }
 

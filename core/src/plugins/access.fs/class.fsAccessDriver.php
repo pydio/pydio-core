@@ -437,7 +437,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $code = $httpVars["content"];
                 $currentNode = $selection->getUniqueNode();
                 $fileName = $currentNode->getUrl();
-                $this->logInfo("Online Edition", array("file"=>$fileName));
+                $this->logInfo("Online Edition", array("files"=> $this->addSlugToPath($fileName)));
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
@@ -578,7 +578,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 if($dest == null) $dest = AJXP_Utils::safeDirname($file);
                 $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
-                $this->logInfo("Rename", array("original"=>$this->addSlugToPath($file), "new"=>$filename_new));
+                $this->logInfo("Rename", array("files"=>$this->addSlugToPath($file), "original"=>$this->addSlugToPath($file), "new"=>$filename_new));
 
             break;
 
@@ -618,7 +618,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $messages[] = $messtmp;
                     $newNode = new AJXP_Node($this->urlBase.$parentDir."/".$basename);
                     array_push($nodesDiffs["ADD"], $newNode);
-                    $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($parentDir)."/".$basename));
+                    $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($parentDir)."/".$basename, "files"=>$this->addSlugToPath($parentDir)."/".$basename));
                 }
                 if(count($errors)){
                     if(!count($messages)){
@@ -662,7 +662,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $logMessage = $messtmp;
                 //$reloadContextNode = true;
                 //$pendingSelection = $dir."/".$filename;
-                $this->logInfo("Create File", array("file"=>$this->addSlugToPath($dir)."/".$filename));
+                $this->logInfo("Create File", array("files"=>$this->addSlugToPath($dir)."/".$filename));
                 $newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 array_push($nodesDiffs["ADD"], $newNode);
@@ -683,7 +683,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $this->chmod($fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
                 }
                 $logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
-                $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
+                $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "files"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes());
 
@@ -793,7 +793,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         clearstatcache(true, $createdNode->getUrl());
                         $createdNode->loadNodeInfo(true);
                         $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-                        $this->logInfo("Upload File", array("file"=>$this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name));
+                        $logFile = $this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name;
+                        $this->logInfo("Upload File", array("file"=>$logFile, "files"=> $logFile ) );
 
                         if($partialUpload){
                             $this->logDebug("Return Partial Upload: SUCESS but no event yet");
@@ -1982,7 +1983,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         AJXP_Controller::applyHook("node.before_path_change", array($node));
         unlink($fileName);
         AJXP_Controller::applyHook("node.change", array($node));
-        $this->logInfo("Purge", array("file" => $fileName));
+        $this->logInfo("Purge", array("file" => $fileName, "files" => $fileName));
         print(" - Purging document : ".$fileName."\n");
     }
 

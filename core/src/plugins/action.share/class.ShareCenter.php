@@ -923,6 +923,7 @@ class ShareCenter extends AJXP_Plugin
         $url = $this->buildPublicletLink($hash);
         $this->logInfo("New Share", array(
             "file" => "'".$copy->display.":/".$data['FILE_PATH']."'",
+            "files" => "'".$copy->display.":/".$data['FILE_PATH']."'",
             "url" => $url,
             "expiration" => $data['EXPIRE_TIME'],
             "limit" => $data['DOWNLOAD_LIMIT'],
@@ -1706,8 +1707,10 @@ class ShareCenter extends AJXP_Plugin
                 return $e->getMessage();
             }
             $url = $this->buildPublicletLink($hash);
+            $files = $userSelection->getFiles();
             $this->logInfo("New Share", array(
                 "file" => "'".$httpVars['file']."'",
+                "files" => $files,
                 "url" => $url,
                 "expiration" => $data['EXPIRE_TIME'],
                 "limit" => $data['DOWNLOAD_LIMIT'],
@@ -1740,6 +1743,7 @@ class ShareCenter extends AJXP_Plugin
             $url = $this->buildPublicletLink($hash);
             $this->logInfo("Update Share", array(
                 "file" => "'".$httpVars['file']."'",
+                "files" => "'".$httpVars['file']."'",
                 "url" => $url,
                 "expiration" => $data['EXPIRE_TIME'],
                 "limit" => $data['DOWNLOAD_LIMIT'],
