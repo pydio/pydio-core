@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_APC extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("PHP APC extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+    public function __construct() { parent::__construct("PHP APC extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
     public function doTest()
     {
         $this->failedLevel = "warning";

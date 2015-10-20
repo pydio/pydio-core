@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class UsersConfig extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("Users Configuration", "Current config for users"); }
+    public function __construct() { parent::__construct("Users Configuration", "Current config for users"); }
     public function doTest()
     {
         $this->testedParams["Users enabled"] = AuthService::usersEnabled();

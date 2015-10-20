@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPCLI extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("PHP Command Line", "Testing PHP command line (default is php)"); }
+    public function __construct() { parent::__construct("PHP Command Line", "Testing PHP command line (default is php)"); }
     public function doTest()
     {
         if (!is_writable(AJXP_CACHE_DIR)) {

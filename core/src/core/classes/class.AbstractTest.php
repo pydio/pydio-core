@@ -44,7 +44,7 @@ class AbstractTest
     /** The test parameters */
     public $params;
 
-    public function AbstractTest($name, $failedInfo, $params = NULL)
+    public function __construct($name, $failedInfo, $params = NULL)
     {
         $this->name = $name;
         $this->failedInfo = $failedInfo;

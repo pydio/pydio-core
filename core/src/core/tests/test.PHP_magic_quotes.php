@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_magic_quotes extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("Magic quotes disabled", "Magic quotes need to be disabled, only relevent for php 5.3"); }
+    public function __construct() { parent::__construct("Magic quotes disabled", "Magic quotes need to be disabled, only relevent for php 5.3"); }
     public function doTest()
     {
         $this->failedLevel = "error";

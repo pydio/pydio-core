@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPGDVersion extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("PHP GD version", "GD is required for generating thumbnails"); }
+    public function __construct() { parent::__construct("PHP GD version", "GD is required for generating thumbnails"); }
     public function doTest()
     {
         $this->failedLevel = "warning";

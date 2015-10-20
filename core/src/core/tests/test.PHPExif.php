@@ -29,7 +29,7 @@ require_once('../classes/class.AbstractTest.php');
 class PHPExif extends AbstractTest
 {
     public function __construct() {
-        parent::AbstractTest("Exif Extension enabled", "Installing php-exif extension is recommended if you plan to handle images");
+        parent::__construct("Exif Extension enabled", "Installing php-exif extension is recommended if you plan to handle images");
     }
     public function doTest()
     {

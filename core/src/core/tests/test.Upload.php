@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class Upload extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
+    public function __construct() { parent::__construct("Upload particularities", "<b>Testing configs</b>"); }
     public function doTest()
     {
         $tmpDir = ini_get("upload_tmp_dir");

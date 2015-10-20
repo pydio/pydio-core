@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPErrorLevel extends AbstractTest
 {
-    public function __construct() { parent::AbstractTest("PHP error level", PHPErrorLevel::error2string(error_reporting())); }
+    public function __construct() { parent::__construct("PHP error level", PHPErrorLevel::error2string(error_reporting())); }
     public function doTest()
     {
         if (error_reporting() & E_NOTICE) {
