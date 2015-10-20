@@ -172,4 +172,6 @@ $mess=array(
 "148" => "Definizione Trigger",
 "149" => "Lista di tutti i trigger innescati nell'applicazione, la loro documentazione, dove sono innescati e quale plugin è in loro ascolto.",
 "150" => "Seleziona un repository",
+    "151" => "Root Group",
+    "152" => "Root Group Role",
 );

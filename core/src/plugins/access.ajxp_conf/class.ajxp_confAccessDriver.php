@@ -459,6 +459,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "ls":
 
                 $rootNodes = $this->getMainTree();
+                $rootAttributes = array();
+                if(isSet($rootNodes["__metadata__"])){
+                    $rootAttributes = $rootNodes["__metadata__"];
+                    unset($rootNodes["__metadata__"]);
+                }
                 $parentName = "";
                 $dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
                 if ($dir != "") {
@@ -512,13 +517,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 } else {
                     $parentName = "/";
                     $nodes = $rootNodes;
+                    if($currentUserIsGroupAdmin){
+                        $rootAttributes["group_admin"]  = "1";
+                    }
                 }
                 if (isSet($httpVars["file"])) {
                     $parentName = $httpVars["dir"]."/";
                     $nodes = array(basename($httpVars["file"]) =>  array("LABEL" => basename($httpVars["file"])));
                 }
                 if (isSet($nodes)) {
-                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::header("tree", $rootAttributes);
                     if(!isSet($httpVars["file"])) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.102" attributeName="description" sortType="String"/></columns>');
                     foreach ($nodes as $key => $data) {
                         $this->renderNode($parentName.$key, $data, $mess);
@@ -594,7 +602,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $filteredGroupPath = AuthService::filterBaseGroup($groupPath);
                     if($filteredGroupPath == "/"){
                         $roleId = "AJXP_GRP_/";
-                        $groupLabel = "Root Group";
+                        $groupLabel = $mess["ajxp_conf.151"];
                         $roleGroup = true;
                     }else{
                         $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
@@ -783,7 +791,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                         $groupLabel = $groups[$key];
                     }else{
-                        $groupLabel = "Root Group";
+                        $groupLabel = $mess["ajxp_conf.151"];
                     }
                     $roleGroup = true;
                 }
@@ -2287,7 +2295,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "group",
                 "object_id" => "/"
             );
-            $xml = AJXP_XMLWriter::renderNode($nodeKey, "Root Group", true, $meta, true, false);
+            $mess = ConfService::getMessages();
+            $xml = AJXP_XMLWriter::renderNode($nodeKey, $mess["ajxp_conf.151"], true, $meta, true, false);
             if(!$returnNodes) print($xml);
             else $allNodes[$nodeKey] = $xml;
         }
@@ -2399,7 +2408,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!$this->listSpecialRoles && !$this->getName() == "ajxp_admin"){
             $rootGroupRole = AuthService::getRole("AJXP_GRP_/", true);
             if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
-                $rootGroupRole->setLabel("Root Group");
+                $mess = ConfService::getMessages();
+                $rootGroupRole->setLabel($mess["ajxp_conf.151"]);
                 AuthService::updateRole($rootGroupRole);
             }
             array_unshift($roles, $rootGroupRole);

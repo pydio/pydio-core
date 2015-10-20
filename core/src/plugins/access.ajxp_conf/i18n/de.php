@@ -173,4 +173,6 @@ $mess=array(
 "148" => "Hook-Definition",
 "149" => "Liste aller Hooks mit Informationen, wo und von welchen Erweiterungen diese aufgerufen werden.",
 "150" => "Eine Arbeitsumgebung auswählen",
+"151" => "Root Group",
+"152" => "Root Group Role",
 );

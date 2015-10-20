@@ -173,4 +173,6 @@ $mess=array(
     "148" => "Hooks Definitions",
     "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
     "150" => "Select a repository",
+    "151" => "Root Group",
+    "152" => "Root Group Role",
 );
