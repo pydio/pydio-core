@@ -10,7 +10,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "chart.js": "^1.0.2",
-    "material-ui": "^0.7.5",
+    "material-ui": "git://github.com/pydio/material-ui.git#pydio",
     "react": "0.13.3",
     "react-chartjs": "git://github.com/dehbmarques/react-chartjs.git#master",
     "react-grid-layout": "^0.8.5",
@@ -28,6 +28,7 @@
     "grunt-contrib-uglify": "~0.9.2",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-browserify": "~4.0.1",
-    "grunt-env": "~0.4.4"
+    "grunt-env": "~0.4.4",
+    "grunt-run":"~0.5.2"
   }
 }

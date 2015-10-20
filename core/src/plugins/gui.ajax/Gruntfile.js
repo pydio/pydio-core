@@ -10,6 +10,18 @@ module.exports = function(grunt) {
 				DEST: 'tmp'
 			}
 		},
+        run: {
+            options:{
+                cwd: "node_modules/material-ui"
+            },
+            materialui:{
+                cmd:"npm",
+                args:[
+                    "run",
+                    "build"
+                ]
+            }
+        },
 		uglify: {
 			options: {
 				mangle: false,
@@ -237,9 +249,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-run');
     grunt.registerTask('default', [
 		'babel',
 		'uglify:js',
+        'run:materialui',
 		'env:build',
 		'browserify',
 		'env:dev',
