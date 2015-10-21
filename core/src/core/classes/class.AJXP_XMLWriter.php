@@ -678,6 +678,9 @@ class AJXP_XMLWriter
                     }
                 }
                 $roleString.='acl="'.$merged->getAcl($repoId).'"';
+                if($merged->hasMask($repoId)){
+                    $roleString.= ' hasMask="true" ';
+                }
             }
             $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
         }
