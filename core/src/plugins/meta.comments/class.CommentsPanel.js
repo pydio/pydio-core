@@ -63,11 +63,13 @@ Class.create("CommentsPanel", {
     // Warning, method is called statically, there is no "this"
     loadInfoPanel : function(container, node){
 
+        console.log(container, container.down("textarea"), container.down("textarea.comments_textarea"));
+
         container.down("#comments_container");
-        container.down("textarea").observe("focus", function(){
+        container.down("textarea.comments_textarea").observe("focus", function(){
             pydio.UI.disableAllKeyBindings();
         });
-        container.down("textarea").observe("blur", function(){
+        container.down("textarea.comments_textarea").observe("blur", function(){
             pydio.UI.enableAllKeyBindings();
         });
 
@@ -120,19 +122,19 @@ Class.create("CommentsPanel", {
 
         var submitComment = function(){
 
-            if(!container.down('textarea').getValue()) {
+            if(!container.down('textarea.comments_textarea').getValue()) {
                 return;
             }
             var conn = new Connexion();
             conn.setParameters({
                 file: node.getPath(),
                 get_action: "post_comment",
-                content: container.down('textarea').getValue()
+                content: container.down('textarea.comments_textarea').getValue()
             });
             conn.setMethod('POST');
             conn.onComplete = function(transport){
                 CommentsPanel.prototype.commentObjectToDOM($H(transport.responseJSON), container, node);
-                container.down('textarea').setValue("");
+                container.down('textarea.comments_textarea').setValue("");
                 CommentsPanel.prototype.refreshScroller(container);
                 $("comments_container").scrollTop = 10000;
             };
@@ -145,7 +147,7 @@ Class.create("CommentsPanel", {
              submitComment();
         });
 
-        container.down('textarea').observe("keydown", function(e){
+        container.down('textarea.comments_textarea').observe("keydown", function(e){
             if(e.keyCode == Event.KEY_RETURN && e.ctrlKey){
                 submitComment();
                 return false;

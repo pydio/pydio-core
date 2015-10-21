@@ -25,7 +25,7 @@
                             <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="AJXP_MESSAGE[meta.comments.1]"></span>AJXP_MESSAGE[meta.comments.1]</div>
                             <div id="comments_container"></div>
                             <div id="comments_form">
-                                <textarea placeholder="AJXP_MESSAGE[meta.comments.2]"></textarea>
+                                <textarea class="comments_textarea" placeholder="AJXP_MESSAGE[meta.comments.2]"></textarea>
                                 <div><input type="button" value="AJXP_MESSAGE[meta.comments.3]" id="comments_submit"></div>
                             </div>
                         </div>
