@@ -27,8 +27,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AJXP_Cache
 {
-    private static $instance;
-
     protected $cacheDir;
     protected $cacheId;
     protected $masterFile;
@@ -39,7 +37,7 @@ class AJXP_Cache
      * Create an AJXP_Cache instance
      * @param string $pluginId
      * @param string $filepath
-     * @param Function $dataCallback A function to generate the data cache. If no callback provided, will simply use the content of the master item as the cache data
+     * @param callable $dataCallback A function to generate the data cache. If no callback provided, will simply use the content of the master item as the cache data
      * @param string $idComputerCallback A function to generate the ID of the cache. If not provided, will generate a random hash
      * @return AJXP_Cache
      */

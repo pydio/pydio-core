@@ -533,7 +533,7 @@ class AJXP_Node
      * Magic setter for metadata
      * @param $metaName
      * @param $metaValue
-     * @return
+     * @return void
      */
     public function __set($metaName, $metaValue)
     {

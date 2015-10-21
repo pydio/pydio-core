@@ -210,7 +210,7 @@ class AJXP_Plugin implements Serializable
 
     /**
      * Main function for loading all the nodes under registry_contributions.
-     * @return void
+     * @param bool $dry
      */
     protected function loadRegistryContributions($dry = false)
     {
@@ -265,7 +265,7 @@ class AJXP_Plugin implements Serializable
      * @param string $xmlFile Path to the file from the base install path
      * @param array $include XPath query for XML Nodes to include
      * @param array $exclude XPath query for XML Nodes to exclude from the included ones.
-     * @return
+     * @param bool $dry Dry-run of the inclusion
      */
     protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array(), $dry = false)
     {
@@ -310,6 +310,7 @@ class AJXP_Plugin implements Serializable
         }
         if(!count($selected)) return;
         $originalRegContrib = $this->xPath->query("registry_contributions")->item(0);
+        $localRegParent = null;
         foreach ($selected as $parentNodeName => $data) {
             $node = $data["parent"]->cloneNode(false);
             //$newNode = $originalRegContrib->ownerDocument->importNode($node, false);

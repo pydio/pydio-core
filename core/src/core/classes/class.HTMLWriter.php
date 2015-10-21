@@ -100,9 +100,6 @@ class HTMLWriter
     /**
      * Send a simple Content-type header
      * @static
-     * @param string $type
-     * @param string $charset
-     * @return void
      */
     public static function internetExplorerMainDocumentHeader()
     {
@@ -133,12 +130,12 @@ class HTMLWriter
     {
         print("</body></html>");
     }
+
     /**
      * Write directly an error as a javascript instruction
      * @static
      * @param $errorType
      * @param $errorMessage
-     * @return
      */
     public static function javascriptErrorHandler($errorType, $errorMessage)
     {

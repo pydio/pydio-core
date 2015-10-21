@@ -77,7 +77,7 @@ class AJXP_Utils
      */
     public static function natkrsort(&$array)
     {
-        natksort($array);
+        AJXP_Utils::natksort($array);
         $array = array_reverse($array, TRUE);
         return true;
     }
@@ -610,6 +610,7 @@ class AJXP_Utils
         } else if (preg_match("/\.gif$/i", $fileName)) {
             return "image/gif";
         }
+        return "";
     }
     /**
      * Headers to send when streaming
@@ -1047,7 +1048,9 @@ class AJXP_Utils
     public static function extractConfStringsFromManifests()
     {
         $plugins = AJXP_PluginsService::getInstance()->getDetectedPlugins();
-        $plug = new AJXP_Plugin("", "");
+        /**
+         * @var AJXP_Plugin $plug
+         */
         foreach ($plugins as $pType => $plugs) {
             foreach ($plugs as $plug) {
                 $lib = $plug->getManifestRawContent("//i18n", "nodes");
@@ -1110,7 +1113,6 @@ class AJXP_Utils
      * @param $baseDir
      * @param bool $detectLanguages
      * @param string $createLanguage
-     * @return
      */
     public static function updateI18nFiles($baseDir, $detectLanguages = true, $createLanguage = "")
     {
@@ -1128,6 +1130,7 @@ class AJXP_Utils
             $filenames = glob($baseDir . "/*.php");
         }
 
+        $mess = array();
         include($baseDir . "/en.php");
         $reference = $mess;
 
@@ -1141,11 +1144,11 @@ class AJXP_Utils
      * @static
      * @param $filename
      * @param $reference
-     * @return
      */
     public static function updateI18nFromRef($filename, $reference)
     {
         if (!is_file($filename)) return;
+        $mess = array();
         include($filename);
         $missing = array();
         foreach ($reference as $messKey => $message) {
@@ -1253,6 +1256,7 @@ class AJXP_Utils
         }
         // PREPARE REPOSITORY LISTS
         $repoList = array();
+        $REPOSITORIES = array();
         require_once("../classes/class.ConfService.php");
         require_once("../classes/class.Repository.php");
         include(AJXP_CONF_PATH . "/bootstrap_repositories.php");
@@ -1330,6 +1334,7 @@ class AJXP_Utils
      *
      * @param String $filePath Full path to the file
      * @param Boolean $skipCheck do not test for file existence before opening
+     * @param string $format
      * @return Array
      */
     public static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
@@ -1359,11 +1364,15 @@ class AJXP_Utils
      * @param Array|Object $value The value to store
      * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
      * @param bool $silent Silently write the file, are throw an exception on problem.
-     * @param string $format
+     * @param string $format "ser" or "json"
+     * @param bool $jsonPrettyPrint If json, use pretty printing
      * @throws Exception
      */
     public static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser", $jsonPrettyPrint = false)
     {
+        if(!in_array($format, array("ser", "json"))){
+            throw new Exception("Unsupported serialization format: ".$format);
+        }
         $filePath = AJXP_VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))) {
             @mkdir(dirname($filePath), 0755, true);
@@ -1375,8 +1384,9 @@ class AJXP_Utils
         }
         try {
             $fp = fopen($filePath, "w");
-            if($format == "ser") $content = serialize($value);
-            else if ($format == "json") {
+            if($format == "ser") {
+                $content = serialize($value);
+            } else {
                 $content = json_encode($value);
                 if($jsonPrettyPrint) $content = self::prettyPrintJSON($content);
             }
@@ -1395,8 +1405,6 @@ class AJXP_Utils
      */
     public static function userAgentIsMobile()
     {
-        $isMobile = false;
-
         $op = strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE'] OR "");
         $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
         $ac = strtolower($_SERVER['HTTP_ACCEPT']);
@@ -1445,34 +1453,6 @@ class AJXP_Utils
                     || strpos($ua, 'vodafone/') !== false
                     || strpos($ua, 'wap1.') !== false
                     || strpos($ua, 'wap2.') !== false;
-        /*
-                  $isBot = false;
-                  $ip = $_SERVER['REMOTE_ADDR'];
-
-                  $isBot =  $ip == '66.249.65.39'
-                  || strpos($ua, 'googlebot') !== false
-                  || strpos($ua, 'mediapartners') !== false
-                  || strpos($ua, 'yahooysmcm') !== false
-                  || strpos($ua, 'baiduspider') !== false
-                  || strpos($ua, 'msnbot') !== false
-                  || strpos($ua, 'slurp') !== false
-                  || strpos($ua, 'ask') !== false
-                  || strpos($ua, 'teoma') !== false
-                  || strpos($ua, 'spider') !== false
-                  || strpos($ua, 'heritrix') !== false
-                  || strpos($ua, 'attentio') !== false
-                  || strpos($ua, 'twiceler') !== false
-                  || strpos($ua, 'irlbot') !== false
-                  || strpos($ua, 'fast crawler') !== false
-                  || strpos($ua, 'fastmobilecrawl') !== false
-                  || strpos($ua, 'jumpbot') !== false
-                  || strpos($ua, 'googlebot-mobile') !== false
-                  || strpos($ua, 'yahooseeker') !== false
-                  || strpos($ua, 'motionbot') !== false
-                  || strpos($ua, 'mediobot') !== false
-                  || strpos($ua, 'chtml generic') !== false
-                  || strpos($ua, 'nokia6230i/. fast crawler') !== false;
-        */
         return $isMobile;
     }
     /**
@@ -1756,6 +1736,7 @@ class AJXP_Utils
         }
         // DO SOMETHING WITH REPLICATED PARAMETERS?
         if (count($switchesGroups)) {
+            $gValues = array();
             foreach ($switchesGroups as $fieldName => $groupName) {
                 if (isSet($options[$fieldName])) {
                     $gValues = array();
@@ -2082,11 +2063,11 @@ class AJXP_Utils
         }
         return $left.$regexp.$right;
     }
+
     /**
      * Hide file or folder for Windows OS
      * @static
-     * @param $path
-     * @return void
+     * @param $file
      */
     public static function winSetHidden($file)
     {

@@ -238,16 +238,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param Array $criteria This parameter can take the following keys
-     *
      *      - Search keys "uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath",
      *        Search values can be either string, array of string, AJXP_FILTER_EMPTY, AJXP_FILTER_NOT_EMPTY or regexp:RegexpString
      *      - or "role" => AJXP_Role object: will search repositories accessible to this role
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
-     *
+     * @param $count int fill this integer with a count
      * @return Repository[]
      */
-    abstract public function listRepositoriesWithCriteria($criteria);
+    abstract public function listRepositoriesWithCriteria($criteria, &$count=null);
 
 
     /**
@@ -291,9 +290,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * @abstract
      * @param AJXP_Role $role
+     * @param AbstractAjxpUser $userObject
      * @return void
      */
-    abstract public function updateRole($role);
+    abstract public function updateRole($role, $userObject = null);
 
     /**
      * @abstract

@@ -85,7 +85,7 @@ class AJXP_XMLWriter
      * @param integer $currentPage
      * @param integer $totalPages
      * @param integer $dirsCount
-     * @return void
+     * @param null $remoteSortAttributes
      */
     public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
     {
@@ -218,6 +218,7 @@ class AJXP_XMLWriter
     {
         self::renderNode($array[0],$array[1],$array[2],$array[3]);
     }
+
     /**
      * Error Catcher for PHP errors. Depending on the SERVER_DEBUG config
      * shows the file/line info or not.
@@ -227,7 +228,6 @@ class AJXP_XMLWriter
      * @param $fichier
      * @param $ligne
      * @param $context
-     * @return
      */
     public static function catchError($code, $message, $fichier, $ligne, $context)
     {
@@ -235,7 +235,6 @@ class AJXP_XMLWriter
             return ;
         }
         AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
-        $loggedUser = AuthService::getLoggedUser();
         if (ConfService::getConf("SERVER_DEBUG")) {
             $stack = debug_backtrace();
             $stackLen = count($stack);
@@ -371,13 +370,15 @@ class AJXP_XMLWriter
     /**
      * Send a <reload> XML instruction for refreshing the list
      * @static
-     * @param string $nodePath
-     * @param string $pendingSelection
+     * @param $diffNodes
      * @param bool $print
      * @return string
      */
     public static function writeNodesDiff($diffNodes, $print = false)
     {
+        /**
+         * @var $ajxpNode AJXP_Node
+         */
         $mess = ConfService::getMessages();
         $buffer = "<nodes_diff>";
         if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
@@ -482,6 +483,7 @@ class AJXP_XMLWriter
      */
     public static function writeBookmarks($allBookmarks, $print = true, $format = "legacy")
     {
+        $driver = false;
         if ($format == "node_list") {
             $driver = ConfService::loadRepositoryDriver();
             if (!is_a($driver, "AjxpWrapperProvider")) {
@@ -509,8 +511,12 @@ class AJXP_XMLWriter
                 $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path, true)."\" title=\"".AJXP_Utils::xmlEntities($title, true)."\"/>";
             }
         }
-        if($print) print $buffer;
-        else return $buffer;
+        if($print) {
+            print $buffer;
+            return null;
+        } else {
+            return $buffer;
+        }
     }
     /**
      * Utilitary for generating a <component_config> tag for the FilesList component
@@ -534,8 +540,6 @@ class AJXP_XMLWriter
      */
     public static function sendMessage($logMessage, $errorMessage, $print = true)
     {
-        $messageType = "";
-        $message = "";
         if ($errorMessage == null) {
             $messageType = "SUCCESS";
             $message = AJXP_Utils::xmlContentEntities($logMessage);

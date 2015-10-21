@@ -154,6 +154,7 @@ class AJXP_ProgressBarCLI {
         $remain=$remain%3600;
         $mins=intval($remain/60);
         $secs=$remain%60;
+        $timestring = "-";
 
         if ($secs>=0) $timestring = "0m".$secs."s";
         if ($mins>0) $timestring = $mins."m".$secs."s";

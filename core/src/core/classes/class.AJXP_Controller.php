@@ -344,6 +344,7 @@ class AJXP_Controller
                   file_put_contents($tmpBat, $cmd);
                   pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
               }
+            return null;
         } else {
             $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
             AJXP_Logger::debug("Starting process and sending output dev null");
@@ -361,7 +362,7 @@ class AJXP_Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return DOMElement|bool
+     * @return DOMElement|bool|DOMElement[]
      */
     private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true)
     {
@@ -387,7 +388,7 @@ class AJXP_Controller
      * Check in the callback node if an applyCondition XML attribute exists, and eval its content.
      * The content must set an $apply boolean as result
      * @static
-     * @param DOMElement $callback
+     * @param DOMElement|DOMNode $callback
      * @param string $actionName
      * @param array $httpVars
      * @param array $fileVars
@@ -441,6 +442,7 @@ class AJXP_Controller
         } else {
             throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
         }
+        return null;
     }
 
     /**
@@ -471,6 +473,9 @@ class AJXP_Controller
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
         self::$hooksCache[$hookName] = array();
+        /**
+         * @var $callback DOMElement
+         */
         foreach ($callbacks as $callback) {
             $defer = ($callback->getAttribute("defer") === "true");
             $applyCondition = $callback->getAttribute("applyCondition");

@@ -491,7 +491,7 @@ class AJXP_Role implements AjxpGroupPathProvider
             if (!is_array($arrays[$i])) {
                 // also array_merge_recursive returns nothing in this case
                 trigger_error('Argument #' . ($i+1) . ' is not an array - trying to merge array with scalar! Returning null!', E_USER_WARNING);
-                return;
+                return null;
             }
         }
 

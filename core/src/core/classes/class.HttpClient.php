@@ -47,7 +47,13 @@ class HttpClient
     public $postDataArray = array();
 
     public $directForwarding = false;
+    /**
+     * @var bool|resource
+     */
     public $contentDestStream = false;
+    /**
+     * @var bool|callable
+     */
     public $eventListener = false;
 
     public $collectHeaders;
@@ -134,10 +140,13 @@ class HttpClient
             switch ($errno) {
                 case -3:
                     $this->errormsg = 'Socket creation failed (-3)';
+                    break;
                 case -4:
                     $this->errormsg = 'DNS lookup failure (-4)';
+                    break;
                 case -5:
                     $this->errormsg = 'Connection refused or timed out (-5)';
+                    break;
                 default:
                     $this->errormsg = 'Connection failed on '.$this->host.'('.$errno.')';
                 $this->errormsg .= ' '.$errstr;
@@ -283,7 +292,7 @@ class HttpClient
         $this->notify("close");
         fclose($fp);
            if ($this->directForwarding) {
-               return ;
+               return true;
            }
         // If data is compressed, uncompress it
         if (isset($this->headers['content-encoding']) && $this->headers['content-encoding'] == 'gzip') {

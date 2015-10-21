@@ -108,7 +108,7 @@ class ContentFilter {
     }
 
     /**
-     * @return Return public data as array, pre-utf8 encoded
+     * @return array public data as array, pre-utf8 encoded
      */
     public function toArray(){
         $data = array("filters" => array(), "virtualPaths" => array());

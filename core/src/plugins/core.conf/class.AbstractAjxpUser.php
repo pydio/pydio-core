@@ -39,7 +39,13 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public $prefs;
     public $bookmarks;
     public $version;
+    /**
+     * @var string
+     */
     public $parentUser;
+    /**
+     * @var bool
+     */
     public $resolveAsParent = false;
     /**
      * @var bool
@@ -278,16 +284,25 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         $this->hasAdmin = $boolean;
     }
 
+    /**
+     * @return bool Whether the user has a parent or not
+     */
     public function hasParent()
     {
         return isSet($this->parentUser);
     }
 
+    /**
+     * @param string $user A user ID
+     */
     public function setParent($user)
     {
         $this->parentUser = $user;
     }
 
+    /**
+     * @return string Returns the ID of the parent user
+     */
     public function getParent()
     {
         return $this->parentUser;

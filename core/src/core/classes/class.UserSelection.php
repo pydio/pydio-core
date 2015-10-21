@@ -27,6 +27,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class UserSelection
 {
     public $files;
+    /**
+     * @var AJXP_Node[]
+     */
     private $nodes;
     public $varPrefix = "file";
     public $dirPrefix = "dir";

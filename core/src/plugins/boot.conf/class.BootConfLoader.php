@@ -447,9 +447,10 @@ class BootConfLoader extends AbstractConfDriver
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param Array $criteria
+     * @param int $count
      * @return Array
      */
-    public function listRepositoriesWithCriteria($criteria){
+    public function listRepositoriesWithCriteria($criteria, &$count = null){
 
     }
 
@@ -515,9 +516,10 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * @param AJXP_Role $role
+     * @param AbstractAjxpUser $userObject
      * @return void
      */
-    public function updateRole($role)
+    public function updateRole($role, $userObject = null)
     {
         // TODO: Implement updateRole() method.
     }

@@ -216,6 +216,9 @@ class AJXP_PluginsService
         // Try to get from cache
         list($type, $name) = explode(".", $pluginId);
         if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+            /**
+             * @var AJXP_Plugin $plugin
+             */
             $plugin = $this->registry[$type][$name];
             $plugin->init($pluginOptions);
             return clone $plugin;
@@ -243,6 +246,9 @@ class AJXP_PluginsService
         $filename = AJXP_INSTALL_PATH."/".$definition["filename"];
         $className = $definition["classname"];
         if (is_file($filename)) {
+            /**
+             * @var AJXP_Plugin $newPlugin
+             */
             require_once($filename);
             $newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
             $newPlugin->loadManifest();
@@ -252,10 +258,10 @@ class AJXP_PluginsService
             return $plugin;
         }
     }
+
     /**
      * Check that a plugin dependencies are loaded, disable it otherwise.
-     * @param $arrayToSort
-     * @return
+     * @param AJXP_Plugin[] $arrayToSort
      */
     private function checkDependencies(&$arrayToSort)
     {
@@ -306,7 +312,6 @@ class AJXP_PluginsService
 
     public function getOrderByDependency($plugins, $withStatus = true)
     {
-        $orders = array();
         $keys = array();
         $unkowns = array();
         if ($withStatus) {
@@ -397,6 +402,9 @@ class AJXP_PluginsService
      */
     public function initActivePlugins()
     {
+        /**
+         * @var AJXP_Plugin $pObject
+         */
         $detected = $this->getDetectedPlugins();
         $toActivate = array();
         foreach ($detected as $pType => $pObjects) {
@@ -631,11 +639,12 @@ class AJXP_PluginsService
         }
         return $self->xmlRegistry;
     }
+
     /**
      * Replace the current xml registry
      * @static
      * @param $registry
-     * @return void
+     * @param bool $extendedVersion
      */
     public static function updateXmlRegistry($registry, $extendedVersion = true)
     {
@@ -677,6 +686,8 @@ class AJXP_PluginsService
      * @param string $query
      * @param string $stringOrNodeFormat
      * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
+     * @param bool $limitToEnabledPlugins
+     * @param bool $loadExternalFiles
      * @return DOMNode[]
      */
     public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
@@ -756,11 +767,11 @@ class AJXP_PluginsService
             }
         }
     }
+
     /**
      * Utilitary function
      * @param $new
      * @param $old
-     * @return
      */
     protected function mergeChildByTagName($new, &$old)
     {

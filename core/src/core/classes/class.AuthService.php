@@ -135,6 +135,9 @@ class AuthService
 
         $frontends = AJXP_PluginsService::getInstance()->getActivePluginsForType("authfront");
         $index = 0;
+        /**
+         * @var AbstractAuthFrontend $frontendPlugin
+         */
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;
             $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
@@ -550,8 +553,8 @@ class AuthService
                  }
                  $userObject->save("superuser");
                  $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
+                self::updateUser($userObject);
              }
-            self::updateUser($userObject);
         } else if ($adminCount == -1) {
             // Here we may come from a previous version! Check the "admin" user and set its right as admin.
             $confStorage = ConfService::getConfStorageImpl();
@@ -981,6 +984,9 @@ class AuthService
         $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
+        /**
+         * @var $allUsers AbstractAjxpUser[]
+         */
         $allUsers = array();
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
@@ -1035,6 +1041,7 @@ class AuthService
      * @param $baseGroup
      * @param $userLogin
      * @param $usersPerPage
+     * @param int $offset
      * @return int
      */
     public static function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
@@ -1122,6 +1129,7 @@ class AuthService
      * Create or update role
      *
      * @param AJXP_Role $roleObject
+     * @param null $userObject
      */
     public static function updateRole($roleObject, $userObject = null)
     {
@@ -1181,12 +1189,12 @@ class AuthService
     }
 
     /**
-     * @param AJXP_User $parentUser
+     * @param string $parentUserId
      * @return AJXP_Role
      */
-    public static function limitedRoleFromParent($parentUser)
+    public static function limitedRoleFromParent($parentUserId)
     {
-        $parentRole = self::getRole("AJXP_USR_/".$parentUser);
+        $parentRole = self::getRole("AJXP_USR_/".$parentUserId);
         if($parentRole === false) return null;
 
         // Inherit actions

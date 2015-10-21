@@ -315,12 +315,14 @@ class Repository implements AjxpGroupPathProvider
         }
         $this->options[$oName] = $oValue;
     }
+
     /**
      * Get the repository options, filtered in various maners
      * @param string $oName
      * @param bool $safe Do not filter
      * @param AbstractAjxpUser $resolveUser
      * @return mixed|string
+     * @throws Exception
      */
     public function getOption($oName, $safe=false, $resolveUser = null)
     {
@@ -579,6 +581,7 @@ class Repository implements AjxpGroupPathProvider
 
     /**
      * @param bool $public
+     * @param null $ownerLabel
      * @return String
      */
     public function getDescription( $public = false, $ownerLabel = null )

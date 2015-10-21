@@ -96,6 +96,7 @@ class ConfService
 
 
         if (is_file(AJXP_CONF_PATH."/bootstrap_repositories.php")) {
+            $REPOSITORIES = array();
             include(AJXP_CONF_PATH."/bootstrap_repositories.php");
             $this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
         } else {
@@ -223,8 +224,7 @@ class ConfService
     /**
      * Set or get if we are currently running REST
      * @static
-     * @param null $set
-     * @param string $baseUrl
+     * @param string $restBase
      * @return bool
      */
     public static function currentContextIsRestAPI($restBase = '')
@@ -560,7 +560,7 @@ class ConfService
      * @param AbstractAjxpUser $userObject
      * @param bool $details
      * @param bool $labelOnly
-     * @param bool $skipShared
+     * @param bool $includeShared
      * @return Repository[]
      */
     public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $includeShared = true)
@@ -723,6 +723,7 @@ class ConfService
             foreach($criteria as $key => $value){
                 if(!in_array($key, $searchableKeys)) continue;
                 $criteriumOk = false;
+                $comp = null;
                 if($key == "uuid") $comp = $repoObject->getUniqueId();
                 else if($key == "parent_uuid") $comp = $repoObject->getParentId();
                 else if($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
@@ -781,6 +782,7 @@ class ConfService
 
     /**
      * @param $scope String "user", "all"
+     * @param bool $includeShared
      * @return array
      */
     protected function initRepositoriesListInst($scope = "user", $includeShared = true)
@@ -825,6 +827,9 @@ class ConfService
             }
         }
         if (is_array($drvList)) {
+            /**
+             * @var $drvList Repository[]
+             */
             foreach ($drvList as $repoId=>$repoObject) {
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $repoObject->getAccessType());
                 if (!is_object($driver) || !$driver->isEnabled()) {
@@ -993,12 +998,6 @@ class ConfService
      */
     public function getRepositoryByIdInst($repoId)
     {
-        /*
-        $currentRepos = $this->getLoadedRepositories();
-        if (isSet($currentRepos[$repoId])) {
-            return $currentRepos[$repoId];
-        }
-        */
         if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$repoId])) {
             return $this->configs["REPOSITORIES"][$repoId];
         }
@@ -1021,6 +1020,7 @@ class ConfService
             $this->keyValueCache->save("repository:".$repoId, $repo);
             return $repo;
         }
+        return null;
     }
 
     /**
@@ -1070,7 +1070,7 @@ class ConfService
      * See static method
      * @param $oldId
      * @param $oRepositoryObject
-     * @return void
+     * @return int
      */
     public function replaceRepositoryInst($oldId, $oRepositoryObject)
     {
@@ -1078,11 +1078,12 @@ class ConfService
         $confStorage = self::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepositoryObject, true);
         if ($res == -1) {
-            return $res;
+            return -1;
         }
         AJXP_Controller::applyHook("workspace.after_update", array($oRepositoryObject));
         AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         $this->invalidateLoadedRepositories();
+        return 0;
     }
     /**
      * Set a temp repository id but not in the session
@@ -1123,6 +1124,7 @@ class ConfService
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         $this->invalidateLoadedRepositories();
+        return 0;
     }
 
     /**
@@ -1176,7 +1178,7 @@ class ConfService
     public function getMessagesInstConf($forceRefresh = false)
     {
         // make sure they are loaded
-        $mess = $this->getMessagesInst($forceRefresh);
+        $this->getMessagesInst($forceRefresh);
         return $this->configs["CONF_MESSAGES"];
     }
 
@@ -1235,6 +1237,7 @@ class ConfService
                     $lang = "en";
                 }
                 if (is_file($path."/conf/".$lang.".php")) {
+                    $mess = array();
                     require($path."/conf/".$lang.".php");
                     $this->configs["CONF_MESSAGES"] = array_merge($this->configs["CONF_MESSAGES"], $mess);
                 }
@@ -1367,7 +1370,7 @@ class ConfService
      */
     public static function setConf($varName, $varValue)
     {
-        return self::getInstance()->setConfInst($varName, $varValue);
+        self::getInstance()->setConfInst($varName, $varValue);
     }
     /**
      * See static method
@@ -1418,7 +1421,7 @@ class ConfService
      */
     public static function setLanguage($lang)
     {
-        return self::getInstance()->setLanguageInst($lang);
+        self::getInstance()->setLanguageInst($lang);
     }
     /**
      * See static method
@@ -1633,7 +1636,6 @@ class ConfService
             }
             $q = new DOMXPath($node->ownerDocument);
             $cNodes = $q->query("//".$filterByTagName, $node);
-            $nodeAttr = $node->attributes;
             $xmlBuffer .= "<ajxpdriver ";
             foreach($node->attributes as $attr) $xmlBuffer.= " $attr->name=\"$attr->value\" ";
             $xmlBuffer .=">";
