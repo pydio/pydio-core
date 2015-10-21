@@ -211,6 +211,11 @@
                 <serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
+        <action name="get_permissions_mask">
+            <processing>
+                <serverCallback methodName="publishPermissionsMask" restParams="/" developerComment="Send the permissions mask for the current workspace, if defined."/>
+            </processing>
+        </action>
 		<action name="save_user_pref">
 			<processing>
 				<serverCallback methodName="switchAction"/>

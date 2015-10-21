@@ -1176,7 +1176,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
                 $indexGroup = 0;
-                if (!$usersOnly && is_array($allGroups)) {
+                if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
@@ -1296,58 +1296,89 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     }
 
     /**
-     * @param $userObject AbstractAjxpUser
-     * @param $rolePrefix get all roles with prefix
-     * @param $includeString get roles in this string
-     * @param $excludeString eliminate roles in this string
+     * @param AbstractAjxpUser $userObject
+     * @param string $rolePrefix get all roles with prefix
+     * @param string $includeString get roles in this string
+     * @param string $excludeString eliminate roles in this string
      * @param bool $byUserRoles
      * @return array
      */
     public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
     {
-        if ($userObject) {
-            if ($byUserRoles) {
-                $allUserRoles = $userObject->getRoles();
-            } else {
-                $allUserRoles = AuthService::getRolesList(array(), true);
-            }
-            $allRoles = array();
-            if (isset($allUserRoles)) {
-
-                // Exclude
-                if ($excludeString) {
-                    if (strpos($excludeString, "preg:") !== false) {
-                        $matchFilterExclude = "/" . str_replace("preg:", "", $excludeString) . "/i";
-                    } else {
-                        $valueFiltersExclude = array_map("trim", explode(",", $excludeString));
-                        $valueFiltersExclude = array_map("strtolower", $valueFiltersExclude);
-                    }
-                }
-
-                // Include
-                if ($includeString) {
-                    if (strpos($includeString, "preg:") !== false) {
-                        $matchFilterInclude = "/" . str_replace("preg:", "", $includeString) . "/i";
-                    } else {
-                        $valueFiltersInclude = array_map("trim", explode(",", $includeString));
-                        $valueFiltersInclude = array_map("strtolower", $valueFiltersInclude);
-                    }
-                }
-
-                foreach ($allUserRoles as $roleId => $role) {
-                    if (!empty($rolePrefix) && strpos($roleId, $rolePrefix) === false) continue;
-                    if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
-                    if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
-                    if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
-                    if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
-                    if(is_a($role, "AJXP_Role")) $roleObject = $role;
-                    else $roleObject = AuthService::getRole($roleId);
-                    $label = $roleObject->getLabel();
-                    $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
-                    $allRoles[$roleId] = $label;
-                }
-            }
-            return $allRoles;
+        if (!$userObject){
+            return array();
         }
+        if ($byUserRoles) {
+            $allUserRoles = $userObject->getRoles();
+        } else {
+            $allUserRoles = AuthService::getRolesList(array(), true);
+        }
+        $allRoles = array();
+        if (isset($allUserRoles)) {
+
+            // Exclude
+            if ($excludeString) {
+                if (strpos($excludeString, "preg:") !== false) {
+                    $matchFilterExclude = "/" . str_replace("preg:", "", $excludeString) . "/i";
+                } else {
+                    $valueFiltersExclude = array_map("trim", explode(",", $excludeString));
+                    $valueFiltersExclude = array_map("strtolower", $valueFiltersExclude);
+                }
+            }
+
+            // Include
+            if ($includeString) {
+                if (strpos($includeString, "preg:") !== false) {
+                    $matchFilterInclude = "/" . str_replace("preg:", "", $includeString) . "/i";
+                } else {
+                    $valueFiltersInclude = array_map("trim", explode(",", $includeString));
+                    $valueFiltersInclude = array_map("strtolower", $valueFiltersInclude);
+                }
+            }
+
+            foreach ($allUserRoles as $roleId => $role) {
+                if (!empty($rolePrefix) && strpos($roleId, $rolePrefix) === false) continue;
+                if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
+                if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
+                if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
+                if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
+                if(is_a($role, "AJXP_Role")) $roleObject = $role;
+                else $roleObject = AuthService::getRole($roleId);
+                $label = $roleObject->getLabel();
+                $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
+                $allRoles[$roleId] = $label;
+            }
+        }
+        return $allRoles;
+    }
+
+    /**
+     * @param string $actionName
+     * @param array $httpVars
+     * @param array $fileVars
+     */
+    public function publishPermissionsMask($actionName, $httpVars, $fileVars){
+        $mask = array();
+        HTMLWriter::charsetHeader("application/json");
+        if(!AuthService::usersEnabled() || AuthService::getLoggedUser() == null){
+            print json_encode($mask);
+            return;
+        }
+        $repoId = ConfService::getCurrentRepositoryId();
+        $role = AuthService::getLoggedUser()->mergedRole;
+        if($role->hasMask($repoId)){
+            $fullMask = $role->getMask($repoId);
+            foreach($fullMask->flattenTree() as $path => $permission){
+                // Do not show if "deny".
+                if($permission->denies()) continue;
+                $mask[$path] = array(
+                    "read" => $permission->canRead(),
+                    "write" => $permission->canWrite()
+                );
+            }
+        }
+        print json_encode($mask);
+        return;
+
     }
 }
