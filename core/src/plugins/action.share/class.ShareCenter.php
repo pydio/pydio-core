@@ -1468,95 +1468,6 @@ class ShareCenter extends AJXP_Plugin
             return array_merge(array_values($sharedGroups), array_values($sharedEntries));
 
         }
-
-        /*
-        $users = AuthService::getUsersForRepository($repoId);
-        //var_dump($roles);
-        $baseGroup = "/";
-        $groups = AuthService::listChildrenGroups($baseGroup);
-        $mess = ConfService::getMessages();
-        $groups[$baseGroup] = $mess["447"];
-        $sharedEntries = array();
-        if (!$mixUsersAndGroups) {
-            $sharedGroups = array();
-        }
-
-        foreach ($groups as $gId => $gLabel) {
-            $r = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($gId));
-            if ($r != null) {
-                $right = $r->getAcl($repoId);
-                if (!empty($right)) {
-                    $entry = array(
-                        "ID"    => "AJXP_GRP_".AuthService::filterBaseGroup($gId),
-                        "TYPE"  => "group",
-                        "LABEL" => $gLabel,
-                        "RIGHT" => $right);
-                    if (!$mixUsersAndGroups) {
-                        $sharedGroups[$gId] = $entry;
-                    } else {
-                        $sharedEntries[] = $entry;
-                    }
-                }
-            }
-        }
-
-        foreach ($roles as $rId){
-            if(strpos($rId, "AJXP_GRP_") === 0 || strpos($rId, "AJXP_USR_") === 0) continue;
-            $role = AuthService::getRole($rId);
-            if ($role != null) {
-                $right = $role->getAcl($repoId);
-                if (!empty($right)) {
-                    $label = $role->getLabel();
-                    if(empty($label)) $label = $rId;
-                    $entry = array(
-                        "ID"    => $rId,
-                        "TYPE"  => "group",
-                        "LABEL" => $label,
-                        "RIGHT" => $right);
-                    if (!$mixUsersAndGroups) {
-                        $sharedGroups[$rId] = $entry;
-                    } else {
-                        $sharedEntries[] = $entry;
-                    }
-                }
-            }
-        }
-
-        foreach ($users as $userId => $userObject) {
-            if($userObject->getId() == $loggedUser->getId() && !$loggedUser->isAdmin()) {
-                continue;
-            }
-            $ri = $userObject->personalRole->getAcl($repoId);
-            $uLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-            if(empty($uLabel)) $uLabel = $userId;
-            if (!empty($ri)) {
-                $entry =  array(
-                    "ID"    => $userId,
-                    "TYPE"  => $userObject->hasParent()?"tmp_user":"user",
-                    "LABEL" => $uLabel,
-                    "RIGHT" => $userObject->personalRole->getAcl($repoId)
-                );
-                if ($this->watcher !== false && $currentFileUrl != null) {
-                    $entry["WATCH"] = $this->watcher->hasWatchOnNode(
-                        new AJXP_Node($currentFileUrl),
-                        $userId,
-                        MetaWatchRegister::$META_WATCH_USERS_NAMESPACE
-                    );
-                }
-                if (!$mixUsersAndGroups) {
-                    $sharedEntries[$userId] = $entry;
-                } else {
-                    $sharedEntries[] = $entry;
-                }
-            }
-        }
-
-        if (!$mixUsersAndGroups) {
-            return array("USERS" => $sharedEntries, "GROUPS" => $sharedGroups);
-        }
-        return $sharedEntries;
-        */
-
     }
 
     /**
@@ -1977,11 +1888,13 @@ class ShareCenter extends AJXP_Plugin
                         $userObject->personalRole->setAcl($newRepoUniqueId, "");
                         $userObject->save("superuser");
                     }
-                    $this->watcher->removeWatchFromFolder(
-                        new AJXP_Node($this->urlBase.$file),
-                        $user,
-                        true
-                    );
+                    if($this->watcher !== false){
+                        $this->watcher->removeWatchFromFolder(
+                            new AJXP_Node($this->urlBase.$file),
+                            $user,
+                            true
+                        );
+                    }
                 }
             }
             $originalGroups = array_keys($currentRights["GROUPS"]);
