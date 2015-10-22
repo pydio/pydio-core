@@ -14,5 +14,5 @@ ALTER TABLE  `ajxp_log`
 ;
 /* SEPARATOR */
 ALTER TABLE `ajxp_roles`
-    ADD COLUMN `last_udpated` INT(11) NOT NULL DEFAULT 0,
-    ADD INDEX (`last_udpated`)
+    ADD COLUMN `last_updated` INT(11) NOT NULL DEFAULT 0,
+    ADD INDEX (`last_updated`)

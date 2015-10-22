@@ -146,10 +146,10 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
-	<!-- BUILD JAVASCRIPT -->
-	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
+    	<!-- BUILD JAVASCRIPT -->
+    	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
         <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-	<delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
+	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
 
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
@@ -180,6 +180,19 @@
         <phingcall target="replace_variables">
         	<property name="passed_directory" value="${upgrade_export}"/>
         </phingcall>
+
+        <if>
+            <available type="dir" file="${upgrade_export}/plugins/gui.ajax"/>
+            <then>
+                <echo message="Copying full gui.ajax folder" level="info"/>
+                <property name="new_package_name" value="${build.source_folder}/pydio-core-${build.version}"/>
+                <copy todir="${upgrade_export}/plugins/gui.ajax">
+                    <fileset dir="${new_package_name}/plugins/gui.ajax" defaultexcludes="false">
+                        <include name="*/**"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
 
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
