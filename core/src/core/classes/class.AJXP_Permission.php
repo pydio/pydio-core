@@ -21,7 +21,15 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AJXP_Permission
+ *
+ * Atomic permission associated to a folder path. Can be initialized either with an integer
+ * value (use MASK constants) or with a string value like "r", "rw", etc.
+ *
+ * @package Pydio
+ * @subpackage Core
+ */
 class AJXP_Permission implements JsonSerializable
 {
     /**
@@ -55,11 +63,16 @@ class AJXP_Permission implements JsonSerializable
         }
     }
 
+    /**
+     * Replicate this permission.
+     * @return AJXP_Permission
+     */
     function getCopy(){
         return new AJXP_Permission($this->value);
     }
 
     /**
+     * Test if the permission is readable
      * @return bool
      */
     function canRead(){
@@ -67,6 +80,7 @@ class AJXP_Permission implements JsonSerializable
     }
 
     /**
+     * Test if the permission is writeable
      * @return bool
      */
     function canWrite(){
@@ -74,6 +88,7 @@ class AJXP_Permission implements JsonSerializable
     }
 
     /**
+     * Test if the permission denies access, whatever happens.
      * @return bool
      */
     function denies(){
@@ -82,10 +97,20 @@ class AJXP_Permission implements JsonSerializable
         return false;
     }
 
+    /**
+     * Test if the permission is just empty
+     * @return bool
+     */
     function isEmpty(){
         return $this->value === 0;
     }
 
+    /**
+     * Test permission against an integer value
+     * @param int $numPerm
+     * @return bool
+     * @throws Exception
+     */
     function testPermission($numPerm){
         if(is_integer($numPerm) && ($numPerm < self::MASK)){
             $numPerm = $numPerm & self::MASK;
@@ -99,6 +124,10 @@ class AJXP_Permission implements JsonSerializable
         }
     }
 
+    /**
+     * Set this permission as readable
+     * @param bool|true $value
+     */
     function setRead($value = true){
         if($value)
             $this->value = $this->value | self::READ;
@@ -106,6 +135,11 @@ class AJXP_Permission implements JsonSerializable
             $this->value = $this->value & (self::READ ^ self::MASK);
         }
     }
+
+    /**
+     * Set this permission as writeable
+     * @param bool|true $value
+     */
     function setWrite($value = true){
         if($value)
             $this->value = $this->value | self::WRITE;
@@ -113,6 +147,11 @@ class AJXP_Permission implements JsonSerializable
             $this->value = $this->value & (self::WRITE ^ self::MASK);
         }
     }
+
+    /**
+     * Set this permission as denied
+     * @param bool|true $value
+     */
     function setDeny($value = true){
         if($value)
             $this->value = self::DENY;
@@ -122,6 +161,7 @@ class AJXP_Permission implements JsonSerializable
     }
 
     /**
+     * Override this permission value with the one passed in parameter
      * @param AJXP_Permission $perm
      * @return AJXP_Permission
      */

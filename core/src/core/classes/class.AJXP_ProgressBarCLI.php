@@ -20,6 +20,13 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class AJXP_ProgressBarCLI
+ * Simple object to print a progress bar on the command-line.
+ *
+ * @package Pydio
+ * @subpackage Core
+ */
 class AJXP_ProgressBarCLI {
     private $strProgress = "";
     private $strLength = 25; // 50 '='

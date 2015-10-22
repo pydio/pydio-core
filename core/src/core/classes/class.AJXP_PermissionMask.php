@@ -21,7 +21,15 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AJXP_PermissionMask
+ *
+ * Stores a mapping of path => AJXP_Permission that can be used as a mask on an existing folder structure.
+ *
+ * @package Pydio
+ * @subpackage Core
+ *
+ */
 class AJXP_PermissionMask implements JsonSerializable, Serializable
 {
     /**
@@ -30,6 +38,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     private $permissionTree = array();
 
     /**
+     * Initialize an empty mask, or from a serializedForm.
      * @param array|null $serializedForm
      */
     function __construct($serializedForm = null){
@@ -48,6 +57,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Returns the whole permission tree
      * @return array
      */
     function getTree(){
@@ -56,6 +66,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Set the permision tree at once
      * @param array $tree
      * @return AJXP_PermissionMask;
      */
@@ -65,6 +76,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Add a branch in the permissions tree
      * @param string $path
      * @param AJXP_Permission $permission
      * @return AJXP_PermissionMask
@@ -76,6 +88,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Delete a branch from the permission tree
      * @param string $path
      * @return AJXP_PermissionMask
      */
@@ -85,6 +98,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Merge the current permission tree with the one passed in parameter. The latter takes precedence on the first.
      * @param AJXP_PermissionMask $mask
      * @return AJXP_PermissionMask
      */
@@ -96,6 +110,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Copy the full tree from the one passed in parameter
      * @param AJXP_PermissionMask $mask
      * @return AJXP_PermissionMask
      */
@@ -105,6 +120,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Test if a given path does have the given permission according to this mask permission tree.
      * @param string $test
      * @param  string $permission
      * @return bool
@@ -146,6 +162,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Merge two trees
      * @param array $t1
      * @param array $t2
      * @return array
@@ -184,6 +201,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Translate a path=> AJXP_Permission to an array-based branch.
      * @param string $path
      * @param AJXP_Permission $permission
      * @return array
@@ -205,6 +223,7 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
     /**
+     * Transform the permission tree into a flat structure of pathes => permissions.
      * @param array|null $tree
      * @param array|null $pathes
      * @param string $currentRoot
@@ -226,7 +245,11 @@ class AJXP_PermissionMask implements JsonSerializable, Serializable
     }
 
 
-
+    /**
+     * Print the tree as a string (for debug puprpose).
+     * @param $permissionTree
+     * @param $level
+     */
     public function toStr($permissionTree, $level)
     {
         $level = $level + 1;

@@ -21,7 +21,13 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AJXP_SchemeTranslatorWrapper
+ * Simple Wrapper that justs converts a given protocol to another one.
+ *
+ * @package Pydio
+ * @subpackage Core
+ */
 class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements AjxpWrapper
 {
     /**

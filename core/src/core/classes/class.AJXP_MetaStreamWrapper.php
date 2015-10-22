@@ -21,7 +21,17 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AJXP_MetaStreamWrapper
+ *
+ * Global streamWrapper that encapsulates all wrappers to access a driver's resource.
+ * Registered under the "pydio" protocol, it should replace all the old ajxp.XX direct calls.
+ * The static "appendMetaWrapper" method allows to add additional wrapper that will be sequentially called until
+ * reaching the driver ajxp.XX wrapper.
+ *
+ * @package Pydio
+ * @subpackage Core
+ */
 class AJXP_MetaStreamWrapper implements AjxpWrapper
 {
     /**
@@ -40,6 +50,10 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
     protected static $cachedRepositoriesWrappers = array();
 
+    /**
+     * Register the stack of protocols/wrappers.
+     * @param null $registered_wrappers
+     */
     public static function register($registered_wrappers = null){
         if($registered_wrappers == null){
             $registered_wrappers = stream_get_wrappers();
@@ -51,6 +65,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
     }
 
+    /**
+     * Register an addition protocol/wrapper in the stack
+     * @param $name string
+     * @param $className string
+     */
     public static function appendMetaWrapper($name, $className){
         self::$metaWrappers[$name] = $className;
         self::register();
@@ -105,6 +124,12 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
     }
 
+    /**
+     * Return the final ajxp.XX wrapper class name.
+     * @param string $repositoryId
+     * @return string mixed
+     * @throws Exception
+     */
     public static function actualRepositoryWrapperClass($repositoryId){
         $data = self::actualRepositoryWrapperData($repositoryId);
         return $data["classname"];

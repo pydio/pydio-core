@@ -24,6 +24,13 @@ define('AJXP_PROMPT_EXCEPTION_PROMPT', 'AJXP_PROMPT_EXCEPTION_PROMPT');
 define('AJXP_PROMPT_EXCEPTION_CONFIRM', 'AJXP_PROMPT_EXCEPTION_CONFIRM');
 define('AJXP_PROMPT_EXCEPTION_ALERT', 'AJXP_PROMPT_EXCEPTION_ALERT');
 
+/**
+ * Class AJXP_PromptException
+ * Specific exception that triggers a prompt in the UI instead of displaying an error message.
+ *
+ * @package Pydio
+ * @subpackage Core
+ */
 class AJXP_PromptException extends AJXP_Exception{
 
     private $promptType = "prompt";
@@ -61,6 +68,12 @@ class AJXP_PromptException extends AJXP_Exception{
         parent::__construct($messageString, $messageId);
     }
 
+    /**
+     * Prompt user for credentials
+     * @param $sessionVariable
+     * @param $switchToRepositoryId
+     * @throws AJXP_PromptException
+     */
     public static function testOrPromptForCredentials($sessionVariable, $switchToRepositoryId){
         if(isSet($_GET["prompt_passed_data"]) && isSet($_GET["variable_name"]) && $_GET["variable_name"] == $sessionVariable){
             $_SESSION[$sessionVariable] = true;

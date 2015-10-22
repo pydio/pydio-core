@@ -18,7 +18,14 @@
  *
  * The latest code can be found at <https://pyd.io/>.
  *
+ *
+ */
+
+/**
+ * Class PydioSdkGenerator
  * Generate a Swagger file for Rest APIs documentation
+ * @package Pydio
+ * @subpackage Core
  */
 class PydioSdkGenerator
 {

@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AJXP_Exception extends Exception
 {
-    public function AJXP_Exception($messageString, $messageId = false)
+    public function __construct($messageString, $messageId = false)
     {
         if ($messageId !== false && class_exists("ConfService")) {
             $messages = ConfService::getMessages();
