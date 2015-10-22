@@ -245,9 +245,9 @@
 			</then>
 		</if>
 		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.pgsql"/>
 			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+				<copy file="${git.local_repository}/dist/php/${build.version}.pgsql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.pgsql"/>
 			</then>
 		</if>
         <if>
