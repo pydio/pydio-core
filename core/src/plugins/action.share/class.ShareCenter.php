@@ -1922,7 +1922,7 @@ class ShareCenter extends AJXP_Plugin
                 }
                 if(!isSet($httpVars["minisite"])){
                     // This is an explicit user creation - check possible limits
-                    AJXP_Controller::applyHook("user.before_create", array($userName));
+                    AJXP_Controller::applyHook("user.before_create", array($userName, null, false, false));
                     $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
                         $count = count(ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()));
@@ -1932,7 +1932,7 @@ class ShareCenter extends AJXP_Plugin
                         }
                     }
                 }
-                AuthService::createUser($userName, $pass);
+                AuthService::createUser($userName, $pass, false, isSet($httpVars["minisite"]));
                 $userObject = $confDriver->createUserObject($userName);
                 $userObject->personalRole->clearAcls();
                 $userObject->setParent($loggedUser->id);

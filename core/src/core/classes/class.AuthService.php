@@ -772,13 +772,14 @@ class AuthService
      * @param $userId
      * @param $userPass
      * @param bool $isAdmin
+     * @param bool $isHidden
      * @return null
      * @todo the minlength check is probably causing problem with the bridges
      */
-    public static function createUser($userId, $userPass, $isAdmin=false)
+    public static function createUser($userId, $userPass, $isAdmin=false, $isHidden=false)
     {
         $userId = self::filterUserSensitivity($userId);
-        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin));
+        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new Exception("Reserved user id");
         }
@@ -791,18 +792,18 @@ class AuthService
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         $authDriver->createUser($userId, $userPass);
-        $user = null;
+        $user = $confDriver->createUserObject($userId);
         if ($isAdmin) {
-            $user = $confDriver->createUserObject($userId);
             $user->setAdmin(true);
+            $user->save("superuser");
+        }
+        if($isHidden){
+            $user->setHidden(true);
             $user->save("superuser");
         }
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
-            if (!isSet($user)) {
-                $user = $confDriver->createUserObject($userId);
-            }
             $wData = $user->getPref("AJXP_WEBDAV_DATA");
             if(!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
