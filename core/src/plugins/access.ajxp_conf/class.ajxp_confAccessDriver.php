@@ -1615,7 +1615,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     print('<users total="'.$users.'"/>');
                     print('<shares total="'.count($shares).'"/>');
                     $rootGroup = AuthService::getRole("AJXP_GRP_/");
-                    if($rootGroup->hasMask($repId)){
+                    if($rootGroup !== false && $rootGroup->hasMask($repId)){
                         print("<mask><![CDATA[".json_encode($rootGroup->getMask($repId))."]]></mask>");
                     }
                     print "</additional_info>";
