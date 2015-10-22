@@ -502,7 +502,7 @@ Class.create("Modal", {
         if(dTitle.getStyle('position') == 'absolute'){
             var innerH = 0;
             $A(dContent.childNodes).each(function(c){
-                if(c.getHeight) innerH += c.getHeight();
+                if(c.getHeight && c.visible()) innerH += c.getHeight();
             });
             var topPadding = Math.min(winHeight*25/100, Math.max(0, parseInt((winHeight - innerH)/2)));
             dContent.setStyle({paddingTop: topPadding + 'px'});
