@@ -3339,6 +3339,14 @@ div.tabulatorContainer div#display_toolbar{
     line-height: 1.5em;
 }
 
+.infopanel_loading{
+    opacity: 0;
+    transition: opacity ease 0.2s;
+}
+.infopanel_loading_finished{
+    opacity: 1;
+}
+
 span.toggleHeader{
     display: inline-block;
     overflow: hidden;

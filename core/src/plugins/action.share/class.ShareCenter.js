@@ -869,7 +869,10 @@ Class.create("ShareCenter", {
     },
 
     loadInfoPanel : function(container, node){
-        container.down('#ajxp_shared_info_panel .infoPanelTable').update('<div class="infoPanelRow">\
+
+        var mainCont = container.down("#ajxp_shared_info_panel .infoPanelTable");
+        mainCont.addClassName('infopanel_loading');
+        mainCont.update('<div class="infoPanelRow">\
             <div class="infoPanelLabel">'+MessageHash['share_center.55']+'</div>\
             <div class="infoPanelValue"><span class="icon-spinner"></span></div>\
             </div>\
@@ -879,7 +882,7 @@ Class.create("ShareCenter", {
 
             if(jsonData.error){
 
-                container.down("#ajxp_shared_info_panel .infoPanelTable").update('<div class="share_info_panel_main_legend"><span class="icon-warning-sign"></span> '+jsonData["label"]+'</div>');
+                mainCont.update('<div class="share_info_panel_main_legend"><span class="icon-warning-sign"></span> '+jsonData["label"]+'</div>');
 
             }else if(node.isLeaf() && !jsonData['repositoryId']){
 
@@ -917,7 +920,7 @@ Class.create("ShareCenter", {
                     }
                 }
 
-                container.down('#ajxp_shared_info_panel .infoPanelTable').update('\
+                mainCont.update('\
                     <div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ '</div>\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
@@ -936,13 +939,12 @@ Class.create("ShareCenter", {
                 ');
 
                 if(linksCount > 1){
-                    container.down('#ajxp_shared_info_panel .infoPanelTable').insert({bottom:'<div class="infoPanelRow">\
+                    mainCont.insert({bottom:'<div class="infoPanelRow">\
                         <div class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</div>\
                     </div>'});
                 }
 
             }else{
-                var mainCont = container.down("#ajxp_shared_info_panel .infoPanelTable");
                 var entries = [];
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
@@ -1001,6 +1003,7 @@ Class.create("ShareCenter", {
                 t.observe("blur", function(e){ pydio.UI.enableShortcuts();});
                 t.observe("click", function(event){event.target.select();});
             });
+            mainCont.addClassName("infopanel_loading_finished");
             container.up("div[ajxpClass]").ajxpPaneObject.resize();
         }, true);
     },

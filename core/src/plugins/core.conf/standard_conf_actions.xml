@@ -649,6 +649,7 @@
                         <div class="panelHeader">#{shared_string}</div>
                         <div id="ajxp_workspace_info_panel_content"></div>
                         <script>
+                            $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
                             bufferCallback("ajxp_load_repo_info_timer", 300,function(){
                                 if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
                                     return;
@@ -657,6 +658,7 @@
                                 var conn = new Connexion();
                                 conn.setParameters({get_action:'load_repository_info'});
                                 conn.onComplete = function(transport){
+                                    $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
                                     if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
                                         var data = transport.responseJSON;
                                         if(!data['core.users']['external']){
