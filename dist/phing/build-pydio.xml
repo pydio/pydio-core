@@ -236,14 +236,26 @@
 			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
 			<then>
 				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
-                <if>
-              			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
-              			<then>
-              				<copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
-              			</then>
-              		</if>
 			</then>
 		</if>
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.mysql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${build.version}.mysql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.mysql"/>
+			</then>
+		</if>
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+			</then>
+		</if>
+        <if>
+            <available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
+            <then>
+                <copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+            </then>
+        </if>
 
     </target>
 
