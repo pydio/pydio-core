@@ -126,7 +126,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
     /**
      * Return the final ajxp.XX wrapper class name.
-     * @param string $repositoryId
+     * @param $repositoryId
      * @return string mixed
      * @throws Exception
      */
