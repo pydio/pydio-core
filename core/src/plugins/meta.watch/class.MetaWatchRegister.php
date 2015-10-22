@@ -241,7 +241,10 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
             $usersMeta = isSet($nodeMeta[self::$META_WATCH_USERS_NAMESPACE]) ? $nodeMeta[self::$META_WATCH_USERS_NAMESPACE] : false;
             $ids = $this->loadWatchesFromMeta($watchType, $currentUserId, $source, $watchMeta, $usersMeta);
             foreach($ids as $id){
-                $result["ancestors"][] = array("node" => $source, "id" => $id);
+                // Do not send notification to myself!
+                if($id !== $currentUserId){
+                    $result["ancestors"][] = array("node" => $source, "id" => $id);
+                }
             }
         }
 

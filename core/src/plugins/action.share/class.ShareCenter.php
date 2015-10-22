@@ -1996,16 +1996,16 @@ class ShareCenter extends AJXP_Plugin
             $userObject->save("superuser");
             if ($this->watcher !== false) {
                 // Register a watch on the current folder for shared user
-                if ($uWatches[$userName] == "true") {
+                if ($uWatches[$userName]) {
                     $this->watcher->setWatchOnFolder(
-                        new AJXP_Node($this->urlBase.$file),
+                        new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                         $userName,
                         MetaWatchRegister::$META_WATCH_USERS_CHANGE,
                         array(AuthService::getLoggedUser()->getId())
                     );
                 } else {
                     $this->watcher->removeWatchFromFolder(
-                        new AJXP_Node($this->urlBase.$file),
+                        new AJXP_Node("pydio://".$newRepoUniqueId."/"),
                         $userName,
                         true
                     );
