@@ -173,6 +173,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if(!$compressNodeList->length) return ;
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
+        $compressNodeList = $actionXpath->query('action[@name="compress_ui"]', $contribNode);
+        if(!$compressNodeList->length) return ;
+        $compressNode = $compressNodeList->item(0);
+        $contribNode->removeChild($compressNode);
         // Disable "download" if selection is multiple
         $nodeList = $actionXpath->query('action[@name="download"]/gui/selectionContext', $contribNode);
         $selectionNode = $nodeList->item(0);

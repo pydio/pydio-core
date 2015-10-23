@@ -59,7 +59,7 @@ class PluginCompression extends AJXP_Plugin
         }
             $progressExtractFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressExtractID-" . $extractId . ".txt";
         if ($action == "compression") {
-            $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archiveName"]), AJXP_SANITIZE_FILENAME);
+            $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
             $archiveFormat = $httpVars["type_archive"];
             $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
             $acceptedExtension = false;
@@ -176,7 +176,7 @@ class PluginCompression extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($messages["compression.8"], null);
-                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, false);
+                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
                 AJXP_XMLWriter::close();
                 unlink($progressCompressionFileName);
             }
@@ -269,7 +269,7 @@ class PluginCompression extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
-                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, false);
+                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
                 AJXP_XMLWriter::close();
                 if (file_exists($progressExtractFileName)) {
                     unlink($progressExtractFileName);

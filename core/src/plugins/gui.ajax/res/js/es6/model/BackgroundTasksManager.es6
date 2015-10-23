@@ -101,8 +101,12 @@ class BackgroundTasksManager extends Observable {
 				if(type != 'SUCCESS'){
 					this.interruptOnError(childs[i].firstChild.nodeValue);
 				}
-			}
-			else if(childs[i].nodeName == "trigger_bg_action"){				
+			} else if(childs[i].nodeName == 'nodes_diff') {
+                var dm = this.actionManager.getDataModel();
+                if(dm.getAjxpNodeProvider().parseAjxpNodesDiffs){
+                    dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, !window.currentLightBox);
+                }
+            } else if(childs[i].nodeName == "trigger_bg_action"){
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");
                 delay = parseInt(childs[i].getAttribute("delay"));

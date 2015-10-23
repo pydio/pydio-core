@@ -793,7 +793,7 @@ class AJXP_PluginsService
                 if ($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing") {
                     $old->appendChild($newChild->cloneNode(true));
                 } else {
-                    $this->mergeChildByTagName($newChild, $found);
+                    $this->mergeChildByTagName($newChild->cloneNode(true), $found);
                 }
             } else {
                 // CloneNode or it's messing with the current foreach loop.
