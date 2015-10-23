@@ -822,7 +822,10 @@ Class.create("SearchEngine", AjxpPane, {
         if(noRes) noRes.remove();
 
         if(this._rootNode){
-            this._rootNode.addChild(ajxpNode);
+            try{
+                // Some derived hooks can trigger errors, ignore them.
+                this._rootNode.addChild(ajxpNode);
+            }catch(e){}
             return;
         }
 
