@@ -704,10 +704,19 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), serialize($roleObject->listAcls()));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin, %s, %i)",
+                        $roleId,
+                        serialize($roleObject),
+                        serialize($roleObject->listAcls()),
+                        time()
+                    );
                     break;
                 case "mysql":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)", $roleId, serialize($roleObject),time());
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)",
+                        $roleId,
+                        serialize($roleObject),
+                        time()
+                    );
                     break;
                 default:
                     return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
@@ -729,10 +738,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
                 $res = $row->fetchSingle();
                 if($res != null){
-                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s,[last_updated]=%i WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), time(), $role->getId());
                 }
                 else{
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), serialize($role->listAcls()));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin,%s,%i)", $role->getId(), serialize($role), serialize($role->listAcls()), time());
                 }
                 break;
             case "mysql":
