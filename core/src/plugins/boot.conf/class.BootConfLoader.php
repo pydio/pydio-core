@@ -217,8 +217,11 @@ class BootConfLoader extends AbstractConfDriver
         }
         if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
             file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
-        }else{
-            $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
+        }else if(AJXP_PACKAGING == "zip"){
+            $testContent = @file_get_contents(AJXP_INSTALL_PATH."/.htaccess");
+            if($testContent === false || $testContent != $htContent){
+                $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
+            }
         }
 
         $sqlPlugs = array(
@@ -281,7 +284,10 @@ class BootConfLoader extends AbstractConfDriver
         $uObj = $newConfigPlugin->createUserObject($adminLogin);
         if(isSet($data["MAILER_ADMIN"])) $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
         $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
-        $uObj->personalRole->setAcl('ajxp_conf', 'rw');
+        $repos = ConfService::getRepositoriesList("all", false);
+        foreach($repos as $repo){
+            $uObj->personalRole->setAcl($repo->getId(), "rw");
+        }
         AuthService::updateRole($uObj->personalRole);
 
         $loginP = "USER_LOGIN";
