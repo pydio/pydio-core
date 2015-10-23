@@ -210,7 +210,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         dibi::connect($this->sqlDriver);
-        if ($repositoryIdFilter != null) {
+        if ($repositoryIdFilter !== null) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
             AND ([repository_id] = %s OR [repository_id] IN  (SELECT [uuid] FROM [ajxp_repo] WHERE [parent_uuid]=%s))
             AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $repositoryIdFilter, $userId, 100);
