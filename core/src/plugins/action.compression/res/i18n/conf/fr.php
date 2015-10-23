@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Compression/Extraction Plugin" => "Plugin Compression/Extraction",
-"Compress or extract some files." => "Archive vos fichiers selectionner ou extrait vos archives selectionner.",
+    "Tar Archives Support" => "Tar Archives Support",
+    "Create and extract tar, tar.gz and tar.bz2 archives." => "Create and extract tar, tar.gz and tar.bz2 archives.",
 );

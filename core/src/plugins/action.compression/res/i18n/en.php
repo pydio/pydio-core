@@ -23,8 +23,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
     "1" => "Compress",
-    "2" => "Compress selected files",
-    "3" => "Compress the selected files in ",
+    "2" => "Compress Selection",
+    "3" => "Select the format of the archive:",
     "4" => "Archive's name :",
     "5" => "Starting compression...",
     "6" => "Adding files in the archive... %s ",
@@ -35,7 +35,7 @@ $mess = array(
     "11" => "Path of the extracted files ",
     "12" => "Starting extraction...",
     "13" => "Extracting files ... %s ",
-    "14" => "Extraction finished successfullly in the folder '%s' !!",
-    "15" => "The selected file is't a TAR, TAR.GZ or TAR.BZ2 archive !!",
-    "16" => "You can only compress in TAR, TAR.GZ or TAR.BZ2 !!",
+    "14" => "Extraction finished successfullly in the folder '%s'.",
+    "15" => "The selected file is neither a TAR  or a TAR.GZ or a TAR.BZ2 archive.",
+    "16" => "You can only compress in TAR, TAR.GZ or TAR.BZ2."
 );

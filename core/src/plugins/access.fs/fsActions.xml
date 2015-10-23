@@ -331,6 +331,15 @@
             </processing>
         </action>
 		<action name="compress">
+			<processing>
+                <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress" developerComment="Compress one or many files into a Zip archive. May be disabled for remote-access workspaces (like FTP).">
+                    <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                    <input_param description="Force new archive name. If not set, the parent folder name is used" name="archive_name" type="string"/>
+                    <input_param description="Skip the original folder structure and store all files at the root of the archive" name="compress_flat" type="boolean"/>
+                </serverCallback>
+				</processing>
+		</action>
+		<action name="compress_ui">
 			<gui text="313" title="314" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="true"
@@ -376,7 +385,7 @@
 				<clientListener name="selectionChange"><![CDATA[
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
-					var action = pydio.getController().getActionByName("compress");
+					var action = pydio.getController().getActionByName("compress_ui");
 					if(!window.zipEnabled || !window.multipleFilesDownloadEnabled){
 						if(action){
 							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
@@ -385,12 +394,7 @@
 					}
 				}
 				]]></clientListener>
-                <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress" developerComment="Compress one or many files into a Zip archive. May be disabled for remote-access workspaces (like FTP).">
-                    <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
-                    <input_param description="Force new archive name. If not set, the parent folder name is used" name="archive_name" type="string"/>
-                    <input_param description="Skip the original folder structure and store all files at the root of the archive" name="compress_flat" type="boolean"/>
-                </serverCallback>
-				</processing>
+            </processing>
 		</action>
         <action name="open_with_unique">
             <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
