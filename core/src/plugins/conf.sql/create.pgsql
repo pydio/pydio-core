@@ -59,8 +59,11 @@ CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options (uuid);
 CREATE TABLE ajxp_roles (
   role_id varchar(255) PRIMARY KEY,
   serial_role bytea NOT NULL,
-  searchable_repositories text
+  searchable_repositories text,
+  last_updated INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE INDEX roles_updated_idx ON ajxp_roles(last_updated);
 
 CREATE TABLE ajxp_groups (
   "groupPath" varchar(255) PRIMARY KEY,
