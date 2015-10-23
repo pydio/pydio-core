@@ -562,7 +562,7 @@
             </processing>
         </action>
         <action name="clear_plugins_cache">
-            <gui src="plugins" text="ajxp_conf.129" title="ajxp_conf.130">
+            <gui src="edit.png" text="ajxp_conf.129" title="ajxp_conf.130">
                 <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
             </gui>
             <processing>
