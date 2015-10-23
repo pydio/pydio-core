@@ -118,7 +118,7 @@ class Controller extends Observable{
 
     getBackgroundTasksManager(){
         if(!Controller._bgManager){
-            Controller._bgManager = new BackgroundTasksManager();
+            Controller._bgManager = new BackgroundTasksManager(this);
         }
         return Controller._bgManager;
     }
