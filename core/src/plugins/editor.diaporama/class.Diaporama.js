@@ -798,12 +798,13 @@ Class.create("Diaporama", AbstractEditor, {
 				});
 			}
             var off = theImage.positionedOffset();
+            var marginTop = (theImage.getStyle('marginTop')) ? parseInt(theImage.getStyle('marginTop')) : 0;
             var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
                 left: (realLeftOffset + 1) + 'px',
                 width: (theImage.getWidth() - 2) + "px",
-                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() -1 )  + "px"
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() + marginTop)  + "px"
             });
 		});
 		img.observe("mouseout", function(event){
