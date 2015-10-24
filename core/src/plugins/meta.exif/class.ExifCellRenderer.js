@@ -84,6 +84,23 @@ Class.create("ExifCellRenderer", {
             metadata.set('ol_center', {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))});
             var  id = "small_map_" + Math.random();
             latiCell.up('div.infoPanelTable').insert({top:'<div id="'+id+'" style="height: 250px;"></div>'});
+            var testDim = $(id).getDimensions();
+            if(testDim.width == 0 && testDim.height == 0){
+                // seems like it's not visible. We are probably inside a tab, try to listen to tab switches
+                var tab = latiCell.up('div[ajxpClass="AjxpTabulator"]');
+                if(tab && tab.ajxpPaneObject){
+                    var object = tab.ajxpPaneObject;
+                    object.observeOnce("switch", function(tabId){
+                        if($(id).getDimensions().width != 0){
+                            pydio.Registry.loadEditorResources(editorData.resourcesManager);
+                            OLViewer.prototype.createOLMap(ajxpNode, id, false, false);
+                        }
+                    });
+                }else{
+                    // Silently fail, otherwise it will trigger an OpenLayer Error
+                }
+                return;
+            }
             pydio.Registry.loadEditorResources(editorData.resourcesManager);
             OLViewer.prototype.createOLMap(ajxpNode, id, false, false);
         }

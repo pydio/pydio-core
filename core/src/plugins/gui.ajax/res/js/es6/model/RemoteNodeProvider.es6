@@ -62,7 +62,6 @@ class RemoteNodeProvider{
             params['recursive'] = true;
             params['depth'] = depth;
         }
-        //if(this.discrete) conn.discrete = true;
         var path = node.getPath();
         // Double encode # character
         var paginationHash;
@@ -85,7 +84,7 @@ class RemoteNodeProvider{
         var complete = function (transport){
             this.parseNodes(node, transport, nodeCallback, childCallback);
         }.bind(this);
-        PydioApi.getClient().request(params,  complete);
+        PydioApi.getClient().request(params,  complete, null, {discrete:this.discrete});
     }
 
     /**
