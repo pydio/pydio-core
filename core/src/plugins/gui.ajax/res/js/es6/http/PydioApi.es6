@@ -1,3 +1,25 @@
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
+ */
+/**
+ * API Client
+ */
 class PydioApi{
 
     constructor(){
@@ -103,20 +125,13 @@ class PydioApi{
             }
             document.location.href=downloadUrl;
         }else{
-            var minisite_session = null;
-            var parts = ajxpServerAccess.replace('?', '&').split('&');
-            parts.map(function(p){
-                var sub = p.split('=');
-                if(sub.length == 2 && sub[0] == 'minisite_session'){
-                    minisite_session = sub[1];
-                }
-            });
             prototypeHiddenForm.action = window.ajxpServerAccessPath;
             prototypeHiddenForm.secure_token.value = this._secureToken;
             prototypeHiddenForm.get_action.value = dlActionName;
             prototypeHiddenForm.select("input").each(function(input){
                 if(input.name!='get_action' && input.name!='secure_token') input.remove();
             });
+            var minisite_session = PydioApi.detectMinisiteSession(ajxpServerAccess);
             if(minisite_session){
                 prototypeHiddenForm.insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
             }
@@ -139,6 +154,21 @@ class PydioApi{
 
     }
 
+    /**
+     * Detect a minisite_session parameter in the URL
+     * @param serverAccess
+     * @returns string|bool
+     */
+    static detectMinisiteSession(serverAccess){
+        var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+        var val = serverAccess.replace(regex, "$1");
+        return ( val == serverAccess ? false : val );
+    }
+
+    /**
+     * Detects if current browser supports HTML5 Upload.
+     * @returns boolean
+     */
     static supportsUpload(){
         if(window.Connexion){
             return (window.FormData || window.FileReader);
@@ -148,6 +178,10 @@ class PydioApi{
         return false;
     }
 
+    /**
+     * Instanciate a PydioApi client if it's not already instanciated and return it.
+     * @returns PydioApi
+     */
     static getClient(){
         if(PydioApi._PydioClient) return PydioApi._PydioClient;
         var client = new PydioApi();
@@ -160,7 +194,6 @@ class PydioApi{
      * @param fileName String
      * @param onLoadedCode Function Callback
      * @param aSync Boolean load library asynchroneously
-     * @todo : We should use Require or equivalent instead.
      */
     static loadLibrary(fileName, onLoadedCode, aSync){
         if(window.pydio && pydio.Parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
@@ -395,11 +428,9 @@ class PydioApi{
             else if(childs[i].tagName == "logging_result")
             {
                 if(childs[i].getAttribute("secure_token")){
-                    var serverAccessPath = this._pydioObject.Parameters.get("ajxpServerAccess");
-                    var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
 
-                    var val = serverAccessPath.replace(regex, "$1");
-                    var minisite_session = ( val == serverAccessPath ? false : val );
+                    var serverAccessPath = this._pydioObject.Parameters.get("ajxpServerAccess");
+                    var minisite_session = PydioApi.detectMinisiteSession(serverAccessPath);
 
                     var secure_token = childs[i].getAttribute("secure_token");
 

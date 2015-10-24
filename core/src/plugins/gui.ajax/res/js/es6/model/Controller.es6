@@ -173,10 +173,7 @@ class Controller extends Observable{
      * @returns {*}
      */
     parseXmlMessage(xmlDoc){
-        Logger.log("Controller.parseXmlMessage() is deprecated, use PydioApi instead");
-        if(window.console && window.console.trace){
-            Logger.log(console.trace());
-        }
+        Logger.debug("Controller.parseXmlMessage() is deprecated, use PydioApi instead");
         return PydioApi.getClient().parseXmlMessage(xmlDoc);
     }
 
@@ -187,7 +184,7 @@ class Controller extends Observable{
      * @param completeCallback Function Callback to be called on complete
      */
     submitForm(formName, post, completeCallback){
-        Logger.log("Controller.submitForm() is deprecated, use PydioApi instead");
+        Logger.debug("Controller.submitForm() is deprecated, use PydioApi instead");
         return PydioApi.getClient().submitForm(formName, post, completeCallback);
     }
 
