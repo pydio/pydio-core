@@ -174,7 +174,7 @@ class HTMLWriter
         if ($isFile && ($dataSize != 0)) {
             header("Content-Range: bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";");
         }
-        header('Content-Disposition: attachment; filename="' . $attachmentName . '"; filename*=utf-8\' \'' . rawurlencode($attachmentName));
+        header("Content-Disposition: attachment; filename=\"".$attachmentName."\"");
         header("Expires: 0");
         header("Cache-Control: no-cache, must-revalidate");
         header("Pragma: no-cache");

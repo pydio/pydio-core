@@ -1472,8 +1472,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $header_sendfile = "X-Sendfile";
                 header($header_sendfile.": ".SystemTextEncoding::toUTF8($filePathOrData));
                 header("Content-type: application/octet-stream");
-                $filename = basename($filePathOrData);
-                header('Content-Disposition: attachment; filename="' . $filename . '"; filename*=utf-8\' \'' . rawurlencode($filename));
+                header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
     if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
@@ -1486,8 +1485,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($replacecount == 1) {
             header("X-Accel-Redirect: $accelfile");
             header("Content-type: application/octet-stream");
-            $filename = basename($accelfile);
-            header('Content-Disposition: attachment; filename="' . $filename . '"; filename*=utf-8\' \'' . rawurlencode($filename));
+            header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
             return;
         } else {
             $this->logError("X-Accel-Redirect","Problem with X-Accel-Mapping for file $filePathOrData");
