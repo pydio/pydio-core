@@ -1570,6 +1570,9 @@ class ShareCenter extends AJXP_Plugin
         $this->initPublicFolder($downloadFolder);
 
         if(isset($existingData)){
+            $repo = ConfService::getRepositoryById($existingData["REPOSITORY"]);
+            if($repo == null) throw new Exception("Oups, something went wrong");
+            $this->shareStore->testUserCanEditShare($repo->getOwner());
             $data = $existingData;
         }else{
             $data = array(
@@ -1825,6 +1828,7 @@ class ShareCenter extends AJXP_Plugin
             $options["PLUGINS_DATA"] = $customData;
         }
         if (isSet($editingRepo)) {
+            $this->shareStore->testUserCanEditShare($editingRepo->getOwner());
             $newRepo = $editingRepo;
             $replace = false;
             if ($editingRepo->getDisplay() != $label) {

@@ -278,7 +278,7 @@ class ShareStore {
         return $dbLets;
     }
 
-    protected function testUserCanEditShare($userId){
+    public function testUserCanEditShare($userId){
 
         if(empty($userId)){
             $mess = ConfService::getMessages();
@@ -432,7 +432,12 @@ class ShareStore {
 
     public function resetDownloadCounter($hash, $userId){
         $data = $this->loadShare($hash);
-        // TODO We must check that the user has the right to do that!
+        $repoId = $data["REPOSITORY"];
+        $repo = ConfService::getRepositoryById($repoId);
+        if ($repo == null) {
+            throw new Exception("Cannot find associated share");
+        }
+        $this->testUserCanEditShare($repo->getOwner());
         PublicletCounter::reset($hash);
     }
 
