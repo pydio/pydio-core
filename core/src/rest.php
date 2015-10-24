@@ -62,7 +62,7 @@ if($repoID == 'pydio'){
     ConfService::switchRootDir();
     $repo = ConfService::getRepository();
 }else{
-    $repo = &ConfService::findRepositoryByIdOrAlias($repoID);
+    $repo = ConfService::findRepositoryByIdOrAlias($repoID);
     if ($repo == null) {
         die("Cannot find repository with ID ".$repoID);
     }

@@ -462,7 +462,8 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             throw new Exception("Empty role, this is not normal");
         }
         uksort($this->roles, array($this, "orderRoles"));
-        $this->mergedRole =  clone $this->roles[array_shift(array_keys($this->roles))];
+        $keys = array_keys($this->roles);
+        $this->mergedRole =  clone $this->roles[array_shift($keys)];
         if (count($this->roles) > 1) {
             $this->parentRole = $this->mergedRole;
         }

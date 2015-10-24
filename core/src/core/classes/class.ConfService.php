@@ -685,7 +685,8 @@ class ConfService
             }
         }
         $currentRepos = $this->getLoadedRepositories();
-        return array_shift(array_keys($currentRepos));
+        $keys = array_keys($currentRepos);
+        return array_shift($keys);
     }
     /**
      * Get the current repo label

@@ -225,7 +225,7 @@ class ftpAccessDriver extends fsAccessDriver
 
     }
 
-    public function deldir($location)
+    public function deldir($location, $repoData)
     {
         if (is_dir($location)) {
             $dirsToRecurse = array();
@@ -242,7 +242,7 @@ class ftpAccessDriver extends fsAccessDriver
             }
             closedir($all);
             foreach ($dirsToRecurse as $recurse) {
-                $this->deldir($recurse);
+                $this->deldir($recurse, $repoData);
             }
             rmdir($location);
         } else {
@@ -251,7 +251,7 @@ class ftpAccessDriver extends fsAccessDriver
                 if(!$test) throw new Exception("Cannot delete file ".$location);
             }
         }
-        if (basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN")) {
+        if (isSet($repoData["recycle"]) && basename(dirname($location)) == $repoData["recycle"]) {
             // DELETING FROM RECYCLE
             RecycleBinManager::deleteFromRecycle($location);
         }

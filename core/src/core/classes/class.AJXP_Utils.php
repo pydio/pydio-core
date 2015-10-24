@@ -378,7 +378,8 @@ class AJXP_Utils
 
         if (isSet($parameters["repository_id"]) && isSet($parameters["folder"]) || isSet($parameters["goto"])) {
             if (isSet($parameters["goto"])) {
-                $repoId = array_shift(explode("/", ltrim($parameters["goto"], "/")));
+                $explode = explode("/", ltrim($parameters["goto"], "/"));
+                $repoId = array_shift($explode);
                 $parameters["folder"] = str_replace($repoId, "", ltrim($parameters["goto"], "/"));
             } else {
                 $repoId = $parameters["repository_id"];
@@ -885,7 +886,8 @@ class AJXP_Utils
             $api = ConfService::currentContextIsRestAPI();
             if(!empty($api)){
                 // Keep only before api base
-                $uri = array_shift(explode("/".$api."/", $uri));
+                $explode = explode("/".$api."/", $uri);
+                $uri = array_shift($explode);
             }
             return "$protocol://$name$port".$uri;
         }
@@ -1775,7 +1777,8 @@ class AJXP_Utils
                 unset($params["group_switch_value"]);
             }
             foreach ($params as $k => $v) {
-                $params[array_pop(explode("_", $k, 2))] = AJXP_VarsFilter::filter($v);
+                $explode = explode("_", $k, 2);
+                $params[array_pop($explode)] = AJXP_VarsFilter::filter($v);
                 unset($params[$k]);
             }
         }
@@ -1821,7 +1824,8 @@ class AJXP_Utils
         $allParts = array();
 
         foreach($separators as $sep){
-            $firstLine = array_shift(explode("\n", trim($sep)));
+            $explode = explode("\n", trim($sep));
+            $firstLine = array_shift($explode);
             if($firstLine == "/** BLOCK **/"){
                 $allParts[] = $sep;
             }else{

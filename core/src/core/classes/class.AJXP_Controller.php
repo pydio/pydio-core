@@ -83,7 +83,8 @@ class AJXP_Controller
         }
         $restPath = $restPathList->item(0)->nodeValue;
         $paramNames = explode("/", trim($restPath, "/"));
-        $path = array_shift(explode("?", $path));
+        $exploded = explode("?", $path);
+        $path = array_shift($exploded);
         $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
         foreach ($paramNames as $i => $pName) {
             if (strpos($pName, "+") !== false) {
