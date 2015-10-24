@@ -63,8 +63,6 @@ Class.create("CommentsPanel", {
     // Warning, method is called statically, there is no "this"
     loadInfoPanel : function(container, node){
 
-        console.log(container, container.down("textarea"), container.down("textarea.comments_textarea"));
-
         container.down("#comments_container");
         container.down("textarea.comments_textarea").observe("focus", function(){
             pydio.UI.disableAllKeyBindings();
