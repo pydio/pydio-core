@@ -169,14 +169,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         // Cannot use zip features on FTP !
         // Remove "compress" action
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
-        $compressNodeList = $actionXpath->query('action[@name="compress"]', $contribNode);
+        $compressNodeList = $actionXpath->query('action[@name="compress"]|action[@name="compress_ui"]|action[@name="download_all"]', $contribNode);
         if(!$compressNodeList->length) return ;
-        $compressNode = $compressNodeList->item(0);
-        $contribNode->removeChild($compressNode);
-        $compressNodeList = $actionXpath->query('action[@name="compress_ui"]', $contribNode);
-        if(!$compressNodeList->length) return ;
-        $compressNode = $compressNodeList->item(0);
-        $contribNode->removeChild($compressNode);
+        foreach($compressNodeList as $compressNodeAction){
+            $contribNode->removeChild($compressNodeAction);
+        }
         // Disable "download" if selection is multiple
         $nodeList = $actionXpath->query('action[@name="download"]/gui/selectionContext', $contribNode);
         $selectionNode = $nodeList->item(0);

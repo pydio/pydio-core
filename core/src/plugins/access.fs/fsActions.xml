@@ -291,7 +291,7 @@
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="true"><![CDATA[
-                        var dm = ajaxplorer.getContextHolder();
+                        var dm = pydio.getContextHolder();
                         dm._selectedNodes = $A([dm.getRootNode()]);
                         dm._bEmpty = dm._bDir = true; dm._bFile = false;
                         dm.publish("selection_changed", dm);
@@ -299,6 +299,12 @@
                             pydio.getController().fireAction("download");
                         }, 200);
                 ]]></clientCallback>
+                <clientListener name="init"><![CDATA[
+                    if(!pydio.Parameters.get('zipEnabled') || !pydio.Parameters.get('multipleFilesDownloadEnabled')){
+                        pydio.Controller.getActionByName("download_all").hide();
+                        pydio.Controller.actions["delete"]("download_all");
+                    }
+                ]]></clientListener>
             </processing>
         </action>
 		<action name="compress">
