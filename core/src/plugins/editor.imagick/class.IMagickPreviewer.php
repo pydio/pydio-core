@@ -281,6 +281,7 @@ class IMagickPreviewer extends AJXP_Plugin
                 } else {
                     $unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
+                putenv('LC_CTYPE='.AJXP_LOCALE);
                 exec($unoconv, $out, $return);
             }
             if (is_file($unoDoc)) {
