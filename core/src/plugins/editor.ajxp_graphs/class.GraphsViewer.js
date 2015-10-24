@@ -38,7 +38,6 @@ Class.create("GraphsViewer", AbstractEditor, {
     },
 
     destroy: function(){
-        // TODO: Shall we destroy the SVG objects?
         this.charts = $H();
     },
 

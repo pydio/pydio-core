@@ -201,7 +201,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
 
     /**
      * @abstract
-     * @todo shall we filter this result by the permissions mask? normally no reason to set a watch on a forbidden item...
      * @param $userId
      * @param null $repositoryIdFilter
      * @return mixed

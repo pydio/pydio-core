@@ -782,11 +782,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
+     * This function is useless for the SQL driver : users are by default correctly listed by group.
      * @param AbstractAjxpUser[] $flatUsersList
      * @param string $baseGroup
      * @param bool $fullTree
      * @return void
-     * @todo
      */
     public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
     {

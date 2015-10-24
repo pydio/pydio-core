@@ -447,7 +447,7 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function listRepositories($user = null)
     {
-        // TODO: Implement listRepositories() method.
+        return array();
     }
 
     /**
@@ -457,7 +457,7 @@ class BootConfLoader extends AbstractConfDriver
      * @return Array
      */
     public function listRepositoriesWithCriteria($criteria, &$count = null){
-
+        return array();
     }
 
     /**
@@ -468,7 +468,7 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function getRepositoryById($repositoryId)
     {
-        // TODO: Implement getRepositoryById() method.
+        return null;
     }
 
     /**
@@ -477,9 +477,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $repositorySlug
      * @return Repository
      */
-    public function getRepositoryByAlias($repositorySlug)
-    {
-        // TODO: Implement getRepositoryByAlias() method.
+    public function getRepositoryByAlias($repositorySlug) {
+        return null;
     }
 
     /**
@@ -487,11 +486,10 @@ class BootConfLoader extends AbstractConfDriver
      *
      * @param Repository $repositoryObject
      * @param Boolean $update
-     * @return -1 if failed
+     * @return int -1 if failed
      */
-    public function saveRepository($repositoryObject, $update = false)
-    {
-        // TODO: Implement saveRepository() method.
+    public function saveRepository($repositoryObject, $update = false) {
+        return -1;
     }
 
     /**
@@ -499,9 +497,8 @@ class BootConfLoader extends AbstractConfDriver
      *
      * @param String $repositoryId
      */
-    public function deleteRepository($repositoryId)
-    {
-        // TODO: Implement deleteRepository() method.
+    public function deleteRepository($repositoryId) {
+
     }
 
     /**
@@ -510,14 +507,11 @@ class BootConfLoader extends AbstractConfDriver
      * @param boolean $excludeReserved,
      * @return array AjxpRole[]
      */
-    public function listRoles($roleIds = array(), $excludeReserved = false)
-    {
-        // TODO: Implement listRoles() method.
+    public function listRoles($roleIds = array(), $excludeReserved = false) {
+        return array();
     }
 
-    public function saveRoles($roles)
-    {
-        // TODO: Implement saveRoles() method.
+    public function saveRoles($roles) {
     }
 
     /**
@@ -525,26 +519,21 @@ class BootConfLoader extends AbstractConfDriver
      * @param AbstractAjxpUser $userObject
      * @return void
      */
-    public function updateRole($role, $userObject = null)
-    {
-        // TODO: Implement updateRole() method.
+    public function updateRole($role, $userObject = null) {
     }
 
     /**
      * @param AJXP_Role|String $role
      * @return void
      */
-    public function deleteRole($role)
-    {
-        // TODO: Implement deleteRole() method.
+    public function deleteRole($role) {
+
     }
 
     /**
      * Specific queries
      */
-    public function countAdminUsers()
-    {
-        // TODO: Implement countAdminUsers() method.
+    public function countAdminUsers() {
     }
 
     /**
@@ -553,9 +542,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $ID
      * @return String $ID
      */
-    public function saveBinary($context, $fileName, $ID = null)
-    {
-        // TODO: Implement saveBinary() method.
+    public function saveBinary($context, $fileName, $ID = null) {
+        return $ID;
     }
 
     /**
@@ -564,9 +552,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param Stream $outputStream
      * @return boolean
      */
-    public function loadBinary($context, $ID, $outputStream = null)
-    {
-        // TODO: Implement loadBinary() method.
+    public function loadBinary($context, $ID, $outputStream = null) {
+        return false;
     }
 
     /**
@@ -574,9 +561,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $ID
      * @return boolean
      */
-    public function deleteBinary($context, $ID)
-    {
-        // TODO: Implement deleteBinary() method.
+    public function deleteBinary($context, $ID) {
+        return false;
     }
 
     /**
@@ -585,9 +571,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $userId
      * @param Array $deletedSubUsers
      */
-    public function deleteUser($userId, &$deletedSubUsers)
-    {
-        // TODO: Implement deleteUser() method.
+    public function deleteUser($userId, &$deletedSubUsers) {
+        return array();
     }
 
     /**
@@ -596,32 +581,28 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $userId
      * @return AbstractAjxpUser
      */
-    public function instantiateAbstractUserImpl($userId)
-    {
-        // TODO: Implement instantiateAbstractUserImpl() method.
+    public function instantiateAbstractUserImpl($userId) {
+        return null;
     }
 
-    public function getUserClassFileName()
-    {
-        // TODO: Implement getUserClassFileName() method.
+    public function getUserClassFileName() {
+        return "";
     }
 
     /**
      * @param $userId
      * @return AbstractAjxpUser[]
      */
-    public function getUserChildren($userId)
-    {
-        // TODO: Implement getUserChildren() method.
+    public function getUserChildren($userId) {
+        return array();
     }
 
     /**
      * @param string $repositoryId
      * @return array()
      */
-    public function getUsersForRepository($repositoryId)
-    {
-        // TODO: Implement getUsersForRepository() method.
+    public function getUsersForRepository($repositoryId) {
+        return array();
     }
 
     /**
@@ -632,9 +613,7 @@ class BootConfLoader extends AbstractConfDriver
      * @return array()
      */
     public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
-
-        // TODO: Implement getUsersForRepository() method.
-
+        return array();
     }
 
     /**
@@ -644,7 +623,7 @@ class BootConfLoader extends AbstractConfDriver
      * @return array
      */
     public function countUsersForRepository($repositoryId, $details = false, $admin=false){
-
+        return array();
     }
 
     /**
@@ -653,9 +632,7 @@ class BootConfLoader extends AbstractConfDriver
      * @param bool $fullTree
      * @return void
      */
-    public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
-    {
-        // TODO: Implement filterUsersByGroup() method.
+    public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false) {
     }
 
     /**
@@ -663,18 +640,15 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $groupLabel
      * @return mixed
      */
-    public function createGroup($groupPath, $groupLabel)
-    {
-        // TODO: Implement createGroup() method.
+    public function createGroup($groupPath, $groupLabel) {
+        return false;
     }
 
     /**
      * @param $groupPath
      * @return void
      */
-    public function deleteGroup($groupPath)
-    {
-        // TODO: Implement deleteGroup() method.
+    public function deleteGroup($groupPath) {
     }
 
     /**
@@ -682,18 +656,14 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $groupLabel
      * @return void
      */
-    public function relabelGroup($groupPath, $groupLabel)
-    {
-        // TODO: Implement relabelGroup() method.
+    public function relabelGroup($groupPath, $groupLabel) {
     }
 
     /**
      * @param string $baseGroup
      * @return string[]
      */
-    public function getChildrenGroups($baseGroup = "/")
-    {
-        // TODO: Implement getChildrenGroups() method.
+    public function getChildrenGroups($baseGroup = "/") {
     }
 
     /**

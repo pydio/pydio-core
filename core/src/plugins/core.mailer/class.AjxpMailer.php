@@ -213,7 +213,6 @@ class AjxpMailer extends AJXP_Plugin
 
     public function abstractUserToAdress(AbstractAjxpUser $user)
     {
-        // TODO
         // SHOULD CHECK THAT THIS USER IS "AUTHORIZED" TO AVOID SPAM
         $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
         if (empty($userEmail)) {
