@@ -79,6 +79,66 @@ class PydioApi{
 
     }
 
+    /**
+     *
+     * @param userSelection UserSelection A Pydio DataModel with selected files
+     * @param prototypeHiddenForm Element A hidden form element: currently relying on PrototypeJS.
+     * @param dlActionName String Action name to trigger, download by default.
+     * @param additionalParameters Object Optional set of key/values to pass to the download.
+     */
+    downloadSelection(userSelection, prototypeHiddenForm = null, dlActionName='download', additionalParameters = {}){
+
+        var ajxpServerAccess = this._pydioObject.Parameters.get("ajxpServerAccess");
+        var agent = navigator.userAgent || '';
+        var agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
+        if(agentIsMobile || !prototypeHiddenForm){
+            var downloadUrl = ajxpServerAccess + '&get_action=' + dlActionName;
+            if(additionalParameters){
+                for(var param in additionalParameters){
+                    if(additionalParameters.hasOwnProperty(param)) downloadUrl += "&" + param + "=" + additionalParameters[param];
+                }
+            }
+            if(userSelection){
+                downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
+            }
+            document.location.href=downloadUrl;
+        }else{
+            var minisite_session = null;
+            var parts = ajxpServerAccess.replace('?', '&').split('&');
+            parts.map(function(p){
+                var sub = p.split('=');
+                if(sub.length == 2 && sub[0] == 'minisite_session'){
+                    minisite_session = sub[1];
+                }
+            });
+            prototypeHiddenForm.action = window.ajxpServerAccessPath;
+            prototypeHiddenForm.secure_token.value = this._secureToken;
+            prototypeHiddenForm.get_action.value = dlActionName;
+            prototypeHiddenForm.select("input").each(function(input){
+                if(input.name!='get_action' && input.name!='secure_token') input.remove();
+            });
+            if(minisite_session){
+                prototypeHiddenForm.insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
+            }
+            if(additionalParameters){
+                for(var parameter in additionalParameters){
+                    if(additionalParameters.hasOwnProperty(parameter)) {
+                        prototypeHiddenForm.insert(new Element('input', {type:'hidden', name:parameter, value:additionalParameters[parameter]}));
+                    }
+                }
+            }
+            if(userSelection) {
+                userSelection.updateFormOrUrl(prototypeHiddenForm);
+            }
+            try{
+                prototypeHiddenForm.submit();
+            }catch(e){
+                if(window.console) window.console.error("Error while submitting hidden form for download", e);
+            }
+        }
+
+    }
+
     static supportsUpload(){
         if(window.Connexion){
             return (window.FormData || window.FileReader);

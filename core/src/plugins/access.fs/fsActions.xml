@@ -217,44 +217,15 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
+					if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled'))
 					{
-						if(gaTrackEvent){
+						if(window.gaTrackEvent){
 							var fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++){
-								gaTrackEvent("Data", "Download", fileNames[i]);
+								window.gaTrackEvent("Data", "Download", fileNames[i]);
 							}
 						}
-						var agent = navigator.userAgent;
-						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1||agent.indexOf('Safari')!=-1)){
-							var downloadUrl = ajxpServerAccessPath+'&get_action=download';
-							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-							document.location.href=downloadUrl;
-						}else{
-						    var minisite_session = null;
-						    var parts = $A(window.ajxpServerAccessPath.replace('?', '&').split('&'));
-						    parts.each(function(p){
-						        var sub = p.split('=');
-						        if(sub.length == 2 && sub[0] == 'minisite_session'){
-						            minisite_session = sub[1];
-                                    throw $break;
-                                }
-						    });
-							$('download_form').action = window.ajxpServerAccessPath;
-							$('download_form').secure_token.value = Connexion.SECURE_TOKEN;
-							$('download_form').select("input").each(function(input){
-								if(input.name!='get_action' && input.name!='secure_token') input.remove();
-							});
-							if(minisite_session){
-							    $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
-							}
-							userSelection.updateFormOrUrl($('download_form'));
-							try{
-    							$('download_form').submit();
-    					    }catch(e){
-
-    					    }
-						}
+						PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
 					}
 					else
 					{
@@ -279,7 +250,7 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="index.php" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="index.php" method="POST" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
 						<input type="hidden" name="secure_token" value="">
 					</form>
