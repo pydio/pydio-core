@@ -114,7 +114,7 @@
                              actionBar="true" contextMenu="true" infoPanel="false"
                              actionBarGroup="change" inZip="false">
                     </context>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="tar,gz,bz2"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="false"><![CDATA[
