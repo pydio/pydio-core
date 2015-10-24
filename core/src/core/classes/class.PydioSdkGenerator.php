@@ -120,7 +120,7 @@ class PydioSdkGenerator
         );
         foreach($swaggerAPIs as $pluginName => $apis){
 
-            var_dump("Writing file for $pluginName");
+            echo("Writing file for $pluginName");
 
             $swaggerJson = array(
                 "apiVersion" => $versionString,
