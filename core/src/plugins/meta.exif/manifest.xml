@@ -25,8 +25,9 @@
 		<actions>
 			<action name="extract_exif">
 				<processing>
-					<serverCallback methodName="extractExif" restParams="/file+" developerComment="Extract all exif data from a compatible image (JPG).">
+					<serverCallback methodName="extractExif" restParams="/format/file+" developerComment="Extract all exif data from a compatible image (JPG).">
                         <input_param name="file" type="path" description="Path to the file to analyze"/>
+                        <input_param name="format" type="string" description="json|xml: Get json instead of xml (default)"/>
                         <output type="XML" description="An XML structure containing all Exif tags"/>
 					</serverCallback>
 				</processing>

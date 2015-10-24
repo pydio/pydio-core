@@ -118,9 +118,13 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $exifData["IPTC"] = $iptc;
         }
         $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
-        AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
+        $format = "xml";
+        if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+            $format = "json";
+        }
+        $filteredData = array();
         foreach ($exifData as $section => $data) {
-            print("<exifSection name='$section'>");
+            $filteredData[$section] = array();
             foreach ($data as $key => $value) {
                 if (is_array($value)) {
                     $value = implode(",", $value);
@@ -128,11 +132,29 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
                 if(in_array(strtolower($key), $excludeTags)) continue;
                 if(strpos($key, "UndefinedTag:") === 0) continue;
                 $value = preg_replace( '/[^[:print:]]/', '',$value);
-                print("<exifTag name=\"$key\">".SystemTextEncoding::toUTF8($value)."</exifTag>");
+                $filteredData[$section][$key] = SystemTextEncoding::toUTF8($value);
             }
-            print("</exifSection>");
         }
-        AJXP_XMLWriter::close("metadata");
+
+        if($format == "xml"){
+
+            AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
+            foreach ($filteredData as $section => $data) {
+                print("<exifSection name='$section'>");
+                foreach ($data as $key => $value) {
+                    print("<exifTag name=\"$key\">". AJXP_Utils::xmlEntities($value)."</exifTag>");
+                }
+                print("</exifSection>");
+            }
+            AJXP_XMLWriter::close("metadata");
+
+        }else{
+
+            HTMLWriter::charsetHeader("application/json");
+            echo json_encode($filteredData);
+
+        }
+
     }
 
     public function string_format($str)
