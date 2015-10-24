@@ -29,7 +29,7 @@ Class.create("LogoWidget", AjxpPane, {
         this._imagePlugin = parts[0];
         this._imageParameter = parts[1];
 
-        var configs = ajaxplorer.getPluginConfigs(this._imagePlugin);
+        var configs = pydio.getPluginConfigs(this._imagePlugin);
         this.updateConfig(configs);
         if(options.link){
             var linkTitle;
@@ -39,7 +39,10 @@ Class.create("LogoWidget", AjxpPane, {
             }
             var clickObs = function(){
                 if(options.link.startsWith('triggerRepositoryChange:')){
-                    ajaxplorer.triggerRepositoryChange(options.link.replace('triggerRepositoryChange:',''));
+                    var repoId = options.link.replace('triggerRepositoryChange:', '');
+                    if(pydio.user && pydio.user.repositories && pydio.user.repositories.get(repoId)) {
+                        pydio.triggerRepositoryChange(repoId);
+                    }
                 }else{
                     if(options.linkTarget && options.linkTarget == 'new'){
                         window.open(options.link);
@@ -112,7 +115,7 @@ Class.create("LogoWidget", AjxpPane, {
                 this.imageIsDefault = true;
                 // Get parameters defaults
                 $A([this._imageParameter + "_H", this._imageParameter + "_W",this._imageParameter + "_L", this._imageParameter + "_T"]).each(function(param){
-                    var v = XPathGetSingleNodeText(ajaxplorer.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default");
+                    var v = XPathGetSingleNodeText(pydio.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default");
                     if(!v) v = 0;
                     configs.set(param, parseInt(v));
                 });
