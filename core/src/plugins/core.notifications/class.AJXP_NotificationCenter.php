@@ -332,6 +332,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $parentNodeURL = $node->getScheme()."://".$repositoryFilter.$relative;
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
+                    $path = $node->getPath();
                 }
 
 

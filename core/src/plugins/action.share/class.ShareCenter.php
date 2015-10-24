@@ -1572,7 +1572,7 @@ class ShareCenter extends AJXP_Plugin
         if(isset($existingData)){
             $repo = ConfService::getRepositoryById($existingData["REPOSITORY"]);
             if($repo == null) throw new Exception("Oups, something went wrong");
-            $this->shareStore->testUserCanEditShare($repo->getOwner());
+            $this->getShareStore()->testUserCanEditShare($repo->getOwner());
             $data = $existingData;
         }else{
             $data = array(
@@ -1828,7 +1828,7 @@ class ShareCenter extends AJXP_Plugin
             $options["PLUGINS_DATA"] = $customData;
         }
         if (isSet($editingRepo)) {
-            $this->shareStore->testUserCanEditShare($editingRepo->getOwner());
+            $this->getShareStore()->testUserCanEditShare($editingRepo->getOwner());
             $newRepo = $editingRepo;
             $replace = false;
             if ($editingRepo->getDisplay() != $label) {
@@ -2462,7 +2462,7 @@ class ShareCenter extends AJXP_Plugin
                 "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
                 "has_password"     => (!empty($pData["PASSWORD"])),
                 "element_watch"    => $elementWatch,
-                "is_expired"       => $this->shareStore->isShareExpired($shareId, $pData)
+                "is_expired"       => $this->getShareStore()->isShareExpired($shareId, $pData)
             ), $shareData);
 
 
@@ -2518,7 +2518,7 @@ class ShareCenter extends AJXP_Plugin
                 );
             }
             if($node != null){
-                $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, $node->getUrl());
+                $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, "pydio://".$repoId."/");
             }else{
                 $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, null);
             }
@@ -2550,7 +2550,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $jsonData["expire_after"] = 0;
                 }
-                $jsonData["is_expired"] = $this->shareStore->isShareExpired($shareId, $minisiteData);
+                $jsonData["is_expired"] = $this->getShareStore()->isShareExpired($shareId, $minisiteData);
                 if(isSet($minisiteData["AJXP_TEMPLATE_NAME"])){
                     $jsonData["minisite_layout"] = $minisiteData["AJXP_TEMPLATE_NAME"];
                 }
