@@ -211,7 +211,7 @@ Class.create("CommentsPanel", {
 
     refreshScroller:function(container){
 
-        container.up('div[@ajxpClass="infoPanel"]').ajxpPaneObject.scrollbar.recalculateLayout();
+        container.up('div[ajxpClass="InfoPanel"]').ajxpPaneObject.scrollbar.recalculateLayout();
 
     }
 
