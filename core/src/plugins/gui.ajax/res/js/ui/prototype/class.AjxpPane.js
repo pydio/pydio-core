@@ -519,6 +519,10 @@ Class.create("AjxpPane", {
             bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
             index++;
         }
+        if(document.viewport.getWidth() < 600 && bgrounds[paramPrefix+'LOWRES']){
+            // This is probably a mobile, let's force switching to low res.
+            bStyles = ["background-image:url('"+bgrounds[paramPrefix+'LOWRES']+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+'LOWRES']?bgrounds[paramPrefix + 'ATTRIBUTES_'+'LOWRES']:'')];
+        }
         if (bStyles.length) {
             i = Math.floor( Math.random() * bStyles.length);
             var bg = bStyles[i];

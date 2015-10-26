@@ -180,13 +180,7 @@ and (max-width : 420px){
         font-size: 20px;
         font-weight: lighter;
         text-transform: uppercase;
-        margin: 0px 0;
-    }
-
-    div#background-imager{
-        background-image: url(../images/hires-photos/03-mobile.jpg) !important;
-        background-position: 50% 50%;
-        background-repeat: repeat repeat;
+        margin: 0 0;
     }
 
     div.dialogBox{
