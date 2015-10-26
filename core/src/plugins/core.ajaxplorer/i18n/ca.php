@@ -23,7 +23,7 @@
 $mess=array(
 "languageLabel" => "Catalan",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "ca-ES",
 "0" => "Darrera veure.",
 "1" => "Nom",
