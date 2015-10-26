@@ -70,6 +70,7 @@ class PluginCompression extends AJXP_Plugin
                 }
             }
             if ($acceptedExtension == false) {
+                file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.16"]);
                 throw new AJXP_Exception($messages["compression.16"]);
             }
             $typeArchive = $httpVars["type_archive"];
@@ -115,12 +116,14 @@ class PluginCompression extends AJXP_Plugin
                 }
                 //WE STOP IF IT'S JUST AN EMPTY FOLDER OR NO FILES
                 if (empty($tabFilesNames)) {
+                    file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.17"]);
                     throw new AJXP_Exception($messages["compression.17"]);
                 }
                 try {
                     $tmpArchiveName = tempnam(AJXP_Utils::getAjxpTmpDir(), "tar-compression") . ".tar";
                     $archive = new PharData($tmpArchiveName);
                 } catch (Exception $e) {
+                    file_put_contents($progressCompressionFileName, "Error : " . $e->getMessage());
                     throw $e;
                 }
                 $counterCompression = 0;
@@ -133,6 +136,7 @@ class PluginCompression extends AJXP_Plugin
                         file_put_contents($progressCompressionFileName, sprintf($messages["compression.6"], round(($counterCompression / count($tabAllFiles)) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                     } catch (Exception $e) {
                         unlink($tmpArchiveName);
+                        file_put_contents($progressCompressionFileName, "Error : " . $e->getMessage());
                         throw $e;
                     }
                 }
@@ -160,17 +164,18 @@ class PluginCompression extends AJXP_Plugin
             }
         }
     elseif ($action == "check_compression_status") {
-            $archivePath = AJXP_Utils::decodeSecureMagic($httpVars["archive_path"]);
-            $progressCompression = file_get_contents($progressCompressionFileName);
-            if ($progressCompression != "SUCCESS") {
-                AJXP_XMLWriter::header();
+        $archivePath = AJXP_Utils::decodeSecureMagic($httpVars["archive_path"]);
+        $progressCompression = file_get_contents($progressCompressionFileName);
+        $substrProgressCompression = substr($progressCompression, 0, 5);
+        if ($progressCompression != "SUCCESS" && $substrProgressCompression != "Error") {
+            AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_compression_status", array(
                     "repository_id" => $repository->getId(),
                     "compression_id" => $compressionId,
                     "archive_path" => SystemTextEncoding::toUTF8($archivePath)
                 ), $progressCompression, true, 5);
                 AJXP_XMLWriter::close();
-            } else {
+            } elseif ($progressCompression == "SUCCESS") {
                 $newNode = new AJXP_Node($userSelection->currentBaseUrl() . $archivePath);
                 $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
                 AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
@@ -178,7 +183,16 @@ class PluginCompression extends AJXP_Plugin
                 AJXP_XMLWriter::sendMessage($messages["compression.8"], null);
                 AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
                 AJXP_XMLWriter::close();
-                unlink($progressCompressionFileName);
+                if (file_exists($progressCompressionFileName)) {
+                    unlink($progressCompressionFileName);
+                }
+            } elseif ($substrProgressCompression == "Error") {
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage(null, $progressCompression);
+                AJXP_XMLWriter::close();
+                if (file_exists($progressCompressionFileName)) {
+                    unlink($progressCompressionFileName);
+                }
             }
         }
         elseif ($action == "extraction") {
@@ -200,6 +214,7 @@ class PluginCompression extends AJXP_Plugin
                 }
             }
             if ($acceptedArchive == false) {
+                file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
                 throw new AJXP_Exception($messages["compression.15"]);
             }
             $onlyFileName = substr($fileArchive, 0, -$extensionLength);
@@ -238,7 +253,6 @@ class PluginCompression extends AJXP_Plugin
                         continue;
                     }
                     $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
-                    //var_dump($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
                     $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
                     $newNode = new AJXP_Node($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
                     AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
@@ -246,6 +260,7 @@ class PluginCompression extends AJXP_Plugin
                     file_put_contents($progressExtractFileName, sprintf($messages["compression.12"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
             } catch (Exception $e) {
+                file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
                 throw new AJXP_Exception($e);
             }
             file_put_contents($progressExtractFileName, "SUCCESS");
@@ -254,7 +269,8 @@ class PluginCompression extends AJXP_Plugin
             $currentDirUrl = $httpVars["currentDirUrl"];
             $onlyFileName = $httpVars["onlyFileName"];
             $progressExtract = file_get_contents($progressExtractFileName);
-            if ($progressExtract != "SUCCESS") {
+            $substrProgressExtract = substr($progressExtract, 0, 5);
+            if ($progressExtract != "SUCCESS" && $substrProgressExtract != "Error") {
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_extraction_status", array(
                     "repository_id" => $repository->getId(),
@@ -263,13 +279,20 @@ class PluginCompression extends AJXP_Plugin
                     "onlyFileName" => $onlyFileName
                 ), $progressExtract, true, 5);
                 AJXP_XMLWriter::close();
-            } else {
+            } elseif ($progressExtract == "SUCCESS") {
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
                 $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
                 AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
                 AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
+                AJXP_XMLWriter::close();
+                if (file_exists($progressExtractFileName)) {
+                    unlink($progressExtractFileName);
+                }
+            } elseif ($substrProgressExtract == "Error") {
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage(null, $progressExtract);
                 AJXP_XMLWriter::close();
                 if (file_exists($progressExtractFileName)) {
                     unlink($progressExtractFileName);

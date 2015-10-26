@@ -37,5 +37,6 @@ $mess = array(
     "13" => "Extracting files ... %s ",
     "14" => "Extraction finished successfullly in the folder '%s'.",
     "15" => "The selected file is neither a TAR  or a TAR.GZ or a TAR.BZ2 archive.",
-    "16" => "You can only compress in TAR, TAR.GZ or TAR.BZ2."
+    "16" => "You can only compress in TAR, TAR.GZ or TAR.BZ2.",
+    "17" => "You can't compress empty folders."
 );
