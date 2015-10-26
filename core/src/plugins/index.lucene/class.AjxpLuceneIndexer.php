@@ -193,6 +193,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    if(isSet($meta["ajxp_modiftime"])){
+                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".AJXP_Utils::relativeDate($meta["ajxp_modiftime"], $messages);
+                    }
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 } else {
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
