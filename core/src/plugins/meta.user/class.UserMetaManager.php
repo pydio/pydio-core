@@ -151,7 +151,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             if (count($searchablesRenderers)) {
                 $metaV .= ',"metaColumnsRenderers":'.json_encode($searchablesRenderers);
             }
-            if (!empty($v) && trim($v) != "{}") {
+            if (!empty($v) && trim($v) != "{}" && !empty($metaV)) {
                 $v = str_replace("}", ", ".$metaV."}", $v);
             } else {
                 $v = "{".$metaV."}";
