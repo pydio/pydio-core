@@ -212,6 +212,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (!is_readable($tmpNode->getUrl())){
                     continue;
                 }
+                $basename = basename($tmpNode->getPath());
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $tmpNode->isLeaf(), array("d" => true, "f" => true))){
+                    continue;
+                }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
                 if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;
@@ -284,6 +288,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
+                $basename = basename($tmpNode->getPath());
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $tmpNode->isLeaf(), array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
