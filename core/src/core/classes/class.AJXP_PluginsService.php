@@ -200,6 +200,8 @@ class AJXP_PluginsService
         @unlink(AJXP_PLUGINS_CACHE_FILE);
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_QUERIES_CACHE);
+        @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+        @unlink(AJXP_PLUGINS_REPOSITORIES_CACHE);
     }
 
     /**

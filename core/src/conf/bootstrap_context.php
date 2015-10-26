@@ -49,6 +49,7 @@ define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_PLUGINS_QUERIES_CACHE", AJXP_CACHE_DIR."/plugins_queries.ser");
 define("AJXP_PLUGINS_BOOTSTRAP_CACHE", AJXP_CACHE_DIR."/plugins_bootstrap.php");
+define("AJXP_PLUGINS_REPOSITORIES_CACHE", AJXP_CACHE_DIR."/plugins_repositories.php");
 define("AJXP_PLUGINS_MESSAGES_FILE", AJXP_CACHE_DIR."/plugins_messages.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
@@ -146,6 +147,6 @@ if(!is_file(AJXP_PLUGINS_BOOTSTRAP_CACHE)){
     foreach($boots as $b){
         $content .= 'require_once("'.$b.'");'."\n";
     }
-    file_put_contents($pluginsBootstrap, $content);
+    file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
 }
 require_once(AJXP_PLUGINS_BOOTSTRAP_CACHE);
