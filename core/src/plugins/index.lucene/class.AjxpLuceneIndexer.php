@@ -216,7 +216,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $basename = basename($tmpNode->getPath());
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $tmpNode->isLeaf(), array("d" => true, "f" => true))){
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -294,7 +295,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $basename = basename($tmpNode->getPath());
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $tmpNode->isLeaf(), array("d"=>true, "f"=>true))){
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
