@@ -40,7 +40,7 @@ Class.create("LocalCartNodeProvider", {
 	loadNode : function(node, nodeCallback, childCallback){
         node.setLoaded(true);
         nodeCallback(node);
-        node.getChildren().each(function(n){
+        node.getChildren().forEach(function(n){
             childCallback(n);
         });
 	},

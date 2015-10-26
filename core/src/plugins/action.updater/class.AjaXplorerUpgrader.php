@@ -90,6 +90,7 @@ class AjaXplorerUpgrader
     public static function configureProxy($proxyHost, $proxyUser, $proxyPass)
     {
         $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
+        $proxy['ssl']['SNI_enabled'] = false;
         if (!empty($proxyUser) && !empty($proxyPass)) {
             $auth = base64_encode($proxyUser.":".$proxyPass);
             $proxy['http']['header'] = "Proxy-Authorization: Basic $auth";
@@ -385,8 +386,7 @@ class AjaXplorerUpgrader
 
     public function clearCache()
     {
-        AJXP_PluginsService::clearPluginsCache();
-        ConfService::clearMessagesCache();
+        ConfService::clearAllCaches();
         return "Ok";
     }
 

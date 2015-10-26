@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPDomXML extends AbstractTest
 {
-    public function PHPDomXML() { parent::AbstractTest("DOM Xml enabled", "Dom XML is required, you may have to install the php-xml extension."); }
+    public function __construct() { parent::__construct("DOM Xml enabled", "Dom XML is required, you may have to install the php-xml extension."); }
     public function doTest()
     {
         $this->failedLevel = "error";
@@ -39,4 +39,4 @@ class PHPDomXML extends AbstractTest
         $this->testedParams["DOM Enabled"] = "Yes";
         return TRUE;
     }
-};
+}

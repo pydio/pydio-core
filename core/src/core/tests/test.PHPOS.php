@@ -28,11 +28,11 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPOS extends AbstractTest
 {
-    public function PHPOS() { parent::AbstractTest("PHP operating system", "Current operating system ".PHP_OS); }
+    public function __construct() { parent::__construct("PHP operating system", "Current operating system ".PHP_OS); }
     public function doTest()
     {
         $this->testedParams["Server OS"] = PHP_OS;
         $this->failedLevel = "info";
         return FALSE;
     }
-};
+}

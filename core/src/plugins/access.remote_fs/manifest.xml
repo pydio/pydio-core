@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="remote_fs" enabled="false" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the Pydio API (most commonly a remote server with another Pydio installed)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png">
+	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png" description_template="{HOST}{URI}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="remote_fs_access" path="plugins/access.remote_fs/i18n"/>
         </resources>
@@ -21,6 +21,7 @@
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
             <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
             <component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label"/>

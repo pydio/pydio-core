@@ -59,14 +59,24 @@ ConfService::start();
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
-//new AjxpSessionHandler();
+
+// Custom Session Handler
+if(defined("AJXP_SESSION_HANDLER_PATH") && defined("AJXP_SESSION_HANDLER_CLASSNAME") && file_exists(AJXP_SESSION_HANDLER_PATH)){
+    require_once(AJXP_SESSION_HANDLER_PATH);
+    if(class_exists(AJXP_SESSION_HANDLER_CLASSNAME, false)){
+        $sessionHandlerClass = AJXP_SESSION_HANDLER_CLASSNAME;
+        $sessionHandler = new $sessionHandlerClass();
+        session_set_save_handler($sessionHandler, false);
+    }
+}
+
 if (!isSet($OVERRIDE_SESSION)) {
     session_name("AjaXplorer");
 }
 session_start();
 
-if (isSet($_GET["tmp_repository_id"])) {
-    ConfService::switchRootDir($_GET["tmp_repository_id"], true);
+if (isSet($_GET["tmp_repository_id"]) || isSet($_POST["tmp_repository_id"])) {
+    ConfService::switchRootDir(isset($_GET["tmp_repository_id"])?$_GET["tmp_repository_id"]:$_POST["tmp_repository_id"], true);
 } else if (isSet($_SESSION["SWITCH_BACK_REPO_ID"])) {
     ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
     unset($_SESSION["SWITCH_BACK_REPO_ID"]);

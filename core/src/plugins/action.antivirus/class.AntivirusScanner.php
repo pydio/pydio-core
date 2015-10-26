@@ -22,6 +22,9 @@ class AntivirusScanner extends AJXP_Plugin
         if ($oldNode!=null || $newNode == null) {
             return;
         }
+        // ADD THOSE TWO LINES
+        $newNode->loadNodeInfo();
+        if(!$newNode->isLeaf()) return;
 
         $this->callSet($newNode);			//initializes attributes
 

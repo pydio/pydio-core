@@ -224,7 +224,7 @@ class ShareStore {
             if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
                 continue;
             }
-            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
+            if(!$parentRepository != "" && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
                     || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
                 continue;
             }
@@ -255,8 +255,8 @@ class ShareStore {
             }
             // Find repositories that would have a parent
             $criteria = array();
-            $criteria["parent_uuid"] = (empty($parentRepository) ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
-            $criteria["owner_user_id"] = (empty($limitToUser) ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
+            $criteria["parent_uuid"] = ($parentRepository == "" ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+            $criteria["owner_user_id"] = ($limitToUser == "" ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
             if(count($storedIds)){
                 $criteria["!uuid"] = $storedIds;
             }
@@ -278,7 +278,7 @@ class ShareStore {
         return $dbLets;
     }
 
-    protected function testUserCanEditShare($userId){
+    public function testUserCanEditShare($userId){
 
         if(empty($userId)){
             $mess = ConfService::getMessages();
@@ -299,7 +299,6 @@ class ShareStore {
      * @param String $type
      * @param String $element
      * @throws Exception
-     * @internal param String $ownerId
      * @return bool
      */
     public function deleteShare($type, $element)
@@ -433,7 +432,12 @@ class ShareStore {
 
     public function resetDownloadCounter($hash, $userId){
         $data = $this->loadShare($hash);
-        // TODO We must check that the user has the right to do that!
+        $repoId = $data["REPOSITORY"];
+        $repo = ConfService::getRepositoryById($repoId);
+        if ($repo == null) {
+            throw new Exception("Cannot find associated share");
+        }
+        $this->testUserCanEditShare($repo->getOwner());
         PublicletCounter::reset($hash);
     }
 

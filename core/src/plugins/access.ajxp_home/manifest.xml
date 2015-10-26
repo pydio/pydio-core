@@ -3,7 +3,8 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/i18n" />
-            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js" autoload="true"/>
+            <!--<js className="WelcomeComponents" file="plugins/access.ajxp_home/build/WelcomeComponents.js" depends="React"/>-->
+            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js"/>
             <css file="plugins/access.ajxp_home/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
@@ -88,7 +89,7 @@
                 </style>
             ]]></template_part>
             <template_part ajxpClass="AjxpPane" ajxpId="browser" ajxpOptions='{"fit":"height"}' theme="vision"><![CDATA[
-                <div id="home_account_pane" ajxpClass="UserDashboardHome">
+                <div id="home_account_pane" ajxpClass="UserDashboardHome" class="vertical_fit horizontal_layout">
                     <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                         <div id="welcome"></div>
                         <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height"}'>
@@ -119,7 +120,7 @@
                         display:none;
                     }
                 </style>
-                <div id="home_account_pane" ajxpClass="UserDashboardHome">
+                <div id="home_account_pane" ajxpClass="UserDashboardHome" class="horizontal_layout">
                     <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content"}' style="width:420px;">
                         <div id="welcome" style="min-height:94px;"></div>
                         <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height", "fitParent":"home_left_bar"}'>
@@ -185,25 +186,25 @@
                                 AJXP_MESSAGE[user_home.62]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg"></iframe>
+                            <img class="tutorial_video" src="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg">
 
                             <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.63]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg"></iframe>
+                            <img class="tutorial_video" src="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg">
 
                             <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.64]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg"></iframe>
+                            <img class="tutorial_video" src="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg">
 
-                            <div class="tutorial_legend" src="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
+                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                                 AJXP_MESSAGE[user_home.66]
                                 <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                             </div>
-                            <iframe width="640" height="360" class="tutorial_video" frameborder="0" allowfullscreen src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"></iframe>
+                            <img class="tutorial_video" src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg">
 
                             <div style="clear:left; text-align:center;">
                                 <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>

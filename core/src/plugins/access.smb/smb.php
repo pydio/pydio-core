@@ -412,11 +412,11 @@ class smb
 
     public static function cleanUrl($url)
     {
-        $url = str_replace("smb://", "smb:/__/__", $url);
+        $url = str_replace("smbclient://", "smbclient:/__/__", $url);
         while (strstr($url, "//")!==FALSE) {
             $url = str_replace("//", "/", $url);
         }
-        $url = str_replace("smb:/__/__", "smb://", $url);
+        $url = str_replace("smbclient:/__/__", "smbclient://", $url);
         return $url;
     }
 
@@ -481,8 +481,8 @@ class smb
     {
         $pass = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
         //$pass = $pass["password"];
-        $pu['scheme'] = 'smb';
-        $temp = substr($url, 6);
+        $pu['scheme'] = 'smbclient';
+        $temp = substr($url, 12);
         //echo $temp . "\n";
         $pu['user'] = "";
         if (strstr($temp, ":") !== false) {
@@ -639,9 +639,7 @@ class smb_stream_wrapper extends smb
         $this->mode = $mode;
         $this->defer_stream_read;
         $this->parsed_url = $pu = smb::parse_url($url);
-        if ($pu['type'] <> 'path') 
-        	return false;
-        	//trigger_error('stream_open(): error in URL', E_USER_ERROR);
+        if ($pu['type'] <> 'path') trigger_error('stream_open(): error in URL', E_USER_ERROR);
         switch ($mode) {
             case 'r':
             case 'r+':
@@ -774,5 +772,5 @@ function ConvSmbParameterToWinOs($params)
 # Register 'smb' protocol !
 ###################################################################
 
-stream_wrapper_register('smb', 'smb_stream_wrapper')
+stream_wrapper_register('smbclient', 'smb_stream_wrapper')
     or die ('Failed to register protocol');

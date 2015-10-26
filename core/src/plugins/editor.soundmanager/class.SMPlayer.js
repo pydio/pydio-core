@@ -18,7 +18,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 window.SM2_DEFER = true;
-if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
+if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager){
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
     conn.loadLibrary('360-player/script/berniecode-animator.js');
@@ -111,16 +111,14 @@ if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager && ajaxplore
 }
 
 function hookToFilesList(){
-    var fLists = ajaxplorer.guiCompRegistry.select(function(guiComponent){
-        return (guiComponent.__className == "FilesList");
-    });
+    var fLists = pydio.UI.getRegisteredComponentsByClassName("FilesList");
     if(!fLists.length){
         return;
     }
     var fList = fLists[0];
     fList.observe("rows:didInitialize", function(){
         if(fList.getDisplayMode() != "list" || !window.soundManager || !window.soundManager.enabled) return;
-        var resManager = ajaxplorer.findEditorById("editor.soundmanager").resourcesManager;
+        var resManager = pydio.Registry.findEditorById("editor.soundmanager").resourcesManager;
         if(!resManager.loaded){
             resManager.load();
         }
@@ -152,9 +150,7 @@ function hookToFilesList(){
 
 function addVolumeButton(){
     if($("sm_volume_button")) return;
-    var locBars = ajaxplorer.guiCompRegistry.select(function(guiComponent){
-        return (guiComponent.__className == "LocationBar");
-    });
+    var locBars = pydio.UI.getRegisteredComponentsByClassName("LocationBar");
     if(!locBars.length){
         return;
     }
@@ -247,7 +243,16 @@ soundManager.setup({\n\
 
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
-            return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
+            if(console) console.log("Returning simple image, window.soundManager is not loaded");
+            var simpleImage = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
+            simpleImage.resizePreviewElement = function(element){
+                simpleImage.setStyle({
+                    width:Math.min(64, element.width) + 'px',
+                    height:Math.min(64, element.height) + 'px'
+                });
+            };
+            simpleImage.destroyElement = function(){};
+            return simpleImage;
         }
         addVolumeButton();
         var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+encodeURIComponent(base64_encode(ajxpNode.getPath()));

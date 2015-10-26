@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver
 	name="sftp_psl"
+	enabled="false"
 	label="CONF_MESSAGE[SSH File Transfer Protocol (SFTP)]"
 	description="CONF_MESSAGE[The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2.]"
 	mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"
@@ -14,7 +15,7 @@
         <plugin_uri>http://pyd.io/plugins/access/sftp_psl</plugin_uri>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
-	<client_settings icon="plugins/access.sftp_psl/icon.png">
+	<client_settings icon="plugins/access.sftp_psl/icon.png" description_template="{SFTP_HOST}{PATH}" iconClass="icon-sitemap">
 		<resources>
 			<i18n namespace="sftp_psl_access" path="plugins/access.sftp_psl/i18n"/>
 		</resources>
@@ -40,6 +41,7 @@
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
 			<component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
@@ -53,7 +55,7 @@
 			</component_config>
 		</client_configs>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
-		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='compress'],actions/action[@name='empty_recycle'],actions/action[@name='restore'],actions/action[@name='purge']"/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='compress'],actions/action[@name='compress_ui'],actions/action[@name='empty_recycle'],actions/action[@name='restore'],actions/action[@name='purge']"/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 	</registry_contributions>

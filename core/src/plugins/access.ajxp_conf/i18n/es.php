@@ -41,6 +41,7 @@ $mess=array(
 "20" => "Usuario",
 "21" => "Acción",
 "22" => "Parámetros",
+"22a"=> "Mas Parámetros",
 "23" => "Nombre de prueba",
 "24" => "Datos de prueba",
 "25" => "Acceso a Carpetas",
@@ -171,4 +172,6 @@ $mess=array(
     "148" => "Hooks Definitions",
     "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
     "150" => "Select a repository",
+    "151" => "Root Group",
+    "152" => "Root Group Role",
 );

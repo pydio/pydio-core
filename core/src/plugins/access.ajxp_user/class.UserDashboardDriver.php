@@ -48,7 +48,6 @@ class UserDashboardDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $loggedUser = AuthService::getLoggedUser();
         if(!AuthService::usersEnabled()) return ;
@@ -284,9 +283,10 @@ class UserDashboardDriver extends AbstractAccessDriver
         $loggedUser = AuthService::getLoggedUser();
         $users = ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()); // AuthService::listUsers();
         $mess = ConfService::getMessages();
-        $repoList = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+        $count = 0;
+        $repoList = ConfService::listRepositoriesWithCriteria(array(
             "owner_user_id" => $loggedUser->getId()
-        ));
+        ), $count);
         $userArray = array();
         foreach ($users as $userIndex => $userObject) {
             $label = $userObject->getId();
@@ -330,9 +330,10 @@ class UserDashboardDriver extends AbstractAccessDriver
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.9" attributeName="parent_label" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
         $repoArray = array();
         $loggedUser = AuthService::getLoggedUser();
-        $repos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+        $count = 0;
+        $repos = ConfService::listRepositoriesWithCriteria(array(
             "owner_user_id" => $loggedUser->getId()
-        ));
+        ), $count);
 
         $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
         $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");

@@ -168,7 +168,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $this->recomputeMergedRole();
     }
 
-    public function save($context = "superuser")
+    protected function _save($context = "superuser")
     {
         if ($this->isAdmin() === true) {
             $this->rights["ajxp.admin"] = true;

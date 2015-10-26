@@ -53,10 +53,8 @@ class AbstractAccessDriver extends AJXP_Plugin
             if (!in_array($httpVars["hook_name"], array("before_create", "before_path_change", "before_change"))) {
                 return;
             }
-            $selection = new UserSelection();
-            $selection->initFromHttpVars($httpVars);
-            $node = $selection->getUniqueNode($this);
-            AJXP_Controller::applyHook("node.".$httpVars["hook_name"], array($node, $httpVars["hook_arg"]));
+            $selection = new UserSelection($this->repository, $httpVars);
+            AJXP_Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
         }
         if ($actionName == "ls") {
             // UPWARD COMPATIBILTY
@@ -123,19 +121,15 @@ class AbstractAccessDriver extends AJXP_Plugin
         $selection->initFromHttpVars($httpVars);
         $files = $selection->getFiles();
 
-        $accessType = $this->repository->getAccessType();
         $repositoryId = $this->repository->getId();
-        $plugin = AJXP_PluginsService::findPlugin("access", $accessType);
-        $origWrapperData = $plugin->detectStreamWrapper(true);
-        $origStreamURL = $origWrapperData["protocol"]."://$repositoryId";
+        $this->repository->detectStreamWrapper(true);
+        $origStreamURL = "pydio://$repositoryId";
 
         $destRepoId = $httpVars["dest_repository_id"];
         $destRepoObject = ConfService::getRepositoryById($destRepoId);
-        $destRepoAccess = $destRepoObject->getAccessType();
-        $plugin = AJXP_PluginsService::findPlugin("access", $destRepoAccess);
-        $plugin->repository = $destRepoObject;
-        $destWrapperData = $plugin->detectStreamWrapper(true);
-        $destStreamURL = $destWrapperData["protocol"]."://$destRepoId";
+        $destRepoObject->detectStreamWrapper(true);
+        $destStreamURL = "pydio://$destRepoId";
+
         // Check rights
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
@@ -147,12 +141,10 @@ class AbstractAccessDriver extends AJXP_Plugin
         }
         $srcRepoData= array(
             'base_url' => $origStreamURL,
-            'wrapper_name' => $origWrapperData['classname'],
             'recycle'   => $this->repository->getOption("RECYCLE_BIN")
         );
         $destRepoData=array(
             'base_url' => $destStreamURL,
-            'wrapper_name' => $destWrapperData['classname'],
             'chmod'         => $this->repository->getOption('CHMOD')
         );
 
@@ -180,21 +172,19 @@ class AbstractAccessDriver extends AJXP_Plugin
      * @param Array $error accumulator for error messages
      * @param Array $success accumulator for success messages
      * @param bool $move Whether to copy or move
-     * @param array $srcRepoData Set of data concerning source repository: base_url, wrapper_name and recycle option
-     * @param array $destRepoData Set of data concerning destination repository: base_url, wrapper_name and chmod option
+     * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
+     * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
      */
     protected function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array())
     {
         $srcUrlBase = $srcRepoData['base_url'];
-        $srcWrapperName = $srcRepoData['wrapper_name'];
         $srcRecycle = $srcRepoData['recycle'];
         $destUrlBase = $destRepoData['base_url'];
-        $destWrapperName = $destRepoData['wrapper_name'];
 
         $mess = ConfService::getMessages();
         $bName = basename($srcFile);
         $localName = '';
-        AJXP_Controller::applyHook("dl.localname", array($srcFile, &$localName, $srcWrapperName));
+        AJXP_Controller::applyHook("dl.localname", array($srcFile, &$localName));
         if(!empty($localName)) $bName = $localName;
         $destFile = $destUrlBase.$destDir."/".$bName;
         $realSrcFile = $srcUrlBase.$srcFile;
@@ -209,7 +199,8 @@ class AbstractAccessDriver extends AJXP_Plugin
             return ;
         }
         if (!$move) {
-            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), filesize($realSrcFile)));
+            $size = filesize($realSrcFile);
+            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
         }
         if (dirname($realSrcFile)==dirname($destFile)) {
             if ($move) {
@@ -261,7 +252,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             if ($move) {
                 AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
-                if(strcmp($srcWrapperName,$destWrapperName) === 0){
+                if(AJXP_MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
                     $res = rename($realSrcFile, $destFile);
                 }else{
                     $res = copy($realSrcFile, $destFile);
@@ -269,7 +260,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, false));
             } else {
                 try {
-                    $this->filecopy($realSrcFile, $destFile, $srcWrapperName, $destWrapperName);
+                    $this->filecopy($realSrcFile, $destFile);
                     $this->changeMode($destFile, $destRepoData);
                     AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, true));
                 } catch (Exception $e) {
@@ -308,12 +299,12 @@ class AbstractAccessDriver extends AJXP_Plugin
     /**
      * @param String $srcFile url of source file
      * @param String $destFile url of destination file
-     * @param String $srcWrapperName Wrapper name
-     * @param String $destWrapperName Wrapper name
      */
-    protected function filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName)
+    protected function filecopy($srcFile, $destFile)
     {
-        if (call_user_func(array($srcWrapperName, "isRemote")) || call_user_func(array($destWrapperName, "isRemote")) || $srcWrapperName != $destWrapperName) {
+        if (!AJXP_MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)
+            || AJXP_MetaStreamWrapper::wrapperIsRemote($srcFile)
+            || AJXP_MetaStreamWrapper::wrapperIsRemote($destFile)) {
             $src = fopen($srcFile, "r");
             $dest = fopen($destFile, "w");
             if (is_resource($src) && is_resource($dest)) {
@@ -337,8 +328,8 @@ class AbstractAccessDriver extends AJXP_Plugin
      * @param Array $success Array of success
      * @param bool $verbose Boolean
      * @param bool $convertSrcFile Boolean
-     * @param array $srcRepoData Set of data concerning source repository: base_url, wrapper_name and recycle option
-     * @param array $destRepoData Set of data concerning destination repository: base_url, wrapper_name and chmod option
+     * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
+     * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
      * @return int
      */
     protected function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true, $srcRepoData = array(), $destRepoData = array())
@@ -368,7 +359,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                         if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
                         if ($ow > 0) {
                             try {
-                                if($convertSrcFile) $tmpPath = call_user_func(array($srcRepoData["wrapper_name"], "getRealFSReference"), $srcfile);
+                                if($convertSrcFile) $tmpPath = AJXP_MetaStreamWrapper::getRealFSReference($srcfile);
                                 else $tmpPath = $srcfile;
                                 if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
                                 copy($tmpPath, $dstfile);
@@ -399,10 +390,10 @@ class AbstractAccessDriver extends AJXP_Plugin
      */
     protected function changeMode($filePath, $repoData)
     {
-        $chmodValue = $repoData["chmod"]; //$this->repository->getOption("CHMOD_VALUE");
+        $chmodValue = $repoData["chmod"];
         if (isSet($chmodValue) && $chmodValue != "") {
             $chmodValue = octdec(ltrim($chmodValue, "0"));
-            call_user_func(array($repoData["wrapper_name"], "changeMode"), $filePath, $chmodValue);
+            AJXP_MetaStreamWrapper::changeMode($filePath, $chmodValue);
         }
     }
 
@@ -452,7 +443,7 @@ class AbstractAccessDriver extends AJXP_Plugin
      * @param array $stat
      * @param Repository $repoObject
      * @param callable $remoteDetectionCallback
-     * @internal param \oct $mode
+     * @var \oct $mode
      */
     public static function fixPermissions(&$stat, $repoObject, $remoteDetectionCallback = null)
     {
@@ -559,7 +550,9 @@ class AbstractAccessDriver extends AJXP_Plugin
     public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
-        $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+        if($isLeaf === ""){
+            $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+        }
         if (AJXP_Utils::isHidden($nodeName) && !$showHiddenFiles) {
             return false;
         }

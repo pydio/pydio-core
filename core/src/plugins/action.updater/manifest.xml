@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of Pydio. Since version 3.3.3]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
-        <global_param name="UPDATE_SITE" type="string" label="CONF_MESSAGE[Update Site]" description="CONF_MESSAGE[Where to update]" default="https://pyd.io/update/"/>
-        <global_param name="UPDATE_CHANNEL" type="select" choices="stable|CONF_MESSAGE[Stable],dev|CONF_MESSAGE[Development],test|CONF_MESSAGE[Testing (blank)]" label="CONF_MESSAGE[Update Channel]" description="CONF_MESSAGE[Check stable or dev channel]" default="stable" mandatory="true"/>
-        <global_param name="PRESERVE_FILES" type="textarea" label="CONF_MESSAGE[Preserve Files]" description="CONF_MESSAGE[Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade.]" default=""/>
-        <global_param name="ENABLE_324_IMPORT" type="boolean" label="CONF_MESSAGE[Enable Import From v3.2.4]" description="CONF_MESSAGE[Enable the migration action, available in the Settings repository]" default="false"/>
+        <global_param name="UPDATE_SITE" group="CONF_MESSAGE[Updater Configuration]" type="string" label="CONF_MESSAGE[Update Site]" description="CONF_MESSAGE[Where to update]" default="https://pyd.io/update/"/>
+        <global_param name="UPDATE_CHANNEL" group="CONF_MESSAGE[Updater Configuration]" type="select" choices="stable|CONF_MESSAGE[Stable],dev|CONF_MESSAGE[Development],test|CONF_MESSAGE[Testing (blank)]" label="CONF_MESSAGE[Update Channel]" description="CONF_MESSAGE[Check stable or dev channel]" default="stable" mandatory="true"/>
+        <global_param name="PRESERVE_FILES" group="CONF_MESSAGE[Updater Configuration]" type="textarea" label="CONF_MESSAGE[Preserve Files]" description="CONF_MESSAGE[Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade.]" default=""/>
+        <global_param name="ENABLE_324_IMPORT" group="CONF_MESSAGE[Updater Configuration]" type="boolean" label="CONF_MESSAGE[Enable Import From v3.2.4]" description="CONF_MESSAGE[Enable the migration action, available in the Settings repository]" default="false"/>
         <global_param name="PROXY_HOST" group="CONF_MESSAGE[Proxy configuration]" type="string" label="CONF_MESSAGE[Proxy Host]" description="CONF_MESSAGE[Use a predefined proxy to establish connexion]" default="" mandatory="false"/>
         <global_param name="PROXY_USER" group="CONF_MESSAGE[Proxy configuration]" type="string" label="CONF_MESSAGE[Proxy User]" description="CONF_MESSAGE[Predefined proxy user name]" default="" mandatory="false"/>
         <global_param name="PROXY_PASS" group="CONF_MESSAGE[Proxy configuration]" type="password" label="CONF_MESSAGE[Proxy Pass]" description="CONF_MESSAGE[Predefined proxy password]" default="" mandatory="false"/>
@@ -155,6 +155,6 @@
 	<class_definition filename="plugins/action.updater/class.UpdateController.php" classname="UpdateController"/>
     <dependencies>
         <!-- Image proxy must be implemented -->
-        <activePlugin pluginName="access.ajxp_conf"/>
+        <activePlugin pluginName="access.ajxp_conf|access.ajxp_admin"/>
     </dependencies>
 </ajxp_plugin>

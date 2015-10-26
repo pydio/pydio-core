@@ -59,7 +59,12 @@ class fsAccessWrapper implements AjxpWrapper
      * Initialize the stream from the given path.
      *
      * @param string $path
+     * @param $streamType
+     * @param bool $storeOpenContext
+     * @param bool $skipZip
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
+     * @throws AJXP_Exception
+     * @throws Exception
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
@@ -100,19 +105,21 @@ class fsAccessWrapper implements AjxpWrapper
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");
                        register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
-                    $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
-                    $content = $crtZip->listContent();
-                    foreach ($content as $item) {
-                        $fName = AJXP_Utils::securePath($item["stored_filename"]);
-                        if ($fName == $localPath || "/".$fName == $localPath) {
-                            $localPath = $fName;
-                            break;
+                        $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
+                        $content = $crtZip->listContent();
+                        if(is_array($content)){
+                            foreach ($content as $item) {
+                                $fName = AJXP_Utils::securePath($item["stored_filename"]);
+                                if ($fName == $localPath || "/".$fName == $localPath) {
+                                    $localPath = $fName;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                    $res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
-                    AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Extracted ".$path." to ".dirname($localPath));
-                    if($storeOpenContext) self::$crtZip = $crtZip;
-                    return $tmpFileName;
+                        $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
+                        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Extracted ".$path." to ".dirname($localPath));
+                        if($storeOpenContext) self::$crtZip = $crtZip;
+                        return $tmpFileName;
                    } else {
                        $key = basename($localPath);
                        if (array_key_exists($key, self::$currentListing)) {
@@ -125,6 +132,7 @@ class fsAccessWrapper implements AjxpWrapper
                } else {
                 $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                 $liste = $crtZip->listContent();
+                   if(!is_array($liste)) $liste = array();
                 if($storeOpenContext) self::$crtZip = $crtZip;
                 $folders = array(); $files = array();$builtFolders = array();
                 if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
@@ -264,9 +272,9 @@ class fsAccessWrapper implements AjxpWrapper
      *
      * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile"
      * @param String $mode
-     * @param unknown_type $options
-     * @param unknown_type $context
-     * @return unknown
+     * @param string $options
+     * @param resource $context
+     * @return bool
      */
     public function stream_open($path, $mode, $options, &$context)
     {
@@ -287,7 +295,7 @@ class fsAccessWrapper implements AjxpWrapper
 
     public function stream_seek($offset , $whence = SEEK_SET)
     {
-        fseek($this->fp, $offset, SEEK_SET);
+        fseek($this->fp, $offset, $whence);
     }
 
     public function stream_tell()
@@ -463,12 +471,16 @@ class fsAccessWrapper implements AjxpWrapper
         if ($this->dH == -1) {
             self::$currentListingIndex = 0;
         } else {
-            return rewinddir($this->dH);
+            rewinddir($this->dH);
         }
     }
 
+    /**
+     * @return bool|float
+     */
     public static function getLastRealSize()
     {
+        if(empty(self::$lastRealSize)) return false;
         return self::$lastRealSize;
     }
 

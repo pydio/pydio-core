@@ -24,10 +24,10 @@
                     <clientCallback prepareModal="false"><![CDATA[
                         var editorData = window.actionArguments[0];
                         if(!editorData){
-                            var editorData = ajaxplorer.findEditorById('editor.infopanel');
+                            var editorData = pydio.Registry.findEditorById('editor.infopanel');
                         }
                         if(editorData){
-                            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                            pydio.Registry.loadEditorResources(editorData.resourcesManager);
                             modal.openEditorDialog(editorData);
                         }
                     ]]></clientCallback>

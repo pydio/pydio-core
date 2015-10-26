@@ -24,7 +24,7 @@
 $mess=array(
 "languageLabel" => "T&uuml;rk&#231;e",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "tr-TR",
 "0" => "Son s&uuml;r&uuml;m",
 "1" => "Dosya",

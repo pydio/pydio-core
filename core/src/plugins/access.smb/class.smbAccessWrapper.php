@@ -40,6 +40,9 @@ class smbAccessWrapper extends fsAccessWrapper
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
         $url = parse_url($path);
+        if (isSet($url["fragment"]) && strlen($url["fragment"]) > 0) {
+            $url["path"] .= "#".$url["fragment"];
+        }
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
@@ -64,7 +67,7 @@ class smbAccessWrapper extends fsAccessWrapper
             }
         }
         $basePath = $repoObject->getOption("PATH");
-        $fullPath = "smb://".$credentials.$host."/";//.$basePath."/".$path;
+        $fullPath = "smbclient://".$credentials.$host."/";//.$basePath."/".$path;
         if ($basePath!="") {
            $fullPath.=trim($basePath, "/\\" );
            }

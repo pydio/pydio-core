@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Feed
  */
-class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
+class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableProvider
 {
 
     private $sqlDriver;
@@ -98,6 +98,28 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["driver"] == "postgre"){
             dibi::query("SET bytea_output=escape");
         }
+
+        // Add some permission mask if necessary
+
+        $repoOrs = array();
+        foreach($filterByRepositories as $repoId){
+            $masks = array();
+            AJXP_Controller::applyHook("role.masks", array($repoId, &$masks, AJXP_Permission::READ));
+            if(count($masks)){
+                $pathesOr = array();
+                foreach($masks as $mask){
+                    $filterLike = "://".$repoId.rtrim($mask, "/") . "/";
+                    $pathesOr[] = array("[index_path] LIKE %~like~", $filterLike);
+                }
+                if(count($pathesOr)){
+                    $repoOrs[] = array("[repository_id]=%s AND %or", $repoId, $pathesOr);
+                }else{
+                    $repoOrs[] = array("[repository_id]=%s", $repoId);
+                }
+            }
+        }
+
+
         if ($enlargeToOwned) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
             ( [repository_id] IN (%s) OR [repository_owner] = %s )
@@ -113,10 +135,10 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
                 if($filterByPath[strlen($filterByPath)-1]=='/'){
                     //$groupByClause = " GROUP BY [index_path] ";
                 }
-                $index_path = "ajxp.fs://".$filterByRepositories[0].$filterByPath."%";
+                $index_path = "%://".$filterByRepositories[0].$filterByPath."%";
                 $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
                 AND
-                  ( [repository_id] IN (%s))
+                  ( %or )
                 AND
                   ([index_path] LIKE %s)
                 AND (
@@ -124,16 +146,16 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
                     OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
                     OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
                 )
-                $groupByClause ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $index_path, $userId, $userGroup, $limit, $offset);
+                $groupByClause ORDER BY [edate] DESC %lmt %ofs", "event", $repoOrs, $index_path, $userId, $userGroup, $limit, $offset);
             }else{
                     $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
-                ( [repository_id] IN (%s))
+                ( %or )
                 AND (
                     [repository_scope] = 'ALL'
                     OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
                     OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
                 )
-                ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userGroup, $limit, $offset);
+                ORDER BY [edate] DESC %lmt %ofs", "event", $repoOrs, $userId, $userGroup, $limit, $offset);
             }
         }
         $data = array();
@@ -187,7 +209,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         dibi::connect($this->sqlDriver);
-        if ($repositoryIdFilter != null) {
+        if ($repositoryIdFilter !== null) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
             AND ([repository_id] = %s OR [repository_id] IN  (SELECT [uuid] FROM [ajxp_repo] WHERE [parent_uuid]=%s))
             AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $repositoryIdFilter, $userId, 100);

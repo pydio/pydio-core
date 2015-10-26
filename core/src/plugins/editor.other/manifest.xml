@@ -30,7 +30,7 @@
             ajaxplorer.__proto__.findEditorsForMime = function(mime, restrictToPreviewProviders){
                 if(this.user && this.user.getPreference("gui_preferences", true) && this.user.getPreference("gui_preferences", true)["other_editor_extensions"]){
                     $H(this.user.getPreference("gui_preferences", true)["other_editor_extensions"]).each(function(pair){
-                        var editor = this.getActiveExtensionByType("editor").detect(function(ed){
+                        var editor = this.Registry.getActiveExtensionByType("editor").detect(function(ed){
                             return ed.editorClass == pair.value;
                         });
                         if(editor && !$A(editor.mimes).include(pair.key)){

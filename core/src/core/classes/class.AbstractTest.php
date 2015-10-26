@@ -44,7 +44,7 @@ class AbstractTest
     /** The test parameters */
     public $params;
 
-    public function AbstractTest($name, $failedInfo, $params = NULL)
+    public function __construct($name, $failedInfo, $params = NULL)
     {
         $this->name = $name;
         $this->failedInfo = $failedInfo;
@@ -82,11 +82,16 @@ class AbstractTest
         switch ($last) {
             // Le modifieur 'G' est disponible depuis PHP 5.1.0
             case 'g':
-                $val *= 1024;
+                $val *= 1024 * 1024 * 1024;
+                break;
             case 'm':
-                $val *= 1024;
+                $val *= 1024 * 1024;
+                break;
             case 'k':
                 $val *= 1024;
+                break;
+            default:
+                break;
         }
 
         return $val;

@@ -28,7 +28,7 @@ require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
  */
 class fsAccessTest extends AbstractTest
 {
-    public function fsAccessTest() { parent::AbstractTest("Filesystem Plugin", ""); }
+    public function fsAccessTest() { parent::__construct("Filesystem Plugin", ""); }
 
     /**
      * Test Repository

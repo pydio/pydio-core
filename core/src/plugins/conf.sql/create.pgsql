@@ -1,9 +1,3 @@
-CREATE TABLE ajxp_users (
-  login varchar(255) PRIMARY KEY,
-  password varchar(255) NOT NULL,
-  "groupPath" varchar(255)
-);
-
 CREATE TABLE ajxp_user_rights (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
@@ -59,8 +53,11 @@ CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options (uuid);
 CREATE TABLE ajxp_roles (
   role_id varchar(255) PRIMARY KEY,
   serial_role bytea NOT NULL,
-  searchable_repositories text
+  searchable_repositories text,
+  last_updated INT NOT NULL DEFAULT 0
 );
+
+CREATE INDEX roles_updated_idx ON ajxp_roles(last_updated);
 
 CREATE TABLE ajxp_groups (
   "groupPath" varchar(255) PRIMARY KEY,

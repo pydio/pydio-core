@@ -137,15 +137,12 @@ class FileHasher extends AJXP_AbstractMetaSource
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-        $streamData = $repository->streamData;
-        $this->streamData = $streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $selection = new UserSelection($repository, $httpVars);
         switch ($actionName) {
             case "filehasher_signature":
-                $file = $selection->getUniqueFile();
-                if(!file_exists($destStreamURL.$file)) break;
-                $cacheItem = AJXP_Cache::getItem("signatures", $destStreamURL.$file, array($this, "generateSignature"));
+                $file = $selection->getUniqueNode();
+                if(!file_exists($file->getUrl())) break;
+                $cacheItem = AJXP_Cache::getItem("signatures", $file->getUrl(), array($this, "generateSignature"));
                 $data = $cacheItem->getData();
                 header("Content-Type:application/octet-stream");
                 header("Content-Length", strlen($data));
@@ -161,8 +158,8 @@ class FileHasher extends AJXP_AbstractMetaSource
                 $uploadedData = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-sig");
                 move_uploaded_file($fileVars["userfile_0"]["tmp_name"], $uploadedData);
 
-                $fileUrl = $destStreamURL.$selection->getUniqueFile();
-                $file = call_user_func(array($this->streamData["classname"], "getRealFSReference"), $fileUrl, true);
+                $fileUrl = $selection->getUniqueNode()->getUrl();
+                $file = AJXP_MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
                     $signatureFile = $uploadedData;
                     $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
@@ -180,21 +177,19 @@ class FileHasher extends AJXP_AbstractMetaSource
                     rsync_patch_file($file, $deltaFile, $patched);
                     rename($patched, $file);
                     unlink($deltaFile);
-                    $node = $selection->getUniqueNode($this->accessDriver);
+                    $node = $selection->getUniqueNode();
                     AJXP_Controller::applyHook("node.change", array($node, $node, false));
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
             break;
             case "stat_hash" :
-                $selection = new UserSelection();
-                $selection->initFromArray($httpVars);
                 clearstatcache();
                 header("Content-type:application/json");
                 if ($selection->isUnique()) {
-                    $node = $selection->getUniqueNode($this->accessDriver);
+                    $node = $selection->getUniqueNode();
                     $stat = @stat($node->getUrl());
-                    if (!$stat) {
+                    if (!$stat || !is_readable($node->getUrl())) {
                         print '{}';
                     } else {
                         if($node->isLeaf()) {
@@ -208,7 +203,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                                 if ($length + $offset > $fullSize || $length < 0) $length = $fullSize - $offset;
                                 $hash = $this->getPartialHash($node, $offset, $length);
                             }else{
-                                $hash = $this->getFileHash($selection->getUniqueNode($this->accessDriver));
+                                $hash = $this->getFileHash($selection->getUniqueNode());
                             }
                         }
                         else $hash = 'directory';
@@ -219,9 +214,9 @@ class FileHasher extends AJXP_AbstractMetaSource
                     $files = $selection->getFiles();
                     print '{';
                     foreach ($files as $index => $path) {
-                        $node = new AJXP_Node($destStreamURL.$path);
-                        $stat = @stat($destStreamURL.$path);
-                        if(!$stat) $stat = '{}';
+                        $node = new AJXP_Node($selection->currentBaseUrl().$path);
+                        $stat = @stat($selection->currentBaseUrl().$path);
+                        if(!$stat || !is_readable($node->getUrl())) $stat = '{}';
                         else {
                             if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
                             else $hash = 'directory';

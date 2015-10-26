@@ -39,28 +39,20 @@ class EmlParser extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
 
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
-        $wrapperClassName = $streamData["classname"];
-
         $selection = new UserSelection($repository, $httpVars);
-
         if($selection->isEmpty()) return;
-
-        $file = $destStreamURL.$selection->getUniqueFile();
-        $mess = ConfService::getMessages();
-
-        $node = new AJXP_Node($file);
+        $node = $selection->getUniqueNode();
+        $file = $node->getUrl();
         AJXP_Controller::applyHook("node.read", array($node));
 
+        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
 
+        $mess = ConfService::getMessages();
         switch ($action) {
             case "eml_get_xml_structure":
                 $params = array(
@@ -194,6 +186,7 @@ class EmlParser extends AJXP_Plugin
                 $part = $this->_findAttachmentById($structure, $attachId);
                 AJXP_XMLWriter::header();
                 if ($part !== false) {
+                    $destStreamURL = $selection->currentBaseUrl();
                     if (isSet($httpVars["dest_repository_id"])) {
                         $destRepoId = $httpVars["dest_repository_id"];
                         if (AuthService::usersEnabled()) {
@@ -201,10 +194,8 @@ class EmlParser extends AJXP_Plugin
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }
                         $destRepoObject = ConfService::getRepositoryById($destRepoId);
-                        $destRepoAccess = $destRepoObject->getAccessType();
-                        $plugin = AJXP_PluginsService::findPlugin("access", $destRepoAccess);
-                        $destWrapperData = $plugin->detectStreamWrapper(true);
-                        $destStreamURL = $destWrapperData["protocol"]."://$destRepoId";
+                        $destRepoObject->detectStreamWrapper(true);
+                        $destStreamURL = "pydio://$destRepoId";
                     }
                     $destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];
                     $fp = fopen($destFile, "w");
@@ -235,7 +226,7 @@ class EmlParser extends AJXP_Plugin
         if($isParent) return;
         $currentNode = $ajxpNode->getUrl();
         $metadata = $ajxpNode->metadata;
-        $wrapperClassName = $ajxpNode->wrapperClassName;
+        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode->getRepositoryId());
 
         $noMail = true;
         if ($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))) {

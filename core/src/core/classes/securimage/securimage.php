@@ -1547,9 +1547,9 @@ class Securimage_Color
      * Example: The code for the HTML color #4A203C is:<br />
      * $color = new Securimage_Color(0x4A, 0x20, 0x3C);
      *
-     * @param $red Red component 0-255
-     * @param $green Green component 0-255
-     * @param $blue Blue component 0-255
+     * @param $red int|String Red component 0-255
+     * @param $green int Green component 0-255
+     * @param $blue int Blue component 0-255
      */
     public function Securimage_Color($red, $green = null, $blue = null)
     {

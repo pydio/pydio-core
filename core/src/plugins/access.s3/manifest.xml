@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="s3" label="CONF_MESSAGE[S3 (Amazon Web Service)]" description="CONF_MESSAGE[Access an AWS server. Requires AWS-SDK v2 for PHP]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/access.s3/class.s3AccessDriver.php" classname="s3AccessDriver"/>
-    <client_settings icon="plugins/access.fs/icon.png">
+    <client_settings icon="plugins/access.fs/icon.png" description_template="{REGION}{STORAGE_URL}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="s3_access" path="plugins/access.s3/i18n"/>
         </resources>
@@ -13,8 +13,8 @@
 		<param name="REGION" type="select" choices="us-east-1|US Standard (Virginia),us-west-1|US West 1 (Northern California),us-west-2|US West 2 (Oregon),eu-west-1|EU (Ireland), ap-southeast-2|South-East (Sydney), ap-southeast-1|South-East (Singapore),ap-northeast-1|Asia Pacific (Japan),sa-east-1|South America (Sao Paulo),us-gov-west-1|EU Governement Cloud" label="CONF_MESSAGE[Region]" description="CONF_MESSAGE[S3 storage region]" mandatory="true"/>
         <param name="STORAGE_URL" type="string" label="CONF_MESSAGE[Storage URL]" description="CONF_MESSAGE[Replace default AWS access points (built from region). Set a full URL, including protocol]" mandatory="false"/>
 		<param name="CONTAINER" type="string" label="CONF_MESSAGE[Container]" description="CONF_MESSAGE[Root container in the S3 storage]" mandatory="true"/>
-                <param name="PROXY" type="string" label="CONF_MESSAGE[Proxy]" description="CONF_MESSAGE[If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080]" mandatory="false"/>
-                <param name="IS_VIPR" type="boolean" label="CONF_MESSAGE[Is ViPR]" description="CONF_MESSAGE[If the backend storage is an EMC ViPR storage]" mandatory="false"/>
+        <param name="PROXY" type="string" label="CONF_MESSAGE[Proxy]" description="CONF_MESSAGE[If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080]" mandatory="false"/>
+        <param name="IS_VIPR" type="boolean" label="CONF_MESSAGE[Is ViPR]" description="CONF_MESSAGE[If the backend storage is an EMC ViPR storage]" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>

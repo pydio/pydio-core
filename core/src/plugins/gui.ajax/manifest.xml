@@ -3,6 +3,7 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"/>
         </resources>
     </client_settings>
 	<server_settings>
@@ -117,6 +118,19 @@
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|CONF_MESSAGE[Center in Page (no-repeat)],background-repeat:repeat;background-size:140%;background-position:50% 50%;|CONF_MESSAGE[Fetch Window (repeat vertically)],background-repeat:no-repeat;background-size:100%; background-position:center center;|CONF_MESSAGE[Fetch Window (no repeat)],background-repeat:repeat;|CONF_MESSAGE[Tile (repeat both directions)]"
                       label="CONF_MESSAGE[Background Attributes (6)]" description="CONF_MESSAGE[Attributes of the image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_LOWRES" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Low-Resolution Background]" description="CONF_MESSAGE[Make sure to use a smaller resolution image, otherwise mobile loading is very slow.]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg"
+                      expose="true"
+                />
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_LOWRES" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|CONF_MESSAGE[Center in Page (no-repeat)],background-repeat:repeat;background-size:140%;background-position:50% 50%;|CONF_MESSAGE[Fetch Window (repeat vertically)],background-repeat:no-repeat;background-size:100%; background-position:center center;|CONF_MESSAGE[Fetch Window (no repeat)],background-repeat:repeat;|CONF_MESSAGE[Tile (repeat both directions)]"
+                      label="CONF_MESSAGE[Background Attributes (Low Resolution)]" description="CONF_MESSAGE[Attributes of the image used as a background]"
                       mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
 
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
@@ -236,7 +250,7 @@
 				</div>
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars" ajxpClass="AjxpPane">
+				<div id="toolbars" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'>
 					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -301,6 +315,22 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
 			]]></template>
+<template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
+				<div id="toolbars">
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="locationbar_cont" class="css_gradient">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
+				</div>
+			]]></template>			
             <template name="widget_vision" element="ajxp_widget" position="top" theme="vision"><![CDATA[
 				<div id="toolbars">
     			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -333,8 +363,6 @@
                 <style>
                     div#overlay.form-login_form_dynamic {
                         opacity: 1;
-                        background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
-                        background-position: 50% 50%;
                     }
                     #browser{
                         background-color: #345E79;
@@ -405,13 +433,16 @@
                     </div>
 				</div>
                 <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+                <script>
+                document.observe("ajaxplorer:afterApply-login", function(){
+                    AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
+                });
+                </script>
 			]]></template>
             <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154" theme="orbit"><![CDATA[
 				<style type="text/css">
                 div#overlay.form-login_form_dynamic {
                     opacity: 1;
-                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
-                    background-position: 50% 50%;
                 }
 				#browser{
 				    -webkit-font-smoothing: antialiased;
@@ -524,12 +555,15 @@
 				</div>
                 <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<script>
+                    document.observe("ajaxplorer:afterApply-login", function(){
+                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
+                    });
                     document.observe("ajaxplorer:selection_changed", function(e){
                         try{
                             var dm = ajaxplorer.getContextHolder();
                             var nodes = dm.getSelectedNodes();
                             if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                             }
                         }catch(e){}
                     });
@@ -543,10 +577,10 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -556,11 +590,9 @@
 				</script>
 			]]></template>
             <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
-				<style type="text/css">
+                <style type="text/css">
                 div#overlay.form-login_form_dynamic {
                     opacity: 1;
-                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
-                    background-position: 50% 50%;
                 }
                 #browser{
                     background-color: #345E79;
@@ -650,6 +682,9 @@
 				</div>
                 <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<script>
+                    document.observe("ajaxplorer:afterApply-login", function(){
+                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
+                    });
 				    document.observe("ajaxplorer:user_logged", function(){
                         try{
 
@@ -660,13 +695,13 @@
                                     return;
                                 }
                                 var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    var first = root.getChildren().first();
+                                var first = root.getFirstChildIfExists();
+                                if(first){
                                     if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
                                         return;
                                     }
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -679,15 +714,13 @@
 			]]></template>
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
 				<style type="text/css">
-            div#overlay.form-login_form_dynamic {
-                opacity: 1;
-                background-image: url(plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg) !important;
-                background-position: 50% 50%;
-            }
+                    div#overlay.form-login_form_dynamic {
+                        opacity: 1;
+                    }
 				#browser{
 				    background-color: #000;
 				    width:102%;
-            -webkit-font-smoothing: antialiased;
+                    -webkit-font-smoothing: antialiased;
 				}
 				#cpane_container{
 				    float:none;
@@ -775,9 +808,9 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
                                     p.stop();
                                     return;
                                 }
@@ -798,7 +831,12 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;}</style>
+				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;} div#overlay.form-login_form_dynamic { opacity: 1; }</style>
+                <script>
+                    document.observe("ajaxplorer:afterApply-login", function(){
+                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
+                    });
+                </script>
 			]]></template>
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -810,7 +848,12 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
+				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }  div#overlay.form-login_form_dynamic { opacity: 1; }</style>
+				<script>
+                    document.observe("ajaxplorer:afterApply-login", function(){
+                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
+                    });
+                </script>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>

@@ -13,7 +13,7 @@ RewriteRule ^api ./rest.php [L]
 RewriteRule ^user ./index.php?get_action=user_access_point [L]
 RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/index
 RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/plugins
-RewriteCond %{REQUEST_URI} ^${APPLICATION_ROOT}/dashboard|^${APPLICATION_ROOT}/welcome|^${APPLICATION_ROOT}/settings|^${APPLICATION_ROOT}/ws-
+RewriteCond %{REQUEST_URI} ^${APPLICATION_ROOT}/dashboard|^${APPLICATION_ROOT}/settings|^${APPLICATION_ROOT}/welcome|^${APPLICATION_ROOT}/ws-
 RewriteRule (.*) index.php [L]
 
 #Following lines seem to be necessary if PHP is working

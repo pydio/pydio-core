@@ -26,15 +26,18 @@ set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 
 $pServ = AJXP_PluginsService::getInstance();
+ConfService::$useSession = false;
+AuthService::$useSession = false;
+
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
 $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
 ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
-session_name("AjaXplorer");
-session_start();
-AuthService::$useSession = false;
+//session_name("AjaXplorer");
+//session_start();
+
 
 AJXP_PluginsService::getInstance()->initActivePlugins();
 AuthService::preLogUser(array_merge($_GET, $_POST));
@@ -59,7 +62,7 @@ if($repoID == 'pydio'){
     ConfService::switchRootDir();
     $repo = ConfService::getRepository();
 }else{
-    $repo = &ConfService::findRepositoryByIdOrAlias($repoID);
+    $repo = ConfService::findRepositoryByIdOrAlias($repoID);
     if ($repo == null) {
         die("Cannot find repository with ID ".$repoID);
     }

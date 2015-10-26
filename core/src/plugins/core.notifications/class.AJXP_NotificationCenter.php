@@ -57,7 +57,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
            // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
                if($contribNode->nodeName == "actions"){
-                   unset($this->actions["get_my_feed"]);
                    $actionXpath=new DOMXPath($contribNode->ownerDocument);
                    $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
                    $publicUrlNode = $publicUrlNodeList->item(0);
@@ -203,7 +202,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     try {
-                        $node->loadNodeInfo();
+                        @$node->loadNodeInfo();
                     } catch (Exception $e) {
                         continue;
                     }
@@ -333,6 +332,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $parentNodeURL = $node->getScheme()."://".$repositoryFilter.$relative;
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
+                    $path = $node->getPath();
                 }
 
 

@@ -58,7 +58,7 @@ Class.create("PixlrEditor", AbstractEditor, {
             }else if(this.editorOptions.context.__className == "AjxpTabulator"){
                 this.editorOptions.context.closeTab("editor.pixlr:/" + this.currentNode.getPath());
             }
-			ajaxplorer.actionBar.fireAction('refresh');
+			pydio.getController().fireAction('refresh');
 		}.bind(this);
 		conn.sendAsync();
 	},

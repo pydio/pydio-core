@@ -36,7 +36,6 @@ class PowerFSController extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
         $dir = AJXP_Utils::decodeSecureMagic($dir);
@@ -45,7 +44,7 @@ class PowerFSController extends AJXP_Plugin
         if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
-        $urlBase = "ajxp.fs://". ConfService::getRepository()->getId();
+        $urlBase = "pydio://". ConfService::getRepository()->getId();
         $mess = ConfService::getMessages();
         switch ($action) {
 
@@ -71,23 +70,10 @@ class PowerFSController extends AJXP_Plugin
                     if ($httpVars["on_end"] == "reload") {
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
                     } else {
-                        $archiveName =  $httpVars["archive_name"];
+                        $archiveName = AJXP_Utils::sanitize($httpVars["archive_name"], AJXP_SANITIZE_FILENAME);
+                        $archiveName = str_replace("'", "\'", $archiveName);
                         $jsCode = "
-                            var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
-                            val = window.ajxpServerAccessPath.replace(regex, \"\$1\");
-                            var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
-
-                            $('download_form').action = window.ajxpServerAccessPath;
-                            $('download_form').secure_token.value = window.Connexion.SECURE_TOKEN;
-                            $('download_form').select('input').each(function(input){
-                                if(input.name!='secure_token') input.remove();
-                            });
-                            $('download_form').insert(new Element('input', {type:'hidden', name:'ope_id', value:'".$httpVars["ope_id"]."'}));
-                            $('download_form').insert(new Element('input', {type:'hidden', name:'archive_name', value:'".$archiveName."'}));
-                            $('download_form').insert(new Element('input', {type:'hidden', name:'get_action', value:'postcompress_download'}));
-                            if(minisite_session) $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
-                            $('download_form').submit();
-                            $('download_form').get_action.value = 'download';
+                            PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$httpVars["ope_id"]."',archive_name:'".$archiveName."'});
                         ";
                         AJXP_XMLWriter::triggerBgJsAction($jsCode, $mess["powerfs.3"], true);
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);

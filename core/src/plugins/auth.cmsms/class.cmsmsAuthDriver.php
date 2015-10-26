@@ -110,14 +110,14 @@ class cmsmsAuthDriver extends AbstractAuthDriver
     {
         $userStoredPass = $this->getUserPass($login);
         if(!$userStoredPass) return false;
-        if (md5($pass) == $userStoredPass) {
+        if (md5($pass) === $userStoredPass) {
         $loggedinData['sessionid']=session_id();
         $loggedinData['lastused']=time();
         $loggedinData['userid']=$this->getUserId($login);
         dibi::query('INSERT INTO ['.$this->prefix.'module_feusers_loggedin]', $loggedinData);
         }
 
-            return ($userStoredPass == md5($pass));
+            return ($userStoredPass === md5($pass));
     }
 
     public function usersEditable()

@@ -29,7 +29,6 @@ class WmsBrowser extends AbstractAccessDriver
 {
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
 
         switch ($action) {
