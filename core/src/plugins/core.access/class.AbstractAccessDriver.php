@@ -550,7 +550,9 @@ class AbstractAccessDriver extends AJXP_Plugin
     public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
-        $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+        if($isLeaf === ""){
+            $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+        }
         if (AJXP_Utils::isHidden($nodeName) && !$showHiddenFiles) {
             return false;
         }

@@ -1240,8 +1240,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 } else if (isSet($httpVars["binary_id"])) {
                     if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->isAdmin()) {
                         $context = array("USER" => $httpVars["user_id"]);
-                    } else {
+                    } else if(AuthService::getLoggedUser() !== null) {
                         $context = array("USER" => AuthService::getLoggedUser()->getId());
+                    } else {
+                        $context = array();
                     }
                     $this->loadBinary($context, $httpVars["binary_id"]);
                 }

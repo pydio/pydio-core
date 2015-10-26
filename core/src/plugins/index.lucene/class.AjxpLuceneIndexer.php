@@ -193,6 +193,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    if(isSet($meta["ajxp_modiftime"])){
+                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".AJXP_Utils::relativeDate($meta["ajxp_modiftime"], $messages);
+                    }
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 } else {
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
@@ -210,6 +213,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
+                $basename = basename($tmpNode->getPath());
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -284,6 +292,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
+                $basename = basename($tmpNode->getPath());
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);

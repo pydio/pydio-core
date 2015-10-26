@@ -202,7 +202,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     try {
-                        $node->loadNodeInfo();
+                        @$node->loadNodeInfo();
                     } catch (Exception $e) {
                         continue;
                     }

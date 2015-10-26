@@ -37,4 +37,6 @@ $mess=array(
 "9" => "Aktivit&auml;ten Arbeitsumgebungen",
 "10" => "Ordner-Aktivit&auml;ten",
 "11" => "Datei-Aktivit&auml;ten",
+    "12" => "Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will happen.",
+    "13" => "Your browser does not seem to support Desktop Notifications yet."
 );
