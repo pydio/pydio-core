@@ -60,10 +60,15 @@ Class.create("HistoryBrowser", {
             title: MessageHash['meta.git.8'],
             callback: this.revertActionCallback.bind(this)
         });
+        this.dlAction.setManager(pydio.Controller);
+        this.openAction.setManager(pydio.Controller);
+        this.revertAction.setManager(pydio.Controller);
+
         this.toolbarObject = new ActionsToolbar(this.toolbar, {
             buttonRenderer : 'this',
             skipBubbling: true,
-            toolbarsList : $A(['history'])
+            toolbarsList : $A(['history']),
+            dataModelElementId: this.element.id
         });
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.revertAction));
         this.toolbar.insert("<div class='separator'></div>");
