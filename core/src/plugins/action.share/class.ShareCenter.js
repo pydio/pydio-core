@@ -967,9 +967,9 @@ Class.create("ShareCenter", {
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
                         </div>');
+                        var dlPath = jsonData['content_filter']['filters'][node.getPath()];
+                        mainCont.down("#embed_code").setValue("<a href='"+ jsonData.minisite.public_link +"?dl=true&file="+dlPath+"'>Download "+ getBaseName(node.getPath()) +"</a>");
                     }
-                    var dlPath = jsonData['content_filter']['filters'][node.getPath()];
-                    mainCont.down("#embed_code").setValue("<a href='"+ jsonData.minisite.public_link +"?dl=true&file="+dlPath+"'>Download "+ getBaseName(node.getPath()) +"</a>");
 
                 }else if(jsonData.minisite){
                     // MINISITE FOLDER SHARE
@@ -986,8 +986,8 @@ Class.create("ShareCenter", {
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
                         </div>');
+                        mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                     }
-                    mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                 }else{
                     // WORKSPACE FOLDER
                     mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"+(jsonData['is_expired']?'b':'')]+'</div>');

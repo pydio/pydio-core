@@ -472,3 +472,24 @@ function attachMobileScroll(targetId, direction){
     if(direction == 'horizontal' || direction == 'both') overflow['overflowX'] = 'auto';
     $(targetId).setStyle(overflow);
 }
+
+/**
+ * Utilitary to get FlashVersion
+ * @returns String
+ */
+function getFlashVersion(){
+    if (!window.PYDIO_DetectedFlashVersion) {
+        var x;
+        if(navigator.plugins && navigator.mimeTypes.length){
+            x = navigator.plugins["Shockwave Flash"];
+            if(x && x.description) x = x.description;
+        } else if (Prototype.Browser.IE){
+            try {
+                x = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+                x = x.GetVariable("$version");
+            } catch(e){}
+        }
+        window.PYDIO_DetectedFlashVersion = (typeof(x) == 'string') ? parseInt(x.match(/\d+/)[0]) : 0;
+    }
+    return window.PYDIO_DetectedFlashVersion;
+}
