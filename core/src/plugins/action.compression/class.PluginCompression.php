@@ -214,6 +214,7 @@ class PluginCompression extends AJXP_Plugin
                 }
             }
             if ($acceptedArchive == false) {
+                file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
                 throw new AJXP_Exception($messages["compression.15"]);
             }
             $onlyFileName = substr($fileArchive, 0, -$extensionLength);
@@ -259,7 +260,7 @@ class PluginCompression extends AJXP_Plugin
                     file_put_contents($progressExtractFileName, sprintf($messages["compression.12"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
             } catch (Exception $e) {
-                file_put_contents($progressExtractFileName, "Error : " . $e);
+                file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
                 throw new AJXP_Exception($e);
             }
             file_put_contents($progressExtractFileName, "SUCCESS");
@@ -268,7 +269,7 @@ class PluginCompression extends AJXP_Plugin
             $currentDirUrl = $httpVars["currentDirUrl"];
             $onlyFileName = $httpVars["onlyFileName"];
             $progressExtract = file_get_contents($progressExtractFileName);
-            $substrProgressExtract = substr($progressExtract, 5);
+            $substrProgressExtract = substr($progressExtract, 0, 5);
             if ($progressExtract != "SUCCESS" && $substrProgressExtract != "Error") {
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_extraction_status", array(
