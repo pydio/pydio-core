@@ -816,6 +816,7 @@
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;} div#overlay.form-login_form_dynamic { opacity: 1; }</style>
+                <script>
                     document.observe("ajaxplorer:afterApply-login", function(){
                         AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
                     });
