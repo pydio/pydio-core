@@ -21,7 +21,7 @@
 $mess=array(
 "languageLabel" => "Ελληνικά",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "el_GR",
 "0" => "Τελευταία Έκδοση",
 "1" => "Όνομα αρχείου",
