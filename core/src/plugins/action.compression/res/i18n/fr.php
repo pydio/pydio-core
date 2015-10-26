@@ -35,4 +35,5 @@ $mess=array(
     "14" => "Extraction terminée avec succès dans le dossier '%s'",
     "15" => "Le fichier selectionné n'est pas une archive TAR, TAR.GZ ou TAR.BZ2.",
     "16" => "Vous ne pouvez compresser qu'en TAR, TAR.GZ ou en TAR.BZ2.",
+    "17" => "Vous ne pouvez pas compresser des dossiers vides."
 );
