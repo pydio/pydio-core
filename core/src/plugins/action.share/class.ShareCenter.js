@@ -1162,6 +1162,8 @@ Class.create("ShareCenter", {
                             pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
+                    }else{
+                        updateFunc();
                     }
                 }.bind(this));
             }
@@ -1334,7 +1336,7 @@ Class.create("ShareCenter", {
                 className:'',
                 title:MessageHash['share_center.152']
             }).update('<span class="icon-save"></span> '+MessageHash['share_center.152']);
-            var editButton = new Element('div', {className:'largeButton'}).update(aSpan);
+            var editButton = new Element('div', {id:"update_share",className:'largeButton'}).update(aSpan);
             bottomButtonsContainer.insert(editButton);
             bottomButtonsContainer.show();
             editButton.observe("click", updateFunc);
