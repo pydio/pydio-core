@@ -678,7 +678,7 @@ class ConfService
     public function getCurrentRepositoryIdInst()
     {
         $ctxId = $this->getContextRepositoryId();
-        if(!empty($ctxId)){
+        if(!empty($ctxId) || $ctxId === 0){
             $object = self::getRepositoryById($ctxId);
             if($object != null && self::repositoryIsAccessible($ctxId, $object)){
                 return $ctxId;
@@ -1605,7 +1605,7 @@ class ConfService
         }
         if($rest){
             $ctxId = $this->getContextRepositoryId();
-            if (!empty($ctxId) && $ctxId == $repository->getId()) {
+            if ( (!empty($ctxId) || $ctxId === 0) && $ctxId == $repository->getId()) {
                 $this->configs["REPOSITORY"] = $repository;
                 $this->cacheRepository($ctxId, $repository);
             }
