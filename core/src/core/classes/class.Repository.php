@@ -151,7 +151,7 @@ class Repository implements AjxpGroupPathProvider
      * @param string $driver
      * @return void
      */
-    public function Repository($id, $display, $driver)
+    public function __construct($id, $display, $driver)
     {
         $this->setAccessType($driver);
         $this->setDisplay($display);

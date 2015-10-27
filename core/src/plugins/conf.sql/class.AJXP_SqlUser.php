@@ -96,9 +96,9 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * @param $storage AbstractConfDriver User storage implementation.
      * @return AJXP_SqlUser
      */
-    public function AJXP_SqlUser($id, $storage=null, $debugEnabled = false)
+    public function __construct($id, $storage=null, $debugEnabled = false)
     {
-        parent::AbstractAjxpUser($id, $storage);
+        parent::__construct($id, $storage);
         //$this->debugEnabled = true;
 
         $this->log('Instantiating User');

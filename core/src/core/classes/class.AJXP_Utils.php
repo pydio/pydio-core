@@ -991,7 +991,7 @@ class AJXP_Utils
      *
      * @return string Indented version of the original JSON string.
      */
-    public function prettyPrintJSON($json)
+    public static function prettyPrintJSON($json)
     {
         $result      = '';
         $pos         = 0;

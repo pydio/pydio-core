@@ -503,7 +503,7 @@ class Securimage
      * </code>
      *
      */
-    public function Securimage()
+    public function __construct()
     {
         // Initialize session or attach to existing
         if ( session_id() == '' ) { // no session has been started yet, which is needed for validation
@@ -1551,7 +1551,7 @@ class Securimage_Color
      * @param $green int Green component 0-255
      * @param $blue int Blue component 0-255
      */
-    public function Securimage_Color($red, $green = null, $blue = null)
+    public function __construct($red, $green = null, $blue = null)
     {
         if ($green == null && $blue == null && preg_match('/^#[a-f0-9]{3,6}$/i', $red)) {
             $col = substr($red, 1);
