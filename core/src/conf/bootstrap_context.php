@@ -149,6 +149,6 @@ if(!is_file(AJXP_PLUGINS_BOOTSTRAP_CACHE)){
     }
     $resWriteBootstrapCache = @file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
 }
-if(!isSet($resWriteBootstrapCache) || $resWriteBootstrapCache !== true){
+if(!isSet($resWriteBootstrapCache) || $resWriteBootstrapCache !== false){
     require_once(AJXP_PLUGINS_BOOTSTRAP_CACHE);
 }

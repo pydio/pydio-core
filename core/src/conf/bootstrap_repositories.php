@@ -185,6 +185,6 @@ if(!is_file(AJXP_PLUGINS_REPOSITORIES_CACHE)){
     }
     $resWriteRepoCache = @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
 }
-if(!isSet($resWriteRepoCache) || $resWriteRepoCache !== true){
+if(!isSet($resWriteRepoCache) || $resWriteRepoCache === true){
     include_once(AJXP_PLUGINS_REPOSITORIES_CACHE);
 }
