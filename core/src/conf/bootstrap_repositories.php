@@ -183,6 +183,8 @@ if(!is_file(AJXP_PLUGINS_REPOSITORIES_CACHE)){
     foreach($boots as $b){
         $content .= 'require_once("'.$b.'");'."\n";
     }
-    @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
+    $resWriteRepoCache = @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
 }
-include_once(AJXP_PLUGINS_REPOSITORIES_CACHE);
+if(!isSet($resWriteRepoCache) || $resWriteRepoCache !== true){
+    include_once(AJXP_PLUGINS_REPOSITORIES_CACHE);
+}

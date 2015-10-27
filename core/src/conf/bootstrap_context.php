@@ -147,6 +147,8 @@ if(!is_file(AJXP_PLUGINS_BOOTSTRAP_CACHE)){
     foreach($boots as $b){
         $content .= 'require_once("'.$b.'");'."\n";
     }
-    @file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
+    $resWriteBootstrapCache = @file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
 }
-require_once(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+if(!isSet($resWriteBootstrapCache) || $resWriteBootstrapCache !== true){
+    require_once(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+}
