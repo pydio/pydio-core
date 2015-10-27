@@ -91,7 +91,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
      */
     public $storage;
 
-    public function AbstractAjxpUser($id, $storage=null)
+    public function __construct($id, $storage=null)
     {
         $this->id = $id;
         if ($storage == null) {

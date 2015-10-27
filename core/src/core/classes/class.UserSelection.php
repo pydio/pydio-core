@@ -50,7 +50,7 @@ class UserSelection
      * @param Repository|null $repository
      * @param array|null $httpVars
      */
-    public function UserSelection($repository = null, $httpVars = null)
+    public function __construct($repository = null, $httpVars = null)
     {
         $this->files = array();
         if(isSet($repository)){
