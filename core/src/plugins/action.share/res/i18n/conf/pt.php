@@ -77,4 +77,6 @@ $mess=array(
 "Minisite" => "Minisite",
 "Minisite Logo" => "Minisite Logo",
 "Top-right logo displayed on minisite page" => "Top-right logo displayed on minisite page",
+"Set password mandatory" => "Set password mandatory",
+"Do not allow users to create public links, only private links (password-protected)" => "Do not allow users to create public links, only private links (password-protected)",
 );

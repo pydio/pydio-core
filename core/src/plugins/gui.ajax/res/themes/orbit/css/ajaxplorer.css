@@ -4929,7 +4929,7 @@ div.user_entry span.cbContainer
 {
     display: inline-block;
     padding: 0 2px;
-    width: 30px;
+    width: 40px;
     text-align: center;
     cursor: pointer;
 }
@@ -5009,7 +5009,7 @@ input.share_info_panel_link_expired{
 #share_folder_form div.dialogContentMainTitle{
     clear: left;
     margin-top: 10px;
-    margin-bottom: -4px;
+    margin-bottom: 0;
     padding: 10px 0 0;
     border-top: 1px dashed rgb(150,150,150);
     border-bottom: 0;
