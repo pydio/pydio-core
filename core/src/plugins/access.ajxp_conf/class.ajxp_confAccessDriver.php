@@ -2286,8 +2286,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
-
-        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1){
+        $groupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1 && !$groupAdmin){
             $nodeKey = "/data/".$root."/";
             $meta = array(
                 "icon" => "users-folder.png",
