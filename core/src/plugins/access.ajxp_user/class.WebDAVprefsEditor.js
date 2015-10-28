@@ -28,8 +28,8 @@ Class.create("WebDAVprefsEditor", AjxpPane, {
         var cont = element.down('#webdav_repo_list');
         cont.update('');
         var activator = element.down("#webdav_activator");
-        element.down('#webdav_password').observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
-        element.down('#webdav_password').observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
+        element.down('#webdav_password').observe("focus", function(){pydio.UI.disableAllKeyBindings()});
+        element.down('#webdav_password').observe("blur", function(){pydio.UI.enableAllKeyBindings()});
 
         var even = false;
         var conn = new Connexion();
@@ -41,7 +41,7 @@ Class.create("WebDAVprefsEditor", AjxpPane, {
                 && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
                 element.down('#webdav_password_form').show();
             }
-            ajaxplorer.user.getRepositoriesList().each(function(pair){
+            ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
                 if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
                     var div = new Element('div', {className:(even?'even':'')});
                     div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );

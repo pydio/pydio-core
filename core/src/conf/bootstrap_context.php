@@ -48,6 +48,8 @@ define("AJXP_SHARED_CACHE_DIR", AJXP_INSTALL_PATH."/data/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_PLUGINS_QUERIES_CACHE", AJXP_CACHE_DIR."/plugins_queries.ser");
+define("AJXP_PLUGINS_BOOTSTRAP_CACHE", AJXP_CACHE_DIR."/plugins_bootstrap.php");
+define("AJXP_PLUGINS_REPOSITORIES_CACHE", AJXP_CACHE_DIR."/plugins_repositories.php");
 define("AJXP_PLUGINS_MESSAGES_FILE", AJXP_CACHE_DIR."/plugins_messages.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
@@ -68,12 +70,14 @@ define("ADMIN_PASSWORD", "admin");
 // example in log.serial. Do not forget the trailing slash
 // define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
 
+// KEY-VALUE-CACHE
+define("AJXP_KVCACHE_PREFIX", "pydio-unique-id");
+define("AJXP_KVCACHE_IGNORE", true);
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
 define("AJXP_SERVER_DEBUG"  ,	false);
 define("AJXP_SKIP_CACHE"    ,   false);
-
 
 // PBKDF2 CONSTANTS FOR A SECURE STORAGE OF PASSWORDS
 // These constants may be changed without breaking existing hashes.
@@ -135,4 +139,16 @@ if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
             setlocale(LC_CTYPE, $ROOT_ENCODING);
         }
     }
+}
+
+if(!is_file(AJXP_PLUGINS_BOOTSTRAP_CACHE)){
+    $content = "<?php \n";
+    $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/bootstrap.php");
+    foreach($boots as $b){
+        $content .= 'require_once("'.$b.'");'."\n";
+    }
+    $resWriteBootstrapCache = @file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
+}
+if(!isSet($resWriteBootstrapCache) || $resWriteBootstrapCache !== false){
+    require_once(AJXP_PLUGINS_BOOTSTRAP_CACHE);
 }

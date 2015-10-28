@@ -65,8 +65,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        $repo = ConfService::getRepository();
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {

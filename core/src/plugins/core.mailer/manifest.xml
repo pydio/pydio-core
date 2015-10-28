@@ -22,9 +22,6 @@
             <action name="send_mail">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <processing>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(!window.AjxpMailer && ajaxplorer.user) ResourcesManager.prototype.loadJSResource('plugins/core.mailer/class.AjxpMailer.js', 'AjxpMailer');
-                    ]]></clientListener>
                     <serverCallback methodName="sendMailAction" restParams="/" developerComment="Trigger an email to a user or external email, sent by currently logged user">
                         <input_param name="from" type="string" description="From email"/>
                         <input_param name="emails" type="string" description="A list of emails or user names"/>

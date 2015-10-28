@@ -20,7 +20,7 @@
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						userSelection = ajaxplorer.getUserSelection();
+						var userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
 							path = userSelection.getUniqueNode();
 						}
@@ -57,7 +57,7 @@
                     modal.showDialogForm('Create', 'mkdir_form', function(form){
                         if(form.down('a.create_file_alt_link')){
                             form.down('a.create_file_alt_link').observe('click', function(){
-                                ajaxplorer.actionBar.fireAction('mkfile');
+                                pydio.getController().fireAction('mkfile');
                             });
                         }
                     }, function(){
@@ -68,15 +68,19 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
                     ]]></clientCallback>
                 <clientForm id="mkdir_form"><![CDATA[
                 <div id="mkdir_form" action="mkdir" box_width="200">
+                <!--
                 <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
-                <input type="text" name="dirname" size="30" class="dialogFocus">
+                -->
+                    <paper-input-decorator label="AJXP_MESSAGE[173]" floatingLabel>
+                        <input type="text" name="dirname" size="30" class="dialogFocus" is="core-input">
+                    </paper-input-decorator>
                 <div class="dialogLegend" style="padding-top:20px;" id="alt_mkfile"><span class="icon-chevron-right"></span> AJXP_MESSAGE[518]</div>
                 </div>
                 ]]></clientForm>
@@ -102,7 +106,7 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -127,7 +131,7 @@
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
+					var uploaders = pydio.Registry.getActiveExtensionByType("uploader");
                     uploaders.sort(function(objA, objB){
                         return objA.order - objB.order;
                     });
@@ -138,11 +142,11 @@
 					    }else{
     						uploader = uploaders[0];
                         }
-						if(ajaxplorer.actionBar.getActionByName("trigger_remote_copy")){
+						if(pydio.getController().getActionByName("trigger_remote_copy")){
                             modal.setCloseAction(function(){
                                 ajaxplorer.fireContextRefresh();
-                                var bgManager = ajaxplorer.actionBar.bgManager;
-                                bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+                                var bgManager = pydio.getController().getBackgroundTasksManager();
+                                bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
                                 bgManager.next();
                             });
 						}
@@ -164,7 +168,7 @@
                                 var label = up.xmlNode.getAttribute("label");
                                 var desc = up.xmlNode.getAttribute("description")
                                 var item = new Element('li', {title:desc}).update(label).observe("click", function(){
-                                    ajaxplorer.actionBar.fireAction("upload", up);
+                                    pydio.getController().fireAction("upload", up);
                                 });
                                 if(up == uploader) item.addClassName('current');
                                 chooserList.insert(item);
@@ -197,7 +201,7 @@
 				<clientCallback prepareModal="false"><![CDATA[
 				    ajaxplorer.getContextHolder().selectAll();
 					window.setTimeout(function(){
-						ajaxplorer.actionBar.fireAction('delete');
+						pydio.getController().fireAction('delete');
 					}, 200);
 					]]></clientCallback>
 				</processing>
@@ -213,44 +217,15 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
-					if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
+					if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled'))
 					{
-						if(gaTrackEvent){
-							fileNames = userSelection.getFileNames();
+						if(window.gaTrackEvent){
+							var fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++){
-								gaTrackEvent("Data", "Download", fileNames[i]);
+								window.gaTrackEvent("Data", "Download", fileNames[i]);
 							}
 						}
-						var agent = navigator.userAgent;
-						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1||agent.indexOf('Safari')!=-1)){
-							var downloadUrl = ajxpServerAccessPath+'&get_action=download';
-							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-							document.location.href=downloadUrl;
-						}else{
-						    var minisite_session = null;
-						    var parts = $A(window.ajxpServerAccessPath.replace('?', '&').split('&'));
-						    parts.each(function(p){
-						        var sub = p.split('=');
-						        if(sub.length == 2 && sub[0] == 'minisite_session'){
-						            minisite_session = sub[1];
-                                    throw $break;
-                                }
-						    });
-							$('download_form').action = window.ajxpServerAccessPath;
-							$('download_form').secure_token.value = Connexion.SECURE_TOKEN;
-							$('download_form').select("input").each(function(input){
-								if(input.name!='get_action' && input.name!='secure_token') input.remove();
-							});
-							if(minisite_session){
-							    $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
-							}
-							userSelection.updateFormOrUrl($('download_form'));
-							try{
-    							$('download_form').submit();
-    					    }catch(e){
-
-    					    }
-						}
+						PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
 					}
 					else
 					{
@@ -258,7 +233,7 @@
 							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
 							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
 							downloader.triggerEnd = function(){hideLightBox()};
-							fileNames = userSelection.getFileNames();
+							var fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++)
 							{
 								downloader.addListRow(fileNames[i]);
@@ -275,7 +250,7 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="index.php" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="index.php" method="POST" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
 						<input type="hidden" name="secure_token" value="">
 					</form>
@@ -285,8 +260,8 @@
 					<clientListener name="selectionChange"><![CDATA[
 					if(ajaxplorer){
 						var userSelection = ajaxplorer.getUserSelection();
-						var action = ajaxplorer.getActionBar().getActionByName("download");
-						if(multipleFilesDownloadEnabled){
+						var action = pydio.getController().getActionByName("download");
+						if(window.zipEnabled && window.multipleFilesDownloadEnabled){
 							if(action){
 								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
 									action.setIconSrc('download_manager.png');
@@ -316,17 +291,32 @@
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="true"><![CDATA[
-                        var dm = ajaxplorer.getContextHolder();
+                        var dm = pydio.getContextHolder();
                         dm._selectedNodes = $A([dm.getRootNode()]);
                         dm._bEmpty = dm._bDir = true; dm._bFile = false;
                         dm.publish("selection_changed", dm);
                         window.setTimeout(function(){
-                            ajaxplorer.actionBar.fireAction("download");
+                            pydio.getController().fireAction("download");
                         }, 200);
                 ]]></clientCallback>
+                <clientListener name="init"><![CDATA[
+                    if(!pydio.Parameters.get('zipEnabled') || !pydio.Parameters.get('multipleFilesDownloadEnabled')){
+                        pydio.Controller.getActionByName("download_all").hide();
+                        pydio.Controller.actions["delete"]("download_all");
+                    }
+                ]]></clientListener>
             </processing>
         </action>
 		<action name="compress">
+			<processing>
+                <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress" developerComment="Compress one or many files into a Zip archive. May be disabled for remote-access workspaces (like FTP).">
+                    <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                    <input_param description="Force new archive name. If not set, the parent folder name is used" name="archive_name" type="string"/>
+                    <input_param description="Skip the original folder structure and store all files at the root of the archive" name="compress_flat" type="boolean"/>
+                </serverCallback>
+				</processing>
+		</action>
+		<action name="compress_ui">
 			<gui text="313" title="314" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="true"
@@ -357,7 +347,7 @@
 						};
 						var closeFunc = function(){
 							userSelection.updateFormOrUrl(modal.getForm());
-							ajaxplorer.actionBar.submitForm(modal.getForm(), true);
+							pydio.getController().submitForm(modal.getForm(), true);
 							hideLightBox();
 						};
 						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);
@@ -372,8 +362,8 @@
 				<clientListener name="selectionChange"><![CDATA[
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
-					var action = ajaxplorer.getActionBar().getActionByName("compress");
-					if(!multipleFilesDownloadEnabled){
+					var action = pydio.getController().getActionByName("compress_ui");
+					if(!window.zipEnabled || !window.multipleFilesDownloadEnabled){
 						if(action){
 							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
 							else action.selectionContext.unique = true;
@@ -381,12 +371,7 @@
 					}
 				}
 				]]></clientListener>
-                <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress" developerComment="Compress one or many files into a Zip archive. May be disabled for remote-access workspaces (like FTP).">
-                    <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
-                    <input_param description="Force new archive name. If not set, the parent folder name is used" name="archive_name" type="string"/>
-                    <input_param description="Skip the original folder structure and store all files at the root of the archive" name="compress_flat" type="boolean"/>
-                </serverCallback>
-				</processing>
+            </processing>
 		</action>
         <action name="open_with_unique">
             <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
@@ -399,7 +384,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
             </processing>
         </action>
@@ -416,7 +401,7 @@
                     var context = window.builderContext;
                     context.builderMenuItems = $A([]);
                     var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-                    var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                    var editors = pydio.Registry.findEditorsForMime(selectedMime);
                     if(editors.length){
                         var index = 0;
                         var sepAdded = false;
@@ -452,7 +437,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
                 </processing>
         </action>
@@ -567,7 +552,7 @@
 				   connexion.addParameter('get_action', 'restore');
 				   connexion.addParameter('dir', userSelection.getContextNode().getPath());
 				   connexion.onComplete = function(transport){
-				   		ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+				   		pydio.getController().parseXmlMessage(transport.responseXML);
 				   };
 				   fileNames.each(function(filename){
 				   		connexion.addParameter('file', filename);
@@ -600,12 +585,12 @@
 						conn.addParameter('file', filename);
 						conn.addParameter('filename_new', newValue);
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
+							if(orig && ajaxplorer.getUserSelection()){
+								ajaxplorer.getUserSelection().setSelectionSource(orig);
+							}
 						};
-						conn.sendSync();
-						if(orig && ajaxplorer.getUserSelection()){
-						    ajaxplorer.getUserSelection().setSelectionSource(orig);
-						}
+						conn.sendAsync();
 					};
 					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
 					    ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
@@ -637,7 +622,7 @@
 						var user = ajaxplorer.user;
 						var activeRepository = user.getActiveRepository();
 					}
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'copy';
@@ -649,7 +634,7 @@
 						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							var firstKey ;
 							var reposList = new Hash();
-							user.getCrossRepositories().each(function(pair){
+							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 								if(!firstKey) firstKey = pair.key;
 								reposList.set(pair.key, pair.value.getLabel());
 							}.bind(this));
@@ -708,14 +693,14 @@
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[
 				if(ajaxplorer){
-					var action = ajaxplorer.getActionBar().getActionByName("copy");
+					var action = pydio.getController().getActionByName("copy");
 					if(action){
 						action.rightsContext.write = true;
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
 							action.rightsContext.write = false;
-							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
-							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
+							pydio.getController().defaultActions['delete']('ctrldragndrop');
+							pydio.getController().defaultActions['delete']('dragndrop');
 						}
 						if(ajxpUser && ajxpUser.canWrite() && ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 						    action.rightsContext.write = false;
@@ -746,12 +731,12 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					if(ajaxplorer.user){
 						var user = ajaxplorer.user;
 						var activeRepository = user.getActiveRepository();
 					}
-					var context = ajaxplorer.actionBar;
+					var context = pydio.getController();
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'move';
@@ -763,7 +748,7 @@
 						this.treeSelector.load();
 						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							this.treeSelector.setFilterShow(true);
-							user.getCrossRepositories().each(function(pair){
+							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 								this.treeSelector.appendFilterValue(pair.key, pair.value.getLabel());
 							}.bind(this));
 							this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
@@ -839,9 +824,9 @@
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
+						pydio.getController().submitForm(oForm, true, function(transport){
 						    var result = this.parseXmlMessage(transport.responseXML);
-						}.bind(ajaxplorer.actionBar));
+						}.bind(pydio.getController()));
 						hideLightBox(true);
 						return false;
 					});
@@ -868,15 +853,15 @@
                 <clientCallback prepareModal="true"><![CDATA[
                     var userSelection =  ajaxplorer.getUserSelection();
                     var loadFunc = function(oForm){
-                        ajaxplorer.actionBar.propertyPane = new PropertyPanel(userSelection, oForm);
+                        pydio.getController().propertyPane = new PropertyPanel(userSelection, oForm);
                     };
                     var completeFunc = function(){
-                        if(!ajaxplorer.actionBar.propertyPane.valueChanged()){
+                        if(!pydio.getController().propertyPane.valueChanged()){
                             hideLightBox();
                             return false;
                         }
                         userSelection.updateFormOrUrl(modal.getForm());
-                        ajaxplorer.actionBar.submitForm(modal.getForm());
+                        pydio.getController().submitForm(modal.getForm());
                         hideLightBox();
                         return false;
                     };

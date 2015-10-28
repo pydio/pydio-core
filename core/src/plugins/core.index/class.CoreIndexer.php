@@ -25,8 +25,8 @@ class CoreIndexer extends AJXP_Plugin {
     private $verboseIndexation = false;
 
 
-    public function logDebug($message = ""){
-        parent::logDebug("core.indexer", $message);
+    public function debug($message = ""){
+        $this->logDebug("core.indexer", $message);
         if($this->verboseIndexation && ConfService::currentContextIsCommandLine()){
             print($message."\n");
         }
@@ -44,7 +44,7 @@ class CoreIndexer extends AJXP_Plugin {
             if($userSelection->isEmpty()){
                 $userSelection->addFile("/");
             }
-            $nodes = $userSelection->buildNodes($repository->driverInstance);
+            $nodes = $userSelection->buildNodes();
 
             if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
                 $this->verboseIndexation = true;
@@ -69,16 +69,16 @@ class CoreIndexer extends AJXP_Plugin {
                 // SIMPLE FILE
                 if(!$dir){
                     try{
-                        $this->logDebug("Indexing - node.index ".$node->getUrl());
+                        $this->debug("Indexing - node.index ".$node->getUrl());
                         AJXP_Controller::applyHook("node.index", array($node));
                     }catch (Exception $e){
-                        $this->logDebug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
+                        $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
                     }
                 }else{
                     try{
                         $this->recursiveIndexation($node);
                     }catch (Exception $e){
-                        $this->logDebug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
+                        $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
                     }
                 }
 
@@ -113,12 +113,12 @@ class CoreIndexer extends AJXP_Plugin {
         $messages = ConfService::getMessages();
         if($user == null && AuthService::usersEnabled()) $user = AuthService::getLoggedUser();
         if($depth == 0){
-            $this->logDebug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());
+            $this->debug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());
             $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);
             AJXP_Controller::applyHook("node.index.recursive.start", array($node));
         }else{
             if($this->isInterruptRequired($repository, $user)){
-                $this->logDebug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
+                $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
                 AJXP_Controller::applyHook("node.index.recursive.end", array($node));
                 $this->releaseStatus($repository, $user);
                 throw new Exception("User interrupted");
@@ -127,13 +127,13 @@ class CoreIndexer extends AJXP_Plugin {
 
         if(!ConfService::currentContextIsCommandLine()) @set_time_limit(120);
         $url = $node->getUrl();
-        $this->logDebug("Indexing Node parent node ".$url);
+        $this->debug("Indexing Node parent node ".$url);
         $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);
         if($node->getPath() != "/"){
             try {
                 AJXP_Controller::applyHook("node.index", array($node));
             } catch (Exception $e) {
-                $this->logDebug("Error Indexing Node ".$url." (".$e->getMessage().")");
+                $this->debug("Error Indexing Node ".$url." (".$e->getMessage().")");
             }
         }
 
@@ -144,27 +144,27 @@ class CoreIndexer extends AJXP_Plugin {
                 $childNode = new AJXP_Node(rtrim($url, "/")."/".$child);
                 $childUrl = $childNode->getUrl();
                 if(is_dir($childUrl)){
-                    $this->logDebug("Entering recursive indexation for ".$childUrl);
+                    $this->debug("Entering recursive indexation for ".$childUrl);
                     $this->recursiveIndexation($childNode, $depth + 1);
                 }else{
                     try {
-                        $this->logDebug("Indexing Node ".$childUrl);
+                        $this->debug("Indexing Node ".$childUrl);
                         AJXP_Controller::applyHook("node.index", array($childNode));
                     } catch (Exception $e) {
-                        $this->logDebug("Error Indexing Node ".$childUrl." (".$e->getMessage().")");
+                        $this->debug("Error Indexing Node ".$childUrl." (".$e->getMessage().")");
                     }
                 }
             }
             closedir($handle);
         } else {
-            $this->logDebug("Cannot open $url!!");
+            $this->debug("Cannot open $url!!");
         }
         if($depth == 0){
-            $this->logDebug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
+            $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
             $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user);
             AJXP_Controller::applyHook("node.index.recursive.end", array($node));
             $this->releaseStatus($repository, $user);
-            $this->logDebug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
+            $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
         }
     }
 
@@ -197,7 +197,7 @@ class CoreIndexer extends AJXP_Plugin {
         $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
         if(!is_dir($iPath)) mkdir($iPath,0755, true);
         $f = $iPath."/.indexation_status-".$this->buildIndexLockKey($repository, $user);
-        $this->logDebug("Updating file ".$f." with status $status - $message");
+        $this->debug("Updating file ".$f." with status $status - $message");
         file_put_contents($f, strtoupper($status).":".$message);
     }
 
@@ -223,7 +223,7 @@ class CoreIndexer extends AJXP_Plugin {
     protected function releaseStatus($repository, $user)
     {
         $f = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.indexation_status-".$this->buildIndexLockKey($repository, $user);
-        $this->logDebug("Removing file ".$f);
+        $this->debug("Removing file ".$f);
         @unlink($f);
     }
 

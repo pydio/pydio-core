@@ -22,10 +22,10 @@
 $mess = array(
     "1" => "Pydio Setup Wizard",
     "2" => "Welcome in the Pydio Setup Wizard",
-    "3" => "Thank you for installing Pydio!<br> This tool will make sure your new sharing platform is up and running in no time: browse through the various sections to set up the general behaviour of the application. You can fly over the fields labels with your mouse to get more information. <br>Are you ready ? ",
-    "4" => "Start Wizard!",
+    "3" => "Thank you for installing Pydio. <br/> Please follow this installation wizard to start sharing and syncing files across all of your devices in no time.  Make sure to create a database and prepare your SQL credentials before starting.  You can hover over the field labels for more information. <br/> Press start when you are ready",
+    "4" => "Start Wizard",
     "5" => "Please wait while Pydio is being configured! It will be up and running in a couple of seconds...",
-    "6" => "Install Pydio Now",
+    "6" => "Install Pydio",
     "7" => "Language",
     "8" => "Click on each section to edit parameters",
 );

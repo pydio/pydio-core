@@ -5,15 +5,16 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 		<link rel="icon" type="image/x-png" href="AJXP_THEME_FOLDER/images/html-folder.png">
-		<script src="plugins/gui.ajax/res/js/lib/prototype/prototype.js" type="text/javascript"></script>
+		<script src="plugins/gui.ajax/res/js/vendor/prototype/prototype.js" type="text/javascript"></script>
         <style>
+            * {
+                font-family: Open Sans, sans-serif;
+            }
             body {
-                background-color:#fff;
-                margin:0;
-                padding:20;
-                font-family: Helvetica, Verdana, Arial;
+                background-color: #F5F5F5;
+                margin: 0;
+                padding: 20px;
                 overflow: hidden;
-                background-image: url('plugins/gui.ajax/res/themes/vision/images/grid_t.png');
             }
             h1 {
                 font-size: 30px;
@@ -21,7 +22,7 @@
                 color: #555;
                 height: 20px;
                 text-align: center;
-                margin: 20px auto;
+                margin: 10px auto;
             }
 
             div.mainContainer{
@@ -29,7 +30,7 @@
                 display: block;
                 border-radius: 4px;
                 margin: 36px auto;
-                width: 500px;
+                width: 660px;
                 height: 80%;
                 padding: 7px 11px;
                 color: #535353;
@@ -44,7 +45,14 @@
                 padding: 0 5px;
             }
             p.status a{
-                color: #535353;
+                display: inline-block;
+                background-color: #555555;
+                color: white;
+                text-transform: uppercase;
+                padding: 5px 10px;
+                text-decoration: none;
+                border-radius: 3px;
+                margin: 9px 1px;
             }
             p.status strong{
                 font-weight: normal;
@@ -52,40 +60,40 @@
             }
 
             div.testList{
-                font-family: Helvetica, Verdana, Arial;
                 font-size: 15px;
                 margin: 0 auto;
-                height: 331px;
                 overflow-y: scroll;
                 background-color: #ffffff;
                 border-radius: 3px;
-                box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+                box-shadow: 0 0 8px rgba(0,0,0,0.25);
             }
 
             div.testLine {
                 text-align: left;
-                padding: 10px;
-                padding-bottom: 0px;
+                padding: 15px 15px 9px;
+                border-bottom: 1px solid #E7E7E7;
             }
             div.testClear{
                 clear:both;
-                border-bottom: 1px solid #dddddd;
                 height: 8px;
             }
             div.testName{
-                float:left;
-                width:80%;
+                float: left;
+                width: 80%;
                 cursor: pointer;
+                font-size: 20px;
+                color: #555;
             }
             div.testName span{
+                display: none;
             }
             div.testStatus{
-                float:right;
-                width:20%;
+                float: right;
+                width: 20%;
                 text-transform: uppercase;
                 text-align: right;
-                font-weight: bold;
                 color: #090;
+                margin-top: 3px;
             }
             div.testLine.error .testStatus{
                 color : #933;
@@ -98,8 +106,7 @@
                 font-size: 0.8em;
                 color: #999;
                 clear: both;
-                padding: 5px 0;
-                padding-left: 8px;
+                padding: 20px 0 5px;
             }
             div.testDescription.visible
             {

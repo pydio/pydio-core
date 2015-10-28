@@ -11,11 +11,11 @@
 	</credentials_consumer>
 	<slug_provider>
 		<server_settings uuidAttr="name">
-            <param group="MIXIN_MESSAGE[Repository Commons]" name="USER_DESCRIPTION" type="textarea" label="MIXIN_MESSAGE[Description]" description="MIXIN_MESSAGE[A user-defined description of the content of this workspace]" default=""/>
-            <param group="MIXIN_MESSAGE[Repository Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="MIXIN_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
+            <param group="MIXIN_MESSAGE[Repository Commons]" name="USER_DESCRIPTION" type="textarea" label="MIXIN_MESSAGE[Description]" description="MIXIN_MESSAGE[A user-defined description of the content of this workspace]" no_templates="false" default=""/>
+            <param group="MIXIN_MESSAGE[Repository Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="MIXIN_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" no_templates="false" default=""/>
             <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_SLUG" type="string" label="MIXIN_MESSAGE[Alias]" description="MIXIN_MESSAGE[Alias for replacing the generated unique id of the repository]" mandatory="false" no_templates="true"/>
             <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_GROUP_PATH_PARAMETER" type="string" label="MIXIN_MESSAGE[Group Path]" description="MIXIN_MESSAGE[Set this repository group owner : only users of this group will see it]" mandatory="false" no_templates="true"/>
-	    <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_WEBDAV_DISABLED" type="boolean" label="MIXIN_MESSAGE[Disable WebDAV]" description="MIXIN_MESSAGE[Explicitly disable WebDAV access for this repository.]" mandatory="false" default="false" no_templates="true"/>
+	        <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_WEBDAV_DISABLED" type="boolean" label="MIXIN_MESSAGE[Disable WebDAV]" description="MIXIN_MESSAGE[Explicitly disable WebDAV access for this repository.]" mandatory="false" default="false" no_templates="true"/>
 		</server_settings>
 	</slug_provider>
 	<template_provider>
@@ -40,7 +40,7 @@
             <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_RECYCLE" type="boolean" label="MIXIN_MESSAGE[Hide recycle bin]" description="MIXIN_MESSAGE[Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable.]" default="false"/>
             <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_EXTENSIONS" type="string" label="MIXIN_MESSAGE[Hide extensions]" description="MIXIN_MESSAGE[Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden.]" default="ser"/>
             <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_FOLDERS" type="textarea" label="MIXIN_MESSAGE[Hide folders]" description="MIXIN_MESSAGE[Comma-separated list of specific folders to hide]"/>
-            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_FILENAMES" type="textarea" label="MIXIN_MESSAGE[Hide files]" description="MIXIN_MESSAGE[Comma-separated list of specific files to hide]"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_FILENAMES" type="textarea" label="MIXIN_MESSAGE[Hide files]" description="MIXIN_MESSAGE[Comma-separated list of specific files to hide]" default="bootstrap.json"/>
             <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false"/>
         </server_settings>
     </filesystem_commons>

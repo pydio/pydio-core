@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPLimits extends AbstractTest
 {
-    public function PHPLimits() { parent::AbstractTest("PHP Limits variables", "<b>Testing configs</b>"); }
+    public function __construct() { parent::__construct("PHP Limits variables", "<b>Testing configs</b>"); }
     public function doTest()
     {
         $this->testedParams["Upload Max Size"] = ini_get("upload_max_filesize");
@@ -43,4 +43,4 @@ class PHPLimits extends AbstractTest
         $this->failedLevel = "info";
         return FALSE;
     }
-};
+}

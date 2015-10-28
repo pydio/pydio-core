@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class ServerEncoding extends AbstractTest
 {
-    public function ServerEncoding() { parent::AbstractTest("Server charset encoding", "You must set a correct charset encoding
+    public function __construct() { parent::__construct("Server charset encoding", "You must set a correct charset encoding
         in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page.
         If your detected locale is C, simply type echo \$LANG on your server command line to read the correct value."); }
     public function doTest()
@@ -58,4 +58,4 @@ class ServerEncoding extends AbstractTest
         }
         return TRUE;
     }
-};
+}

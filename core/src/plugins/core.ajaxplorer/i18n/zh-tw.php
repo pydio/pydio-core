@@ -24,7 +24,7 @@
 $mess=array(
 "languageLabel" => "繁體中文",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "zh-TW",
 "0" => "上一版本",
 "1" => "名稱",

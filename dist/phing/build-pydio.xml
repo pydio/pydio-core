@@ -146,6 +146,11 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
+    	<!-- BUILD JAVASCRIPT -->
+    	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
+        <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
+	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
+
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>
@@ -175,6 +180,19 @@
         <phingcall target="replace_variables">
         	<property name="passed_directory" value="${upgrade_export}"/>
         </phingcall>
+
+        <if>
+            <available type="dir" file="${upgrade_export}/plugins/gui.ajax"/>
+            <then>
+                <echo message="Copying full gui.ajax folder" level="info"/>
+                <property name="new_package_name" value="${build.source_folder}/pydio-core-${build.version}"/>
+                <copy todir="${upgrade_export}/plugins/gui.ajax">
+                    <fileset dir="${new_package_name}/plugins/gui.ajax" defaultexcludes="false">
+                        <include name="*/**"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
 
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
@@ -218,14 +236,26 @@
 			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
 			<then>
 				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
-                <if>
-              			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
-              			<then>
-              				<copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
-              			</then>
-              		</if>
 			</then>
 		</if>
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.mysql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${build.version}.mysql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.mysql"/>
+			</then>
+		</if>
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${build.version}.pgsql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${build.version}.pgsql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.pgsql"/>
+			</then>
+		</if>
+        <if>
+            <available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
+            <then>
+                <copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+            </then>
+        </if>
 
     </target>
 

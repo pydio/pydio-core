@@ -20,7 +20,7 @@
 */
 $mess=array(
 "1" => "Données de configuration",
-"2" => "Utilisateurs & Groupes",
+"2" => "Utilisateurs",
 "3" => "Dépôts",
 "4" => "Journal",
 "5" => "Diagnostique",
@@ -40,7 +40,8 @@ $mess=array(
 "19" => "Niveau",
 "20" => "Utilisateur",
 "21" => "Action",
-"22" => "Paramètres",
+"22" => "Parametres",
+"22a"=> "Plus d'infos",
 "23" => "Nom du test",
 "24" => "Résultat",
 "25" => "Accès aux dépôts",
@@ -171,4 +172,6 @@ $mess=array(
     "148" => "Hooks Definitions",
     "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
     "150" => "Select a repository",
+    "151" => "Groupe Racine",
+    "152" => "Role du groupe racine",
 );

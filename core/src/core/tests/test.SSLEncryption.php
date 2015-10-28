@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class SSLEncryption extends AbstractTest
 {
-    public function SSLEncryption() { parent::AbstractTest("SSL Encryption", "You are not using SSL encryption, or it was not detected by the server. Be aware that it is strongly recommended to secure all communication of data over the network."); }
+    public function __construct() { parent::__construct("SSL Encryption", "You are not using SSL encryption, or it was not detected by the server. Be aware that it is strongly recommended to secure all communication of data over the network."); }
     public function doTest()
     {
         // Get the locale
@@ -45,4 +45,4 @@ class SSLEncryption extends AbstractTest
             return TRUE;
         }
     }
-};
+}

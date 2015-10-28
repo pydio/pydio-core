@@ -55,14 +55,12 @@ class PluploadProcessor extends AJXP_Plugin
             //error_log("currentChunk:".$chunk."  chunks: ".$chunks);
 
             $repository = ConfService::getRepository();
-            if (!$repository->detectStreamWrapper(false)) {
+            if (!$repository->detectStreamWrapper(true)) {
                 return false;
             }
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
-            $wrapperName = $streamData["classname"];
+            $userSelection = new UserSelection($repository);
             $dir = AJXP_Utils::securePath($httpVars["dir"]);
-            $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+            $destStreamURL = $userSelection->currentBaseUrl().$dir."/";
 
             $driver = ConfService::loadDriverForRepository($repository);
             $remote = false;
@@ -76,7 +74,7 @@ class PluploadProcessor extends AJXP_Plugin
                 }
                 $target = $tmpFolder.'/'.$filename;
                 $fileVars["file"]["destination"] = base64_encode($dir);
-            }else if(call_user_func(array($wrapperName, "isRemote"))){
+            }else if(AJXP_MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
                 $remote = true;
                 $tmpFolder = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){
@@ -93,7 +91,7 @@ class PluploadProcessor extends AJXP_Plugin
 
             // Clean the fileName for security reasons
             //$filename = preg_replace('/[^\w\._]+/', '', $filename);
-
+            $contentType =  "";
             // Look for the content type header
             if (isset($_SERVER["HTTP_CONTENT_TYPE"]))
                 $contentType = $_SERVER["HTTP_CONTENT_TYPE"];

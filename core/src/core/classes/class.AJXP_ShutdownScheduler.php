@@ -22,6 +22,8 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
  *
+ * Registry for callbacks that must be triggered after the script is finished.
+ *
  * @package Pydio
  * @subpackage Core
  *

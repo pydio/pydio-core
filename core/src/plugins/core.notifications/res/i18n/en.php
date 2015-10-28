@@ -19,15 +19,17 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Notifications",
-"2" => "Notifications feed",
-"3" => "Alerts",
-"4" => "Notifications",
-"5" => "All Events",
-"6" => "Go to ...",
-"7" => "Dismiss",
-"8" => "No alerts",
-"9" => "Workspace Activity",
-"10"=> "Folder Activity",
-"11"=> "File Activity",
+    "1" => "Notifications",
+    "2" => "Notifications feed",
+    "3" => "Alerts",
+    "4" => "Notifications",
+    "5" => "All Events",
+    "6" => "Go to ...",
+    "7" => "Dismiss",
+    "8" => "No alerts",
+    "9" => "Workspace Activity",
+    "10"=> "Folder Activity",
+    "11"=> "File Activity",
+    "12" => "Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will happen.",
+    "13" => "Your browser does not seem to support Desktop Notifications yet."
 );

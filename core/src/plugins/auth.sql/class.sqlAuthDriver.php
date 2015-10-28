@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class sqlAuthDriver extends AbstractAuthDriver
+class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 {
     public $sqlDriver;
     public $driverName = "sql";
@@ -76,7 +76,15 @@ class sqlAuthDriver extends AbstractAuthDriver
         return $pairs;
     }
 
-    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){
+    /**
+     * See parent method
+     * @param string $baseGroup
+     * @param string $userLogin
+     * @param int $usersPerPage
+     * @param int $offset
+     * @return float
+     */
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
 
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
         $count = $res->fetchSingle();
@@ -129,7 +137,13 @@ class sqlAuthDriver extends AbstractAuthDriver
         return $res->fetchSingle();
     }
 
-    public function listUsers($baseGroup="/")
+    /**
+     * See parent method
+     * @param string $baseGroup
+     * @param bool|true $recursive
+     * @return array
+     */
+    public function listUsers($baseGroup="/", $recursive = true)
     {
         $pairs = array();
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";

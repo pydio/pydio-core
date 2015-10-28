@@ -124,7 +124,7 @@ Class.create("AjxpMailer", {
         connexion.setMethod("post");
         connexion.setParameters(params);
         connexion.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            pydio.getController().parseXmlMessage(transport.responseXML);
         };
         connexion.sendSync();
     }

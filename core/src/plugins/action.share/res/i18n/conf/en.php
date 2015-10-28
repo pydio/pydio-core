@@ -68,4 +68,6 @@ $mess=array(
 "Minisites only" => "Minisites only",
 "Workspaces only" => "Workspaces only",
 "Disable Folder Sharing" => "Disable Folder Sharing",
+"Set password mandatory" => "Set password mandatory",
+"Do not allow users to create public links, only private links (password-protected)" => "Do not allow users to create public links, only private links (password-protected)",
 );

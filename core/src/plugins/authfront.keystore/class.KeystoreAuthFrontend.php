@@ -57,7 +57,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         //$this->logDebug(__FUNCTION__, "Found token in keystore");
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
-        $server_uri = rtrim(array_shift(explode("?", $_SERVER["REQUEST_URI"])), "/");
+        $explode = explode("?", $_SERVER["REQUEST_URI"]);
+        $server_uri = rtrim(array_shift($explode), "/");
         $server_uri = implode("/", array_map("rawurlencode", array_map("urldecode", explode("/", $server_uri))));
         $server_uri = str_replace("~", "%7E", $server_uri);
         //$this->logDebug(__FUNCTION__, "Decoded URI is ".$server_uri);

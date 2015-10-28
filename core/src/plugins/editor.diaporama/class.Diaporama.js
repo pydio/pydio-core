@@ -52,7 +52,7 @@ Class.create("Diaporama", AbstractEditor, {
                 replaceScroll = true;
             }
             this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:replaceScroll});
-            var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
+            var ipConfigs = pydio.UI.getGuiComponentConfigs("InfoPanel");
             ipConfigs.each(function(el){
                 this.infoPanel.parseComponentConfig(el.get("all"));
             }.bind(this));
@@ -300,7 +300,7 @@ Class.create("Diaporama", AbstractEditor, {
         var userSelection = ajaxplorer.getUserSelection();
 		var allItems, sCurrentFile;
 		if(userSelection.isUnique()){
-			allItems = userSelection.getContextNode().getChildren();
+			allItems = ProtoCompat.map2values(userSelection.getContextNode().getChildren());
 			sCurrentFile = node.getPath();
 		}else{
 			allItems = userSelection.getSelectedNodes();
@@ -408,8 +408,7 @@ Class.create("Diaporama", AbstractEditor, {
 			}
 		}
         if(this.scrollbar){
-            this.scrollbar.track.setStyle({height:parseInt(this.imgContainer.getHeight())+"px"});
-            this.scrollbar.recalculateLayout();
+            this.scrollbar.recalculateLayout(parseInt(this.imgContainer.getHeight()));
         }
         this.imageNavigator();
 	},
@@ -795,16 +794,17 @@ Class.create("Diaporama", AbstractEditor, {
 				theImage.setStyle({cursor:'pointer'});
 				theImage.openBehaviour = true;
 				theImage.observe("click", function(event){
-					ajaxplorer.actionBar.fireAction('open_with');
+					pydio.getController().fireAction('open_with');
 				});
 			}
             var off = theImage.positionedOffset();
+            var marginTop = (theImage.getStyle('marginTop')) ? parseInt(theImage.getStyle('marginTop')) : 0;
             var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
                 left: (realLeftOffset + 1) + 'px',
                 width: (theImage.getWidth() - 2) + "px",
-                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() -1 )  + "px"
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() + marginTop)  + "px"
             });
 		});
 		img.observe("mouseout", function(event){

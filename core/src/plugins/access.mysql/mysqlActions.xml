@@ -59,8 +59,8 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var sTitle = MessageHash[187];
 					var loadFunc = function(oForm){
-						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
-						ajaxplorer.actionBar.sqlEditor.createTableEditor();
+						pydio.getController().sqlEditor = new SQLEditor(oForm);
+						pydio.getController().sqlEditor.createTableEditor();
 					};
 					modal.showDialogForm('Create Table', 'mysql_edit_table', loadFunc, null, null, true, true);
 					]]></clientCallback>
@@ -77,11 +77,11 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
-						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
-						ajaxplorer.actionBar.sqlEditor.createRecordEditor();
+						pydio.getController().sqlEditor = new SQLEditor(oForm);
+						pydio.getController().sqlEditor.createRecordEditor();
 					};
 					var completeFunc = function(){
-						ajaxplorer.actionBar.sqlEditor.submitRecordForm();
+						pydio.getController().sqlEditor.submitRecordForm();
 						return false;
 					};
 					modal.showDialogForm('Add Record', 'mysql_edit_record', loadFunc, completeFunc, null);
@@ -102,8 +102,8 @@
 					var currentTable = ajaxplorer.getContextNode().getPath();
 					var sTitle = MessageHash[187]+currentTable;
 					var loadFunc = function(oForm){
-						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
-						ajaxplorer.actionBar.sqlEditor.createTableEditor(currentTable);
+						pydio.getController().sqlEditor = new SQLEditor(oForm);
+						pydio.getController().sqlEditor.createTableEditor(currentTable);
 					};
 					modal.showDialogForm('Edit Table Columns', 'mysql_edit_table', loadFunc, null, null, true, true);
 					]]></clientCallback>
@@ -210,11 +210,11 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
 					var loadFunc = function(oForm){
-						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
-						ajaxplorer.actionBar.sqlEditor.createRecordEditor(userSelection);
+						pydio.getController().sqlEditor = new SQLEditor(oForm);
+						pydio.getController().sqlEditor.createRecordEditor(userSelection);
 					};
 					var completeFunc = function(){
-						ajaxplorer.actionBar.sqlEditor.submitRecordForm();
+						pydio.getController().sqlEditor.submitRecordForm();
 						return false;
 					};
 					modal.showDialogForm('Edit Online', 'mysql_edit_record', loadFunc, completeFunc, null);
@@ -243,7 +243,7 @@
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.submitForm(oForm);
+						pydio.getController().submitForm(oForm);
 						hideLightBox(true);
 						return false;
 					});
@@ -272,7 +272,7 @@
 					modal.showDialogForm('Delete', 'delete_record_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.submitForm(oForm);
+						pydio.getController().submitForm(oForm);
 						hideLightBox(true);
 						return false;
 					});

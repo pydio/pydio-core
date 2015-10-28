@@ -44,10 +44,8 @@ class dropboxAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->logDebug("Detected wrapper data", $wrapperData);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
 
         if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
             $this->logError("Dropbox", "The PEAR HTTP_OAuth package must be installed!");

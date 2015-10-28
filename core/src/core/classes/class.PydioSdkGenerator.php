@@ -18,13 +18,23 @@
  *
  * The latest code can be found at <https://pyd.io/>.
  *
+ *
+ */
+
+/**
+ * Class PydioSdkGenerator
  * Generate a Swagger file for Rest APIs documentation
+ * @package Pydio
+ * @subpackage Core
  */
 class PydioSdkGenerator
 {
     public static function analyzeRegistry($versionString)
     {
-        if(!AJXP_SERVER_DEBUG) return;
+        if(!AJXP_SERVER_DEBUG) {
+            echo "Please switch the server to debug mode to use this API.";
+            return;
+        }
 
         $pServ = AJXP_PluginsService::getInstance();
         $nodes = $pServ->searchAllManifests('//actions/*/processing/serverCallback[@developerComment]', 'node', false, false, true);
@@ -110,7 +120,7 @@ class PydioSdkGenerator
         );
         foreach($swaggerAPIs as $pluginName => $apis){
 
-            var_dump("Writing file for $pluginName");
+            echo("Writing file for $pluginName");
 
             $swaggerJson = array(
                 "apiVersion" => $versionString,

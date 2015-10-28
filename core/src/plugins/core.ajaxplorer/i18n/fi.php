@@ -24,7 +24,7 @@
 $mess=array(
 "languageLabel" => "Finnish",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "fi-FI",
 "0" => "Viimeisin versio",
 "1" => "Nimi",

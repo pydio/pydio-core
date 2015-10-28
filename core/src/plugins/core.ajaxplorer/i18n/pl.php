@@ -21,7 +21,7 @@
 $mess=array(
 "languageLabel" => "Polski",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "pl-PL",
 "0" => "Ostatnia wersja",
 "1" => "Nazwa pliku",

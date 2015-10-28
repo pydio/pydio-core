@@ -79,9 +79,8 @@ class webdavAccessDriver extends fsAccessDriver
             }
         }
         */
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
         if (!is_dir($this->urlBase)) {
             if (webdavAccessWrapper::$lastException) {
                 throw webdavAccessWrapper::$lastException;

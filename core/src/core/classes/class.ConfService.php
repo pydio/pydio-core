@@ -28,8 +28,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ConfService
 {
     private static $instance;
+    public static $useSession = true;
+
     private $errors = array();
     private $configs = array();
+
+    private $contextRepositoryId;
+    private $contextCharset;
+
+    /**
+     * @var AJXP_KeyValueCache
+     */
+    private $keyValueCache;
 
     /**
      * @param AJXP_PluginsService $ajxpPluginService
@@ -86,6 +96,7 @@ class ConfService
 
 
         if (is_file(AJXP_CONF_PATH."/bootstrap_repositories.php")) {
+            $REPOSITORIES = array();
             include(AJXP_CONF_PATH."/bootstrap_repositories.php");
             $this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
         } else {
@@ -121,12 +132,55 @@ class ConfService
         return self::getInstance()->errors;
     }
 
+    public static function getContextCharset(){
+        if(self::$useSession) {
+            if(isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
+            else return null;
+        }else {
+            return self::getInstance()->contextCharset;
+        }
+    }
+
+    public static function setContextCharset($value){
+        if(self::$useSession){
+            $_SESSION["AJXP_CHARSET"] = $value;
+        }else{
+            self::getInstance()->contextCharset = $value;
+        }
+    }
+
+    public static function clearContextCharset(){
+        if(self::$useSession && isSet($_SESSION["AJXP_CHARSET"])){
+            unset($_SESSION["AJXP_CHARSET"]);
+        }else{
+            self::getInstance()->contextCharset = null;
+        }
+    }
+
+    public function getContextRepositoryId(){
+        return self::$useSession ? $_SESSION["REPO_ID"] : $this->contextRepositoryId;
+    }
+
+    public function getKeyValueCache(){
+        if(!isSet($this->keyValueCache)){
+            $this->keyValueCache = new AJXP_KeyValueCache();
+        }
+        return $this->keyValueCache;
+    }
+
+    public static function clearAllCaches(){
+        AJXP_PluginsService::clearPluginsCache();
+        self::clearMessagesCache();
+        self::getInstance()->getKeyValueCache()->deleteAll();
+        if(function_exists('opcache_reset')){
+            opcache_reset();
+        }
+    }
+
     /**
      * @static
      * @param $globalsArray
      * @param string $interfaceCheck
-     * @internal param string $bootstrapConfigKey
-     * @internal param string $bootstrapConfigType
      * @return AJXP_Plugin|null
      */
     public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "")
@@ -170,8 +224,7 @@ class ConfService
     /**
      * Set or get if we are currently running REST
      * @static
-     * @param null $set
-     * @param string $baseUrl
+     * @param string $restBase
      * @return bool
      */
     public static function currentContextIsRestAPI($restBase = '')
@@ -235,6 +288,104 @@ class ConfService
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
 
+    public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
+
+        if($useCache){
+            $kvCache = ConfService::getInstance()->getKeyValueCache();
+            $cacheKey = self::getRegistryCacheKey($extendedVersion);
+            $cachedXml = $kvCache->fetch($cacheKey);
+            if($cachedXml !== false){
+                $registry = new DOMDocument("1.0", "utf-8");
+                $registry->loadXML($cachedXml);
+                AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
+                if($clone){
+                    return $registry->cloneNode(true);
+                }else{
+                    return $registry;
+                }
+            }
+        }
+
+        $registry = AJXP_PluginsService::getXmlRegistry($extendedVersion);
+        $changes = self::filterRegistryFromRole($registry);
+        if($changes){
+            AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
+        }
+
+        if($useCache && isSet($kvCache) && isSet($cacheKey)){
+            $kvCache->save($cacheKey, $registry->saveXML());
+        }
+
+        if($clone){
+            $cloneDoc = $registry->cloneNode(true);
+            $registry = $cloneDoc;
+        }
+        return $registry;
+
+    }
+
+    private static function getRegistryCacheKey($extendedVersion = true){
+
+        $logged = AuthService::getLoggedUser();
+        $u = $logged == null ? "shared" : $logged->getId();
+        $r = ConfService::getRepository();
+        $a = $r->getSlug();
+        $v = $extendedVersion ? "extended":"light";
+        return "xml_registry:".$v.":".$u.":".$a;
+
+    }
+
+    /**
+     * Check the current user "specificActionsRights" and filter the full registry actions with these.
+     * @static
+     * @param DOMDocument $registry
+     * @return bool
+     */
+    public static function filterRegistryFromRole(&$registry)
+    {
+        if(!AuthService::usersEnabled()) return false ;
+        $loggedUser = AuthService::getLoggedUser();
+        if($loggedUser == null) return false;
+        $crtRepo = ConfService::getRepository();
+        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
+        if ($crtRepo != null && is_a($crtRepo, "Repository")) {
+            $crtRepoId = $crtRepo->getId();
+        }
+        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
+        $changes = false;
+        $xPath = new DOMXPath($registry);
+        foreach ($actionRights as $pluginName => $actions) {
+            foreach ($actions as $actionName => $enabled) {
+                if($enabled !== false) continue;
+                $actions = $xPath->query("actions/action[@name='$actionName']");
+                if (!$actions->length) {
+                    continue;
+                }
+                $action = $actions->item(0);
+                $action->parentNode->removeChild($action);
+                $changes = true;
+            }
+        }
+        $parameters = $loggedUser->mergedRole->listParameters();
+        foreach ($parameters as $scope => $paramsPlugs) {
+            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
+                foreach ($paramsPlugs as $plugId => $params) {
+                    foreach ($params as $name => $value) {
+                        // Search exposed plugin_configs, replace if necessary.
+                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
+                        if(!$searchparams->length) continue;
+                        $param = $searchparams->item(0);
+                        $newCdata = $registry->createCDATASection(json_encode($value));
+                        $param->removeChild($param->firstChild);
+                        $param->appendChild($newCdata);
+                    }
+                }
+            }
+        }
+        return $changes;
+    }
+
+
     /**
      * @param AbstractAjxpUser $loggedUser
      * @param String|int $parameterId
@@ -289,8 +440,8 @@ class ConfService
     {
         if ($rootDirIndex == -1) {
             $ok = false;
-            if (isSet($_SESSION['REPO_ID'])) {
-                $sessionId = $_SESSION['REPO_ID'];
+            if (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null) {
+                $sessionId = self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 $object = self::getRepositoryById($sessionId);
                 if($object != null && self::repositoryIsAccessible($sessionId, $object)){
                     $this->configs["REPOSITORY"] = $object;
@@ -301,7 +452,11 @@ class ConfService
                 $currentRepos = $this->getLoadedRepositories();
                 $keys = array_keys($currentRepos);
                 $this->configs["REPOSITORY"] = $currentRepos[$keys[0]];
-                $_SESSION['REPO_ID'] = $keys[0];
+                if(self::$useSession){
+                    $_SESSION['REPO_ID'] = $keys[0];
+                }else{
+                    $this->contextRepositoryId = $keys[0];
+                }
             }
         } else {
             /*
@@ -309,14 +464,14 @@ class ConfService
                 return;
             }
             */
-            if ($temporary && isSet($_SESSION['REPO_ID'])) {
-                $crtId = $_SESSION['REPO_ID'];
+            if ($temporary && (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null)) {
+                $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 if ($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])) {
                     $_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
                     //AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
                 }
             } else {
-                $crtId = $_SESSION['REPO_ID'];
+                $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 $_SESSION['PREVIOUS_REPO_ID'] = $crtId;
                 //AJXP_Logger::debug("switching back to $rootDirIndex");
             }
@@ -325,16 +480,18 @@ class ConfService
             } else {
                 $this->configs["REPOSITORY"] = ConfService::getRepositoryById($rootDirIndex);
             }
-            $_SESSION['REPO_ID'] = $rootDirIndex;
+            if(self::$useSession){
+                $_SESSION['REPO_ID'] = $rootDirIndex;
+            }else{
+                $this->contextRepositoryId = $rootDirIndex;
+            }
             if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
         }
 
         if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getOption("CHARSET")!="") {
-            $_SESSION["AJXP_CHARSET"] = $this->configs["REPOSITORY"]->getOption("CHARSET");
+            self::setContextCharset($this->configs["REPOSITORY"]->getOption("CHARSET"));
         } else {
-            if (isSet($_SESSION["AJXP_CHARSET"])) {
-                unset($_SESSION["AJXP_CHARSET"]);
-            }
+            self::clearContextCharset();
         }
 
 
@@ -367,16 +524,35 @@ class ConfService
      */
     private function getLoadedRepositories()
     {
+        if (isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])){
+            $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
+            return $_SESSION["REPOSITORIES"];
+        }
         if (isSet($this->configs["REPOSITORIES"])) {
             return $this->configs["REPOSITORIES"];
         }
         $this->configs["REPOSITORIES"] = $this->initRepositoriesListInst();
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
         return $this->configs["REPOSITORIES"];
     }
 
-    private function invalidateLoadedRepositories()
+    public function invalidateLoadedRepositories()
     {
+        if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
+        $this->getKeyValueCache()->deleteAll();
+    }
+
+    private function cacheRepository($repoId, $repository){
+        if(!is_array($this->configs["REPOSITORIES"])) return;
+        $this->configs["REPOSITORIES"][$repoId] = $repository;
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
+    }
+
+    private function removeRepositoryFromCache($repositoryId){
+        if(!is_array($this->configs["REPOSITORIES"]) || !isSet($this->configs["REPOSITORIES"][$repositoryId])) return;
+        unset($this->configs["REPOSITORIES"][$repositoryId]);
+        $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
     }
 
     /**
@@ -384,7 +560,7 @@ class ConfService
      * @param AbstractAjxpUser $userObject
      * @param bool $details
      * @param bool $labelOnly
-     * @param bool $skipShared
+     * @param bool $includeShared
      * @return Repository[]
      */
     public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $includeShared = true)
@@ -427,7 +603,7 @@ class ConfService
         if ($repositoryObject->isTemplate) {
             return false;
         }
-        if ($repositoryObject->getAccessType()=="ajxp_conf" && $userObject != null) {
+        if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
             if (AuthService::usersEnabled() && !$userObject->isAdmin()) {
                 return false;
             }
@@ -468,6 +644,12 @@ class ConfService
                 return false;
             }
         }
+        $res = null;
+        $args = array($repositoryId, $repositoryObject, $userObject, &$res);
+        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
+        if($res === false){
+            return false;
+        }
         return true;
     }
 
@@ -495,14 +677,16 @@ class ConfService
      */
     public function getCurrentRepositoryIdInst()
     {
-        if(isSet($_SESSION['REPO_ID'])){
-            $object = self::getRepositoryById($_SESSION['REPO_ID']);
-            if($object != null && self::repositoryIsAccessible($_SESSION['REPO_ID'], $object)){
-                return $_SESSION['REPO_ID'];
+        $ctxId = $this->getContextRepositoryId();
+        if(!empty($ctxId) || $ctxId === 0){
+            $object = self::getRepositoryById($ctxId);
+            if($object != null && self::repositoryIsAccessible($ctxId, $object)){
+                return $ctxId;
             }
         }
         $currentRepos = $this->getLoadedRepositories();
-        return array_shift(array_keys($currentRepos));
+        $keys = array_keys($currentRepos);
+        return array_shift($keys);
     }
     /**
      * Get the current repo label
@@ -519,8 +703,9 @@ class ConfService
     public function getCurrentRootDirDisplayInst()
     {
         $currentRepos = $this->getLoadedRepositories();
-        if (isSet($currentRepos[$_SESSION['REPO_ID']])) {
-            $repo = $currentRepos[$_SESSION['REPO_ID']];
+        $ctxId = $this->getContextRepositoryId();
+        if (isSet($currentRepos[$ctxId])) {
+            $repo = $currentRepos[$ctxId];
             return $repo->getDisplay();
         }
         return "";
@@ -539,6 +724,7 @@ class ConfService
             foreach($criteria as $key => $value){
                 if(!in_array($key, $searchableKeys)) continue;
                 $criteriumOk = false;
+                $comp = null;
                 if($key == "uuid") $comp = $repoObject->getUniqueId();
                 else if($key == "parent_uuid") $comp = $repoObject->getParentId();
                 else if($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
@@ -597,6 +783,7 @@ class ConfService
 
     /**
      * @param $scope String "user", "all"
+     * @param bool $includeShared
      * @return array
      */
     protected function initRepositoriesListInst($scope = "user", $includeShared = true)
@@ -641,6 +828,9 @@ class ConfService
             }
         }
         if (is_array($drvList)) {
+            /**
+             * @var $drvList Repository[]
+             */
             foreach ($drvList as $repoId=>$repoObject) {
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $repoObject->getAccessType());
                 if (!is_object($driver) || !$driver->isEnabled()) {
@@ -649,11 +839,17 @@ class ConfService
                     $repoObject->setId($repoId);
                     $drvList[$repoId] = $repoObject;
                 }
+                if($repoObject->hasParent() && !ConfService::findRepositoryByIdOrAlias($repoObject->getParentId())){
+                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Disabling repository ".$repoObject->getSlug()." as parent cannot be correctly loaded.");
+                    unset($drvList[$repoId]);
+                }
             }
             foreach($drvList as $key => $value){
                 $objList[$key] = $value;
             }
         }
+        $args = array(&$objList);
+        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
         return $objList;
     }
     /**
@@ -803,28 +999,29 @@ class ConfService
      */
     public function getRepositoryByIdInst($repoId)
     {
-        /*
-        $currentRepos = $this->getLoadedRepositories();
-        if (isSet($currentRepos[$repoId])) {
-            return $currentRepos[$repoId];
-        }
-        */
         if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$repoId])) {
             return $this->configs["REPOSITORIES"][$repoId];
         }
         if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
+        $test = $this->getKeyValueCache()->fetch("repository:".$repoId);
+        if($test !== false){
+            return $test;
+        }
         $test =  $this->getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
+            $this->getKeyValueCache()->save("repository:".$repoId, $test);
             return $test;
         }
         // Finally try to search in default repositories
         if (isSet($this->configs["DEFAULT_REPOSITORIES"]) && isSet($this->configs["DEFAULT_REPOSITORIES"][$repoId])) {
             $repo = self::createRepositoryFromArray($repoId, $this->configs["DEFAULT_REPOSITORIES"][$repoId]);
             $repo->setWriteable(false);
+            $this->keyValueCache->save("repository:".$repoId, $repo);
             return $repo;
         }
+        return null;
     }
 
     /**
@@ -874,7 +1071,7 @@ class ConfService
      * See static method
      * @param $oldId
      * @param $oRepositoryObject
-     * @return void
+     * @return int
      */
     public function replaceRepositoryInst($oldId, $oRepositoryObject)
     {
@@ -882,11 +1079,12 @@ class ConfService
         $confStorage = self::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepositoryObject, true);
         if ($res == -1) {
-            return $res;
+            return -1;
         }
         AJXP_Controller::applyHook("workspace.after_update", array($oRepositoryObject));
         AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         $this->invalidateLoadedRepositories();
+        return 0;
     }
     /**
      * Set a temp repository id but not in the session
@@ -927,6 +1125,7 @@ class ConfService
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         $this->invalidateLoadedRepositories();
+        return 0;
     }
 
     /**
@@ -980,7 +1179,7 @@ class ConfService
     public function getMessagesInstConf($forceRefresh = false)
     {
         // make sure they are loaded
-        $mess = $this->getMessagesInst($forceRefresh);
+        $this->getMessagesInst($forceRefresh);
         return $this->configs["CONF_MESSAGES"];
     }
 
@@ -1039,6 +1238,7 @@ class ConfService
                     $lang = "en";
                 }
                 if (is_file($path."/conf/".$lang.".php")) {
+                    $mess = array();
                     require($path."/conf/".$lang.".php");
                     $this->configs["CONF_MESSAGES"] = array_merge($this->configs["CONF_MESSAGES"], $mess);
                 }
@@ -1171,7 +1371,7 @@ class ConfService
      */
     public static function setConf($varName, $varValue)
     {
-        return self::getInstance()->setConfInst($varName, $varValue);
+        self::getInstance()->setConfInst($varName, $varValue);
     }
     /**
      * See static method
@@ -1222,7 +1422,7 @@ class ConfService
      */
     public static function setLanguage($lang)
     {
-        return self::getInstance()->setLanguageInst($lang);
+        self::getInstance()->setLanguageInst($lang);
     }
     /**
      * See static method
@@ -1264,10 +1464,11 @@ class ConfService
      */
     public function getRepositoryInst()
     {
-        if (isSet($_SESSION['REPO_ID']) && isSet($this->configs["REPOSITORIES"])  &&  isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']])) {
-            return $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']];
+        $ctxId = $this->getContextRepositoryId();
+        if (!empty($ctxId) && isSet($this->configs["REPOSITORIES"])  &&  isSet($this->configs["REPOSITORIES"][$ctxId])) {
+            return $this->configs["REPOSITORIES"][$ctxId];
         }
-        return $this->configs["REPOSITORY"];
+        return isSet($this->configs["REPOSITORY"])?$this->configs["REPOSITORY"]:null;
     }
 
     /**
@@ -1278,105 +1479,6 @@ class ConfService
     {
         return self::getInstance()->loadRepositoryDriverInst();
     }
-    /**
-     * See static method
-     * @throws Exception
-     * @return AJXP_Plugin
-     */
-    public function loadRepositoryDriverInst()
-    {
-        if (isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")) {
-            return $this->configs["ACCESS_DRIVER"];
-        }
-        $this->switchRootDirInst();
-        $crtRepository = $this->getRepositoryInst();
-        if($crtRepository == null){
-            throw new Exception("No active repository found for user!");
-        }
-        $accessType = $crtRepository->getAccessType();
-        $pServ = AJXP_PluginsService::getInstance();
-        $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
-
-        // TRIGGER BEFORE INIT META
-        $metaSources = $crtRepository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $split = explode(".", $plugId);
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                if (!method_exists($instance, "beforeInitMeta")) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
-                    $instance->beforeInitMeta($plugInstance, $crtRepository);
-                } catch (Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-            }
-        }
-
-        // INIT MAIN DRIVER
-        $plugInstance->init($crtRepository);
-        try {
-            $plugInstance->initRepository();
-            $crtRepository->driverInstance = $plugInstance;
-        } catch (Exception $e) {
-            // Remove repositories from the lists
-            unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
-            if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
-                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-            } else {
-                $this->switchRootDir();
-            }
-            throw $e;
-        }
-        $pServ->setPluginUniqueActiveForType("access", $accessType);
-
-        // TRIGGER INIT META
-        $metaSources = $crtRepository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $split = explode(".", $plugId);
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
-                    if (!method_exists($instance, "initMeta")) {
-                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
-                    }
-                    $instance->initMeta($plugInstance);
-                } catch (Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-                $pServ->setPluginActive($split[0], $split[1]);
-            }
-        }
-        if (count($this->errors)>0) {
-            $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
-            // Remove repositories from the lists
-            unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
-            if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()) {
-                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-            } else {
-                $this->switchRootDir();
-            }
-            throw $e;
-        }
-
-        $this->configs["ACCESS_DRIVER"] = $plugInstance;
-        return $this->configs["ACCESS_DRIVER"];
-    }
 
     /**
      * @static
@@ -1385,20 +1487,36 @@ class ConfService
      */
     public static function loadDriverForRepository(&$repository)
     {
-        return self::getInstance()->loadRepositoryDriverREST($repository);
+        return self::getInstance()->loadRepositoryDriverInst($repository);
     }
 
     /**
      * See static method
-     * @param Repository $repository
+     * @param Repository|null $repository
      * @throws AJXP_Exception|Exception
      * @return AbstractAccessDriver
      */
-    public function loadRepositoryDriverREST(&$repository)
+    private function loadRepositoryDriverInst(&$repository = null)
     {
-        if (isset($repository->driverInstance)) {
-            return $repository->driverInstance;
+        $rest = false;
+        if($repository == null){
+            if (isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")) {
+                return $this->configs["ACCESS_DRIVER"];
+            }
+            $this->switchRootDirInst();
+            $repository = $this->getRepositoryInst();
+            if($repository == null){
+                throw new Exception("No active repository found for user!");
+            }
+        }else{
+            $rest = true;
+            if (isset($repository->driverInstance)) {
+                return $repository->driverInstance;
+            }
         }
+        /**
+         * @var AbstractAccessDriver $plugInstance
+         */
         $accessType = $repository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
         $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
@@ -1430,9 +1548,20 @@ class ConfService
         $plugInstance->init($repository);
         try {
             $plugInstance->initRepository();
+            $repository->driverInstance = $plugInstance;
         } catch (Exception $e) {
+            if(!$rest){
+                // Remove repositories from the lists
+                $this->removeRepositoryFromCache($repository->getId());
+                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
+                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+                } else {
+                    $this->switchRootDir();
+                }
+            }
             throw $e;
         }
+
         AJXP_PluginsService::deferBuildingRegistry();
         $pServ->setPluginUniqueActiveForType("access", $accessType);
 
@@ -1449,7 +1578,9 @@ class ConfService
                 }
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
-                    if(!method_exists($instance, "initMeta")) throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                    if(!method_exists($instance, "initMeta")) {
+                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                    }
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
@@ -1461,21 +1592,31 @@ class ConfService
         AJXP_PluginsService::flushDeferredRegistryBuilding();
         if (count($this->errors)>0) {
             $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
+            if(!$rest){
+                // Remove repositories from the lists
+                $this->removeRepositoryFromCache($repository->getId());
+                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
+                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+                } else {
+                    $this->switchRootDir();
+                }
+            }
             throw $e;
         }
-
-        $repository->driverInstance = $plugInstance;
-        if (isSet($_SESSION["REPO_ID"]) && $_SESSION["REPO_ID"] == $repository->getId()) {
-            $this->configs["REPOSITORY"] = $repository;
-            if(is_array($this->configs["REPOSITORIES"])){
-                $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']] = $repository;
+        if($rest){
+            $ctxId = $this->getContextRepositoryId();
+            if ( (!empty($ctxId) || $ctxId === 0) && $ctxId == $repository->getId()) {
+                $this->configs["REPOSITORY"] = $repository;
+                $this->cacheRepository($ctxId, $repository);
             }
+        } else {
+            $this->configs["ACCESS_DRIVER"] = $plugInstance;
         }
         return $plugInstance;
     }
 
     /**
-     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_conf & ajxp_shared
+     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
      * @static
      * @param string $filterByTagName
      * @param string $filterByDriverName
@@ -1489,14 +1630,13 @@ class ConfService
         foreach ($nodeList as $node) {
             $dName = $node->getAttribute("name");
             if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
-            if($dName == "ajxp_conf" || $dName == "ajxp_shared") continue;
+            if(strpos($dName, "ajxp_") === 0) continue;
             if ($filterByTagName == "") {
                 $xmlBuffer .= $node->ownerDocument->saveXML($node);
                 continue;
             }
             $q = new DOMXPath($node->ownerDocument);
             $cNodes = $q->query("//".$filterByTagName, $node);
-            $nodeAttr = $node->attributes;
             $xmlBuffer .= "<ajxpdriver ";
             foreach($node->attributes as $attr) $xmlBuffer.= " $attr->name=\"$attr->value\" ";
             $xmlBuffer .=">";

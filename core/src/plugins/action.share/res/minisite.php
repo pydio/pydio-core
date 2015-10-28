@@ -197,6 +197,11 @@
                     padding: inherit !important;
                 }
             }
+            #browser{
+                flex-direction:column !important;
+                -webkit-flex-direction:column !important;
+            }
+
         </style>
         <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
         <script type="text/javascript">
@@ -228,7 +233,7 @@
                 window.ajxpMinisite = true;
                 /*
                 window.onbeforeunload = function(){
-                    if(ajaxplorer && !Prototype.Browser.Gecko) ajaxplorer.actionBar.fireAction("logout");
+                    if(ajaxplorer && !Prototype.Browser.Gecko) pydio.getController().fireAction("logout");
                 }
                 */
                 document.observe("dom:loaded", function(){

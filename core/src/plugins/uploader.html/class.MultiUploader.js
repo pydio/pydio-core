@@ -119,7 +119,7 @@ Class.create("MultiUploader", {
         }
 		this.sendButton.observerSet = true;
 		this.sendButton.observe("click", function(){
-			ajaxplorer.actionBar.multi_selector.submitMainForm();
+			pydio.getController().multi_selector.submitMainForm();
 		});
 		optionsButton.observe("click", function(){
             var message = MessageHash[281] + '\n';

@@ -273,10 +273,4 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         $this->channels[$channel]["MESSAGES"][] = $message;
     }
 
-    public function installSQLTables($param)
-    {
-        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
-    }
-
 }

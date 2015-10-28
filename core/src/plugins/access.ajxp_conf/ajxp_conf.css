@@ -374,3 +374,8 @@
 .ajxp_theme_orbit .settings_main_pane div#vertical_splitter-actions_toolbar span.ajxp_icon_span{
     font-size: 1.0em;
 }
+
+.ajxp_theme_orbit #vertical_splitter{
+    transition: opacity  0.4s ease;
+    opacity: 1 !important;
+}

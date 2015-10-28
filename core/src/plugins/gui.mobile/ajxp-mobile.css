@@ -104,12 +104,6 @@ a.m-2.disabled {
     background-image: url('../gui.ajax/res/themes/vision/images/grid_t.png');
 }
 
-.ajxp_theme_orbit div#background-imager{
-    background-image: url(../gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg) !important;
-    background-position: 50% 50%;
-    background-repeat: repeat repeat;
-}
-
 #uploadBrowseButton{
     display: none !important;
 }
@@ -220,4 +214,48 @@ div.detailed .FL-inlineToolbar a#ls_inline_button > span.actionbar_button_label{
 #cpane_header #inline_toolbar
 {
     display: none;
+}
+
+/* Modifs Leo */
+
+
+/* Login Page */
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+    #generic_dialog_box {
+        height: 100% !important;
+        width: 100% !important;
+    }
+    .SF_input {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #login_form {
+        text-align: center;
+    }
+}
+
+#browser {
+    height: 100%;
+}
+
+/* Share Page */
+
+.repository_title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 130px;
+    height: 30px;
+}
+
+#widget_title {
+    height: 60px !important;
+}
+
+#display_toolbar {
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
 }

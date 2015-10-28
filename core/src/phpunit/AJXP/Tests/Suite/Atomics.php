@@ -27,8 +27,7 @@ class Atomics extends \PHPUnit_Framework_TestSuite
         $s =  new Atomics();
         $s->addTestFile("AJXP/Tests/Atomics/RolesTest.php");
         $s->addTestFile("AJXP/Tests/Atomics/UtilsTest.php");
-        $s->addTestFile("AJXP/Tests/Atomics/MemStoresTest.php");
-        $s->addTestFile("AJXP/Tests/Atomics/FiltersTest.php");
+        $s->addTestFile("AJXP/Tests/Atomics/PermissionMaskTest.php");
         return $s;
 
     }

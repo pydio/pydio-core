@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver enabled="false" name="dropbox" label="CONF_MESSAGE[Dropbox]" description="CONF_MESSAGE[This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.]" mixins="filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<client_settings icon="plugins/access.dropbox/dropboxLogo.png">
+	<client_settings icon="plugins/access.dropbox/dropboxLogo.png" description_template="" iconClass="icon-dropbox">
         <resources>
             <i18n namespace="access_dropbox" path="plugins/access.dropbox/i18n"/>
         </resources>

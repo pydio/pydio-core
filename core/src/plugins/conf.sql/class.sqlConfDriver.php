@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Conf
  */
-class sqlConfDriver extends AbstractConfDriver
+class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 {
     public $sqlDriver = array();
 
@@ -323,21 +323,8 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function getRepositoryById($repositoryId)
     {
-        $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
+        return $this->_loadRepository("uuid", $repositoryId);
 
-        $repo_row = $res->fetchAll();
-        if (count($repo_row) > 0) {
-            $repo_row = $repo_row[0];
-            if($this->sqlDriver["driver"] == "postgre"){
-                dibi::nativeQuery("SET bytea_output=escape");
-            }
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repository = $this->repoFromDb($repo_row, $opts);
-            return $repository;
-        }
-
-        return null;
     }
 
     /**
@@ -348,20 +335,27 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function getRepositoryByAlias($repositorySlug)
     {
-        $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
+        return $this->_loadRepository("slug", $repositorySlug);
+    }
 
-        $repo_row = $res->fetchAll();
-        if (count($repo_row) > 0) {
-            $repo_row = $repo_row[0];
-            if($this->sqlDriver["driver"] == "postgre"){
-                dibi::nativeQuery("SET bytea_output=escape");
-            }
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repository = $this->repoFromDb($repo_row, $opts);
+
+    protected function _loadRepository($slugOrAlias, $value){
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::nativeQuery("SET bytea_output=escape");
+        }
+        $keyName = ($slugOrAlias=="slug"?"slug":"uuid");
+        $res = dibi::query("SELECT * FROM [ajxp_repo],[ajxp_repo_options] WHERE [ajxp_repo].[uuid] = [ajxp_repo_options].[uuid] AND [ajxp_repo].[$keyName] = %s", $value);
+
+        $options = array();
+        foreach($res as $row){
+            $options[$row->name] = $row->val;
+        }
+        if(isSet($row)){
+            unset($row->name);
+            unset($row->val);
+            $repository = $this->repoFromDb($row, $options);
             return $repository;
         }
-
         return null;
     }
 
@@ -416,6 +410,8 @@ class sqlConfDriver extends AbstractConfDriver
             $options = $repository_array['options'];
             if($repositoryObject->hasContentFilter()){
                 $options["content_filter"] = $repositoryObject->getContentFilter();
+            }else if(isSet($options["content_filter"])){
+                unset($options["content_filter"]);
             }
             unset($repository_array['options']);
             if (!$update) {
@@ -576,18 +572,21 @@ class sqlConfDriver extends AbstractConfDriver
     /**
      * @param string $repositoryId
      * @param boolean $details
-     * @return Integer|Array
+     * @param bool $admin
+     * @return Array|int
      */
-    public function countUsersForRepository($repositoryId, $details = false){
+    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
         $object = ConfService::getRepositoryById($repositoryId);
-        if($object->securityScope() == "USER"){
-            if($details) return array('internal' => 1);
-            else return 1;
-        }else if($object->securityScope() == "GROUP"){
-            // Count users from current group
-            $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
-            if($details) return array('internal' => $groupUsers);
-            else return $groupUsers;
+        if(!$admin){
+            if($object->securityScope() == "USER"){
+                if($details) return array('internal' => 1);
+                else return 1;
+            }else if($object->securityScope() == "GROUP"){
+                // Count users from current group
+                $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
+                if($details) return array('internal' => $groupUsers);
+                else return $groupUsers;
+            }
         }
         // Users from roles
         $internal = 0;
@@ -684,6 +683,9 @@ class sqlConfDriver extends AbstractConfDriver
             $object = unserialize($serialized);
             if (is_a($object, "AjxpRole") || is_a($object, "AJXP_Role")) {
                 $roles[$id] = $object;
+                if(is_a($object, "AJXP_Role")){
+                    $object->setLastUpdated($role_row["last_updated"]);
+                }
             }
         }
 
@@ -702,10 +704,19 @@ class sqlConfDriver extends AbstractConfDriver
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), serialize($roleObject->listAcls()));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin, %s, %i)",
+                        $roleId,
+                        serialize($roleObject),
+                        serialize($roleObject->listAcls()),
+                        time()
+                    );
                     break;
                 case "mysql":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $roleId, serialize($roleObject));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)",
+                        $roleId,
+                        serialize($roleObject),
+                        time()
+                    );
                     break;
                 default:
                     return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
@@ -715,6 +726,7 @@ class sqlConfDriver extends AbstractConfDriver
 
     /**
      * @param AJXP_Role $role
+     * @return string|void
      */
     public function updateRole($role, $userObject = null)
     {
@@ -726,14 +738,14 @@ class sqlConfDriver extends AbstractConfDriver
                 $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
                 $res = $row->fetchSingle();
                 if($res != null){
-                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s,[last_updated]=%i WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), time(), $role->getId());
                 }
                 else{
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), serialize($role->listAcls()));
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin,%s,%i)", $role->getId(), serialize($role), serialize($role->listAcls()), time());
                 }
                 break;
             case "mysql":
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role])", $role->getId(), serialize($role));
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])", $role->getId(), serialize($role), time());
                 break;
             default:
                 return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
@@ -752,18 +764,29 @@ class sqlConfDriver extends AbstractConfDriver
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $roleId);
     }
 
+    /**
+     * Compute the most recent date where one of these roles where updated.
+     *
+     * @param $rolesIdsList
+     * @return int
+     */
+    public function rolesLastUpdated($rolesIdsList){
+        $res = dibi::query("SELECT MAX([last_updated]) FROM [ajxp_roles] WHERE [role_id] IN (%s)", $rolesIdsList);
+        return $res->fetchSingle();
+    }
+
     public function countAdminUsers()
     {
-        $rows = dibi::query("SELECT COUNT(*) FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
+        $rows = dibi::query("SELECT COUNT(*) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
         return $rows->fetchSingle();
     }
 
     /**
+     * This function is useless for the SQL driver : users are by default correctly listed by group.
      * @param AbstractAjxpUser[] $flatUsersList
      * @param string $baseGroup
      * @param bool $fullTree
      * @return void
-     * @todo
      */
     public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
     {

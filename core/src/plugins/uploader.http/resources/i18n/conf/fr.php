@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "Remote Download" => "Télécharment à distance",
+    "Remote Download" => "Téléchargement à distance",
     "Async downloader to load a file from another source" => "Télécharger un fichier dans l'application depuis une autre source",
 );

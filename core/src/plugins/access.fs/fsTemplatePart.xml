@@ -40,7 +40,7 @@
                                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "change_main"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
                             </div>
-                            <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initB":"290", "minB":290,"fit":"height","fitParent":"browser", "minSize":280, "invisibleBar": true, "foldingButton":"B", "foldingButtonText":341, "foldingMinSize":0}'>
+                            <div id="vertical_splitter" ajxpClass="Splitter" class="forceComputeFit" ajxpOptions='{"direction": "vertical", "initB":290, "minB":290,"fit":"height","fitParent":"browser", "minSize":280, "invisibleBar": true, "foldingButton":"B", "foldingButtonText":341, "foldingMinSize":0}'>
                                 <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                                 <div id="info_panel" ajxpClass="InfoPanel" style="top:0;" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
                             </div>

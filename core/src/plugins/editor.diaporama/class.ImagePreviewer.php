@@ -32,8 +32,6 @@ class ImagePreviewer extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
@@ -41,22 +39,17 @@ class ImagePreviewer extends AJXP_Plugin
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
-        $selection = new UserSelection($repository);
-        $selection->initFromHttpVars($httpVars);
-
-
-        $streamData = $repository->streamData;
-        $this->streamData = $streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
+        $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "preview_data_proxy") {
             $file = $selection->getUniqueFile();
-            if (!file_exists($destStreamURL.$file)) {
+            if (!file_exists($destStreamURL.$file) || !is_readable($destStreamURL.$file)) {
                 header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;
             }
-            $this->logInfo('Preview', 'Preview content of '.$file);
+            $this->logInfo('Preview', 'Preview content of '.$file, array("files" =>$selection->getUniqueFile()));
             if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
@@ -88,9 +81,8 @@ class ImagePreviewer extends AJXP_Plugin
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
                 header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
 
-                $class = $streamData["classname"];
                 $stream = fopen("php://output", "a");
-                call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+                AJXP_MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
                 fflush($stream);
                 fclose($stream);
                 AJXP_Controller::applyHook("node.read", array($node));
@@ -126,7 +118,7 @@ class ImagePreviewer extends AJXP_Plugin
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
         $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
         if (!$pThumb->isError()) {
-            $pThumb->remote_wrapper = $this->streamData["classname"];
+            $pThumb->remote_wrapper = "AJXP_MetaStreamWrapper";
             //$this->logDebug("Will fit thumbnail");
             $sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
             //$this->logDebug("Will print thumbnail");
@@ -206,7 +198,7 @@ class ImagePreviewer extends AJXP_Plugin
 
     protected function handleMime($filename)
     {
-        $mimesAtt = explode(",", $this->xPath->query("@mimes")->item(0)->nodeValue);
+        $mimesAtt = explode(",", $this->getXPath()->query("@mimes")->item(0)->nodeValue);
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         return in_array($ext, $mimesAtt);
     }

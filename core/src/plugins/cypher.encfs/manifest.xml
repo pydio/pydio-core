@@ -46,7 +46,7 @@
                                 pass: passValue
                              }));
                              conn.onComplete = function(transport){
-                                ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                                pydio.getController().parseXmlMessage(transport.responseXML);
                              };
                              conn.sendAsync();
                              hideLightBox();
@@ -80,7 +80,7 @@
                             dir:ajaxplorer.getUserSelection().getUniqueNode().getPath()
                          }));
                          conn.onComplete = function(transport){
-                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                          };
                          conn.sendAsync();
                          hideLightBox();
@@ -107,7 +107,7 @@
                                 pass: passValue
                                 }));
                              conn.onComplete = function(transport){
-                                ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                                pydio.getController().parseXmlMessage(transport.responseXML);
                              };
                              conn.sendAsync();
                              hideLightBox();

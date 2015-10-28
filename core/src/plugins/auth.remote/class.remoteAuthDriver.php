@@ -94,7 +94,7 @@ class remoteAuthDriver extends AbstractAuthDriver
 
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
         if ($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
-            $contribs = $this->xPath->query("registry_contributions/external_file");
+            $contribs = $this->getXPath()->query("registry_contributions/external_file");
             foreach ($contribs as $contribNode) {
                 if ($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml') {
                     $contribNode->parentNode->removeChild($contribNode);

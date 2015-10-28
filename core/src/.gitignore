@@ -1,4 +1,4 @@
-.idea/*
+.idea/
 data/cache/*
 data/files/*
 data/logs/*
@@ -6,3 +6,8 @@ data/personal/*
 data/plugins/*
 data/public/*
 data/tmp
+node_modules/
+.DS_Store
+.jshintignore
+.jshintrc
+.validate.json

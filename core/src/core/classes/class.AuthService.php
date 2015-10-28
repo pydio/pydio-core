@@ -31,6 +31,7 @@ class AuthService
     public static $roles;
     public static $useSession = true;
     private static $currentUser;
+    public static $bufferedMessage = null;
     /**
      * Whether the whole users management system is enabled or not.
      * @static
@@ -134,6 +135,9 @@ class AuthService
 
         $frontends = AJXP_PluginsService::getInstance()->getActivePluginsForType("authfront");
         $index = 0;
+        /**
+         * @var AbstractAuthFrontend $frontendPlugin
+         */
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;
             $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
@@ -320,7 +324,18 @@ class AuthService
         $confDriver = ConfService::getConfStorageImpl();
         if ($user_id == null) {
             if (self::$useSession) {
-                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
+                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) {
+                    /**
+                     * @var AbstractAjxpUser $u
+                     */
+                    $u = $_SESSION["AJXP_USER"];
+                    if($u->reloadRolesIfRequired()){
+                        ConfService::getInstance()->invalidateLoadedRepositories();
+                        self::$bufferedMessage = AJXP_XMLWriter::reloadRepositoryList(false);
+                        $_SESSION["AJXP_USER"] = $u;
+                    }
+                    return 1;
+                }
             } else {
                 if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
             }
@@ -435,16 +450,16 @@ class AuthService
     {
         if(AJXP_Utils::detectApplicationFirstRun()) return;
         if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
-        $rootRole = self::getRole("ROOT_ROLE", false);
+        $rootRole = self::getRole("AJXP_GRP_/", false);
         if ($rootRole === false) {
-            $rootRole = new AJXP_Role("ROOT_ROLE");
-            $rootRole->setLabel("Root Role");
-            $rootRole->setAutoApplies(array("standard", "admin"));
-            $dashId = "";
+            $rootRole = new AJXP_Role("AJXP_GRP_/");
+            $rootRole->setLabel("Root Group");
+            //$rootRole->setAutoApplies(array("standard", "admin"));
+            //$dashId = "";
             $allRepos = ConfService::getRepositoriesList("all", false);
             foreach ($allRepos as $repositoryId => $repoObject) {
                 if($repoObject->isTemplate) continue;
-                if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
+                //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
                 $gp = $repoObject->getGroupPath();
                 if (empty($gp) || $gp == "/") {
                     if ($repoObject->getDefaultRight() != "") {
@@ -452,7 +467,7 @@ class AuthService
                     }
                 }
             }
-            if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
+            //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
             $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
@@ -538,8 +553,8 @@ class AuthService
                  }
                  $userObject->save("superuser");
                  $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
+                self::updateUser($userObject);
              }
-            self::updateUser($userObject);
         } else if ($adminCount == -1) {
             // Here we may come from a previous version! Check the "admin" user and set its right as admin.
             $confStorage = ConfService::getConfStorageImpl();
@@ -580,23 +595,6 @@ class AuthService
             if (!empty($right) && ConfService::getRepositoryById($key) != null) return $key;
         }
         return 0;
-        /*
-        $repoList = ConfService::getRepositoriesList();
-        foreach ($repoList as $rootDirIndex => $rootDirObject) {
-            if ($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
-                // Warning : do not grant access to admin repository to a non admin, or there will be
-                // an "Empty Repository Object" error.
-                if ($rootDirObject->getAccessType()=="ajxp_conf" && self::usersEnabled() && !$loggedUser->isAdmin()) {
-                    continue;
-                }
-                if ($rootDirObject->getAccessType() == "ajxp_shared" && count($repoList) > 1) {
-                    continue;
-                }
-                return $rootDirIndex;
-            }
-        }
-        return 0;
-        */
     }
 
     /**
@@ -606,16 +604,7 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        if(ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS") !== true){
-            $allRepoList = ConfService::getRepositoriesList("all", false);
-            foreach ($allRepoList as $repoId => $repoObject) {
-                if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
-                if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
-                $adminUser->personalRole->setAcl($repoId, "rw");
-            }
-            $adminUser->recomputeMergedRole();
-            $adminUser->save("superuser");
-        }else if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
+        if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
             $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
             $adminUser->recomputeMergedRole();
             $adminUser->save("superuser");
@@ -783,13 +772,14 @@ class AuthService
      * @param $userId
      * @param $userPass
      * @param bool $isAdmin
+     * @param bool $isHidden
      * @return null
      * @todo the minlength check is probably causing problem with the bridges
      */
-    public static function createUser($userId, $userPass, $isAdmin=false)
+    public static function createUser($userId, $userPass, $isAdmin=false, $isHidden=false)
     {
         $userId = self::filterUserSensitivity($userId);
-        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin));
+        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new Exception("Reserved user id");
         }
@@ -802,18 +792,18 @@ class AuthService
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         $authDriver->createUser($userId, $userPass);
-        $user = null;
+        $user = $confDriver->createUserObject($userId);
         if ($isAdmin) {
-            $user = $confDriver->createUserObject($userId);
             $user->setAdmin(true);
+            $user->save("superuser");
+        }
+        if($isHidden){
+            $user->setHidden(true);
             $user->save("superuser");
         }
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
-            if (!isSet($user)) {
-                $user = $confDriver->createUserObject($userId);
-            }
             $wData = $user->getPref("AJXP_WEBDAV_DATA");
             if(!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
@@ -970,11 +960,12 @@ class AuthService
      * Count the number of users who have either read or write access to a repository
      * @param $repositoryId
      * @param bool $details
+     * @param bool $admin True if called in an admin context
      * @return Array|int
      */
-    public static function countUsersForRepository($repositoryId, $details = false)
+    public static function countUsersForRepository($repositoryId, $details = false, $admin = false)
     {
-        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details);
+        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details, $admin);
     }
 
     /**
@@ -994,6 +985,9 @@ class AuthService
         $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
+        /**
+         * @var $allUsers AbstractAjxpUser[]
+         */
         $allUsers = array();
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
@@ -1048,6 +1042,7 @@ class AuthService
      * @param $baseGroup
      * @param $userLogin
      * @param $usersPerPage
+     * @param int $offset
      * @return int
      */
     public static function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
@@ -1135,10 +1130,12 @@ class AuthService
      * Create or update role
      *
      * @param AJXP_Role $roleObject
+     * @param null $userObject
      */
     public static function updateRole($roleObject, $userObject = null)
     {
         ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
+        ConfService::getInstance()->getKeyValueCache()->deleteAll();
     }
     /**
      * Delete a role by its id
@@ -1149,6 +1146,7 @@ class AuthService
     public static function deleteRole($roleId)
     {
         ConfService::getConfStorageImpl()->deleteRole($roleId);
+        ConfService::getInstance()->getKeyValueCache()->deleteAll();
     }
 
     public static function filterPluginParameters($pluginId, $params, $repoId = null)
@@ -1192,12 +1190,12 @@ class AuthService
     }
 
     /**
-     * @param AJXP_User $parentUser
+     * @param string $parentUserId
      * @return AJXP_Role
      */
-    public static function limitedRoleFromParent($parentUser)
+    public static function limitedRoleFromParent($parentUserId)
     {
-        $parentRole = self::getRole("AJXP_USR_/".$parentUser);
+        $parentRole = self::getRole("AJXP_USR_/".$parentUserId);
         if($parentRole === false) return null;
 
         // Inherit actions

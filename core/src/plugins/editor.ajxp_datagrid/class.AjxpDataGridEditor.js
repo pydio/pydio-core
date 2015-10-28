@@ -33,7 +33,6 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
     },
 
     destroy: function(){
-        // TODO: Shall we destroy the SVG objects?
         this._lists.each(function(resultPane){
             resultPane.destroy();
         });

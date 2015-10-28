@@ -43,6 +43,7 @@ $mess=array(
 "20" => "Felhasználó",
 "21" => "Művelet",
 "22" => "Paraméterek",
+"22a"=> "Paraméterek",
 "23" => "Teszt név",
 "24" => "Teszt adat",
 "25" => "Gyűjtemény hozzáférés",
@@ -173,5 +174,7 @@ $mess=array(
     "148" => "Hooks Definitions",
     "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
     "150" => "Select a repository",
+    "151" => "Root Group",
+    "152" => "Root Group Role",
 /* END SENTENCE */
 );

@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPVersion extends AbstractTest
 {
-    public function PHPVersion() { parent::AbstractTest("PHP version", "Minimum required version is PHP 5.3.0"); }
+    public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.3.0"); }
     public function doTest()
     {
         $version = phpversion();
@@ -42,4 +42,4 @@ class PHPVersion extends AbstractTest
         if (floatval($version) < 5.3 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
         return TRUE;
     }
-};
+}

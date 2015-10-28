@@ -36,4 +36,10 @@ $mess = array(
     "12"=> "Os dados meta.serial antigos do plugin foram removidos e divididos entre metastore.serial e meta.user",
     "13"=> "Simular Migração",
     "14"=> "Correr Migração agora",
+    "15" => "Are you sure that you want to perform the upgrade?",
+    "16" => "The following packages will be downloaded and installed.",
+    "17" => "Checking for available upgrades...",
+    "18" => "No necessary upgrade detected: click to perform a new check.",
+    "19" => "Click to check for new upgrade",
+    "20" => "Check now"
 );

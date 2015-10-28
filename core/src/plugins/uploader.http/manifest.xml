@@ -39,8 +39,8 @@
 					<clientCallback><![CDATA[
 						fileName = ajaxplorer.getUserSelection().getUniqueFileName();
 						var crtDir = ajaxplorer.getContextNode().getPath();
-						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("external_download", new Hash({dlfile:fileName, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
+						var bgManager = pydio.getController().getBackgroundTasksManager();
+						bgManager.queueAction("external_download", {dlfile:fileName, dir:crtDir}, MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
 						bgManager.next();
 						]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
@@ -118,11 +118,6 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
-            <action name="get_xml_registry">
-                <post_processing>
-                    <serverCallback methodName="switchAction"></serverCallback>
-                </post_processing>
-            </action>
 		</actions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>
@@ -154,12 +149,12 @@
                 oForm = modal.getForm();
                 var dlFile = oForm.down('[name="url"]').getValue();
                 var crtDir = ajaxplorer.getContextNode().getPath();
-                var bgManager = ajaxplorer.actionBar.bgManager;
-                bgManager.queueAction("external_download", new Hash({file:dlFile, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(dlFile)+" " + MessageHash["httpdownloader.7"]);
+                var bgManager = pydio.getController().getBackgroundTasksManager();
+                bgManager.queueAction("external_download", {file:dlFile, dir:crtDir}, MessageHash["httpdownloader.6"]+ " " +getBaseName(dlFile)+" " + MessageHash["httpdownloader.7"]);
                 for(var i=2;i<6;i++){
                     var file = oForm.down('[name="url'+i+'"]').getValue();
                     if(file){
-                        bgManager.queueAction("external_download", new Hash({file:file, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(file)+" " + MessageHash["httpdownloader.7"]);
+                        bgManager.queueAction("external_download", {file:file, dir:crtDir}, MessageHash["httpdownloader.6"]+ " " +getBaseName(file)+" " + MessageHash["httpdownloader.7"]);
                     }
                 }
                 bgManager.next();

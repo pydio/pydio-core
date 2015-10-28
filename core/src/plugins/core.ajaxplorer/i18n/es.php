@@ -27,7 +27,7 @@
 $mess=array(
 "languageLabel" => "Español",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "es-ES",
 "0" => "Última ver.",
 "1" => "Nombre",

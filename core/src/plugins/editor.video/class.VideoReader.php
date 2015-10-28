@@ -30,40 +30,34 @@ class VideoReader extends AJXP_Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
 
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
-
         $selection = new UserSelection($repository, $httpVars);
+        $node = $selection->getUniqueNode();
 
         if ($action == "read_video_data") {
-            $this->logDebug("Reading video");
-            $file = $selection->getUniqueFile();
-            $node = new AJXP_Node($destStreamURL.$file);
-            session_write_close();
-            if(method_exists($node->getDriver(), "filesystemFileSize")){
-                $filesize = $node->getDriver()->filesystemFileSize($node->getUrl());
-            }else{
-                $filesize = filesize($node->getUrl());
+            if(!file_exists($node->getUrl()) || !is_readable($node->getUrl())){
+                throw new Exception("Cannot find file!");
             }
-             $filename = $destStreamURL.$file;
+            $this->logDebug("Reading video");
+            session_write_close();
+            $filesize = filesize($node->getUrl());
+            $filename = $node->getUrl();
+            $basename = AJXP_Utils::safeBasename($filename);
 
             //$fp = fopen($destStreamURL.$file, "r");
-             if (preg_match("/\.ogv$/", $file)) {
-                header("Content-Type: video/ogg; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.mp4$/", $file)) {
-                 header("Content-Type: video/mp4; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.m4v$/", $file)) {
-                 header("Content-Type: video/x-m4v; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.webm$/", $file)) {
-                 header("Content-Type: video/webm; name=\"".basename($file)."\"");
-             }
+            if (preg_match("/\.ogv$/", $basename)) {
+                header("Content-Type: video/ogg; name=\"".$basename."\"");
+            } else if (preg_match("/\.mp4$/", $basename)) {
+                header("Content-Type: video/mp4; name=\"".$basename."\"");
+            } else if (preg_match("/\.m4v$/", $basename)) {
+                header("Content-Type: video/x-m4v; name=\"".$basename."\"");
+            } else if (preg_match("/\.webm$/", $basename)) {
+                header("Content-Type: video/webm; name=\"".$basename."\"");
+            }
 
             if ( isset($_SERVER['HTTP_RANGE']) && $filesize != 0 ) {
                 $this->logDebug("Http range", array($_SERVER['HTTP_RANGE']));
@@ -72,7 +66,7 @@ class VideoReader extends AJXP_Plugin
                 $offsets = explode('-', $ranges[1]);
                 $offset = floatval($offsets[0]);
                 if($offset == 0){
-                    $this->logInfo('Preview', 'Streaming content of '.$file);
+                    $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 }
 
                 $length = floatval($offsets[1]) - $offset + 1;
@@ -110,15 +104,13 @@ class VideoReader extends AJXP_Plugin
                 }
                 fclose($file);
             } else {
-                $this->logInfo('Preview', 'Streaming content of '.$file);
-                 $fp = fopen($filename, "rb");
+                $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 header("Content-Length: ".$filesize);
                 header("Content-Range: bytes 0-" . ($filesize - 1) . "/" . $filesize. ";");
                 header('Cache-Control: public');
 
-                $class = $streamData["classname"];
                 $stream = fopen("php://output", "a");
-                call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+                AJXP_MetaStreamWrapper::copyFileInStream($node->getUrl(), $stream);
                 fflush($stream);
                 fclose($stream);
             }
