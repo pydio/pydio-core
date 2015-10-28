@@ -257,7 +257,7 @@ class PluginCompression extends AJXP_Plugin
                     $newNode = new AJXP_Node($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
                     AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                     $counterExtract++;
-                    file_put_contents($progressExtractFileName, sprintf($messages["compression.12"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
+                    file_put_contents($progressExtractFileName, sprintf($messages["compression.13"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
             } catch (Exception $e) {
                 file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
