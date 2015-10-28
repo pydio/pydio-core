@@ -131,11 +131,15 @@ Class.create("AjxpInstaller", AjxpPane, {
         //startButton.removeClassName('SF_input').addClassName('largeButton');
         startButton.stopObserving("click");
         startButton.observe("click", function(){
-            if(startButton.hasClassName("disabled")) return;
+            if(startButton.hasClassName("disabled")){
+                window.alert("You are missing some required fields, or the password and confirmation differ. Please make sure to go through the form.");
+                return;
+            }
             var conn = new Connexion();
             conn.setMethod('POST');
             var params = new Hash({get_action: "apply_installer_form"});
             this.formManager.serializeParametersInputs(this.formElement, params);
+            params.set('installer_lang', this.htmlElement.down(".installerLang").down("select").getValue());
             conn.setParameters(params);
             this.formElement.hide();
             startButton.up('div').hide();
