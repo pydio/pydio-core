@@ -1532,6 +1532,7 @@ class AJXP_Utils
             'Mac OSX Mountain Lion' => 'mac os x 10.8',
             'Mac OSX Mavericks' => 'mac os x 10.9',
             'Mac OSX Yosemite' => 'mac os x 10.10',
+            'Mac OSX El Capitan' => 'mac os x 10.11',
             'Mac OS (classic)' => '(mac_powerpc)|(macintosh)',
             'QNX' => 'QNX',
             'BeOS' => 'beos',
