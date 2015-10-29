@@ -69,13 +69,10 @@ class fsAccessWrapper implements AjxpWrapper
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
         $path = self::unPatchPathForBaseDir($path);
-        $url = parse_url($path);
+        $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $test = trim($url["path"], "/");
         $atRoot = empty($test);
-        if (isSet($url["fragment"]) && strlen($url["fragment"]) > 0) {
-            $url["path"] .= "#".$url["fragment"];
-        }
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
         $split = UserSelection::detectZip($url["path"]);

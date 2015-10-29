@@ -79,7 +79,7 @@ class imapAccessWrapper implements AjxpWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         // parse URL
-        $parts = parse_url($path);
+        $parts = AJXP_Utils::safeParseUrl($path);
         $this->repositoryId = $parts["host"];
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
         if (!isset(self::$delimiter) && file_exists($mainCacheDir."/access.imap/mailbox_delim_".$this->repositoryId)) {

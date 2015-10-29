@@ -39,10 +39,7 @@ class smbAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = parse_url($path);
-        if (isSet($url["fragment"]) && strlen($url["fragment"]) > 0) {
-            $url["path"] .= "#".$url["fragment"];
-        }
+        $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
