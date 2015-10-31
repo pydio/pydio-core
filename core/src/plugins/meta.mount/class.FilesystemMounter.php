@@ -123,7 +123,6 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $repo = $this->repository;
 
         $MOUNT_TYPE = $this->options["FILESYSTEM_TYPE"];
-        $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_POINT_ROOT = $this->getOption("MOUNT_POINT", "", "");
         $create = $repo->getOption("CREATE");
@@ -145,7 +144,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password, false);
 
-        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
+        $cmd = "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
         if($this->getOption("MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
@@ -163,7 +162,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         if($res === null){
             // Check it is correctly mounted now!
             // Could not get the output return code
-            $cmd1 = ($MOUNT_SUDO?"sudo":"")." mount | grep ".escapeshellarg($MOUNT_POINT);
+            $cmd1 = "mount | grep ".escapeshellarg($MOUNT_POINT);
             $output = shell_exec($cmd1);
             $success = !empty($output);
         }else{
@@ -183,9 +182,8 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $this->logDebug("FSMounter::unmountFS");
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
-        $MOUNT_SUDO = $this->options["MOUNT_SUDO"];
 
-        system(($MOUNT_SUDO?"sudo":"")." umount ".escapeshellarg($MOUNT_POINT), $res);
+        system("umount ".escapeshellarg($MOUNT_POINT), $res);
         if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted() ){
             // Remove mount point
             $testRm = @rmdir($MOUNT_POINT);
