@@ -135,9 +135,11 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         foreach($all as $row => &$data){
             // PG: Recapitalize keys
             if($pg){
+                $newData = array();
                 foreach($data as $k => $v){
-                    $data[ucfirst($k)] = $v;
+                    $newData[ucfirst($k)] = $v;
                 }
+                $data = $newData;
             }
             if(isSet($data["File"])){
                 $data["File"] = AJXP_Utils::safeBasename($data["File"]);
