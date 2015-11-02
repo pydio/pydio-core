@@ -104,7 +104,13 @@ class UpdateController extends AJXP_Plugin
 
                 AJXP_Utils::safeIniSet("output_buffering", "Off");
                 if (AJXP_PACKAGING != "zip") {
-                    print "Your installation is managed directly via os packages, you should not upgrade manually.";
+                    $lang = ConfService::getLanguage();
+                    $file = $this->getBaseDir()."/howto/linux_en.html";
+                    if($lang != "en" && is_file($this->getBaseDir()."/howto/linux_$lang.html")){
+                        $file = $this->getBaseDir()."/howto/linux_$lang.html";
+                    }
+                    $content = file_get_contents($file);
+                    print $content;
                     break;
                 }
                 $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);
