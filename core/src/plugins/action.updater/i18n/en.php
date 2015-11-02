@@ -41,5 +41,5 @@ $mess = array(
     "17" => "Checking for available upgrades...",
     "18" => "No necessary upgrade detected: click to perform a new check.",
     "19" => "Click to check for new upgrade",
-    "20" => "Check now"
+    "20" => "Check now",
 );
