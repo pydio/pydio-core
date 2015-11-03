@@ -478,7 +478,17 @@ class ConfService
             if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$rootDirIndex])) {
                 $this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];
             } else {
+                
                 $this->configs["REPOSITORY"] = ConfService::getRepositoryById($rootDirIndex);
+                
+                //
+                // Patch EC - Allow &tmp_repository_id={repo-alias}
+                //
+                if($this->configs["REPOSITORY"] == null) {
+                    $this->configs["REPOSITORY"] = ConfService::getRepositoryByAlias($rootDirIndex);
+                    $rootDirIndex = $this->configs["REPOSITORY"]->getId();
+                }                
+                
             }
             if(self::$useSession){
                 $_SESSION['REPO_ID'] = $rootDirIndex;
