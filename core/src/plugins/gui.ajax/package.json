@@ -15,7 +15,6 @@
     "react-chartjs": "git://github.com/dehbmarques/react-chartjs.git#master",
     "react-grid-layout": "^0.8.5",
     "react-infinite": "^0.3.4",
-    "react-tap-event-plugin": "^0.1.7",
     "reactify": "^1.1.1",
     "react-select": "^0.6.5",
     "react-dnd": "^1.1.5",
