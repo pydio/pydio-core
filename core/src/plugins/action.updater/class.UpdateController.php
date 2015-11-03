@@ -64,11 +64,13 @@ class UpdateController extends AJXP_Plugin
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
-        if (!empty($this->pluginConf["PROXY_HOST"])) {
+        if (!empty($this->pluginConf["PROXY_HOST"]) || !empty($this->pluginConf["UPDATE_SITE_USER"])) {
             AjaXplorerUpgrader::configureProxy(
                 $this->pluginConf["PROXY_HOST"],
                 $this->pluginConf["PROXY_USER"],
-                $this->pluginConf["PROXY_PASS"]
+                $this->pluginConf["PROXY_PASS"],
+                $this->pluginConf["UPDATE_SITE_USER"],
+                $this->pluginConf["UPDATE_SITE_PASS"]
             );
         }
 
@@ -85,6 +87,19 @@ class UpdateController extends AJXP_Plugin
 
                 header("Content-type: application/json");
                 print AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "json", $this->pluginConf["UPDATE_CHANNEL"]);
+
+            break;
+
+            case "display_upgrade_note":
+
+                $url = $httpVars["url"];
+                $context = AjaXplorerUpgrader::getContext();
+                if($context != null){
+                    $content = file_get_contents($url, null, $context);
+                }else{
+                    $content = file_get_contents($url);
+                }
+                echo $content;
 
             break;
 

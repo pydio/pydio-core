@@ -87,15 +87,32 @@ class AjaXplorerUpgrader
 
     }
 
-    public static function configureProxy($proxyHost, $proxyUser, $proxyPass)
+    public static function configureProxy($proxyHost, $proxyUser, $proxyPass, $siteUser = "", $sitePass = "")
     {
-        $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
-        $proxy['ssl']['SNI_enabled'] = false;
-        if (!empty($proxyUser) && !empty($proxyPass)) {
-            $auth = base64_encode($proxyUser.":".$proxyPass);
-            $proxy['http']['header'] = "Proxy-Authorization: Basic $auth";
+        $contextData = array('http' => array());
+        if(!empty($proxyHost)){
+            $contextData['http']['proxy'] = 'tcp://'.$proxyHost;// $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
+            $contextData['http']['request_fulluri'] = true;
+            $contextData['ssl']['SNI_enabled'] = false;
+            if (!empty($proxyUser) && !empty($proxyPass)) {
+                $auth = base64_encode($proxyUser.":".$proxyPass);
+                $contextData['http']['header'] = "Proxy-Authorization: Basic $auth";
+            }
         }
-        self::$context = stream_context_create($proxy);
+        if(!empty($siteUser) && !empty($sitePass)){
+            $headerString = "Authorization: Basic " . base64_encode("$siteUser:$sitePass");
+            if(isSet($contextData['http']['header'])){
+                $contextData['http']['header'] .= "; ".$headerString;
+            }else{
+                $contextData['http']['header'] = $headerString;
+            }
+        }
+
+        self::$context = stream_context_create($contextData);
+    }
+
+    public static function getContext(){
+        return self::$context;
     }
 
     public static function getUpgradePath($url, $format = "php", $channel="stable")
@@ -170,7 +187,11 @@ class AjaXplorerUpgrader
         if ($this->debugMode && is_file($this->archive)) {
             return "Already downloaded";
         }
-        $content = AJXP_Utils::getRemoteContent($this->archiveURL);
+        if(self::$context){
+            $content = file_get_contents($this->archiveURL, null, self::$context);
+        }else{
+            $content = AJXP_Utils::getRemoteContent($this->archiveURL);
+        }
         if ($content === false || strlen($content) == 0) {
             throw new Exception("Error while downloading");
         }
