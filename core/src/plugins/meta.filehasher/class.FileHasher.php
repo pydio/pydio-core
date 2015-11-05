@@ -192,7 +192,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                     if (!$stat || !is_readable($node->getUrl())) {
                         print '{}';
                     } else {
-                        if($node->isLeaf()) {
+                        if(is_file($node->getUrl())) {
                             if(isSet($_SERVER["HTTP_RANGE"])){
                                 $fullSize = floatval($stat['size']);
                                 $ranges = explode('=', $_SERVER["HTTP_RANGE"]);
@@ -223,7 +223,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                             $stat[13] = $stat["hash"] = $hash;
                             $stat = json_encode($stat);
                         }
-                        print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
+                        print json_encode(SystemTextEncoding::toUTF8($path)).':'.$stat . (($index < count($files) -1) ? "," : "");
                     }
                     print '}';
                 }

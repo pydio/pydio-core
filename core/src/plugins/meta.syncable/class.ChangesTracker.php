@@ -498,14 +498,14 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 // DELETE
                 $this->logDebug('DELETE', $oldNode->getUrl());
-                dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
             } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
                 $newNode->setLeaf(!($stat['mode'] & 040000));
                 $this->logDebug('INSERT', $newNode->getUrl());
                 dibi::query("INSERT INTO [ajxp_index]", array(
-                    "node_path" => $newNode->getPath(),
+                    "node_path" => SystemTextEncoding::toUTF8($newNode->getPath()),
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
@@ -523,7 +523,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],
                         "md5"       => md5_file($newNode->getUrl())
-                    ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                    ), "WHERE [node_path] = %s AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
                     try{
                         $rowCount = dibi::getAffectedRows();
                         if($rowCount === 0){
@@ -538,8 +538,8 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     if ($newNode->isLeaf()) {
                         $this->logDebug('UPDATE LEAF PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET ", array(
-                            "node_path"  => $newNode->getPath(),
-                        ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                            "node_path"  => SystemTextEncoding::toUTF8($newNode->getPath()),
+                        ), "WHERE [node_path] = %s AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
@@ -552,7 +552,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             $oldNode->getPath(),
                             $newNode->getPath()
-                            , "WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
+                            , "WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){

@@ -95,6 +95,7 @@ class AJXP_Controller
         if (count($paramValues) < count($paramNames)) {
             $paramNames = array_slice($paramNames, 0, count($paramValues));
         }
+        $paramValues = array_map(array("SystemTextEncoding", "toUTF8"), $paramValues);
         $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
         return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
 
