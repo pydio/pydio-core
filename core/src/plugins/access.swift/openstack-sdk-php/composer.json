@@ -1,0 +1,16 @@
+{
+  "name": "pydio/openstack-sdk-php",
+  "description": "This will install the last published commit of the prototype OpenStack SDK before it was EOL.",
+  "type": "metapackage",
+  "authors": [
+    {
+      "name": "Robert McKenney",
+      "email": "robert@mckenney.ca"
+    }
+  ],
+  "minimum-stability": "dev",
+
+  "require-dev": {
+    "openstack/openstack-sdk-php": "dev-master#4536bbc166ada96ff2a3a5a4b6e636b093103f0e"
+  }
+}
