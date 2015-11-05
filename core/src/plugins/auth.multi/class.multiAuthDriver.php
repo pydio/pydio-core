@@ -60,6 +60,9 @@ class multiAuthDriver extends AbstractAuthDriver
             if (!is_object($instance)) {
                 throw new Exception("Cannot find plugin $name for type 'auth'");
             }
+            if (!$instance->isEnabled()){
+                throw new Exception("You have selected a disabled plugin ($name) for type 'auth'");
+            }
             $instance->init($options);
             if ($name != $this->getOption("MASTER_DRIVER")) {
                 $this->slaveName = $name;

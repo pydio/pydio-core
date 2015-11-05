@@ -1956,6 +1956,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $pInstNode->setAttribute("type", "group_switch:".$fieldName);
                     $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
                     foreach ($typePlugs as $typePlug) {
+                        if(!$typePlug->isEnabled()) continue;
                         if($typePlug->getId() == "auth.multi") continue;
                         $checkErrorMessage = "";
                         try {

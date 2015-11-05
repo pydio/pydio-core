@@ -55,7 +55,7 @@ class CoreAuthLoader extends AJXP_Plugin
             }
             $masterName = is_array($this->pluginConf["MASTER_INSTANCE_CONFIG"]) ? $this->pluginConf["MASTER_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["MASTER_INSTANCE_CONFIG"];
             $masterName = str_replace("auth.", "", $masterName);
-            if (!empty($this->pluginConf["SLAVE_INSTANCE_CONFIG"])) {
+            if (!empty($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) && !empty($this->pluginConf["MULTI_MODE"])) {
                 $slaveName = is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) ? $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["SLAVE_INSTANCE_CONFIG"];
                 $slaveName = str_replace("auth.", "", $slaveName);
                 // Manually set up a multi config
