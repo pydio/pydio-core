@@ -96,10 +96,10 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			}			
 		}.bind(this) );
 
-        textSearch.observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
-        textSearch.observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
-        gotoLine.observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
-        gotoLine.observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
+        textSearch.observe("focus", function(){pydio.UI.disableAllKeyBindings()});
+        textSearch.observe("blur", function(){pydio.UI.enableAllKeyBindings()});
+        gotoLine.observe("focus", function(){pydio.UI.disableAllKeyBindings()});
+        gotoLine.observe("blur", function(){pydio.UI.enableAllKeyBindings()});
 
 		// Remove python rule, if any
 		$$('link[href="plugins/editor.codemirror/css/linenumbers-py.css"]').invoke('remove');

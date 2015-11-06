@@ -227,8 +227,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
     function logOutCAS($action, $httpVars, $fileVars)
     {
-        if (!isSet($this->actions[$action])) return;
-
         switch ($action) {
             case "logout":
                 if(isset($_SESSION['LOGGED_IN_BY_CAS'])){

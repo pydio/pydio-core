@@ -24,7 +24,7 @@ Class.create("UserGuiController", AjxpPane, {
     initialize: function(element){
         try{
             this._currentAction = document.location.pathname.substr('/user/'.length).split('/')[0];
-            ajaxplorer.actionBar.fireAction(this._currentAction);
+            pydio.getController().fireAction(this._currentAction);
         }catch(e){
             if(console) console.log(e);
         }

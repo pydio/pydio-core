@@ -36,7 +36,7 @@ function apiPost($baseData, $url, $parameters, $private){
     $hash = $nonce.":".hash_hmac("sha256", $msg, $parameters["auth_token"]);
     $client = new HttpClient($baseData["host"]);
     $parameters["auth_hash"] = $hash;
-    $res  = $client->post($url, $parameters);
+    $client->post($url, $parameters);
     return $client;
 
 }

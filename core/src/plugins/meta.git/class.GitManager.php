@@ -65,7 +65,6 @@ class GitManager extends AJXP_AbstractMetaSource
             case "git_history":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $file = ltrim($file, "/");
-
                 $res = $this->gitHistory($git, $file);
                 AJXP_XMLWriter::header();
                 $ic = AJXP_Utils::mimetype($file, "image", false);
@@ -191,7 +190,10 @@ class GitManager extends AJXP_AbstractMetaSource
     protected function gitHistory($git, $file)
     {
         $command = $git->getCommand("log");
-        $command->setOption("follow", true);
+        if(strpos($file, " ") === false){
+            // We currently cannot use follow if file/folder has a space
+            $command->setOption("follow", true);
+        }
         $command->setOption("p", true);
         $command->addArgument($file);
         //var_dump($command->createCommandString());

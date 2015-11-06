@@ -32,14 +32,14 @@ Class.create("QuicksendManager", AjxpPane, {
 
     applyUpload: function(){
 
-        var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
+        var uploaders = pydio.Registry.getActiveExtensionByType("uploader");
         if(uploaders.length){
             var uploader = uploaders[0];
-            if(ajaxplorer.actionBar.getActionByName("trigger_remote_copy")){
+            if(pydio.getController().getActionByName("trigger_remote_copy")){
                 modal.setCloseAction(function(){
                     ajaxplorer.fireContextRefresh();
-                    var bgManager = ajaxplorer.actionBar.bgManager;
-                    bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+                    var bgManager = pydio.getController().getBackgroundTasksManager();
+                    bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
                     bgManager.next();
                 });
             }
@@ -64,14 +64,14 @@ Class.create("QuicksendManager", AjxpPane, {
                 });
                 connex.onComplete = function(transport){
                     var linkURL = transport.responseText;
-                    if(ajaxplorer.hasPluginOfType("mailer")){
+                    if(pydio.Registry.hasPluginOfType("mailer")){
                         var s, message;
                         s = 'A user from %s shared a file with you: ';
                         if(s) s = s.replace("%s", ajaxplorer.appTitle);
                         message = s + "\n\n " + linkURL;
                         var mailer = new AjxpMailer();
                         var usersList = null;
-                        ajaxplorer.disableAllKeyBindings();
+                        pydio.UI.disableAllKeyBindings();
                         var mailerPane = mailer.buildMailPane('A user from %s shared a file with you: '.replace("%s", ajaxplorer.appTitle), message, usersList, 'Send the weblink by email');
                         mailerPane.setStyle({width:'420px'});
                         modal.showSimpleModal(
@@ -79,10 +79,10 @@ Class.create("QuicksendManager", AjxpPane, {
                             mailerPane,
                             function(){
                                 mailer.postEmail();
-                                ajaxplorer.enableAllKeyBindings();
+                                pydio.UI.enableAllKeyBindings();
                                 return true;
                             },function(){
-                                ajaxplorer.enableAllKeyBindings();
+                                pydio.UI.enableAllKeyBindings();
                                 return true;
                             });
                     }

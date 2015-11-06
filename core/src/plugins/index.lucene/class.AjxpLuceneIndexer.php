@@ -52,7 +52,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
-            $el = $this->xPath->query("/indexer")->item(0);
+            $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
                 $data = array("indexed_meta_fields" => $metaFields,
@@ -189,8 +189,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $limit = intval($httpVars['limit']);
             }
             foreach ($hits as $hit) {
+                // Backward compatibility
+                $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    if(isSet($meta["ajxp_modiftime"])){
+                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".AJXP_Utils::relativeDate($meta["ajxp_modiftime"], $messages);
+                    }
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 } else {
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
@@ -205,6 +210,14 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (!file_exists($tmpNode->getUrl())) {
                     $index->delete($hit->id);
                     $commitIndex = true;
+                    continue;
+                }
+                if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
+                $basename = basename($tmpNode->getPath());
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -264,6 +277,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 AJXP_XMLWriter::header();
             }
             foreach ($hits as $hit) {
+                // Backward compat with old protocols
+                $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
@@ -274,6 +289,14 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (!file_exists($tmpNode->getUrl())) {
                     $index->delete($hit->id);
                     $commitIndex = true;
+                    continue;
+                }
+                if (!is_readable($tmpNode->getUrl())){
+                    continue;
+                }
+                $basename = basename($tmpNode->getPath());
+                $isLeaf = $tmpNode->isLeaf();
+                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -419,23 +442,32 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     {
         require_once("Zend/Search/Lucene.php");
         if (isSet($this->currentIndex)) {
-            $index = $this->currentIndex;
+            $oldIndex = $newIndex = $this->currentIndex;
         } else {
             if($oldNode == null){
-                $index =  $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+            }else if($newNode == null){
+                $oldIndex = $newIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
             }else{
-                $index = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                $newId = $newNode->getRepositoryId();
+                $oldId = $oldNode->getRepositoryId();
+                if($newId == $oldId){
+                    $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                }else{
+                    $newIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                    $oldIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                }
             }
         }
         $this->setDefaultAnalyzer();
         if ($oldNode != null && $copy == false) {
-            $oldDocId = $this->getIndexedDocumentId($index, $oldNode);
+            $oldDocId = $this->getIndexedDocumentId($oldIndex, $oldNode);
             if ($oldDocId != null) {
-                $index->delete($oldDocId);
+                $oldIndex->delete($oldDocId);
                 if ($newNode == null) { // DELETION
-                    $childrenHits = $this->getIndexedChildrenDocuments($index, $oldNode);
+                    $childrenHits = $this->getIndexedChildrenDocuments($oldIndex, $oldNode);
                     foreach ($childrenHits as $hit) {
-                        $index->delete($hit->id);
+                        $oldIndex->delete($hit->id);
                     }
                 }
             }
@@ -443,38 +475,41 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
         if ($newNode != null) {
             // Make sure it does not already exists anyway
-            $newDocId = $this->getIndexedDocumentId($index, $newNode);
+            $newDocId = $this->getIndexedDocumentId($newIndex, $newNode);
             if ($newDocId != null) {
-                $index->delete($newDocId);
-                $childrenHits = $this->getIndexedChildrenDocuments($index, $newNode);
+                $newIndex->delete($newDocId);
+                $childrenHits = $this->getIndexedChildrenDocuments($newIndex, $newNode);
                 foreach ($childrenHits as $hit) {
-                    $index->delete($hit->id);
+                    $newIndex->delete($hit->id);
                 }
             }
-            $this->createIndexedDocument($newNode, $index);
+            $this->createIndexedDocument($newNode, $newIndex);
             if ( $recursive && $oldNode == null && is_dir($newNode->getUrl())) {
                 $this->recursiveIndexation($newNode->getUrl());
             }
         }
 
-        if ($oldNode != null && $newNode != null && is_dir($newNode->getUrl())) { // Copy / Move / Rename
+        if ($oldNode != null && $newNode != null && is_dir($newNode->getUrl()) && ($newIndex == $oldIndex)) { // Copy / Move / Rename
             // Get old node children docs, and update them manually, no need to scan real directory
-            $childrenHits = $this->getIndexedChildrenDocuments($index, $oldNode);
+            $childrenHits = $this->getIndexedChildrenDocuments($oldIndex, $oldNode);
             foreach ($childrenHits as $hit) {
-                $oldChildURL = $index->getDocument($hit->id)->node_url;
+                $oldChildURL = $oldIndex->getDocument($hit->id)->node_url;
                 if ($copy == false) {
-                    $index->delete($hit->id);
+                    $oldIndex->delete($hit->id);
                 }
                 $newChildURL = str_replace(SystemTextEncoding::toUTF8($oldNode->getUrl()),
                                            SystemTextEncoding::toUTF8($newNode->getUrl()),
                                            $oldChildURL);
                 $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
-                $this->createIndexedDocument(new AJXP_Node($newChildURL), $index);
+                $this->createIndexedDocument(new AJXP_Node($newChildURL), $oldIndex);
             }
         }
 
         if (!isSet($this->currentIndex)) {
-            $index->commit();
+            $oldIndex->commit();
+            if($newIndex != $oldIndex){
+                $newIndex->commit();
+            }
         }
     }
 

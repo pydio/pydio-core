@@ -1,0 +1,52 @@
+<div style="font-family:'Open Sans', Helvetica, Sans-serif;font-size:13px;line-height: 1.7em;">
+    <style>
+        code {
+            display: inline-block;
+            border: 1px solid #D8D8D8;
+            background-color: #F7F7F7;
+            border-radius: 3px;
+            padding: 1px 3px;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+    </style>
+    <span style="color: #f00000"><i>Oops</i>: Your installation is managed directly via os packages, you cannot use the in-app updater.</span>
+
+    <h2>How-to upgrade?</h2>
+    <h3>1. Backup your Database</h3>
+
+    Use either a command line tool (e.g. mysqldump) or a GUI-based manager (e.g. phpMyAdmin) to entirely backup your database content.
+
+    <h3>2. Update the packages via command line</h3>
+
+    <p>Depending on your OS, you may have to issue one of the following command:<br/>
+    <code>$ yum update pydio</code><br/>
+    or<br/>
+    <code>$ apt-get install --only-upgrade pydio</code>
+    </p>
+    <p>Let the package manager do its job.</p>
+
+    <h3>3. Manually upgrade the database</h3>
+
+    <h4>Identify optional upgrade scripts</h4>
+
+    <p>
+        After the packages upgrades, please have a look inside the <i>/var/lib/doc/pydio/upgrade/db</i> folder.
+    This folder may contain a set of scripts named with version numbers for upgrading from one version to another.
+    If you find that one or many scripts are required to go from your previous version to the new one, you will have to apply them all.
+    For example, if you are running v6.0.5 and just upgraded to v6.0.8, you may have to run the scripts 6.0.5-6.0.6, 6.0.6-6.0.7 and 6.0.7-6.0.8.
+    </p>
+    <p>
+    Scripts are also suffixed with the according DB extension: .mysql is for MySql / MariaDB, .pgsql for Postgres and .sqlite for SQlite. Make
+    sur to use the correct one.
+    </p>
+
+    <h4>Apply the scripts if necessary</h4>
+    <p>
+    Once you have collected the necessary scripts, use either a GUI-based tool to connect to your DB and exectute the SQL queries (like PhpMyAdmin for example)
+    or apply the SQL by using command line.
+    <br/>
+    For example for MySql:<br/>
+    <code>$ mysql -u adminuser -p DBNAME << pydio-core-upgrade-6.0.7-6.0.8.mysql</code>
+    </p>
+</div>

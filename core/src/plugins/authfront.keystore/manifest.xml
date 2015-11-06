@@ -5,7 +5,7 @@
     <client_settings>
         <resources>
             <i18n namespace="authfront.keystore" path="plugins/authfront.keystore/i18n"/>
-            <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js" autoload="true"/>
+            <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js"/>
             <i18n namespace="keystore" path="plugins/authfront.keystore/i18n"/>
             <css file="plugins/authfront.keystore/apikeypane.css" autoload="true"/>
         </resources>

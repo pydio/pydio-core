@@ -126,7 +126,7 @@
                             var conn = new Connexion();
                             conn.setParameters(params);
                             conn.onComplete = function(transport){
-                                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                pydio.getController().parseXmlMessage(transport.responseXML);
                             }
                             conn.sendAsync();
 					]]></dialogOnComplete>
@@ -183,6 +183,7 @@
                         if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
+                    if(!window.BookmarksBar) return;
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
                         className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
                         mouseClick:'over',
@@ -190,7 +191,7 @@
                         leftOffset:0,
                         position:'bottom right'
                     }});
-                    var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+                    var bmAction = pydio.getController().actions.get('bookmark');
                     bmBar.addBookmarkObject = {
                         name:bmAction.getKeyedText(),
                         alt:bmAction.options.title,
@@ -210,6 +211,11 @@
                 <serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
+        <action name="get_permissions_mask">
+            <processing>
+                <serverCallback methodName="publishPermissionsMask" restParams="/" developerComment="Send the permissions mask for the current workspace, if defined."/>
+            </processing>
+        </action>
 		<action name="save_user_pref">
 			<processing>
 				<serverCallback methodName="switchAction"/>
@@ -262,10 +268,10 @@
                           conn.setParameters(params);
                           conn.setMethod("POST");
                           conn.onComplete = function(transport){
-                              ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                              pydio.getController().parseXmlMessage(transport.responseXML);
                               document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
                                   if(event.memo != "user/preferences") return;
-                                  ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
+                                  pydio.Registry.logXmlUser();
                               });
                               ajaxplorer.loadXmlRegistry(false, "user/preferences");
                           };
@@ -492,7 +498,7 @@
 						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-                        ajaxplorer.user.getRepositoriesList().each(function(pair){
+                        ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
                             if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
                                 var div = new Element('div', {className:(even?'even':'')});
                                 div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
@@ -648,9 +654,11 @@
                                     return;
                                 }
                                 if(!ajaxplorer.user) return;
+                                $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
                                 var conn = new Connexion();
                                 conn.setParameters({get_action:'load_repository_info'});
                                 conn.onComplete = function(transport){
+                                    $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
                                     if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
                                         var data = transport.responseJSON;
                                         if(!data['core.users']['external']){

@@ -117,7 +117,7 @@ class sysLogDriver extends textLogDriver
      * @param String $message The message to log
      *
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message)
+    public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
     {
         //syslog already take care of timestamp and log severity
         $textMessage = "$ip\t$user\t$source\t$prefix\t$message";

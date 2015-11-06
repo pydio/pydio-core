@@ -22,7 +22,7 @@
 			    <ul class="tabrow">
                     <li class="selected" data-PaneID="pane-infos"><i class="icon-cogs"></i> <span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
                     <li class="" data-PaneID="pane-metas"><i class="icon-puzzle-piece"></i> <span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
-                    <li class="" data-PaneID="pane-shares"><i class="icon-share"></i> <span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.16]</span></li>
+                    <li class="" data-PaneID="pane-shares"><i class="icon-share"></i> <span ajxp_message_id="ajxp_repository_editor.16">AJXP_MESSAGE[ajxp_repository_editor.16]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>

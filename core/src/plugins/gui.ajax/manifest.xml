@@ -3,11 +3,13 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"/>
         </resources>
     </client_settings>
 	<server_settings>
-        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
         <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[Additional JS frameworks description]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
+        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
         <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Login Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
                     editable="true"
@@ -21,8 +23,7 @@
         <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
         <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
         <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
-        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Welcome Page]"  label="CONF_MESSAGE[Logo]" description="CONF_MESSAGE[Replace the logo displayed in the welcome page]"  type="image"
+        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Login Screen]"  label="CONF_MESSAGE[User Home Logo]" description="CONF_MESSAGE[Replace the logo displayed in the welcome page]"  type="image"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
@@ -41,11 +42,11 @@
         <global_param name="CUSTOM_TOP_LOGO_W" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Width]" description="CONF_MESSAGE[Manually set a logo width]" mandatory="false" default="" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="4" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="6" expose="true"/>
-        <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
-		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
-		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
-		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics Domain]" description="CONF_MESSAGE[Set the domain for your analytics reports (not mandatory!)]" mandatory="false"/>
-		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Google Analytics]" type="boolean" label="CONF_MESSAGE[Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in Pydio]" mandatory="false" default="false"/>
+        <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Web Session]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
+		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Web Session]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
+		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Web Session]" type="string" label="CONF_MESSAGE[Google Analytics Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Web Session]" type="string" label="CONF_MESSAGE[Google Analytics Analytics Domain]" description="CONF_MESSAGE[Set the domain for your analytics reports (not mandatory!)]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Web Session]" type="boolean" label="CONF_MESSAGE[Google Analytics Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in Pydio]" mandatory="false" default="false"/>
 
         <global_param name="WELCOME_PAGE_BACKGROUND_1" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
                       editable="true"
@@ -117,6 +118,19 @@
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|CONF_MESSAGE[Center in Page (no-repeat)],background-repeat:repeat;background-size:140%;background-position:50% 50%;|CONF_MESSAGE[Fetch Window (repeat vertically)],background-repeat:no-repeat;background-size:100%; background-position:center center;|CONF_MESSAGE[Fetch Window (no repeat)],background-repeat:repeat;|CONF_MESSAGE[Tile (repeat both directions)]"
                       label="CONF_MESSAGE[Background Attributes (6)]" description="CONF_MESSAGE[Attributes of the image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_LOWRES" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Low-Resolution Background]" description="CONF_MESSAGE[Make sure to use a smaller resolution image, otherwise mobile loading is very slow.]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg"
+                      expose="true"
+                />
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_LOWRES" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|CONF_MESSAGE[Center in Page (no-repeat)],background-repeat:repeat;background-size:140%;background-position:50% 50%;|CONF_MESSAGE[Fetch Window (repeat vertically)],background-repeat:no-repeat;background-size:100%; background-position:center center;|CONF_MESSAGE[Fetch Window (no repeat)],background-repeat:repeat;|CONF_MESSAGE[Tile (repeat both directions)]"
+                      label="CONF_MESSAGE[Background Attributes (Low Resolution)]" description="CONF_MESSAGE[Attributes of the image used as a background]"
                       mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
 
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
@@ -236,7 +250,7 @@
 				</div>
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars" ajxpClass="AjxpPane">
+				<div id="toolbars" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'>
 					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -301,6 +315,22 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
 			]]></template>
+<template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
+				<div id="toolbars">
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="locationbar_cont" class="css_gradient">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
+				</div>
+			]]></template>			
             <template name="widget_vision" element="ajxp_widget" position="top" theme="vision"><![CDATA[
 				<div id="toolbars">
     			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -533,7 +563,7 @@
                             var dm = ajaxplorer.getContextHolder();
                             var nodes = dm.getSelectedNodes();
                             if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                             }
                         }catch(e){}
                     });
@@ -547,10 +577,10 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -665,13 +695,13 @@
                                     return;
                                 }
                                 var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    var first = root.getChildren().first();
+                                var first = root.getFirstChildIfExists();
+                                if(first){
                                     if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
                                         return;
                                     }
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    dm.setSelectedNodes([first], "dataModel");
+                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
                                     p.stop();
                                     return;
                                 }
@@ -778,9 +808,9 @@
                                     p.stop();
                                     return;
                                 }
-                                var root = dm.getRootNode();
-                                if(root.getChildren().length){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                var first = dm.getRootNode().getFirstChildIfExists();
+                                if(first){
+                                    dm.setSelectedNodes([first], "dataModel");
                                     p.stop();
                                     return;
                                 }
@@ -802,6 +832,7 @@
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;} div#overlay.form-login_form_dynamic { opacity: 1; }</style>
+                <script>
                     document.observe("ajaxplorer:afterApply-login", function(){
                         AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
                     });

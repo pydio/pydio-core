@@ -54,9 +54,8 @@ class smbAccessDriver extends fsAccessDriver
         $create = $this->repository->getOption("CREATE");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
 
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
 
         if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
             @mkdir($this->urlBase."/".$recycle);
@@ -99,7 +98,8 @@ class smbAccessDriver extends fsAccessDriver
 
         $filePaths = array();
         foreach ($src as $item) {
-            $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.(($item[0] == "/")? "" : "/").AJXP_Utils::securePath($item));
+            $url = $this->urlBase.(($item[0] == "/")? "" : "/").AJXP_Utils::securePath($item);
+            $realFile = AJXP_MetaStreamWrapper::getRealFSReference($url);
             //$basedir = trim(dirname($realFile))."/";
             if (basename($item) == "") {
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
@@ -118,7 +118,7 @@ class smbAccessDriver extends fsAccessDriver
         if($basedir == "__AJXP_ZIP_FLAT__/"){
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
         }else{
-            $basedir = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase).trim($basedir);
+            $basedir = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase).trim($basedir);
             $this->logDebug("Basedir", array($basedir));
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
         }
@@ -127,15 +127,6 @@ class smbAccessDriver extends fsAccessDriver
         }
         self::$filteringDriverInstance = null;
         return $vList;
-    }
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        if ($bytesize < 0) {
-            $bytesize = sprintf("%u", $bytesize);
-        }
-        return $bytesize;
     }
 
     public function isWriteable($dir, $type="dir")

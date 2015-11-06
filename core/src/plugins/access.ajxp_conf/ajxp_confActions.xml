@@ -111,20 +111,20 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var completeFunc = function(){
 						var oForm = modal.getForm();
-						if(!ajaxplorer.actionBar.configEditor){
-							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
 						}
-						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						result = ajaxplorer.actionBar.configEditor.submitCreateUser();
+						pydio.getController().configEditor.setForm(oForm);
+						result = pydio.getController().configEditor.submitCreateUser();
 						if(result) hideLightBox();
 						return false;
 					};
 					var loadFunc = function(oForm){
-						if(!ajaxplorer.actionBar.configEditor){
-							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
 						}
-						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.loadCreateUserForm();
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.loadCreateUserForm();
 
 						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
 							barContainer:$('pwd_strength_container'),
@@ -239,11 +239,11 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!ajaxplorer.actionBar.configEditor){
-							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
 						}
-						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.initCreateRepoWizard('repository');
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.initCreateRepoWizard('repository');
 					};
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
@@ -287,11 +287,11 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!ajaxplorer.actionBar.configEditor){
-							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
 						}
-						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.initCreateRepoWizard('template');
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.initCreateRepoWizard('template');
 					};
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
                 ]]></clientCallback>
@@ -310,11 +310,11 @@
 					var userSelection =  ajaxplorer.getUserSelection();
 					var loadFunc = function(oForm){
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!ajaxplorer.actionBar.configEditor){
-							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
 						}
-						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.loadUsers(userSelection);
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.loadUsers(userSelection);
 					};
 					modal.showDialogForm('Batch Edition', 'batch_roles_edit_box', loadFunc, function(){hideLightBox();}, null, true);
 				]]></clientCallback>
@@ -335,7 +335,7 @@
 				<clientListener name="selectionChange"><![CDATA[
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
-					var action = ajaxplorer.getActionBar().getActionByName("user_update_role");
+					var action = pydio.getController().getActionByName("user_update_role");
 					if(action){
 						if(userSelection.isUnique()){
 							action.selectionContext.dir = true;
@@ -366,7 +366,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction" restParams="/sub_action" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>
@@ -389,7 +389,7 @@
 						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
 						conn.addParameter('newLabel', newValue);
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
 						};
 						conn.sendSync();
 					};
@@ -449,8 +449,13 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getUserSelection();
-					var node = userSelection.getUniqueNode();
+				    var userSelection;
+				    if(window.actionArguments && window.actionArguments.length){
+				        userSelection = window.actionArguments[0];
+                    }else{
+                        userSelection =  ajaxplorer.getUserSelection();
+				    }
+				    var node = userSelection.getUniqueNode();
 					var meta = node.getMetadata();
 					var deleteMessage, fieldName, fieldValue;
 					if(meta.get("ajxp_mime") == "user_editable"){
@@ -478,7 +483,7 @@
 					};
 					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
 						var oForm = modal.getForm();
-						ajaxplorer.actionBar.submitForm(oForm);
+						pydio.getController().submitForm(oForm);
                         if (userSelection.isMultiple()) {
                            var i = 1;
 	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
@@ -493,7 +498,7 @@
                                   	value = meta.get("text");
                                   }
                                   hidden.setAttribute("value", value);
-            					  ajaxplorer.actionBar.submitForm(oForm);
+            					  pydio.getController().submitForm(oForm);
                                   i++;
                               } catch (e)
                               {
@@ -557,7 +562,7 @@
             </processing>
         </action>
         <action name="clear_plugins_cache">
-            <gui src="plugins" text="ajxp_conf.129" title="ajxp_conf.130">
+            <gui src="edit.png" text="ajxp_conf.129" title="ajxp_conf.130">
                 <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
             </gui>
             <processing>

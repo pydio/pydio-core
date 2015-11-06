@@ -29,11 +29,11 @@ require_once('../classes/class.AbstractTest.php');
  */
 class Client extends AbstractTest
 {
-    public function Client() { parent::AbstractTest("Client Browser", "Current client ".$_SERVER['HTTP_USER_AGENT']); }
+    public function __construct() { parent::__construct("Client Browser", "Current client ".$_SERVER['HTTP_USER_AGENT']); }
     public function doTest()
     {
         $this->testedParams["Client"] = $_SERVER['HTTP_USER_AGENT'];
         $this->failedLevel = "info";
         return FALSE;
     }
-};
+}

@@ -60,9 +60,8 @@ class sftpPSLAccessDriver extends fsAccessDriver
         $create = $this->repository->getOption("CREATE");
         $path = $this->repository->getOption("PATH");
 
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
     }
 
     public function detectStreamWrapper($register = false)
@@ -82,15 +81,6 @@ class sftpPSLAccessDriver extends fsAccessDriver
         parent::parseSpecificContributions($contribNode);
         if($contribNode->nodeName != "actions") return ;
         $this->disableArchiveBrowsingContributions($contribNode);
-    }
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        if ($bytesize < 0) {
-            $bytesize = sprintf("%u", $bytesize);
-        }
-        return $bytesize;
     }
 
     /**

@@ -11,6 +11,7 @@
 		<!-- Hack : use activeCondition as an extension starter, we should enable extensionOnInit instead
 			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
 		 -->
+        <!--
 		<activeCondition><![CDATA[
 			if(!window.OpenLayers && !window.OpenLayersLoading){
 				window.OpenLayersLoading = true;
@@ -30,6 +31,7 @@
 			}
 			return true;
 		]]></activeCondition>
+		-->
 	</processing>
 	<clientForm id="openlayer_box"><![CDATA[
 		<div id="openlayer_box" action="ol_view" box_width="80%" box_height="90%" box_padding="0">

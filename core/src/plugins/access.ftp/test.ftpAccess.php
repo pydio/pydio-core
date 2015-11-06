@@ -28,7 +28,7 @@ require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
  */
 class ftpAccessTest extends AbstractTest
 {
-    public function ftpAccessTest() { parent::AbstractTest("Remote FTP Filesystem Plugin", ""); }
+    public function __construct() { parent::__construct("Remote FTP Filesystem Plugin", ""); }
 
     public function doRepositoryTest($repo)
     {

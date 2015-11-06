@@ -339,10 +339,8 @@ Class.create("LocalAPINodeProvider", {
 			changes = true;
 		}
 		if(changes){
-			var fList = $A(ajaxplorer.guiCompRegistry).detect(function(object){
-				return (object.__className == "FilesList");
-			});
-			if(fList) fList.reload();			
+			var fLists = pydio.UI.getRegisteredComponentsByClassName("FilesList");
+			if(fLists) fLists[0].reload();
 		}
 	},
 	

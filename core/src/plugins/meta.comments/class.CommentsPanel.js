@@ -64,11 +64,11 @@ Class.create("CommentsPanel", {
     loadInfoPanel : function(container, node){
 
         container.down("#comments_container");
-        container.down("textarea").observe("focus", function(){
-            ajaxplorer.disableAllKeyBindings();
+        container.down("textarea.comments_textarea").observe("focus", function(){
+            pydio.UI.disableAllKeyBindings();
         });
-        container.down("textarea").observe("blur", function(){
-            ajaxplorer.enableAllKeyBindings();
+        container.down("textarea.comments_textarea").observe("blur", function(){
+            pydio.UI.enableAllKeyBindings();
         });
 
         if(node.getMetadata().get("ajxp_has_comments_feed")){
@@ -120,19 +120,19 @@ Class.create("CommentsPanel", {
 
         var submitComment = function(){
 
-            if(!container.down('textarea').getValue()) {
+            if(!container.down('textarea.comments_textarea').getValue()) {
                 return;
             }
             var conn = new Connexion();
             conn.setParameters({
                 file: node.getPath(),
                 get_action: "post_comment",
-                content: container.down('textarea').getValue()
+                content: container.down('textarea.comments_textarea').getValue()
             });
             conn.setMethod('POST');
             conn.onComplete = function(transport){
                 CommentsPanel.prototype.commentObjectToDOM($H(transport.responseJSON), container, node);
-                container.down('textarea').setValue("");
+                container.down('textarea.comments_textarea').setValue("");
                 CommentsPanel.prototype.refreshScroller(container);
                 $("comments_container").scrollTop = 10000;
             };
@@ -145,7 +145,7 @@ Class.create("CommentsPanel", {
              submitComment();
         });
 
-        container.down('textarea').observe("keydown", function(e){
+        container.down('textarea.comments_textarea').observe("keydown", function(e){
             if(e.keyCode == Event.KEY_RETURN && e.ctrlKey){
                 submitComment();
                 return false;
@@ -211,7 +211,7 @@ Class.create("CommentsPanel", {
 
     refreshScroller:function(container){
 
-        container.up('div[@ajxpClass="infoPanel"]').ajxpPaneObject.scrollbar.recalculateLayout();
+        container.up('div[ajxpClass="InfoPanel"]').ajxpPaneObject.scrollbar.recalculateLayout();
 
     }
 

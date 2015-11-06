@@ -26,7 +26,7 @@ initialize:function(form){
             height:'315px',
             position:'relative'
         });
-        this.versionsDm = new AjxpDataModel(true);
+        this.versionsDm = new PydioDataModel(true);
         this.versionsRoot = new AjxpNode("/", false, "Versions", "folder.png");
         this.versionsDm.setRootNode(this.versionsRoot);
 

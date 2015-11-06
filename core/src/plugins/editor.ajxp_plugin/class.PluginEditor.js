@@ -87,7 +87,7 @@ Class.create("PluginEditor", AbstractEditor, {
             conn.setParameters(toSubmit);
             conn.setMethod("post");
             conn.onComplete = function(transport){
-                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                pydio.getController().parseXmlMessage(transport.responseXML);
                 this.loadPluginConfig();
                 this.setClean();
             }.bind(this);
@@ -200,7 +200,7 @@ Class.create("PluginEditor", AbstractEditor, {
             this.formManager.observeFormChanges(form, this.setDirty.bind(this));
 
 
-            ajaxplorer.blurAll();
+            pydio.UI.blurAll();
         }.bind(this);
         connexion.sendAsync();
     },
@@ -291,7 +291,7 @@ Class.create("PluginEditor", AbstractEditor, {
         sync.sendSync();
         var encoded;
         if(seed != '-1'){
-            encoded = hex_md5(password);
+            encoded = HasherUtils.hex_md5(password);
         }else{
             encoded = password;
         }

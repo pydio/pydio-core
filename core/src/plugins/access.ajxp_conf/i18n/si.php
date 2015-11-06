@@ -42,6 +42,7 @@ $mess=array(
 "20" => "Uporabnik",
 "21" => "Ukrep",
 "22" => "Parametri",
+"22a"=> "Parametri",
 "23" => "Preizkus",
 "24" => "Izid",
 "25" => "Dostop do zbirke",
@@ -172,4 +173,6 @@ $mess=array(
     "148" => "Hooks Definitions",
     "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
     "150" => "Select a repository",
+    "151" => "Root Group",
+    "152" => "Root Group Role",
 );

@@ -15,3 +15,19 @@
     url('../open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.ttf') format('truetype'),
     url('../open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.svg#webfont') format('svg');
 }
+
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 300;
+    src: url(../roboto-font/roboto-light.woff2) format('woff2'), url(../roboto-font/roboto-light.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 400;
+    src: url(../roboto-font/roboto.woff2) format('woff2'), url(../roboto-font/roboto.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 500;
+    src: url(../roboto-font/roboto-medium.woff2) format('woff2'), url(../roboto-font/roboto-medium.woff) format('woff');
+}

@@ -30,107 +30,114 @@ class PixlrEditor extends AJXP_Plugin
 {
   public function switchAction($action, $httpVars, $filesVars)
   {
-    if(!isSet($this->actions[$action])) return false;
-
     $repository = ConfService::getRepository();
     if (!$repository->detectStreamWrapper(true)) {
       return false;
     }
 
-    $streamData = $repository->streamData;
-      $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
+        $selectedNode = $selection->getUniqueNode();
+        $selectedNodeUrl = $selectedNode->getUrl();
 
-      $selection = new UserSelection($repository, $httpVars);
+        if ($action == "post_to_server") {
 
-    if ($action == "post_to_server") {
-
-        // Backward compat
-        if(strpos($httpVars["file"], "base64encoded:") !== 0){
-            $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
-        }else{
-            $file = $selection->getUniqueFile();
-        }
-      $target = base64_decode($httpVars["parent_url"])."/plugins/editor.pixlr";
-      $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
-      $tmp = SystemTextEncoding::fromUTF8($tmp);
-      $fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)), "type" => "image/jpg");
-      //var_dump($fData);
-        $node = new AJXP_Node($destStreamURL.$file);
-        $this->logInfo('Preview', 'Sending content of '.$file.' to Pixlr server.');
-        AJXP_Controller::applyHook("node.read", array($node));
-
-
-        $httpClient = new HttpClient("apps.pixlr.com");
-      //$httpClient->setDebug(true);
-      $postData = array();
-      $httpClient->setHandleRedirects(false);
-      $saveTarget = $target."/fake_save_pixlr.php";
-      if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository->getId())) {
-          $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
-      }
-      $params = array(
-        "referrer"  => "Pydio",
-        "method"  => "get",
-        "loc"    => ConfService::getLanguage(),
-        "target"  => $saveTarget,
-        "exit"    => $target."/fake_close_pixlr.php",
-        "title"    => urlencode(basename($file)),
-        "locktarget"=> "false",
-        "locktitle" => "true",
-        "locktype"  => "source"
-      );
-      $httpClient->postFile("/editor/", $params, "image", $fData);
-      $loc = $httpClient->getHeader("location");
-      header("Location:$loc");
-
-    } else if ($action == "retrieve_pixlr_image") {
-      $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
-        $node = new AJXP_Node($destStreamURL.$file);
-        $node->loadNodeInfo();
-        $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.');
-        AJXP_Controller::applyHook("node.before_change", array(&$node));
-      $url = $httpVars["new_url"];
-      $urlParts = parse_url($url);
-      $query = $urlParts["query"];
-        if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository->getId())) {
-            $scriptName = basename($urlParts["path"]);
-            $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
-            if ($token != md5($httpVars["secure_token"])) {
-                throw new AJXP_Exception("Invalid Token, this could mean some security problem!");
+            // Backward compat
+            if(strpos($httpVars["file"], "base64encoded:") !== 0){
+                $legacyFilePath = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $selectedNode = new AJXP_Node($selection->currentBaseUrl().$legacyFilePath);
+                $selectedNodeUrl = $selectedNode->getUrl();
             }
+
+            $target = rtrim(base64_decode($httpVars["parent_url"]), '/') ."/plugins/editor.pixlr";
+            $tmp = AJXP_MetaStreamWrapper::getRealFSReference($selectedNodeUrl);
+            $tmp = SystemTextEncoding::fromUTF8($tmp);
+            $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
+            AJXP_Controller::applyHook("node.read", array($selectedNode));
+
+
+            $saveTarget = $target."/fake_save_pixlr.php";
+            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository->getId())) {
+                $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
+            }
+            $params = array(
+                "referrer"  => "Pydio",
+                "method"  => "get",
+                "loc"    => ConfService::getLanguage(),
+                "target"  => $saveTarget,
+                "exit"    => $target."/fake_close_pixlr.php",
+                "title"    => urlencode(basename($selectedNodeUrl)),
+                "locktarget"=> "false",
+                "locktitle" => "true",
+                "locktype"  => "source"
+            );
+
+            require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
+            $arguments = array();
+            $httpClient = new http_class();
+            $httpClient->request_method = "POST";
+            $httpClient->GetRequestArguments("https://pixlr.com/editor/", $arguments);
+            $arguments["PostValues"] = $params;
+            $arguments["PostFiles"] = array(
+                "image"   => array("FileName" => $tmp, "Content-Type" => "automatic/name"));
+
+            $err = $httpClient->Open($arguments);
+            if (empty($err)) {
+                $err = $httpClient->SendRequest($arguments);
+                if (empty($err)) {
+                    $response = "";
+                    while (true) {
+                        $header = array();
+                        $error = $httpClient->ReadReplyHeaders($header, 1000);
+                        if ($error != "" || $header != null) break;
+                            $response .= $header;
+                    }
+                }
+            }
+
+        header("Location: {$header['location']}"); //$response");
+
+        } else if ($action == "retrieve_pixlr_image") {
+            $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
+            $selectedNode = new AJXP_Node($selection->currentBaseUrl() . $file);
+            $selectedNode->loadNodeInfo();
+            $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));
+            AJXP_Controller::applyHook("node.before_change", array(&$selectedNode));
+            $url = $httpVars["new_url"];
+            $urlParts = parse_url($url);
+            $query = $urlParts["query"];
+            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository->getId())) {
+                $scriptName = basename($urlParts["path"]);
+                $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
+                if ($token != md5($httpVars["secure_token"])) {
+                    throw new AJXP_Exception("Invalid Token, this could mean some security problem!");
+                }
+            }
+            $params = array();
+            parse_str($query, $params);
+
+            $image = $params['image'];
+            $headers = get_headers($image, 1);
+            $content_type = explode("/", $headers['Content-Type']);
+            if ($content_type[0] != "image") {
+                throw new AJXP_Exception("Invalid File Type");
+            }
+            $content_length = intval($headers["Content-Length"]);
+            if($content_length != 0) AJXP_Controller::applyHook("node.before_change", array(&$selectedNode, $content_length));
+
+            $orig = fopen($image, "r");
+            $target = fopen($selectedNode->getUrl(), "w");
+            if(is_resource($orig) && is_resource($target)){
+                while (!feof($orig)) {
+                    fwrite($target, fread($orig, 4096));
+                }
+                fclose($orig);
+                fclose($target);
+            }
+            clearstatcache(true, $selectedNode->getUrl());
+            $selectedNode->loadNodeInfo(true);
+            AJXP_Controller::applyHook("node.change", array(&$selectedNode, &$selectedNode));
         }
-      $params = array();
-      parse_str($query, $params);
-
-      $image = $params['image'];
-      $headers = get_headers($image, 1);
-      $content_type = explode("/", $headers['Content-Type']);
-      if ($content_type[0] != "image") {
-        throw new AJXP_Exception("Invalid File Type");
-      }
-        $content_length = intval($headers["Content-Length"]);
-        if($content_length != 0) AJXP_Controller::applyHook("node.before_change", array(&$node, $content_length));
-
-      $orig = fopen($image, "r");
-      $target = fopen($destStreamURL.$file, "w");
-      if(is_resource($orig) && is_resource($target)){
-          while (!feof($orig)) {
-            fwrite($target, fread($orig, 4096));
-          }
-          fclose($orig);
-          fclose($target);
-      }
-        clearstatcache(true, $node->getUrl());
-        $node->loadNodeInfo(true);
-        AJXP_Controller::applyHook("node.change", array(&$node, &$node));
-      //header("Content-Type:text/plain");
-      //print($mess[115]);
 
     }
-
-
-    return ;
-
-  }
 
 }

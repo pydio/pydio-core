@@ -42,6 +42,7 @@ $mess=array(
 "20" => "Benutzer",
 "21" => "Aktion",
 "22" => "Param.",
+"22a"=> "Mehr...",
 "23" => "Test",
 "24" => "Ergebnis",
 "25" => "Arbeitsumgebung-Zugriffe",
@@ -172,4 +173,6 @@ $mess=array(
 "148" => "Hook-Definition",
 "149" => "Liste aller Hooks mit Informationen, wo und von welchen Erweiterungen diese aufgerufen werden.",
 "150" => "Eine Arbeitsumgebung auswählen",
+"151" => "Root Group",
+"152" => "Root Group Role",
 );

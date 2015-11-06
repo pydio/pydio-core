@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<authdriver enabled="false" name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="remote_auth" path="plugins/auth.remote/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-        <param name="CMS_TYPE" type="group_switch:cms" label="CONF_MESSAGE[CMS Type]" description="CONF_MESSAGE[Choose a predefined CMS or define your custom values]" mandatory="true"/>
+        <param name="CMS_TYPE" type="group_switch:cms" label="CONF_MESSAGE[CMS Type]" description="CONF_MESSAGE[Choose a predefined CMS or define your custom values]" mandatory="true" default="wp"/>
         <param name="LOCAL_PREFIX" label="CONF_MESSAGE[Local Prefix]" description="CONF_MESSAGE[The users created with this prefix in their identifier will be stored and handled in the local filesystem. This can be handy for managing the temporary users.]" type="string"/>
         <param name="ROLES_MAP" label="CONF_MESSAGE[Roles Map]" description="CONF_MESSAGE[Define a map of key/values for automatically mapping roles from the CMS to Pydio.]" type="array"/>
         <param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="false" />

@@ -22,7 +22,7 @@
 $mess=array(
 "languageLabel" => "Slovenščina",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "sl-SI",
 "0" => "Zadnja različica",
 "1" => "Ime",

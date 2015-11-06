@@ -71,7 +71,7 @@ Class.create("NotificationLoader", {
         var newNotifs = $A();
         var currentLastAlert = 0, currentLastEvent = 0;
 
-        this.ajxpNode.getChildren().each(function(el){
+        this.ajxpNode.getChildren().forEach(function(el){
 
             // REPLACE REAL PATH NOW
             el._path = el.getMetadata().get("real_path");
@@ -297,6 +297,8 @@ Class.create("NotificationLoader", {
 
     loadInfoPanel : function(container, node){
         var label= MessageHash['notification_center.'+(node.isLeaf()?'11': (node.isRoot()?'9': '10'))];
+        var mainContainer = container.down("#ajxp_activity_panel");
+        mainContainer.addClassName("infopanel_loading");
         container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+label+'</div><div id="activity_results">Nothing</div>');
         var resultPane = container.down("#activity_results");
         if(node.isLeaf()) resultPane.addClassName('leaf_activity');
@@ -327,13 +329,16 @@ Class.create("NotificationLoader", {
             }});
         var pane = container.up('[ajxpClass="InfoPanel"]');
         fRp._rootNode.observe("loaded", function(){
+            if(!mainContainer.hasClassName("infopanel_loading_finished")){
+                mainContainer.addClassName("infopanel_loading_finished");
+            }
             if(pane && pane.ajxpPaneObject){
                 window.setTimeout(function(){
                     pane.ajxpPaneObject.resize();
                 },0.2);
             }
             if(container.down('#ajxp_activity_panel > div.panelHeader')){
-                if(!fRp._rootNode.getChildren().length){
+                if(!fRp._rootNode.getChildren().size){
                     container.down('#ajxp_activity_panel > div.panelHeader').hide();
                 }else{
                     container.down('#ajxp_activity_panel > div.panelHeader').show();
@@ -347,7 +352,7 @@ Class.create("NotificationLoader", {
 
     },
 
-    loaderTimer: null,
+    loaderTimer: null
 
 });
 

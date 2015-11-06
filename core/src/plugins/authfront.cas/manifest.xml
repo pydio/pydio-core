@@ -38,7 +38,7 @@
                       description="CONF_MESSAGE[Log to file. If null, use yyyy-mm-dd.txt]"/>
 
         <global_param name="PHPCAS_MODE" type="group_switch:casmode" group="CONF_MESSAGE[phpCAS mode]"  label="CONF_MESSAGE[phpCAS mode]"
-                      description="CONF_MESSAGE[In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP]" mandatory="true" />
+                      description="CONF_MESSAGE[In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP]" mandatory="true" default="client" />
         <global_param group_switch_name="casmode" group_switch_label="Client" group_switch_value="client" name="casmode" type="hidden" label="" description="" default="client"/>
         <global_param group_switch_name="casmode" group_switch_label="Proxy"  group_switch_value="proxy"  name="casmode"  type="hidden" label="" description="" default="proxy"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PROXIED_SERVICE_SMB"  type="string" label="CONF_MESSAGE[Proxied Service]"

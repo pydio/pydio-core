@@ -7,7 +7,7 @@
     <server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Wms Server]" description="CONF_MESSAGE[Wms server url]" mandatory="true"/>
 	</server_settings>
-	<client_settings icon="plugins/access.wms/images/world.png">
+	<client_settings icon="plugins/access.wms/images/world.png" description_template="{HOST}" iconClass="icon-globe">
 		<resources>
 			<i18n namespace="wms" path="plugins/access.wms/i18n" />
 			<img_library alias="wms_images" path="plugins/access.wms/images"/>
@@ -112,7 +112,7 @@
 						var context = window.builderContext;
 						context.builderMenuItems = $A([]);
 						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-						var editors = ajaxplorer.findEditorsForMime(selectedMime);
+						var editors = pydio.Registry.findEditorsForMime(selectedMime);
 						if(editors.length){
 							var index = 0;
 							editors.each(function(el){
@@ -142,13 +142,13 @@
 						var editorData = window.actionArguments[0];
 						if(!editorData){
 							var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-							var editors = ajaxplorer.findEditorsForMime(selectedMime);
+							var editors = pydio.Registry.findEditorsForMime(selectedMime);
 							if(editors.length){
 								editorData = editors[0];
 							}
 						}
 						if(editorData){
-							ajaxplorer.loadEditorResources(editorData.resourcesManager);
+							pydio.Registry.loadEditorResources(editorData.resourcesManager);
 							modal.openEditorDialog(editorData);
 						}
 					]]></clientCallback>

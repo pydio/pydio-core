@@ -37,7 +37,7 @@
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientListener name="contextChange"><![CDATA[
-                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading){
+                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading && !window.ajxpMinisite){
                             ajaxplorer.mqObserverLoading = true;
                             ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
                                 ajaxplorer.mqObserver = new AjxpMqObserver();
@@ -52,6 +52,7 @@
                 </processing>
             </action>
             <action name="client_unregister_channel">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
                         <input_param name="channel" type="string" description="Channel to connect to"/>
@@ -61,6 +62,7 @@
                 </processing>
             </action>
             <action name="client_consume_channel">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
                         <input_param name="channel" type="string" description="Channel to connect to"/>

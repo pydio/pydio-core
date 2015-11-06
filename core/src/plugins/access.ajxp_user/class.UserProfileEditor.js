@@ -28,7 +28,7 @@ Class.create("UserProfileEditor", AjxpPane, {
 
         attachMobileScroll(oFormObject.down("#user_profile_form"), "vertical");
 
-        if(ajaxplorer.actionBar.getActionByName('custom_data_edit')){
+        if(pydio.getController().getActionByName('custom_data_edit')){
 
             this._formManager = new FormManager();
             var definitions = this._formManager.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true']");
@@ -47,10 +47,10 @@ Class.create("UserProfileEditor", AjxpPane, {
                 conn.setParameters(params);
                 conn.setMethod("POST");
                 conn.onComplete = function(transport){
-                    ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                    pydio.getController().parseXmlMessage(transport.responseXML);
                     document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
                         if(event.memo != "user/preferences") return;
-                        ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
+                        pydio.Registry.logXmlUser(false);
                     });
                     ajaxplorer.loadXmlRegistry(false, "user/preferences");
                 };
@@ -65,12 +65,12 @@ Class.create("UserProfileEditor", AjxpPane, {
 
         }
 
-        if(ajaxplorer.actionBar.getActionByName('pass_change')){
+        if(pydio.getController().getActionByName('pass_change')){
 
             var chPassButton = new Element('a', {className:''}).update('<span class="icon-key"></span> <span>'+MessageHash[194]+'</span>');
             oFormObject.down('.toolbarGroup').insert(chPassButton);
             chPassButton.observe("click", function(){
-                ajaxplorer.actionBar.getActionByName('pass_change').apply();
+                pydio.getController().getActionByName('pass_change').apply();
             });
 
         }

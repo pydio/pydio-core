@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPSession extends AbstractTest
 {
-    public function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
+    public function __construct() { parent::__construct("PHP Session", "<b>Testing configs</b>"); }
     public function doTest()
     {
         $handler = ini_get("session.save_handler");
@@ -54,4 +54,4 @@ class PHPSession extends AbstractTest
         $this->failedLevel = "info";
         return FALSE;
     }
-};
+}

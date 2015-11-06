@@ -52,15 +52,22 @@ class AJXP_PluginsService
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
             $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
             if (count($reqs)) {
-                foreach ($reqs as $filename) {
-                    if (!is_file($filename)) {
+                foreach ($reqs as $fileName) {
+                    if (!is_file($fileName)) {
                         // Cache is out of sync
                         return false;
                     }
-                    require_once($filename);
+                    require_once($fileName);
                 }
-                $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                $this->registry = $res;
+                $kvCache = ConfService::getInstance()->getKeyValueCache();
+                $test = $kvCache->fetch("plugins_registry");
+                if($test !== FALSE) {
+                    $this->registry = $test;
+                }else{
+                    $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $this->registry = $res;
+                    $kvCache->save("plugins_registry", $res);
+                }
                 // Refresh streamWrapperPlugins
                 foreach ($this->registry as $plugs) {
                     foreach ($plugs as $plugin) {
@@ -161,8 +168,10 @@ class AJXP_PluginsService
         if (!isSet($this->registry[$plugType])) {
             $this->registry[$plugType] = array();
         }
-        $plugin = $this->instanciatePluginClass($plugin);
         $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+        if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
+            $plugin = $this->instanciatePluginClass($plugin);
+        }
         $plugin->loadConfigs($options);
         $this->registry[$plugType][$plugin->getName()] = $plugin;
         $plugin->loadingState = "loaded";
@@ -191,6 +200,8 @@ class AJXP_PluginsService
         @unlink(AJXP_PLUGINS_CACHE_FILE);
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_QUERIES_CACHE);
+        @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+        @unlink(AJXP_PLUGINS_REPOSITORIES_CACHE);
     }
 
     /**
@@ -207,6 +218,9 @@ class AJXP_PluginsService
         // Try to get from cache
         list($type, $name) = explode(".", $pluginId);
         if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+            /**
+             * @var AJXP_Plugin $plugin
+             */
             $plugin = $this->registry[$type][$name];
             $plugin->init($pluginOptions);
             return clone $plugin;
@@ -234,19 +248,22 @@ class AJXP_PluginsService
         $filename = AJXP_INSTALL_PATH."/".$definition["filename"];
         $className = $definition["classname"];
         if (is_file($filename)) {
+            /**
+             * @var AJXP_Plugin $newPlugin
+             */
             require_once($filename);
             $newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
             $newPlugin->loadManifest();
-            $this->required_files[] = $filename;
+            $this->required_files[$filename] = $filename;
             return $newPlugin;
         } else {
             return $plugin;
         }
     }
+
     /**
      * Check that a plugin dependencies are loaded, disable it otherwise.
-     * @param $arrayToSort
-     * @return
+     * @param AJXP_Plugin[] $arrayToSort
      */
     private function checkDependencies(&$arrayToSort)
     {
@@ -297,7 +314,6 @@ class AJXP_PluginsService
 
     public function getOrderByDependency($plugins, $withStatus = true)
     {
-        $orders = array();
         $keys = array();
         $unkowns = array();
         if ($withStatus) {
@@ -388,6 +404,9 @@ class AJXP_PluginsService
      */
     public function initActivePlugins()
     {
+        /**
+         * @var AJXP_Plugin $pObject
+         */
         $detected = $this->getDetectedPlugins();
         $toActivate = array();
         foreach ($detected as $pType => $pObjects) {
@@ -622,16 +641,18 @@ class AJXP_PluginsService
         }
         return $self->xmlRegistry;
     }
+
     /**
      * Replace the current xml registry
      * @static
      * @param $registry
-     * @return void
+     * @param bool $extendedVersion
      */
-    public static function updateXmlRegistry($registry)
+    public static function updateXmlRegistry($registry, $extendedVersion = true)
     {
         $self = self::getInstance();
         $self->xmlRegistry = $registry;
+        $self->registryVersion = ($extendedVersion? "extended" : "light");
     }
 
     /**
@@ -667,6 +688,8 @@ class AJXP_PluginsService
      * @param string $query
      * @param string $stringOrNodeFormat
      * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
+     * @param bool $limitToEnabledPlugins
+     * @param bool $loadExternalFiles
      * @return DOMNode[]
      */
     public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
@@ -746,11 +769,11 @@ class AJXP_PluginsService
             }
         }
     }
+
     /**
      * Utilitary function
      * @param $new
      * @param $old
-     * @return
      */
     protected function mergeChildByTagName($new, &$old)
     {
@@ -772,7 +795,7 @@ class AJXP_PluginsService
                 if ($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing") {
                     $old->appendChild($newChild->cloneNode(true));
                 } else {
-                    $this->mergeChildByTagName($newChild, $found);
+                    $this->mergeChildByTagName($newChild->cloneNode(true), $found);
                 }
             } else {
                 // CloneNode or it's messing with the current foreach loop.

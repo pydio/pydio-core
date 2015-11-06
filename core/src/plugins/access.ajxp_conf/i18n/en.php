@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Configuration Data",
-"2" => "Users & Groups",
+"2" => "People",
 "3" => "Workspaces",
 "4" => "Logs",
 "5" => "Diagnostic",
@@ -41,6 +41,7 @@ $mess=array(
 "20" => "User",
 "21" => "Action",
 "22" => "Params",
+"22a"=> "More info",
 "23" => "Test Name",
 "24" => "Test Data",
 "25" => "Workspaces Access",
@@ -171,4 +172,6 @@ $mess=array(
 "148" => "Hooks Definitions",
 "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
 "150" => "Select a repository",
+"151" => "Root Group",
+"152" => "Root Group Role",
 );

@@ -43,10 +43,10 @@
                         var userSelection = ajaxplorer.getUserSelection();
                         if((userSelection.isUnique() && !userSelection.hasDir()) || multipleFilesDownloadEnabled)
                         {
-                            if(gaTrackEvent){
-                                fileNames = userSelection.getFileNames();
+                            if(window.gaTrackEvent){
+                                var fileNames = userSelection.getFileNames();
                                 for(var i=0; i<fileNames.length;i++){
-                                    gaTrackEvent("Data", "Download", fileNames[i]);
+                                    window.gaTrackEvent("Data", "Download", fileNames[i]);
                                 }
                             }
                             var agent = navigator.userAgent;
@@ -57,7 +57,7 @@
                             }else{
                                 if( !userSelection.isUnique() || userSelection.hasDir() ){
 
-                                    zipName = getBaseName(userSelection.getContextNode().getPath());
+                                    var zipName = getBaseName(userSelection.getContextNode().getPath());
                                     if(zipName == "") zipName = "Archive";
                                     var index=1;
                                     var buff = zipName;
@@ -78,25 +78,13 @@
                                     conn.addParameter("dir", dir);
                                     conn.onComplete = function(transport){
                                         this.parseXmlMessage(transport.responseXML);
-                                    }.bind(ajaxplorer.actionBar) ;
+                                    }.bind(pydio.getController()) ;
                                     conn.sendAsync();
 
                                 }else{
-                                    var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
-                                    val = window.ajxpServerAccessPath.replace(regex, "$1");
-                                    var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
 
-                                    $('download_form').action = window.ajxpServerAccessPath;
-                                    $('download_form').secure_token.value = Connexion.SECURE_TOKEN;
-                                    $('download_form').select("input").each(function(input){
-                                        if(input.name!='get_action' && input.name!='secure_token') input.remove();
-                                        if(input.name=='get_action') input.value = 'download';
-                                    });
-                                    if(minisite_session){
-                                        $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
-                                    }
-                                    userSelection.updateFormOrUrl($('download_form'));
-                                    $('download_form').submit();
+                                    PydioApi.getClient().downloadSelection(userSelection, $('download_form'));
+
                                 }
                             }
                         }
@@ -106,7 +94,7 @@
                                 var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
                                 var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
                                 downloader.triggerEnd = function(){hideLightBox()};
-                                fileNames = userSelection.getFileNames();
+                                var fileNames = userSelection.getFileNames();
                                 for(var i=0; i<fileNames.length;i++)
                                 {
                                     downloader.addListRow(fileNames[i]);

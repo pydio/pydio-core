@@ -37,7 +37,7 @@ function getAjxpMobileActions(){
 		});
 	});
 	act[1].observe('click', function(e){		
-		ajaxplorer.actionBar.fireAction(act[1]._action);
+		pydio.getController().fireAction(act[1]._action);
 		Event.stop(e);
 	});
 	return mobileActions;
@@ -55,7 +55,7 @@ function initAjxpMobileActions(){
 		
 		if(node && node.isLeaf()){
 			//mobileActions.select('a')[1].hide();
-			var editors = ajaxplorer.findEditorsForMime(getAjxpMimeType(node));			
+			var editors = pydio.Registry.findEditorsForMime(getAjxpMimeType(node));
 			if(editors.length){
 				a.show();
 				a._action = "open_with";
@@ -99,7 +99,9 @@ function initAjxpMobileActions(){
 
 document.observe("ajaxplorer:gui_loaded", function(){
 	//initAjxpMobileActions();
+    /*
 	document.addEventListener("touchmove", function(event){
 		event.preventDefault();
 	});
+	*/
 });

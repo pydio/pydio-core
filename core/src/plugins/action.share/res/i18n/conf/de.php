@@ -68,4 +68,6 @@ $mess=array(
 "Minisites only" => "Nur als Miniseite",
 "Workspaces only" => "Nur als Arbeitsumgebung",
 "Disable Folder Sharing" => "Freigabe von Ordnern deaktivieren",
+"Set password mandatory" => "Passwort als Pflichtfeld",
+"Do not allow users to create public links, only private links (password-protected)" => "Es ist nicht mögich, öffentliche Links zu erstellen, sondern nur welche mit Passwortschutz.",
 );

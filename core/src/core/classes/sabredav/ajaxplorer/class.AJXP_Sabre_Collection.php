@@ -153,7 +153,8 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             if ($file == "." || $file == "..") {
                 continue;
             }
-            // This function will perform the is_dir() call and update $isDir variable.
+            // This function will perform the is_dir() call and update $isLeaf variable.
+            $isLeaf = "";
             if (!$this->getAccessDriver()->filterNodeName($this->getUrl(), $file, $isLeaf, array("d"=>true, "f"=>true, "z"=>true))){
                 continue;
             }

@@ -60,10 +60,15 @@ Class.create("HistoryBrowser", {
             title: MessageHash['meta.git.8'],
             callback: this.revertActionCallback.bind(this)
         });
+        this.dlAction.setManager(pydio.Controller);
+        this.openAction.setManager(pydio.Controller);
+        this.revertAction.setManager(pydio.Controller);
+
         this.toolbarObject = new ActionsToolbar(this.toolbar, {
             buttonRenderer : 'this',
             skipBubbling: true,
-            toolbarsList : $A(['history'])
+            toolbarsList : $A(['history']),
+            dataModelElementId: this.element.id
         });
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.revertAction));
         this.toolbar.insert("<div class='separator'></div>");
@@ -74,7 +79,7 @@ Class.create("HistoryBrowser", {
         this.revertAction.show(); this.revertAction.disable();
         this.openAction.show(); this.openAction.disable();
 
-        this.versionsDm = new AjxpDataModel(true);
+        this.versionsDm = new PydioDataModel(true);
         this.versionsRoot = new AjxpNode("/", false, "Versions", "folder.png");
 
         this.versionsDm.observe("selection_changed", function(event){
@@ -186,7 +191,7 @@ Class.create("HistoryBrowser", {
             commit_id   : selectedNode.getMetadata().get("ID")
         }));
         connex.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            pydio.getController().parseXmlMessage(transport.responseXML);
             hideLightBox();
         };
         connex.sendAsync();

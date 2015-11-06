@@ -85,7 +85,7 @@ class AJXP_XMLWriter
      * @param integer $currentPage
      * @param integer $totalPages
      * @param integer $dirsCount
-     * @return void
+     * @param null $remoteSortAttributes
      */
     public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
     {
@@ -96,6 +96,31 @@ class AJXP_XMLWriter
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
         AJXP_XMLWriter::write($string, true);
     }
+
+    /**
+     * Convert an arbitrary list of data (array of associative array) as standard XML list.
+     * @param $data
+     * @param $rootPath
+     * @param $idKey
+     * @param $labelKey
+     */
+    public static function renderSimpleListAsNodes($data, $rootPath, $idKey, $labelKey){
+
+        self::header();
+
+        foreach($data as $item){
+
+            $nodeName = rtrim($rootPath, "/")."/".$item[$idKey];
+            $nodeLabel = $item[$labelKey];
+            $isLeaf = true;
+            $metaData = $item;
+            self::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData);
+
+        }
+
+        self::close();
+    }
+
     /**
      * Prints out the XML headers and preamble, then an open node
      * @static
@@ -193,6 +218,7 @@ class AJXP_XMLWriter
     {
         self::renderNode($array[0],$array[1],$array[2],$array[3]);
     }
+
     /**
      * Error Catcher for PHP errors. Depending on the SERVER_DEBUG config
      * shows the file/line info or not.
@@ -202,7 +228,6 @@ class AJXP_XMLWriter
      * @param $fichier
      * @param $ligne
      * @param $context
-     * @return
      */
     public static function catchError($code, $message, $fichier, $ligne, $context)
     {
@@ -210,7 +235,6 @@ class AJXP_XMLWriter
             return ;
         }
         AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
-        $loggedUser = AuthService::getLoggedUser();
         if (ConfService::getConf("SERVER_DEBUG")) {
             $stack = debug_backtrace();
             $stackLen = count($stack);
@@ -346,13 +370,15 @@ class AJXP_XMLWriter
     /**
      * Send a <reload> XML instruction for refreshing the list
      * @static
-     * @param string $nodePath
-     * @param string $pendingSelection
+     * @param $diffNodes
      * @param bool $print
      * @return string
      */
     public static function writeNodesDiff($diffNodes, $print = false)
     {
+        /**
+         * @var $ajxpNode AJXP_Node
+         */
         $mess = ConfService::getMessages();
         $buffer = "<nodes_diff>";
         if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
@@ -457,6 +483,7 @@ class AJXP_XMLWriter
      */
     public static function writeBookmarks($allBookmarks, $print = true, $format = "legacy")
     {
+        $driver = false;
         if ($format == "node_list") {
             $driver = ConfService::loadRepositoryDriver();
             if (!is_a($driver, "AjxpWrapperProvider")) {
@@ -484,8 +511,12 @@ class AJXP_XMLWriter
                 $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path, true)."\" title=\"".AJXP_Utils::xmlEntities($title, true)."\"/>";
             }
         }
-        if($print) print $buffer;
-        else return $buffer;
+        if($print) {
+            print $buffer;
+            return null;
+        } else {
+            return $buffer;
+        }
     }
     /**
      * Utilitary for generating a <component_config> tag for the FilesList component
@@ -509,8 +540,6 @@ class AJXP_XMLWriter
      */
     public static function sendMessage($logMessage, $errorMessage, $print = true)
     {
-        $messageType = "";
-        $message = "";
         if ($errorMessage == null) {
             $messageType = "SUCCESS";
             $message = AJXP_Utils::xmlContentEntities($logMessage);
@@ -602,12 +631,8 @@ class AJXP_XMLWriter
             AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
         }
 
-        foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
-            $toLast = false;
-            if ($repoObject->getAccessType()=="ajxp_conf") {
-                if(AuthService::usersEnabled() && !$loggedUser->isAdmin())continue;
-                $toLast = true;
-            }
+        $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
+        foreach ($accessible as $repoId => $repoObject) {
             $rightString = "";
             $streamString = "";
             if (in_array($repoObject->accessType, $streams)) {
@@ -622,13 +647,11 @@ class AJXP_XMLWriter
                 $slugString = "repositorySlug=\"$slug\"";
             }
             $isSharedString = "";
-            $ownerLabel = null;
             if ($repoObject->hasOwner()) {
                 $uId = $repoObject->getOwner();
                 $uObject = ConfService::getConfStorageImpl()->createUserObject($uId);
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
                 if(empty($label)) $label = $uId;
-                $ownerLabel = $label;
                 $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
             }
             $descTag = "";
@@ -659,18 +682,13 @@ class AJXP_XMLWriter
                     }
                 }
                 $roleString.='acl="'.$merged->getAcl($repoId).'"';
+                if($merged->hasMask($repoId)){
+                    $roleString.= ' hasMask="true" ';
+                }
             }
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
-            if ($toLast) {
-                $lastString = $xmlString;
-            } else {
-                $st .= $xmlString;
-            }
+            $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
         }
 
-        if (isSet($lastString)) {
-            $st.= $lastString;
-        }
         $st .= "</repositories>";
         return $st;
     }
