@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "BSD-2-Clause",
+  "license": "AGPL-v3",
   "dependencies": {
     "chart.js": "^1.0.2",
     "material-ui": "git://github.com/pydio/material-ui.git#pydio",
