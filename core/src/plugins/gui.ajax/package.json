@@ -3,6 +3,7 @@
   "version": "6.2.0",
   "description": "",
   "main": "index.js",
+  "source_path":"res/js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

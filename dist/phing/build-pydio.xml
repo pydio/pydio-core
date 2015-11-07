@@ -147,9 +147,15 @@
         </phingcall>
 
     	<!-- BUILD JAVASCRIPT -->
+        <!--
     	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
         <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
 	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
+	    -->
+        <phingcall target="iterate-plugins">
+            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+            <property name="target" value="grunt"/>
+        </phingcall>
 
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
@@ -181,6 +187,15 @@
         	<property name="passed_directory" value="${upgrade_export}"/>
         </phingcall>
 
+
+        <phingcall target="iterate-plugins">
+            <property name="plugin_dir" value="${local_repository_root}/core/src/plugins"/>
+            <property name="upgrade_export" value="${upgrade_export}"/>
+            <property name="local_repository_root" value="${git.local_repository}/core/src"/>
+            <property name="target" value="force-update-if-package-json"/>
+        </phingcall>
+
+        <!--
         <if>
             <available type="dir" file="${upgrade_export}/plugins/gui.ajax"/>
             <then>
@@ -193,6 +208,7 @@
                 </copy>
             </then>
         </if>
+        -->
 
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
@@ -498,6 +514,79 @@
 		</if>
 
     </target>
+
+    <target name="iterate-plugins">
+        <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
+            <fileset dir="${plugins_dir}">
+                <include name="*"/>
+            </fileset>
+        </foreach>
+    </target>
+
+    <adhoc-task name="read-package-json"><![CDATA[
+        class PackageJsonLoader extends Task{
+            private $file;
+            private $output;
+            function setFile($file){
+                $this->file = $file;
+            }
+            function main(){
+                $content = file_get_contents($this->file);
+                $data = json_decode($content, true);
+                if(isSet($data["source_path"])){
+                    $this->project->setProperty('js_source_path', $data["source_path"]);
+                }else{
+                    $this->project->setProperty('js_source_path', '__NOT_FOUND__');
+                }
+            }
+        }
+    ]]></adhoc-task>
+
+    <!-- We should have a ${local_repository_root} and ${upgrade_export} from upper scope -->
+    <target name="force-update-if-package-json">
+        <if>
+            <available file="${plugin_abs_dir}/package.json"/>
+            <then>
+                <read-package-json file="${plugin_abs_dir}/package.json"/>
+                <if>
+                    <not><equals arg1="${js_source_path}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <if>
+                            <available type="dir" file="${upgrade_export}/plugins/${plugin}/${js_source_path}"/>
+                            <then>
+                                <echo message="REBUILD JS FOR PLUGIN ${plugin}"/>
+                                <copy todir="${upgrade_export}/plugins/${plugin}/${js_source_path}">
+                                    <fileset dir="${local_repository_root}/plugins/${plugin}/${js_source_path}" defaultexcludes="false">
+                                        <include name="*/**"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${upgrade_export}/plugins/${plugin}">
+                                    <fileset dir="${local_repository_root}/plugins/${plugin}">
+                                        <include name="Gruntfile.js"/>
+                                        <include name="package.json"/>
+                                    </fileset>
+                                </copy>
+                                <phingcall target="grunt">
+                                    <property name="${plugin_abs_dir}" value="${upgrade_export}/plugins/${plugin}"/>
+                                </phingcall>
+                            </then>
+                        </if>
+
+                    </then>
+                </if>
+            </then>
+        </if>
+
+    </target>
+
+    <target name="grunt">
+        <!-- BUILD JAVASCRIPT -->
+        <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
+        <exec command="grunt" dir="${plugin_abs_dir}" passthru="true"/>
+        <delete dir="${plugin_abs_dir}/node_modules"/>
+
+    </target>
+
 
     <target name="clean" description="Clean all working folders">
         <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
