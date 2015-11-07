@@ -189,7 +189,7 @@
 
 
         <phingcall target="iterate-plugins">
-            <property name="plugin_dir" value="${local_repository_root}/core/src/plugins"/>
+            <property name="plugins_dir" value="${git.local_repository}/core/src/plugins"/>
             <property name="upgrade_export" value="${upgrade_export}"/>
             <property name="local_repository_root" value="${git.local_repository}/core/src"/>
             <property name="target" value="force-update-if-package-json"/>
