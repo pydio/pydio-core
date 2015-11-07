@@ -567,7 +567,7 @@
                                     </fileset>
                                 </copy>
                                 <phingcall target="grunt">
-                                    <property name="${plugin_abs_dir}" value="${upgrade_export}/plugins/${plugin}"/>
+                                    <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
                                 </phingcall>
                             </then>
                         </if>
