@@ -195,21 +195,6 @@
             <property name="target" value="force-update-if-package-json"/>
         </phingcall>
 
-        <!--
-        <if>
-            <available type="dir" file="${upgrade_export}/plugins/gui.ajax"/>
-            <then>
-                <echo message="Copying full gui.ajax folder" level="info"/>
-                <property name="new_package_name" value="${build.source_folder}/pydio-core-${build.version}"/>
-                <copy todir="${upgrade_export}/plugins/gui.ajax">
-                    <fileset dir="${new_package_name}/plugins/gui.ajax" defaultexcludes="false">
-                        <include name="*/**"/>
-                    </fileset>
-                </copy>
-            </then>
-        </if>
-        -->
-
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
 		<copy file="${git.local_repository}/core/src/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
@@ -591,11 +576,11 @@
         </if>
     </target>
 
-
     <target name="clean" description="Clean all working folders">
         <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
+
     <target name="delete_me">
         <if>
             <available file="${filename}"/>
