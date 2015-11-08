@@ -574,17 +574,26 @@
     </target>
 
     <target name="ftp_deploy" description="Generic FTP deployment">
-                               <scp
-                                        username="${scp.username}"
-                                        password="${scp.password}"
-                                        host="${scp.host}"
-					port="${scp.port}"
-                                        todir="${remote_folder}">
-                                    <fileset dir="${base_folder}">
-                                        <include name="*.zip" />
-					<include name="*.tar.gz"/>
-                                    </fileset>
-                                </scp>
+        <if>
+            <equals arg1="${scp.password}" arg2="__LOCAL_KEY__"/>
+            <then>
+                <echo message="Sending ${base_folder} zips to ${scp.host}:${remote_folder}"/>
+                <exec command="scp -p ${scp.port} *.zip *.tar.gz ${scp.username}@${scp.host}:${remote_folder}" dir="${base_folder}" passthru="true"/>
+            </then>
+            <else>
+                <scp
+                        username="${scp.username}"
+                        password="${scp.password}"
+                        host="${scp.host}"
+                        port="${scp.port}"
+                        todir="${remote_folder}">
+                    <fileset dir="${base_folder}">
+                        <include name="*.zip" />
+                        <include name="*.tar.gz"/>
+                    </fileset>
+                </scp>
+            </else>
+        </if>
 <!--
         <ftpdeploy
           host="${ftp.host}"
