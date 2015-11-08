@@ -72,7 +72,7 @@
         </phingcall>
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/plugins"/>
-            <property name="remote_folder" value="${scp.dir}/plugins"/>
+            <property name="remote_folder" value="${scp.plugins_dir}"/>
         </phingcall>
     </target>
 
@@ -578,7 +578,7 @@
             <equals arg1="${scp.password}" arg2="__LOCAL_KEY__"/>
             <then>
                 <echo message="Sending ${base_folder} zips to ${scp.host}:${remote_folder}"/>
-                <exec command="scp -p ${scp.port} *.zip *.tar.gz ${scp.username}@${scp.host}:${remote_folder}" dir="${base_folder}" passthru="true"/>
+                <exec command="scp -P ${scp.port} *.zip *.tar.gz ${scp.username}@${scp.host}:${remote_folder}" dir="${base_folder}" passthru="true"/>
             </then>
             <else>
                 <scp
