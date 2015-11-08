@@ -484,25 +484,6 @@
         </foreach>
     </target>
 
-    <adhoc-task name="read-package-json"><![CDATA[
-        class PackageJsonLoader extends Task{
-            private $file;
-            private $output;
-            function setFile($file){
-                $this->file = $file;
-            }
-            function main(){
-                $content = file_get_contents($this->file);
-                $data = json_decode($content, true);
-                if(isSet($data["source_path"])){
-                    $this->project->setProperty('js_source_path', $data["source_path"]);
-                }else{
-                    $this->project->setProperty('js_source_path', '__NOT_FOUND__');
-                }
-            }
-        }
-    ]]></adhoc-task>
-
     <!-- We should have a ${local_repository_root} and ${upgrade_export} from upper scope -->
     <target name="force-update-if-package-json">
         <if>
