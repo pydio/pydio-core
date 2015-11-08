@@ -49,6 +49,11 @@ class PydioGitSummarizeTask extends GitBaseTask
 
     }
 
+    public function setRepository($repository)
+    {
+        parent::setRepository($repository);
+    }
+
     public function setCommit1($revision)
     {
         $this->commit1 = $revision;
