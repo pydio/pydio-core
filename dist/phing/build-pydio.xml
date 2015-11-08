@@ -4,18 +4,13 @@
             schematypens="http://relaxng.org/ns/structure/1.0" ?>
 <project name="Pydio" default="build">
 
+    <import file="adhoctasks.xml"/>
     <property file="build-pydio.properties"/>
     <property name="env" value="testing"/>
     <property name="skip_deploy" value="false"/>
     <property name="build_linux" value="false"/>
     <property name="build_channel" value="testing"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
-    <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
-    <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
-    <taskdef classname="lib.AjxpSvnSummarizeTask" name="svn_summarize"/>
-    <taskdef classname="lib.AjxpGitSummarizeTask" name="git_summarize"/>
-    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_diff_summarize"/>
-
 
     <target name="build" description="Main sequence">
         <if>
@@ -159,7 +154,7 @@
 
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
-        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>
+        <pydio-plugins-discriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>
     </target>
 
     <target name="prepare_upgrade" description="Building upgrade package" depends="prepare_git">
@@ -170,14 +165,14 @@
     	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/pydio-core-upgrade-${previous_version}-${build.version}"/>
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
-    	<git_summarize
+    	<pydio-git-summarize
     	 commit1="${previous_tag}"
     	 commit2="${LASTREVISION}"
-    	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 summarizeFile="${build.working_folder}/upgrade/git_summarize_core"
     	 repository="${git.local_repository}"
     	 />
-    	 <parse_diff_summarize
-    	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 <pydio-parse-git-summarize
+    	 	summarizeFile="${build.working_folder}/upgrade/git_summarize_core"
     	 	sourceDir="${git.local_repository}"
     	 	prefixPath="core/src"
     	 	upgradeDir="${upgrade_export}"
@@ -264,15 +259,7 @@
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
-        <if>
-        	<available type="dir" file="${svn.local_folder}"/>
-        	<then>
-		        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
-        	</then>
-        	<else>
-		        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
-        	</else>
-        </if>
+        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
         <if>
         	<equals arg1="${env}" arg2="testing"/>
         	<then>
@@ -363,25 +350,14 @@
 		<mkdir dir="${build.working_folder}/deb"/>
 		<mkdir dir="${build.working_folder}/deb/builddeb"/>
 
-        <if>
-            <available type="dir" file="${svn.local_folder}"/>
-            <then>
-                <svncheckout
-                        revision="HEAD"
-                        repositoryurl="${svn.repository_url}${svn.dist_root}"
-                        todir="${build.working_folder}/dist"
-                        />
-            </then>
-            <else>
-                <copy todir="${build.working_folder}/dist">
-                    <fileset dir="${git.local_repository}/dist" defaultexcludes="false">
-                        <include name="**/*"/>
-                        <exclude name=".gitignore"/>
-                    </fileset>
-                </copy>
-                <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
-            </else>
-        </if>
+        <!-- Extract Last Revision -->
+        <copy todir="${build.working_folder}/dist">
+            <fileset dir="${git.local_repository}/dist" defaultexcludes="false">
+                <include name="**/*"/>
+                <exclude name=".gitignore"/>
+            </fileset>
+        </copy>
+        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
 
         <if>
             <equals arg1="${build_channel}" arg2="stable"/>
@@ -532,7 +508,7 @@
         <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
-                <read-package-json file="${plugin_abs_dir}/package.json"/>
+                <pydio-read-package-json file="${plugin_abs_dir}/package.json"/>
                 <if>
                     <not><equals arg1="${js_source_path}" arg2="__NOT_FOUND__"/></not>
                     <then>
@@ -577,7 +553,7 @@
     </target>
 
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
+        <foreach list="${build.source_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
 
