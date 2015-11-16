@@ -149,6 +149,103 @@ class BootConfLoader extends AbstractConfDriver
         $data = array();
         AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "");
 
+        list($newConfigPlugin, $newAuthPlugin) = $this->createBootstrapConf($data);
+
+        $this->feedPluginsOptions($newConfigPlugin, $data);
+
+        ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin);
+        $this->createUsers($data);
+
+        $this->setAdditionalData($data);
+        $htContent = null;
+        $htAccessToUpdate = $this->updateHtAccess($data, $htContent);
+        $this->sendInstallResult($htAccessToUpdate, $htContent);
+
+    }
+
+    /**
+     * Send output to the user.
+     * @param String $htAccessToUpdate file path
+     * @param String $htContent file content
+     */
+    public function sendInstallResult($htAccessToUpdate, $htContent){
+        ConfService::clearAllCaches();
+        AJXP_Utils::setApplicationFirstRunPassed();
+
+        if($htAccessToUpdate != null){
+            HTMLWriter::charsetHeader("application/json");
+            echo json_encode(array('file' => $htAccessToUpdate, 'content' => $htContent));
+        }else{
+            session_destroy();
+            HTMLWriter::charsetHeader("text/plain");
+            echo 'OK';
+        }
+
+    }
+
+    /**
+     * Non-impacting operations
+     * @param array $data Installer parsed form result
+     * @throws Exception
+     */
+    public function setAdditionalData($data){
+        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding())){
+            file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
+        }
+    }
+
+    /**
+     * Update the plugins parameters. OptionsLinks can be an array associating keys of $data
+     * to pluginID/plugin_parameter_name
+     *
+     * @param AbstractConfDriver $confDriver
+     * @param array $data
+     * @param null|array $optionsLinks
+     */
+    public function feedPluginsOptions($confDriver, $data, $optionsLinks = null){
+
+        if(isSet($optionsLinks)){
+            $direct = $optionsLinks;
+        }else{
+            $data["ENABLE_NOTIF"] = true;
+            // Prepare plugins configs
+            $direct = array(
+                "APPLICATION_TITLE" => "core.ajaxplorer/APPLICATION_TITLE",
+                "APPLICATION_LANGUAGE" => "core.ajaxplorer/DEFAULT_LANGUAGE",
+                "ENABLE_NOTIF"      => "core.notifications/USER_EVENTS",
+                "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
+            );
+            $mailerEnabled = $data["MAILER_ENABLE"]["status"];
+            if ($mailerEnabled == "yes") {
+                // Enable core.mailer
+                $data["MAILER_SYSTEM"] = $data["MAILER_ENABLE"]["MAILER_SYSTEM"];
+                $data["MAILER_ADMIN"] = $data["MAILER_ENABLE"]["MAILER_ADMIN"];
+                $direct = array_merge($direct, array(
+                    "MAILER_SYSTEM" => "mailer.phpmailer-lite/MAILER",
+                    "MAILER_ADMIN" => "core.mailer/FROM",
+                ));
+            }
+        }
+
+        foreach ($direct as $key => $value) {
+            list($pluginId, $param) = explode("/", $value);
+            $options = array();
+            $confDriver->_loadPluginConfig($pluginId, $options);
+            $options[$param] = $data[$key];
+            $confDriver->_savePluginConfig($pluginId, $options);
+        }
+
+
+    }
+
+    /**
+     * Create or update the bootstrap json file.
+     * @param Array $data Parsed result of the installer form
+     * @return array 2 entries array containing the new Conf Driver (0) and Auth Driver (1)
+     * @throws Exception
+     */
+    public function createBootstrapConf($data){
+
         // Create a custom bootstrap.json file
         $coreConf = array(); $coreAuth = array();
         $this->_loadPluginConfig("core.conf", $coreConf);
@@ -204,10 +301,38 @@ class BootConfLoader extends AbstractConfDriver
         $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
 
-        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding())){
-            file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
+        $sqlPlugs = array(
+            "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
+            "core.log/UNIQUE_PLUGIN_INSTANCE" => "log.sql",
+            "core.mq/UNIQUE_MS_INSTANCE" => "mq.sql"
+        );
+        foreach ($sqlPlugs as $core => $value) {
+            list($pluginId, $param) = explode("/",$core);
+            $options = array();
+            $newConfigPlugin->_loadPluginConfig($pluginId, $options);
+            $options[$param] = array(
+                "instance_name"=> $value,
+                "group_switch_value"=> $value,
+                "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+            );
+            $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
+        return array($newConfigPlugin, $newAuthPlugin);
+    }
+
+    /**
+     * Tries to detect if the .htaccess file needs updating. If so, returns the path to this file
+     * and feed the $htContent with target data. That way it can be sent to the users to tell him
+     * how to update the content.
+     *
+     * @param $data
+     * @param $htContent
+     * @return null|string
+     */
+    public function updateHtAccess($data, &$htContent){
+
+        $htAccessToUpdate = null;
         $tpl = file_get_contents($this->getBaseDir()."/htaccess.tpl");
         if(!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/"){
             $htContent = str_replace('${APPLICATION_ROOT}', $data["SERVER_URI"], $tpl);
@@ -223,66 +348,30 @@ class BootConfLoader extends AbstractConfDriver
                 $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
             }
         }
+        return $htAccessToUpdate;
 
-        $sqlPlugs = array(
-            "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
-            "core.log/UNIQUE_PLUGIN_INSTANCE" => "log.sql",
-            "core.mq/UNIQUE_MS_INSTANCE" => "mq.sql"
-        );
-        $data["ENABLE_NOTIF"] = true;
+    }
 
-
-        // Prepare plugins configs
-        $direct = array(
-            "APPLICATION_TITLE" => "core.ajaxplorer/APPLICATION_TITLE",
-            "APPLICATION_LANGUAGE" => "core.ajaxplorer/DEFAULT_LANGUAGE",
-            "ENABLE_NOTIF"      => "core.notifications/USER_EVENTS",
-            "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
-        );
-        $mailerEnabled = $data["MAILER_ENABLE"]["status"];
-        if ($mailerEnabled == "yes") {
-            // Enable core.mailer
-            $data["MAILER_SYSTEM"] = $data["MAILER_ENABLE"]["MAILER_SYSTEM"];
-            $data["MAILER_ADMIN"] = $data["MAILER_ENABLE"]["MAILER_ADMIN"];
-            $direct = array_merge($direct, array(
-                "MAILER_SYSTEM" => "mailer.phpmailer-lite/MAILER",
-                "MAILER_ADMIN" => "core.mailer/FROM",
-            ));
-        }
-
-        foreach ($direct as $key => $value) {
-            list($pluginId, $param) = explode("/", $value);
-            $options = array();
-            $newConfigPlugin->_loadPluginConfig($pluginId, $options);
-            $options[$param] = $data[$key];
-            $newConfigPlugin->_savePluginConfig($pluginId, $options);
-        }
-
-        if (isSet($sqlPlugs)) {
-            foreach ($sqlPlugs as $core => $value) {
-                list($pluginId, $param) = explode("/",$core);
-                $options = array();
-                $newConfigPlugin->_loadPluginConfig($pluginId, $options);
-                $options[$param] = array(
-                    "instance_name"=> $value,
-                    "group_switch_value"=> $value,
-                    "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
-                );
-                $newConfigPlugin->_savePluginConfig($pluginId, $options);
-            }
-        }
-
-
-        ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin);
+    /**
+     * Create the users based on the installer form results.
+     * @param array $data Parsed form results
+     * @param bool $loginIsEmail Whether to use the login as primary email.
+     * @throws Exception
+     */
+    public function createUsers($data, $loginIsEmail = false){
+        $newConfigPlugin = ConfService::getConfStorageImpl();
         require_once($newConfigPlugin->getUserClassFileName());
 
         $adminLogin = AJXP_Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
-        $adminPass2 = $data["ADMIN_USER_PASS2"];
         AuthService::createUser($adminLogin, $adminPass, true);
         $uObj = $newConfigPlugin->createUserObject($adminLogin);
-        if(isSet($data["MAILER_ADMIN"])) $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
+        if($loginIsEmail){
+            $uObj->personalRole->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
+        }else if(isSet($data["MAILER_ADMIN"])) {
+            $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
+        }
         $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
         $repos = ConfService::getRepositoriesList("all", false);
         foreach($repos as $repo){
@@ -294,7 +383,6 @@ class BootConfLoader extends AbstractConfDriver
         $i = 0;
         while (isSet($data[$loginP]) && !empty($data[$loginP])) {
             $pass  = $data[str_replace("_LOGIN", "_PASS",  $loginP)];
-            $pass2 = $data[str_replace("_LOGIN", "_PASS2", $loginP)];
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
             $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
             $saniLogin = AJXP_Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
@@ -307,21 +395,15 @@ class BootConfLoader extends AbstractConfDriver
             $loginP = "USER_LOGIN_".$i;
         }
 
-
-        ConfService::clearAllCaches();
-        AJXP_Utils::setApplicationFirstRunPassed();
-
-        if(isSet($htAccessToUpdate)){
-            HTMLWriter::charsetHeader("application/json");
-            echo json_encode(array('file' => $htAccessToUpdate, 'content' => $htContent));
-        }else{
-            session_destroy();
-            HTMLWriter::charsetHeader("text/plain");
-            echo 'OK';
-        }
-
     }
 
+    /**
+     * Helpers to test SQL connection and send a test email.
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @throws Exception
+     */
     public function testConnexions($action, $httpVars, $fileVars)
     {
         $data = array();

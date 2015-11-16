@@ -1432,9 +1432,13 @@ div.tabbed_editor div.innerTitle{
     width: 98%;
 }
 
-.dialogContent div.SF_material .SF_failed{
+.dialogContent div.SF_material input.SF_failed{
     border: 0 !important;
-    border-bottom: 1px solid #D8B0B0 !important;
+    border-bottom: 1px solid #CF4747 !important;
+}
+
+.dialogContent div.SF_material div.SF_input.SF_inlineButton.disabled{
+    opacity: 0.5;
 }
 
 /****************

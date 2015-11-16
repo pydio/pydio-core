@@ -1956,6 +1956,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $pInstNode->setAttribute("type", "group_switch:".$fieldName);
                     $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
                     foreach ($typePlugs as $typePlug) {
+                        if(!$typePlug->isEnabled()) continue;
                         if($typePlug->getId() == "auth.multi") continue;
                         $checkErrorMessage = "";
                         try {
@@ -2062,10 +2063,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $options = array();
                 $this->parseParameters($httpVars, $options, null, true);
                 $confStorage = ConfService::getConfStorageImpl();
-                list($pType, $pName) = explode(".", $httpVars["plugin_id"]);
+                $pluginId = AJXP_Utils::sanitize($httpVars["plugin_id"], AJXP_SANITIZE_ALPHANUM);
+                list($pType, $pName) = explode(".", $pluginId);
                 $existing = $confStorage->loadPluginConfig($pType, $pName);
                 $this->mergeExistingParameters($options, $existing);
-                $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+                $confStorage->savePluginConfig($pluginId, $options);
                 ConfService::clearAllCaches();
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
@@ -2286,8 +2288,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
-
-        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1){
+        $groupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1 && !$groupAdmin){
             $nodeKey = "/data/".$root."/";
             $meta = array(
                 "icon" => "users-folder.png",

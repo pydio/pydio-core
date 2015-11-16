@@ -74,7 +74,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 $userGroup,
                 ($repositoryScope !== false ? $repositoryScope : "ALL"),
                 serialize($data),
-                ($node!=null ? $node->getUrl():'')
+                ($node!=null ? SystemTextEncoding::toUTF8($node->getUrl()):'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist event", $e->getMessage());
@@ -192,7 +192,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 $userId,
                 $repositoryId,
                 serialize($notif),
-                ($notif->getNode()!=null ? $notif->getNode()->getUrl():'')
+                ($notif->getNode()!=null ? SystemTextEncoding::toUTF8($notif->getNode()->getUrl()):'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist alert", $e->getMessage());

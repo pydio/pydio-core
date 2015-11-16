@@ -3,11 +3,12 @@
   "version": "6.2.0",
   "description": "",
   "main": "index.js",
+  "source_path":"res/js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "BSD-2-Clause",
+  "license": "AGPL-v3",
   "dependencies": {
     "chart.js": "^1.0.2",
     "material-ui": "git://github.com/pydio/material-ui.git#pydio",
@@ -15,7 +16,6 @@
     "react-chartjs": "git://github.com/dehbmarques/react-chartjs.git#master",
     "react-grid-layout": "^0.8.5",
     "react-infinite": "^0.3.4",
-    "react-tap-event-plugin": "^0.1.7",
     "reactify": "^1.1.1",
     "react-select": "^0.6.5",
     "react-dnd": "^1.1.5",

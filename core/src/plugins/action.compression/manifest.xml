@@ -53,7 +53,11 @@
                                 }
                                 var archiveExtension = archiveTypeSelect.getValue();
                                 if (userSelection.isUnique()) {
-                                    archive_name = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
+                                    if (userSelection.getUniqueNode().isLeaf() == true) {
+                                        archive_name = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
+                                    } else {
+                                        archive_name = getBaseName(userSelection.getUniqueFileName());
+                                    }
                                 } else if (crtDir.length == 1) {
                                     archive_name = "Archive";
                                 } else {

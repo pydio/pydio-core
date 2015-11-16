@@ -58,6 +58,18 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             dibi::connect($this->sqlDriver);
+            if(AJXP_SERVER_DEBUG && AJXP_VERSION_DB != "##DB_VERSION##"){
+                $res = dibi::query("select MAX(db_build) from [ajxp_version]");
+                if(!empty($res)){
+                    $dbVersion = intval($res->fetchSingle());
+                    $current = intval(AJXP_VERSION_DB);
+                    if($dbVersion > 0 && $dbVersion < $current){
+                        // We need to upgrade now!
+                        error_log("[Pydio] DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
+                        $this->logError("[DB]", "DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
+                    }
+                }
+            }
         } catch (DibiException $e) {
             //throw $e;
             echo get_class($e), ': ', $e->getMessage(), "\n";

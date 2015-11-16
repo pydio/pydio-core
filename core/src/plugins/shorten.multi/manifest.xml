@@ -10,7 +10,7 @@
         </resources>
     </client_settings>
     <server_settings>
-		<global_param name="SHORTEN_TYPE" type="group_switch:shorten_type" label="CONF_MESSAGE[Shorten type]" description="CONF_MESSAGE[Shorten type]" mandatory="true"/>
+		<global_param name="SHORTEN_TYPE" type="group_switch:shorten_type" label="CONF_MESSAGE[Shorten type]" description="CONF_MESSAGE[Shorten type]" mandatory="true" default="0"/>
         <global_param group_switch_name="shorten_type" group_switch_label="adF.ly" group_switch_value="adF.ly" name="shorten_type" type="hidden" label="" description="" mandatory="false" default="0"/>
         <global_param group_switch_name="shorten_type" group_switch_label="adF.ly" group_switch_value="adF.ly" name="ADFLY_UID" type="string" label="CONF_MESSAGE[User ID]" description="CONF_MESSAGE[adF.ly account user ID. The numbers after -= ?id= =- in of your referral program's URL]" mandatory="false"/>
         <global_param group_switch_name="shorten_type" group_switch_label="adF.ly" group_switch_value="adF.ly" name="ADFLY_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[adF.ly account API Key]" mandatory="false"/>

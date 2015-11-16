@@ -64,11 +64,13 @@ class UpdateController extends AJXP_Plugin
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
-        if (!empty($this->pluginConf["PROXY_HOST"])) {
+        if (!empty($this->pluginConf["PROXY_HOST"]) || !empty($this->pluginConf["UPDATE_SITE_USER"])) {
             AjaXplorerUpgrader::configureProxy(
                 $this->pluginConf["PROXY_HOST"],
                 $this->pluginConf["PROXY_USER"],
-                $this->pluginConf["PROXY_PASS"]
+                $this->pluginConf["PROXY_PASS"],
+                $this->pluginConf["UPDATE_SITE_USER"],
+                $this->pluginConf["UPDATE_SITE_PASS"]
             );
         }
 
@@ -88,6 +90,19 @@ class UpdateController extends AJXP_Plugin
 
             break;
 
+            case "display_upgrade_note":
+
+                $url = $httpVars["url"];
+                $context = AjaXplorerUpgrader::getContext();
+                if($context != null){
+                    $content = file_get_contents($url, null, $context);
+                }else{
+                    $content = file_get_contents($url);
+                }
+                echo $content;
+
+            break;
+
             case "test_upgrade_scripts":
 
                 if(!AJXP_SERVER_DEBUG
@@ -104,7 +119,13 @@ class UpdateController extends AJXP_Plugin
 
                 AJXP_Utils::safeIniSet("output_buffering", "Off");
                 if (AJXP_PACKAGING != "zip") {
-                    print "Your installation is managed directly via os packages, you should not upgrade manually.";
+                    $lang = ConfService::getLanguage();
+                    $file = $this->getBaseDir()."/howto/linux_en.html";
+                    if($lang != "en" && is_file($this->getBaseDir()."/howto/linux_$lang.html")){
+                        $file = $this->getBaseDir()."/howto/linux_$lang.html";
+                    }
+                    $content = file_get_contents($file);
+                    print $content;
                     break;
                 }
                 $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);

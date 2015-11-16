@@ -3,7 +3,7 @@
 
     <h2>Pydio 6.0.8 - Security Update & Bug Fixes</h2>
 
-    [06.26.2015] Pydio 6.0.8 is another security update fixing XSS vulnerabilities discovered by Lane Thames and William Sörderberg. It also fixes various issues with indexation, sorting, and reverts some changes from previous version.
+    [06.26.2015] Pydio 6.0.8 is another security update fixing XSS vulnerabilities discovered by Lane Thames and William Sörderberg. It also fixes various issues with indexation, sorting, and reverts some problematic changes from previous version.
     <br/>Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
     <br/>Contributors: cdujeu, Lane Thames, William Sörderberg, c12simple, DepaMarco, FireFoxIXI, Sandoracs
 
@@ -55,5 +55,12 @@
         <li>Catch Zip decompression errors. (<a href="http://github.com/pydio/pydio-core/commit/b5dc409b99cda08e23cf919cb9e3c3e6c4832653">details</a>)</li>
         <li>Fix workspaces securityScope() for templates that predefine a Path (or Container) value. (<a href="http://github.com/pydio/pydio-core/commit/894fdae51f724d1406368f57f7edb30aec1d55b9">details</a>)</li>
         <li>Make sure to not propagate a share event to a workspace parent if it's a template. (<a href="http://github.com/pydio/pydio-core/commit/baaf59f5bb03133a29ea6e2aefeafe7434ce4fb8">details</a>)</li>
+        <li>Make sure to use ConfService::listRepositoriesWithCriteria() instead of directly conf storage implementation, otherwise the hardcode workspaces/templates may be missing. (<a href="http://github.com/pydio/pydio-core/commit/773423cdedfe868f88831a45f4c9077f95429c19">details</a>)</li>
+        <li>Follow-up for filename encoding for attachment headers and IE. (<a href="http://github.com/pydio/pydio-core/commit/c8b12e1fdca2df0ac19772a75b356d3474b562d0">details</a>)</li>
+        <li>Make sure to never call getRepositoriesList() on "user" scope before the user is actually logged, otherwise it caches an incomplete list (e.g. in updateDefaultRights). Fixes incomplete list in sync client sometime, and make fix some issues with default rights as well. (<a href="http://github.com/pydio/pydio-core/commit/fc354f467ce431d1d19ca944fe3db52579ae4270">details</a>)</li>
+        <li>Reorder attributes (<a href="http://github.com/pydio/pydio-core/commit/809451f132d537ac5ed9c3a3af4d27fac7cfcb3e">details</a>)</li>
+        <li>Detect if Download URL contains a full URL or just an URI. In latter case, concatenate current server host (without URI) and URI. (<a href="http://github.com/pydio/pydio-core/commit/d4761fe822752ceff183ea22663c2f2b9bfc6b78">details</a>)</li>
+        <li>RPM: set PUBLIC_DOWNLOAD_URL to /pydio_public by default (<a href="http://github.com/pydio/pydio-core/commit/e265d403a9d3c1383b9ea6d7db2ff1e1c82f2b5e">details</a>)</li>
+        <li>Make sure to use (<a href="http://github.com/pydio/pydio-core/commit/4e4119b83525d64bf9a54fa8f0c256b4e3d33315">details</a>)</li>
     </ul>
 </div>

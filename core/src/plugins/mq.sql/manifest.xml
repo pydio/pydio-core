@@ -9,7 +9,7 @@
     </client_settings>
     <server_settings>
         <param description="CONF_MESSAGE[SQL Connexion Parameters]" label="CONF_MESSAGE[SQL Driver]" name="SQL_DRIVER"
-                      type="group_switch:dibi" mandatory="true"/>
+                      type="group_switch:dibi" mandatory="true" default="core"/>
         <param type="button" name="INSTALL_SQL" choices="run_plugin_action:mq.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
     </server_settings>
 </ajxp_plugin>

@@ -59,7 +59,10 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $private = $data["PRIVATE"];
         $explode = explode("?", $_SERVER["REQUEST_URI"]);
         $server_uri = rtrim(array_shift($explode), "/");
-        $server_uri = implode("/", array_map("rawurlencode", array_map("urldecode", explode("/", $server_uri))));
+        $decoded = array_map("urldecode", explode("/", $server_uri));
+        $decoded = array_map(array("SystemTextEncoding", "toUTF8"), $decoded);
+        $decoded = array_map("rawurlencode", $decoded);
+        $server_uri = implode("/", $decoded);
         $server_uri = str_replace("~", "%7E", $server_uri);
         //$this->logDebug(__FUNCTION__, "Decoded URI is ".$server_uri);
         list($nonce, $hash) = explode(":", $this->detectVar($httpVars, "auth_hash"));
