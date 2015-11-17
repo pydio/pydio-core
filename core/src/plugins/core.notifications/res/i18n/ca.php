@@ -17,17 +17,19 @@
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
 * The latest code can be found at <http://pyd.io/>.
+*
+* 
 */
 $mess=array(
-"1" => "Notificaciones",
-"2" => "Fuente de Notificaciones",
-"3" => "Alertas",
-"4" => "Notificaciones",
-"5" => "Todos los Eventos",
-"6" => "Ir a ...",
-"7" => "Omitir",
-"8" => "No hay alertas",
-"9" => "Actividad del repositorio",
-"10" => "Actividad de la carpeta",
-"11" => "Actividad del archivo",
+"1" => "Notificacions",
+"2" => "Font de notificacions",
+"3" => "Alertes",
+"4" => "Notificacions",
+"5" => "Tots els events",
+"6" => "Anar a ...",
+"7" => "Ometre",
+"8" => "No hi ha alertes",
+"9" => "Activitat del repositori",
+"10" => "Activitat de la carpeta",
+"11" => "Activitat de l'arxiu",
 );

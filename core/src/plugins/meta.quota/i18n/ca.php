@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2012 Charles du Jeu <contact (at) cdujeu.me>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,15 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Notificaciones",
-"2" => "Fuente de Notificaciones",
-"3" => "Alertas",
-"4" => "Notificaciones",
-"5" => "Todos los Eventos",
-"6" => "Ir a ...",
-"7" => "Omitir",
-"8" => "No hay alertas",
-"9" => "Actividad del repositorio",
-"10" => "Actividad de la carpeta",
-"11" => "Actividad del archivo",
+"1" => "Ús de la quota (carregant...)",
+"2" => "Clic per recarregar l'ús de la quota",
+"3" => "Està excedint la seva quota",
+"4" => "Ús de la quota",
 );

@@ -20,14 +20,14 @@
  */
 
 $mess = array(
-    "1" => "Indexar contenido",
-    "2" => "Indexar el contenido de la carpeta",
-    "3" => "Ejecutando indexación en segundo plano",
-    "4" => "El índice parece estar bloqueado, puede que un proceso de indexación se esté realizando en este momento. En caso contrario borre el fichero  .ajxp_lock localizado en la carpeta cache/indexes.",
-    "5" => "Indexación finalizada",
-    "6" => "Atención, la carpeta actual está indexándose, inténtelo más tarde.",
-    "7" => "Primera indexación de esta carpeta, por favor espere y reintente más tarde su búsqueda",
-    "8" => "Indexando %s en segundo plano",
-    "9" => "¡No puedo encontrar el índice de la carpeta actual! ¡Debería primero ejecutar la indexación de los datos!",
-    "10" => "Indexando subcarpetas en segundo plano",
+    "1" => "Indexar contingut",
+    "2" => "Indexar el contingut de la carpeta",
+    "3" => "Executant indexació en segon pla",
+    "4" => "L'índex sembla estar bloquejat, pot ser que un procés d'indexació s'estigui realitzant en aquest moment. En cas contrari esborri el fitxer .ajxp_lock localitzat a la carpeta cache/indexes.",
+    "5" => "Indexació finalitzada",
+    "6" => "Atenció, la carpeta actual s'està indexant. Intenteu-ho més tard.",
+    "7" => "Primera indexació d'aquesta carpeta, si us plau esperi i torni a intentar més tard la seva recerca",
+    "8" => "Indexant %s en segon pla",
+    "9" => "No es put trobat l'índex de la carpeta actual! En primer lloc hauría d'executar la indexació de les dades!",
+    "10" => "Indexant subcarpetes en segon pla",
 );
