@@ -56,6 +56,7 @@ class DisclaimerProvider extends AJXP_Plugin
                 AJXP_XMLWriter::requireAuth(true);
                 AJXP_XMLWriter::close();
             }
+            ConfService::getInstance()->invalidateLoadedRepositories();
 
         }else{
             $u->setLock("validate_disclaimer");
