@@ -21,6 +21,6 @@
 $mess=array(
 "1" => "Uso de la cuota (cargando...)",
 "2" => "Click para recargar el uso de la cuota",
-"3" => "EstÃ¡ excediendo su cuota",
+"3" => "Está excediendo su cuota",
 "4" => "Uso de la cuota",
 );

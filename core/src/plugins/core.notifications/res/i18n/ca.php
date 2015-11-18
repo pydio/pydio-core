@@ -20,7 +20,6 @@
 *
 * 
 */
-
 $mess=array(
 "1" => "Notificacions",
 "2" => "Font de notificacions",

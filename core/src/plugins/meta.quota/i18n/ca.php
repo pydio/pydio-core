@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Ãšs de la quota (carregant...)",
-"2" => "Clic per recarregar l'Ãºs de la quota",
-"3" => "EstÃ  excedint la seva quota",
-"4" => "Ãšs de la quota",
+"1" => "Ús de la quota (carregant...)",
+"2" => "Clic per recarregar l'ús de la quota",
+"3" => "Està excedint la seva quota",
+"4" => "Ús de la quota",
 );
