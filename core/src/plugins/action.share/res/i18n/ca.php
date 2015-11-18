@@ -189,4 +189,5 @@ $mess = array(
 	"175" => "Per favor establiu una contrasenya i assegureu-vos que és prou llarga!",
     "176" => "(Obligatori)",
     "177" => "Veure paràmetres",
+
 );

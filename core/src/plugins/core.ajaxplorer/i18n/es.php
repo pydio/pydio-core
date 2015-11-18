@@ -640,5 +640,4 @@ $mess=array(
 "541" => "Error al subir: no se puede escribir en el directorio temporal",
 "542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga."
 
-/* END SENTENCE */
 );

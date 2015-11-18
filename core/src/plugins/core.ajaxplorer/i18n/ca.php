@@ -615,7 +615,6 @@ $mess=array(
 "plugtype.title.shorten" => "Abreviadors URL",
 "plugtype.desc.shorten" => "Serveis web emprats a l'abreviació d'enllaços públics",
 "plugtype.title.uploader" => "Uploaders",
-
 "plugtype.desc.uploader" => "Implementació d'uploaders emprant diverses tecnologíes (html, js, java...)",
 "plugtype.title.auth" => "Backends d'autenticació",
 "plugtype.desc.auth" => "Com la informació dels usuaris es enmagatzemada al backend",
@@ -638,5 +637,4 @@ $mess=array(
     "541" => "Error en la pujada: no es pot escriure en el directori temporal",
     "542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega."
 
-/* END SENTENCE */
 );
