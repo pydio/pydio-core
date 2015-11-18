@@ -41,8 +41,9 @@ Class.create("AjxpInstaller", AjxpPane, {
             selector.insert(option);
         });
         selector.observe("change", function(){
-            ajaxplorer.currentLanguage = selector.getValue();
-            ajaxplorer.loadI18NMessages(selector.getValue());
+            pydio.fire("language_changed");
+            pydio.currentLanguage = selector.getValue();
+            pydio.loadI18NMessages(selector.getValue());
         });
     },
 
@@ -54,10 +55,16 @@ Class.create("AjxpInstaller", AjxpPane, {
         connexion.setParameters(params);
         connexion.onComplete = function(transport){
             var params = this.formManager.parseParameters(transport.responseXML, "//global_param");
-            this.formManager.createParametersInputs(this.formElement,  params, true, false, false, false, false, true);
-            this.formElement.SF_accordion.observe("animation-finished", function(){
+            this.formManager.createParametersInputs(this.formElement,  params, true, false, false, "wizard", false, true);
+            var saveButton = this.htmlElement.select('.SF_inlineButton').last();
+            this.formElement.observe("wizard:refreshed", function(event){
                 modal.refreshDialogPosition();
-            });
+                if(event.memo && event.memo.isLast){
+                    this.formElement.down(".wizard_buttons").insert({bottom:saveButton});
+                }else{
+                    this.htmlElement.insert({bottom:saveButton});
+                }
+            }.bind(this));
             this.formElement.select("select").invoke("observe", "change", function(){
                 modal.refreshDialogPosition();
             });
@@ -79,7 +86,7 @@ Class.create("AjxpInstaller", AjxpPane, {
                 }
 
                 var missing = this.formManager.serializeParametersInputs(this.formElement, new Hash(), '', true);
-                missing = (missing > 0 || !this.formElement.down('select[name="STORAGE_TYPE"]').getValue() || !passValidating);
+                missing = (missing > 0 || !passValidating);
 
                 if(!missing){
                     this.htmlElement.select('.SF_inlineButton').last().removeClassName("disabled");
@@ -91,29 +98,29 @@ Class.create("AjxpInstaller", AjxpPane, {
             this.formElement.select('select').invoke("observe", "change", function(){
                 this.formManager.observeFormChanges(this.formElement, observer, 50);
             }.bind(this));
-            this.updateAndBindButton(this.htmlElement.select('.SF_inlineButton').last());
-            this.bindPassword(this.formElement.down('input[name="ADMIN_USER_PASS"]').up('div.accordion_content'));
+            saveButton.hide();
+            this.updateAndBindButton(saveButton);
+            this.bindPassword(this.formElement.down('input[name="ADMIN_USER_PASS"]').up('div.wizard-pane'));
             this.formElement.ajxpPaneObject.observe("after_replicate_row", function(newRow){
                 this.bindPassword(newRow);
             }.bind(this));
             this.htmlElement.down("#start_button").observe("click", function(){
-                new Effect.Morph(this.htmlElement.down(".install_pydio_logo"), {
-                    style:'height:60px',
-                    duration:0.5
-                });
+                this.htmlElement.down(".install_pydio_logo").hide();
                 this.htmlElement.down(".installerLang").hide();
-                this.htmlElement.down(".installerWelcome").update(MessageHash["installer.8"]);
+                this.htmlElement.down(".installerWelcome").hide();
                 new Effect.Appear(this.formElement, {afterFinish : function(){
-                    this.formElement.SF_accordion.activate(this.formElement.down('.accordion_toggle'));
+                    modal.refreshDialogPosition();
                 }.bind(this)});
             }.bind(this));
+            pydio.fire("installer_loaded", this);
+            observer.defer();
         }.bind(this);
         connexion.sendAsync();
     },
 
     bindPassword : function(contentDiv){
         var passes = contentDiv.select('input[type="password"]');
-        var container = new Element("div", {className:'SF_element'});
+        var container = new Element("div", {className:'SF_element passStrengthContainer'});
         passes[1].up('div.SF_element').insert({after:container});
         var p = new Protopass(passes[0], {
             barContainer:container,
@@ -126,43 +133,51 @@ Class.create("AjxpInstaller", AjxpPane, {
         //startButton.removeClassName('SF_input').addClassName('largeButton');
         startButton.stopObserving("click");
         startButton.observe("click", function(){
-            if(startButton.hasClassName("disabled")) return;
-            var conn = new Connexion();
-            conn.setMethod('POST');
-            var params = new Hash({get_action: "apply_installer_form"});
-            this.formManager.serializeParametersInputs(this.formElement, params);
-            conn.setParameters(params);
-            this.formElement.hide();
-            startButton.up('div').hide();
-            this.formElement.previous('.dialogLegend').hide();
-            var progress = this.formElement.next('#configuration_progress');
-            progress.show();
-            modal.refreshDialogPosition();
-            conn.onComplete = function(transport){
-                new Effect.Fade(progress.down('span.icon-spinner'), {afterFinish : function(){
-                    progress.down('span.icon-spinner').remove();
-                    modal.refreshDialogPosition();
-                }});
-                if(transport.responseText == "OK"){
-                    window.setTimeout(function(){
-                        progress.insert('...done! <br/>The page will now reload automatically. You can log in with the admin user <b>"'+params.get('ADMIN_USER_LOGIN')+'"</b> you have just defined.<br/><br/>');
-                        window.setTimeout(function(){
-                            document.location.reload(true);
-                        }, 6000);
-                    }, 3000);
-                }else{
-                    var json = transport.responseJSON;
-                    progress.insert('<u>Warning</u>: cannot write htaccess file. Please copy the content below and update the ' +
-                        'file located at the following location: '  + json['file'] + '<br> Hit <kbd>Ctrl/Cmd</kbd>+<kbd>C</kbd> ' +
-                        'to copy the content to your clipboard. Simply reload this page once it\'s done.');
-                    var textarea = new Element('textarea', {style:'width: 98%;height: 260px; margin-top:10px;'}).update(json['content']);
-                    progress.insert(textarea);
-                    textarea.select();
-                    modal.refreshDialogPosition();
-                }
-            };
-            conn.sendAsync();
+            this.startInstall(startButton);
         }.bind(this));
+    },
+
+    startInstall: function(startButton){
+        if(startButton.hasClassName("disabled")){
+            window.alert("You are missing some required fields, or the password and confirmation differ. Please make sure to go through the form.");
+            return;
+        }
+        var conn = new Connexion();
+        conn.setMethod('POST');
+        var params = new Hash({get_action: "apply_installer_form"});
+        this.formManager.serializeParametersInputs(this.formElement, params);
+        params.set('installer_lang', this.htmlElement.down(".installerLang").down("select").getValue());
+        conn.setParameters(params);
+        this.formElement.hide();
+        startButton.up('div').hide();
+        this.formElement.previous('.dialogLegend').hide();
+        var progress = this.formElement.next('#configuration_progress');
+        progress.show();
+        modal.refreshDialogPosition();
+        conn.onComplete = function(transport){
+            new Effect.Fade(progress.down('span.icon-spinner'), {afterFinish : function(){
+                progress.down('span.icon-spinner').remove();
+                modal.refreshDialogPosition();
+            }});
+            if(transport.responseText == "OK"){
+                window.setTimeout(function(){
+                    progress.insert('...done! <br/>The page will now reload automatically. You can log in with the admin user <b>"'+params.get('ADMIN_USER_LOGIN')+'"</b> you have just defined.<br/><br/>');
+                    window.setTimeout(function(){
+                        document.location.reload(true);
+                    }, 6000);
+                }, 3000);
+            }else{
+                var json = transport.responseJSON;
+                progress.insert('<u>Warning</u>: cannot write htaccess file. Please copy the content below and update the ' +
+                    'file located at the following location: '  + json['file'] + '<br> Hit <kbd>Ctrl/Cmd</kbd>+<kbd>C</kbd> ' +
+                    'to copy the content to your clipboard. Simply reload this page once it\'s done.');
+                var textarea = new Element('textarea', {style:'width: 98%;height: 260px; margin-top:10px;'}).update(json['content']);
+                progress.insert(textarea);
+                textarea.select();
+                modal.refreshDialogPosition();
+            }
+        };
+        conn.sendAsync();
     }
 
 });

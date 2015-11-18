@@ -2,4 +2,9 @@
 <ajxp_plugin label="CONF_MESSAGE[MQ Serial]" description="CONF_MESSAGE[Store persistant and worker queues in serial files]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AJXP_SerialMessageExchanger" filename="plugins/mq.serial/class.AJXP_SerialMessageExchanger.php"/>
+	<client_settings>
+        <resources>
+            <i18n namespace="serialMessageExchanger" path="plugins/mq.serial/i18n" />
+        </resources>
+    </client_settings>
 </ajxp_plugin>

@@ -23,7 +23,7 @@ $mess=array(
     "file.delete" => "The file AJXP_NODE_LABEL was deleted from AJXP_PARENT_PATH AJXP_DATE, by AJXP_USER.",
     "file.change" => "The file AJXP_NODE_LABEL was modified AJXP_DATE, by AJXP_USER.",
     "file.rename" => "The file AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL AJXP_DATE, by AJXP_USER.",
-    "file.view" => "The file AJXP_NODE_LABEL was consulted by AJXP_USER AJXP_DATE, by AJXP_USER.",
+    "file.view" => "The file AJXP_NODE_LABEL was consulted by AJXP_USER AJXP_DATE.",
     "file.copy" => "The file AJXP_NODE_LABEL was copied from AJXP_SOURCE_FOLDER to AJXP_PARENT_PATH AJXP_DATE, by AJXP_USER.",
     "file.copy_to" => "The file AJXP_NODE_LABEL was copied to AJXP_TARGET_FOLDER AJXP_DATE, by AJXP_USER.",
     "file.copy_from" => "The file AJXP_NODE_LABEL was copied from AJXP_SOURCE_FOLDER AJXP_DATE, by AJXP_USER.",
@@ -41,5 +41,5 @@ $mess=array(
     "folder.move" => "The folder AJXP_NODE_LABEL was moved to from AJXP_SOURCE_FOLDER to AJXP_PARENT_PATH AJXP_DATE, by AJXP_USER.",
     "folder.move_to" => "The folder AJXP_NODE_LABEL was moved to AJXP_TARGET_FOLDER AJXP_DATE, by AJXP_USER.",
     "folder.move_from" => "The folder AJXP_NODE_LABEL was moved from AJXP_SOURCE_FOLDER AJXP_DATE, by AJXP_USER.",
-    "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+    "ajxp_link" => "Click here to go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
 );

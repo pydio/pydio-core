@@ -40,7 +40,6 @@ class customDbAuthDriver extends AbstractAuthDriver
     public function init($options)
     {
         parent::init($options);
-        require_once(AJXP_BIN_FOLDER . "/dibi.compact.php");
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_CUSTOM_DRIVER"]);
         $this->coreSqlDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
 
@@ -69,7 +68,7 @@ class customDbAuthDriver extends AbstractAuthDriver
         if(!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_CUSTOM_DRIVER"]);
         if (!count($test)) {
-            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+            throw new Exception("Could not find any driver definition for CustomDB plugin! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 
@@ -159,7 +158,7 @@ class customDbAuthDriver extends AbstractAuthDriver
         if($hashAlgo == "pbkdf2"){
             return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);
         }else if($hashAlgo == "md5"){
-            return md5($pass) == $userStoredPass;
+            return md5($pass) === $userStoredPass;
         }else if($hashAlgo == "clear"){
             return $pass == $userStoredPass;
         }
@@ -186,7 +185,6 @@ class customDbAuthDriver extends AbstractAuthDriver
             }
         }
 
-        require_once(AJXP_BIN_FOLDER . "/dibi.compact.php");
         // Should throw an exception if there was a problem.
         dibi::connect($p);
         $cTableName = $httpVars["SQL_CUSTOM_TABLE"];

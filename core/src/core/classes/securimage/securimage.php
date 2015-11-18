@@ -503,7 +503,7 @@ class Securimage
      * </code>
      *
      */
-    public function Securimage()
+    public function __construct()
     {
         // Initialize session or attach to existing
         if ( session_id() == '' ) { // no session has been started yet, which is needed for validation
@@ -1547,11 +1547,11 @@ class Securimage_Color
      * Example: The code for the HTML color #4A203C is:<br />
      * $color = new Securimage_Color(0x4A, 0x20, 0x3C);
      *
-     * @param $red Red component 0-255
-     * @param $green Green component 0-255
-     * @param $blue Blue component 0-255
+     * @param $red int|String Red component 0-255
+     * @param $green int Green component 0-255
+     * @param $blue int Blue component 0-255
      */
-    public function Securimage_Color($red, $green = null, $blue = null)
+    public function __construct($red, $green = null, $blue = null)
     {
         if ($green == null && $blue == null && preg_match('/^#[a-f0-9]{3,6}$/i', $red)) {
             $col = substr($red, 1);

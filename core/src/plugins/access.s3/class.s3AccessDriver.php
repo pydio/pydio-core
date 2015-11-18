@@ -66,6 +66,10 @@ class s3AccessDriver extends fsAccessDriver
             }else{
                 $options["region"] = $this->repository->getOption("REGION");
             }
+            $proxy = $this->repository->getOption("PROXY");
+            if(!empty($proxy)){
+                $options['request.options'] = array('proxy' => $proxy);
+            }
             $this->s3Client = S3Client::factory($options);
             $this->s3Client->registerStreamWrapper();
         }
@@ -74,7 +78,7 @@ class s3AccessDriver extends fsAccessDriver
 
     public function initRepository()
     {
-        $wrapperData = $this->detectStreamWrapper(true);
+        $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -84,8 +88,17 @@ class s3AccessDriver extends fsAccessDriver
 
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->urlBase = "pydio://".$this->repository->getId();
+
+        if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
+            @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
+            if(!is_dir($this->urlBase. "/" . $recycle . "/")) {
+                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+            } else {
+                $this->setHiddenAttribute(new AJXP_Node($this->urlBase. "/" . $recycle . "/"));
+            }
+        }
+
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
@@ -131,6 +144,41 @@ class s3AccessDriver extends fsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
+    /**
+     * We have to overwrite original FS function as S3 wrapper does not support "a+" open mode.
+     *
+     * @param String $folder Folder destination
+     * @param String $source Maybe updated by the function
+     * @param String $target Existing part to append data
+     * @return bool If the target file already existed or not.
+     * @throws Exception
+     */
+    protected function appendUploadedData($folder, $source, $target){
+
+        $already_existed = false;
+        if($source == $target){
+            throw new Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
+        }
+        // S3 does not really support append. Let's grab the remote target first.
+        if (file_exists($folder ."/" . $target)) {
+            $already_existed = true;
+            $this->logDebug("Should copy stream from $source to $target - folder is ($folder)");
+            $partO = fopen($folder."/".$source, "r");
+            $appendF = fopen($folder ."/". $target, 'a');
+            while (!feof($partO)) {
+                $buf = fread($partO, 1024);
+                fwrite($appendF, $buf);
+            }
+            fclose($partO);
+            fclose($appendF);
+            $this->logDebug("Done, closing streams!");
+        }
+        @unlink($folder."/".$source);
+        return $already_existed;
+
+    }
+
+
     public function isWriteable($dir, $type="dir")
     {
         return true;
@@ -147,12 +195,6 @@ class s3AccessDriver extends fsAccessDriver
         if (!$node->isLeaf()) {
             $node->setLabel(rtrim($node->getLabel(), "/"));
         }
-    }
-
-    public function filesystemFileSize($filePath)
-    {
-        $bytesize = filesize($filePath);
-        return $bytesize;
     }
 
     public function makeSharedRepositoryOptions($httpVars, $repository)

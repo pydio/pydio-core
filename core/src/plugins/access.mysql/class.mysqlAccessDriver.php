@@ -65,8 +65,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        $repo = ConfService::getRepository();
-        if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
@@ -88,6 +86,11 @@ class mysqlAccessDriver extends AbstractAccessDriver
             $dest = SystemTextEncoding::fromUTF8($dest);
         }
         $mess = ConfService::getMessages();
+
+        // Sanitize all httpVars entries
+        foreach($httpVars as $k=>&$value){
+            $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_FILENAME);
+        }
 
         switch ($action) {
 
@@ -322,8 +325,14 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
-                        $size = $this->getSize($tableName);
-                        $count = $this->getCount($tableName);
+                        if(AJXP_Utils::detectXSS($tableName)) {
+                            $tableName = "XSS Detected!";
+                            $size = 'N/A';
+                            $count = 'N/A';
+                        }else{
+                            $size = $this->getSize($tableName);
+                            $count = $this->getCount($tableName);
+                        }
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
                     }
                     print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
@@ -393,6 +402,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                                 print "$key=\"BLOB$sizeStr\" ";
                             } else {
                                 $value = str_replace("\"", "", $value);
+                                if(AJXP_Utils::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
                                 $value = AJXP_Utils::xmlEntities($value);
                                 print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
                                 if ($result["HAS_PK"]>0) {
@@ -420,6 +430,9 @@ class mysqlAccessDriver extends AbstractAccessDriver
         }
 
         if (isset($logMessage) || isset($errorMessage)) {
+            if(AJXP_Utils::detectXSS($logMessage) || AJXP_Utils::detectXSS($errorMessage)){
+                $xmlBuffer = AJXP_XMLWriter::sendMessage(null, "XSS Detected!", false);
+            }
             $xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
 

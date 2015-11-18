@@ -44,10 +44,8 @@ class dropboxAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->logDebug("Detected wrapper data", $wrapperData);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        $this->detectStreamWrapper(true);
+        $this->urlBase = "pydio://".$this->repository->getId();
 
         if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
             $this->logError("Dropbox", "The PEAR HTTP_OAuth package must be installed!");
@@ -85,18 +83,22 @@ class dropboxAccessDriver extends fsAccessDriver
                 //echo "Step 2: You must now redirect the user to:\n";
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 2;
                 $_SESSION['oauth_tokens'] = $tokens;
-                throw new Exception("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this repository.");
+                throw new Exception("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
 
             case 2 :
                 $oauth->setToken($_SESSION['oauth_tokens']);
-                $tokens = $oauth->getAccessToken();
+                try{
+                    $tokens = $oauth->getAccessToken();
+                }catch(Exception $oauthEx){
+                    throw new Exception($oauthEx->getMessage() . ". Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
+                }
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
                 $_SESSION['OAUTH_DROPBOX_TOKENS'] = $tokens;
                 $this->setTokens($tokens);
                 return;
         }
 
-        throw new Exception("Impossible to find the tokens for accessing the dropbox repository");
+        throw new Exception("Impossible to find the dropbox tokens for accessing this workspace");
 
     }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="smb" label="CONF_MESSAGE[SMB Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an SMB share]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<authdriver name="smb" enabled="false" label="CONF_MESSAGE[SMB Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an SMB share]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="smb_auth" path="plugins/auth.smb/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="REPOSITORY_ID" type="string" label="CONF_MESSAGE[Repository]" description="CONF_MESSAGE[Id of the repository to use for testing connexion]" mandatory="true"/>
+		<param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Workspace]" description="CONF_MESSAGE[ID of the workspace used to validate credentials]" mandatory="true"/>
 		<param name="ADMIN_USER" type="string" label="CONF_MESSAGE[Admin user]" description="CONF_MESSAGE[The ID of an existing admin for Pydio (using conf.serial)]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.smb/class.smbAuthDriver.php" classname="smbAuthDriver"/>
@@ -29,7 +29,7 @@
 						var connexion = new Connexion();
 						connexion.addParameter('get_action', 'smb_logout');
 						connexion.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							pydio.getController().parseXmlMessage(transport.responseXML);
 							};
 						connexion.sendAsync();
 						]]></clientCallback>

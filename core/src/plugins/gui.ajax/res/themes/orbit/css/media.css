@@ -14,6 +14,10 @@ and (max-width : 800px) {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
+    #search_results div.thumbnail_selectable_cell.detailed{
+        width:95%;
+    }
 }
 
 @media only screen
@@ -80,13 +84,22 @@ and (max-width : 720px) {
     .thumbnail_selectable_cell > div > div.overlay_icon_div{
         top: 32px !important;
     }
+    .thumbnail_selectable_cell.selected-focus:not(.ajxpNodeLeaf) > div > div.overlay_icon_div{
+        display: none;
+    }
     #topPane{
         width: 200px;
     }
     #cpane_container{
         left: 200px;
     }
-
+    #search_meta.toggle_open {
+        margin-left: -200px;
+        width: 200px;
+    }
+    #search_meta > div {
+        width: 200px;
+    }
     .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
         width: 121px;
         white-space: nowrap;
@@ -167,13 +180,7 @@ and (max-width : 420px){
         font-size: 20px;
         font-weight: lighter;
         text-transform: uppercase;
-        margin: 0px 0;
-    }
-
-    div#background-imager{
-        background-image: url(../images/hires-photos/03-mobile.jpg) !important;
-        background-position: 50% 50%;
-        background-repeat: repeat repeat;
+        margin: 0 0;
     }
 
     div.dialogBox{
@@ -181,8 +188,8 @@ and (max-width : 420px){
     }
 
     div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent {
-        height: 100%;
-        padding-top: 20%!important;
+        /*height: 100%;
+        padding-top: 20%!important;*/
     }
 
     #login_form, #login_form_dynamic {

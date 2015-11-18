@@ -1,5 +1,4 @@
 *.php								usr/share/pydio
-.htaccess							usr/share/pydio
 core/classes						usr/share/pydio/core
 core/tests							usr/share/pydio/core
 core/doc							usr/share/pydio/core

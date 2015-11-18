@@ -52,7 +52,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             return ;
         }
         $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="user_meta_change" title="AJXP_MESSAGE[meta.exif.1]">AJXP_MESSAGE[meta.exif.2]</span>AJXP_MESSAGE[meta.exif.1]</div>
+                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="user_meta_change" title="AJXP_MESSAGE[meta.exif.1]">AJXP_MESSAGE[meta.exif.2]</span>AJXP_MESSAGE[meta.exif.3]</div>
                         <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
         $cdataFoot = '</div></div>';
         $cdataParts = "";
@@ -63,11 +63,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
-        $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
         $contrib->setAttribute("modifier", "ExifCellRenderer.prototype.infoPanelModifier");
-        $htmlSel = $this->xPath->query('html', $contrib);
+        $htmlSel = $this->getXPath()->query('html', $contrib);
         $html = $htmlSel->item(0);
         $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
         $html->appendChild($cdata);
@@ -100,37 +100,61 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     public function extractExif($actionName, $httpVars, $fileVars)
     {
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
         $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper();
-        $wrapperData = $repo->streamData;
-        $urlBase = $wrapperData["protocol"]."://".$repo->getId();
-        $selection = new UserSelection($repo, $httpVars);
-        $decoded = $selection->getUniqueFile();
-        $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
+        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
+        $repo->detectStreamWrapper(true);
+
+        $selectedNode = $userSelection->getUniqueNode();
+        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+
         AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
         if($exifData === false || !is_array($exifData)) return;
         if ($exifData !== false && isSet($exifData["GPS"])) {
             $exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
         }
-        $excludeTags = array("componentsconfiguration", "filesource", "scenetype", "makernote");
-        AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
+        $iptc = $this->extractIPTC($realFile);
+        if(count($iptc)){
+            $exifData["IPTC"] = $iptc;
+        }
+        $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
+        $format = "xml";
+        if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+            $format = "json";
+        }
+        $filteredData = array();
         foreach ($exifData as $section => $data) {
-            print("<exifSection name='$section'>");
+            $filteredData[$section] = array();
             foreach ($data as $key => $value) {
                 if (is_array($value)) {
                     $value = implode(",", $value);
                 }
                 if(in_array(strtolower($key), $excludeTags)) continue;
                 if(strpos($key, "UndefinedTag:") === 0) continue;
-                if(!is_numeric($value)) $value = $this->string_format($value);
-                print("<exifTag name=\"$key\">".SystemTextEncoding::toUTF8($value)."</exifTag>");
+                $value = preg_replace( '/[^[:print:]]/', '',$value);
+                $filteredData[$section][$key] = SystemTextEncoding::toUTF8($value);
             }
-            print("</exifSection>");
         }
-        AJXP_XMLWriter::close("metadata");
+
+        if($format == "xml"){
+
+            AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
+            foreach ($filteredData as $section => $data) {
+                print("<exifSection name='$section'>");
+                foreach ($data as $key => $value) {
+                    print("<exifTag name=\"$key\">". AJXP_Utils::xmlEntities($value)."</exifTag>");
+                }
+                print("</exifSection>");
+            }
+            AJXP_XMLWriter::close("metadata");
+
+        }else{
+
+            HTMLWriter::charsetHeader("application/json");
+            echo json_encode($filteredData);
+
+        }
+
     }
 
     public function string_format($str)
@@ -159,6 +183,8 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         //if(!exif_imagetype($currentFile)) return ;
         $realFile = $ajxpNode->getRealFile();
         $exif = @exif_read_data($realFile, 0, TRUE);
+        $iptc = $this->extractIPTC($realFile);
+
         if($exif === false) return ;
         $additionalMeta = array();
         foreach ($definitions as $def => $label) {
@@ -169,8 +195,57 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             if (isSet($exif[$exifSection]) && isSet($exif[$exifSection][$exifName])) {
                 $additionalMeta[$def] = $exif[$exifSection][$exifName];
             }
+            if ($exifSection == "IPTC" && isSet($iptc[$exifName])){
+                $additionalMeta[$def] = $iptc[$exifName];
+            }
         }
         $ajxpNode->mergeMetadata($additionalMeta);
+    }
+
+    private function extractIPTC($realFile){
+        $output = array();
+        if(!function_exists("iptcparse")) {
+            return $output;
+        }
+        getimagesize($realFile,$info);
+        if(!isset($info['APP13'])) {
+            return $output;
+        }
+        $iptcHeaderArray = array
+        (
+            '2#005'=>'DocumentTitle',
+            '2#010'=>'Urgency',
+            '2#015'=>'Category',
+            '2#020'=>'Subcategories',
+            '2#025'=>'Keywords',
+            '2#040'=>'SpecialInstructions',
+            '2#055'=>'CreationDate',
+            '2#080'=>'AuthorByline',
+            '2#085'=>'AuthorTitle',
+            '2#090'=>'City',
+            '2#095'=>'State',
+            '2#101'=>'Country',
+            '2#103'=>'OTR',
+            '2#105'=>'Headline',
+            '2#110'=>'Source',
+            '2#115'=>'PhotoSource',
+            '2#116'=>'Copyright',
+            '2#120'=>'Caption',
+            '2#122'=>'CaptionWriter'
+        );
+        $iptc =iptcparse($info['APP13']);
+        if (!is_array($iptc)) {
+            return $output;
+        }
+        foreach (array_keys($iptc) as $key) {
+            if (isSet($iptcHeaderArray[$key])) {
+                $cnt = count($iptc[$key]);
+                $val = "";
+                for ($i=0; $i < $cnt; $i++) $val .= $iptc[$key][$i] . " ";
+                $output[$iptcHeaderArray[$key]] = preg_replace( '/[^[:print:]]/', '',$val);
+            }
+        }
+        return $output;
     }
 
     private function convertGPSData($exif)

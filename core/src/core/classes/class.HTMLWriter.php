@@ -100,9 +100,6 @@ class HTMLWriter
     /**
      * Send a simple Content-type header
      * @static
-     * @param string $type
-     * @param string $charset
-     * @return void
      */
     public static function internetExplorerMainDocumentHeader()
     {
@@ -133,12 +130,12 @@ class HTMLWriter
     {
         print("</body></html>");
     }
+
     /**
      * Write directly an error as a javascript instruction
      * @static
      * @param $errorType
      * @param $errorMessage
-     * @return
      */
     public static function javascriptErrorHandler($errorType, $errorMessage)
     {
@@ -146,6 +143,15 @@ class HTMLWriter
         if(error_reporting() == 0) return ;
         restore_error_handler();
         die("<script language='javascript'>parent.ajaxplorer.displayMessage('ERROR', '".str_replace("'", "\'", $errorMessage)."');</script>");
+    }
+
+    public static function encodeAttachmentName($name){
+        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])
+            || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])
+            || preg_match('/ Trident/',$_SERVER['HTTP_USER_AGENT'])) {
+            $name = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($name)));
+        }
+        return $name;
     }
 
     /**
@@ -157,9 +163,7 @@ class HTMLWriter
      */
     public static function generateAttachmentsHeader(&$attachmentName, $dataSize, $isFile=true, $gzip=false)
     {
-        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])) {
-             $attachmentName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($attachmentName)));
-         }
+        $attachmentName = self::encodeAttachmentName($attachmentName);
 
         header("Content-Type: application/force-download; name=\"".$attachmentName."\"");
         header("Content-Transfer-Encoding: binary");
@@ -197,6 +201,8 @@ class HTMLWriter
 
     public static function generateInlineHeaders($attachName, $fileSize, $mimeType)
     {
+        $attachName = self::encodeAttachmentName($attachName);
+
         //Send headers
         header("Content-Type: " . $mimeType . "; name=\"" . $attachName . "\"");
         header("Content-Disposition: inline; filename=\"" . $attachName . "\"");

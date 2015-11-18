@@ -87,7 +87,7 @@ Class.create("PluginEditor", AbstractEditor, {
             conn.setParameters(toSubmit);
             conn.setMethod("post");
             conn.onComplete = function(transport){
-                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                pydio.getController().parseXmlMessage(transport.responseXML);
                 this.loadPluginConfig();
                 this.setClean();
             }.bind(this);
@@ -132,6 +132,9 @@ Class.create("PluginEditor", AbstractEditor, {
             var params = XPathSelectNodes(xmlData, "//global_param");
             var values = XPathSelectNodes(xmlData, "//plugin_settings_values/param");
             var documentation = XPathSelectSingleNode(xmlData, "//plugin_doc");
+            var enabledAlways = false;
+            try{enabledAlways = xmlData.firstChild.firstChild.attributes['enabled'].value === 'always';}catch (e){}
+
 
             var paramsValues = new Hash();
             $A(values).each(function(child){
@@ -145,7 +148,7 @@ Class.create("PluginEditor", AbstractEditor, {
 
 
             var driverParamsHash = $A([]);
-            if(this.pluginId.split("\.")[0] != "core"){
+            if(this.pluginId.split("\.")[0] != "core" && !enabledAlways){
                 driverParamsHash.push($H({
                     name:'AJXP_PLUGIN_ENABLED',
                     type:'boolean',
@@ -184,7 +187,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
                 this.formManager.disableShortcutsOnForm(form);
             }else{
-                form.update(MessageHash['ajxp_conf.105']);
+                form.update('<div style="padding: 10px;">No options for this plugin</div>');
             }
 
             if(form.SF_accordion){
@@ -197,7 +200,7 @@ Class.create("PluginEditor", AbstractEditor, {
             this.formManager.observeFormChanges(form, this.setDirty.bind(this));
 
 
-            ajaxplorer.blurAll();
+            pydio.UI.blurAll();
         }.bind(this);
         connexion.sendAsync();
     },
@@ -288,7 +291,7 @@ Class.create("PluginEditor", AbstractEditor, {
         sync.sendSync();
         var encoded;
         if(seed != '-1'){
-            encoded = hex_md5(password);
+            encoded = HasherUtils.hex_md5(password);
         }else{
             encoded = password;
         }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <client_settings icon="plugins/access.sftp/icon.png">
+<ajxpdriver name="sftp" enabled="false" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.sftp/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
         </resources>
@@ -19,6 +19,7 @@
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
             <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
             <component_config className="FilesList">
 				<columns switchGridMode="filelist">

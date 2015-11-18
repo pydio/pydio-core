@@ -20,6 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class AJXP_AbstractMetaSource
+ * Abstract class from which all meta.* plugins must extend.
+ */
 abstract class AJXP_AbstractMetaSource extends AJXP_Plugin {
 
     /**

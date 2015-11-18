@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="authfront.session_login" enabled="true" label="CONF_MESSAGE[Standard login screen]"
+<ajxpcore id="authfront.session_login" enabled="always" label="CONF_MESSAGE[Standard login screen]"
           description="CONF_MESSAGE[Display a standard user/password login screen]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.session_login/class.SessionLoginFrontend.php" classname="SessionLoginFrontend"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="authfront.session_login" path="plugins/authfront.session_login/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="20"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="20"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only],no_session|CONF_MESSAGE[REST Only],both|CONF_MESSAGE[Session-based or Rest]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only"/>
     </server_settings>
     <registry_contributions>
         <actions>
@@ -16,10 +21,10 @@
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="true" contextMenu="false" infoPanel="false"
-                             actionBarGroup="user">
+                             actionBarGroup="user,admin">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+                <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
 					var loginRedirect = AJXP_LOGIN_REDIRECT;
@@ -29,6 +34,7 @@
 					    modal.setCloseValidation(function(){
 					        return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
 					    });
+					    if(ajaxplorer.user && ajaxplorer.user.id == 'guest') $$('html')[0].addClassName('ajxp_guest_enabled');
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
 						function(oForm){
 						    $("generic_dialog_box").setStyle({
@@ -60,7 +66,7 @@
 						    oForm.setStyle({display:'block'});
 						    oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
 
-							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+							ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
 								oForm.select('input').invoke("observe", "keydown", function(event){
 									if(event.keyCode == Event.KEY_RETURN){
@@ -88,7 +94,7 @@
                                     oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link" ajxp_message_id="479">AJXP_MESSAGE[479]</a></div>'});
                                     oForm.down('a.forgot-password-link').observe("click", function(e){
                                         Event.stop(e);
-                                        ajaxplorer.actionBar.fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
+                                        pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
                                     });
                                 }catch(e){ if(console) console.log(e); }
                             }
@@ -102,7 +108,7 @@
 							connexion.addParameter('login_seed', oForm.login_seed.value);
 							connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
 							if(oForm.login_seed.value != '-1'){
-								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+								connexion.addParameter('password', HasherUtils.hex_md5(HasherUtils.hex_md5(oForm.password.value)+oForm.login_seed.value));
 							}else{
 								connexion.addParameter('password', oForm.password.value);
 							}
@@ -112,22 +118,35 @@
 							oForm.select('input[data-ajxpLoginAdditionalParameter]').each(function(i){
 							    connexion.addParameter(i.name, i.getValue());
 							});
+                            if(oForm.down(".ajxp_login_error")){
+                                oForm.down(".ajxp_login_error").remove();
+                            }
 							connexion.onComplete = function(transport){
-								var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-								if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-								}
+                                oForm.userid.value = '';
+                                oForm.password.value = '';
+								var success = pydio.getController().parseXmlMessage(transport.responseXML);
 								if(success){
         						    $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
         						    oForm.up('.dialogContent').writeAttribute("style", "");
     						        $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
+                                    modal.setCloseValidation(null);
+                                    hideLightBox(true);
+        						}else{
+        						    var errorId = PydioApi.getClient().LAST_ERROR_ID;
+                                    if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                        ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                    }
+                                    if(errorId && oForm.visible() && oForm.down("div.dialogLegend")){
+                                        oForm.down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
+                                        Effect.ErrorShake(oForm.down('.ajxp_login_error'));
+                                    }else{
+                                        alert(MessageHash[errorId]);
+                                    }
         						}
 
 							};
 							connexion.setMethod('put');
 							connexion.sendAsync();
-							oForm.userid.value = '';
-							oForm.password.value = '';
 							return false;
 						}, function(){}, true);
 					}
@@ -136,7 +155,7 @@
                         <form id="login_form_dynamic" action="login" style="display:none;" box_width="320" box_padding="0" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}'>
                             <input type="hidden" name="get_action" value="login">
                             <input type="hidden" name="login_seed" id="login_seed" value="">
-                            <a style="float:right;font-size: 16px;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
+                            <a style="float:right;font-size: 16px;" href="javascript:pydio.getController().fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
                             <div class="dialogLegend" style="margin-bottom: 3px;margin-top: 4px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
                             <div style="width:100%;">
                                 <div class="SF_element">
@@ -170,7 +189,7 @@
 					var connexion = new Connexion();
 					connexion.addParameter('get_action', 'logout');
 					connexion.onComplete = function(transport){
-						ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						pydio.getController().parseXmlMessage(transport.responseXML);
 						};
 					connexion.sendAsync();
 					]]></clientCallback>

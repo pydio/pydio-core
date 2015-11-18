@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.imagick" enabled="false" openable="true" iconClass="icon-picture" previewProvider="true" formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2" label="CONF_MESSAGE[Image Magick]" description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.imagick" enabled="false" openable="true" order="11" iconClass="icon-picture" previewProvider="true"
+        formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer"
+        mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2,ai" label="CONF_MESSAGE[Image Magick]"
+        description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
     <client_settings>
         <resources>
@@ -18,7 +22,7 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache"/>
 		</hooks>
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.svn" label="CONF_MESSAGE[Subversion Repository]" description="CONF_MESSAGE[Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<meta id="meta.svn" enabled="false" label="CONF_MESSAGE[Subversion Repository]" description="CONF_MESSAGE[Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/meta.svn/class.SvnManager.php" classname="SvnManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<i18n namespace="meta.svn" path="plugins/meta.svn/i18n" />
-			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger" autoload="true"/>
+			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger"/>
 			<img_library alias="svn_images" path="plugins/meta.svn/images"/>
 		</resources>
 	</client_settings>
@@ -27,18 +27,18 @@
 					</messages>
 					<html><![CDATA[
 						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">Versioning</div>
+							<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.svn.4]</div>
 							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 								<tr>
-									<td class="infoPanelLabel">Last Revision</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.41]</td>
 									<td class="infoPanelValue">#{last_revision}</td>
 								</tr>
 								<tr class="even">
-									<td class="infoPanelLabel">Revision Date</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.42]</td>
 									<td class="infoPanelValue">#{last_revision_date}</td>
 								</tr>
 								<tr>
-									<td class="infoPanelLabel">Revision Author</td>
+									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.43]</td>
 									<td class="infoPanelValue">#{last_revision_author}</td>
 								</tr>
 							</table>
@@ -59,16 +59,18 @@
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
+                        ResourcesManager.detectModuleToLoadAndApply('SVNLogger', function(){
 							var loadFunc = function(oForm){
-								ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
-								ajaxplorer.actionBar.svnLogger.open();
+								pydio.getController().svnLogger = new SVNLogger($(oForm));
+								pydio.getController().svnLogger.open();
 							};
 							var closeFunc = function(){
-								ajaxplorer.actionBar.svnLogger.close();
+								pydio.getController().svnLogger.close();
 								hideLightBox();
 								return false;
 							};
 							modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
+                        });
 						]]></clientCallback>
 					<clientForm id="svnlog_box"><![CDATA[
 					<div id="svnlog_box" action="svnlog" box_width="80%" box_height="340"></div>
@@ -84,11 +86,11 @@
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var loadFunc = function(oForm){
-							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
-							ajaxplorer.actionBar.svnLogger.open(true);
+							pydio.getController().svnLogger = new SVNLogger($(oForm));
+							pydio.getController().svnLogger.open(true);
 						};
 						var closeFunc = function(){
-							ajaxplorer.actionBar.svnLogger.close();
+							pydio.getController().svnLogger.close();
 							hideLightBox();
 							return false;
 						};

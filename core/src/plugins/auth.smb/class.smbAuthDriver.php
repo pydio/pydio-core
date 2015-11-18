@@ -56,7 +56,7 @@ class smbAuthDriver extends AbstractAuthDriver
 
     public function checkPassword($login, $pass, $seed)
     {
-        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
+       require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
 
         $_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
         $repoId = $this->options["REPOSITORY_ID"];
@@ -66,7 +66,15 @@ class smbAuthDriver extends AbstractAuthDriver
         $basePath = $repoObject->getOption("PATH", true);
         $basePath = str_replace("AJXP_USER", $login, $basePath);
         $host = $repoObject->getOption("HOST");
-        $url = "smb://$login:$pass@".$host."/".$basePath."/";
+        $domain = $repoObject->getOption("DOMAIN", true);
+        $smbPath = $repoObject->getOption("PATH", true);
+
+        if(!empty($domain)){
+            $login = $domain.$login;
+        }
+        $strTmp = "$login:$pass@".$host."/".$basePath."/";
+        $strTmp = str_replace("//", "/",$strTmp);
+        $url = "smb://".$strTmp;
         try {
             if (!is_dir($url)) {
                 $this->logDebug("SMB Login failure");

@@ -35,6 +35,7 @@ sed -i 's/\/\/ define("AJXP_FORCE_LOGPATH/define("AJXP_FORCE_LOGPATH/g' conf/boo
 
 # Update Share URL
 sed -i 's/"AJXP_INSTALL_PATH\/data\/public"/"\/var\/lib\/pydio\/public"/g' plugins/core.ajaxplorer/manifest.xml
+sed -i 's/name="PUBLIC_DOWNLOAD_URL" default=""/name="PUBLIC_DOWNLOAD_URL" default="\/pydio_public"/g' plugins/core.ajaxplorer/manifest.xml
 
 %build
 
@@ -73,6 +74,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/%{name}/.htaccess
 %config(noreplace) %{_sysconfdir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}*.conf
+%config(noreplace) %{pydiodir}/.htaccess
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %dir %attr(755,apache,apache) %{_localstatedir}/cache/%{name}
 %{_localstatedir}/cache/%{name}/.htaccess
@@ -91,6 +93,9 @@ if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
 then
 touch %{_localstatedir}/cache/%{name}/first_run_passed
 fi
+else
+# Brand new install
+cp -p %{pydiodir}/plugins/boot.conf/htaccess.tpl.linux %{pydiodir}/.htaccess
 fi
 
 

@@ -190,9 +190,11 @@ Class.create("AjxpCkEditor", TextEditor, {
 		
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
-		CKEDITOR.instances[this.editorInstanceId].setData(transport.responseText);
-		this.removeOnLoad(this.textareaContainer);
-		this.setModified(false);
+        window.setTimeout(function(){
+            CKEDITOR.instances[this.editorInstanceId].setData(transport.responseText);
+            this.removeOnLoad(this.textareaContainer);
+            this.setModified(false);
+        }.bind(this), 400);
 	}
 
 	

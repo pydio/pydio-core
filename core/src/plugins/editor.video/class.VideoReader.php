@@ -30,36 +30,34 @@ class VideoReader extends AJXP_Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
-        if(!isSet($this->actions[$action])) return false;
-
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
 
-        $streamData = $repository->streamData;
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
-
         $selection = new UserSelection($repository, $httpVars);
+        $node = $selection->getUniqueNode();
 
         if ($action == "read_video_data") {
+            if(!file_exists($node->getUrl()) || !is_readable($node->getUrl())){
+                throw new Exception("Cannot find file!");
+            }
             $this->logDebug("Reading video");
-            $file = $selection->getUniqueFile();
-            $node = new AJXP_Node($destStreamURL.$file);
             session_write_close();
-            $filesize = filesize($destStreamURL.$file);
-             $filename = $destStreamURL.$file;
+            $filesize = filesize($node->getUrl());
+            $filename = $node->getUrl();
+            $basename = AJXP_Utils::safeBasename($filename);
 
             //$fp = fopen($destStreamURL.$file, "r");
-             if (preg_match("/\.ogv$/", $file)) {
-                header("Content-Type: video/ogg; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.mp4$/", $file)) {
-                 header("Content-Type: video/mp4; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.m4v$/", $file)) {
-                 header("Content-Type: video/x-m4v; name=\"".basename($file)."\"");
-             } else if (preg_match("/\.webm$/", $file)) {
-                 header("Content-Type: video/webm; name=\"".basename($file)."\"");
-             }
+            if (preg_match("/\.ogv$/", $basename)) {
+                header("Content-Type: video/ogg; name=\"".$basename."\"");
+            } else if (preg_match("/\.mp4$/", $basename)) {
+                header("Content-Type: video/mp4; name=\"".$basename."\"");
+            } else if (preg_match("/\.m4v$/", $basename)) {
+                header("Content-Type: video/x-m4v; name=\"".$basename."\"");
+            } else if (preg_match("/\.webm$/", $basename)) {
+                header("Content-Type: video/webm; name=\"".$basename."\"");
+            }
 
             if ( isset($_SERVER['HTTP_RANGE']) && $filesize != 0 ) {
                 $this->logDebug("Http range", array($_SERVER['HTTP_RANGE']));
@@ -67,8 +65,12 @@ class VideoReader extends AJXP_Plugin
                 $ranges = explode('=', $_SERVER['HTTP_RANGE']);
                 $offsets = explode('-', $ranges[1]);
                 $offset = floatval($offsets[0]);
+                if($offset == 0){
+                    $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
+                }
 
-                $length = floatval($offsets[1]) - $offset;
+                $length = floatval($offsets[1]) - $offset + 1;
+
                 if (!$length) $length = $filesize - $offset;
                 if ($length + $offset > $filesize || $length < 0) $length = $filesize - $offset;
                 header('HTTP/1.1 206 Partial Content');
@@ -77,6 +79,7 @@ class VideoReader extends AJXP_Plugin
                 header('Accept-Ranges:bytes');
                 header("Content-Length: ". $length);
                 $file = fopen($filename, 'rb');
+                if(!is_resource($file)) throw new Exception("Cannot open file $file!");
                 fseek($file, 0);
                 $relOffset = $offset;
                 while ($relOffset > 2.0E9) {
@@ -90,20 +93,24 @@ class VideoReader extends AJXP_Plugin
                 while(ob_get_level()) ob_end_flush();
                 $readSize = 0.0;
                 while (!feof($file) && $readSize < $length && connection_status() == 0) {
-                    echo fread($file, 2048);
+                    if ($length < 2048){
+                        echo fread($file, $length);
+                    } else {
+                        echo fread($file, 2048);
+                    }
+
                     $readSize += 2048.0;
                     flush();
                 }
                 fclose($file);
             } else {
-                 $fp = fopen($filename, "rb");
+                $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 header("Content-Length: ".$filesize);
                 header("Content-Range: bytes 0-" . ($filesize - 1) . "/" . $filesize. ";");
                 header('Cache-Control: public');
 
-                $class = $streamData["classname"];
                 $stream = fopen("php://output", "a");
-                call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+                AJXP_MetaStreamWrapper::copyFileInStream($node->getUrl(), $stream);
                 fflush($stream);
                 fclose($stream);
             }

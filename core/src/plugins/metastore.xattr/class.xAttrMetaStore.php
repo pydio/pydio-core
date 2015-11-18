@@ -107,22 +107,37 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
      * @abstract
      * @param AJXP_Node $ajxpNode
      * @param String $nameSpace
-     * @param bool $private
+     * @param bool|String $private
      * @param int $scope
+     * @return array()
      */
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return array();
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             //throw new Exception("Filesystem does not support Extended Attributes!");
             return array();
         }
-        $data = xattr_get($path, $key);
-        $data = unserialize(base64_decode($data));
-        if( empty($data) || !is_array($data)) return array();
-        return $data;
+        if($private === AJXP_METADATA_ALLUSERS){
+            $startKey = $this->getMetaKey($nameSpace, $scope, "");
+            $arrMeta = array();
+            $keyList = xattr_list($path);
+            foreach($keyList as $k){
+                if(strpos($k, $startKey) === 0){
+                    $mData = xattr_get($path, $k);
+                    $decData = unserialize(base64_decode($mData));
+                    if(is_array($decData)) $arrMeta = array_merge_recursive($arrMeta, $decData);
+                }
+            }
+            return $arrMeta;
+        }else{
+            $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
+            $data = xattr_get($path, $key);
+            $data = unserialize(base64_decode($data));
+            if( empty($data) || !is_array($data)) return array();
+            return $data;
+        }
     }
 
     /**

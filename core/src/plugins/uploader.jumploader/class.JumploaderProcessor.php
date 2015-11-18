@@ -48,15 +48,14 @@ class JumploaderProcessor extends AJXP_Plugin
             self::$remote = true;
         }
 
-        if ($repository->detectStreamWrapper(false)) {
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
-            if ($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs") {
+        if ($repository->detectStreamWrapper(true)) {
+            $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
+            if ($wrapperName == "ajxp.ftp" || $wrapperName == "ajxp.remotefs") {
                 $this->logDebug("Skip decoding");
                 self::$skipDecoding = true;
             }
-            $this->logDebug("Stream ",$streamData);
-            self::$wrapperIsRemote = call_user_func(array($streamData["classname"], "isRemote"));
+            $this->logDebug("Stream is",$wrapperName);
+            self::$wrapperIsRemote = call_user_func(array($wrapperName, "isRemote"));
         }
         $this->logDebug("Jumploader HttpVars", $httpVars);
         $this->logDebug("Jumploader FileVars", $fileVars);
@@ -70,10 +69,10 @@ class JumploaderProcessor extends AJXP_Plugin
         if (!isSet($httpVars["fileId"])) {
             $this->logDebug("Trying Cross-Session Resume request");
 
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-            $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir;
+            $repository->detectStreamWrapper(true);
+            $context = new UserSelection($repository);
+            $destStreamURL = $context->currentBaseUrl().$dir;
             $fileHash = md5($httpVars["fileName"]);
 
             if (!self::$remote) {
@@ -174,9 +173,9 @@ class JumploaderProcessor extends AJXP_Plugin
                 /* we get the stream url (where all the partitions have been uploaded so far) */
                 $repository = ConfService::getRepository();
                 $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-                $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-                $streamData = $plugin->detectStreamWrapper(true);
-                $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+                $repository->detectStreamWrapper(true);
+                $context = new UserSelection($repository);
+                $destStreamURL = $context->currentBaseUrl().$dir."/";
 
                 if ($httpVars["partitionCount"] > 1) {
                     /* we fetch the information that help us to construct the temp files name */
@@ -210,10 +209,10 @@ class JumploaderProcessor extends AJXP_Plugin
         }
 
         if ($httpVars["lastPartition"]) {
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-            $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+            $repository->detectStreamWrapper(true);
+            $context = new UserSelection($repository);
+            $destStreamURL = $context->currentBaseUrl().$dir."/";
 
             /* we check if the current file has a relative path (aka we want to upload an entire directory) */
             $this->logDebug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
@@ -375,10 +374,12 @@ class JumploaderProcessor extends AJXP_Plugin
                             $currentFile = $partitions[$i];
                             $currentFileName = $currentFile["tmp_name"];
                             $part = fopen($currentFileName, "r");
-                            while (!feof($part)) {
-                                $length += fwrite($newDest, fread($part, 4096));
+                            if(is_resource($part)){
+                                while (!feof($part)) {
+                                    $length += fwrite($newDest, fread($part, 4096));
+                                }
+                                fclose($part);
                             }
-                            fclose($part);
                             unlink($currentFileName);
                         }
                         $newFile["type"] = $partitions[0]["type"];
@@ -389,15 +390,18 @@ class JumploaderProcessor extends AJXP_Plugin
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
                     } else {
-                        $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
+                        $current = $destStreamURL.$httpVars["partitionRealName"];
+                        $newDest = fopen($current, "w");
                         $fileHash = md5($httpVars["partitionRealName"]);
 
                         for ($i = 0; $i < $httpVars["partitionCount"] ; $i++) {
                             $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
-                            while (!feof($part)) {
-                                fwrite($newDest, fread($part, 4096));
+                            if(is_resource($part)){
+                                while (!feof($part)) {
+                                    fwrite($newDest, fread($part, 4096));
+                                }
+                                fclose($part);
                             }
-                            fclose($part);
                             unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
 
@@ -406,14 +410,17 @@ class JumploaderProcessor extends AJXP_Plugin
                 }
 
                 if (!self::$remote && (!self::$wrapperIsRemote || $relPath != $httpVars["partitionRealName"])) {
-                    $err = copy($current, $target);
+                    if($current != $target){
+                        $err = copy($current, $target);
+                    }
+                    else $err = true;
                 } else {
                     for ($i=0, $count=count($newPartitions); $i<$count; $i++) {
                         $driver->storeFileToCopy($newPartitions[$i]);
                     }
                 }
 
-                if ($err !== false) {
+                if ($current != $target && $err !== false) {
                     if(!self::$remote) unlink($current);
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 } else if ($current == $target) {

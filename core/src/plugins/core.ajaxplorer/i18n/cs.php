@@ -31,7 +31,7 @@ $mess=array(
 "date_relative_tomorrow" => "zítra v TIME",
 "date_relative_days_ago" => "před %s dny",
 "date_relative_days_ahead" => "během %s dnů",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "0" => "Poslední verze",
 "1" => "Jméno souboru",
 "2" => "Velkost",
@@ -628,4 +628,10 @@ $mess=array(
 "plugtype.desc.mailer" => "Pomůcky pro zasílání e-mailů z aplikací",
 "plugtype.title.mq" => "Komunikační služby",
 "plugtype.desc.mq" => "Implementace jednoduchého PUB/SUB serveru",
-); 
+    "537" => "File is too large! Maximum authorized size is %i",
+    "538" => "Upload error: no file found on server!",
+    "539" => "Upload error: file is partial",
+    "540" => "Upload error: cannot find the temporary directory",
+    "541" => "Upload error: cannot write into the temporary directory",
+    "542" => "Upload error: a PHP extension stopped the upload process."
+);

@@ -44,19 +44,20 @@ class AJXP_Plugin implements Serializable
      *
      * @var DOMXPath
      */
-    protected $xPath;
+    private $xPath;
     protected $manifestLoaded = false;
     protected $externalFilesAppended = false;
     protected $enabled;
-    protected $actions;
     protected $registryContributions = array();
     protected $contributionsLoaded = false;
     protected $options; // can be passed at init time
     protected $pluginConf; // can be passed at load time
     protected $pluginConfDefinition;
     protected $dependencies;
+    protected $extensionsDependencies;
     protected $streamData;
     protected $mixins = array();
+    protected $cachedXPathResults = array();
     public $loadingState = "";
     /**
      * The manifest.xml loaded
@@ -80,12 +81,11 @@ class AJXP_Plugin implements Serializable
         "manifestLoaded",
         "externalFilesAppended",
         "enabled",
-        "actions",
         "registryContributions",
         "contributionsLoaded",
         "mixins",
         "streamData",
-        "options", "pluginConf", "pluginConfDefinition", "dependencies", "loadingState", "manifestXML");
+        "options", "pluginConf", "pluginConfDefinition", "dependencies", "extensionsDependencies", "loadingState", "manifestXML", "cachedXPathResults");
 
     /**
      * Construction method
@@ -100,8 +100,8 @@ class AJXP_Plugin implements Serializable
         $split = explode(".", $id);
         $this->type = $split[0];
         $this->name = $split[1];
-        $this->actions = array();
         $this->dependencies = array();
+        $this->extensionsDependencies = array();
     }
 
     protected function getPluginWorkDir($check = false)
@@ -127,6 +127,14 @@ class AJXP_Plugin implements Serializable
     }
 
     /**
+     * @return DOMXPath
+     */
+    protected function getXPath(){
+        $this->unserializeManifest();
+        return $this->xPath;
+    }
+
+    /**
      * @param $options
      * @return void
      */
@@ -135,12 +143,15 @@ class AJXP_Plugin implements Serializable
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
-    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL)
+    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
     {
         if(!is_array($this->options)) $this->options = array();
         $merged = $this->options;
         if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $userObject;
+        if($loggedUser == null){
+            $loggedUser = AuthService::getLoggedUser();
+        }
         if ($loggedUser != null) {
             if ($repositoryScope == AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
@@ -152,7 +163,7 @@ class AJXP_Plugin implements Serializable
                 $repositoryScope,
                 isSet($merged[$optionName]) ? $merged[$optionName] : null
             );
-            if ($repo != null && $repo->hasParent()) {
+            if (isSet($repo) && $repo != null && $repo->hasParent()) {
                 $retest = $loggedUser->mergedRole->filterParameterValue(
                     $this->getId(),
                     $optionName,
@@ -180,7 +191,15 @@ class AJXP_Plugin implements Serializable
     {
         if(isSet($this->enabled)) return $this->enabled;
         $this->enabled = true;
+        if(isSet($this->cachedXPathResults["@enabled"])){
+            $value = $this->cachedXPathResults["@enabled"];
+            if($value === "false"){
+                $this->enabled = false;
+            }
+            return $this->enabled;
+        }
         if ($this->manifestLoaded) {
+            if($this->manifestXML != null) $this->unserializeManifest();
             $l = $this->xPath->query("@enabled", $this->manifestDoc->documentElement);
             if ($l->length && $l->item(0)->nodeValue === "false") {
                 $this->enabled = false;
@@ -191,10 +210,11 @@ class AJXP_Plugin implements Serializable
 
     /**
      * Main function for loading all the nodes under registry_contributions.
-     * @return void
+     * @param bool $dry
      */
     protected function loadRegistryContributions($dry = false)
     {
+        if($this->manifestXML != null) $this->unserializeManifest();
         $regNodes = $this->xPath->query("registry_contributions/*");
         for ($i=0;$i<$regNodes->length;$i++) {
             $regNode = $regNodes->item($i);
@@ -245,7 +265,7 @@ class AJXP_Plugin implements Serializable
      * @param string $xmlFile Path to the file from the base install path
      * @param array $include XPath query for XML Nodes to include
      * @param array $exclude XPath query for XML Nodes to exclude from the included ones.
-     * @return
+     * @param bool $dry Dry-run of the inclusion
      */
     protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array(), $dry = false)
     {
@@ -290,6 +310,7 @@ class AJXP_Plugin implements Serializable
         }
         if(!count($selected)) return;
         $originalRegContrib = $this->xPath->query("registry_contributions")->item(0);
+        $localRegParent = null;
         foreach ($selected as $parentNodeName => $data) {
             $node = $data["parent"]->cloneNode(false);
             //$newNode = $originalRegContrib->ownerDocument->importNode($node, false);
@@ -329,37 +350,12 @@ class AJXP_Plugin implements Serializable
             $attr->value = $this->id;
             $callback->appendChild($attr);
         }
-        if ($contribNode->nodeName == "actions") {
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            foreach ($contribNode->childNodes as $actionNode) {
-                if($actionNode->nodeType!=XML_ELEMENT_NODE) continue;
-                $names = $actionXpath->query("@name", $actionNode);
-                $name = $names->item(0)->value;
-                $this->actions[$name] = $name;
-                continue;
-                /*
-                $actionData=array();
-                $actionData["XML"] = $contribNode->ownerDocument->saveXML($actionNode);
-                $names = $actionXpath->query("@name", $actionNode);
-                $callbacks = $actionXpath->query("processing/serverCallback/@methodName", $actionNode);
-                if ($callbacks->length) {
-                    $actionData["callback"] = $callbacks->item(0)->value;
-                }
-                $rightContextNodes = $actionXpath->query("rightsContext",$actionNode);
-                if ($rightContextNodes->length) {
-                    $rightContext = $rightContextNodes->item(0);
-                    $actionData["rights"] = $this->nodeAttrToHash($rightContext);
-                }
-                $actionData["node"] = $actionNode;
-                $this->actions[$name] = $actionData;
-                */
-            }
-        }
     }
+
     /**
      * Load the main manifest.xml file of the plugni
      * @throws Exception
-     * @return
+     * @return void
      */
     public function loadManifest()
     {
@@ -390,6 +386,7 @@ class AJXP_Plugin implements Serializable
      */
     public function getManifestLabel()
     {
+        if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@label", $this->manifestDoc->documentElement);
         if($l->length) return AJXP_XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
         else return $this->id;
@@ -400,6 +397,7 @@ class AJXP_Plugin implements Serializable
      */
     public function getManifestDescription()
     {
+        if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@description", $this->manifestDoc->documentElement);
         if($l->length) return AJXP_XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
         else return "";
@@ -413,11 +411,11 @@ class AJXP_Plugin implements Serializable
     public function serialize()
     {
         if ($this->manifestDoc != null) {
-            $this->manifestXML = base64_encode($this->manifestDoc->saveXML());
+            $this->manifestXML = serialize(base64_encode($this->manifestDoc->saveXML()));
         }
         $serialArray = array();
         foreach ($this->serializableAttributes as $attr) {
-            $serialArray[$attr] = serialize($this->$attr);
+            $serialArray[$attr] = $this->$attr;
         }
         return serialize($serialArray);
     }
@@ -431,16 +429,29 @@ class AJXP_Plugin implements Serializable
     {
         $serialArray = unserialize($string);
         foreach ($serialArray as $key => $value) {
-            $this->$key = unserialize($value);
+            $this->$key = $value;
         }
+        /*
         if ($this->manifestXML != NULL) {
-            //$this->manifestDoc = DOMDocument::loadXML(base64_decode($this->manifestXML));
             $this->manifestDoc = new DOMDocument(1.0, "UTF-8");
-            $this->manifestDoc->loadXML(base64_decode($this->manifestXML));
+            $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
             $this->reloadXPath();
             unset($this->manifestXML);
         }
-        //var_dump($this);
+        */
+    }
+
+    /**
+     * Load DOMDocument from serialized value. Must be called after checking
+     * that property $this->manifestXML is not null.
+     */
+    protected function unserializeManifest(){
+        if($this->manifestXML != null){
+            $this->manifestDoc = new DOMDocument(1.0, "UTF-8");
+            $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
+            $this->reloadXPath();
+            unset($this->manifestXML);
+        }
     }
 
     /**
@@ -448,6 +459,7 @@ class AJXP_Plugin implements Serializable
      * on the manifest.
      * @param string $xmlNodeName
      * @param string $format
+     * @param bool $externalFiles
      * @return DOMElement|DOMNodeList|string
      */
     public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false)
@@ -456,6 +468,7 @@ class AJXP_Plugin implements Serializable
             $this->loadRegistryContributions(true);
             $this->externalFilesAppended = true;
         }
+        if($this->manifestXML != null) $this->unserializeManifest();
         if ($xmlNodeName == "") {
             if ($format == "string") {
                 return $this->manifestDoc->saveXML($this->manifestDoc->documentElement);
@@ -500,6 +513,21 @@ class AJXP_Plugin implements Serializable
             $value = $attr->value;
             $this->dependencies = array_merge($this->dependencies, explode("|", $value));
         }
+        $extPaths = "dependencies/phpExtension/@name";
+        $nodes = $this->xPath->query($extPaths);
+        foreach ($nodes as $attr) {
+            $this->extensionsDependencies[] = $attr->value;
+        }
+        $this->cachedNodesFromManifest("dependencies/activePlugin");
+        $this->cachedNodesFromManifest("//server_settings/param[@default]");
+        $this->cachedNodesFromManifest("//server_settings/global_param|//server_settings/param");
+        $l = $this->xPath->query("@enabled", $this->manifestDoc->documentElement);
+        if ($l->length) {
+            $this->cachedXPathResults["@enabled"] = $l->item(0)->nodeValue;
+        }else{
+            $this->cachedXPathResults["@enabled"] = "not_set";
+        }
+
     }
     /**
      * Update dependencies dynamically
@@ -529,6 +557,24 @@ class AJXP_Plugin implements Serializable
         return (in_array($pluginName, $this->dependencies)
             || in_array(substr($pluginName, 0, strpos($pluginName, "."))."+", $this->dependencies));
     }
+
+    protected function cachedNodesFromManifest($query){
+        if(isSet($this->cachedXPathResults[$query])){
+            return $this->cachedXPathResults[$query];
+        }
+        if(!$this->manifestLoaded) return array();
+        if($this->manifestXML != null) $this->unserializeManifest();
+        $nodes = $this->xPath->query($query);
+        $res = array();
+        foreach($nodes as $xmlNode){
+            $arrayNode = $this->nodeAttrToHash($xmlNode);
+            $arrayNode["__NODE_NAME__"] = $xmlNode->nodeName;
+            $res[] = $arrayNode;
+        }
+        $this->cachedXPathResults[$query] = $res;
+        return $res;
+    }
+
     /**
      * Get dependencies
      *
@@ -537,11 +583,10 @@ class AJXP_Plugin implements Serializable
      */
     public function getActiveDependencies($pluginService)
     {
-        if(!$this->manifestLoaded) return array();
         $deps = array();
-        $nodes = $this->xPath->query("dependencies/activePlugin/@pluginName");
-        foreach ($nodes as $attr) {
-            $value = $attr->value;
+        $nodes = $this->cachedNodesFromManifest("dependencies/activePlugin");
+        foreach ($nodes as $arrayNode) {
+            $value = $arrayNode["pluginName"];
             $parts = explode("|", $value);
             foreach ($parts as $depName) {
                 if ($depName == "access.AJXP_STREAM_PROVIDER") {
@@ -562,12 +607,12 @@ class AJXP_Plugin implements Serializable
      */
     protected function loadConfigsDefinitions()
     {
-        $params = $this->xPath->query("//server_settings/global_param");
+        $params = $this->cachedNodesFromManifest("//server_settings/global_param|//server_settings/param");
         $this->pluginConf = array();
-        foreach ($params as $xmlNode) {
-            $paramNode = $this->nodeAttrToHash($xmlNode);
+        foreach ($params as $paramNode) {
+            $global = ($paramNode['__NODE_NAME__'] == "global_param");
             $this->pluginConfDefinition[$paramNode["name"]] = $paramNode;
-            if (isset($paramNode["default"])) {
+            if ($global && isset($paramNode["default"])) {
                 if ($paramNode["type"] == "boolean") {
                     $paramNode["default"] = ($paramNode["default"] === "true" ? true: false);
                 } else if ($paramNode["type"] == "integer") {
@@ -584,15 +629,15 @@ class AJXP_Plugin implements Serializable
     protected function loadOptionsDefaults()
     {
         $optionsDefaults = array();
-        $params = $this->xPath->query("//server_settings/param[@default]");
-        foreach ($params as $xmlNode) {
-            $default = $xmlNode->getAttribute("default");
-            if ($xmlNode->getAttribute("type") == "boolean") {
+        $params = $this->cachedNodesFromManifest("//server_settings/param[@default]");
+        foreach ($params as $node) {
+            $default = $node["default"];
+            if ($node["type"] == "boolean") {
                 $default = ($default === "true" ? true: false);
-            } else if ($xmlNode->getAttribute("type") == "integer") {
+            } else if ($node["type"] == "integer") {
                 $default = intval($default);
             }
-            $optionsDefaults[$xmlNode->getAttribute("name")] = $default;
+            $optionsDefaults[$node["name"]] = $default;
         }
         return $optionsDefaults;
     }
@@ -652,10 +697,28 @@ class AJXP_Plugin implements Serializable
      */
     public function getClassFile()
     {
+        if($this->manifestXML != null) $this->unserializeManifest();
         $files = $this->xPath->query("class_definition");
         if(!$files->length) return false;
         return $this->nodeAttrToHash($files->item(0));
     }
+
+    public function missingExtensions(){
+        $missing = array();
+        if(count($this->extensionsDependencies)){
+            foreach($this->extensionsDependencies as $ext){
+                if (!extension_loaded($ext)) {
+                    $missing[] = $ext;
+                }
+            }
+        }
+        return $missing;
+    }
+
+    public function hasMissingExtensions(){
+        return count($this->missingExtensions()) > 0;
+    }
+
     /**
      * @return bool
      */
@@ -778,6 +841,7 @@ class AJXP_Plugin implements Serializable
             // include wrapper, no other checks needed.
             include_once(AJXP_INSTALL_PATH."/".$streamData["filename"]);
         } else {
+            if($this->manifestXML != null) $this->unserializeManifest();
             $files = $this->xPath->query("class_stream_wrapper");
             if (!$files->length) {
                 $this->streamData = false;
@@ -797,10 +861,12 @@ class AJXP_Plugin implements Serializable
         }
         if ($register) {
             $pServ = AJXP_PluginsService::getInstance();
-            if (!in_array($streamData["protocol"], stream_get_wrappers())) {
+            $wrappers = stream_get_wrappers();
+            if (!in_array($streamData["protocol"], $wrappers)) {
                 stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
                 $pServ->registerWrapperClass($streamData["protocol"], $streamData["classname"]);
             }
+            AJXP_MetaStreamWrapper::register($wrappers);
         }
         return $streamData;
     }
@@ -812,6 +878,7 @@ class AJXP_Plugin implements Serializable
      */
     protected function exposeConfigInManifest($configName, $configValue)
     {
+        if($this->manifestXML != null) $this->unserializeManifest();
         $confBranch = $this->xPath->query("plugin_configs");
         if (!$confBranch->length) {
             $configNode = $this->manifestDoc->importNode(new DOMElement("plugin_configs", ""));
@@ -839,6 +906,7 @@ class AJXP_Plugin implements Serializable
             "plugin_version"=> "follow",
             "core_version" => AJXP_VERSION,
         );
+        if($this->manifestXML != null) $this->unserializeManifest();
         $infoBranch = $this->xPath->query("plugin_info");
         if ($infoBranch->length) {
             foreach ($infoBranch->item(0)->childNodes as $child) {

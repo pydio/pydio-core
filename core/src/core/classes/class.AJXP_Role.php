@@ -33,13 +33,42 @@ define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 class AJXP_Role implements AjxpGroupPathProvider
 {
 
+    /**
+     * @var String path of this role, default is root path
+     */
     protected $groupPath;
+    /**
+     * @var String Role identifier
+     */
     protected $roleId;
 
+    /**
+     * @var array List of access rights for each workspaces (wsId => "r", "w", "rw", "d")
+     */
     protected $acls = array();
+    /**
+     * @var array List of plugins parameters values, (SCOPE => PLUGIN NAME => PARAM NAME => value)
+     */
     protected $parameters = array();
+    /**
+     * @var array List of plugin actions that can be disabled/enabled (SCOPE => PLUGIN NAME => ACTION NAME => status)
+     */
     protected $actions = array();
+    /**
+     * @var array Automatically applies to a given list of profiles
+     */
     protected $autoApplies = array();
+    /**
+     * @var AJXP_PermissionMask[]
+     */
+    protected $masks = array();
+
+    /**
+     * @var integer
+     */
+    protected $lastUpdated = 0;
+
+    static $cypheredPassPrefix = '$pydio_password$';
 
     public function __construct($id)
     {
@@ -143,15 +172,57 @@ class AJXP_Role implements AjxpGroupPathProvider
     }
 
     /**
+     * @param String $repositoryId
+     * @param AJXP_PermissionMask $mask
+     */
+    public function setMask($repositoryId, $mask){
+        $this->masks[$repositoryId] = $mask;
+    }
+
+    /**
+     * @param string $repositoryId
+     */
+    public function clearMask($repositoryId){
+        if(isSet($this->masks[$repositoryId])){
+            unset($this->masks[$repositoryId]);
+        }
+    }
+
+    /**
+     * @param string $repositoryId
+     * @return bool
+     */
+    public function hasMask($repositoryId){
+        return isSet($this->masks[$repositoryId]);
+    }
+
+    /**
+     * @param $repositoryId
+     * @return AJXP_PermissionMask|null
+     */
+    public function getMask($repositoryId){
+        return (isSet($this->masks[$repositoryId]) ? $this->masks[$repositoryId] : null);
+    }
+
+    /**
+     * @return AJXP_PermissionMask[]
+     */
+    public function listMasks(){
+        return $this->masks;
+    }
+
+    /**
      * Send all role informations as an associative array
+     * @param bool $blurPasswords
      * @return array
      */
-    public function getDataArray()
+    public function getDataArray($blurPasswords = false)
     {
         $roleData = array();
         $roleData["ACL"] = $this->listAcls();
+        $roleData["MASKS"] = $this->listMasks();
         $roleData["ACTIONS"] = $this->listActionsStates();
-        $roleData["PARAMETERS"] = $this->listParameters();
+        $roleData["PARAMETERS"] = $this->listParameters(false, $blurPasswords);
         $roleData["APPLIES"] = $this->listAutoApplies();
         return $roleData;
     }
@@ -167,6 +238,9 @@ class AJXP_Role implements AjxpGroupPathProvider
         $this->actions = $roleData["ACTIONS"];
         $this->parameters = $roleData["PARAMETERS"];
         $this->autoApplies = $roleData["APPLIES"];
+        if(isSet($roleData["MASKS"])){
+            $this->masks = $roleData["MASKS"];
+        }
 
     }
 
@@ -201,29 +275,55 @@ class AJXP_Role implements AjxpGroupPathProvider
      */
     public function filterParameterValue($pluginId, $parameterName, $repositoryId, $parameterValue)
     {
-        if (isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])) {
-            $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
-            if($v === AJXP_VALUE_CLEAR) return "";
-            else return $v;
-        }
         if (isSet($this->parameters[$repositoryId][$pluginId][$parameterName])) {
             $v = $this->parameters[$repositoryId][$pluginId][$parameterName];
             if($v === AJXP_VALUE_CLEAR) return "";
-            else return $v;
+            else return $this->filterCypheredPasswordValue($v);
+        }
+        if (isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])) {
+            $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
+            if($v === AJXP_VALUE_CLEAR) return "";
+            else return $this->filterCypheredPasswordValue($v);
         }
         return $parameterValue;
     }
+
     /**
+     * @param bool $preserveCypheredPasswords
+     * @param bool $blurCypheredPasswords
      * @return array Associative array of parameters : array[REPO_ID][PLUGIN_ID][PARAMETER_NAME] = PARAMETER_VALUE
      */
-    public function listParameters()
+    public function listParameters($preserveCypheredPasswords = false, $blurCypheredPasswords = false)
     {
-        return $this->parameters;
+        if($preserveCypheredPasswords) return $this->parameters;
+
+        $copy = $this->parameters;
+        foreach($copy as $repo => &$plugs){
+            foreach($plugs as $plugName => &$plugData){
+                foreach($plugData as $paramName => &$paramValue){
+                    $testValue = $this->filterCypheredPasswordValue($paramValue);
+                    if($testValue != $paramValue){
+                        if($blurCypheredPasswords) $paramValue = "__AJXP_VALUE_SET__";
+                        else $paramValue = $testValue;
+                    }
+                }
+            }
+        }
+        return $copy;
     }
 
     public function listAutoApplies()
     {
         return $this->autoApplies;
+    }
+
+    /**
+     * @param String $value
+     * @return String
+     */
+    private function filterCypheredPasswordValue($value){
+        if(is_string($value) && strpos($value, self::$cypheredPassPrefix) === 0) return str_replace(self::$cypheredPassPrefix, "", $value);
+        return $value;
     }
 
     /**
@@ -296,13 +396,18 @@ class AJXP_Role implements AjxpGroupPathProvider
     {
         $newRole = new AJXP_Role($role->getId());
 
-        $newAcls = $this->array_merge_recursive2($role->listAcls(), $this->listAcls());
+        $roleAcl = $role->listAcls();
+        $newAcls = $this->array_merge_recursive2($roleAcl, $this->listAcls());
         foreach ($newAcls as $repoId => $rightString) {
             if($rightString == AJXP_VALUE_CLEAR) continue;
+            if(empty($rightString) && !empty($roleAcl[$repoId])){
+                $rightString = $roleAcl[$repoId];
+            }
             $newRole->setAcl($repoId, $rightString);
         }
 
-        $newParams = $this->array_merge_recursive2($role->listParameters(), $this->listParameters());
+        $roleParameters = $role->listParameters(true);
+        $newParams = $this->array_merge_recursive2($roleParameters, $this->listParameters(true));
         foreach ($newParams as $repoId => $data) {
             foreach ($data as $pluginId => $param) {
                 foreach ($param as $parameterName => $parameterValue) {
@@ -311,6 +416,9 @@ class AJXP_Role implements AjxpGroupPathProvider
                         continue;
                     }
                     if($parameterValue == AJXP_VALUE_CLEAR) continue;
+                    if($parameterValue === "" && !empty($roleParameters[$repoId][$pluginId][$parameterName])){
+                        $parameterValue = $newParams[$repoId][$pluginId][$parameterName];
+                    }
                     $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
                 }
             }
@@ -322,6 +430,18 @@ class AJXP_Role implements AjxpGroupPathProvider
                 foreach ($action as $actionName => $actionState) {
                     $newRole->setActionState($pluginId, $actionName, $repoId, $actionState);
                 }
+            }
+        }
+
+        $roleMasks = $role->listMasks();
+        $allKeys = array_merge(array_keys($this->masks), array_keys($roleMasks));
+        foreach($allKeys as $repoId){
+            if(isSet($roleMasks[$repoId]) && isSet($this->masks[$repoId])){
+                $newRole->setMask($repoId, $roleMasks[$repoId]->override($this->masks[$repoId]));
+            }else if(isSet($roleMasks[$repoId])){
+                $newRole->setMask($repoId, $roleMasks[$repoId]);
+            }else{
+                $newRole->setMask($repoId, $this->masks[$repoId]);
             }
         }
 
@@ -355,6 +475,11 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $arr;
     }
 
+    /**
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
     public function array_merge_recursive2($array1, $array2)
     {
         $arrays = func_get_args();
@@ -366,7 +491,7 @@ class AJXP_Role implements AjxpGroupPathProvider
             if (!is_array($arrays[$i])) {
                 // also array_merge_recursive returns nothing in this case
                 trigger_error('Argument #' . ($i+1) . ' is not an array - trying to merge array with scalar! Returning null!', E_USER_WARNING);
-                return;
+                return null;
             }
         }
 
@@ -421,6 +546,11 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $this->roleId;
    }
 
+    public function alwaysOverrides()
+    {
+        return $this->filterParameterValue("core.conf", "ROLE_FORCE_OVERRIDE", AJXP_REPO_SCOPE_ALL, false);
+   }
+
     /**
      * @param array $specificRights
      */
@@ -436,6 +566,14 @@ class AJXP_Role implements AjxpGroupPathProvider
     public function autoAppliesTo($specificRight)
     {
         return in_array($specificRight, $this->autoApplies);
+    }
+
+    public function getLastUpdated(){
+        return $this->lastUpdated;
+    }
+
+    public function setLastUpdated($time){
+        $this->lastUpdated = $time;
     }
 
 }

@@ -56,4 +56,6 @@ $mess = array(
     "20d" => "Gerar uma expressão Cronológica",
     "21" => "Adicionar a seguinte linha à sua Tabela Cronológica, substituindo o valor da sua palavra-chave real e agendando o que pretende (configurado aqui para correr a cada cinco minutos).",
     "22" => "Agendamento Genérico para correr tarefas de forma regular. Requer a activação de CLI e de uma Tabela Cronológica ou de um sistema semelhante.",
+    "23" => "Execution Context",
+    "24" => "Parameters",
 );

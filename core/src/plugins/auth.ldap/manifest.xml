@@ -9,26 +9,44 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="LDAP_URL" type="string" label="CONF_MESSAGE[LDAP URL]" description="CONF_MESSAGE[LDAP Server URL (IP or name)]" mandatory="true"/>
-        <param name="LDAP_PROTOCOL" type="select" choices="ldap|Standard (ldap),ldaps|SSL (ldaps)" default="ldap" label="CONF_MESSAGE[Protocol]" description="CONF_MESSAGE[Connect through ldap or ldaps]" mandatory="true"/>
-        <param name="LDAP_PORT" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false"/>
-        <param name="LDAP_USER" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
-        <param name="LDAP_PASSWORD" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>
-        <param name="LDAP_DN" type="string" replicationGroup="LDAPDN" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
-        <param name="LDAP_PAGE_SIZE" type="string" label="CONF_MESSAGE[LDAP Server page size]" description="CONF_MESSAGE[Page size of LDAP Server]" mandatory="false" default="500"/>
-        <param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false" default="objectClass=person"/>
-        <param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
-        <param name="LDAP_SEARCHUSER_ATTR" type="string" label="CONF_MESSAGE[Search Users by Attribute]" description="CONF_MESSAGE[When looking for a user through autocomplete, search on a specific parameter instead of user ID]" mandatory="false" default=""/>
-        <param name="LDAP_GDN" type="string" replicationGroup="LDAPGDN" label="CONF_MESSAGE[Groups DN]" description="CONF_MESSAGE[DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.]" mandatory="false"/>
-        <param name="LDAP_GROUP_FILTER" type="string" label="CONF_MESSAGE[LDAP Groups Filter]" description="CONF_MESSAGE[Filter which groups to fetch.]" mandatory="false" default="objectClass=group"/>
-        <param name="LDAP_GROUPATTR" type="string" label="CONF_MESSAGE[Group attribute]" description="CONF_MESSAGE[Group main attribute to be used as a label]" mandatory="false"/>
-        <param name="LDAP_FAKE_MEMBEROF" type="string" label="CONF_MESSAGE[Fake Member from...]" description="CONF_MESSAGE[If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema.]" default="" mandatory="false"/>
-        <param name="LDAP_GROUP_PREFIX" type="string" label="CONF_MESSAGE[Role Prefix (for memberof)]" description="CONF_MESSAGE[Role prefix when you mapping memberof => roleID]" default="" mandatory="false" />
-        <param name="MAPPING_LDAP_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[LDAP attribute]" description="CONF_MESSAGE[Name of the LDAP attribute to read]" mandatory="false"/>
-        <param name="MAPPING_LOCAL_TYPE" type="select" replicationGroup="MAPPING" choices="plugin_param|Plugin Parameter,role_id|Role Id,group_path|Group Path,profile|Profile" label="CONF_MESSAGE[Mapping Type]" description="CONF_MESSAGE[Determine the type of mapping]" mandatory="false"/>
-        <param name="MAPPING_LOCAL_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[Plugin parameter]" description="CONF_MESSAGE[Name of the custom local parameter to set]" mandatory="false"/>
-        <param type="string" name="TEST_USER" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use the Test Connexion button to check if this user is correctly found in your LDAP directory.]" mandatory="false"/>
-        <param type="button" name="TEST_LDAP" choices="run_plugin_action:auth.ldap:testLDAPConnexion" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Try to connect to LDAP]" mandatory="false"/>
+        <!-- Server Connection -->
+        <param name="LDAP_CONNECTION_LEGEND" group="CONF_MESSAGE[Server Connection]" type="legend" label="" description="CONF_MESSAGE[Set up main connection to server. Use the button to test that your parameters are correct.]"/>
+        <param name="LDAP_URL" group="CONF_MESSAGE[Server Connection]" type="string" label="CONF_MESSAGE[LDAP URL]" description="CONF_MESSAGE[LDAP Server URL (IP or name)]" mandatory="true"/>
+        <param name="LDAP_PROTOCOL" group="CONF_MESSAGE[Server Connection]" type="select" choices="ldap|Standard (ldap),ldaps|SSL (ldaps)" default="ldap" label="CONF_MESSAGE[Protocol]" description="CONF_MESSAGE[Connect through ldap or ldaps]" mandatory="true"/>
+        <param name="LDAP_PORT" group="CONF_MESSAGE[Server Connection]" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false" default="389"/>
+        <param name="LDAP_USER" group="CONF_MESSAGE[Server Connection]" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
+        <param name="LDAP_PASSWORD" group="CONF_MESSAGE[Server Connection]" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>
+
+        <!-- Users Schema -->
+        <param name="LDAP_USERS_LEGEND" group="CONF_MESSAGE[Users Schema]" type="legend" label="" description="CONF_MESSAGE[These parameters will describe how the users will be loaded/filtered from the directory.]"/>
+        <param name="LDAP_DN" group="CONF_MESSAGE[Users Schema]" type="string" replicationGroup="LDAPDN" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
+        <param name="LDAP_FILTER" group="CONF_MESSAGE[Users Schema]" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false" default="objectClass=person"/>
+        <param name="LDAP_USERATTR" group="CONF_MESSAGE[Users Schema]" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
+
+        <param name="TEST_USER" group="CONF_MESSAGE[Users Schema]" type="string" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use the Test Connexion button to check if this user is correctly found in your LDAP directory.]" mandatory="false"/>
+        <param name="TEST_LDAP" group="CONF_MESSAGE[Users Schema]" type="button" choices="run_plugin_action:auth.ldap:testLDAPConnexion" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Try to connect to LDAP]" mandatory="false"/>
+
+        <!-- Groups Schema -->
+        <param name="LDAP_GROUPS_LEGEND" group="CONF_MESSAGE[Groups Schema]" type="legend" label="" description="CONF_MESSAGE[These parameters will describe how groups will optionally be loaded/filtered from the directory.]"/>
+        <param name="LDAP_GDN" group="CONF_MESSAGE[Groups Schema]" type="string" replicationGroup="LDAPGDN" label="CONF_MESSAGE[Groups DN]" description="CONF_MESSAGE[DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.]" mandatory="false"/>
+        <param name="LDAP_GROUP_FILTER" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[LDAP Groups Filter]" description="CONF_MESSAGE[Filter which groups to fetch.]" mandatory="false" default="objectClass=group"/>
+        <param name="LDAP_GROUPATTR" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[Group attribute]" description="CONF_MESSAGE[Group main attribute to be used as a label]" mandatory="false"/>
+        <param name="LDAP_GROUP_PREFIX" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[Role Prefix (for memberof)]" description="CONF_MESSAGE[Role prefix when you mapping memberof => roleID]" default="" mandatory="false" />
+
+        <!-- Attributes Mapping -->
+        <param name="LDAP_MAPPING_LEGEND" group="CONF_MESSAGE[Attributes Mapping]" type="legend" label="" description="CONF_MESSAGE[Use this section to automatically map some LDAP attributes to Pydio plugins parameters values.]"/>
+        <param name="MAPPING_LDAP_PARAM" group="CONF_MESSAGE[Attributes Mapping]" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[LDAP attribute]" description="CONF_MESSAGE[Name of the LDAP attribute to read]" mandatory="false"/>
+        <param name="MAPPING_LOCAL_TYPE" group="CONF_MESSAGE[Attributes Mapping]" type="select" replicationGroup="MAPPING" choices="plugin_param|Plugin Parameter,role_id|Role Id,group_path|Group Path,profile|Profile" label="CONF_MESSAGE[Mapping Type]" description="CONF_MESSAGE[Determine the type of mapping]" mandatory="false"/>
+        <param name="MAPPING_LOCAL_PARAM" group="CONF_MESSAGE[Attributes Mapping]" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[Plugin parameter]" description="CONF_MESSAGE[Name of the custom local parameter to set]" mandatory="false"/>
+
+        <!-- Advanced Parameters -->
+        <param name="LDAP_ADVANCED_LEGEND" group="CONF_MESSAGE[Advanced Parameters]" type="legend" label="" description="CONF_MESSAGE[More advanced settings for LDAP/AD]"/>
+        <param name="LDAP_FAKE_MEMBEROF" group="CONF_MESSAGE[Advanced Parameters]" type="string" label="CONF_MESSAGE[Fake Member from...]" description="CONF_MESSAGE[If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema.]" default="" mandatory="false"/>
+        <param name="LDAP_VALUE_MEMBERATTR_IN_GROUP" group="CONF_MESSAGE[Advanced Parameters]" type="boolean" label="CONF_MESSAGE[Fake MemberOf. value of member/memberUid attribute of group]" description="CONF_MESSAGE[value of member/memberUid attribute of group: can be user DN or user CN. Use with Fake memberOf enabled. YES use DN, otherwise CN]" default="true" mandatory="false"/>
+        <param name="LDAP_SEARCHUSER_ATTR" group="CONF_MESSAGE[Advanced Parameters]" type="string" label="CONF_MESSAGE[Search Users by Attribute]" description="CONF_MESSAGE[When looking for a user through autocomplete, search on a specific parameter instead of user ID]" mandatory="false" default=""/>
+        <param name="LDAP_PAGE_SIZE" group="CONF_MESSAGE[Advanced Parameters]" type="string" label="CONF_MESSAGE[LDAP Server page size]" description="CONF_MESSAGE[Page size of LDAP Server]" mandatory="false" default="500"/>
+        <param name="LDAP_COUNT_CACHE_TTL" group="CONF_MESSAGE[Advanced Parameters]" type="integer" label="CONF_MESSAGE[Cache User Count (hours)]" description="CONF_MESSAGE[Locally cache the total number of users during X hours. Can be handy for huge directories.]" mandatory="false" default="1"/>
+
     </server_settings>
     <class_definition filename="plugins/auth.ldap/class.ldapAuthDriver.php" classname="ldapAuthDriver"/>
     <registry_contributions>

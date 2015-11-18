@@ -1,9 +1,8 @@
-js/lib/prototype/prototype.js
-js/lib/prototype/prototype.livepipe.js
-js/lib/prototype/prototype.oo.js
-js/lib/modernizr/modernizr.min.js
-js/lib/prototype/jsProgressBarHandler.js
-js/ajaxplorer/class.Connexion.js
-js/lib/md5/md5.js
-js/ajaxplorer/ajxp_utils.js
-js/ajaxplorer/class.AjxpBootstrap.js
+js/vendor/es6/browser-polyfill.js
+js/vendor/prototype/prototype.js
+js/vendor/prototype/prototype.livepipe.js
+js/vendor/prototype/prototype.oo.js
+js/core/util/HasherUtils.js
+js/vendor/prototype/jsProgressBarHandler.js
+js/ui/prototype/http/class.Connexion.js
+js/ui/prototype/class.AjxpBootstrap.js

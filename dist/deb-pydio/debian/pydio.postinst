@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for phpmyadmin
+# postinst script for pydio
 
 set -e
 
@@ -33,6 +33,13 @@ then
             touch $VAR_DIR/data/cache/first_run_passed
 
 	    fi
+
+	fi
+
+	if [ ! -f "$BIN_DIR/.htaccess" ]
+	then
+        # Install linux specific htaccess
+	    cp $BIN_DIR/plugins/boot.conf/htaccess.tpl.linux $BIN_DIR/.htaccess
 
 	fi
 

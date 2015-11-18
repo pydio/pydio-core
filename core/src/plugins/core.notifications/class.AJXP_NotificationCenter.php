@@ -57,7 +57,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
            // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
                if($contribNode->nodeName == "actions"){
-                   unset($this->actions["get_my_feed"]);
                    $actionXpath=new DOMXPath($contribNode->ownerDocument);
                    $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
                    $publicUrlNode = $publicUrlNodeList->item(0);
@@ -75,12 +74,19 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function persistNotificationToAlerts(AJXP_Notification &$notification)
     {
         if ($this->eventStore) {
+            $this->eventStore->persistAlert($notification);
             AJXP_Controller::applyHook("msg.instant",array(
                 "<reload_user_feed/>",
                 $notification->getNode()->getRepositoryId(),
                 $notification->getTarget()
             ));
-            $this->eventStore->persistAlert($notification);
+            if($notification->getNode()->getRepository() != null && $notification->getNode()->getRepository()->hasParent()){
+                AJXP_Controller::applyHook("msg.instant",array(
+                    "<reload_user_feed/>",
+                    $notification->getNode()->getRepository()->getParentId(),
+                    $notification->getTarget()
+                ));
+            }
         }
     }
 
@@ -91,8 +97,14 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         $n = ($oldNode == null ? $newNode : $oldNode);
         $repoId = $n->getRepositoryId();
-        $userId = AuthService::getLoggedUser()->getId();
-        $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        if($n->getUser()){
+            $userId = $n->getUser();
+            $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
+            if($obj) $userGroup = $obj->getGroupPath();
+        }else{
+            $userId = AuthService::getLoggedUser()->getId();
+            $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        }
         $repository = ConfService::getRepositoryById($repoId);
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
@@ -190,13 +202,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     try {
-                        $node->loadNodeInfo();
+                        @$node->loadNodeInfo();
                     } catch (Exception $e) {
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
                     $node->event_description_long = $notif->getDescriptionLong(true);
-                    $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
+                    $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notif->getDate(), $mess));
                     $node->short_date = AJXP_Utils::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
@@ -309,7 +321,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $contentFilter = $nodeRepo->getContentFilter();
                     if(isSet($contentFilter)){
                         $nodePath = $contentFilter->filterExternalPath($node->getPath());
-                        if($nodePath == "/"){
+                        if(empty($nodePath) || $nodePath == "/"){
                             $k = array_keys($contentFilter->filters);
                             $nodePath = $k[0];
                         }
@@ -320,6 +332,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $parentNodeURL = $node->getScheme()."://".$repositoryFilter.$relative;
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
+                    $path = $node->getPath();
                 }
 
 
@@ -338,7 +351,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
                 $node->event_description_long = $notification->getDescriptionLong(true);
-                $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
+                $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notification->getDate(), $mess));
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
                 if ($node->getRepository() != null) {

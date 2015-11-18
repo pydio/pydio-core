@@ -33,28 +33,28 @@ class HttpDownloader extends AJXP_Plugin
         //$this->logInfo("DL file", $httpVars);
 
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(false)) {
+        if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-        $streamData = $plugin->detectStreamWrapper(true);
+        $userSelection = new UserSelection($repository);
         $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+        $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";
         $dlURL = null;
         if (isSet($httpVars["file"])) {
             $parts = parse_url($httpVars["file"]);
             $getPath = $parts["path"];
             $basename = basename($getPath);
-            $dlURL = $httpVars["file"];
-        }
-        if (isSet($httpVars["dlfile"])) {
-            $dlFile = $streamData["protocol"]."://".$repository->getId().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
+            //$dlURL = $httpVars["file"];
+        }else if (isSet($httpVars["dlfile"])) {
+            $dlFile = $userSelection->currentBaseUrl().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
             $realFile = file_get_contents($dlFile);
             if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
             $parts = parse_url($realFile);
             $getPath = $parts["path"];
             $basename = basename($getPath);
-            $dlURL = $realFile;
+            //$dlURL = $realFile;
+        }else{
+            throw new Exception("Missing argument, either file or dlfile");
         }
 
         switch ($action) {
@@ -63,7 +63,7 @@ class HttpDownloader extends AJXP_Plugin
 
                     $unixProcess = AJXP_Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
                     if ($unixProcess !== null) {
-                        @file_put_contents($destStreamURL.".".$basename.".pid", $unixProcess->getPid());
+                        @file_put_contents($currentDirUrl.".".$basename.".pid", $unixProcess->getPid());
                     }
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
@@ -84,84 +84,90 @@ class HttpDownloader extends AJXP_Plugin
                     "content-disposition"	=> "",
                     "content-length"		=> ""
                 );
-
-                if (empty($err)) {
-                    $err = $httpClient->SendRequest($arguments);
-                    $httpClient->follow_redirect = true;
-
-                    $pidHiddenFileName = $destStreamURL.".".$basename.".pid";
-                    if (is_file($pidHiddenFileName)) {
-                        $pid = file_get_contents($pidHiddenFileName);
-                        @unlink($pidHiddenFileName);
-                    }
-                    if (empty($err)) {
-
-                        $httpClient->ReadReplyHeaders($collectHeaders);
-
-                        $totalSize = -1;
-                        if (!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false) {
-                            $ar = explode("filename=", $collectHeaders["content-disposition"]);
-                            $basename = trim(array_pop($ar));
-                            $basename = str_replace("\"", "", $basename); // Remove quotes
-                        }
-                        if (!empty($collectHeaders["content-length"])) {
-                            $totalSize = intval($collectHeaders["content-length"]);
-                            $this->logDebug("Should download $totalSize bytes!");
-                        }
-                        if ($totalSize != -1) {
-                            $node = new AJXP_Node($destStreamURL.$basename);
-                            AJXP_Controller::applyHook("node.before_create", array($node, $totalSize));
-                        }
-
-                        $tmpFilename = $destStreamURL.$basename.".dlpart";
-                        $hiddenFilename = $destStreamURL."__".$basename.".ser";
-                        $filename = $destStreamURL.$basename;
-
-                        $dlData = array(
-                            "sourceUrl" => $getPath,
-                            "totalSize" => $totalSize
-                        );
-                        if (isSet($pid)) {
-                            $dlData["pid"] = $pid;
-                        }
-                        //file_put_contents($hiddenFilename, serialize($dlData));
-                        $fpHid=fopen($hiddenFilename,"w");
-                        fputs($fpHid,serialize($dlData));
-                        fclose($fpHid);
-
-                        // NOW READ RESPONSE
-                        $destStream = fopen($tmpFilename, "w");
-                        while (true) {
-                            $body = "";
-                            $error = $httpClient->ReadReplyBody($body, 1000);
-                            if($error != "" || strlen($body) == 0) break;
-                            fwrite($destStream, $body, strlen($body));
-                        }
-                        fclose($destStream);
-                        rename($tmpFilename, $filename);
-                        unlink($hiddenFilename);
-                    }
-                    $httpClient->Close();
-
-                    if (isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)) {
-                        AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($dlFile)));
-                        unlink($dlFile);
-                        AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
-                    }
-                    $mess = ConfService::getMessages();
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
-                    AJXP_XMLWriter::close();
-
+                if(!empty($err)){
+                    throw new Exception($err);
                 }
+
+                $err = $httpClient->SendRequest($arguments);
+                $httpClient->follow_redirect = true;
+
+                $pidHiddenFileName = $currentDirUrl.".".$basename.".pid";
+                if (is_file($pidHiddenFileName)) {
+                    $pid = file_get_contents($pidHiddenFileName);
+                    @unlink($pidHiddenFileName);
+                }
+
+                if(!empty($err)){
+                    $httpClient->Close();
+                    throw new Exception($err);
+                }
+
+                $httpClient->ReadReplyHeaders($collectHeaders);
+
+                $totalSize = -1;
+                if (!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false) {
+                    $ar = explode("filename=", $collectHeaders["content-disposition"]);
+                    $basename = trim(array_pop($ar));
+                    $basename = str_replace("\"", "", $basename); // Remove quotes
+                }
+                if (!empty($collectHeaders["content-length"])) {
+                    $totalSize = intval($collectHeaders["content-length"]);
+                    $this->logDebug("Should download $totalSize bytes!");
+                }
+                if ($totalSize != -1) {
+                    $node = new AJXP_Node($currentDirUrl.$basename);
+                    AJXP_Controller::applyHook("node.before_create", array($node, $totalSize));
+                }
+
+                $tmpFilename = $currentDirUrl.$basename.".dlpart";
+                $hiddenFilename = $currentDirUrl."__".$basename.".ser";
+                $filename = $currentDirUrl.$basename;
+
+                $dlData = array(
+                    "sourceUrl" => $getPath,
+                    "totalSize" => $totalSize
+                );
+                if (isSet($pid)) {
+                    $dlData["pid"] = $pid;
+                }
+                //file_put_contents($hiddenFilename, serialize($dlData));
+                $fpHid=fopen($hiddenFilename,"w");
+                fputs($fpHid,serialize($dlData));
+                fclose($fpHid);
+
+                // NOW READ RESPONSE
+                $destStream = fopen($tmpFilename, "w");
+                while (true) {
+                    $body = "";
+                    $error = $httpClient->ReadReplyBody($body, 1000);
+                    if($error != "" || strlen($body) == 0) break;
+                    fwrite($destStream, $body, strlen($body));
+                }
+                fclose($destStream);
+                rename($tmpFilename, $filename);
+                unlink($hiddenFilename);
+                $httpClient->Close();
+
+                if (isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)) {
+                    AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($dlFile)));
+                    unlink($dlFile);
+                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
+                }
+                $mess = ConfService::getMessages();
+                AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
+                AJXP_XMLWriter::close();
+
 
             break;
             case "update_dl_data":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 header("text/plain");
-                if (is_file($destStreamURL.$file)) {
-                    echo filesize($destStreamURL.$file);
+                if (is_file($currentDirUrl.$file)) {
+                    $node = new AJXP_Node($currentDirUrl.$file);
+                    $filesize = filesize($node->getUrl());
+                    echo $filesize;
                 } else {
                     echo "stop";
                 }
@@ -169,7 +175,7 @@ class HttpDownloader extends AJXP_Plugin
             break;
             case "stop_dl":
                 $newName = "__".str_replace(".dlpart", ".ser", $basename);
-                $hiddenFilename = $destStreamURL.$newName;
+                $hiddenFilename = $currentDirUrl.$newName;
                 $data = @unserialize(@file_get_contents($hiddenFilename));
                 header("text/plain");
                 $this->logDebug("Getting $hiddenFilename",$data);
@@ -178,7 +184,7 @@ class HttpDownloader extends AJXP_Plugin
                     $process->setPid($data["pid"]);
                     $process->stop();
                     unlink($hiddenFilename);
-                    unlink($destStreamURL.$basename);
+                    unlink($currentDirUrl.$basename);
                     echo 'stop';
                 } else {
                     echo 'failed';

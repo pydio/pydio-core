@@ -921,10 +921,12 @@ class PThumb{
             
             $data = "";
             $fp = fopen($url, "r");
-            while (!feof($fp)) {
-            	$data .= fread($fp, 4096);
+            if(is_resource($fp)){
+                while (!feof($fp)) {
+                    $data .= fread($fp, 4096);
+                }
+                fclose($fp);
             }
-            fclose($fp);
             //$data = @implode("",file($url));
             if (strlen($data) > 0){
                 $this -> data_cache[sha1($url)] = $data;

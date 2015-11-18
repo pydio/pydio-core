@@ -9,15 +9,16 @@
     <client_settings>
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
+            <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="13"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="13"/>
         <global_param name="PROTOCOL_TYPE" type="select"
-                      choices="session_only|Sessions Only"
-                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only" editable="false"/>
-        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="Modify login page"
-                       description="Login page will be modified to give user a OTP textbox." default="true"/>
+                      choices="session_only|CONF_MESSAGE[Sessions Only]"
+                      label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only" editable="false"/>
+        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="CONF_MESSAGE[Modify login page]"
+                       description="CONF_MESSAGE[Login page will be modified to give user a OTP textbox.]" default="true"/>
         <global_param name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
         <global_param name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
         <param name="yubikey1" type="string" label="CONF_MESSAGE[YubiKey 1]"  description="CONF_MESSAGE[YubiKey 1]" mandatory="false"/>
@@ -33,6 +34,11 @@
             <script>
                   document.observe("ajaxplorer:afterApply-login", function(){
                     var f= modal.getForm();
+
+                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
+
+                    if(!enableModifyGUI) return;
+
                     if(f.down('input[name="otp_code"]')){
                         return;
                     }

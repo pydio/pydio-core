@@ -43,8 +43,8 @@ $mess=array(
 "57"=> "Download APPLICATION_TITLE for...",
 "58"=> "Android device",
 "59"=> "iPhone/iPad",
-    "60"=>"Mac OS (Beta)",
-    "61"=>"Windows (Beta)",
+    "60"=>"Mac OS",
+    "61"=>"Windows",
     "62"=>"<h2>Getting started</h2>
             This video is an introduction to APPLICATION_TITLE web application:
             <ul>

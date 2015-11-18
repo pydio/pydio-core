@@ -78,7 +78,7 @@ class AjxpScheduler extends AJXP_Plugin
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
         $sVals = array();
-        $repos = ConfService::getRepositoriesList();
+        $repos = ConfService::getRepositoriesList("all");
         foreach ($repos as $repoId => $repoObject) {
             $sVals[] = $repoId."|". AJXP_Utils::xmlEntities($repoObject->getDisplay());
         }
@@ -175,18 +175,25 @@ class AjxpScheduler extends AJXP_Plugin
             $queued = false;
         }
         if ( ( $res >= $lastExec && $res < $now && !$alreadyRunning ) || $queued || $forceStart) {
-            if ($data["user_id"] == "*") {
-                $data["user_id"] = implode(",", array_keys(AuthService::listUsers()));
-            } else if ($data["user_id"] == "*/*") {
+            if ($data["user_id"] == "*/*" || $data["user_id"] == "*") {
                 // Recurse all groups and put them into a queue file
                 $allUsers = array();
-                $this->gatherUsers($allUsers, "/");
+                if($data["user_id"] == "*"){
+                    $allUsers = $this->listUsersIds();
+                }else{
+                    $this->gatherUsers($allUsers, "/");
+                }
                 $tmpQueue = AJXP_CACHE_DIR."/cmd_outputs/queue_".$taskId."";
+                echo "Queuing ".count($allUsers)." users in file ".$tmpQueue."\n";
                 file_put_contents($tmpQueue, implode(",", $allUsers));
                 $data["user_id"] = "queue:".$tmpQueue;
             }
             if ($data["repository_id"] == "*") {
-                $data["repository_id"] = implode(",", array_keys(ConfService::getRepositoriesList()));
+                $criteria = array();
+                $criteria["isTemplate"] = false;
+                $count = 0;
+                $listRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+                $data["repository_id"] = implode(",", array_keys($listRepos));
             }
             $process = AJXP_Controller::applyActionInBackground(
                 $data["repository_id"],
@@ -205,10 +212,16 @@ class AjxpScheduler extends AJXP_Plugin
         return false;
     }
 
+    protected function listUsersIds($baseGroup = "/"){
+        $authDriver = ConfService::getAuthDriverImpl();
+        $pairs = $authDriver->listUsers($baseGroup);
+        return array_keys($pairs);
+    }
+
     protected function gatherUsers(&$users, $startGroup="/")
     {
-        $u = AuthService::listUsers($startGroup);
-        $users = array_merge($users, array_keys($u));
+        $u = $this->listUsersIds($startGroup);
+        $users = array_merge($users, $u);
         $g = AuthService::listChildrenGroups($startGroup);
         if (count($g)) {
             foreach ($g as $gName => $gLabel) {
@@ -261,7 +274,7 @@ class AjxpScheduler extends AJXP_Plugin
                     AJXP_XMLWriter::close();
                 }
 
-            break;
+                break;
 
             case "scheduler_runTask":
 
@@ -271,7 +284,7 @@ class AjxpScheduler extends AJXP_Plugin
                 AJXP_XMLWriter::reloadDataNode();
                 AJXP_XMLWriter::close();
 
-            break;
+                break;
 
             case "scheduler_generateCronExpression":
 
@@ -282,10 +295,10 @@ class AjxpScheduler extends AJXP_Plugin
                 HTMLWriter::charsetHeader("text/plain", "UTF-8");
                 print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=".AuthService::getLoggedUser()->getId()." -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
 
-            break;
+                break;
 
             default:
-            break;
+                break;
         }
 
     }
@@ -322,26 +335,26 @@ class AjxpScheduler extends AJXP_Plugin
 
             $timeArray = $this->getTimeArray($task["schedule"]);
             $res = $this->getNextExecutionTimeForScript(time(), $timeArray);
-                $task["NEXT_EXECUTION"] = date($mess["date_format"], $res);
-                $task["PARAMS"] = implode(", ", $task["PARAMS"]);
-                $task["icon"] = "scheduler/ICON_SIZE/task.png";
-                $task["ajxp_mime"] = "scheduler_task";
-                $sFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$task["task_id"].".status";
-                if (is_file($sFile)) {
-                    $s = $this->getTaskStatus($task["task_id"]);
-                    $task["STATUS"] = implode(":", $s);
-                    $task["LAST_EXECUTION"] = date($mess["date_format"], filemtime($sFile));
-                } else {
-                    $task["STATUS"] = "n/a";
-                    $task["LAST_EXECUTION"] = "n/a";
-                }
-
-                AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
-                    (isSet($task["label"])?$task["label"]:"Action ".$task["action_name"]),
-                    true,
-                    $task
-                );
+            $task["NEXT_EXECUTION"] = date($mess["date_format"], $res);
+            $task["PARAMS"] = implode(", ", $task["PARAMS"]);
+            $task["icon"] = "scheduler/ICON_SIZE/task.png";
+            $task["ajxp_mime"] = "scheduler_task";
+            $sFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$task["task_id"].".status";
+            if (is_file($sFile)) {
+                $s = $this->getTaskStatus($task["task_id"]);
+                $task["STATUS"] = implode(":", $s);
+                $task["LAST_EXECUTION"] = date($mess["date_format"], filemtime($sFile));
+            } else {
+                $task["STATUS"] = "n/a";
+                $task["LAST_EXECUTION"] = "n/a";
             }
+
+            AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
+                (isSet($task["label"])?$task["label"]:"Action ".$task["action_name"]),
+                true,
+                $task
+            );
+        }
         AJXP_XMLWriter::close();
 
     }
@@ -448,7 +461,7 @@ class AjxpScheduler extends AJXP_Plugin
                 AJXP_XMLWriter::reloadDataNode();
                 AJXP_XMLWriter::close();
 
-            break;
+                break;
 
             case "scheduler_removeTask" :
 
@@ -458,7 +471,7 @@ class AjxpScheduler extends AJXP_Plugin
                 AJXP_XMLWriter::reloadDataNode();
                 AJXP_XMLWriter::close();
 
-            break;
+                break;
 
             case "scheduler_loadTask":
 
@@ -493,10 +506,10 @@ class AjxpScheduler extends AJXP_Plugin
                     echo json_encode($task);
                 }
 
-            break;
+                break;
 
             default:
-            break;
+                break;
         }
         //var_dump($tasks);
 
@@ -505,9 +518,9 @@ class AjxpScheduler extends AJXP_Plugin
     public function fakeLongTask($action, $httpVars, $fileVars)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        $this->logDebug("Running Fake task on ".AuthService::getLoggedUser()->getId());
+        $this->logInfo(__FUNCTION__, "Running Fake task on ".AuthService::getLoggedUser()->getId());
         print('STARTING FAKE TASK');
-        sleep($minutes * 60);
+        sleep($minutes * 30);
         print('ENDIND FAKE TASK');
     }
 

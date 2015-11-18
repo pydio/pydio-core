@@ -34,4 +34,10 @@ $mess=array(
     "13" => "Êtes-vous sûr de vouloir supprimer cette source ?",
     "14" => "Veuillez choisir un driver !",
     "15" => "Ce dépôt est défini dans le fichier de configuration (voir conf/bootstrap_repositories.php), vous ne pouvez pas modifier ses fonctionnalités via l'interface.",
+    "16" => "Partages",
+    "17" => "Fonctionnalités du Workspace",
+    "18" => "Fichiers et répertoires partagés de ce workspaces",
+    "19" => "Pas de paramètres",
+    "20" => "Pas de paramètres pour ce plugin",
+    "21" => "Ajouter une fonctionnalité au workspace",
 );

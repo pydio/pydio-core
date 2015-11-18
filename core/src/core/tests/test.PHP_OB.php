@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_OB extends AbstractTest
 {
-    public function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with Pydio."); }
+    public function __construct() { parent::__construct("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with Pydio."); }
     public function doTest()
     {
         $this->failedLevel = "warning";
@@ -44,4 +44,4 @@ class PHP_OB extends AbstractTest
         $this->testedParams["PHP Output Buffer disabled"] = "Yes";
         return TRUE;
     }
-};
+}

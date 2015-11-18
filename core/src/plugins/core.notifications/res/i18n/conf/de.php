@@ -23,6 +23,13 @@
 *  	Martin Schaible <martin@martinschaible.ch>
 *******************************************************************************/  
 $mess=array(
+"Notification Center" => "Ereignis-Benachrichtigungen",
+"Handle users watches and notifications" => "Verarbeitet durch Benutzer beobachtete Dateien und Benachrichtigungen",
 "Activate desktop notifications"=> "Desktop-Benachrichtigungen aktivieren",
 "Desktop Notifications"=> "Desktop-Benachrichtigungen",
+"User events and alerts" => "Benutzer-Ereignisse und Benachrichtigungen",
+"Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration." => "Bei allen Ereignissen in einem Arbeitsbereich einen neuen Eintrag anzeigen und Benachrichtigungen ausgeben. Dafür muss unten eine SQL-Datenbank konfiguriert werden.",
+"Instance Params" => "Parameter des Ereignisspeichers",
+"Feed Instance" => "Ereignisspeicher",
+"Choose the plugin" => "Eine Erweiterung auswählen",
 );

@@ -41,7 +41,7 @@ class webdavAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = parse_url($path);
+        $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if (!isSet($repoObject)) {
@@ -210,6 +210,7 @@ class webdavAccessWrapper extends fsAccessWrapper
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");
+        if(!is_resource($fp)) return;
         while (!feof($fp)) {
             $data = fread($fp, 4096);
             fwrite($stream, $data, strlen($data));

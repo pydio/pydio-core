@@ -40,18 +40,18 @@ class AJXP_Controller
      */
     private static $includeHooks = array();
 
+    private static $hooksCache = array();
+
     /**
      * Initialize the queryable xPath object
      * @static
+     * @param bool $useCache Whether to cache the registry version in a memory cache.
      * @return DOMXPath
      */
-    private static function initXPath()
+    private static function initXPath($useCache = false)
     {
         if (!isSet(self::$xPath)) {
-
-            $registry = AJXP_PluginsService::getXmlRegistry( false );
-            $changes = self::filterRegistryFromRole($registry);
-            if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
+            $registry = ConfService::getFilteredXMLRegistry(false, false, $useCache);
             self::$xPath = new DOMXPath($registry);
         }
         return self::$xPath;
@@ -59,58 +59,8 @@ class AJXP_Controller
 
     public static function registryReset(){
         self::$xPath = null;
+        self::$hooksCache = array();
     }
-
-    /**
-     * Check the current user "specificActionsRights" and filter the full registry actions with these.
-     * @static
-     * @param DOMDocument $registry
-     * @return bool
-     */
-    public static function filterRegistryFromRole(&$registry)
-    {
-        if(!AuthService::usersEnabled()) return false ;
-        $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null) return false;
-        $crtRepo = ConfService::getRepository();
-        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
-        if ($crtRepo != null && is_a($crtRepo, "Repository")) {
-            $crtRepoId = $crtRepo->getId();
-        }
-        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
-        $changes = false;
-        $xPath = new DOMXPath($registry);
-        foreach ($actionRights as $pluginName => $actions) {
-            foreach ($actions as $actionName => $enabled) {
-                if($enabled !== false) continue;
-                $actions = $xPath->query("actions/action[@name='$actionName']");
-                if (!$actions->length) {
-                    continue;
-                }
-                $action = $actions->item(0);
-                $action->parentNode->removeChild($action);
-                $changes = true;
-            }
-        }
-        $parameters = $loggedUser->mergedRole->listParameters();
-        foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
-                foreach ($paramsPlugs as $plugId => $params) {
-                    foreach ($params as $name => $value) {
-                        // Search exposed plugin_configs, replace if necessary.
-                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
-                        if(!$searchparams->length) continue;
-                        $param = $searchparams->item(0);
-                        $newCdata = $registry->createCDATASection(json_encode($value));
-                        $param->removeChild($param->firstChild);
-                        $param->appendChild($newCdata);
-                    }
-                }
-            }
-        }
-        return $changes;
-    }
-
 
     /**
      * @param $actionName
@@ -119,7 +69,7 @@ class AJXP_Controller
      */
     public static function findRestActionAndApply($actionName, $path)
     {
-        $xPath = self::initXPath();
+        $xPath = self::initXPath(true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
             self::$lastActionNeedsAuth = true;
@@ -133,7 +83,8 @@ class AJXP_Controller
         }
         $restPath = $restPathList->item(0)->nodeValue;
         $paramNames = explode("/", trim($restPath, "/"));
-        $path = array_shift(explode("?", $path));
+        $exploded = explode("?", $path);
+        $path = array_shift($exploded);
         $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
         foreach ($paramNames as $i => $pName) {
             if (strpos($pName, "+") !== false) {
@@ -144,6 +95,7 @@ class AJXP_Controller
         if (count($paramValues) < count($paramNames)) {
             $paramNames = array_slice($paramNames, 0, count($paramValues));
         }
+        $paramValues = array_map(array("SystemTextEncoding", "toUTF8"), $paramValues);
         $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
         return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
 
@@ -189,7 +141,7 @@ class AJXP_Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param DOMNode $action
-     * @return bool
+     * @return mixed
      */
     public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null)
     {
@@ -207,7 +159,7 @@ class AJXP_Controller
                 }
             }
             self::$lastActionNeedsAuth = true;
-            return ;
+            return null;
         }
         $xPath = self::initXPath();
         if ($action == null) {
@@ -274,14 +226,14 @@ class AJXP_Controller
         if ($preCalls !== false) {
             foreach ($preCalls as $preCall) {
                 // A Preprocessing callback can modify its input arguments (passed by ref)
-                $preResult = self::applyCallback($xPath, $preCall, $actionName, $httpVars, $fileVars);
+                $preResult = self::applyCallback($preCall, $actionName, $httpVars, $fileVars);
                 if (isSet($params)) {
                     $params["pre_processor_results"][$preCall->getAttribute("pluginId")] = $preResult;
                 }
             }
         }
         if ($mainCall) {
-            $result = self::applyCallback($xPath, $mainCall, $actionName, $httpVars, $fileVars);
+            $result = self::applyCallback($mainCall, $actionName, $httpVars, $fileVars);
             if (isSet($params)) {
                 $params["processor_result"] = $result;
             }
@@ -289,7 +241,7 @@ class AJXP_Controller
         if ($postCalls !== false) {
             foreach ($postCalls as $postCall) {
                 // A Preprocessing callback can modify its input arguments (passed by ref)
-                $postResult = self::applyCallback($xPath, $postCall, $actionName, $httpVars, $fileVars);
+                $postResult = self::applyCallback($postCall, $actionName, $httpVars, $fileVars);
                 if (isSet($params)) {
                     $params["post_processor_results"][$postCall->getAttribute("pluginId")] = $postResult;
                 }
@@ -299,11 +251,12 @@ class AJXP_Controller
             $params["ob_output"] = ob_get_contents();
             ob_end_clean();
             foreach ($captureCalls as $captureCall) {
-                self::applyCallback($xPath, $captureCall, $actionName, $httpVars, $params);
+                self::applyCallback($captureCall, $actionName, $httpVars, $params);
             }
         } else {
             if(isSet($result)) return $result;
         }
+        return null;
     }
 
     /**
@@ -327,7 +280,11 @@ class AJXP_Controller
             else $user = "shared";
         }
         if (AuthService::usersEnabled()) {
-            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), $user, MCRYPT_MODE_ECB));
+            $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
+            if(empty($cKey)){
+                $cKey = "\1CDAFx¨op#";
+            }
+            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token.$cKey), $user, MCRYPT_MODE_ECB));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
@@ -351,26 +308,21 @@ class AJXP_Controller
             }
         }
 
-        return self::runCommandInBackground($cmd, $logFile);
-        /*
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
-            if (class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")) {
-                $WshShell   = new COM("WScript.Shell");
-                $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
-            } else {
-                $tmpBat = implode(DIRECTORY_SEPARATOR, array( $robustInstallPath, "data","tmp", md5(time()).".bat"));
-                $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
-                AJXP_Logger::debug("Writing file $cmd to $tmpBat");
-                file_put_contents($tmpBat, $cmd);
-                pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
+        $repoObject = ConfService::getRepository();
+        $clearEnv = false;
+        if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
+            $encodedCreds = AJXP_Safe::getEncodedCredentialString();
+            if(!empty($encodedCreds)){
+                putenv("AJXP_SAFE_CREDENTIALS=".$encodedCreds);
+                $clearEnv = "AJXP_SAFE_CREDENTIALS";
             }
-        } else {
-            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
-            AJXP_Logger::debug("Starting process and sending output dev null");
-            return $process;
         }
-        */
+
+        $res = self::runCommandInBackground($cmd, $logFile);
+        if(!empty($clearEnv)){
+            putenv($clearEnv);
+        }
+        return $res;
     }
 
     /**
@@ -388,11 +340,13 @@ class AJXP_Controller
               } else {
                   $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
                   $tmpBat = implode(DIRECTORY_SEPARATOR, array( $basePath, "data","tmp", md5(time()).".bat"));
+                  $cmd = "@chcp 1252 > nul \r\n".$cmd;
                   $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                   AJXP_Logger::debug("Writing file $cmd to $tmpBat");
                   file_put_contents($tmpBat, $cmd);
                   pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
               }
+            return null;
         } else {
             $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
             AJXP_Logger::debug("Starting process and sending output dev null");
@@ -410,7 +364,7 @@ class AJXP_Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return DOMNode|bool
+     * @return DOMElement|bool|DOMElement[]
      */
     private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true)
     {
@@ -436,7 +390,7 @@ class AJXP_Controller
      * Check in the callback node if an applyCondition XML attribute exists, and eval its content.
      * The content must set an $apply boolean as result
      * @static
-     * @param DOMNode $callback
+     * @param DOMElement|DOMNode $callback
      * @param string $actionName
      * @param array $httpVars
      * @param array $fileVars
@@ -455,21 +409,25 @@ class AJXP_Controller
     /**
      * Applies a callback node
      * @static
-     * @param DOMXPath $xPath
-     * @param DOMNode $callback
+     * @param DOMElement|Array $callback The DOM Node or directly an array of attributes
      * @param String $actionName
      * @param Array $httpVars
      * @param Array $fileVars
      * @param null $variableArgs
      * @param bool $defer
-     * @throws AJXP_Exception* @throw AJXP_Exception
-     * @return void
+     * @throws AJXP_Exception* @internal param \DOMXPath $xPath
+     * @return mixed
      */
-    private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
+    private static function applyCallback($callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
     {
         //Processing
-        $plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
-        $methodName = $xPath->query("@methodName", $callback)->item(0)->value;
+        if(is_array($callback)){
+            $plugId = $callback["pluginId"];
+            $methodName = $callback["methodName"];
+        }else{
+            $plugId = $callback->getAttribute("pluginId");
+            $methodName = $callback->getAttribute("methodName");
+        }
         $plugInstance = AJXP_PluginsService::findPluginById($plugId);
         //return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
         // Do not use call_user_func, it cannot pass parameters by reference.
@@ -486,6 +444,7 @@ class AJXP_Controller
         } else {
             throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
         }
+        return null;
     }
 
     /**
@@ -498,19 +457,46 @@ class AJXP_Controller
      */
     public static function applyHook($hookName, $args, $forceNonDefer = false)
     {
+        if(isSet(self::$hooksCache[$hookName])){
+            $hooks = self::$hooksCache[$hookName];
+            foreach($hooks as $hook){
+                if (isSet($hook["applyCondition"]) && $hook["applyCondition"]!="") {
+                    $apply = false;
+                    eval($hook["applyCondition"]);
+                    if(!$apply) continue;
+                }
+                $defer = $hook["defer"];
+                if($defer && $forceNonDefer) $defer = false;
+                self::applyCallback($hook, $fake1, $fake2, $fake3, $args, $defer);
+            }
+            return;
+        }
         $xPath = self::initXPath();
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
+        self::$hooksCache[$hookName] = array();
+        /**
+         * @var $callback DOMElement
+         */
         foreach ($callbacks as $callback) {
-            if ($callback->getAttribute("applyCondition")!="") {
+            $defer = ($callback->getAttribute("defer") === "true");
+            $applyCondition = $callback->getAttribute("applyCondition");
+            $plugId = $callback->getAttribute("pluginId");
+            $methodName = $callback->getAttribute("methodName");
+            $hookCallback = array(
+                "defer" => $defer,
+                "applyCondition" => $applyCondition,
+                "pluginId"    => $plugId,
+                "methodName"    => $methodName
+            );
+            self::$hooksCache[$hookName][] = $hookCallback;
+            if (!empty($applyCondition)) {
                 $apply = false;
-                eval($callback->getAttribute("applyCondition"));
+                eval($applyCondition);
                 if(!$apply) continue;
-              }
-            //$fake1; $fake2; $fake3;
-            $defer = ($callback->attributes->getNamedItem("defer") != null && $callback->attributes->getNamedItem("defer")->nodeValue == "true");
+            }
             if($defer && $forceNonDefer) $defer = false;
-            self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args, $defer);
+            self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
         }
     }
 

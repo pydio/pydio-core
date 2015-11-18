@@ -99,13 +99,13 @@ class ShareStore {
             $loader = 'ShareCenter::loadPubliclet($data);';
         }
 
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $data, MCRYPT_MODE_ECB));
+        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, str_pad($hash, 16, "\0"), $data, MCRYPT_MODE_ECB));
         $fileData = "<"."?"."php \n".
             '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
             '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
             '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-            '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
-            '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
+            '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
+            '   // if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
             '   // Ok extract the data '."\n".
             '   $data = unserialize($inputData); '.$loader;
         if (@file_put_contents($this->downloadFolder."/".$hash.".php", $fileData) === FALSE) {
@@ -125,6 +125,7 @@ class ShareStore {
                 $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
                 if(!empty($data)){
                     $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
+                    $data["SECURITY_MODIFIED"] = false;
                     return $data;
                 }
             }
@@ -134,6 +135,12 @@ class ShareStore {
         $inputData = '';
         // Necessary for the eval
         $id = $hash;
+        // UPDATE LINK FOR PHP5.6
+        if(trim($lines[4]) == '$inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");' && is_writable($file)){
+            // Upgrade line
+            $lines[4] = '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");'."\n";
+            $res = file_put_contents($file, implode('', $lines));
+        }
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         if(empty($inputData)) return false;
@@ -217,7 +224,7 @@ class ShareStore {
             if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
                 continue;
             }
-            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
+            if(!$parentRepository != "" && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
                     || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
                 continue;
             }
@@ -248,8 +255,8 @@ class ShareStore {
             }
             // Find repositories that would have a parent
             $criteria = array();
-            $criteria["parent_uuid"] = (empty($parentRepository) ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
-            $criteria["owner_user_id"] = (empty($limitToUser) ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
+            $criteria["parent_uuid"] = ($parentRepository == "" ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+            $criteria["owner_user_id"] = ($limitToUser == "" ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
             if(count($storedIds)){
                 $criteria["!uuid"] = $storedIds;
             }
@@ -271,7 +278,7 @@ class ShareStore {
         return $dbLets;
     }
 
-    protected function testUserCanEditShare($userId){
+    public function testUserCanEditShare($userId){
 
         if(empty($userId)){
             $mess = ConfService::getMessages();
@@ -281,7 +288,7 @@ class ShareStore {
         if($crtUser->getId() == $userId) return true;
         if($crtUser->isAdmin()) return true;
         $user = ConfService::getConfStorageImpl()->createUserObject($userId);
-        if($user->hasParent() && $user->getParent() == $userId){
+        if($user->hasParent() && $user->getParent() == $crtUser->getId()){
             return true;
         }
         $mess = ConfService::getMessages();
@@ -292,7 +299,6 @@ class ShareStore {
      * @param String $type
      * @param String $element
      * @throws Exception
-     * @internal param String $ownerId
      * @return bool
      */
     public function deleteShare($type, $element)
@@ -426,7 +432,12 @@ class ShareStore {
 
     public function resetDownloadCounter($hash, $userId){
         $data = $this->loadShare($hash);
-        // TODO We must check that the user has the right to do that!
+        $repoId = $data["REPOSITORY"];
+        $repo = ConfService::getRepositoryById($repoId);
+        if ($repo == null) {
+            throw new Exception("Cannot find associated share");
+        }
+        $this->testUserCanEditShare($repo->getOwner());
         PublicletCounter::reset($hash);
     }
 

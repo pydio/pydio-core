@@ -139,7 +139,7 @@ $mess = array(
     "131" => "Nessun file o cartella condiviso, al momento.",
     "132" => "Workspace",
     "133" => "Come link pubblico",
-    "134" => "Come workpsace",
+    "134" => "Come workspace",
     "135" => "La cartella apparirà come un minisito",
     "136" => "Il contenuto della cartella apparirà come un nuovo workspace per gli utenti dell'applicazione",
     "137" => "Condividi i file selezionati con un link pubblico",
@@ -183,4 +183,7 @@ $mess = array(
     "172" => "Spiacenti, il link è già in uso. Sceglierne un altro.",
     "173" => "Se desideri un link personalizzato e più duraturo (come https://.../my-share-link), puoi utilizzare questo campo. Un gestore link verrà generato automaticamente in caso contrario.",
     "174" => "Disabilita Password",
+    "175" => "Please set a password and make sure it's long enough!",
+    "176" => "(Mandatory)",
+    "177" => "View parameters",
 );

@@ -31,69 +31,69 @@ class EtherpadClient extends AJXP_Plugin
         $this->baseURL = rtrim($this->getFilteredOption("ETHERPAD_SERVER"), "/");
         $this->apiKey =  $this->getFilteredOption("ETHERPAD_APIKEY");
 
-        if (isSet($httpVars["file"])) {
+        $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
+        if ($userSelection->isEmpty()){
+            throw new Exception("Empty selection");
+        }
+        $repository = ConfService::getRepository();
+        if (!$repository->detectStreamWrapper(false)) {
+            return false;
+        }
+        $selectedNode = $userSelection->getUniqueNode();
+        $selectedNode->loadNodeInfo();
+        if(!$selectedNode->isLeaf()){
+            throw new Exception("Cannot handle folders, please select a file!");
+        }
+        $nodeExtension = strtolower(pathinfo($selectedNode->getPath(), PATHINFO_EXTENSION));
 
-            $repository = ConfService::getRepository();
-            if (!$repository->detectStreamWrapper(false)) {
-                return false;
-            }
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
-            $destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
-            $filename = $destStreamURL. AJXP_Utils::securePath($httpVars["file"]);
-
-            if (!is_file($filename)) {
-                throw new Exception("Cannot find file!");
+        // Determine pad ID
+        if($nodeExtension == "pad"){
+            $padID = file_get_contents($selectedNode->getUrl());
+        }else{
+            // TRY TO LOAD PAD ID FROM NODE SHARED METADATA
+            $metadata = $selectedNode->retrieveMetadata("etherpad", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+            if(isSet($metadata["pad_id"])){
+                $padID = $metadata["pad_id"];
+            }else{
+                $padID = AJXP_Utils::generateRandomString();
+                $selectedNode->setMetadata("etherpad", array("pad_id" => $padID), AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
             }
         }
 
         require_once("etherpad-client/etherpad-lite-client.php");
         $client = new EtherpadLiteClient($this->apiKey,$this->baseURL."/api");
-        $userName = AuthService::getLoggedUser()->getId();
-        $res = $client->createAuthorIfNotExistsFor($userName, $userName);
+        $loggedUser = AuthService::getLoggedUser();
+        $userName = $loggedUser->getId();
+        $userLabel = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userName);
+        $res = $client->createAuthorIfNotExistsFor($userName, $userLabel);
         $authorID = $res->authorID;
-        $res2 = $client->createGroupIfNotExistsFor("ajaxplorer");
+        $res2 = $client->createGroupIfNotExistsFor($loggedUser->getGroupPath());
         $groupID = $res2->groupID;
+        $fullId = $groupID."$".$padID;
 
         if ($actionName == "etherpad_create") {
 
-            if (isSet($httpVars["pad_name"])) {
+            $resP = $client->listPads($groupID);
 
-                $padID = $httpVars["pad_name"];
-                $startContent = "";
-                if ($httpVars["pad_type"] && $httpVars["pad_type"] == 'free') {
-                    $padID = "FREEPAD__".$padID;
-                }
-
-            } else if (isSet($httpVars["file"])) {
-
-                $startContent = file_get_contents($filename);
-                if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) == "html") {
-                    $startContentHTML = $startContent;
-                }
-                $padID = AJXP_Utils::slugify($httpVars["file"]);
-
+            $currentContent = file_get_contents($selectedNode->getUrl());
+            if($nodeExtension == "html" && strpos($currentContent, "<html>") === false){
+               $currentContent = "<html><head></head><body>$currentContent</body></html>";
             }
-
-
-            $resP = $client->listPads($res2->groupID);
-
-            $pads = $resP->padIDs;
-            if (!in_array($groupID.'$'.$padID, $pads)) {
-                $res3 = $client->createGroupPad($groupID, $padID, null);
-                if (isSet($startContentHTML)) {
-                    $client->setHTML($groupID.'$'.$padID, $startContentHTML);
-                } else if (!empty($startContent)) {
-                    $client->setText($groupID.'$'.$padID, $startContent);
+            if (!in_array($fullId, $resP->padIDs)) {
+                $client->createGroupPad($groupID, $padID, null);
+                if($nodeExtension == "html" && !empty($currentContent)){
+                    $client->setHTML($fullId, $currentContent);
+                }else if($nodeExtension != "pad"){
+                    $client->setText($fullId, $currentContent);
                 }
-            } else {
-                // Check if content needs relaunch!
-                $test = $client->getText($groupID.'$'.$padID);
-                if (!empty($startContent) && $test->text != $startContent) {
-                    if (isSet($startContentHTML)) {
-                        $client->setHTML($groupID.'$'.$padID, $startContentHTML);
-                    } else {
-                        $client->setText($groupID.'$'.$padID, $startContent);
+            } else if($nodeExtension != "pad") {
+                // If someone is already connected, do not override.
+                $existingAuthors = $client->listAuthorsOfPad($fullId);
+                if(!count($existingAuthors->authorIDs)){
+                    if($nodeExtension == "html" && !empty($currentContent)){
+                        $client->setHTML($fullId, $currentContent);
+                    }else{
+                        $client->setText($fullId, $currentContent);
                     }
                 }
             }
@@ -116,22 +116,39 @@ class EtherpadClient extends AJXP_Plugin
 
         } else if ($actionName == "etherpad_save") {
 
-            $node = new AJXP_Node($filename);
-
             $padID = $httpVars["pad_id"];
-            if (isSet($startContentHTML)) {
+
+            if ($nodeExtension == "html" || $nodeExtension == "pad") {
                 $res = $client->getHTML($padID);
+                $content = $res->html;
             } else {
                 $res = $client->getText($padID);
+                $content = $res->text;
             }
 
-            AJXP_Controller::applyHook("node.before_change", array($node, strlen($res->text)));
-            file_put_contents($filename, $res->text);
-            AJXP_Controller::applyHook("node.change", array($node, $node));
+            if($nodeExtension == "pad"){
+                // Create a new file and save the content in it.
+                $origUrl = $selectedNode->getUrl();
+                $mess = ConfService::getMessages();
+                $dateStamp = date(" Y-m-d H:i", time());
+                $startUrl = preg_replace('"\.pad$"', $dateStamp.'.html', $origUrl);
+                $newNode = new AJXP_Node($startUrl);
+                AJXP_Controller::applyHook("node.before_create", array($newNode, strlen($content)));
+                file_put_contents($newNode->getUrl(), $content);
+                AJXP_Controller::applyHook("node.change", array(null, $newNode));
+            }else{
+                AJXP_Controller::applyHook("node.before_change", array($selectedNode, strlen($content)));
+                file_put_contents($selectedNode->getUrl(), $content);
+                clearstatcache(true, $selectedNode->getUrl());
+                $selectedNode->loadNodeInfo(true);
+                AJXP_Controller::applyHook("node.change", array($selectedNode, $selectedNode));
+            }
+
 
         } else if ($actionName == "etherpad_close") {
 
             // WE SHOULD DETECT IF THERE IS NOBODY CONNECTED ANYMORE, AND DELETE THE PAD.
+            // BUT SEEMS LIKE THERE'S NO WAY TO PROPERLY REMOVE AN AUTHOR VIA API
             $sessionID = $httpVars["session_id"];
             $client->deleteSession($sessionID);
 
@@ -145,9 +162,39 @@ class EtherpadClient extends AJXP_Plugin
             HTMLWriter::charsetHeader("application/json");
             echo(json_encode($res));
 
+        } else if ($actionName == "etherpad_get_content"){
+
+            HTMLWriter::charsetHeader("text/plain");
+            echo $client->getText($httpVars["pad_id"])->text;
+
         }
+
+        return null;
 
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     */
+    public function hideExtension(&$ajxpNode){
+        if($ajxpNode->hasExtension("pad")){
+            $baseName = AJXP_Utils::safeBasename($ajxpNode->getPath());
+            $ajxpNode->setLabel(str_replace(".pad", "", $baseName));
+        }
+    }
+
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
+     * @param bool $copy
+     */
+    public function handleNodeChange($fromNode=null, $toNode=null, $copy = false){
+        if($fromNode == null) return;
+        if($toNode == null){
+            $fromNode->removeMetadata("etherpad", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+        }else if(!$copy){
+            $toNode->copyOrMoveMetadataFromNode($fromNode, "etherpad", "move", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+        }
+    }
 
 }

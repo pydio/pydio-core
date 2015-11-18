@@ -34,7 +34,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
         ajaxplorer.__proto__.findEditorsForMime = function(mime, restrictToPreviewProviders){
             if(this.user && this.user.getPreference("gui_preferences", true) && this.user.getPreference("gui_preferences", true)["other_editor_extensions"]){
                 $H(this.user.getPreference("gui_preferences", true)["other_editor_extensions"]).each(function(pair){
-                    var editor = this.getActiveExtensionByType("editor").detect(function(ed){
+                    var editor = this.Registry.getActiveExtensionByType("editor").detect(function(ed){
                         return ed.editorClass == pair.value;
                     });
                     if(editor && !$A(editor.mimes).include(pair.key)){
@@ -85,7 +85,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 	selectEditor : function(event){
         Event.stop(event);
 		if(!event.target.editorData) return;
-		ajaxplorer.loadEditorResources(event.target.editorData.resourcesManager);
+		pydio.Registry.loadEditorResources(event.target.editorData.resourcesManager);
 		hideLightBox();
         if(!ajaxplorer._editorOpener || event.target.editorData.modalOnly){
             modal.openEditorDialog(event.target.editorData);
@@ -96,7 +96,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 	},
 
     createAssociation : function(mime, editorClassName){
-        var editor = ajaxplorer.getActiveExtensionByType("editor").detect(function(ed){
+        var editor = pydio.Registry.getActiveExtensionByType("editor").detect(function(ed){
             return ed.editorClass == editorClassName;
         });
         if(editor && !$A(editor.mimes).include(mime)){
@@ -119,7 +119,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
         }catch(e){}
         if(assoc && assoc[mime]){
             var editorClassName = assoc[mime];
-            var editor = ajaxplorer.getActiveExtensionByType("editor").detect(function(ed){
+            var editor = pydio.Registry.getActiveExtensionByType("editor").detect(function(ed){
                 return ed.editorClass == editorClassName;
             });
             if(editor){
@@ -143,7 +143,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		if(this.user != null && !this.user.canWrite()){
 			checkWrite = true;
 		}
-		ajaxplorer.getActiveExtensionByType('editor').each(function(el){
+        pydio.Registry.getActiveExtensionByType('editor').each(function(el){
 			if(checkWrite && el.write) return;
 			if(!el.openable) return;
 			if(el.mimes.include(mime) || el.mimes.include('*')) return;

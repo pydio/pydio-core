@@ -86,15 +86,15 @@ class SimpleUploadProcessor extends AJXP_Plugin
             print("<html><script language=\"javascript\">\n");
             if (isSet($result["ERROR"])) {
                 $message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
-                print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
+                print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
             } else {
-                print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+                print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
                     $s = '<tree>';
                     $s .= AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
                     print("\n var resultString = '".$s."'; var resultXML = parent.parseXml(resultString);");
-                    print("\n parent.ajaxplorer.actionBar.parseXmlMessage(resultXML);");
+                    print("\n parent.pydio.getController().parseXmlMessage(resultXML);");
                 }
             }
             print("</script></html>");
@@ -109,7 +109,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 }
                 AJXP_XMLWriter::close();
                 /* for further implementation */
-                if (!$result["PREVENT_NOTIF"]) {
+                if (!isSet($result["PREVENT_NOTIF"])) {
                     if (isset($result["CREATED_NODE"])) {
                         AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
                     } else if (isSet($result["UPDATED_NODE"])) {
@@ -125,14 +125,14 @@ class SimpleUploadProcessor extends AJXP_Plugin
     public function unifyChunks($action, $httpVars, $fileVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(false)) {
+        if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-        $streamData = $plugin->detectStreamWrapper(true);
+        $selection = new UserSelection($repository);
         $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-        $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+        $destStreamURL = $selection->currentBaseUrl().$dir."/";
         $filename = AJXP_Utils::decodeSecureMagic($httpVars["file_name"]);
+
         $chunks = array();
         $index = 0;
         while (isSet($httpVars["chunk_".$index])) {
@@ -143,10 +143,12 @@ class SimpleUploadProcessor extends AJXP_Plugin
         $newDest = fopen($destStreamURL.$filename, "w");
         for ($i = 0; $i < count($chunks) ; $i++) {
             $part = fopen($destStreamURL.$chunks[$i], "r");
-            while (!feof($part)) {
-                fwrite($newDest, fread($part, 4096));
+            if(is_resource($part)){
+                while (!feof($part)) {
+                    fwrite($newDest, fread($part, 4096));
+                }
+                fclose($part);
             }
-            fclose($part);
             unlink($destStreamURL.$chunks[$i]);
         }
         fclose($newDest);

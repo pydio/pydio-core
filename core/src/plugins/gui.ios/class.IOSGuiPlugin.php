@@ -31,6 +31,9 @@ class IOSGuiPlugin extends AJXP_Plugin
     public function performChecks()
     {
         if(isSet($_SESSION["CURRENT_MINISITE"])) throw new Exception("Disabled for minisites");
+        if(AJXP_Utils::userAgentIsWindowsPhone()){
+            throw new Exception("No native app for windows phone");
+        }
 
         if (AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
             return;

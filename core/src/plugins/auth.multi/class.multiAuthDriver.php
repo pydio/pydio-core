@@ -60,11 +60,20 @@ class multiAuthDriver extends AbstractAuthDriver
             if (!is_object($instance)) {
                 throw new Exception("Cannot find plugin $name for type 'auth'");
             }
+            if (!$instance->isEnabled()){
+                throw new Exception("You have selected a disabled plugin ($name) for type 'auth'");
+            }
             $instance->init($options);
             if ($name != $this->getOption("MASTER_DRIVER")) {
                 $this->slaveName = $name;
             }
             $this->drivers[$name] = $instance;
+        }
+        if(!$this->masterSlaveMode){
+            // Enable Multiple choice login screen
+            $multi = AJXP_PluginsService::getInstance()->findPluginById("authfront.multi");
+            $multi->enabled = true;
+            $multi->options = $this->options;
         }
         // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
         // WILL BE CALLED LATER, TO BE SURE THAT THE
@@ -95,61 +104,6 @@ class multiAuthDriver extends AbstractAuthDriver
         $this->setCurrentDriverName($authSource);
     }
 
-    protected function parseSpecificContributions(&$contribNode)
-    {
-        parent::parseSpecificContributions($contribNode);
-        if($contribNode->nodeName != "actions") return ;
-
-        if($this->masterSlaveMode) {
-            // REMOVE CHILD
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $actionOverrideNodeList = $actionXpath->query('//action', $contribNode);
-            $actionNode = $actionOverrideNodeList->item(0);
-            if($actionNode->parentNode) $actionNode->parentNode->removeChild($actionNode);
-
-        }else{
-
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $loginCallbackNodeList = $actionXpath->query('//clientCallback', $contribNode);
-            $callbackNode = $loginCallbackNodeList->item(0);
-            $xmlContent = $callbackNode->firstChild->wholeText;
-
-            $sources = array();
-            if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])) return;
-            foreach ($this->getOption("DRIVERS") as $driverDef) {
-                $dName = $driverDef["NAME"];
-                if (isSet($driverDef["LABEL"])) {
-                    $dLabel = $driverDef["LABEL"];
-                } else {
-                    $dLabel = $driverDef["NAME"];
-                }
-                $sources[$dName] = $dLabel;
-            }
-            $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
-            $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
-            $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
-            if($callbackNode) {
-                $callbackNode->removeChild($callbackNode->firstChild);
-                $callbackNode->appendChild($contribNode->ownerDocument->createCDATASection($xmlContent));
-            }
-
-        }
-    }
-/*
-    public function getLoginRedirect(){
-
-        $l = $this->drivers[$this->masterName]->getLoginRedirect();
-        if(!empty($l)) return $l;
-        return $this->drivers[$this->slaveName]->getLoginRedirect();
-    }
-
-    public function getLogoutRedirect(){
-
-        $l = $this->drivers[$this->masterName]->getLogoutRedirect();
-        if(!empty($l)) return $l;
-        return $this->drivers[$this->slaveName]->getLogoutRedirect();
-    }
-*/
     protected function setCurrentDriverName($name)
     {
         $this->currentDriver = $name;
@@ -221,10 +175,18 @@ class multiAuthDriver extends AbstractAuthDriver
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->baseName) && $regexp == null) {
-            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
+            $users = $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
+            $this->addToCache(array_keys($users), $this->baseName);
+            return $users;
         } else {
             $keys = array_keys($this->drivers);
-            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
+            $k0 = $keys[0];
+            $k1 = $keys[1];
+            $users0 = $this->drivers[$k0]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
+            $users1 = $this->drivers[$k1]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
+            $this->addToCache(array_keys($users0), $k0);
+            $this->addToCache(array_keys($users1), $k1);
+            return $users0 + $users1;
         }
     }
 

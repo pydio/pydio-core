@@ -70,10 +70,11 @@ class AjxpMailer extends AJXP_Plugin
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
         $forceFrom = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
         $coreFrom = ConfService::getCoreConf("FROM", "mailer");
-        if($forceFrom && $from != null){
+        if($forceFrom && $coreFrom != null){
             $coreFromName = ConfService::getCoreConf("FROM_NAME", "mailer");
             $from = array("adress" => $coreFrom, "name" => $coreFromName);
         }
+        $rowBody = $body;
         $images = array();
         if(!empty($prepend)) $subject = $prepend ." ". $subject;
         if(!empty($append)) $subject .= " ".$append;
@@ -99,7 +100,7 @@ class AjxpMailer extends AJXP_Plugin
         $this->sendMailImpl($recipients, $subject, $body, $from, $images);
         if (AJXP_SERVER_DEBUG) {
             $line = "------------------------------------------------------------------------\n";
-            file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
+            file_put_contents($this->mailCache, $line."Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\nSubject: $subject\nBody:\n$rowBody\n", FILE_APPEND);
         }
     }
 
@@ -212,7 +213,6 @@ class AjxpMailer extends AJXP_Plugin
 
     public function abstractUserToAdress(AbstractAjxpUser $user)
     {
-        // TODO
         // SHOULD CHECK THAT THIS USER IS "AUTHORIZED" TO AVOID SPAM
         $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
         if (empty($userEmail)) {

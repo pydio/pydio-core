@@ -34,4 +34,10 @@ $mess=array(
 "13" => "Are you sure you want to delete this source?",
 "14" => "Please choose a driver!",
 "15" => "This workspace is defined in the config file (see conf/bootstrap_repositories.php), you cannot edit its features via the GUI.",
+    "16" => "Shares",
+    "17" => "Workspace additional features",
+    "18" => "Shared Files and Folders from this workspace",
+    "19" => "No parameters",
+    "20" => "No parameters for this plugin",
+    "21" => "Add a feature to this workspace",
 );

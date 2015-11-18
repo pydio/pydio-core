@@ -1,0 +1,54 @@
+<div style="font-family:'Open Sans', Helvetica, Sans-serif;font-size:13px;line-height: 1.7em;">
+    <style>
+        code {
+            display: inline-block;
+            border: 1px solid #D8D8D8;
+            background-color: #F7F7F7;
+            border-radius: 3px;
+            padding: 1px 3px;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+    </style>
+    <span style="color: #f00000"><i>Oops</i>: votre installation est gérée directement via les packages linux.</span>
+
+    <h2>Comment mettre à jour?</h2>
+    <h3>1. Sauvegarder votre base de données</h3>
+
+    Utiliser la ligne de commande (par example mysqldump) ou un outil graphique de gestion (par exemple phpMyAdmin) pour sauvegarder l'intégralité de votre base de données.
+
+    <h3>2. Mettre à jour via la ligne de commande.</h3>
+
+    <p>En fonction de votre OS, vous pouvez être amené à executer une commande du type:<br/>
+    <code>$ yum update pydio</code><br/>
+    ou<br/>
+    <code>$ apt-get install --only-upgrade pydio</code>
+    </p>
+    <p>Le gestionnaire de paquets va mettre à jour Pydio à la dernière version..</p>
+
+    <h3>3. Mise à jour manuelle de la base de données</h3>
+
+    <h4>Identification des scripts de mises à jour</h4>
+
+    <p>
+        Après la mise à jour des paquets, vous pouvez être amené à devoir manuellement mettre à jour la base de données. Voir dans le répertoire
+        <i>/var/lib/doc/pydio/upgrade/db</i>: ce répertoire contient des scripts SQL qui sont nommés avec des numéros de version identifiant des mises
+        à jour requises pour passer d'une version à une autre.
+        Si vous trouvez un ou plusieurs scripts nécessaires pour passer d'une version à une autre, appliquez les tous.
+        Par exemple pour passer de v6.0.5 à v6.0.8, vous devrez peut-être applique les scripts 6.0.5-6.0.6, 6.0.6-6.0.7 and 6.0.7-6.0.8.
+        S'il n'y a pas de scripts entre deux versions, c'est qu'il n'y a pas de mise à jour nécessaire.
+    </p>
+    <p>
+        Les scripts sont aussi suffixés en fonction de la base de données : .mysql pour MySql / MariaDB, .pgsql pour Postgres et .sqlite pour SQlite.
+        Bien utiliser ceux qui correspondent à votre base.
+    </p>
+
+    <h4>Appliquer les scripts SQL</h4>
+    <p>
+        Une fois que vous avez collecté les scripts nécessaire, utiliser un outil graphique ou la ligne de commande pour modifier
+        votre base de données avec ces scripts.
+    <br/>
+    Par exemple, pour mysql:<br/>
+    <code>$ mysql -u adminuser -p DBNAME << pydio-core-upgrade-6.0.7-6.0.8.mysql</code>
+    </p>
+</div>

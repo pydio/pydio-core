@@ -126,7 +126,7 @@
                             var conn = new Connexion();
                             conn.setParameters(params);
                             conn.onComplete = function(transport){
-                                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                pydio.getController().parseXmlMessage(transport.responseXML);
                             }
                             conn.sendAsync();
 					]]></dialogOnComplete>
@@ -183,6 +183,7 @@
                         if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
+                    if(!window.BookmarksBar) return;
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
                         className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
                         mouseClick:'over',
@@ -190,7 +191,7 @@
                         leftOffset:0,
                         position:'bottom right'
                     }});
-                    var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+                    var bmAction = pydio.getController().actions.get('bookmark');
                     bmBar.addBookmarkObject = {
                         name:bmAction.getKeyedText(),
                         alt:bmAction.options.title,
@@ -210,6 +211,11 @@
                 <serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
+        <action name="get_permissions_mask">
+            <processing>
+                <serverCallback methodName="publishPermissionsMask" restParams="/" developerComment="Send the permissions mask for the current workspace, if defined."/>
+            </processing>
+        </action>
 		<action name="save_user_pref">
 			<processing>
 				<serverCallback methodName="switchAction"/>
@@ -262,10 +268,10 @@
                           conn.setParameters(params);
                           conn.setMethod("POST");
                           conn.onComplete = function(transport){
-                              ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                              pydio.getController().parseXmlMessage(transport.responseXML);
                               document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
                                   if(event.memo != "user/preferences") return;
-                                  ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
+                                  pydio.Registry.logXmlUser();
                               });
                               ajaxplorer.loadXmlRegistry(false, "user/preferences");
                           };
@@ -492,7 +498,7 @@
 						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-                        ajaxplorer.user.getRepositoriesList().each(function(pair){
+                        ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
                             if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
                                 var div = new Element('div', {className:(even?'even':'')});
                                 div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
@@ -616,8 +622,8 @@
                     <div class="action_bar" style="height: 33px;">&nbsp;</div>
                     <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
                     <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
-                        <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
                         <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
+                        <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
                         <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
                             <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px !important;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
                         </div>
@@ -648,9 +654,11 @@
                                     return;
                                 }
                                 if(!ajaxplorer.user) return;
+                                $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
                                 var conn = new Connexion();
                                 conn.setParameters({get_action:'load_repository_info'});
                                 conn.onComplete = function(transport){
+                                    $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
                                     if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
                                         var data = transport.responseJSON;
                                         if(!data['core.users']['external']){

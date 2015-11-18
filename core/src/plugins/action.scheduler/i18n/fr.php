@@ -43,7 +43,7 @@ $mess = array(
     "14" => "Dernière exécution",
     "15"=> "Démarrer",
     "15d" => "Exécuter la tâche sélectionnée",
-    "16" => "Lancer les tâches",
+    "16" => "Lancer la tâche",
     "16d" => "Déclencher le planificateur de tâches et exécuter les tâches planifiées",
     "17" => "Utilisateur(s)",
     "17d" => "Entrer une liste d'utilisateurs séparés par des virgules, ou un joker (*) pour lancer la tâche sur chaque utilisateur.",
@@ -55,4 +55,6 @@ $mess = array(
     "20d" => "Générer l'expression Cron",
     "21" => "Ajoutez la ligne suivante dans votre CRONTAB, en remplaçant le mot de passe par le votre, et la planification (ici configurée pour un déclenchement toutes les 5 minutes).",
     "22" => "Planificateur permettant l'exécution récurrente de tâches. Nécessite l'activation de la ligne de commande et un système type CRONTAB.",
+    "23" => "Execution Context",
+    "24" => "Parameters",
 );

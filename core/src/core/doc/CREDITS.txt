@@ -49,6 +49,7 @@ Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt,
 Gerrit Pannek, Max Ruman, Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon,
 Gerald Me, Matthieu Simon, Florian Huwyler, Aaron Guggisberg, Stefan Wüthrich, Teki Imai,
 Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Lukasz Lis.
+Garnetius
 
 ++ Third Party Library ++
 [Amazon S3]
@@ -59,6 +60,7 @@ Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Luka
 	Modernizr 	http://modernizr.com (BSD / MIT)
 	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
 	Chosen selector by Patrick Filler for Harvest (MIT): https://github.com/harvesthq/chosen
+	PDFJS library is provided by the Mozilla Foundation (Apache 2): http://mozilla.github.io/pdf.js/
 
 [Images and Fonts]
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
@@ -69,6 +71,7 @@ Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Luka
 	Folders & Files icons in Orbit Theme, by Ionic : http://ionicons.com/ (MIT License)
 
 [Core PHP Classes]
+    Dibi ORM: Copyright (c) 2004, 2014 David Grudl (http://davidgrudl.com) All rights reserved. (New BSD)
 	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
 	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
 	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)

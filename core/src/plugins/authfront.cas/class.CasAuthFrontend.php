@@ -67,6 +67,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
         $enre = !empty($httpVars['put_action_enable_redirect']);
         $ticket = !empty($httpVars['ticket']);
         $pgt = !empty($_SESSION['phpCAS']['pgt']);
+        $clientModeTicketPendding = isset($_SESSION['AUTHENTICATE_BY_CAS_CLIENT_MOD_TICKET_PENDDING']);
 
         if ($this->cas_modify_login_page) {
 
@@ -76,15 +77,22 @@ class CasAuthFrontend extends AbstractAuthFrontend
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }elseif(($flag == 1) && ($enre) && !$logged && !$pgtIou){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif($pgtIou || $ticket || $pgt){
+            }elseif($pgtIou || $pgt){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+            }elseif($ticket){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+                $_SESSION['AUTHENTICATE_BY_CAS_CLIENT_MOD_TICKET_PENDDING'] = 1;
             }elseif($logged && $pgtIou){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 2;
             }else{
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }
             if ($_SESSION['AUTHENTICATE_BY_CAS'] < 1) {
-                return false;
+                if($clientModeTicketPendding){
+                    unset($_SESSION['AUTHENTICATE_BY_CAS_CLIENT_MOD_TICKET_PENDDING']);
+                }else{
+                    return false;
+                }
             }
         }
 
@@ -219,8 +227,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
     function logOutCAS($action, $httpVars, $fileVars)
     {
-        if (!isSet($this->actions[$action])) return;
-
         switch ($action) {
             case "logout":
                 if(isset($_SESSION['LOGGED_IN_BY_CAS'])){

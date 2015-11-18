@@ -19,10 +19,11 @@ div.tabbed_editor input[type="password"]
 {
     font-size: 13px;
     line-height: 21px;
-    padding: 0 1% !important;
+    padding: 0 0 0 5px !important;
     width: 52% !important;
     height: 30px;
     border: 1px solid #C8CCD3;
+    box-sizing: border-box;
 }
 
 div.tabbed_editor input:focus,
@@ -92,8 +93,10 @@ div#parameters-selector{
 
 div.tabbed_editor div.SF_input.SF_inlineButton{
     margin-left: 10px !important;
-    width: 53% !important;
+    width: 56% !important;
     padding: 7px 3px !important;
+    box-sizing: border-box;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
 }
 
 .ajxp_theme_vision div.tabbed_editor{

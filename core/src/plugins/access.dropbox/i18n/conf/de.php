@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Dies Plugin ermöglicht einen Dropbox-Zugriff. Experimentelle Version, benötigt PEAR/HTTP_OAuth-Erweiterungen.",
+"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Erweiterung zum Zugriff auf Dropbox. Experimentelle Version, benötigt PEAR/HTTP_OAuth-Erweiterungen.",
 "Consumer Key" => "Benutzerschlüssel",
 "Key" => "Schlüssel",
 "Consumer Secret" => "Benutzerpasswort",
@@ -28,5 +28,5 @@ $mess=array(
 "User Mail" => "Benutzer E-Mail-Adresse",
 "User account" => "Benutzeraccount",
 "Password" => "Passwort",
-"User Password" => "Benutzer Passwort",
+"User Password" => "Passwort des Benutzers",
 );

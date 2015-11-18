@@ -1,0 +1,74 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 6.0.4 - Bugfix Release</h2>
+
+    This is a bugfix release for v6. Upgrade is recommended. Main changes described below.
+
+    <ul>
+        <li>Bugfixes for sync between parent & shared folders, trigger indexation on first sync of shared workspace, update Observe Storage changes mechanism.</li>
+        <li>SearchEngine UX improved.</li>
+        <li>Analytics Dashboard now supported by PostgreSQL and Sqlite.</li>
+        <li>Decoupling index.lucene from meta.syncable.</li>
+        <li>New hooks: before/after create/delete/update workspace. Used to properly clear indexation data on workspace removal.</li>
+    </ul>
+
+    <h2>Upgrade instructions</h2>
+    <div style="border:1px solid #c00; padding: 5px; border-radius: 3px;"><b style="color: #cc0000;">IMPORTANT</b>: if you have not yet upgraded to v6.0.0, please read the <a href="https://pyd.io/pydio-core-6.0.0/"‎ target="_blank">Pydio 6 release note and upgrade instructions</a> before going further.</div>
+
+    <ul>
+        <li>
+            <b>In-app upgrade</b>: automatic. If you update from before 6.0.2, make sure to have conf/bootstrap_context.php writeable.
+        </li>
+        <li>
+            <b>Linux Packages</b>: automatic via yum / apt-get
+        </li>
+    </ul>
+
+    <h2>Changelog</h2>
+    <ul>
+        <li>Update de.php (<a href="http://github.com/pydio/pydio-core/commit/698d98aa945e72cfe8e7ad280e1ecbd488e60981">details</a>)</li>
+        <li>Fix #834 - Wrong message on group deletion (<a href="http://github.com/pydio/pydio-core/commit/e95d7fc1d982faa9e50285ccaf120958b404dd4a">details</a>)</li>
+        <li>CartManager is triggering the old-fashion public link (<a href="http://github.com/pydio/pydio-core/commit/98838207b3a3dfc582fabf0fdd03a494df5c3ae7">details</a>)</li>
+        <li>Make sure to push the newly activated plugins at the end of the list. Should fix #822 (<a href="http://github.com/pydio/pydio-core/commit/f81ab4babd5ea18d0dd0d7048ecb1771f92fc261">details</a>)</li>
+        <li>Transport a contextual user ID as a node property or through the URL. Pass a contextual user to the VarsFilter::filter() function Fix shareEventsForwarding when in a personal workspace (shared events not going to parents, preventing sync for example) (<a href="http://github.com/pydio/pydio-core/commit/5a32597e44ad91aa4baec2b7cb62aacbad97af14">details</a>)</li>
+        <li>Performances: do not call getRole() again if role is already loaded in the loop (<a href="http://github.com/pydio/pydio-core/commit/c4f6e3c6d357fe593a8b4b096dd0dc27c75aecca">details</a>)</li>
+        <li>Meta.mount: New option to delete mount point on unmount (<a href="http://github.com/pydio/pydio-core/commit/a2d5a2973429a8811295f78c2bed2a0a6435515a">details</a>)</li>
+        <li>Fix #803 (<a href="http://github.com/pydio/pydio-core/commit/aa4edbe76c51d6ea2c10673297e00788fc82a920">details</a>)</li>
+        <li>Open search box when clicking on magnifier. (<a href="http://github.com/pydio/pydio-core/commit/5b1f4a9f956f9a841e18c3631eae3045ffacd2b8">details</a>)</li>
+        <li>Modal: handle case where dialogTitle is positioned absolute. Modify CSS accordingly. (<a href="http://github.com/pydio/pydio-core/commit/641b1c62e382b2aead3fd25022f9e0ebe228e9ac">details</a>)</li>
+        <li>Typo prevented shared users deletion when not logged as admin (<a href="http://github.com/pydio/pydio-core/commit/6d60aa131c24350e56277534826642f5f76dac12">details</a>)</li>
+        <li>Try base64_decode for legacy - Was breaking the mp3 player in a shared minisite (<a href="http://github.com/pydio/pydio-core/commit/929ed4169d40bd0efa76e3435b73c249c1b82758">details</a>)</li>
+        <li>Fix repository exposed property, values not correctly retrieved (<a href="http://github.com/pydio/pydio-core/commit/d30ce581af6edf174e12a6ce4895355db5eee1d9">details</a>)</li>
+        <li>Error in slug generation, make sure to look at the reserved slugs when building new ones (<a href="http://github.com/pydio/pydio-core/commit/e861e31891181e0fe7752a16f0b58a8a50fd23c0">details</a>)</li>
+        <li>Share users list: Add an option to not trigger any listing if no regexp is sent (<a href="http://github.com/pydio/pydio-core/commit/ec840657d20af251d55eab64933d0f3c1439be3d">details</a>)</li>
+        <li>Fix error if msgExchanger is not set. (<a href="http://github.com/pydio/pydio-core/commit/c9162bd203e4871cfe76e2d8440d82134aa2e92e">details</a>)</li>
+        <li>Use loadNodeInfo() instead of stat in ChangesTracker, otherwise eventForwarding can end up indexing a folder as file. (<a href="http://github.com/pydio/pydio-core/commit/0c769108ad814d945cbaba46485c9b3ae3644f6e">details</a>)</li>
+        <li>[index.lucene] Typo calling getUser() on wrong object (<a href="http://github.com/pydio/pydio-core/commit/1164429d45ab54b5deffd16bc7c27e2fe93c0312">details</a>)</li>
+        <li>Introduce an AJXP_METADATA_ALLUSERS metadata users scope to gather meta from all users. Used in eventForwarding for ShareCenter. (<a href="http://github.com/pydio/pydio-core/commit/46e117b0ddcae9e144f9b705f1cea4309a1f7b2c">details</a>)</li>
+        <li>Big refactoring to decouple meta.syncable from index.lucene: core.index is now responsible for triggering a recursive indexation and sending corresponding events. (<a href="http://github.com/pydio/pydio-core/commit/5d02e93f518238e8d5f3784b6f6a70f4dc9f3648">details</a>)</li>
+        <li>Fix #842 : API issue on IIS when in root folder. (<a href="http://github.com/pydio/pydio-core/commit/a1aa6416486b62b64ad687a1d5ccb1c9988a3069">details</a>)</li>
+        <li>Fix inZip detection for UserSelection built without "dir" parameter. (<a href="http://github.com/pydio/pydio-core/commit/33f01aac6b704f761dcf362cd0ba4f48c2b4c18b">details</a>)</li>
+        <li>Set pydio global variable from within AjaXplorer class, not only Bootstrap (skip updating bootstrap) (<a href="http://github.com/pydio/pydio-core/commit/2e6cf3f123f3826116ed7899ef6ac6557b07e518">details</a>)</li>
+        <li>Consume_channel: avoid repeating query if previous query is not yet finished (<a href="http://github.com/pydio/pydio-core/commit/73a1f43be35e649959fe805190bef02df6ddac02">details</a>)</li>
+        <li>Make sure to unset currentIndex to trigger the __destruct function and release all handlers on files. Prevented the cleaning of the TMP index on Windows. (<a href="http://github.com/pydio/pydio-core/commit/15b8d4df2091522d4df7ae509a4f8c1c9dc74976">details</a>)</li>
+        <li>Fix Quota computation on MacOS server (<a href="http://github.com/pydio/pydio-core/commit/7672d1000736bebbe7ed89d033d7bb7fba6b624c">details</a>)</li>
+        <li>The indexIsSync() feature can be triggered with bad value, creating issues in synchro (<a href="http://github.com/pydio/pydio-core/commit/a20e6a78381fdcc6fd600dc9bf98318879c8a202">details</a>)</li>
+        <li>Comment out debugs from authfront.keystore , too verbose. (<a href="http://github.com/pydio/pydio-core/commit/0b81a9225ffc180988d1c7a85825dff4fc375a74">details</a>)</li>
+        <li>Refactor upload method to make it more readable. Fix wrong event sent after partial uploads. (<a href="http://github.com/pydio/pydio-core/commit/4fc619d13a02510bf983f9d064f72f7f29e6d9f7">details</a>)</li>
+        <li>Translate PHP errors (<a href="http://github.com/pydio/pydio-core/commit/6af583c4d07e40fd12a40f514571fb465915a915">details</a>)</li>
+        <li>Move fsAccessDriver functions to its parent AbstractAccessDriver (<a href="http://github.com/pydio/pydio-core/commit/dba284ae2167ad30dca924b794453e1d61af3256">details</a>)</li>
+        <li>Update "Observe Storage" mechanism to make it more reliable and less frequent. (<a href="http://github.com/pydio/pydio-core/commit/56cda77204121c52df03dd7944401c4687c6ce28">details</a>)</li>
+        <li>Do not set default plugin value if not in meta source. (<a href="http://github.com/pydio/pydio-core/commit/55d0c2ec0f9d856ba255a0df83b0e535044d9c44">details</a>)</li>
+        <li>Fix Analytics Dashboard for Sqlite and PostgreSQL drivers (<a href="http://github.com/pydio/pydio-core/commit/97bc2cb1897e202793ab5dd773b16d8eb06c0175">details</a>)</li>
+        <li>New parameter in Index.Lucene to hide the "My Shares" section (<a href="http://github.com/pydio/pydio-core/commit/71d7379bd9f598653ce78380c10e64aaefc8fb04">details</a>)</li>
+        <li>Close SearchEngine on context_changed (<a href="http://github.com/pydio/pydio-core/commit/8a34363f18d8fea8a9d6519aa1cfe916afc98577">details</a>)</li>
+        <li>Mark a repository for REQUIRES_INDEXATION at share time. Trigger indexation if necessary when requiring changes - Fix auto-indexation on first search. (<a href="http://github.com/pydio/pydio-core/commit/f94414e4c51a884cafe2640447a75516a6138751">details</a>)</li>
+        <li>Trigger events on workspace before/after create/update/delete Hook indexers (lucene & meta.syncable) to the after_delete event to clear the indexes. (<a href="http://github.com/pydio/pydio-core/commit/8501d449baaa64c4ee0a613f5880940c2b7bd5fd">details</a>)</li>
+        <li>Sync: trigger client last_seq reset if the sequence ID is greater than the current max of the changes table. Foresee the need to vacuum the changes table. (<a href="http://github.com/pydio/pydio-core/commit/e97f4aca7adcf96d671870333ae3e2ad4c24f10d">details</a>)</li>
+        <li>Search results are limited by max-height (ndeet)</li>
+        <li>Fix Dav configuration when Server URL is set (andypmuc)</li>
+        <li>Sanitize function: trim spaces only no the left, or it can break when syncing files with trailing space</li>
+        <li>Secure error message on rename operations by catching the result</li>
+    </ul>
+</div>

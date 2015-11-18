@@ -1,4 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Indexation]" description="CONF_MESSAGE[Indexation plugins]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="CoreIndexer" filename="plugins/core.index/class.CoreIndexer.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core.index" path="plugins/core.index/i18n"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="index">
+                <gui text="core.index.1" title="core.index.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
+                    <context selection="false" dir="true" recycle="hidden"
+                             actionBar="true" contextMenu="false" infoPanel="false"
+                             actionBarGroup="remote" inZip="false">
+                    </context>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var crtDir = pydio.getContextHolder().getContextNode().getPath();
+                        if(!pydio.getUserSelection().isEmpty()){
+                            crtDir = pydio.getUserSelection().getUniqueNode().getPath();
+                        }
+						var bgManager = pydio.getController().getBackgroundTasksManager();
+						bgManager.queueAction("index", {file:crtDir}, MessageHash["index.lucene.8"].replace('%s', crtDir));
+						bgManager.next();
+					]]></clientCallback>
+                    <serverCallback methodName="applyAction" restParams="/file+" developerComment="Trigger re-indexation of a directory, recursively">
+                        <input_param name="file" type="string" description="Folder to index (can be empty for root)"/>
+                        <input_param name="verbose" type="boolean" description="Print out some info about indexation"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="check_index_status">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkIndexStatus" developerComment="Check the indexation process status."/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="index.lucene|meta.syncable"/>
+    </dependencies>
 </ajxp_plugin>

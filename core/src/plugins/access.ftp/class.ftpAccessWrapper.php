@@ -210,6 +210,7 @@ class ftpAccessWrapper implements AjxpWrapper
         $parts = $this->parseUrl($path);
         $link = $this->createFTPLink();
         $serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+        if(empty($parts["path"])) $parts["path"] = "/";
         if ($parts["path"] == "/") {
             $basename = ".";
         } else {
@@ -440,8 +441,13 @@ class ftpAccessWrapper implements AjxpWrapper
         $cacheKey = $repository->getId()."_ftpCharset";
         if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]) || $forceLogin) {
             $features = $this->getServerFeatures();
-            if(!isSet($_SESSION["AJXP_CHARSET"]) || $_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = $features["charset"];
-            $_SESSION[$cacheKey] = $_SESSION["AJXP_CHARSET"];
+            $ctxCharset = ConfService::getContextCharset();
+            if(empty($ctxCharset)) {
+                ConfService::setContextCharset($features["charset"]);
+                $_SESSION[$cacheKey] = $features["charset"];
+            }else{
+                $_SESSION[$cacheKey] = $ctxCharset;
+            }
         }
         return $urlParts;
     }

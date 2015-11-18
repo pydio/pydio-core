@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Video Player" => "Video Player",
-"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Fügt einen Videoplayer zur Infoleiste hinzu. Je nach Format wird ein HTML5- oder Flash-Player verwendet.",
+"Video Player" => "Video-Player",
+"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Fügt einen Video-Player zum Info-Bereich hinzu. Je nach Format wird ein HTML5- oder Flash-Player verwendet.",
 );

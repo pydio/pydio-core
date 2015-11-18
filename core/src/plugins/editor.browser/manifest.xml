@@ -6,10 +6,10 @@
     <server_settings>
         <global_param name="OPEN_DOCS_IN_TAB" type="select" label="CONF_MESSAGE[Open documents in...]"
                       description="CONF_MESSAGE[Choose where the documents are opened]"
-                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+                      choices="application|CONF_MESSAGE[Application Tab],browser|CONF_MESSAGE[Browser Tab]" default="application" expose="true"/>
         <global_param name="OPEN_LINK_IN_TAB" type="select" label="CONF_MESSAGE[Open link in...]"
                       description="CONF_MESSAGE[Choose where the http links are opened]"
-                      choices="application|Application Tab,browser|Browser Tab" default="application" expose="true"/>
+                      choices="application|CONF_MESSAGE[Application Tab],browser|CONF_MESSAGE[Browser Tab]" default="application" expose="true"/>
     </server_settings>
     <client_settings>
         <resources>
@@ -49,7 +49,7 @@
 
                         var oForm = modal.getForm();
                         oForm.down("#filename").setValue(oForm.down("#filename").getValue()+ '.url');
-                        ajaxplorer.actionBar.submitForm(oForm);
+                        pydio.getController().submitForm(oForm);
                         hideLightBox(true);
                         return false;
 
@@ -69,7 +69,7 @@
                         var link = '<div class="dialogLegend" style="padding-top:20px;" id="alt_mklink"><span class="icon-chevron-right"></span> '+MessageHash["openbrowser.5"]+'</div>';
                         modal.getForm().down("div.dialogButtons").insert({before:link});
                         modal.getForm().down("#alt_mklink").down("a").addClassName("create_file_alt_link").observe("click", function(){
-                            ajaxplorer.actionBar.fireAction("mklink");
+                            pydio.getController().fireAction("mklink");
                         });
                     });
                 ]]></clientListener>

@@ -107,9 +107,9 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $loggedUser->save("superuser");
         }
 
-        if($loggingResult > 0 || $isLast){
+//        if($loggingResult > 0 || $isLast){
             exit();
-        }
+//       }
 
     }
 

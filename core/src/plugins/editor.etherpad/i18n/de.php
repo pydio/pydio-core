@@ -21,13 +21,14 @@
 
 $mess = array(
     "1" => "Gemeinsames Board",
-    "1b"=> "Leeres, gemeinsames Pad erstellen oder beitreten",
-    "2" => "Collaborative Editor",
-    "3" => "Zusammenarbeit mit Ausgabe in Echtzeit",
-    "4" => "Einen vorhandenen Board beitreten oder ein neues erstellen:: ",
+    "1b"=> "Leeres Pad erstellen oder bestehendem beitreten",
+    "2" => "Kollaborativer Editor",
+    "3" => "Zusammenarbeit an einem Dokument mit Echtzeit-Übertragung von Änderungen",
+    "4" => "Einem vorhandenem Board beitreten oder ein neues erstellen.",
     "5" => "Freie Boards",
     "6" => "Dateien",
     "7" => "Beitreten",
-    "8" => "Board name",
-    "9" => "Neues Board erstellen",
+    "8" => "Board-Name",
+    "9" => " <a>Neues Board</a> erstellen",
+    "10" => "Export",
 );

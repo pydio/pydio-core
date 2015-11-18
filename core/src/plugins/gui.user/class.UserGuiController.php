@@ -60,15 +60,28 @@ class UserGuiController extends AJXP_Plugin
     {
         switch ($action) {
             case "user_access_point":
-
-                $uri = explode("/", trim($_SERVER["REQUEST_URI"], "/"));
-                array_shift($uri);
-                $action = array_shift($uri);
-                $this->processSubAction($action, $uri);
-                $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
-                    "REBASE"=>"../../",
-                    "USER_GUI_ACTION" => $action
-                );
+                $setUrl = ConfService::getCoreConf("SERVER_URL");
+                $realUri = "/";
+                if(!empty($setUrl)){
+                    $realUri = parse_url(ConfService::getCoreConf("SERVER_URL"), PHP_URL_PATH);
+                }
+                $requestURI = str_replace("//", "/", $_SERVER["REQUEST_URI"]);
+                $uri = trim(str_replace(rtrim($realUri, "/")."/user", "", $requestURI), "/");
+                $uriParts = explode("/", $uri);
+                $action = array_shift($uriParts);
+                $key = ($action == "reset-password" && count($uriParts)) ? array_shift($uriParts) : "";
+                try{
+                    $this->processSubAction($action, $uriParts);
+                    $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
+                        "REBASE"=>"../../",
+                        "USER_GUI_ACTION" => $action,
+                        "USER_ACTION_KEY" => $key
+                    );
+                }catch(Exception $e){
+                    $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
+                        "ALERT" => $e->getMessage()
+                    );
+                }
                 AJXP_Controller::findActionAndApply("get_boot_gui", array(), array());
                 unset($_SESSION['OVERRIDE_GUI_START_PARAMETERS']);
 
@@ -106,10 +119,17 @@ class UserGuiController extends AJXP_Plugin
                 // This is a reset password
                 if (isSet($httpVars["key"]) && isSet($httpVars["user_id"])) {
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
-                    if ($key != null && $key["user_id"] == $httpVars["user_id"] && AuthService::userExists($key["user_id"])) {
-                        AuthService::updatePassword($key["user_id"], $httpVars["new_pass"]);
-                    }
                     ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);
+                    $uId  = $httpVars["user_id"];
+                    if(AuthService::ignoreUserCase()){
+                        $uId = strtolower($uId);
+                    }
+                    if ($key != null && strtolower($key["user_id"]) == $uId && AuthService::userExists($uId)) {
+                        AuthService::updatePassword($key["user_id"], $httpVars["new_pass"]);
+                    }else{
+                        echo 'PASS_ERROR';
+                        break;
+                    }
                 }
                 AuthService::disconnect();
                 echo 'SUCCESS';
@@ -129,8 +149,8 @@ class UserGuiController extends AJXP_Plugin
                 if (count($args)) {
                     $token = $args[0];
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $token);
-                    if ($key == null) {
-
+                    if ($key == null || $key["user_id"] === false) {
+                        throw new Exception("Invalid password reset key! Did you make sure to copy the correct link?");
                     }
                 }
                 break;

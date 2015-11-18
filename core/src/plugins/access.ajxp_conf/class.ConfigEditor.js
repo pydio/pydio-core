@@ -146,7 +146,7 @@ Class.create("ConfigEditor",{
 		connexion.onComplete = function(transport){
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
-			ajaxplorer.blurAll();
+			pydio.UI.blurAll();
 		}.bind(this);
 		connexion.sendAsync();
 	},
@@ -165,7 +165,7 @@ Class.create("ConfigEditor",{
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.39']);
 			return false;
 		}
-		if(pass.value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+		if(pass.value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
 			ajaxplorer.displayMessage("ERROR", MessageHash[378]);
 			return false;
 		}
@@ -188,10 +188,10 @@ Class.create("ConfigEditor",{
 		this.submitForm("create_user", 'create_user', parameters, null, function(responseXML){
             // success callback
             hideLightBox();
-            var editorData = ajaxplorer.findEditorById("editor.ajxp_role");
+            var editorData = pydio.Registry.findEditorById("editor.ajxp_role");
             var node = new AjxpNode(currentPath + "/"+newUserName, true);
             node.getMetadata().set("ajxp_mime", "user");
-            ajaxplorer.openCurrentSelectionInEditor(editorData, node);
+            pydio.UI.openCurrentSelectionInEditor(editorData, node);
         }.bind(this), function(responseXML){
             // error callback;
         });
@@ -247,7 +247,7 @@ Class.create("ConfigEditor",{
         sync.sendSync();
         var encoded;
         if(seed != '-1'){
-            encoded = hex_md5(password);
+            encoded = HasherUtils.hex_md5(password);
         }else{
             encoded = password;
         }
@@ -439,13 +439,13 @@ Class.create("ConfigEditor",{
             var reloadNode = XPathSelectSingleNode(responseXML.documentElement, "//reload_instruction/@file");
             if(reloadNode && reloadNode.nodeValue){
                 var newRepoId = reloadNode.nodeValue;
-                var editors = ajaxplorer.findEditorsForMime("repository");
+                var editors = pydio.Registry.findEditorsForMime("repository");
                 if(editors.length && editors[0].openable){
                     var editorData = editors[0];
                     var currentPath = ajaxplorer.getContextNode().getPath();
                     var node = new AjxpNode(currentPath+"/"+newRepoId, true);
                     node.getMetadata().set("text", this.newRepoLabelInput.getValue());
-                    ajaxplorer.openCurrentSelectionInEditor(editorData, node);
+                    pydio.UI.openCurrentSelectionInEditor(editorData, node);
                     hideLightBox();
                 }
             }
@@ -556,7 +556,7 @@ Class.create("ConfigEditor",{
 				this.repositories.set(childs[i].getAttribute('index'), childs[i]);
 			}
 		}
-        ajaxplorer.actionBar.parseXmlMessage(xmlResponse);
+        pydio.getController().parseXmlMessage(xmlResponse);
         if(xmlResponse.documentElement){
             if(XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
                 return false;

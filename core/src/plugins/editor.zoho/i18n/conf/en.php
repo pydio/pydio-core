@@ -19,12 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
+"Office Docs" => "Office Docs",
+"Zoho editor" => "Zoho editor",
 "Zoho API Key, you must have registered to api.zoho.com" => "Zoho API Key, you must have registered to api.zoho.com",
 "API Key" => "API Key",
-"Zoho secret key, you must have registered to api.zoho.com" => "Zoho secret key, you must have registered to api.zoho.com",
-"Secret Key" => "Secret Key",
 "If you are working locally or behind a firewall, you can install an ajaxplorer Zoho Agent somewhere in the public zone. See the plugin folder content." => "If you are working locally or behind a firewall, you can install an ajaxplorer Zoho Agent somewhere in the public zone. See the plugin folder content.",
-"Use Z-Agent" => "Use Z-Agent",
 "If you use the agent, enter its URL here." => "If you use the agent, enter its URL here.",
 "Z-Agent URL" => "Z-Agent URL",
 "Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc)." => "Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc).",

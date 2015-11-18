@@ -62,7 +62,7 @@
                         var connexion = new Connexion();
                         connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
                         connexion.onComplete = function(transport){
-                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -73,7 +73,7 @@
                 <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
@@ -86,7 +86,7 @@
                             task_id:taskId
                         }));
                         connexion.onComplete = function(transport){
-                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -144,6 +144,49 @@
                            }
                        ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
+
+                            /**
+                             * @author Jordi Salvat i Alabart - with thanks to <a href="www.salir.com">Salir.com</a>.
+                             */
+                            var regStr = "^\\s*((\\*(\/\\d+)?|([0-5]?\\d)(-([0-5]?\\d)(\/\\d+)?)?(,([0-5]?\\d)(-([0-5]?\\d)(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|([01]?\\d|2[0-3])(-([01]?\\d|2[0-3])(\/\\d+)?)?(,([01]?\\d|2[0-3])(-([01]?\\d|2[0-3])(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|(0?[1-9]|[12]\\d|3[01])(-(0?[1-9]|[12]\\d|3[01])(\/\\d+)?)?(,(0?[1-9]|[12]\\d|3[01])(-(0?[1-9]|[12]\\d|3[01])(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|([1-9]|1[012])(-([1-9]|1[012])(\/\\d+)?)?(,([1-9]|1[012])(-([1-9]|1[012])(\/\\d+)?)?)*|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s+(\\*(\/\\d+)?|([0-7])(-([0-7])(\/\\d+)?)?(,([0-7])(-([0-7])(\/\\d+)?)?)*|mon|tue|wed|thu|fri|sat|sun)\\s*$|(@yearly|@annually|@monthly|@weekly|@daily|@midnight|@hourly)\\s*$)";
+
+                            /*
+                               form validation
+                            */
+                            var schLabel = $('scheduler-task-form').select('[name=label]')[0];
+                            // $('scheduler-task-form').select('[name=schedule]')[0].removeClassName('SF_failed')
+                            var schSch = $('scheduler-task-form').select('[name=schedule]')[0];
+                            var schUser = $('scheduler-task-form').select('[name=user_id]')[0];
+                            var schRepoId = $('scheduler-task-form').select('[name=repository_id]')[0];
+                            var schActionName = $('scheduler-task-form').select('[name=action_name]')[0];
+
+                            schSch.value = schSch.value.trim();
+                            /* check null value */
+
+                            var errorMsg = "";
+
+                            if( schLabel.value === "" ||
+                                schSch.value === "" ||
+                                schUser.value === "" ||
+                                schRepoId.value === "" ||
+                                schActionName.value === "loading"){
+                                    (schLabel.value === "" )?schLabel.addClassName("SF_failed"):schLabel.removeClassName("SF_failed");
+                                    (schSch.value === "")?schSch.addClassName("SF_failed"):schSch.removeClassName("SF_failed");
+                                    (schUser.value === "")?schUser.addClassName("SF_failed"):schUser.removeClassName("SF_failed");
+                                    (schRepoId.value === "")?schRepoId.addClassName("SF_failed"):schRepoId.removeClassName("SF_failed");
+                                    (schActionName.value === "")?schActionName.addClassName("SF_failed"):schActionName.removeClassName("SF_failed");
+                                    alert("Some fields should not be empty");
+                                    return 0;
+                                }
+                            /* check schedule format */
+                            if(schSch.value.match(regStr) != null){
+                                schSch.removeClassName("SF_failed");
+                            }else{
+                                schSch.addClassName("SF_failed");
+                                alert("Check format of Schedule");
+                                return 0;
+                            }
+
                             var values = new Hash({});
                             this.currentFormManager.serializeParametersInputs(
                                 $('scheduler-task-form'),
@@ -158,7 +201,7 @@
                             conn.setParameters(values);
                             conn.sendAsync();
                             conn.onComplete = function(transport){
-                                var res = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                var res = pydio.getController().parseXmlMessage(transport.responseXML);
                                 if(res) hideLightBox();
                             };
                        ]]></dialogOnComplete>
@@ -167,13 +210,13 @@
                         <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
                     <standardFormDefinition>
-                        <param name="label" group="Execution Context" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
-                        <param name="schedule" group="Execution Context" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
-                        <param name="user_id" group="Execution Context" label="action.scheduler.17" description="action.scheduler.17d" type="string" mandatory="true" default=""/>
-                        <param name="repository_id" group="Execution Context" replicationGroup="group2" label="action.scheduler.4" description="action.scheduler.4d" type="select" choices="" mandatory="true"/>
-                        <param name="action_name" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="select" choices="json_list:list_all_plugins_actions" mandatory="true"/>
-                        <param name="param_name" group="Parameters" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
-                        <param name="param_value" group="Parameters" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
+                        <param name="label" group="action.scheduler.23" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
+                        <param name="schedule" group="action.scheduler.23" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
+                        <param name="user_id" group="action.scheduler.23" label="action.scheduler.17" description="action.scheduler.17d" type="string" mandatory="true" default=""/>
+                        <param name="repository_id" group="action.scheduler.23" replicationGroup="group2" label="action.scheduler.4" description="action.scheduler.4d" type="select" choices="" mandatory="true"/>
+                        <param name="action_name" group="action.scheduler.24" label="action.scheduler.1" description="action.scheduler.1d" type="select" choices="json_list:list_all_plugins_actions" mandatory="true"/>
+                        <param name="param_name" group="action.scheduler.24" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
+                        <param name="param_value" group="action.scheduler.24" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
                     </standardFormDefinition>
                     <serverCallback methodName="handleTasks" developerComment="Create a new task by posting parameters">
                         <input_param description="All parameters generated by the FormManager (label, schedule, user_id, repository_id, action_name, one or more param_name / param_value)" name="FORM_DATA"
@@ -185,13 +228,13 @@
                 <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="icon-edit" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
                         var u = ajaxplorer.getUserSelection();
-                        ajaxplorer.getActionBar().fireAction('scheduler_addTask', u.getUniqueNode());
+                        pydio.getController().fireAction('scheduler_addTask', u.getUniqueNode());
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -199,7 +242,7 @@
                 <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" src="scheduler/22/task_delete.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="change"/>
+                             actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
@@ -208,7 +251,7 @@
                         var conn = new Connexion();
                         conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(u.getUniqueNode().getPath()) }));
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                          };
                         conn.sendAsync();
 

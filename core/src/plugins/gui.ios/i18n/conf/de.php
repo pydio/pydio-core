@@ -25,10 +25,10 @@
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"iOS" => "iOS",
-"Template for redirecting to iPhone application" => "Vorlage für die Weiterleitung an die iPhone-Applikation",
-"iOS Application URL" => "URL zur iOS-Applikation",
-"iOS Application" => "iOS-Applikation",
-"Android Application URL" => "URL zur Android-Applikation",
+"iOS" => "Apps vorschlagen",
+"Template for redirecting to iPhone application" => "Auf mobilen Geräten eine Weiterleitung zu den entsprechenden Apps vorschlagen.",
+"iOS Application URL" => "URL zur iOS-App",
+"iOS Application" => "iOS-App",
+"Android Application URL" => "URL zur Android-App",
 "Android App" => "Android-App",
 );

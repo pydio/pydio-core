@@ -34,7 +34,7 @@ $mess=array(
 "date_relative_tomorrow" => "homme TIME",
 "date_relative_days_ago" => "%s päeva tagasi",
 "date_relative_days_ahead" => "%s päeva jooksul",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "0" => "Viimane versioon",
 "1" => "Nimi",
 "2" => "Suurus",
@@ -629,5 +629,11 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
+    "537" => "File is too large! Maximum authorized size is %i",
+    "538" => "Upload error: no file found on server!",
+    "539" => "Upload error: file is partial",
+    "540" => "Upload error: cannot find the temporary directory",
+    "541" => "Upload error: cannot write into the temporary directory",
+    "542" => "Upload error: a PHP extension stopped the upload process."
 /* END SENTENCE */
 );

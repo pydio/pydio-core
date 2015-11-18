@@ -46,6 +46,18 @@ Class.create("ShareCenter", {
                 if(console) console.log(e);
             }
         });
+        var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
+        this.authorizations = {
+            folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+            folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+            file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+            editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+        };
+        var pass_mandatory = pluginConfigs.get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
     },
 
     performShareAction : function(dataModel){
@@ -56,6 +68,11 @@ Class.create("ShareCenter", {
         }else{
             userSelection =  ajaxplorer.getUserSelection();
         }
+        var pass_mandatory = ajaxplorer.getPluginConfigs("action.share").get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
         this.readonlyMode = this.currentNode.getMetadata().get('share_data') ? true : false;
@@ -94,6 +111,17 @@ Class.create("ShareCenter", {
 
     performShare: function(type){
         this.currentNode = ajaxplorer.getUserSelection().getUniqueNode();
+
+        var pass_mandatory = ajaxplorer.getPluginConfigs("action.share").get("SHARE_FORCE_PASSWORD");
+        if(pass_mandatory){
+            this.authorizations.password_mandatory = true;
+        }
+        this.authorizations.password_placeholder = pass_mandatory ? MessageHash['share_center.176'] : MessageHash['share_center.148']
+        if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
+            alert('You are not authorized to share folders');
+            return;
+        }
+
         if(type == 'workspace'){
             this.shareFolderMode = 'workspace';
         }else if(type == 'minisite-public'){
@@ -104,8 +132,17 @@ Class.create("ShareCenter", {
             this.shareFolderMode = 'file';
         }
         if(this.shareFolderMode == 'file'){
+            if(this.currentNode.isLeaf() && !this.authorizations.file_public_link){
+                alert('You are not authorized to share files');
+                return;
+            }
             this.shareFile();
         }else{
+            if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
+                this.shareFolderMode = "workspace";
+            }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
+                this.shareFolderMode = "minisite_public";
+            }
             this.shareRepository();
         }
     },
@@ -117,17 +154,24 @@ Class.create("ShareCenter", {
                 alert(MessageHash[349]);
                 return false;
             }
-            oForm.addClassName("share_edit");
-            var userSelection = ajaxplorer.getUserSelection();
-            var publicUrl = ajxpServerAccessPath+'&get_action=share';
-            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
-            var conn = new Connexion(publicUrl);
-            conn.setMethod("POST");
             var params = modal.getForm().serialize(true);
             var passwordField = modal.getForm().down('input[name="guest_user_pass"]');
             if(passwordField.readAttribute('data-password-set') === 'true' && !passwordField.getValue()){
                 delete params['guest_user_pass'];
             }
+            if(this.shareFolderMode == "minisite_public" && this.authorizations.password_mandatory && passwordField.readAttribute('data-password-set') !== 'true'
+                && ( !params['guest_user_pass'] || params['guest_user_pass'].length < parseInt(pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH")) ) ){
+                pydio.displayMessage('ERROR', MessageHash["share_center.175"]);
+                passwordField.addClassName("SF_failed");
+                modal.getForm().down('#generate_publiclet').show();
+                return;
+            }
+            var userSelection = ajaxplorer.getUserSelection();
+            var publicUrl = ajxpServerAccessPath+'&get_action=share';
+            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
+            var conn = new Connexion(publicUrl);
+            conn.setMethod("POST");
+            oForm.addClassName("share_edit");
             conn.setParameters(params);
             if(this._currentRepositoryId){
                 conn.addParameter("repository_id", this._currentRepositoryId);
@@ -264,12 +308,14 @@ Class.create("ShareCenter", {
             if(this.maxdownload > 0){
                 oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
             }
-            this.authorizations = {
-                folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
-                folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
-                file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
-                editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
-            };
+            if(!this.authorizations){
+                this.authorizations = {
+                    folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
+                    folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+                    file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
+                    editable_hash : pluginConfigs.get("HASH_USER_EDITABLE")
+                };
+            }
 
             if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link && !this.authorizations.folder_workspaces){
                 alert('You are not authorized to share folders');
@@ -280,7 +326,7 @@ Class.create("ShareCenter", {
                 hideLightBox();
                 return;
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_public_link){
-                this.shareFolderMode = "workspaces";
+                this.shareFolderMode = "workspace";
             }else if(!this.currentNode.isLeaf() && !this.authorizations.folder_workspaces){
                 this.shareFolderMode = "minisite_public";
             }
@@ -348,7 +394,7 @@ Class.create("ShareCenter", {
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
                 var watchBox = '';
-                if(ajaxplorer.hasPluginOfType("meta", "watch")){
+                if(pydio.Registry.hasPluginOfType("meta", "watch")){
                     if(watchValue) watchValue = ' checked';
                     else watchValue = '';
                     watchBox = '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"'+watchValue+'></span>';
@@ -365,23 +411,26 @@ Class.create("ShareCenter", {
                 }
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
-            if(!$('share_folder_form').autocompleter){
+            var shareFolderForm = oForm.down('#share_folder_form');
+            if(!shareFolderForm.autocompleter){
                 var pref = ajaxplorer.getPluginConfigs("action.share").get("SHARED_USERS_TMP_PREFIX");
-                $('share_folder_form').autocompleter = new AjxpUsersCompleter(
-                    $("shared_user"),
-                    $("shared_users_summary"),
+                shareFolderForm.autocompleter = new AjxpUsersCompleter(
+                    oForm.down("#shared_user"),
+                    oForm.down("#shared_users_summary"),
                     $("shared_users_autocomplete_choices"),
                     {
                         tmpUsersPrefix:pref,
                         updateUserEntryAfterCreate:updateUserEntryAfterCreate,
-                        indicator: $("complete_indicator"),
+                        indicator: oForm.down("#complete_indicator"),
                         minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }
                 );
             }
+            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', this.authorizations.password_placeholder);
             if(this.readonlyMode){
-                $("shared_user").disabled = true;
+                oForm.down("#shared_user").disabled = true;
             }
+            var openBlocks = null;
             this._currentRepositoryId = null;
             this._currentRepositoryLink = null;
             this._currentRepositoryLabel = null;
@@ -409,18 +458,34 @@ Class.create("ShareCenter", {
                         if(json['password']){
                             oForm.down('input[name="guest_user_pass"]').setValue(json['password']);
                         }
+                        var passwordField = oForm.down('input[name="guest_user_pass"]');
+                        var passwordButton = oForm.down('#remove_user_pass');
+                        var protopassContainer = oForm.down('#password_strength_checker');
                         if(json['has_password']){
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', '***********');
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'true');
-                            oForm.down('#remove_user_pass').show();
-                            oForm.down('#remove_user_pass').observeOnce('click', function(){
-                                oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
-                                oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', MessageHash['share_center.148']);
-                                oForm.down('#remove_user_pass').hide();
+                            var placeholder = this.authorizations.password_placeholder;
+                            passwordField.writeAttribute('placeholder', '***********');
+                            passwordField.writeAttribute('data-password-set', 'true');
+                            protopassContainer.hide();
+                            passwordButton.show();
+                            passwordButton.observeOnce('click', function(){
+                                passwordField.writeAttribute('data-password-set', 'false');
+                                passwordField.writeAttribute('placeholder', placeholder);
+                                passwordButton.hide();
+                                protopassContainer.show();
+                                new Protopass(passwordField, {
+                                    barContainer : protopassContainer,
+                                    barPosition:'bottom',
+                                    labelWidth: 28
+                                });
                             });
                         }else{
-                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
-                            oForm.down('#remove_user_pass').hide();
+                            passwordField.writeAttribute('data-password-set', 'false');
+                            passwordButton.hide();
+                            new Protopass(passwordField, {
+                                barContainer : protopassContainer,
+                                barPosition:'bottom',
+                                labelWidth: 28
+                            });
                         }
                         if(json['expire_time']){
                             oForm.down('input[name="expiration"]').setValue(json['expire_after']);
@@ -448,7 +513,7 @@ Class.create("ShareCenter", {
                         }catch(e){}
                         oForm.down('#simple_right_download').checked = !(json.minisite.disable_download);
                         if(json.entries && json.entries.length){
-                            oForm.down('#simple_right_read').checked = (json.entries[0].RIGHT.indexOf('r') !== -1);
+                            oForm.down('#simple_right_read').checked = (json.entries[0].RIGHT.indexOf('r') !== -1 && json['minisite_layout']!='ajxp_unique_dl');
                             oForm.down('#simple_right_write').checked = (json.entries[0].RIGHT.indexOf('w') !== -1);
                         }
                         if(this.authorizations.editable_hash && this._currentMinisiteHash){
@@ -491,7 +556,14 @@ Class.create("ShareCenter", {
                 if(this.authorizations.editable_hash){
                     oForm.down('#editable_hash_link').insert({top:MessageHash['share_center.171'] + ': '});
                 }
-
+                if(this.authorizations.password_mandatory){
+                    openBlocks = ["security_parameters"];
+                }
+                new Protopass(oForm.down('input[name="guest_user_pass"]'), {
+                    barContainer : oForm.down('#password_strength_checker'),
+                    barPosition:'bottom',
+                    labelWidth: 28
+                });
                 if(this.shareFolderMode != "workspace"){
                     var generateButton = oForm.down("#generate_publiclet");
                     var container = oForm.down('.layout_template_container');
@@ -512,7 +584,7 @@ Class.create("ShareCenter", {
                     } );
                 }
             }
-            if(ajaxplorer.hasPluginOfType("meta", "watch")){
+            if(pydio.Registry.hasPluginOfType("meta", "watch")){
                 oForm.down('#target_user').down('#header_watch').show();
             }else{
                 oForm.down('#target_user').down('#header_watch').hide();
@@ -534,14 +606,16 @@ Class.create("ShareCenter", {
             if(!reload){
                 window.setTimeout(modal.refreshDialogPosition.bind(modal), 400);
             }
-            this.accordionize(oForm);
+            this.accordionize(oForm, openBlocks);
 
         }.bind(this);
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
+                /*
                 if($(document.body).down("#shared_users_autocomplete_choices")){
                     $(document.body).down("#shared_users_autocomplete_choices").remove();
                 }
+                */
                 if($(document.body).down("#shared_users_autocomplete_choices_iefix")){
                     $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
                 }
@@ -598,7 +672,7 @@ Class.create("ShareCenter", {
             var name = node.getAttribute('name');
             var label = node.getAttribute('label');
             if(currentExt && name == "unique_preview_file"){
-                var editors = ajaxplorer.findEditorsForMime(currentExt);
+                var editors = pydio.Registry.findEditorsForMime(currentExt);
                 if(!editors.length || (editors.length == 1 && editors[0].editorClass == "OtherEditorChooser")) {
                     noEditorsFound = true;
                     return;
@@ -709,14 +783,17 @@ Class.create("ShareCenter", {
 
     },
 
-    accordionize: function(form){
+    accordionize: function(form, openBlocks){
 
         form.select('div[data-toggleBlock]').each(function(toggler){
 
-            var toggled = form.down('#' + toggler.readAttribute('data-toggleBlock'));
+            var toggleName = toggler.readAttribute('data-toggleBlock');
+            var toggled = form.down('#' + toggleName);
             if(!toggled) return;
 
-
+            if(openBlocks && openBlocks.indexOf(toggleName) > -1){
+                toggled.addClassName('share_dialog_toggled_open');
+            }
             toggler.addClassName('share_dialog_toggler');
             var initialHeight = toggled.getHeight();
             if(initialHeight){
@@ -792,7 +869,10 @@ Class.create("ShareCenter", {
     },
 
     loadInfoPanel : function(container, node){
-        container.down('#ajxp_shared_info_panel .infoPanelTable').update('<div class="infoPanelRow">\
+
+        var mainCont = container.down("#ajxp_shared_info_panel .infoPanelTable");
+        mainCont.addClassName('infopanel_loading');
+        mainCont.update('<div class="infoPanelRow">\
             <div class="infoPanelLabel">'+MessageHash['share_center.55']+'</div>\
             <div class="infoPanelValue"><span class="icon-spinner"></span></div>\
             </div>\
@@ -802,7 +882,7 @@ Class.create("ShareCenter", {
 
             if(jsonData.error){
 
-                container.down("#ajxp_shared_info_panel .infoPanelTable").update('<div class="share_info_panel_main_legend"><span class="icon-warning-sign"></span> '+jsonData["label"]+'</div>');
+                mainCont.update('<div class="share_info_panel_main_legend"><span class="icon-warning-sign"></span> '+jsonData["label"]+'</div>');
 
             }else if(node.isLeaf() && !jsonData['repositoryId']){
 
@@ -819,7 +899,7 @@ Class.create("ShareCenter", {
                         <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ shortlink +'">'+ MessageHash[88] + ' ' +node.getLabel()+'</a></textarea></div>\
                     </div>\
                     ';
-                    var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                    var editors = pydio.Registry.findEditorsForMime(node.getAjxpMime(), true);
                     if(editors.length){
                         var tplString ;
                         var messKey = "share_center.61";
@@ -840,7 +920,7 @@ Class.create("ShareCenter", {
                     }
                 }
 
-                container.down('#ajxp_shared_info_panel .infoPanelTable').update('\
+                mainCont.update('\
                     <div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ '</div>\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
@@ -859,13 +939,12 @@ Class.create("ShareCenter", {
                 ');
 
                 if(linksCount > 1){
-                    container.down('#ajxp_shared_info_panel .infoPanelTable').insert({bottom:'<div class="infoPanelRow">\
+                    mainCont.insert({bottom:'<div class="infoPanelRow">\
                         <div class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</div>\
                     </div>'});
                 }
 
             }else{
-                var mainCont = container.down("#ajxp_shared_info_panel .infoPanelTable");
                 var entries = [];
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
@@ -888,9 +967,9 @@ Class.create("ShareCenter", {
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
                         </div>');
+                        var dlPath = jsonData['content_filter']['filters'][node.getPath()];
+                        mainCont.down("#embed_code").setValue("<a href='"+ jsonData.minisite.public_link +"?dl=true&file="+dlPath+"'>Download "+ getBaseName(node.getPath()) +"</a>");
                     }
-                    var dlPath = jsonData['content_filter']['filters'][node.getPath()];
-                    mainCont.down("#embed_code").setValue("<a href='"+ jsonData.minisite.public_link +"?dl=true&file="+dlPath+"'>Download "+ getBaseName(node.getPath()) +"</a>");
 
                 }else if(jsonData.minisite){
                     // MINISITE FOLDER SHARE
@@ -907,8 +986,8 @@ Class.create("ShareCenter", {
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
                         </div>');
+                        mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                     }
-                    mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                 }else{
                     // WORKSPACE FOLDER
                     mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"+(jsonData['is_expired']?'b':'')]+'</div>');
@@ -920,10 +999,11 @@ Class.create("ShareCenter", {
                 }
             }
             mainCont.select('textarea,input').each(function(t){
-                t.observe("focus", function(e){ ajaxplorer.disableShortcuts();});
-                t.observe("blur", function(e){ ajaxplorer.enableShortcuts();});
+                t.observe("focus", function(e){ pydio.UI.disableShortcuts();});
+                t.observe("blur", function(e){ pydio.UI.enableShortcuts();});
                 t.observe("click", function(event){event.target.select();});
             });
+            mainCont.addClassName("infopanel_loading_finished");
             container.up("div[ajxpClass]").ajxpPaneObject.resize();
         }, true);
     },
@@ -1048,7 +1128,7 @@ Class.create("ShareCenter", {
             bottomButtonsContainer = bottomButtonsContainer.down("#shareDialogButtons");
         }
         // WATCH BUTTON
-        if(ajaxplorer.hasPluginOfType("meta", "watch")){
+        if(pydio.Registry.hasPluginOfType("meta", "watch")){
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
             if(!dialogButtonsOrRow.down('#watch_folder_eye')) {
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center."+(shareType=='folder'?'83b':'83')]+"'><span class='icon-eye-close'></span> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
@@ -1079,9 +1159,11 @@ Class.create("ShareCenter", {
                             conn.addParameter("repository_id", this._currentRepositoryId);
                         }
                         conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            pydio.getController().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
+                    }else{
+                        updateFunc();
                     }
                 }.bind(this));
             }
@@ -1103,7 +1185,7 @@ Class.create("ShareCenter", {
         }
         var oForm = dialogButtonsOrRow.up('.dialogContent');
 
-        if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
+        if(pydio.Registry.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
                 Event.stop(event);
                 var s, message, link;
@@ -1129,21 +1211,22 @@ Class.create("ShareCenter", {
                 if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
                     message += "\n\n "+ MessageHash["share_center.108"] + "\n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
                 }
-                var mailer = new AjxpMailer();
                 var usersList = null;
                 if(this.shareFolderMode == 'workspace' && oForm) {
                     usersList = oForm.down(".editable_users_list");
                 }
-                console.log(mailerShower);
-                modal.showSimpleModal(
-                    mailerShower,
-                    mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
-                    function(){
-                        mailer.postEmail();
-                        return true;
-                    },function(){
-                        return true;
-                    });
+                ResourcesManager.detectModuleToLoadAndApply('AjxpMailer', function(){
+                    var mailer = new AjxpMailer();
+                    modal.showSimpleModal(
+                        mailerShower,
+                        mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
+                        function(){
+                            mailer.postEmail();
+                            return true;
+                        },function(){
+                            return true;
+                        });
+                });
             }.bind(this));
         }else{
             var subject = encodeURIComponent(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle));
@@ -1168,7 +1251,6 @@ Class.create("ShareCenter", {
         }
 
         // QRCODE BUTTON
-        console.log(dialogButtonsOrRow);
         var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
         if (this.createQRCode) {
             if(!qrcodediv){
@@ -1194,11 +1276,13 @@ Class.create("ShareCenter", {
                     }else{
                         url = this._currentRepositoryLink;
                     }
-                    var qrcode = new QRCode(randId, {
-                        width: 128,
-                        height: 128
+                    ResourcesManager.detectModuleToLoadAndApply('QRCode', function(){
+                        var qrcode = new QRCode(randId, {
+                            width: 128,
+                            height: 128
+                        });
+                        qrcode.makeCode(url);
                     });
-                    qrcode.makeCode(url);
                 }
                 if(qrcodediv.visible()) qrcodediv.hide();
                 else qrcodediv.show();
@@ -1252,7 +1336,7 @@ Class.create("ShareCenter", {
                 className:'',
                 title:MessageHash['share_center.152']
             }).update('<span class="icon-save"></span> '+MessageHash['share_center.152']);
-            var editButton = new Element('div', {className:'largeButton'}).update(aSpan);
+            var editButton = new Element('div', {id:"update_share",className:'largeButton'}).update(aSpan);
             bottomButtonsContainer.insert(editButton);
             bottomButtonsContainer.show();
             editButton.observe("click", updateFunc);
@@ -1296,6 +1380,6 @@ Class.create("ShareCenter", {
 
 });
 
-if(ajaxplorer && ajaxplorer.actionBar){
-    ajaxplorer.actionBar.shareCenter = new ShareCenter();
+if(ajaxplorer && pydio.getController()){
+    pydio.getController().shareCenter = new ShareCenter();
 }

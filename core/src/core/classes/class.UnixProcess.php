@@ -102,8 +102,8 @@ class UnixProcess
      */
     public function start()
     {
-        if ($this->command != '')$this->runCom();
-        else return true;
+        if ($this->command != '') $this->runCom();
+        return true;
     }
     /**
      * Try to kill the process via command line.

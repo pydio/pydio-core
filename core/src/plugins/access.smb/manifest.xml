@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="smb" label="CONF_MESSAGE[Samba]" description="CONF_MESSAGE[Browse a Samba Server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <client_settings icon="plugins/access.fs/icon.png">
+<ajxpdriver name="smb" enabled="false" label="CONF_MESSAGE[Samba]" description="CONF_MESSAGE[Browse a Samba Server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.fs/icon.png" description_template="{HOST}{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="smb_access" path="plugins/access.smb/i18n"/>
         </resources>
@@ -22,6 +22,11 @@
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+        <client_configs>
+            <component_config className="FoldersTree">
+                <property name="display" value="d"/>
+            </component_config>
+        </client_configs>
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>

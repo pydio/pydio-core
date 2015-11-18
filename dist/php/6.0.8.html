@@ -1,0 +1,66 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 6.0.8 - Security Update & Bug Fixes</h2>
+
+    [06.26.2015] Pydio 6.0.8 is another security update fixing XSS vulnerabilities discovered by Lane Thames and William Sörderberg. It also fixes various issues with indexation, sorting, and reverts some problematic changes from previous version.
+    <br/>Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
+    <br/>Contributors: cdujeu, Lane Thames, William Sörderberg, c12simple, DepaMarco, FireFoxIXI, Sandoracs
+
+    <ul>
+        <li>Minor update of german translation (mainly to unify the strings) (<a href="http://github.com/pydio/pydio-core/commit/46ebca4c2b239e4c73677a398d75d0c93e8d706a">details</a>)</li>
+        <li>Small fixes for the german translation of access.ajxp_conf (<a href="http://github.com/pydio/pydio-core/commit/cd5e63c765c894308a555b4fc9cb4419d8630b02">details</a>)</li>
+        <li>Add LDAP support. (<a href="http://github.com/pydio/pydio-core/commit/f49ff9f4d9033d67b2c81adbfb8e1fa05bcbb208">details</a>)</li>
+        <li>Italian translation for plugin 'meta.monitor_fs' (<a href="http://github.com/pydio/pydio-core/commit/a9284cf3e2b280506ecaf8b695c8e2ed30e2aa63">details</a>)</li>
+        <li>Italian translation for plugin 'mq.serial' (<a href="http://github.com/pydio/pydio-core/commit/784d0ea5a4eb9955b90ca0a815d0e850fb3fa6a6">details</a>)</li>
+        <li>Italian translation for plugin 'mq.sql' and FIXED English one (<a href="http://github.com/pydio/pydio-core/commit/00dcf5b0ed83a7e22c4233e286f04fba92e7fcb2">details</a>)</li>
+        <li>Italian translation for plugin 'shorten.bitly' (<a href="http://github.com/pydio/pydio-core/commit/407035e00e92cebe6d7a49585fbdb6264fa0dce2">details</a>)</li>
+        <li>Italian translation for plugin 'shorten.multi' (<a href="http://github.com/pydio/pydio-core/commit/e7ef8dfd48145bb6379c433c069f233e1f84a83e">details</a>)</li>
+        <li>Italian translation for plugin 'uploader.flex' (<a href="http://github.com/pydio/pydio-core/commit/038f6b08bab7f21d2da7879f3cee761b208a6058">details</a>)</li>
+        <li>Italian translation for plugin 'uploader.html' (<a href="http://github.com/pydio/pydio-core/commit/835dfc011cb572254b39d9c4649997900557424e">details</a>)</li>
+        <li>Italian translation for plugin 'uploader.http' (<a href="http://github.com/pydio/pydio-core/commit/6be2d95410b4ab23a5bd53afb319bd471c8cb83c">details</a>)</li>
+        <li>Add delete button on minisite (<a href="http://github.com/pydio/pydio-core/commit/64f134644b989a1ac6740d705e1373664d0a36a1">details</a>)</li>
+        <li>Fix meta.mount fs on 6.0.7 (<a href="http://github.com/pydio/pydio-core/commit/2abedb9f7617f99b772e41de1dc1c8a192a73a41">details</a>)</li>
+        <li>Fix wording error (<a href="http://github.com/pydio/pydio-core/commit/2eb7a117919bca7e5faac87bfceff212871afbf4">details</a>)</li>
+        <li>Fix wording error (<a href="http://github.com/pydio/pydio-core/commit/da3b2d59a63f84fff28ffd9b9b705fa8af1e43c7">details</a>)</li>
+        <li>Fix wording error (<a href="http://github.com/pydio/pydio-core/commit/3f69510c6c5fdfe7325148cf3c49466dda108642">details</a>)</li>
+        <li>Reload_registry message: make sure to trigger only if required. This can end up in a loop. (<a href="http://github.com/pydio/pydio-core/commit/4507aaf34cb67e6e02e1947da814d54d73fcb873">details</a>)</li>
+        <li>Mysql: Tablename may create an error when getting size and count (<a href="http://github.com/pydio/pydio-core/commit/3a871bc1d2968a323a3f7728a2355c605f2ee47d">details</a>)</li>
+        <li>Added minor tweaks for getting the S3 driver working with EMC ViPR (<a href="http://github.com/pydio/pydio-core/commit/25597ffb81db937535fedfaa1ab6210430827229">details</a>)</li>
+        <li>Add new DIRNAME mode for sanitization, same as filenames except that it lets the / pass through. Use strpos() instead of deprecated ereg() function. (<a href="http://github.com/pydio/pydio-core/commit/e6afe73d3d58f466f44fe259e2ff653ecd3d60bd">details</a>)</li>
+        <li>Should fix #912 (alert on watch broken in some cases) (<a href="http://github.com/pydio/pydio-core/commit/25adf0444fdc216b20a34c03f9974f696c138c8c">details</a>)</li>
+        <li>Fix #919 - Disable right click in FetchedResultPane (<a href="http://github.com/pydio/pydio-core/commit/1871b615ae442bfac8d71f2a5a0abbcb395f9435">details</a>)</li>
+        <li>Tweaks to support "dot" character in custom links handle - Fix #905 (<a href="http://github.com/pydio/pydio-core/commit/99a718ad595ec6b05c196f9eacf74d09b48b2715">details</a>)</li>
+        <li>ShareCenter: Fix authorization checking for various share types. Make sure to register the REQUIRES_INDEXATION flag on syncable shared workspaces to trigger indexation at first changes API call (should fix #913) (<a href="http://github.com/pydio/pydio-core/commit/b5f0b321dac9310f52c7a8b05674be9afe3e80f2">details</a>)</li>
+        <li>UserMetaManager: check metadata is not empty. (cherry picked from commit ac99bf4) (<a href="http://github.com/pydio/pydio-core/commit/268428b97af007502e4719c6c1e78e088c6a6fbf">details</a>)</li>
+        <li>Add a MAIL_ENCODING parameter in the phpmailer plugin to eventually switch to 7bit for old Exchange+Outlook configs. (cherry picked from commit 98eebeb) (<a href="http://github.com/pydio/pydio-core/commit/2b0b6853b7dc18c765bf24a1b2d4407c9b0a137b">details</a>)</li>
+        <li>Perf: load repositories with a unique query instead of many small queries (cherry picked from commit c955991) (<a href="http://github.com/pydio/pydio-core/commit/20fa848104e49967f00291633911a26336215cff">details</a>)</li>
+        <li>Slight doc issue (<a href="http://github.com/pydio/pydio-core/commit/aa27304d45e288cefb61bd1a8b4d2a77222d3a27">details</a>)</li>
+        <li>Italian translation for plugin 'uploader.jumploader' (<a href="http://github.com/pydio/pydio-core/commit/4e0762cb3eccb8cce98d891f0d1f025e710b14f7">details</a>)</li>
+        <li>Italian translation for plugin 'uploader.plupload' (<a href="http://github.com/pydio/pydio-core/commit/7770c4fbdabf57eee66a8364674148d3337c33ee">details</a>)</li>
+        <li>Updated Italian translation for plugin 'core.ajaxplorer' (<a href="http://github.com/pydio/pydio-core/commit/7b82690f00708b5280f3da29209d8da960612dd0">details</a>)</li>
+        <li>Hide Native App download panel on Windows Phone (<a href="http://github.com/pydio/pydio-core/commit/529ef93f9dffc4ed7a649e0c1c9a433db5da5dcd">details</a>)</li>
+        <li>Fix minisite login background by loading configs via JS. (<a href="http://github.com/pydio/pydio-core/commit/e979c82e2107b11be097e46d8b9b1c5fc4c8e44e">details</a>)</li>
+        <li>Clean listing code for sorting, get page_position on demand when listing unique file, fixes search results not going to correct page when pagination is on. (<a href="http://github.com/pydio/pydio-core/commit/e5b814669605d3bb48ec959e487f4d6335118194">details</a>)</li>
+        <li>Antivirus: make sure to do nothing when node is a folder, do not scan it! (<a href="http://github.com/pydio/pydio-core/commit/21f516a4c8566f69000faec12c9598e3adc00392">details</a>)</li>
+        <li>Repository Creation Time was overriden by parent repo when created for sharing. (<a href="http://github.com/pydio/pydio-core/commit/ed6e0017b3561f3a6fa7db7fbff28ce2e47e137c">details</a>)</li>
+        <li>Fix 2G limitation on windows in many places ( do not use filesize directly ) (<a href="http://github.com/pydio/pydio-core/commit/783e094ed7ea8e9b57f1c991e44678ed111a71e0">details</a>)</li>
+        <li>Repository securityScope() : check the CONTAINER option if it exists for object-based drivers. (<a href="http://github.com/pydio/pydio-core/commit/b2e70c0a03f538377471e0d7620dd595ee11bc89">details</a>)</li>
+        <li>Fix auto update via proxy (<a href="http://github.com/pydio/pydio-core/commit/c5346607a8d53b30dfbda715af48fce8c90fc10b">details</a>)</li>
+        <li>revert cef1688f1e38830badefa1d147b48400cd09d7f2 (<a href="http://github.com/pydio/pydio-core/commit/a7ca4f2496e46e40b9be335841cd10665ecae080">details</a>)</li>
+        <li>Add a default sorting field and direction for server sorting. Set this params via the filesystem mixin instead of access.fs only. (<a href="http://github.com/pydio/pydio-core/commit/0ff09da7c7626a6164ffee9352912a65558d34aa">details</a>)</li>
+        <li>Fix SearchEngine template configuration issue on various remote drivers. (<a href="http://github.com/pydio/pydio-core/commit/a25863ab25e7b94407b29b140a6a465ca97f960b">details</a>)</li>
+        <li>Catch an OpenLayer error. (<a href="http://github.com/pydio/pydio-core/commit/ce80ce656f9558b7c977eafc7c1d61b91acb6498">details</a>)</li>
+        <li>Fix and improve various sorting aspects. Deselect everything on blur in search engine and fetchedresultpane, otherwise further click on the same item does nothing. (<a href="http://github.com/pydio/pydio-core/commit/dda18302dddf76aa60e8f001d6c632d294041fb9">details</a>)</li>
+        <li>Catch Zip decompression errors. (<a href="http://github.com/pydio/pydio-core/commit/b5dc409b99cda08e23cf919cb9e3c3e6c4832653">details</a>)</li>
+        <li>Fix workspaces securityScope() for templates that predefine a Path (or Container) value. (<a href="http://github.com/pydio/pydio-core/commit/894fdae51f724d1406368f57f7edb30aec1d55b9">details</a>)</li>
+        <li>Make sure to not propagate a share event to a workspace parent if it's a template. (<a href="http://github.com/pydio/pydio-core/commit/baaf59f5bb03133a29ea6e2aefeafe7434ce4fb8">details</a>)</li>
+        <li>Make sure to use ConfService::listRepositoriesWithCriteria() instead of directly conf storage implementation, otherwise the hardcode workspaces/templates may be missing. (<a href="http://github.com/pydio/pydio-core/commit/773423cdedfe868f88831a45f4c9077f95429c19">details</a>)</li>
+        <li>Follow-up for filename encoding for attachment headers and IE. (<a href="http://github.com/pydio/pydio-core/commit/c8b12e1fdca2df0ac19772a75b356d3474b562d0">details</a>)</li>
+        <li>Make sure to never call getRepositoriesList() on "user" scope before the user is actually logged, otherwise it caches an incomplete list (e.g. in updateDefaultRights). Fixes incomplete list in sync client sometime, and make fix some issues with default rights as well. (<a href="http://github.com/pydio/pydio-core/commit/fc354f467ce431d1d19ca944fe3db52579ae4270">details</a>)</li>
+        <li>Reorder attributes (<a href="http://github.com/pydio/pydio-core/commit/809451f132d537ac5ed9c3a3af4d27fac7cfcb3e">details</a>)</li>
+        <li>Detect if Download URL contains a full URL or just an URI. In latter case, concatenate current server host (without URI) and URI. (<a href="http://github.com/pydio/pydio-core/commit/d4761fe822752ceff183ea22663c2f2b9bfc6b78">details</a>)</li>
+        <li>RPM: set PUBLIC_DOWNLOAD_URL to /pydio_public by default (<a href="http://github.com/pydio/pydio-core/commit/e265d403a9d3c1383b9ea6d7db2ff1e1c82f2b5e">details</a>)</li>
+        <li>Make sure to use (<a href="http://github.com/pydio/pydio-core/commit/4e4119b83525d64bf9a54fa8f0c256b4e3d33315">details</a>)</li>
+    </ul>
+</div>

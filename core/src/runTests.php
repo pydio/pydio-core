@@ -31,12 +31,12 @@ require_once("base.conf.php");
 function apiPost($baseData, $url, $parameters, $private){
 
     $nonce = substr(md5(microtime()), 0, 6);
+    $url = $baseData["path"].$url;
     $msg = "$url:$nonce:$private";
     $hash = $nonce.":".hash_hmac("sha256", $msg, $parameters["auth_token"]);
     $client = new HttpClient($baseData["host"]);
     $parameters["auth_hash"] = $hash;
-    $url = $baseData["path"].$url;
-    $res  = $client->post($url, $parameters);
+    $client->post($url, $parameters);
     return $client;
 
 }
@@ -58,7 +58,7 @@ if(isSet($_GET["api"])){
         echo "<style>*{font-family: Arial,sans-serif;}</style>";
         echo "<h3>Getting authentication token with user credentials</h3>";
         flush();
-        $tokens = file_get_contents("http://$user:$password@$host.$path/api/pydio/keystore_generate_auth_token/php_client");
+        $tokens = file_get_contents("${protocol}://${user}:${password}@${host}${path}/api/pydio/keystore_generate_auth_token/php_client");
         $data = json_decode($tokens, true);
         if(is_array($data)){
             echo "\n\nData is correctly decoded as JSON.";

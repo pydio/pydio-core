@@ -139,7 +139,7 @@ Class.create("SQLEditor", {
 				el.setAttribute('name', 'ajxp_mysql_'+el.getAttribute('name'));
 			}
 		}.bind(this));
-		ajaxplorer.actionBar.submitForm(oForm, true);
+		pydio.getController().submitForm(oForm, true);
 		hideLightBox();
 	},
 	
@@ -158,7 +158,7 @@ Class.create("SQLEditor", {
 			columns.each(function(col){
 				col['field_origname'] = col['field_name'];
 			});
-			this.oForm.insert(new Element('input', {type:'hidden',name:'current_table',value:getBaseName(tableName)}));
+			this.oForm.insert(new Element('input', {type:'hidden',name:'current_table',value:getBaseName(tableName.stripTags())}));
 			this.displayTableEditorForm(columns.length, fields, columns);
 		}
 	},
@@ -169,7 +169,7 @@ Class.create("SQLEditor", {
 		var button = chooser.down('input[id="toNext"]');
 		button.observe('click', function(e){
 			Event.stop(e);
-			this.newTableName = chooser.down('input[id="table_name"]').getValue();
+			this.newTableName = chooser.down('input[id="table_name"]').getValue().stripTags();
 			var fieldsNumber = parseInt(chooser.down('input[id="fields_number"]').getValue());
 			if(this.newTableName && fieldsNumber){
 				chooser.remove();
@@ -283,7 +283,7 @@ Class.create("SQLEditor", {
 			rows.each(function(row){
 				if(row.getAttribute('enabled')=='false') row.remove();
 			});
-			ajaxplorer.actionBar.submitForm(this.oForm);
+			pydio.getController().submitForm(this.oForm);
 			hideLightBox();
 			return false;			
 		}.bind(this);
@@ -298,7 +298,7 @@ Class.create("SQLEditor", {
 		parameters.set('current_table', currentTable);
 		var connexion = new Connexion();
 		connexion.setParameters(parameters);		
-		connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();
 	},
@@ -316,7 +316,7 @@ Class.create("SQLEditor", {
 		});		
 		var connexion = new Connexion();
 		connexion.setParameters(params);		
-		connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();		
 	},

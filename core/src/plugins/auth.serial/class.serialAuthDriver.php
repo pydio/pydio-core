@@ -119,7 +119,7 @@ class serialAuthDriver extends AbstractAuthDriver
         if ($seed == "-1") { // Seed = -1 means that password is not encoded.
             return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);//($userStoredPass == md5($pass));
         } else {
-            return (md5($userStoredPass.$seed) == $pass);
+            return (md5($userStoredPass.$seed) === $pass);
         }
     }
 
@@ -138,7 +138,7 @@ class serialAuthDriver extends AbstractAuthDriver
         $users = $this->_listAllUsers();
         if(!is_array($users)) $users = array();
         if(array_key_exists($login, $users)) return "exists";
-        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);//md5($passwd);
         } else {
             $users[$login] = $passwd;
@@ -150,7 +150,7 @@ class serialAuthDriver extends AbstractAuthDriver
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->_listAllUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
-        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);//md5($newPass);
         } else {
             $users[$login] = $newPass;

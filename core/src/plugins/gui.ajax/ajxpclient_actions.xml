@@ -67,7 +67,7 @@
 					if((userSelection.isUnique() && !userSelection.hasDir()))
 					{
 						var fileName = userSelection.getUniqueFileName();
-						var selectorData = ajaxplorer.actionBar.selectorData;
+						var selectorData = pydio.getController().selectorData;
 						if(selectorData.get('type') == "ckeditor"){
 							var ckData = selectorData.get('data');
 							if (ckData['CKEditorFuncNum']) {

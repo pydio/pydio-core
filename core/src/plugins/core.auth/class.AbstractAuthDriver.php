@@ -37,8 +37,6 @@ class AbstractAuthDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
-
         switch ($action) {
 
             case "get_secure_token" :
@@ -122,7 +120,6 @@ class AbstractAuthDriver extends AJXP_Plugin
         if(!isSet($actionXpath)) $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $passChangeNodeList = $actionXpath->query('action[@name="pass_change"]', $contribNode);
         if(!$passChangeNodeList->length) return ;
-        unset($this->actions["pass_change"]);
         $passChangeNode = $passChangeNodeList->item(0);
         $contribNode->removeChild($passChangeNode);
     }
@@ -268,6 +265,18 @@ class AbstractAuthDriver extends AJXP_Plugin
         return (isSet($this->options[$optionName])?$this->options[$optionName]:"");
     }
 
+    /**
+     * @param $optionName
+     * @return bool
+     */
+    public function getOptionAsBool($optionName)
+    {
+        return (isSet($this->options[$optionName]) &&
+            ($this->options[$optionName] === true || $this->options[$optionName] === 1
+                || $this->options[$optionName] === "true" || $this->options[$optionName] === "1")
+        );
+    }
+
     public function isAjxpAdmin($login)
     {
         return ($this->getOption("AJXP_ADMIN_LOGIN") === $login);
@@ -282,7 +291,7 @@ class AbstractAuthDriver extends AJXP_Plugin
 
     public function getSeed($new=true)
     {
-        if($this->getOption("TRANSMIT_CLEAR_PASS") === true) return -1;
+        if($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) return -1;
         if ($new) {
             $seed = md5(time());
             $_SESSION["AJXP_CURRENT_SEED"] = $seed;
@@ -314,7 +323,7 @@ class AbstractAuthDriver extends AJXP_Plugin
     public function updateUserObject(&$userObject)
     {
         $applyRole = $this->getOption("AUTO_APPLY_ROLE");
-        if(!empty($applyRole)){
+        if(!empty($applyRole) && !(is_array($userObject->getRoles()) && array_key_exists($applyRole, $userObject->getRoles())) ){
             $rObject = AuthService::getRole($applyRole, true);
             $userObject->addRole($rObject);
             $userObject->save("superuser");

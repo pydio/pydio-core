@@ -38,10 +38,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
     public function loadConfigs($configData)
     {
         parent::loadConfigs($configData);
-        if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
-            // Force legacy theme for the moment
-             $this->pluginConf["GUI_THEME"] = "oxygen";
-        }
         if (!defined("AJXP_THEME_FOLDER")) {
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
@@ -53,11 +49,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return null;
-        if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])) {
-            // Force legacy theme for the moment
-            $this->pluginConf["GUI_THEME"] = "oxygen";
-        }
         if (!defined("AJXP_THEME_FOLDER")) {
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
@@ -102,8 +93,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     ConfService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
-                HTMLWriter::charsetHeader('text/javascript');
-                HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
+                if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+                    HTMLWriter::charsetHeader("application/json");
+                    echo json_encode(ConfService::getMessages($refresh));
+                }else{
+                    HTMLWriter::charsetHeader('text/javascript');
+                    HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
+                }
 
             break;
 
@@ -138,13 +134,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                 }
 
-                $root = $_SERVER['REQUEST_URI'];
+                $root = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                 $configUrl = ConfService::getCoreConf("SERVER_URL");
                 if(!empty($configUrl)){
                     $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
                     if(strlen($root) > 1) $root = rtrim($root, '/').'/';
                 }else{
-                    preg_match ('/ws-(.)*\/|settings|dashboard|welcome/', $root, $matches, PREG_OFFSET_CAPTURE);
+                    preg_match ('/ws-(.)*\/|settings|dashboard|welcome|user/', $root, $matches, PREG_OFFSET_CAPTURE);
                     if(count($matches)){
                         $capture = $matches[0][1];
                         $root = substr($root, 0, $capture);
@@ -188,10 +184,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
                 // PRECOMPUTE REGISTRY
                 if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
-                    $regDoc = AJXP_PluginsService::getXmlRegistry();
-                    $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
-                    if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
-                    $clone = $regDoc->cloneNode(true);
+                    $clone = ConfService::getFilteredXMLRegistry(true, true);
                     $clonePath = new DOMXPath($clone);
                     $serverCallbacks = $clonePath->query("//serverCallback|hooks");
                     foreach ($serverCallbacks as $callback) {
@@ -226,8 +219,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     } else {
                         $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
                     }
-                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
-                        $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
+                    if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
+                        $ADDITIONAL_FRAMEWORKS = "";
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
@@ -271,8 +264,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
         }
-        $config["zipEnabled"] = ConfService::zipEnabled();
-        $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+        $config["zipEnabled"] = ConfService::zipBrowsingEnabled();
+        $config["multipleFilesDownloadEnabled"] = ConfService::zipCreationEnabled();
         $customIcon = $this->getFilteredOption("CUSTOM_ICON");
         self::filterXml($customIcon);
         $config["customWording"] = array(
@@ -305,9 +298,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-        if (stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")) {
-            $config["cssResources"] = array("css/pngHack/pngHack.css");
-        }
         $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
@@ -317,7 +307,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();
-        $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
         $config["SECURE_TOKEN"] = AuthService::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];
@@ -354,6 +343,26 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }
         }
+    }
+
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
+     * @param bool $copy
+     */
+    public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){
+        if($copy || $fromNode == null) return;
+        $user = AuthService::getLoggedUser();
+        if($user == null) return;
+        if (!isSet(self::$loadedBookmarks)) {
+            self::$loadedBookmarks = $user->getBookmarks();
+        }
+        if($toNode == null) {
+            $fromNode->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        } else {
+            $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        }
+        AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), AuthService::getLoggedUser()->getId()));
     }
 
     public static function filterXml(&$value)

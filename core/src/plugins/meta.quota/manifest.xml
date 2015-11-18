@@ -3,13 +3,13 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.quota/class.QuotaComputer.php" classname="QuotaComputer"/>
     <server_settings>
-        <param description="Authorized quota. Use php.ini like values (20M, 2G), etc." label="User Quota" name="DEFAULT_QUOTA" type="string" inherit="true"/>
-        <param description="Store computed quota value in the user preferences, to avoid triggering computation each time it is requested. This may introduce some lag if the repository is shared by many users." label="Cache value" name="CACHE_QUOTA" type="boolean" default="false"/>
-        <param description="Limit that will trigger an alert when approaching the end of the quota. Use a percent value" label="Soft Limit (%)"
+        <param description="CONF_MESSAGE[Authorized quota. Use php.ini like values (20M, 2G), etc.]" label="CONF_MESSAGE[User Quota]" name="DEFAULT_QUOTA" type="string" inherit="true"/>
+        <param description="CONF_MESSAGE[Store computed quota value in the user preferences, to avoid triggering computation each time it is requested. This may introduce some lag if the repository is shared by many users.]" label="CONF_MESSAGE[Cache value]" name="CACHE_QUOTA" type="boolean" default="false"/>
+        <param description="Limit that will trigger an alert when approaching the end of the quota. Use a percent value" label="CONF_MESSAGE[Soft Limit (%)]"
                name="SOFT_QUOTA"
                type="integer"/>
-        <param description="If you want to define quotas for each user, define a custom field in the CUSTOM_DATA parameter of the conf plugin, and declare this field name here." label="Custom Field (Deprecated)" name="CUSTOM_DATA_FIELD" type="string"/>
-        <global_param description="Define if usage must be computed for this repository only, or cumulated on all the repositories of the user" label="Usage scope" name="USAGE_SCOPE" type="select" choices="local|Repository,global|Cumulate repositories" default="local"/>
+        <param description="CONF_MESSAGE[If you want to define quotas for each user, define a custom field in the CUSTOM_DATA parameter of the conf plugin, and declare this field name here.]" label="CONF_MESSAGE[Custom Field (Deprecated)]" name="CUSTOM_DATA_FIELD" type="string"/>
+        <global_param description="CONF_MESSAGE[Define if usage must be computed for this repository only, or cumulated on all the repositories of the user]" label="CONF_MESSAGE[Usage scope]" name="USAGE_SCOPE" type="select" choices="local|CONF_MESSAGE[Repository],global|CONF_MESSAGE[Cumulate repositories]" default="local"/>
     </server_settings>
     <client_settings>
         <resources>
@@ -40,7 +40,7 @@
                             c.discrete = true;
                             c.onComplete = function(transport){
                                 window.ajxp_meta_quota_loading = false;
-                                var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                var action = pydio.getController().getActionByName("monitor_quota");
                                 if(!action) return;
                                 var data = transport.responseJSON;
                                 ajaxplorer.meta_quota_text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
@@ -61,7 +61,7 @@
                                 ajaxplorer.observe("server_message", function(event){
                                     var newValue = XPathSelectSingleNode(event, "/tree/metaquota");
                                     if(newValue){
-                                        var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                        var action = pydio.getController().getActionByName("monitor_quota");
                                         if(!action) return;
                                         ajaxplorer.meta_quota_text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
                                         action.options.text = ajaxplorer.meta_quota_text;
@@ -71,16 +71,16 @@
                                         action.refreshInstances();
                                     }
                                 });
-                                ajaxplorer.getActionBar().fireAction('monitor_quota');
+                                pydio.getController().fireAction('monitor_quota');
                             }else{
                                 new PeriodicalExecuter(function(pe){
-                                    var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                    var action = pydio.getController().getActionByName("monitor_quota");
                                     if(!action) {
                                         pe.stop();
                                         ajaxplorer.meta_quota_pe_created = false;
                                         return;
                                     }
-                                    ajaxplorer.getActionBar().fireAction('monitor_quota');
+                                    pydio.getController().fireAction('monitor_quota');
                                 }, 20);
                             }
                             ajaxplorer.meta_quota_pe_created = true;
@@ -103,8 +103,8 @@
                             <div class="panelHeader">#{quota_string}</div>
                             <div id="ajxp_quota_panel_content" style="padding:5px 0;font-size:20px;"></div>
                             <script>
-                                if(ajaxplorer.getActionBar().getActionByName("monitor_quota")){
-                                    ajaxplorer.getActionBar().fireAction('monitor_quota');
+                                if(pydio.getController().getActionByName("monitor_quota")){
+                                    pydio.getController().fireAction('monitor_quota');
                                 }
                             </script>
                         </div>

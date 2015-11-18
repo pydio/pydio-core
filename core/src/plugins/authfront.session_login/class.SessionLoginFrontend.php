@@ -89,8 +89,6 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if(!isSet($this->actions[$action])) return;
-
         switch ($action) {
 
             case "logout" :

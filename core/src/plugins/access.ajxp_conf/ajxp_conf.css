@@ -7,6 +7,10 @@
     padding: 19px 0 10px 0;
 }
 
+.settings_main_pane #search_form .search_advanced_direct_access{
+    display: none;
+}
+
 .developerDoc{
     font-size: 12px !important;
     line-height: 18px !important;
@@ -43,6 +47,8 @@
     margin: 0;
     padding: 0;
     width: auto;
+    float: none;
+    display: inline-block;
 }
 
 .settings_main_pane #breadcrumb_container{
@@ -139,6 +145,15 @@
     font-size: 1.4em;
 }
 
+.settings_main_pane div#remote_toolbar span.icon-bookmark-empty.ajxp_icon_span {
+    padding: 4px 0px 2px 2px;
+}
+
+.settings_main_pane div#remote_toolbar{
+    float: right;
+    margin-right: 4px;
+}
+
 .settings_main_pane #leftPane #buttons_bar{
     position:absolute;
     top: 49px;
@@ -213,7 +228,9 @@
 #search_container_settings #search_results div.thumbnail_selectable_cell.detailed {
     margin: 0 !important;
     border-radius: 0;
-    padding-bottom: 20px;
+    padding-bottom: 28px;
+    height: 35px;
+    border-bottom: 1px solid white;
 }
 
 #leftTabulator div.panelHeader{
@@ -356,4 +373,9 @@
 
 .ajxp_theme_orbit .settings_main_pane div#vertical_splitter-actions_toolbar span.ajxp_icon_span{
     font-size: 1.0em;
+}
+
+.ajxp_theme_orbit #vertical_splitter{
+    transition: opacity  0.4s ease;
+    opacity: 1 !important;
 }

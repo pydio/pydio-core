@@ -5,12 +5,12 @@
 		<resources>
 			<i18n namespace="meta.comments" path="plugins/meta.comments/i18n" />
             <css file="plugins/meta.comments/comments_feed.css" autoload="true"/>
-			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel" autoload="true"/>
+			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel"/>
 		</resources>
 	</client_settings>
     <server_settings>
-        <param name="COMMENT_SIZE_LIMIT" type="integer" label="Comment limit"
-                      description="Maximum number of characters for each comment" default="1000" />
+        <param name="COMMENT_SIZE_LIMIT" type="integer" label="CONF_MESSAGE[Comment limit]"
+                      description="CONF_MESSAGE[Maximum number of characters for each comment]" default="1000" />
     </server_settings>
 	<registry_contributions>
 		<hooks>
@@ -25,7 +25,7 @@
                             <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="AJXP_MESSAGE[meta.comments.1]"></span>AJXP_MESSAGE[meta.comments.1]</div>
                             <div id="comments_container"></div>
                             <div id="comments_form">
-                                <textarea placeholder="AJXP_MESSAGE[meta.comments.2]"></textarea>
+                                <textarea class="comments_textarea" placeholder="AJXP_MESSAGE[meta.comments.2]"></textarea>
                                 <div><input type="button" value="AJXP_MESSAGE[meta.comments.3]" id="comments_submit"></div>
                             </div>
                         </div>

@@ -5,6 +5,11 @@
         mimes="*" formId="ip_content_info_panel" label="CONF_MESSAGE[Info Panel...]" description="CONF_MESSAGE[Info Panel]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
         >
+    <client_settings>
+        <resources>
+            <i18n namespace="editor.infopanel" path="plugins/editor.infopanel/i18n" />
+        </resources>
+    </client_settings>
     <registry_contributions>
         <actions>
             <action name="dir_infopanel">
@@ -19,10 +24,10 @@
                     <clientCallback prepareModal="false"><![CDATA[
                         var editorData = window.actionArguments[0];
                         if(!editorData){
-                            var editorData = ajaxplorer.findEditorById('editor.infopanel');
+                            var editorData = pydio.Registry.findEditorById('editor.infopanel');
                         }
                         if(editorData){
-                            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                            pydio.Registry.loadEditorResources(editorData.resourcesManager);
                             modal.openEditorDialog(editorData);
                         }
                     ]]></clientCallback>

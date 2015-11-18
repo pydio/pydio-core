@@ -68,7 +68,17 @@ if (!empty($optUser)) {
     } else {
         // Consider "u" is a crypted version of u:p
         $optToken = $options["t"];
-        $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken."\1CDAFx¨op#"), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
+        $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
+        if(empty($cKey)) $cKey = "\1CDAFx¨op#";
+        $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
+        $env = getenv("AJXP_SAFE_CREDENTIALS");
+        if(!empty($env)){
+            $array = AJXP_Safe::getCredentialsFromEncodedString($env);
+            if(isSet($array["user"]) && $array["user"] == $optUser){
+                unset($optToken);
+                $optPass = $array["password"];
+            }
+        }
     }
     if (strpos($optUser,",") !== false) {
         $originalOptUser = $optUser;

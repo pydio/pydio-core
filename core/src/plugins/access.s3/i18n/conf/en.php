@@ -20,7 +20,7 @@
 */
 $mess=array(
 "S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK for PHP" => "Access an AWS server. Requires AWS-SDK for PHP ",
+"Access an AWS server. Requires AWS-SDK v2 for PHP" => "Access an AWS server. Requires AWS-SDK (Version 2) for PHP ",
 "Key" => "Key",
 "S3 Api Key" => "S3 Api Key",
 "Secret Key" => "Secret Key",
@@ -28,5 +28,7 @@ $mess=array(
 "Region" => "Region",
 "S3 storage region" => "S3 storage region",
 "Container" => "Bucket",
-"Root container in the S3 storage" => "S3 bucket"
+"Root container in the S3 storage" => "S3 bucket",
+"Storage URL" => "Storage URL",
+"Replace default AWS access points (built from region). Set a full URL, including protocol" => "Replace default AWS access points (built from region). Set a full URL, including protocol",
 );

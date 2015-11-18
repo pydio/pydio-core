@@ -6,5 +6,16 @@ CREATE TABLE IF NOT EXISTS ajxp_log (
   "user" text DEFAULT NULL,
   source text DEFAULT NULL,
   message text DEFAULT NULL,
-  params text DEFAULT NULL
+  params text DEFAULT NULL,
+  repository_id text DEFAULT NULL,
+  dirname text DEFAULT NULL,
+  basename text DEFAULT NULL,
+  device text DEFAULT NULL
 );
+
+CREATE INDEX log_date_idx ON ajxp_log(logdate);
+CREATE INDEX log_repository_id_idx ON ajxp_log(repository_id);
+CREATE INDEX log_dirname_idx ON ajxp_log(dirname);
+CREATE INDEX log_basename_idx ON ajxp_log(basename);
+CREATE INDEX log_severity_idx ON ajxp_log(severity);
+CREATE INDEX log_source_idx ON ajxp_log(source);

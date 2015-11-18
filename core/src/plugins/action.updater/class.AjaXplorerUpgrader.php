@@ -87,22 +87,44 @@ class AjaXplorerUpgrader
 
     }
 
-    public static function configureProxy($proxyHost, $proxyUser, $proxyPass)
+    public static function configureProxy($proxyHost, $proxyUser, $proxyPass, $siteUser = "", $sitePass = "")
     {
-        $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
-        if (!empty($proxyUser) && !empty($proxyPass)) {
-            $auth = base64_encode($proxyUser.":".$proxyPass);
-            $proxy['http']['header'] = "Proxy-Authorization: Basic $auth";
+        $contextData = array('http' => array());
+        if(!empty($proxyHost)){
+            $contextData['http']['proxy'] = 'tcp://'.$proxyHost;// $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
+            $contextData['http']['request_fulluri'] = true;
+            $contextData['ssl']['SNI_enabled'] = false;
+            if (!empty($proxyUser) && !empty($proxyPass)) {
+                $auth = base64_encode($proxyUser.":".$proxyPass);
+                $contextData['http']['header'] = "Proxy-Authorization: Basic $auth";
+            }
         }
-        self::$context = stream_context_create($proxy);
+        if(!empty($siteUser) && !empty($sitePass)){
+            $headerString = "Authorization: Basic " . base64_encode("$siteUser:$sitePass");
+            if(isSet($contextData['http']['header'])){
+                $contextData['http']['header'] .= "; ".$headerString;
+            }else{
+                $contextData['http']['header'] = $headerString;
+            }
+        }
+
+        self::$context = stream_context_create($contextData);
+    }
+
+    public static function getContext(){
+        return self::$context;
     }
 
     public static function getUpgradePath($url, $format = "php", $channel="stable")
     {
+        $packageName = "pydio-core";
+        if(defined('AJXP_PACKAGE_NAME')){
+            $packageName = AJXP_PACKAGE_NAME;
+        }
         if (isSet(self::$context)) {
-            $json = file_get_contents($url."?channel=".$channel."&version=".AJXP_VERSION."&package=pydio-core", null, self::$context);
+            $json = file_get_contents($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName, null, self::$context);
         } else {
-            $json = AJXP_Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION."&package=pydio-core");
+            $json = AJXP_Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName);
         }
         if($format == "php") return json_decode($json, true);
         else return $json;
@@ -153,8 +175,12 @@ class AjaXplorerUpgrader
     public function checkTargetFolder()
     {
         if (!is_writable(AJXP_INSTALL_PATH)) {
-            throw new Exception("The root install path is not writeable, no file will be copied!
-            The archive is available on your server, you can copy its manually to override the current installation.");
+            throw new Exception("The root install path is not writeable, no file will be overriden!
+            <br>When performing upgrades, first change the ownership (using chown) of the Pydio root folder
+            to your web server account (e.g. www-data or apache) and propagate that ownership change to all
+            Pydio sub-folders. <br>Run the upgrade again then, post upgrade, change the ownership back
+            to the previous settings for all Pydio folders, <b>except for the data/ folder</b> that must stay
+            writeable by the web server.");
         }
         return "OK";
     }
@@ -165,7 +191,11 @@ class AjaXplorerUpgrader
         if ($this->debugMode && is_file($this->archive)) {
             return "Already downloaded";
         }
-        $content = AJXP_Utils::getRemoteContent($this->archiveURL);
+        if(self::$context){
+            $content = file_get_contents($this->archiveURL, null, self::$context);
+        }else{
+            $content = AJXP_Utils::getRemoteContent($this->archiveURL);
+        }
         if ($content === false || strlen($content) == 0) {
             throw new Exception("Error while downloading");
         }
@@ -311,7 +341,7 @@ class AjaXplorerUpgrader
                     $ext = (is_file($this->workingFolder."/".$this->dbUpgrade.".mysql")) ? ".mysql" : ".sql";
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $conf["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver ". $conf["driver"] ." not supported yet in __FUNCTION__";
             }
 
             $file = $this->dbUpgrade.$ext;
@@ -322,7 +352,6 @@ class AjaXplorerUpgrader
             $results = array();
             $errors = array();
 
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($conf);
             dibi::begin();
             foreach ($parts as $sqlPart) {
@@ -382,15 +411,7 @@ class AjaXplorerUpgrader
 
     public function clearCache()
     {
-        @unlink(AJXP_PLUGINS_CACHE_FILE);
-        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
-        @unlink(AJXP_PLUGINS_MESSAGES_FILE);
-        $i18nFiles = glob(dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n/*.ser");
-        if (is_array($i18nFiles)) {
-            foreach ($i18nFiles as $file) {
-                @unlink($file);
-            }
-        }
+        ConfService::clearAllCaches();
         return "Ok";
     }
 
@@ -399,6 +420,7 @@ class AjaXplorerUpgrader
         if (is_file($this->workingFolder."/".$this->releaseNote)) {
             return nl2br(file_get_contents($this->workingFolder."/".$this->releaseNote));
         }
+        return "";
     }
 
     public function displayUpgradeInstructions()

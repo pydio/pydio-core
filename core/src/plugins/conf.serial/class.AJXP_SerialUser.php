@@ -50,9 +50,9 @@ class AJXP_SerialUser extends AbstractAjxpUser
      * @param $id
      * @param serialConfDriver $storage
      */
-    public function AJXP_SerialUser($id, $storage=null)
+    public function __construct($id, $storage=null)
     {
-        parent::AbstractAjxpUser($id, $storage);
+        parent::__construct($id, $storage);
         $this->registerForSave = array();
     }
 
@@ -168,7 +168,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $this->recomputeMergedRole();
     }
 
-    public function save($context = "superuser")
+    protected function _save($context = "superuser")
     {
         if ($this->isAdmin() === true) {
             $this->rights["ajxp.admin"] = true;

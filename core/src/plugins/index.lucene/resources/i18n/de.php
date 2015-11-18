@@ -20,14 +20,16 @@
  */
 
 $mess = array(
-    "1" => "Index Inhalt",
-    "2" => "Index Verzeichnisinhalt",
-    "3" => "Indexieren im Hintergrund ausführen",
-    "4" => "Der Index scheint gesperrt zu sein, ein Indexierungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
-    "5" => "Indexierung abgeschlossen",
-    "6" => "Warning, the repository is currently being indexed, please retry later.",
-    "7" => "First indexing of this repository, please wait and retry your search",
-    "8" => "Indexing %s in background",
-    "9" => "Cannot find index for current repository! You should trigger the indexation of the data first!",
-    "10" => "Indexing subfolders in background",
+    "1" => "Indiziere Inhalt",
+    "2" => "Indiziere Verzeichnisinhalt",
+    "3" => "Indizierung im Hintergrund ausführen",
+    "4" => "Der Index scheint gesperrt zu sein, ein Indizierungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
+    "5" => "Indizierung abgeschlossen",
+    "6" => "Warnung, die Arbeitsumgebung wird gerade indiziert. Bitte später erneut versuchen.",
+    "7" => "Arbeitsumgebung wird zum ersten Mal indiziert. Bitte führen Sie die Suche später erneut aus",
+    "8" => "Indiziere %s im Hintergrund",
+    "9" => "Index für aktuelle Arbeitsumgebung nicht gefunden. Bitte starten Sie zuerst die Indizierung!",
+    "10" => "Indiziere Unterordner im Hintergrund",
+    "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
+    "12" => "Workspace is not indexed, try launching indexation manually!"
 );

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin id="gui.user" enabled="true" description="User access point" label="User access point"
+<ajxp_plugin id="gui.user" enabled="always" description="CONF_MESSAGE[User access point]" label="CONF_MESSAGE[User access point]"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 
     <client_settings>
@@ -29,7 +29,7 @@
                             $(oForm).down('.dialogButtons').insert({bottom:$(oForm).down('.dialogButtons').down('input')});
                         ]]></dialogOnOpen>
                         <dialogOnCancel><![CDATA[
-                                ajaxplorer.actionBar.fireAction('login');
+                                pydio.getController().fireAction('login');
                         ]]></dialogOnCancel>
                         <dialogOnComplete><![CDATA[
                             if(!oForm.BUTTON_CLICKED){
@@ -42,6 +42,7 @@
                                         duration:0.5,
                                         afterFinish: function(){
                                             oForm.down('#reset-password-ask').update(MessageHash['gui.user.5']);
+                                            $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
                                         }
                                     });
                                 };
@@ -68,14 +69,14 @@
                             });
                         ]]></dialogOnOpen>
                         <dialogOnCancel><![CDATA[
-                                ajaxplorer.actionBar.fireAction('login');
+                                pydio.getController().fireAction('login');
                         ]]></dialogOnCancel>
                         <dialogOnComplete><![CDATA[
 						var userPass = null;
 						var passSeed = null;
 						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
 						{
-							if($('user_change_ownpass1').value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+							if($('user_change_ownpass1').value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
 								alert(MessageHash[378]);
 								return false;
 							}
@@ -91,6 +92,7 @@
 									}else if(transport.responseText == 'SUCCESS'){
 										ajaxplorer.displayMessage('SUCCESS', MessageHash['gui.user.6']);
 										oForm.down('#reset-password').update(MessageHash['gui.user.6']);
+                                        $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
 									}
 								}
 							};
@@ -98,7 +100,7 @@
 							conn.addParameter("get_action", "reset-password");
 							conn.addParameter("new_pass", userPass);
 							conn.addParameter("user_id", oForm.down('#user_id').getValue());
-							conn.addParameter("key", $A(document.location.pathname.trim('/').split('/')).last());
+							conn.addParameter("key", pydioBootstrap.parameters.get('USER_ACTION_KEY'));
 							conn.onComplete = onComplete;
 							conn.sendAsync();
 						}
@@ -143,7 +145,7 @@
                             }, true);
                         }
                     });
-				    ajaxplorer.disableAllKeyBindings();
+				    pydio.UI.disableAllKeyBindings();
 				</script>
             ]]></template>
         </client_configs>

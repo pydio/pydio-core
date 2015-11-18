@@ -140,16 +140,17 @@ Class.create("IMagickPreviewer", Diaporama, {
 				theImage.setStyle({cursor:'pointer'});
 				theImage.openBehaviour = true;
 				theImage.observe("click", function(event){
-					ajaxplorer.actionBar.fireAction('open_with');
+					pydio.getController().fireAction('open_with');
 				});
 			}
             var off = theImage.positionedOffset();
+            var marginTop = (theImage.getStyle('marginTop')) ? parseInt(theImage.getStyle('marginTop')) : 0;
             var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
                 left: realLeftOffset + 'px',
                 width:theImage.getWidth() + "px",
-                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() + marginTop) + "px"
             });
 		});
 		img.observe("mouseout", function(event){
@@ -172,7 +173,8 @@ Class.create("IMagickPreviewer", Diaporama, {
         if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
             repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
         }
-		return ajxpServerAccessPath+"&get_action=imagick_data_proxy"+repoString+"&file="+encodeURIComponent(ajxpNode.getPath());
+        var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
+		return ajxpServerAccessPath+"&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{

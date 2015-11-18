@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+              name="compression" enabled="true" label="CONF_MESSAGE[Tar Archives Support]"
+              description="CONF_MESSAGE[Create and extract tar, tar.gz and tar.bz2 archives.]" >
+
+    <client_settings>
+        <resources>
+            <i18n namespace="compression" path="plugins/action.compression/res/i18n"/>
+        </resources>
+    </client_settings>
+
+	<registry_contributions>
+        <extensions>
+            <extension mime="tar" icon="archive.png" messageId="61"/>
+            <extension mime="bz2" icon="archive.png" messageId="61"/>
+        </extensions>
+        <actions>
+            <action name="compression">
+                <processing>
+                    <serverCallback methodName="receiveAction"/>
+                </processing>
+            </action>
+            <action name="compress_ui">
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var crtDir = pydio.getContextHolder().getContextNode().getPath();
+                        var userSelection = pydio.getUserSelection();
+                        if (!userSelection.isEmpty()) {
+                            var loadFunc = function (oForm) {
+                                if (userSelection.isEmpty()) {
+                                    return;
+                                }
+                                var archive_nameInput = oForm.down('input[id="archive_name"]');
+                                var changeDuplicateArchiveName = function (name, extension) {
+                                    var nameLastIndexOf = name.lastIndexOf("-");
+                                    var tmpFileName = name.substr(0, nameLastIndexOf);
+                                    var compteurFileName = name.substr(nameLastIndexOf + 1);
+                                    if (nameLastIndexOf == -1) {
+                                        tmpFileName = name;
+                                        compteurFileName = 1;
+                                    }
+                                    while(userSelection.fileNameExists(name + extension)){
+                                        name = tmpFileName + "-" + compteurFileName;
+                                        compteurFileName ++;
+                                    }
+                                    archive_nameInput.setValue(name + extension);
+                                    return name;
+                                };
+                                var archive_name = archive_nameInput.getValue();
+                                var archiveTypeSelect = oForm.down('select[id="type_archive"]');
+                                if(window.multipleFilesDownloadEnabled){
+                                    archiveTypeSelect.insert({top:'<option value=".zip">ZIP</option>'});
+                                }
+                                var archiveExtension = archiveTypeSelect.getValue();
+                                if (userSelection.isUnique()) {
+                                    if (userSelection.getUniqueNode().isLeaf() == true) {
+                                        archive_name = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
+                                    } else {
+                                        archive_name = getBaseName(userSelection.getUniqueFileName());
+                                    }
+                                } else if (crtDir.length == 1) {
+                                    archive_name = "Archive";
+                                } else {
+                                    archive_name = getBaseName(crtDir);
+                                }
+                                var updateFormAndArchiveName = function (){
+                                    var archiveExtension = archiveTypeSelect.getValue();
+                                    if(archiveExtension == ".zip"){
+                                        oForm.setAttribute("action", "compress");
+                                        oForm.down("#compression_form").setAttribute("action", "compress");
+                                        oForm.down('input[name="get_action"]').value = "compress";
+                                    }else{
+                                        oForm.setAttribute("action", "compression");
+                                        oForm.down("#compression_form").setAttribute("action", "compression");
+                                        oForm.down('input[name="get_action"]').value = "compression";
+                                    }
+                                    changeDuplicateArchiveName(archive_name, archiveExtension);
+                                };
+                                updateFormAndArchiveName();
+                                archiveTypeSelect.observe("change", updateFormAndArchiveName);
+                                archive_nameInput.observe("change", function () {
+                                    archive_name = archive_nameInput.getValue().slice(0, -archiveTypeSelect.getValue().length);
+                                    changeDuplicateArchiveName(archive_name, archiveTypeSelect.getValue());
+                                });
+                            };
+                            var closeFunc = function(){
+                                userSelection.updateFormOrUrl(modal.getForm());
+                                PydioApi.getClient().submitForm(modal.getForm(), true);
+                                hideLightBox();
+                            };
+                            modal.showDialogForm('Compress selection to ...', 'compression_form', loadFunc, closeFunc);
+                        }
+                    ]]></clientCallback>
+                    <clientForm id="compression_form"><![CDATA[
+                        <div id="compression_form" action="compression" box_width="272">
+                            <label class="dialogLegend" id="type_archive" style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.3]</label>
+                            <select style="width:100px;"  name="type_archive" id="type_archive" class="dialogFocus initFicName">
+                                <option value=".tar">TAR</option>
+                                <option value=".tar.gz">TAR.GZ</option>
+                                <option value=".tar.bz2">TAR.BZ2</option>
+                            </select>
+                            <br/>
+                            <label class="dialogLegend" for="archive_name"  style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.4]</label>
+                            <br/>
+                            <input style="width: 93%;margin-left: 9px;margin-top: 7px; margin-bottom:12px;" type="text" name="archive_name" id="archive_name" class="dialogFocus initFicName" />
+                        </div>
+				]]></clientForm>
+                </processing>
+            </action>
+            <action name="check_compression_status">
+                <processing>
+                    <serverCallback methodName="receiveAction"/>
+                </processing>
+            </action>
+            <action name="extraction">
+                <gui text="compression.9" title="compression.10" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
+                    <context selection="true" dir="true" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="change" inZip="false">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="tar,gz,bz2"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var crtDir = pydio.getContextHolder().getContextNode().getPath();
+                        var userSelection = pydio.getUserSelection();
+                        if (!userSelection.isEmpty()) {
+                            var file = userSelection.getFileNames();
+                            var dir = userSelection.getContextNode().getPath();
+                            var connexion = new Connexion();
+                            connexion.setParameters({get_action : "extraction", file : file, currentDir : dir});
+				   		    connexion.sendAsync();
+                            connexion.onComplete=function(transport){
+                                pydio.Controller.parseXmlMessage(transport.responseXML);
+                            };
+                        }
+                    ]]></clientCallback>
+                    <serverCallback methodName="receiveAction" pluginId="action.compression" />
+                </processing>
+            </action>
+            <action name="check_extraction_status">
+                <processing>
+                    <serverCallback methodName="receiveAction"/>
+                </processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/action.compression/class.PluginCompression.php" classname="PluginCompression"/>
+    <dependencies>
+        <activePlugin pluginName="access.fs"/>
+    </dependencies>
+</ajxp_plugin>

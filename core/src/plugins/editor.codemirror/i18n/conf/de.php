@@ -26,6 +26,6 @@
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Source Viewer" => "Quelltext-Betrachter",
-"Syntax Highlighter for all major code source files" => "Syntax-Highlighter für alle unterstützten Quelltext-Dateien",
+"Source Viewer" => "Quelltext-Editor",
+"Syntax Highlighter for all major code source files" => "Text-Editor mit CodeMirror-Syntaxhervorhebung",
 );

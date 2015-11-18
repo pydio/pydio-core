@@ -64,6 +64,10 @@ if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
+if (substr($requestUri, 0, strlen($baseURI)) != $baseURI) 
+{
+    $baseURI = substr($requestUri, 0, stripos($requestUri, $baseURI)) . $baseURI;
+}
 $end = trim(substr($requestUri, strlen($baseURI."/")));
 $rId = null;
 if ((!empty($end) || $end ==="0") && $end[0] != "?") {
@@ -99,7 +103,7 @@ if ((!empty($end) || $end ==="0") && $end[0] != "?") {
 }
 
 if((AJXP_Sabre_AuthBackendBasic::detectBasicHeader() || ConfService::getCoreConf("WEBDAV_FORCE_BASIC"))
-    && ConfService::getAuthDriverImpl()->getOption("TRANSMIT_CLEAR_PASS")){
+    && ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")){
     $authBackend = new AJXP_Sabre_AuthBackendBasic($rId);
 } else {
     $authBackend = new AJXP_Sabre_AuthBackendDigest($rId);

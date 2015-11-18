@@ -61,7 +61,7 @@
                             });
                             context.builderMenuItems.push({
                                 name:MessageHash['meta.watch.3'],
-                                alt:MessageHash['meta.watch.4'],
+                                alt:MessageHash["meta.watch." + (n.isLeaf()?"8":"4")],
                                 isDefault : false,
                                 image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
                                 callback:function(e){
@@ -86,7 +86,7 @@
                                 file : node.getPath()
                             });
                             conn.onComplete = function(transport){
-                                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                pydio.getController().parseXmlMessage(transport.responseXML);
                             };
                             window.metaWatchCmd = null;
                             conn.sendAsync();

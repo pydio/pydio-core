@@ -1,0 +1,26 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 6.0.5 - Bugfix Release</h2>
+
+    This is fixing some annoying issues introduced by 6.0.4. Upgrade is recommended and simple. Changes described below.
+
+    <ul>
+        <li>Revert "close search engine on context change" as it breaks results pane in admin (<a href="http://github.com/pydio/pydio-core/commit/e63e0a894a415e26e832dc8b05528d0da2a1dbe9">details</a>)</li>
+        <li>Move Multi & WebFTP login screen into dedicated authfront plugin, as previous fixes in AJXP_PluginsService changes the plugins loading order. (<a href="http://github.com/pydio/pydio-core/commit/7f24062cf3a435088b2efb5a5ce438c1250feacf">details</a>)</li>
+        <li>Prevent FTP login screen modal closing (<a href="http://github.com/pydio/pydio-core/commit/b256426a559d85109d8b2d58bc6f5e7b339d3206">details</a>)</li>
+        <li>Fix #847: share link with non-ascii filename on windows IIS (<a href="http://github.com/pydio/pydio-core/commit/29e59c661cf97c59a6a536b2218aae51fcc33da5">details</a>)</li>
+        <li>Fix scrolling issue: use a fixed scrolling step instead of a fraction, could make it hardly usable for long listings (<a href="http://github.com/pydio/pydio-core/commit/3bbf76b992629699ea2f477bfe5adc467e4465b3">details</a>)</li>
+    </ul>
+
+    <h2>Upgrade instructions</h2>
+    <ul>
+        <li>
+            <b>In-app upgrade</b>: automatic.
+        </li>
+        <li>
+            <b>Linux Packages</b>: automatic via yum / apt-get
+        </li>
+    </ul>
+
+</div>

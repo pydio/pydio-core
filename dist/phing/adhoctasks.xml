@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="phing-grammar.rng"
+        type="application/xml"
+        schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<project name="AdhocTasks">
+
+
+    <adhoc-task name="pydio-git-summarize"><![CDATA[
+class PydioGitSummarizeTask extends GitBaseTask
+{
+    /**
+     * Which Revision to Export
+     *
+     * @todo check if version_control_svn supports constants
+     *
+     * @var string
+     */
+    private $commit1 = '';
+    private $commit2 = '';
+    private $summarizeFile;
+
+    /**
+     * The main entry point
+     *
+     * @throws BuildException
+     */
+    public function main()
+    {
+       if (null === $this->getRepository()) {
+            throw new BuildException('"repository" is required parameter');
+        }
+
+        $client = $this->getGitClient(false, $this->getRepository());
+        $command = $client->getCommand('diff-tree');
+        $command->setOption('r');
+        $command->setOption('name-status', true);
+        $command->addArgument($this->getCommit1());
+        $command->addArgument($this->getCommit2());
+
+        $this->log("Diffing Git repository '" . $this->getRepository() . "' "
+          . " (revision: {$this->getCommit1()}:{$this->getCommit2()}");
+
+         try {
+            $output = $command->execute();
+         } catch (Exception $e) {
+             throw new BuildException('Task execution failed.');
+         }
+        file_put_contents($this->getSummarizeFile(), $output);
+
+    }
+
+    public function setRepository($repository)
+    {
+        parent::setRepository($repository);
+    }
+
+    public function setCommit1($revision)
+    {
+        $this->commit1 = $revision;
+    }
+
+    public function getCommit1()
+    {
+        return $this->commit1;
+    }
+
+    public function setCommit2($revision)
+    {
+        $this->commit2 = $revision;
+    }
+
+    public function getCommit2()
+    {
+        return $this->commit2;
+    }
+
+    public function setSummarizeFile($summarizeFile)
+    {
+        $this->summarizeFile = $summarizeFile;
+    }
+
+    public function getSummarizeFile()
+    {
+        return $this->summarizeFile;
+    }
+
+}
+
+
+    ]]></adhoc-task>
+
+    <adhoc-task name="pydio-parse-git-summarize"><![CDATA[
+class PydioParseGitSummarize extends Task
+  {
+      private $summarizeFile;
+      private $sourceDir;
+      private $upgradeDir;
+      private $prefixPath;
+      private $extPluginsFolder;
+      private $ignores = array("/.gitignore");
+
+      public function setSummarizeFile($summarizeFile)
+      {
+          $this->summarizeFile = $summarizeFile;
+      }
+
+      public function getSummarizeFile()
+      {
+          return $this->summarizeFile;
+      }
+
+      public function setSourceDir($sourceDir)
+      {
+          $this->sourceDir = $sourceDir;
+      }
+
+      public function setUpgradeDir($upgradeDir)
+      {
+          $this->upgradeDir = $upgradeDir;
+      }
+
+      public function setExtPluginsFolder($extPluginsFolder)
+      {
+            $this->extPluginsFolder = $extPluginsFolder;
+      }
+
+      public function setPrefixPath($prefixPath)
+      {
+          $this->prefixPath = $prefixPath;
+      }
+
+      public function getPrefixPath()
+      {
+          return $this->prefixPath;
+      }
+
+      public function main()
+      {
+          $summarizeLines = file($this->summarizeFile);
+          $toDelete = array();
+          if(isSet($this->prefixPath)) $this->sourceDir .= "/" . $this->prefixPath;
+
+          foreach ($summarizeLines as $line) {
+              list($letter, $path) = preg_split('/[\s]+/', trim($line), 2);
+              if (isSet($this->prefixPath)) {
+                  if (strpos($path, $this->prefixPath) !== 0) {
+                      $this->log("-- Skipping ".$path, Project::MSG_INFO);
+                      continue;
+                  }
+                  $end = str_replace($this->prefixPath, "", $path);
+              } else {
+                  $end = str_replace($this->sourceDir, '', $path);
+              }
+              if (in_array($end, $this->ignores)) {
+                  continue;
+              }
+              //$this->log("-- Parsing ".$line, Project::MSG_INFO);
+
+              if ($letter == "D") {
+                  $toDelete[] = $end;
+                  continue;
+              }
+               if (substr($end, 0, strlen("/plugins/"))=="/plugins/") {
+                   if (file_exists($this->extPluginsFolder.substr($end, strlen("/plugins")))) {
+                    $this->log("-- Skipping ".$line.", it's an external plugin", Project::MSG_INFO);
+                       continue;
+                   }
+               }
+              if (is_dir($this->sourceDir.$end)) {
+                  if(!is_dir($this->upgradeDir.$end)) mkdir($this->upgradeDir.$end, 0777, true);
+              } else if (is_file($this->sourceDir.$end)) {
+                  if(!is_dir($this->upgradeDir."/".dirname($end))) mkdir($this->upgradeDir."/".dirname($end), 0777, true);
+                  $this->log("-- Copy ".$this->sourceDir.$end ." to ".$this->upgradeDir.$end, Project::MSG_INFO);
+                  copy($this->sourceDir.$end, $this->upgradeDir.$end);
+              }
+          }
+          if (count($toDelete)) {
+              $this->log("-- Adding CLEAN-FILES list for ".count($toDelete)." items to delete", Project::MSG_INFO);
+              file_put_contents($this->upgradeDir."/UPGRADE/CLEAN-FILES", implode("\r\n", str_replace("\\", "/", $toDelete)));
+          }
+      }
+
+      function copy_r( $path, $dest )
+      {
+          if ( is_dir($path) ) {
+              @mkdir( $dest , 0777);
+              $objects = scandir($path);
+              if ( sizeof($objects) > 0 ) {
+                  foreach ($objects as $file) {
+                      if( $file == "." || $file == ".." )
+                      continue;
+                      // go on
+                      if ( is_dir( $path.DIRECTORY_SEPARATOR.$file ) ) {
+                          self::copy_r( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
+                      } else {
+                          copy( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
+                      }
+                  }
+              }
+              return true;
+          } elseif ( is_file($path) ) {
+              return copy($path, $dest);
+          } else {
+              return false;
+          }
+      }
+
+  }
+
+    ]]></adhoc-task>
+
+    <adhoc-task name="pydio-plugins-discriminate"><![CDATA[
+class AjxpPluginDiscriminate extends Task
+{
+      private $ext;
+      private $all;
+
+      public function setExt($ext)
+      {
+          $this->ext = $ext;
+      }
+
+      public function setAll($all)
+      {
+          $this->all = $all;
+      }
+
+
+      public function main()
+      {
+          $results = glob($this->all."/*");
+          foreach ($results as $pluginDir) {
+              if (!$this->isCore($pluginDir)) {
+                  $this->log("Moving ".$pluginDir." to the external plugins", Project::MSG_INFO);
+                  rename($pluginDir, $this->ext."/".basename($pluginDir));
+              }
+          }
+      }
+
+      public function isCore($file)
+      {
+          if(!is_dir($file)) return true;
+          if(!file_exists($file."/manifest.xml")) return true;
+          $content = file_get_contents($file."/manifest.xml");
+          $dom = new DOMDocument();
+          $dom->loadXML($content);
+          $xpath = new DOMXPath($dom);
+          $nodes = $xpath->query("plugin_info/core_relation");
+          if ($nodes->length > 0) {
+              $att = $nodes->item(0)->attributes->getNamedItem("packaged")->nodeValue;
+              if($att == "false") return false;
+          }
+          return true;
+      }
+  }
+    ]]></adhoc-task>
+
+    <adhoc-task name="pydio-read-package-json"><![CDATA[
+        class PackageJsonLoader extends Task{
+            private $file;
+            private $output;
+            function setFile($file){
+                $this->file = $file;
+            }
+            function main(){
+                $content = file_get_contents($this->file);
+                $data = json_decode($content, true);
+                if(isSet($data["source_path"])){
+                    $this->project->setProperty('js_source_path', $data["source_path"]);
+                }else{
+                    $this->project->setProperty('js_source_path', '__NOT_FOUND__');
+                }
+            }
+        }
+    ]]></adhoc-task>
+
+</project>

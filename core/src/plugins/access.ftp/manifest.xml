@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ftp" label="CONF_MESSAGE[FTP Server]" description="CONF_MESSAGE[This driver can access a remote FTP server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <client_settings icon="plugins/access.ftp/icon.png">
+    <client_settings icon="plugins/access.ftp/icon.png" description_template="{FTP_HOST}/{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="ftp_access" path="plugins/access.ftp/i18n"/>
         </resources>
@@ -24,6 +24,7 @@
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
             <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
             <component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label"/>

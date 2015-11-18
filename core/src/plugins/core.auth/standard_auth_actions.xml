@@ -36,7 +36,7 @@
 						var passSeed = null;
 						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
 						{
-							if($('user_change_ownpass1').value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+							if($('user_change_ownpass1').value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
 								alert(MessageHash[378]);
 								return false;
 							}
@@ -53,8 +53,8 @@
 								userPass = $('user_change_ownpass1').value;
 								userOldPass = $('user_change_ownpass_old').value;
 							}else{
-								userPass = hex_md5($('user_change_ownpass1').value);
-								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+								userPass = HasherUtils.hex_md5($('user_change_ownpass1').value);
+								userOldPass = HasherUtils.hex_md5( HasherUtils.hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
 							}
 							var onComplete = function(transport){
 								var addition = '';
@@ -76,10 +76,11 @@
 									hideLightBox(true);
 								}
 								if(logout){
-								    ajaxplorer.actionBar.fireAction("logout");
+								    pydio.getController().fireAction("logout");
 								}
 							};
 							var conn = new Connexion();
+							conn.setMethod('POST');
 							conn.addParameter("get_action", "pass_change");
 							conn.addParameter("old_pass", userOldPass);
 							conn.addParameter("new_pass", userPass);

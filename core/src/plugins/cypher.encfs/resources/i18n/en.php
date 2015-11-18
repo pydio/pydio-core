@@ -24,5 +24,5 @@ $mess=array(
 "3" => "Uncypher folder",
 "4" => "Decrypt folder data",
 "5" => "Cypher folder",
-"6" => "Encrypt folder data"
+"6" => "Encrypt folder data",
 );

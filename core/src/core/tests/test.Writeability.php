@@ -28,33 +28,10 @@ require_once('../classes/class.AbstractTest.php');
  */
 class Writeability extends AbstractTest
 {
-    public function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
+    public function __construct() { parent::__construct("Required writeable folder", "One of the following folder should be writeable and is not : "); }
     public function doTest()
     {
-        //include(AJXP_CONF_PATH."/bootstrap_plugins.php");
         $checks = array();
-        /*
-        if (isSet($PLUGINS["CONF_DRIVER"])) {
-            $confDriver = $PLUGINS["CONF_DRIVER"];
-            if (isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"])) {
-                $checks[] =  dirname($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"]);
-            }
-            if (isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["USERS_DIRPATH"])) {
-                $checks[] = $confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"];
-            }
-        }
-        if (isset($PLUGINS["AUTH_DRIVER"])) {
-            $authDriver = $PLUGINS["AUTH_DRIVER"];
-            if (isset($authDriver["OPTIONS"]) && isSet($authDriver["OPTIONS"]["USERS_FILEPATH"])) {
-                $checks[] = dirname($authDriver["OPTIONS"]["USERS_FILEPATH"]);
-            }
-        }
-        if (isset($PLUGINS["LOG_DRIVER"])) {
-            if (isset($PLUGINS["LOG_DRIVER"]["OPTIONS"]) && isSet($PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"])) {
-                $checks[] = $PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"];
-            }
-        }
-        */
         $checks[] = AJXP_CACHE_DIR;
         $checks[] = AJXP_DATA_PATH;
         $checked = array();
@@ -78,4 +55,4 @@ class Writeability extends AbstractTest
         $this->failedInfo = "[".implode(',<br>', array_values($checked))."]";
         return FALSE;
     }
-};
+}

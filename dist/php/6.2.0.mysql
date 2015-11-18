@@ -1,0 +1,18 @@
+/* SEPARATOR */
+ALTER TABLE  `ajxp_log`
+  ADD COLUMN `repository_id` VARCHAR(32),
+  ADD COLUMN `device` VARCHAR( 255 ),
+  ADD COLUMN `dirname` VARCHAR(255),
+  ADD COLUMN `basename`  VARCHAR(255),
+  ADD INDEX (  `source` ),
+  ADD INDEX (  `logdate` ),
+  ADD INDEX (  `severity` ),
+  ADD INDEX (  `basename` ),
+  ADD INDEX (  `repository_id` ),
+  ADD INDEX (  `dirname` )
+;
+/* SEPARATOR */
+ALTER TABLE `ajxp_roles`
+    ADD COLUMN `last_updated` INT(11) NOT NULL DEFAULT 0,
+    ADD INDEX (`last_updated`)
+;

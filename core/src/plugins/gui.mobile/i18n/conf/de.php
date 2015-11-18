@@ -26,6 +26,6 @@
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Mobile" => "Mobile",
-"Template extending gui.ajax for small screen terminals." => "Erweiterungs-Vorlage für gui.ajax und kleine Bildschirme.",
+"Mobile" => "Mobile Browser",
+"Template extending gui.ajax for small screen terminals." => "Erweitert die Ansicht im Browser um eine Vorlage für mobile Geräte mit kleiner Auflösung.",
 );

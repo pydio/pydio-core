@@ -28,6 +28,7 @@ Class.create("AjxpMqObserver", {
     clientId:null,
     ws: null,
     configs: null,
+    channel_pending: false,
 
     initialize : function(){
         "use strict";
@@ -41,8 +42,14 @@ Class.create("AjxpMqObserver", {
 
             var repoId;
             var data = event.memo;
-            if(data.active) repoId = data.active;
-            else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
+            if(data.active) {
+                repoId = data.active;
+            } else if(pydio.repositoryId) {
+                repoId = pydio.repositoryId;
+            }
+            if(this.currentRepo && this.currentRepo == repoId){ // Ignore, repoId did not change!
+                return;
+            }
             this.initForRepoId(repoId);
 
         }.bind(this));
@@ -77,7 +84,7 @@ Class.create("AjxpMqObserver", {
                     this.ws.onmessage = function(event){
                         var obj = parseXml(event.data);
                         if(obj){
-                            ajaxplorer.actionBar.parseXmlMessage(obj);
+                            pydio.getController().parseXmlMessage(obj);
                             ajaxplorer.notify("server_message", obj);
                         }
                     };
@@ -147,6 +154,9 @@ Class.create("AjxpMqObserver", {
     },
 
     consumeChannel : function(){
+        if(this.channel_pending) {
+            return;
+        }
         var conn = new Connexion();
         conn.setParameters($H({
             get_action:'client_consume_channel',
@@ -155,11 +165,13 @@ Class.create("AjxpMqObserver", {
         }));
         conn.discrete = true;
         conn.onComplete = function(transport){
+            this.channel_pending = false;
             if(transport.responseXML){
-                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                pydio.getController().parseXmlMessage(transport.responseXML);
                 ajaxplorer.notify("server_message", transport.responseXML);
             }
-        };
+        }.bind(this);
+        this.channel_pending = true;
         conn.sendAsync();
     }
 
