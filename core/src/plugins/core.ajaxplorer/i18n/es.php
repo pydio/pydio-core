@@ -28,7 +28,7 @@
 $mess=array(
 "languageLabel" => "Español",
 "date_format"  => "d/m/Y H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "es-ES",
 "0" => "Última ver.",
 "1" => "Nombre",
@@ -633,5 +633,12 @@ $mess=array(
 "plugtype.desc.mailer" => "Herramientas que permiten a la aplicación enviar correos electrónicos",
 "plugtype.title.mq" => "Mensajería instantanea",
 "plugtype.desc.mq" => "Implementaciones de un simple servidor PUB/SUB",
+"537" => "¡El fichero es demasiado grande! El tamaño máximo autorizado es %i",
+"538" => "Error al subir: ningún archivo encontrado en el servidor!",
+"539" => "Error al subir: archivo parcialmente subido",
+"540" => "Error al subir: no puede encontrar el directorio temporal",
+"541" => "Error al subir: no se puede escribir en el directorio temporal",
+"542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga."
+
 /* END SENTENCE */
 );

@@ -30,4 +30,7 @@ $mess = array(
     "8" => "Indexando %s en segundo plano",
     "9" => "¡No puedo encontrar el índice de la carpeta actual! ¡Debería primero ejecutar la indexación de los datos!",
     "10" => "Indexando subcarpetas en segundo plano",
+    "11" => "El repositorio parece ser que está realizando la indexación, por favor espere 3 minutos y reintente su búsqueda.",
+    "12" => "¡El repositorio no está indexado, por favor lance la indexación manualmente!"
+
 );

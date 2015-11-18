@@ -113,7 +113,7 @@ $mess = array(
 "107" => "El límite de descarga debe estar entre 1 y %s",
 "108" => "Use un lector de códigos QR para escanear la imagen ",
 "80b"=> "Invitar a visitar este repositorio a los usuarios seleccionados vía correo electrónico",
-"83b"=> "Conmuta el estado de visto para recibir o no notificaciones cuando el repositorio es consultado",",
+"83b"=> "Conmuta el estado de visto para recibir o no notificaciones cuando el repositorio es consultado",
 "109" => "Minisitio de usario",
 "110" => "Compartir esto",
 "110b"=> "Compartir",
@@ -186,4 +186,7 @@ $mess = array(
     "172" => "Lo sentimos pero este enlace ya está en uso, por favor seleccione otro nombre.",
     "173" => "Si desea un enlace bonito y duradero (al estilo https://.../mi-enlace), puede usar este campo. Si no lo establece éste se generará automáticamente.",
     "174" => "Deshabilitar contraseña",
+	"175" => "¡Por favor establezca una contraseña y asegúrese de que es suficientemente larga!",
+    "176" => "(Obligatorio)",
+    "177" => "Ver parámetros",
 );

@@ -32,4 +32,6 @@ $mess=array(
 "9" => "Activitat del repositori",
 "10" => "Activitat de la carpeta",
 "11" => "Activitat de l'arxiu",
+"12" => "Depenent del seu navegador, això demanarà un permís específic. Per desactivar, anar a través de les preferències del navegador i excepcions. Si ja ha activat aquesta funció, probablement no passarà res.",
+"13" => "El seu navegador pareix no suportar de moment les notificacions d'escriptori."
 );

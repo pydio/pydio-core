@@ -24,7 +24,7 @@
 $mess=array(
 "languageLabel" => "Catalan",
 "date_format"  => "Y/m/d H:i",
-"byte_unit_symbol" => "b",
+"byte_unit_symbol" => "B",
 "date_intl_locale" => "ca-ES",
 "0" => "Darrera vers.",
 "1" => "Nom",
@@ -397,27 +397,16 @@ $mess=array(
 "346" => "La seva versió està actualitzada",
 "347" => "Una nova versió (%s) està disponible! Visiti %s",
 "348" => "Un nou repositori ha estat compartit.",
-
-
-
-
 "349" => "Atenció, falten arguments",
 "350" => "Un usuari ja existeix amb aquest nom, per favor triar un altre nom.",
 "351" => "No té permisos per compartir aquest element.",
 "352" => "Un repositori amb el mateix nom ja existeix, per favor triar un altre nom.",
 "353" => "Usuari destí",
 "354" => "Crear un nou usuari o seleccionar un dels existents de la llista.",
-
-
-
-
-
 "355" => "Nom d'usuari",
 "356" => "Contrasenya",
 "357" => "Repositori destí",
 "358" => "Triar un nom per l'element compartit i assignar permisos d'accès.",
-
-
 "359" => "Etiqueta",
 "360" => "Permisos",
 "361" => "Llegir",
@@ -428,25 +417,15 @@ $mess=array(
 "366" => "Aquest usuari no té repositori actiu.",
 "367" => "No pot carregar aquest tipus de fitxer. Per favor seleccioni les següents extensions : ",
 "368" => "Selecció extreta correctament de l'arxiu %s a la carpeta %s",
-
-
-
-
-
 "369" => "APPLICATION_TITLE Enllaç",
 "370" => "APPLICATION_TITLE Descàrrega pública",
 "371" => "Contrasenya requerida per a aquesta descàrrega",
-
 "372" => "Repositori actual",
 "373" => "Destí",
 "374" => "No pot copiar carpetes entre repositoris",
 "375" => "Atenció, ha estat inacti més de __IDLE__, la seva sessió serà finalitzada en __LOGOUT__",
 "376" => "Faci click per a reactivar",
 "378" => "Atenció, la contrasenya està buida i és massa curta!",
-
-
-
-
 "379" => "Paraula insegura!",
 "380" => "Massa curta",
 "381" => "Molt dèbil",
@@ -456,8 +435,6 @@ $mess=array(
 "385" => "Molt forta",
 "386" => "L'inici de sessió ha estat erroni 3 vegades.\nPer la seva seguretat, per favor impli el codi que apareix a la imatge.",
 "389" => "Per favor llegeixi el codi següent :",
-
-
 "390" => "Codi",
 "391" => "Sense repositori",
 "392" => "Atenció, la versió d'AjaXplorer ha canviat (%s), per favor netegi la cache del seu navegador i recarregui la pàgina per estar segur de que tot sigui funcional!",
@@ -468,44 +445,26 @@ $mess=array(
 "397" => "Descàrrega fragmentada",
 "398" => "Descarregar el fitxer seleccionat per peces",
 "399" => "Introduïu el nombre de peces que voleu descarregar, i després feu clic al botó i feu clic a cada arxiu per descarregar.",
-
-
-
-
-
-
-
-
 "400" => "Nombre de peces :",
 "401" => "Podeu descarregar i instal·lar el programari següent per unir les peces, un cop a l'equip: ",
-
 "402" => "http://www.hjsplit.org/",
 "403" => "Preferències WebDAV ",
 "404" => "Vostè pot utilitzar el protocol WebDAV per muntar els seus repositoris AjaXplorer com unitat de xarxa a diversos clients, incloent Windows, Mac, iPhone, etc.",
 "405" => "Utilitzeu les següents URL per accedir als seus repositoris, amb el seu nom d'usuari i la contrasenya que ha introduït. Advertència, això no funcionarà fins que estableixi aquesta característica com 'activa' i s'introdueix la clau. ",
-
-
 "406" => "Activar comparticions WebDAV",
 "407" => "Introduïu la contrasenya si aquesta és la primera vegada que va a activar recursos compartits de WebDAV, o desitja tornar a escriure una nova contrasenya: ",
 "408" => "Recursos compartits de WebDAV activats amb èxit, no s'oblidi d'actualitzar la contrasenya si aquesta és la primera vegada! ",
 "409" => "Recursos compartits de WebDAV desactivats amb èxit",
 "410" => "Contrasenya de WebDav actualitzada amb èxit",
-
-
-
-
 "411" => "Obrir",
 "412" => "Només carregar",
 "413" => "Compartit per",
 "414" => "Emprar les fletxes per navegar i +/- per canviar el zoom",
 "415" => "Alternar visibilitat panell de l'esquerra ",
-
-
 "416" => "Panell Esq",
 "leftpane_accesskey" => "E",
 "417" => "Afegir repositori ...",
 "418" => "Crear el seu propi repositori",
-
 "419" => "Carregant plantilles...",
 "420" => "Plantilles",
 "421" => "Nou %s",
@@ -534,23 +493,15 @@ $mess=array(
 "444" => "Si us plau, actualitzi la contrasenya, no podrà accedir d'una altra manera.",
 "445" => "Ara es tancarà la sessió, si us plau torni a iniciar sessió amb la nova contrasenya, gràcies! ",
 "446" => "Presentació",
-
-
-
 "447" => "El meu grup",
 "448" => "crear usuari",
 "449" => "Creant %s, triau una contrasenya",
-
 "450" => "Ordenar per ...",
 "451" => "Ordenar miniatures per ...",
 "452" => "Tamany de les miniatures",
 "453" => "Establir el tamany de les miniatures",
 "454" => "Seleccionar fitxers del seu ordinador",
 "455" => "Àrea de treball",
-
-
-
-
 "456" => "Més",
 "457" => "actualitzar",
 "458" => "eliminar",
@@ -572,13 +523,9 @@ $mess=array(
 "463" => "Descarregar tot",
 "464" => "Descarregar tot el contingut de l'àrea de treball (a un zip)",
 "465" => "Mostrar URLs alternatives (montar àrees de treball separadament)",
-
-
 "466" => "Carregant...",
 "467" => "Tots els elements compartits",
 "468" => "Les meves àrees de treball",
-
-
 "469" => "Compartit amb mi",
 "470" => "Creat %date",
 "471" => "Creat per %user %date",
@@ -586,25 +533,16 @@ $mess=array(
 "473" => "Compartit per %user %date",
 "474" => "Descripció no disponible",
 "475" => "Fitxers compartits entre tots els usuaris",
-
-
 "476" => "La seva àrea personal",
 "477" => "Seleccioni un arxiu o carpeta per a veure els seus detalls aquí",
 "478" => "No s'han trobat resultats",
-----
 "479" => "Ha oblidat la seva contrasenya?",
 "480" => "Explora totes les carpetes del repositori actual.",
 "481" => "Tots els seus arxius i carpetes compartides",
 "482" => "Accès ràpid als seus elements marcats",
 "483" => "Vosté no està autoritzat a crear més usuaris!",
-
-
-
-
-
 "484" => "Crear usuari",
 "485" => "Crear un usuari compartit",
-
 "486" => "Avanzat",
 "487" => "Bàsic",
 "488" => "Filtrr avanzat",
@@ -618,7 +556,6 @@ $mess=array(
 "496" => "El darrer mes",
 "497" => "El darrer any",
 "498" => "Propietat de documento",
-
 "499" => "Arxiu",
 "500" => "extensió",
 "501" => "o",
@@ -627,21 +564,15 @@ $mess=array(
 "504" => "1k,1M,1G",
 "505" => "a",
 "506" => "Paràmetres de la aplicació (usuaris, repositoris, configuracions)",
-
 "507" => "Benvingut a %s",
 "508" => "Acabo de crear un compte per vosté a %s. Per a connectar, per favor faci click al següent enllaç %link i empri aquestes credencials:  <br><br> Usuari: %user <br><br> Contrasenya: %pass",
 "509" => "Guardar la llista actual d'usuaris com un equip personal",
 "510" => "Per favor, intodueixi el nom de l'equip",
-
-
-
 "511" => "El meu %s",
 "512" => "Escriptori a pantalla completa",
-
 "513" => "mostrar",
 "514" => "amagar",
 "515" => "Sense marcadors - Arrossegui carpetes o fitxers aquí per a accès ràpid.",
-
 "516" => "expandir",
 "517" => "col·lapsar",
 "518" => "De manera alternativa, pot <a class='create_file_alt_link'>crear un nou arxiu buit</a>.",
@@ -649,16 +580,10 @@ $mess=array(
 "520" => "Actualitzar dades d'usuari i contrasenya",
 "521" => "L'usuari ha estat actualitzat correctament",
 "522" => "Identificador d'usuari",
-
-
-
-
 "523" => "Contrasenya",
 "524" => "Actualitzar contrasenya",
-
 "525"=> "Mostrar imatge original",
 "526"=> "Versió a baixa resolució",
-
 "527"=> "Compartit amb",
 "528"=> "Usuaris interns",
 "530"=> "Usuaris externs",
@@ -669,38 +594,28 @@ $mess=array(
 "535" => "Enviar contrasenya per correu electrònic",
 "536" => "Enviar un correu electrònic de benvinguda incloent la contrasenya per al nou usuari",
 
-
-
-
 "plugtype.title.access" => "Drivers de repositori",
 "plugtype.desc.access" => "Plugins que defineixen com un repositori accedirà tant al seu back-end (sistema d'arxius o similar) i a les principals accions y dissenys.",
-
 "plugtype.title.action" => "Plugins d'acció",
 "plugtype.desc.action" => "Plugins orientats a característiques per aspectes varis",
-
 "plugtype.title.authfront" => "Frontends d'autenticació",
 "plugtype.desc.authfront" => "Mètodes per recopilar credencials d'identificació(web form, api key, etc)",
 "plugtype.title.cypher" => "Eines d'encriptació",
 "plugtype.desc.cypher" => "Plugins d'encriptació de dades",
 "plugtype.title.editor" => "Editors",
-
 "plugtype.title.gui" => "Interfície gràfica de l'usuari",
 "plugtype.desc.editor" => "Visors o editors per a una amplia gamma de tipus MIME",
 "plugtype.desc.gui" => "Interfície web principal i les seves declinacions",
-
 "plugtype.title.index" => "Indexació",
 "plugtype.desc.index" => "Eines per a la indexació de dades que proporciona l'opció de cerca ràpida",
-
 "plugtype.title.meta" => "Meta aspectes del repositori",
 "plugtype.desc.meta" => "Característiques adicionals per ser afegides als repositoris",
-
 "plugtype.title.metastore" => "Enmagatzemament de metadades",
 "plugtype.desc.metastore" => "Implementacions diverses per a l'enmagatzemament de metadades juntament amb arxius i carpetes",
-
 "plugtype.title.shorten" => "Abreviadors URL",
 "plugtype.desc.shorten" => "Serveis web emprats a l'abreviació d'enllaços públics",
-
 "plugtype.title.uploader" => "Uploaders",
+
 "plugtype.desc.uploader" => "Implementació d'uploaders emprant diverses tecnologíes (html, js, java...)",
 "plugtype.title.auth" => "Backends d'autenticació",
 "plugtype.desc.auth" => "Com la informació dels usuaris es enmagatzemada al backend",
@@ -710,14 +625,18 @@ $mess=array(
 "plugtype.desc.conf" => "Com les dades d'enmagatzemament son guardades al backend",
 "plugtype.title.feed" => "Enmagatzemament del notificador d'eventos",
 "plugtype.desc.feed" => "Implementacions per l'enmagatzemament de dades d'eventos (de moment únicament SQL)",
-
 "plugtype.title.log" => "Registradors",
 "plugtype.desc.log" => "Envia els registres d'aplicació a varis canals",
-
 "plugtype.title.mailer" => "Enviadors de correu",
 "plugtype.desc.mailer" => "Eines que permeten a l'aplicació enviar correus electrònics",
-
 "plugtype.title.mq" => "Missatgeria instantània",
 "plugtype.desc.mq" => "Implementacions d'un simple servidor PUB/SUB",
+    "537" => "L'arxiu és massa gran! La mida màxima autoritzada és %i",
+    "538" => "Error en la pujada: no s'ha trobat cap arxiu al servidor!",
+    "539" => "Error en la pujada: arxiu pujat parcialment",
+    "540" => "Error en la pujada: no es pot trobar el directori temporal",
+    "541" => "Error en la pujada: no es pot escriure en el directori temporal",
+    "542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega."
+
 /* END SENTENCE */
 );

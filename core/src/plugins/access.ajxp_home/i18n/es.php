@@ -45,10 +45,17 @@ $mess=array(
     "57"=> "Descargar APPLICATION_TITLE para...",
     "58"=> "Dispositivo Android",
     "59"=> "iPhone/iPad",
+<<<<<<< HEAD
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
     "62"=>"<h2>Empezando</h2>
             Este video es una introducción a la aplicación web APPLICATION_TITLE :
+=======
+    "60"=>"Mac OS",
+    "61"=>"Windows",
+    "62"=>"<h2>Getting started</h2>
+            This video is an introduction to APPLICATION_TITLE web application:
+>>>>>>> refs/remotes/pydio/develop
             <ul>
                 <li>Cuadro de mandos del usuario</li>
                 <li>Descripción del interfaz gráfico</li>

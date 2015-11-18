@@ -186,4 +186,7 @@ $mess = array(
     "172" => "Ho sentim però aquest enllaç ja s'utilitza, si us plau triau un altre.",
     "173" => "Si vol un vincle durador i bonic (com https: //.../el-meu-nom), pot utilitzar aquest camp. Si es deixa buit es generarà de manera aleatòria.",
     "174" => "Deshabilitar contrasenya",
+	"175" => "Per favor establiu una contrasenya i assegureu-vos que és prou llarga!",
+    "176" => "(Obligatori)",
+    "177" => "Veure paràmetres",
 );
