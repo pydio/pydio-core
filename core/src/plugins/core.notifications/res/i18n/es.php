@@ -18,6 +18,7 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+// spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "1" => "Notificaciones",
 "2" => "Fuente de Notificaciones",

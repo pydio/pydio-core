@@ -18,6 +18,7 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+// catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "1" => "Ús de la quota (carregant...)",
 "2" => "Clic per recarregar l'ús de la quota",

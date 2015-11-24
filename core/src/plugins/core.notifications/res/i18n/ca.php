@@ -20,6 +20,7 @@
 *
 * 
 */
+// catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "1" => "Notificacions",
 "2" => "Font de notificacions",

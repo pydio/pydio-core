@@ -1,5 +1,5 @@
 <?php
-
+// spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess = array(
 // will be replaced by the application title
 "1" => "%s Descarga Pública",

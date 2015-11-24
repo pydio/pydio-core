@@ -20,6 +20,7 @@
  */
  // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
+// spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "1" => "Usuarios compartidos",
 "2" => "Repositorios compartidos",

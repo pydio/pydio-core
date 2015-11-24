@@ -18,7 +18,7 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-
+// catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 
 $mess=array(
 "title"=> "Inici",

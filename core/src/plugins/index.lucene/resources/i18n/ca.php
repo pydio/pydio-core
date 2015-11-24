@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
+// catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess = array(
     "1" => "Indexar contingut",
     "2" => "Indexar el contingut de la carpeta",
