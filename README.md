@@ -1,6 +1,6 @@
 ## Pydio Core
 
-[Homepage](https://pyd.io/) |
+[Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
  [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core)
