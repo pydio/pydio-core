@@ -233,6 +233,12 @@ class ftpAccessWrapper implements AjxpWrapper
                     return $statValue;
                 }
             }
+            // Not found : is it the "."
+            if($basename == "."){
+                // Make at least a readable fake stat
+                $fakeStat = stat(AJXP_DATA_PATH);
+                return $fakeStat;
+            }
         } else {
             // FILE
             $contents = $this->rawList($link, $serverPath, 'f');
