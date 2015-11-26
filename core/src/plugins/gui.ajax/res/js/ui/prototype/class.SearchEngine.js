@@ -236,8 +236,8 @@ Class.create("SearchEngine", AjxpPane, {
         }
 
         formPanel.select('input').each(function(el){
-            el.observe('focus', pydio.UI.disableAllKeyBindings.bind(ajaxplorer));
-            el.observe('blur', pydio.UI.enableAllKeyBindings.bind(ajaxplorer));
+            el.observe('focus', pydio.UI.disableAllKeyBindings.bind(pydio.UI));
+            el.observe('blur', pydio.UI.enableAllKeyBindings.bind(pydio.UI));
             el.observe('keydown', function(event){
                 if(event.keyCode == Event.KEY_RETURN){
                     oThis.search();
