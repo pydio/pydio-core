@@ -175,4 +175,5 @@ $mess=array(
 "150" => "Eine Arbeitsumgebung auswählen",
 "151" => "Root Group",
 "152" => "Root Group Role",
+"153" => "Applies to the whole hierarchy of users",
 );

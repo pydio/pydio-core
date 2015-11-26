@@ -2405,12 +2405,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
             </columns>');
         if(!AuthService::usersEnabled()) return array();
+        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
         $roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
         ksort($roles);
-        if(!$this->listSpecialRoles && !$this->getName() == "ajxp_admin"){
+        $mess = ConfService::getMessages();
+        if(!$this->listSpecialRoles && $this->getName() != "ajxp_admin" && !$currentUserIsGroupAdmin){
             $rootGroupRole = AuthService::getRole("AJXP_GRP_/", true);
             if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
-                $mess = ConfService::getMessages();
                 $rootGroupRole->setLabel($mess["ajxp_conf.151"]);
                 AuthService::updateRole($rootGroupRole);
             }
@@ -2431,10 +2432,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             }
             $rightsString = implode(", ", $r);
             $nodeKey = "/data/roles/".$roleObject->getId();
+            $appliesToDefault = implode(",", $roleObject->listAutoApplies());
+            if($roleObject->getId() == "AJXP_GRP_/"){
+                $appliesToDefault = $mess["ajxp_conf.153"];
+            }
             $meta = array(
                 "icon" => "user-acl.png",
                 "rights_summary" => $rightsString,
-                "is_default"    => implode(",", $roleObject->listAutoApplies()), //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
+                "is_default"    => $appliesToDefault, //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
                 "ajxp_mime" => "role",
                 "role_id"   => $roleObject->getId(),
                 "text"      => $roleObject->getLabel()
