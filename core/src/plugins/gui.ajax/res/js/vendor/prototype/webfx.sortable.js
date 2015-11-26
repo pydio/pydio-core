@@ -479,7 +479,7 @@ Class.create('SortableTable', {
                 if(this._sortTypeInfo[sType].getRowValue){
                     stringValue = this._sortTypeInfo[sType].getRowValue(oRow, nColumn, attName);
                 }
-                if(stringValue === undefined) {
+                if(stringValue === undefined && oRow.ajxpNode) {
                     stringValue = oRow.ajxpNode.getMetadata().get(attName);
                 }
             }

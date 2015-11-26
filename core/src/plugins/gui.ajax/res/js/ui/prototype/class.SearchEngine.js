@@ -808,6 +808,9 @@ Class.create("SearchEngine", AjxpPane, {
 		// Clear the results
         this.hasResults = false;
         this._rootNode.clear();
+        if(this._fileList) {
+            this._fileList.empty(true);
+        }
         this._even = false;
 	},
 	/**
