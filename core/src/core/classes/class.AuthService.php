@@ -620,6 +620,7 @@ class AuthService
     public static function updateDefaultRights(&$userObject)
     {
         if (!$userObject->hasParent()) {
+            /*
             $changes = false;
             $repoList = ConfService::getRepositoriesList("all");
             foreach ($repoList as $repositoryId => $repoObject) {
@@ -633,6 +634,7 @@ class AuthService
             if ($changes) {
                 $userObject->recomputeMergedRole();
             }
+            */
             $rolesList = self::getRolesList(array(), true);
             foreach ($rolesList as $roleId => $roleObject) {
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
