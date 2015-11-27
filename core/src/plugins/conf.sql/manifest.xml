@@ -33,9 +33,11 @@
                 <processing>
                     <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
                         <dialogOnOpen><![CDATA[
+                            var contextHolder = window.actionManager.getDataModel();
                             var oForm = modal.getForm();
+                            oForm.CONTEXT_HOLDER = contextHolder;
                             var textA = oForm.down('#team_edit_input');
-                            var users = ajaxplorer.getContextHolder().getUniqueNode().getMetadata().get('users').stripTags().strip();
+                            var users = contextHolder.getUniqueNode().getMetadata().get('users').stripTags().strip();
                             textA.setValue(users.replace(/, /g, '\n') + '\n');
                             moveCaretToEnd(textA);
                             var completer = new AjxpUsersCompleter(
@@ -65,9 +67,10 @@
                             );
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
+                            var contextHolder = modal.getForm().CONTEXT_HOLDER;
                              var newValues = modal.getForm().down('#team_edit_input').getValue().strip().split(new RegExp('[ ,\n]+', 'g'));
-                             var teamId = getBaseName(ajaxplorer.getContextHolder().getUniqueNode().getPath());
-                             var teamLabel = ajaxplorer.getContextHolder().getUniqueNode().getLabel();
+                             var teamId = getBaseName(contextHolder.getUniqueNode().getPath());
+                             var teamLabel = contextHolder.getUniqueNode().getLabel();
                              console.log(teamId, newValues);
                              var c = new Connexion();
                              c.setParameters($H({
@@ -82,8 +85,11 @@
                                 $('team_panel').ajxpPaneObject.reloadDataModel();
                              };
                              c.sendAsync();
+                             modal.getForm().CONTEXT_HOLDER = null;
                         ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                        <dialogOnCancel><![CDATA[
+                            modal.getForm().CONTEXT_HOLDER = null;
+                        ]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="team_edit_form"><![CDATA[
                          <div id="team_edit_form">
@@ -106,18 +112,14 @@
                 <processing>
                     <clientCallback><![CDATA[
                     if(window.confirm(MessageHash["user_dash.52"])){
-                        var sel = ajaxplorer.getUserSelection().getUniqueNode();
+                        var sel = window.actionManager.getDataModel().getUniqueNode();
                         var conn = new Connexion();
                         conn.setParameters($H({
                             get_action: "user_team_delete",
                             team_id: getBaseName(sel.getPath())
                         }));
                         conn.onComplete = function(){
-                            var pane = $("team_panel").ajxpPaneObject;
-                            pane.getCurrentContextNode().observeOnce("loaded", function(){
-                                pane.reload();
-                            });
-                            pane.getCurrentContextNode().reload();
+                            $("team_panel").ajxpPaneObject.reloadDataModel();
                         };
                         conn.sendAsync();
                     }
@@ -137,9 +139,9 @@
                                 tabInfo='{"id":"team_pane","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="team_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"team_panel","toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]</h3>
-                    <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor display_metadata"></div>
+                    <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor display_metadata"></div>
                 </div>
                 ]]></additional_tab>
             </component_config>
