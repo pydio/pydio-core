@@ -29,7 +29,7 @@
         <param name="USER_SHARED_USERS_LIMIT" scope="user" description="CONF_MESSAGE[Maximum number of shared users per user]" label="CONF_MESSAGE[Shared users limit]" type="integer" expose="false" editable="false"/>
         <global_param name="DIBI_PRECONFIGURATION" group="CONF_MESSAGE[Core SQL Connexion]" type="group_switch:dibi_provider" label="CONF_MESSAGE[SQL Connexion]" description="CONF_MESSAGE[Simple SQL Connexion definition that can be used by other sql-based plugins]" mandatory="false"/>
         <global_param name="SAVE_GUEST_PREFERENCES" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Remember guest preferences]" description="CONF_MESSAGE[If the 'guest' user is enabled, remember her preferences accross sessions.]"  mandatory="true" default="false"/>
-        <global_param name="SKIP_USER_HISTORY" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Skip user history]" description="CONF_MESSAGE[Use this option to avoid automatic reloading of the interface state (last folder, opened tabs, etc)]"  mandatory="false" default="true"/>
+        <global_param name="SKIP_USER_HISTORY" expose="true" group="CONF_MESSAGE[Preferences Saving]"  type="boolean" label="CONF_MESSAGE[Skip user history]" description="CONF_MESSAGE[Use this option to avoid automatic reloading of the interface state (last folder, opened tabs, etc)]"  mandatory="false" default="true"/>
 
         <global_param name="USER_CREATE_REPOSITORY" group="CONF_MESSAGE[Worskpace creation delegation]"  type="boolean" label="CONF_MESSAGE[Let user create repositories from templates]" description="CONF_MESSAGE[Whether users can create their own repositories, based on predefined templates.]"  mandatory="false" default="false"/>
 
