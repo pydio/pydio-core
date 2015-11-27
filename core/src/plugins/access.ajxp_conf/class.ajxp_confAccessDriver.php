@@ -665,7 +665,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             continue;
                         }else if(empty($userObject) &&
                             (
-                                !AuthService::canAdministrate($repositoryObject)
+                                !AuthService::canAdministrate($repositoryObject) || $repositoryObject->isTemplate
                             )){
                             continue;
                         }
