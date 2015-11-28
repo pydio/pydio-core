@@ -475,6 +475,13 @@ class AJXP_PluginsService
         if(isSet($this->activePlugins[$type.".".$name])){
             unset($this->activePlugins[$type.".".$name]);
         }
+        if($type == "core"){
+            $act = array_reverse($this->activePlugins);
+            $act[$type.".".$name] = $active;
+            $this->activePlugins = array_reverse($act);
+        }else{
+            $this->activePlugins[$type.".".$name] = $active;
+        }
         $this->activePlugins[$type.".".$name] = $active;
         if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
             $this->registry[$type][$name] = $updateInstance;
@@ -749,6 +756,9 @@ class AJXP_PluginsService
                 if ($childrenSel->length) {
                     if($doNotOverrideChildren) continue;
                     foreach ($childrenSel as $existingNode) {
+                        if($existingNode->getAttribute("forbidOverride") == "true"){
+                            continue;
+                        }
                         // Clone as many as needed
                         $clone = $original->importNode($child, true);
                         $this->mergeChildByTagName($clone, $existingNode);
@@ -795,6 +805,9 @@ class AJXP_PluginsService
                 if ($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing") {
                     $old->appendChild($newChild->cloneNode(true));
                 } else {
+                    if($found->getAttribute("forbidOverride") == "true") {
+                        continue;
+                    }
                     $this->mergeChildByTagName($newChild->cloneNode(true), $found);
                 }
             } else {

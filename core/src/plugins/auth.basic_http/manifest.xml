@@ -11,17 +11,17 @@
     </server_settings>
 	<class_definition filename="plugins/auth.basic_http/class.basic_httpAuthDriver.php" classname="basic_httpAuthDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude="actions/action[@name='logout']"/>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*"/>
         <actions>
             <action name="logout" expireDefault="true">
-                <gui text="164" title="169" src="decrypted.png" accessKey="" hasAccessKey="false">
+                <gui text="164" title="169" src="decrypted.png" accessKey="" hasAccessKey="false" forbidOverride="true">
                     <context selection="false" dir="" recycle="false"
                             actionBar="true" contextMenu="false" infoPanel="false"
                             actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""/>
-                <processing>
+                <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly="" forbidOverride="true"/>
+                <processing forbidOverride="true">
                     <clientCallback prepareModal="false"><![CDATA[
                         clearRememberData();
                         var connexion = new Connexion();
