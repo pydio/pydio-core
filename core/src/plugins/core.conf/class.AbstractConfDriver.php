@@ -1238,14 +1238,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->isAdmin()) {
-                        $context = array("USER" => $httpVars["user_id"]);
+                    if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null
+                        && ( AuthService::getLoggedUser()->getId() == $httpVars["user_id"] || AuthService::getLoggedUser()->isAdmin() )) {
+                        $context = array("USER" => AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS));
                     } else if(AuthService::getLoggedUser() !== null) {
                         $context = array("USER" => AuthService::getLoggedUser()->getId());
                     } else {
                         $context = array();
                     }
-                    $this->loadBinary($context, $httpVars["binary_id"]);
+                    $this->loadBinary($context, AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1258,7 +1259,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    $this->loadBinary(array(), $httpVars["binary_id"]);
+                    $this->loadBinary(array(), AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
