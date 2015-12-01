@@ -49,9 +49,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         } else {
             $this->driverConf = array();
         }
-        if ( $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository->getId()) == true ) {
+        if ( $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository) == true ) {
             // PASS IT TO THE WRAPPER
-            ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository->getId()));
+            ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository));
         }
         $create = $this->repository->getOption("CREATE");
         $path = SystemTextEncoding::toStorageEncoding($this->repository->getOption("PATH"));
@@ -288,8 +288,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new AJXP_Exception("Error while compressing");
-                    if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository->getId())
-                        && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId())){
+                    if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
+                        && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
                         register_shutdown_function("unlink", $file);
                     }
                     $localName = ($base==""?"Files":$base).".zip";
@@ -516,7 +516,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $nodesDiffs["ADD"][] = $newNode;
                     if($action == "move") $nodesDiffs["REMOVE"][] = $selectedPath;
                 }
-                if (!(RecycleBinManager::getRelativeRecycle() ==$dest && $this->getFilteredOption("HIDE_RECYCLE", $this->repository->getId()) == true)) {
+                if (!(RecycleBinManager::getRelativeRecycle() ==$dest && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) == true)) {
                     //$reloadDataNode = $dest;
                 }
 
@@ -1094,7 +1094,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
-                if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository->getId()) !== true) {
+                if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     if (file_exists($this->urlBase.$recycleBinOption)) {
                         $recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
@@ -1458,7 +1458,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($data) {
             print($filePathOrData);
         } else {
-            if ($this->getFilteredOption("USE_XSENDFILE", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+            if ($this->getFilteredOption("USE_XSENDFILE", $this->repository) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                 if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
                 $server_name = $_SERVER["SERVER_SOFTWARE"];
@@ -1537,7 +1537,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             return count($dirs);
         }
         $count = 0;
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
+        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         while (strlen($file = readdir($handle)) > 0) {
             if($file != "." && $file !=".."
                 && !(AJXP_Utils::isHidden($file) && !$showHiddenFiles)){
@@ -1810,7 +1810,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function isWriteable($dir, $type="dir")
     {
-        if ( $this->getFilteredOption("USE_POSIX", $this->repository->getId()) == true && extension_loaded('posix')) {
+        if ( $this->getFilteredOption("USE_POSIX", $this->repository) == true && extension_loaded('posix')) {
             $real = AJXP_MetaStreamWrapper::getRealFSReference($dir);
             return posix_access($real, POSIX_W_OK);
         }

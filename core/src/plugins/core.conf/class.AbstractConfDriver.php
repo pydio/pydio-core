@@ -758,7 +758,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         throw new Exception($mess["ajxp_conf.43"]);
                     }
                     $loggedUser = AuthService::getLoggedUser();
-                    $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                    $limit = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
                         $count = count($this->getUserChildren($loggedUser->getId()));
                         if ($count >= $limit) {
