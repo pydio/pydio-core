@@ -401,6 +401,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         }
         AuthService::updateAutoApplyRole($abstractUser);
         AuthService::updateAuthProvidedData($abstractUser);
+        $args = array(&$abstractUser);
+        AJXP_Controller::applyIncludeHook("include.user.updateUserObject", $args);
         $kvCache->save("pydio:user:".$userId, $abstractUser);
         return $abstractUser;
     }
