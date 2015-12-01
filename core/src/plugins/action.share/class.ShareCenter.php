@@ -125,7 +125,7 @@ class ShareCenter extends AJXP_Plugin
             }else if($shareType == "workspace"){
                 return ($opt == "workspace" || $opt == "both");
             }else{
-                return ($opt !== "disabled");
+                return ($opt !== "disable");
             }
         }
     }
@@ -145,7 +145,7 @@ class ShareCenter extends AJXP_Plugin
             require_once("class.ShareStore.php");
             $hMin = 32;
             if(isSet($this->repository)){
-                $hMin = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository->getId());
+                $hMin = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository);
             }
             $this->shareStore = new ShareStore(
                 ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
@@ -209,7 +209,7 @@ class ShareCenter extends AJXP_Plugin
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
                 $newMeta = null;
-                $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
+                $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository)));
                 $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
                 if ($maxdownload == 0) {
                     $httpVars["downloadlimit"] = $download;
@@ -218,7 +218,7 @@ class ShareCenter extends AJXP_Plugin
                 } else {
                     $httpVars["downloadlimit"] = min($download,$maxdownload);
                 }
-                $maxexpiration = abs(intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId())));
+                $maxexpiration = abs(intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository)));
                 $expiration = isset($httpVars["expiration"]) ? abs(intval($httpVars["expiration"])) : 0;
                 if ($maxexpiration == 0) {
                     $httpVars["expiration"] = $expiration;
@@ -227,7 +227,7 @@ class ShareCenter extends AJXP_Plugin
                 } else {
                     $httpVars["expiration"] = min($expiration,$maxexpiration);
                 }
-                $forcePassword = $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository->getId());
+                $forcePassword = $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository);
                 $httpHash = null;
                 $originalHash = null;
 
@@ -967,7 +967,7 @@ class ShareCenter extends AJXP_Plugin
     public function buildPublicletLink($hash)
     {
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
-        if ($this->getFilteredOption("USE_REWRITE_RULE", $this->repository->getId()) == true) {
+        if ($this->getFilteredOption("USE_REWRITE_RULE", $this->repository) == true) {
             if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
             else return $this->buildPublicDlURL()."/".$hash;
         } else {
@@ -1496,7 +1496,7 @@ class ShareCenter extends AJXP_Plugin
         }else if (isSet($httpVars["create_guest_user"])) {
             // Create a guest user
             $userId = substr(md5(time()), 0, 12);
-            $pref = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
+            $pref = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository);
             if (!empty($pref)) {
                 $userId = $pref.$userId;
             }
@@ -1716,7 +1716,7 @@ class ShareCenter extends AJXP_Plugin
         $uWatches = array();
 
         $index = 0;
-        $prefix = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
+        $prefix = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository);
         while (isSet($httpVars["user_".$index])) {
             $eType = $httpVars["entry_type_".$index];
             $uWatch = false;
@@ -1774,7 +1774,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         // CHECK USER & REPO DOES NOT ALREADY EXISTS
-        if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository->getId()) == true) {
+        if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository) == true) {
             $count = 0;
             $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
             if($count && !isSet($editingRepo)){
@@ -1925,7 +1925,7 @@ class ShareCenter extends AJXP_Plugin
                 if(!isSet($httpVars["minisite"])){
                     // This is an explicit user creation - check possible limits
                     AJXP_Controller::applyHook("user.before_create", array($userName, null, false, false));
-                    $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                    $limit = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
                         $count = count(ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()));
                         if ($count >= $limit) {
