@@ -1670,7 +1670,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             if ($key == "AJXP_SLUG") {
                                 $repo->setSlug($value);
                                 continue;
-                            } else if ($key == "WORKSPACE_LABEL"){
+                            } else if ($key == "WORKSPACE_LABEL" || $key == "TEMPLATE_LABEL"){
                                 $newLabel = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                                 if($repo->getDisplay() != $newLabel){
                                     if ($this->repositoryExists($newLabel)) {
