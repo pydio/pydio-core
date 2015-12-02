@@ -467,6 +467,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     abstract public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false);
 
     /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    abstract public function groupExists($groupPath);
+
+    /**
      * @param string $groupPath
      * @param string $groupLabel
      * @return mixed
@@ -479,7 +486,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @return void
      */
     abstract public function deleteGroup($groupPath);
-
 
     /**
      * @abstract

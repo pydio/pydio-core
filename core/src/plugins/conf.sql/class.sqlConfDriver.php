@@ -805,6 +805,16 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    public function groupExists($groupPath)
+    {
+        return false;
+    }
+
+    /**
      * @param string $groupPath
      * @param string $groupLabel
      * @return mixed

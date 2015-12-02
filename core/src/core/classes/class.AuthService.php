@@ -908,8 +908,9 @@ class AuthService
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
         if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
-        $currentGroups = self::listChildrenGroups($baseGroup);
-        if(array_key_exists("/".$groupName, $currentGroups)){
+        $fullGroupPath = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
+        $exists = ConfService::getConfStorageImpl()->groupExists($fullGroupPath);
+        if($exists){
             throw new Exception("Group with this name already exists, please pick another name!");
         }
         if(empty($groupLabel)) $groupLabel = $groupName;

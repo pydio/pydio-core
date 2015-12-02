@@ -698,5 +698,14 @@ class serialConfDriver extends AbstractConfDriver
         AJXP_Utils::saveSerialFile($storage, $list);
     }
 
+    /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    public function groupExists($groupPath)
+    {
+        return false;
+    }
 
 }
