@@ -20,6 +20,7 @@
 */
 // catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 
+
 $mess=array(
 "title"=> "Inici",
 "desc" => "Pàgina de benvinguda",
