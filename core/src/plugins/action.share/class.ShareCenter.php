@@ -1592,11 +1592,19 @@ class ShareCenter extends AJXP_Plugin
         if(isSet($httpVars["minisite_layout"])){
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
         }
-        if(isSet($httpVars["expiration"]) && intval($httpVars["expiration"]) > 0){
-            $data["EXPIRE_TIME"] = time() + intval($httpVars["expiration"]) * 86400;
+        if(isSet($httpVars["expiration"])){
+            if(intval($httpVars["expiration"]) > 0){
+                $data["EXPIRE_TIME"] = time() + intval($httpVars["expiration"]) * 86400;
+            }else if(isSet($data["EXPIRE_TIME"])) {
+                unset($data["EXPIRE_TIME"]);
+            }
         }
-        if(isSet($httpVars["downloadlimit"]) && intval($httpVars["downloadlimit"]) > 0){
-            $data["DOWNLOAD_LIMIT"] = intval($httpVars["downloadlimit"]);
+        if(isSet($httpVars["downloadlimit"])){
+            if(intval($httpVars["downloadlimit"]) > 0){
+                $data["DOWNLOAD_LIMIT"] = intval($httpVars["downloadlimit"]);
+            }else if(isSet($data["DOWNLOAD_LIMIT"])){
+                unset($data["DOWNLOAD_LIMIT"]);
+            }
         }
         if(AuthService::usersEnabled()){
             $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
