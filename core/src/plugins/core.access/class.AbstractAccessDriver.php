@@ -535,7 +535,7 @@ class AbstractAccessDriver extends AJXP_Plugin
      */
     public function filterUserSelectionToHidden($files)
     {
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
+        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         foreach ($files as $file) {
             $file = basename($file);
             if (AJXP_Utils::isHidden($file) && !$showHiddenFiles) {
@@ -549,7 +549,7 @@ class AbstractAccessDriver extends AJXP_Plugin
 
     public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
+        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         if($isLeaf === ""){
             $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
         }
@@ -583,11 +583,11 @@ class AbstractAccessDriver extends AJXP_Plugin
     {
         $pathParts = pathinfo($fileName);
         if($hiddenTest){
-            $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
+            $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
             if (AJXP_Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
         }
-        $hiddenFileNames = $this->getFilteredOption("HIDE_FILENAMES", $this->repository->getId());
-        $hiddenExtensions = $this->getFilteredOption("HIDE_EXTENSIONS", $this->repository->getId());
+        $hiddenFileNames = $this->getFilteredOption("HIDE_FILENAMES", $this->repository);
+        $hiddenExtensions = $this->getFilteredOption("HIDE_EXTENSIONS", $this->repository);
         if (!empty($hiddenFileNames)) {
             if (!is_array($hiddenFileNames)) {
                 $hiddenFileNames = explode(",",$hiddenFileNames);
@@ -609,7 +609,7 @@ class AbstractAccessDriver extends AJXP_Plugin
 
     public function filterFolder($folderName, $compare = "equals")
     {
-        $hiddenFolders = $this->getFilteredOption("HIDE_FOLDERS", $this->repository->getId());
+        $hiddenFolders = $this->getFilteredOption("HIDE_FOLDERS", $this->repository);
         if (!empty($hiddenFolders)) {
             if (!is_array($hiddenFolders)) {
                 $hiddenFolders = explode(",",$hiddenFolders);

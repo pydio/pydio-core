@@ -399,7 +399,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         $roleAcl = $role->listAcls();
         $newAcls = $this->array_merge_recursive2($roleAcl, $this->listAcls());
         foreach ($newAcls as $repoId => $rightString) {
-            if($rightString == AJXP_VALUE_CLEAR) continue;
+            //if($rightString == AJXP_VALUE_CLEAR) continue;
             if(empty($rightString) && !empty($roleAcl[$repoId])){
                 $rightString = $roleAcl[$repoId];
             }

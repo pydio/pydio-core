@@ -174,4 +174,6 @@ $mess=array(
     "150" => "Select a repository",
     "151" => "Groupe Racine",
     "152" => "Role du groupe racine",
+    "153" => "S'applique à toute la hiérarchie des utilisateurs",
+
 );

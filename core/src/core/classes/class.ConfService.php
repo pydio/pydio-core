@@ -935,7 +935,7 @@ class ConfService
         return self::getInstance()->addRepositoryInst($oRepository);
     }
     /**
-     * @param $oRepository
+     * @param Repository $oRepository
      * @return -1|null on error
      */
     public function addRepositoryInst($oRepository)

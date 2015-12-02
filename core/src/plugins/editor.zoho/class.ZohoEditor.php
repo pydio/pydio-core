@@ -134,8 +134,8 @@ class ZohoEditor extends AJXP_Plugin
             $_SESSION["ZOHO_CURRENT_EDITED"] = $destStreamURL.$file;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
 
-            if ($this->getFilteredOption("USE_ZOHO_AGENT", $repository->getId())) {
-                $saveUrl = $this->getFilteredOption("ZOHO_AGENT_URL", $repository->getId());
+            if ($this->getFilteredOption("USE_ZOHO_AGENT", $repository)) {
+                $saveUrl = $this->getFilteredOption("ZOHO_AGENT_URL", $repository);
             } else {
                 $saveUrl = $target."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/save_zoho.php";
             }
@@ -144,7 +144,7 @@ class ZohoEditor extends AJXP_Plugin
 
             $params = array(
                 'id' => $_SESSION["ZOHO_CURRENT_UUID"],
-                'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository->getId()),
+                'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
                 'output' => 'url',
                 'lang' => "en",
                 'filename' => urlencode(basename($file)),
@@ -206,8 +206,8 @@ class ZohoEditor extends AJXP_Plugin
 
             $b64Sig = $this->signID($id);
 
-            if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository->getId()) ) {
-                $url =  $this->getFilteredOption("ZOHO_AGENT_URL",$repository->getId())."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
+            if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository) ) {
+                $url =  $this->getFilteredOption("ZOHO_AGENT_URL",$repository)."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
                 $data = AJXP_Utils::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);

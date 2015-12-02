@@ -224,7 +224,7 @@ class ShareStore {
             if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
                 continue;
             }
-            if(!$parentRepository != "" && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
+            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
                     || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
                 continue;
             }

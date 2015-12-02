@@ -176,5 +176,6 @@ $mess=array(
     "150" => "Select a repository",
     "151" => "Root Group",
     "152" => "Root Group Role",
-/* END SENTENCE */
+    "153" => "Applies to the whole hierarchy of users",
+    /* END SENTENCE */
 );

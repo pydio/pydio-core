@@ -18,7 +18,7 @@ class EmptyNodeProvider extends Observable{
 
     }
 
-    loadLeafNodeSyncfunction(node, callback){
+    loadLeafNodeSync(node, callback){
 
     }
 

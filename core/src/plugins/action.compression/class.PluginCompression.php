@@ -253,7 +253,12 @@ class PluginCompression extends AJXP_Plugin
                         continue;
                     }
                     $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
-                    $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
+                    try {
+                        $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
+                    } catch (Exception $e) {
+                        file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
+                        throw new AJXP_Exception($e);
+                    }
                     $newNode = new AJXP_Node($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
                     AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                     $counterExtract++;
