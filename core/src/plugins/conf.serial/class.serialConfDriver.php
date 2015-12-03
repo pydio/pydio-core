@@ -705,6 +705,12 @@ class serialConfDriver extends AbstractConfDriver
      */
     public function groupExists($groupPath)
     {
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $reverse = array_flip($groups);
+        if (isSet($reverse[$groupPath])) {
+            return true;
+        }
+
         return false;
     }
 

@@ -510,8 +510,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                 if (count($branch)) {
                     $parent = "/" . implode("/", array_reverse($branch));
                 }
-                AuthService::createGroup($parent, $dn, $login);
-
+                if(!ConfService::getConfStorageImpl()->groupExists(rtrim(AuthService::filterBaseGroup($parent), "/")."/".$dn)) {
+                    AuthService::createGroup($parent, $dn, $login);
+                }
             }
             $this->ldapDN = $origUsersDN;
             $this->ldapFilter = $origUsersFilter;
