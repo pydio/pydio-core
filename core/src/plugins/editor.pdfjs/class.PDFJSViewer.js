@@ -43,6 +43,10 @@ Class.create("PDFJSViewer", AbstractEditor, {
 		if($$('base').length){
 			url = $$("base")[0].getAttribute("href");
 			if(!url.startsWith('http') && !url.startsWith('https')){
+                if (!window.location.origin) {
+                    // Fix for IE when Pydio is inside an iFrame
+                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+                }
 				url = document.location.origin + url;
 			}
 		}
