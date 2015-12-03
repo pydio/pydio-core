@@ -391,6 +391,11 @@ class AuthService
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $user_id, "error" => "Locked user"));
             return -1;
         }
+
+        if(AuthService::$useSession && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+            ConfService::getInstance()->invalidateLoadedRepositories();
+        }
+
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
