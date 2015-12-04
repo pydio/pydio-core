@@ -188,6 +188,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if(isSet($httpVars['limit'])){
                 $limit = intval($httpVars['limit']);
             }
+            if(!isSet($returnNodes) && !empty($limit) && count($hits) > $limit){
+                AJXP_XMLWriter::renderPaginationData(count($hits), 1, 1);
+            }
             foreach ($hits as $hit) {
                 // Backward compatibility
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
@@ -227,7 +230,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
                 $cursor++;
-                if(isSet($limit) && $cursor > $limit) break;
+                if(isSet($limit) && $cursor >= $limit) break;
             }
             if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {
