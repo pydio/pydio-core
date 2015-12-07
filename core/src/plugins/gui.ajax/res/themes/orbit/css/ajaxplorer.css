@@ -343,7 +343,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     height: 18px;
     line-height: 17px;
     white-space : nowrap;
-    color: #999;
+    color: #555;
     text-overflow: ellipsis;
 }
 
@@ -2630,11 +2630,11 @@ div.header_cell input[type="text"] {
 }
 
 div.sort-table-filter {
-    display: none;
+    display: none !important;
 }
 
 div.fl-showFilterPane div.sort-table-filter {
-    display: block;
+    display: block !important;
 }
 
 div.fl-displayMode-list.fl-showFilterPane div.scroller_track {
@@ -2833,13 +2833,6 @@ a.enabled
 .action_bar a.disabled:hover
 {
     cursor: default;
-}
-
-.dialogBox div.action_bar a.disabled
-{
-    filter: alpha(opacity=20);
-    opacity: 0.2;
-    -moz-opacity: 0.2;
 }
 
 .action_bar a.disabled
