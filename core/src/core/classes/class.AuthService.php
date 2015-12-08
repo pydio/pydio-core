@@ -140,6 +140,10 @@ class AuthService
          */
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;
+            if(!method_exists($frontendPlugin, "tryToLogUser")){
+                AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
+                continue;
+            }
             $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
             $index ++;
             if($res) break;
