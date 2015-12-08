@@ -1,6 +1,6 @@
 {
   "name": "action.scheduler",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "description": "",
   "source_path":"react",
   "main": "index.js",
