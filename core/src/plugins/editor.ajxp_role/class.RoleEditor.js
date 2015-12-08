@@ -146,7 +146,7 @@ Class.create("RoleEditor", AbstractEditor, {
             this.roleData.USER.PROFILE = this.element.down("#account_infos").down("select[name='profile']").getValue();
             this.roleData.USER.ROLES = this.element.down("#account_infos").down("select[name='roles']").getValue();
             fullPostData["USER"] = this.roleData.USER;
-        }else if(this.roleData.GROUP){
+        }else if(this.roleData.GROUP && this.element.down("#account_infos").down("input[name='groupLabel']")){
             this.roleData.GROUP.LABEL = this.element.down("#account_infos").down("input[name='groupLabel']").getValue();
             fullPostData["GROUP_LABEL"] = this.roleData.GROUP.LABEL;
         }
@@ -417,6 +417,9 @@ Class.create("RoleEditor", AbstractEditor, {
                 this.roleWrite.APPLIES = appliesSelect.getValue();
             }.bind(this) );
             new Chosen(appliesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
+            if(getBaseName(node.getPath()) == "AJXP_GRP_"){
+                this.element.down("#pane-infos").down("#account_infos").down('div.SF_element.form-element-applies').setStyle({display:'none'});
+            }
 
         }else if(scope == "group"){
             // MAIN INFO

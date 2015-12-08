@@ -432,9 +432,9 @@ $mess=array(
 "373" => "Destination",
 "374" => "Vous ne pouvez pas copier un répertoire dans un autre dépôt.",
 "375" => "Attention, vous êtes inactif depuis plus de __IDLE__, vous serez déconnecté dans __LOGOUT__",
-"376" => "Cliquez n'importe où !",
-"378" => "Attention le mot de passe est vide ou trop court !",
-"379" => "Mot peu sûr !",
+"376" => "Cliquez n'importe où!",
+"378" => "Mot de passe est vide ou trop court!",
+"379" => "Mot peu sûr!",
 "380" => "Trop court",
 "381" => "Très faible",
 "382" => "Faible",
@@ -633,6 +633,8 @@ $mess=array(
 "539" => "Erreur de transfert: le fichier est partiellement transferé.",
 "540" => "Erreur de transfert: impossible d'ouvrir le répertoire temporaire.",
 "541" => "Erreur de transfert: impossible d'écrire dans le répertoire temporaire.",
-"542" => "Erreur de transfert: une extension PHP a stoppé le processus."
+"542" => "Erreur de transfert: une extension PHP a stoppé le processus.",
+"543" => "Résultats limités au 100 premiers sur %s.",
+"544" => "Voir tout",
 /* END SENTENCE */
 );

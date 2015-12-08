@@ -45,8 +45,9 @@ class Observable {
         this._objectEventSetup(event_name);
         var collected_return_values = [];
         var args = Array.from(arguments).slice(1);
-        for(var i = 0; i < this._observers[event_name].length; ++i){
-            collected_return_values.push(this._observers[event_name][i].apply(this._observers[event_name][i],args) || null);
+        var observersCopy = this._observers[event_name].slice(0);
+        for(var i = 0; i < observersCopy.length; ++i){
+            collected_return_values.push(observersCopy[i].apply(observersCopy[i],args) || null);
         }
         return collected_return_values;
     }

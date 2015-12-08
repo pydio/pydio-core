@@ -160,9 +160,9 @@
                                 tabInfo='{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
-                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>
                 ]]></additional_tab>
             </component_config>
@@ -216,18 +216,19 @@
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
+					    var dModel = window.actionManager.getDataModel();
+                        var mime = dModel.getUniqueNode().getAjxpMime();
 						var onLoad = function(oForm){
 			   		    	$(oForm).down('span[id="delete_message"]').update(MessageHash['user_dash.11']);
-			   		    	$(oForm).down('input[name="ajxp_mime"]').value = ajaxplorer.getUserSelection().getUniqueNode().getAjxpMime();
+			   		    	$(oForm).down('input[name="ajxp_mime"]').value = dModel.getUniqueNode().getAjxpMime();
 						};
 						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
 							var oForm = modal.getForm();
-							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							dModel.updateFormOrUrl(oForm);
 							pydio.getController().submitForm(oForm, true, function(transport){
 							    this.getController().parseXmlMessage(transport.responseXML);
-							    if(this.getContextHolder()._selectionSource && this.getContextHolder()._selectionSource.__className=='FetchedResultPane'){
-							        this.getContextHolder()._selectionSource.reloadDataModel();
-							    }
+							    if(mime == "shared_user" && $('address_book')) $('address_book').ajxpPaneObject.reloadDataModel();
+							    else if(mime == "team" && $('team_panel')) $('team_panel').ajxpPaneObject.reloadDataModel();
 							}.bind(pydio));
 							hideLightBox(true);
 							return false;

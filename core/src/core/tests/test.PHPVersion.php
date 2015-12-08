@@ -28,18 +28,18 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPVersion extends AbstractTest
 {
-    public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.3.0"); }
+    public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.4.0"); }
     public function doTest()
     {
         $version = phpversion();
         $this->testedParams["PHP Version"] = $version;
         //return false;
-        if (floatval($version) < 5.3) return FALSE;
+        if (floatval($version) < 5.4) return FALSE;
         $locale = setlocale(LC_CTYPE, 0);
         $dirSep = DIRECTORY_SEPARATOR;
         $this->testedParams["Locale"] = $locale;
         $this->testedParams["Directory Separator"] = $dirSep;
-        if (floatval($version) < 5.3 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
+        if (floatval($version) < 5.4 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
         return TRUE;
     }
 }

@@ -149,7 +149,6 @@ class AJXP_Notification
      */
     public function getMainLink()
     {
-        $repoId = $this->getNode()->getRepositoryId();
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             $hash = $_SESSION["CURRENT_MINISITE"];
             $shareCenter = ShareCenter::getShareCenter();
@@ -157,7 +156,7 @@ class AJXP_Notification
                 return $shareCenter->buildPublicletLink($hash);
             }
         }
-        return trim(AJXP_Utils::detectServerURL(true), "/")."/?goto=".$repoId.$this->node->getPath();
+        return AJXP_Utils::getWorkspaceShortcutURL($this->getNode()->getRepository()).$this->getNode()->getPath();
     }
 
     /**

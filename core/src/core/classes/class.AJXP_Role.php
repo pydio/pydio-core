@@ -354,10 +354,10 @@ class AJXP_Role implements AjxpGroupPathProvider
             $actions = $this->actions[AJXP_REPO_SCOPE_ALL];
         }
         if ($repository != null && isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()) {
-            $actions = array_merge($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
+            $actions = $this->array_merge_recursive2($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
         }
         if ($repository != null && isSet($this->actions[$repository->getId()])) {
-            $actions = array_merge($actions, $this->actions[$repository->getId()]);
+            $actions = $this->array_merge_recursive2($actions, $this->actions[$repository->getId()]);
         }
         return $actions;
     }
@@ -399,7 +399,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         $roleAcl = $role->listAcls();
         $newAcls = $this->array_merge_recursive2($roleAcl, $this->listAcls());
         foreach ($newAcls as $repoId => $rightString) {
-            if($rightString == AJXP_VALUE_CLEAR) continue;
+            //if($rightString == AJXP_VALUE_CLEAR) continue;
             if(empty($rightString) && !empty($roleAcl[$repoId])){
                 $rightString = $roleAcl[$repoId];
             }

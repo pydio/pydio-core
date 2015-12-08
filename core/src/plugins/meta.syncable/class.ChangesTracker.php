@@ -294,7 +294,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 if ($row->node_id == $previousNodeId) {
                     $previousRow->target = $row->target;
                     $previousRow->seq = $row->seq;
-                    if ($order[$row->type] > $order[$previousRow->type]) {
+                    // Specific case, maybe linked to recycle bin management
+                    // A create should make a new node ID.
+                    if ($row->type === "create" && $previousRow->type === "delete"){
+                        $previousRow->type = "create";
+                    }else if ($order[$row->type] > $order[$previousRow->type]) {
                         $previousRow->type = $row->type;
                     }
                 } else {

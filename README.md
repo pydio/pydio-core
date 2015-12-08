@@ -1,13 +1,13 @@
 ## Pydio Core
 
-[Homepage](https://pyd.io/) |
+[Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
  [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core)
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 6.0.8
+* Latest Stable release : 6.2.0
 * Latest Dev release : 5.3.4 (was RC4 for Pydio 6.0.0)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
@@ -15,7 +15,7 @@ This is the main source code repository of Pydio (formerly AjaXplorer), containi
 
 ### Getting support
 
-Please DO NOT send emails to Charles, but use the forum located on http://pyd.io/f/ instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
+Please DO NOT send emails to Charles, but use the forum located on https://pydio.com/forum/ instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
 
 ### How to contribute / Developer Resources
 

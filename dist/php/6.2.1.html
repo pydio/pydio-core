@@ -1,0 +1,62 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio Core 6.2.1 - Compatibility Update</h2>
+
+    Pydio Core 6.2.1 is a bugfix release providing compatibility fixes for non-standard plugins to the core. See complete changelog below.
+
+    <ul>
+        <li>Some servers do not return the "." value, send a fake stat in that case by grabing the stat from AJXP_DATA_PATH. (<a href="http://github.com/pydio/pydio-core/commit/db9bf8e77ce6abcf8cb16f10d417d0f0d3233f5c">details</a>)</li>
+        <li>Fix tab char in sql script (<a href="http://github.com/pydio/pydio-core/commit/5069fad54ac6163e3a17426d522f1405883459c4">details</a>)</li>
+        <li>[action.disclaimer] Make sure to invalidateLoadedRepositories() after updating the lock value. (<a href="http://github.com/pydio/pydio-core/commit/a6acac5d0a60a996034b7fd427e184eb0aa897a9">details</a>)</li>
+        <li>[access.fs] Fix is_readable call for folders inside API. Fix #988 (<a href="http://github.com/pydio/pydio-core/commit/e7bb9952bfc3d861c76d69403d7a37689c26e28a">details</a>)</li>
+        <li>try catch every single file when we extract an archive (<a href="http://github.com/pydio/pydio-core/commit/af08725f4f992e91cc482b2c750403e64ca1c3d3">details</a>)</li>
+        <li>Update website (<a href="http://github.com/pydio/pydio-core/commit/b10020b7bbb6ba8e3a08d8e0dc79305355fba832">details</a>)</li>
+        <li>Update README.md (<a href="http://github.com/pydio/pydio-core/commit/fa102f4547bcafc136711ae50452bf88f8cf3976">details</a>)</li>
+        <li>[meta.syncable] Fix a wrong flatten case when deleting/restoring to/from the recycle bin. (<a href="http://github.com/pydio/pydio-core/commit/32ecc1936b470cf48de88155aa6d4e398723c1c5">details</a>)</li>
+        <li>Fix shortcuts disabling on SearchEngine. Fix #994 (<a href="http://github.com/pydio/pydio-core/commit/ced1fdf579d4624ad8f6938da1ff2b81146985b6">details</a>)</li>
+        <li>Fix Root Group management issues. (<a href="http://github.com/pydio/pydio-core/commit/de81b04859e18eba974028ba003755e61d8dfa88">details</a>)</li>
+        <li>Change DefaultRights management: update Root Group, do not update personal roles anymore, otherwise it always takes precedency on parent groups/roles. Do not skip the AJXP_CLEAR_VALUE, set to the merged role. (<a href="http://github.com/pydio/pydio-core/commit/388e73a726fd48a984790710384bd6eef6275ba0">details</a>)</li>
+        <li>Fix display in search engine leaving the group headers on empty result. (<a href="http://github.com/pydio/pydio-core/commit/cbaedc3ab9fa9f058989e80ea6026455e2789613">details</a>)</li>
+        <li>Observable: make a copy of observers otherwise if there are many observeOnce ones they are not correctly applied. (<a href="http://github.com/pydio/pydio-core/commit/7cb5725043c6f0da01a4cfde00bb67f32535e4a3">details</a>)</li>
+        <li>Typo in EmptyNodeProvider Fix user history and ?goTo= mechanism. If skip_user_history is fale, use goTo, otherwise use URL directly. (<a href="http://github.com/pydio/pydio-core/commit/78de82dca40ce92151f155452dbe8a51a4e89b65">details</a>)</li>
+        <li>User dashboard, switch action bars to dataModelElementId instead of global events. (<a href="http://github.com/pydio/pydio-core/commit/24d4e489644c19517004d20ccdffe1fc2fe61bd5">details</a>)</li>
+        <li>Admin Panel: to not list Templates in group/roles ACL - Fix Legacy shares listing not properly filtered. (<a href="http://github.com/pydio/pydio-core/commit/abbec09d281774ce4858805613b2b2a91a16f790">details</a>)</li>
+        <li>Core.* plugins should be appended at the beginning of active lists. Fix compatibility of remote logout with 6.2.X : add a forbidOverride attribute to block further merge in registry, otherwise session_login logout action will always take precedency. (<a href="http://github.com/pydio/pydio-core/commit/69edd0ab0513c4af855c82a11149a223526efbfc">details</a>)</li>
+        <li>Fix load binary (<a href="http://github.com/pydio/pydio-core/commit/2b905b7a5ae1ddf6fbb5c543de7b79694048825e">details</a>)</li>
+        <li>Make too short string smaller in french (<a href="http://github.com/pydio/pydio-core/commit/0e5280182d9ad831f8bacb84a074b299913a5db6">details</a>)</li>
+        <li>Add include Hook for to load and update user info (<a href="http://github.com/pydio/pydio-core/commit/9ea960ab9f8ba09fcc9f1251c4a7f4c57b44efc4">details</a>)</li>
+        <li>Fix update template label (<a href="http://github.com/pydio/pydio-core/commit/d5d338a18e0396bd3b72276858898b60d0c2748f">details</a>)</li>
+        <li>Pass a scope string or a repository object to getFilteredOption() to test on the AJXP_REPO_SCOPE_SHARED scope if necessary. (<a href="http://github.com/pydio/pydio-core/commit/8eb41d846d9e01598e560bb12868cc6bf9f43d20">details</a>)</li>
+        <li>Fix typo in ENABLE_FOLDER_SHARING value testing Fix check for USER_SHARED_USERS_LIMIT on mergedRole instead of personalRole (<a href="http://github.com/pydio/pydio-core/commit/3075ee13f1738ff91cd42f039abc4a3158963d1c">details</a>)</li>
+        <li>Update getFilteredOption signature (<a href="http://github.com/pydio/pydio-core/commit/3078a98b788fee44214f7ade2b482056f26e142e">details</a>)</li>
+        <li>Unused images - Fix #1001 (<a href="http://github.com/pydio/pydio-core/commit/39757523b5bb4ef28623f4367c24a22d408eba17">details</a>)</li>
+        <li>Glob can return false on error, we should check before running a foreach. (<a href="http://github.com/pydio/pydio-core/commit/85b7754a522634f77ddc8f2e85faec8a3771a323">details</a>)</li>
+        <li>[action.share] Reset max download and max expiration time Fix #1004 (<a href="http://github.com/pydio/pydio-core/commit/25a8d3d658cc1a6ed34e674bfc1619e659182aeb">details</a>)</li>
+        <li>Fix CAS button in login interface in 6.2 (<a href="http://github.com/pydio/pydio-core/commit/a387ea230511a8bfaad33afd6b446a9dc5f4801b">details</a>)</li>
+        <li>Add method groupExists() instead of using listChildrenGroups() as it can create a recursivity in auth.ldap. (<a href="http://github.com/pydio/pydio-core/commit/26c5add98a0785bd1e5fc6e74c7df56812ded709">details</a>)</li>
+        <li>Add method groupExists() implement in serial and sql confdriver (<a href="http://github.com/pydio/pydio-core/commit/b571eb2820403e015f156aae053a2c2deac604ce">details</a>)</li>
+        <li>Fix loop in creation of groupPath (<a href="http://github.com/pydio/pydio-core/commit/28ef2f49555a05cb4b94cd8a1faf226edd410823">details</a>)</li>
+        <li>[editor.pdfjs] Fix for IE when Pydio is inside an iFrame. (<a href="http://github.com/pydio/pydio-core/commit/527da7cbd3042c5d00bd7c95d173833bc6d2b14a">details</a>)</li>
+        <li>[auth] When guest is enabled, make sure to invalidateLoadedRepositories() at login time, otherwise they are already in the session. Fix #1002 (<a href="http://github.com/pydio/pydio-core/commit/b2b72573ca9e46666ae3b0a409be137701cf2f4a">details</a>)</li>
+        <li>[gui.ajax] FilesList: add bulkUpdating mode to avoid triggering initRows() on each child_added event. (<a href="http://github.com/pydio/pydio-core/commit/7f2ecc99fc08051a638734732e16f2643c98de82">details</a>)</li>
+        <li>[gui.ajax] Always limit search engine to 100 results by default, use bulkUpdating when parsing results, and display the total count plus a "show all" link. (<a href="http://github.com/pydio/pydio-core/commit/604fc1c28e43288ad9ddabbffccdea4a928a0b8a">details</a>)</li>
+        <li>[index.lucene] Send a &lt;pagination&gt; tag in results if limit is set and number of hits is cut. (<a href="http://github.com/pydio/pydio-core/commit/30afd128127aa4ec9a9021ff13ecacef392cfaf1">details</a>)</li>
+        <li>Compiled version of css (<a href="http://github.com/pydio/pydio-core/commit/f55d5e8761f848401fb0541ce8ab92ff99cc634b">details</a>)</li>
+        <li>[editor.pdfjs] Add fake file name parameter to the file url passed to pdfjs, to have a correct info in the pdfjs properties viewer. (<a href="http://github.com/pydio/pydio-core/commit/36cc0c3c1002acf263aed1b81fa1599aabbf4ad3">details</a>)</li>
+        <li>[phpversion test] Update php version to 5.4. (<a href="http://github.com/pydio/pydio-core/commit/02671f0cba34b18048a17437a5d0dee84fce1c7d">details</a>)</li>
+        <li>[gui.ajax] InfoPanel : display node label instead of basename if set. (<a href="http://github.com/pydio/pydio-core/commit/8477c105230ed334df3d5e2e239aa68ae524cd9d">details</a>)</li>
+        <li>Revert previous core plugins reordering issues (<a href="http://github.com/pydio/pydio-core/commit/5eddfb22c79027ef0274e299f366650acb6e6690">details</a>)</li>
+        <li>Fix actions disabling merging (<a href="http://github.com/pydio/pydio-core/commit/aea0f07ed6e842a5653b53490618012f8b10ec32">details</a>)</li>
+        <li>[core.ajaxplorer] Update default WEBDAV_BASEURI as it was still /ajaxplorer/share. (<a href="http://github.com/pydio/pydio-core/commit/3f23b5fdef60e8e2fd0d1c9960278edabe7b9886">details</a>)</li>
+        <li>[meta.git] Remove dependency to meta.svn plugin (<a href="http://github.com/pydio/pydio-core/commit/02beafbfc08e301565335d0511aac60506f470ec">details</a>)</li>
+        <li>[css] Fix contrast on history browser (<a href="http://github.com/pydio/pydio-core/commit/8949969e23bed0c2c5760179f30b8be8058d2d6c">details</a>)</li>
+        <li>[action.scheduler] Create simple react dashboard for enterprise admin panel. Just trigger same ol' actions. (<a href="http://github.com/pydio/pydio-core/commit/e4e7e9a71bc216c778dcee0ff2446a99085820d7">details</a>)</li>
+        <li>[utils] getWorkspaceShortcutUrl use "?goto=" or "/ws-" depending on the skip_user_history status. (<a href="http://github.com/pydio/pydio-core/commit/9cf3dc108bf6b9d5c2b8a7584d26aaf2cb4f5651">details</a>)</li>
+        <li>[AuthService] Avoid error if trying to execute tryToLogUser(). Log to error though. [authfront.webftp] Fix login form not closing after successfull login. (<a href="http://github.com/pydio/pydio-core/commit/5a9dd959ef545ea0cb6fbce2357dbb1c63143c06">details</a>)</li>
+        <li>[ConfService] Use a dedicated UserAlertException to send back OAuth message and avoid removing temporary failing workspace from the list. Use it in access.dropbox driver. (<a href="http://github.com/pydio/pydio-core/commit/f057f1407393e208baf195862d6cce8f130bbdb8">details</a>)</li>
+        <li>Update package.json versions (<a href="http://github.com/pydio/pydio-core/commit/9af985daed88ee8f7c233805ca680f88faeb06cb">details</a>)</li>
+        <li>[action.updater] Point to new update site (<a href="http://github.com/pydio/pydio-core/commit/2ee46b0ed853027d8c45ea5eb3ca383ecc22ab17">details</a>)</li>
+        <li>[access.ajxp_conf] Fix strange horizontal scrolling (<a href="http://github.com/pydio/pydio-core/commit/08034f28e76809d5a89d0e18b03b7e6893cd3eb7">details</a>)</li>
+    </ul>
+</div>

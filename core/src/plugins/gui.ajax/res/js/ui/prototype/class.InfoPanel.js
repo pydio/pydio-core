@@ -431,6 +431,9 @@ Class.create("InfoPanel", AjxpPane, {
 				tAttributes.each(function(attName){
 					if(attName == 'basename' && metadata.get('filename')){
 						this[attName] = getBaseName(metadata.get('filename'));
+                        if(metadata.get('text')){
+                            this[attName] = metadata.get('text');
+                        }
 					} else if(attName == 'compute_image_dimensions'){
 						if(metadata.get('image_width') && metadata.get('image_height')){
 							var width = metadata.get('image_width');

@@ -50,7 +50,7 @@ class ImagePreviewer extends AJXP_Plugin
                 return;
             }
             $this->logInfo('Preview', 'Preview content of '.$file, array("files" =>$selection->getUniqueFile()));
-            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())) {
+            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository)) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;

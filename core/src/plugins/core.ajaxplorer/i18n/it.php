@@ -651,6 +651,8 @@ $mess=array(
 "539" => "Errore caricamento: il file è parziale",
 "540" => "Errore caricamento: impossibile trovare la cartella temporanea",
 "541" => "Errore caricamento: non è possibile scrivere nella cartella temporanea",
-"542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento"
+"542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento",
+"543" => "Results limited to 100 out of %s.",
+"544" => "Show All",
 /* END SENTENCE */
 );

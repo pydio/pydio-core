@@ -4,9 +4,22 @@
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
             <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
+            <js className="Scheduler" file="plugins/action.scheduler/build/Scheduler.js" depends="React"/>
         </resources>
     </client_settings>
     <registry_contributions>
+        <client_configs>
+            <template element="ajxp_desktop" name="scheduler_style" position="after"><![CDATA[
+            <style>
+                .scheduler-list .mui-toolbar-group.mui-left {
+                    width: 88% !important;
+                }
+                .dialogButtons input.dialogButton{
+                    padding: 0 !important;
+                }
+            </style>
+            ]]></template>
+        </client_configs>
         <actions>
             <action name="scheduler_menu">
                 <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
@@ -43,9 +56,9 @@
                                 ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="scheduler_cronExpression"><![CDATA[
-                         <div id="scheduler_cronExpression" box_width="330">
+                         <div id="scheduler_cronExpression" box_width="420">
                              <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
-                             <textarea class="dialogFocus" style="width:300px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
+                             <textarea class="dialogFocus" style="width:400px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
                          </div>
                     ]]></clientForm>
                     <serverCallback methodName="switchAction" developerComment="Generate a correct expression to be inserted in Crontab, in order to trigger the {runAll} action on a regular basis."/>
@@ -68,32 +81,6 @@
                     ]]></clientCallback>
                     <serverCallback methodName="switchAction" developerComment="Run the scheduler: check if some tasks must be run now, and launch them. Generally launched from command line."/>
                 </processing>
-            </action>
-            <action name="scheduler_runTask">
-                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
-                             actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get"/>
-                    <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var u = ajaxplorer.getUserSelection();
-                        var taskId = getBaseName(u.getUniqueNode().getPath());
-                        var connexion = new Connexion();
-                        connexion.setParameters(new Hash({
-                            get_action:'scheduler_runTask',
-                            task_id:taskId
-                        }));
-                        connexion.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
-                        };
-                        connexion.sendAsync();
-                    ]]></clientCallback>
-                    <serverCallback methodName="switchAction" developerComment="Force running a specific task">
-                        <input_param description="The id of the task to run" name="task_id" type="string" mandatory="true"/>
-                    </serverCallback>
-                    </processing>
             </action>
             <action name="scheduler_loadTask">
                 <processing>
@@ -224,6 +211,37 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="scheduler_runTask">
+                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="get"/>
+                    <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var userSelection;
+                        if(window.actionArguments && window.actionArguments.length){
+                            userSelection = window.actionArguments[0];
+                        }else{
+                            userSelection =  pydio.getUserSelection();
+                        }
+                        var taskId = getBaseName(userSelection.getUniqueNode().getPath());
+                        var connexion = new Connexion();
+                        connexion.setParameters(new Hash({
+                            get_action:'scheduler_runTask',
+                            task_id:taskId
+                        }));
+                        connexion.onComplete = function(transport){
+                            pydio.getController().parseXmlMessage(transport.responseXML);
+                        };
+                        connexion.sendAsync();
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction" developerComment="Force running a specific task">
+                        <input_param description="The id of the task to run" name="task_id" type="string" mandatory="true"/>
+                    </serverCallback>
+                </processing>
+            </action>
             <action name="scheduler_editTask">
                 <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="icon-edit" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
@@ -233,8 +251,13 @@
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
-                        var u = ajaxplorer.getUserSelection();
-                        pydio.getController().fireAction('scheduler_addTask', u.getUniqueNode());
+                        var userSelection;
+                        if(window.actionArguments && window.actionArguments.length){
+                            userSelection = window.actionArguments[0];
+                        }else{
+                            userSelection =  pydio.getUserSelection();
+                        }
+                        pydio.getController().fireAction('scheduler_addTask', userSelection.getUniqueNode());
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -247,9 +270,14 @@
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
-                        var u = ajaxplorer.getUserSelection();
+                        var userSelection;
+                        if(window.actionArguments && window.actionArguments.length){
+                            userSelection = window.actionArguments[0];
+                        }else{
+                            userSelection =  pydio.getUserSelection();
+                        }
                         var conn = new Connexion();
-                        conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(u.getUniqueNode().getPath()) }));
+                        conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(userSelection.getUniqueNode().getPath()) }));
                         conn.onComplete = function(transport){
                             pydio.getController().parseXmlMessage(transport.responseXML);
                          };
@@ -269,10 +297,11 @@
         </actions>
         <hooks>
             <serverCallback methodName="placeConfigNode" hookName="ajxp_conf.list_config_nodes"/>
+            <serverCallback methodName="placeConfigNode" hookName="admin.list_config_nodes"/>
         </hooks>
     </registry_contributions>
     <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
     <dependencies>
-        <activePlugin pluginName="access.ajxp_conf"/>
+        <activePlugin pluginName="access.ajxp_conf|access.ajxp_admin"/>
     </dependencies>
 </ajxp_plugin>

@@ -27,14 +27,17 @@ Class.create("CAS_LoginForm", {
         var auth_cas_msg = "Use CAS Credential";
         var auth_pyd_msg = "Use Pydio Credential";
         var auth_button_msg = "Click here";
-        if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING){
-            auth_cas_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING;
+
+        if(pydio.getPluginConfigs("authfront.cas").get("AUTH_CAS_MESS_STRING")){
+            auth_cas_msg = pydio.getPluginConfigs("authfront.cas").get("AUTH_CAS_MESS_STRING");
         }
-        if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_PYD_MESS_STRING){
-            auth_pyd_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_PYD_MESS_STRING;
+
+        if(pydio.getPluginConfigs("authfront.cas").get("AUTH_PYD_MESS_STRING")){
+            auth_pyd_msg = pydio.getPluginConfigs("authfront.cas").get("AUTH_PYD_MESS_STRING");
         }
-        if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CLICK_MESS_STRING){
-            auth_button_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CLICK_MESS_STRING;
+
+        if(pydio.getPluginConfigs("authfront.cas").get("AUTH_CLICK_MESS_STRING")){
+            auth_button_msg = pydio.getPluginConfigs("authfront.cas").get("AUTH_CLICK_MESS_STRING")
         }
 
         // string form
@@ -47,7 +50,7 @@ Class.create("CAS_LoginForm", {
                                 style=" border-style:solid;padding-left:30px; padding-right: 30px; block;width: 125px;height: 12px;background: #ffffff;padding-top: 5px; padding-bottom:5px;text-align: center;border:1px;border-radius: 15px;color: #000000;font-weight: bold;" \
                                 > ' + auth_button_msg + '</a>\
                                 </div><br/>';
-                                                        
+
         var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_pyd_msg + '</span>';
 
         var objallforms = $("all_forms");
@@ -64,7 +67,9 @@ Class.create("CAS_LoginForm", {
 
     }
 });
-var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.cas")._object.MODIFY_LOGIN_SCREEN;
+
+var enableModifyGUI = pydio.getPluginConfigs("authfront.cas").get("MODIFY_LOGIN_SCREEN");
+
 if(enableModifyGUI){
     window.CASFORM = new CAS_LoginForm();
 }

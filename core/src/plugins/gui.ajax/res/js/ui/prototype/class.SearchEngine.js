@@ -236,8 +236,8 @@ Class.create("SearchEngine", AjxpPane, {
         }
 
         formPanel.select('input').each(function(el){
-            el.observe('focus', pydio.UI.disableAllKeyBindings.bind(ajaxplorer));
-            el.observe('blur', pydio.UI.enableAllKeyBindings.bind(ajaxplorer));
+            el.observe('focus', pydio.UI.disableAllKeyBindings.bind(pydio.UI));
+            el.observe('blur', pydio.UI.enableAllKeyBindings.bind(pydio.UI));
             el.observe('keydown', function(event){
                 if(event.keyCode == Event.KEY_RETURN){
                     oThis.search();
@@ -398,7 +398,7 @@ Class.create("SearchEngine", AjxpPane, {
         this._inputBox.observe("input", function(e){
             if(this._inputBox.getValue().length > 2){
                 bufferCallback('searchByTyping', 300, this.searchWhenTyping.bind(this));
-                bufferCallback('fullSearch', 2000, this.searchCompleteTypedResults.bind(this));
+                bufferCallback('fullSearch', 1000, this.searchCompleteTypedResults.bind(this));
             }
         }.bind(this));
 
@@ -691,10 +691,10 @@ Class.create("SearchEngine", AjxpPane, {
             if(text == this.crtText){
                 if(ProtoCompat.map2values(this._rootNode.getChildren()).length >= 9) {
                     // Get more
-                    this.search(50, true);
+                    this.search(0, true);
                 }
             }else{
-                this.search(50, false);
+                this.search(0, false);
             }
         }
     },
@@ -703,6 +703,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Perform search
 	 */
 	search : function(limit, skipClear){
+        if(!limit){
+            this.currentLimitDefault = true;
+            limit = 100;
+        }else{
+            this.currentLimitDefault = false;
+        }
 		var text = this._inputBox.value.toLowerCase();
         var searchQuery;
         var metadata = this.parseMetadataForm();
@@ -808,6 +814,9 @@ Class.create("SearchEngine", AjxpPane, {
 		// Clear the results
         this.hasResults = false;
         this._rootNode.clear();
+        if(this._fileList) {
+            this._fileList.empty(true);
+        }
         this._even = false;
 	},
 	/**
@@ -1034,13 +1043,30 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 			return;
 		}
-		var nodes = XPathSelectNodes(oXmlDoc.documentElement, "tree");
+        var paginationNode = XMLUtils.XPathSelectSingleNode(oXmlDoc.documentElement, "pagination");
+        var showAllDiv = this.htmlElement.down('#search_show_all');
+        if(showAllDiv) showAllDiv.remove();
+        if(paginationNode && this.currentLimitDefault){
+            var totalCount = parseInt(paginationNode.getAttribute("count"));
+            showAllDiv = new Element('div', {id:'search_show_all'}).update(pydio.MessageHash['543'].replace('%s', totalCount) + ' ');
+            var showAllLink = new Element('a').update(pydio.MessageHash['544']);
+            showAllLink.observe("click", function(){
+                this.search(totalCount, true);
+            }.bind(this));
+            showAllDiv.insert(showAllLink);
+            this.htmlElement.down("#basic_search").insert(showAllDiv);
+        }
+		var nodes = XMLUtils.XPathSelectNodes(oXmlDoc.documentElement, "tree");
         if(!nodes.length){
             this.addNoResultString();
         }else{
             var noRes =  $(this._resultsBoxId).down('#no-results-found');
             if(noRes) noRes.remove();
         }
+        if(this._fileList){
+            this._fileList.setBulkUpdatingMode();
+        }
+        var resultsCount = 0;
 		for (var i = 0; i < nodes.length; i++) 
 		{
 			if (nodes[i].tagName == "tree")
@@ -1063,9 +1089,10 @@ Class.create("SearchEngine", AjxpPane, {
 				    this.addResult(currentFolder, ajxpNode);
                 }
 			}
-		}		
+		}
 		if(this._fileList){
             //this._fileList.reload();
+            this._fileList.flushBulkUpdatingMode();
             this._fileList._sortableTable.sort(0);
         }
 	},
