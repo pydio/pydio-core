@@ -2540,7 +2540,7 @@ class ShareCenter extends AJXP_Plugin
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,
                 "element_watch" => $elementWatch,
-                "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/",
+                "repository_url"=> AJXP_Utils::getWorkspaceShortcutURL($repo)."/",
                 "content_filter"=> $cFilter
             );
             if (isSet($minisiteData)) {
