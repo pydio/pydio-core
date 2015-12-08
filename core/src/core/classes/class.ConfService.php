@@ -1552,7 +1552,9 @@ class ConfService
         } catch (Exception $e) {
             if(!$rest){
                 // Remove repositories from the lists
-                $this->removeRepositoryFromCache($repository->getId());
+                if(!is_a($e, "AJXP_UserAlertException")){
+                    $this->removeRepositoryFromCache($repository->getId());
+                }
                 if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
                     $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
                 } else {
