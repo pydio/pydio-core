@@ -812,7 +812,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (count($branch)) {
                                             $parent = "/" . implode("/", array_reverse($branch));
                                         }
-                                        AuthService::createGroup($parent, $fullDN, $humanName);
+                                        if(!ConfService::getConfStorageImpl()->groupExists(rtrim(AuthService::filterBaseGroup($parent), "/")."/".$fullDN)) {
+                                            AuthService::createGroup($parent, $fullDN, $humanName);
+                                        }
                                         $userObject->setGroupPath(rtrim($parent, "/") . "/" . $fullDN, true);
                                         // Update Roles from groupPath
                                         $b = array_reverse($branch);
