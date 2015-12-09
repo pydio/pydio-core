@@ -652,7 +652,7 @@ $mess=array(
 "540" => "Errore caricamento: impossibile trovare la cartella temporanea",
 "541" => "Errore caricamento: non è possibile scrivere nella cartella temporanea",
 "542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento",
-"543" => "Results limited to 100 out of %s.",
-"544" => "Show All",
+"543" => "Risultati limitati a 100 su %s.",
+"544" => "Visualizza tutti",
 /* END SENTENCE */
 );
