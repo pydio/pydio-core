@@ -263,15 +263,29 @@ class UserDashboardDriver extends AbstractAccessDriver
         if(!method_exists($conf, "listUserTeams")) return;
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" switchGridMode="filelist">
             <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
-            <column messageId="user_dash.10" attributeName="users" sortType="String"/>
+            <column messageId="user_dash.10" attributeName="users_labels" sortType="String"/>
         </columns>');
         $teams = $conf->listUserTeams();
+        $usersLabels = array();
         foreach ($teams as $teamId => $team) {
             if(empty($team["LABEL"])) continue;
+            $team["USERS_LABELS"] = array();
+            foreach(array_values($team["USERS"]) as $userId){
+                if(!isSet($usersLabels[$userId])) {
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    if (is_object($userObject)) {
+                        $usersLabels[$userId] = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
+                    } else {
+                        $usersLabels[$userId] = $userId;
+                    }
+                }
+                $team["USERS_LABELS"][] = $usersLabels[$userId];
+            }
             AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
                     "icon"      => "users-folder.png",
                     "ajxp_mime" => "ajxp_team",
-                    "users"     => "<span class='icon-groups'></span> ".implode(", ", array_values($team["USERS"]))
+                    "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"])),
+                    "users_labels"     => "<span class='icon-groups'></span> ".implode(", ", $team["USERS_LABELS"])
                 ), true, true);
         }
     }
