@@ -607,8 +607,8 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function __wakeup(){
         $this->storage = ConfService::getConfStorageImpl();
-        if(is_string($this->personalRole)){
-            $this->personalRole = AuthService::getRole($this->personalRole);
+        if(!is_object($this->personalRole)){
+            $this->personalRole = AuthService::getRole("AJXP_USR_/".$this->getId());
         }
         $this->recomputeMergedRole();
     }
