@@ -557,9 +557,10 @@ Class.create("PydioUI", {
     updateI18nTags: function(){
         var messageTags = $$('[ajxp_message_id]');
         messageTags.each(function(tag){
-            var messageId = tag.getAttribute("ajxp_message_id");
+            var messageId = tag.getAttribute("ajxp_message_id")
+             mH = this._pydio.MessageHash;
             try{
-                tag.update(MessageHash[messageId]);
+                tag.update(mH[messageId]);
             }catch(e){}
         });
     },
