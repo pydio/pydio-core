@@ -304,6 +304,6 @@ class AJXP_Notification
      */
     public function getRelatedNotifications()
     {
-        return $this->relatedNotification;
+        return $this->relatedNotifications;
     }
 }
