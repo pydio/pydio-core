@@ -1118,9 +1118,17 @@ class ConfService
     {
         AJXP_Controller::applyHook("workspace.before_delete", array($repoId));
         $confStorage = self::getConfStorageImpl();
+        $shares = $confStorage->listRepositoriesWithCriteria(array("parent_uuid" => $repoId));
+        $toDelete = array();
+        foreach($shares as $share){
+            $toDelete[] = $share->getId();
+        }
         $res = $confStorage->deleteRepository($repoId);
         if ($res == -1) {
             return $res;
+        }
+        foreach($toDelete as $deleteId){
+            $this->deleteRepositoryInst($deleteId);
         }
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));

@@ -670,8 +670,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             continue;
                         }
                         $meta = array();
-                        if($repositoryObject->getOption("META_SOURCES") != null){
-                            $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
+                        try{
+                            if($repositoryObject->getOption("META_SOURCES") != null){
+                                $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
+                            }
+                        }catch(Exception $e){
+                            if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
+                            $this->logError("Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
+                            continue;
                         }
                         $repoDetailed[$repositoryId] = array(
                             "label"  => SystemTextEncoding::toUTF8($repositoryObject->getDisplay()),
