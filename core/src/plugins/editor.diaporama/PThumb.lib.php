@@ -132,7 +132,7 @@ class PThumb{
 	     * The class constructor.
 	     * @access public
 	     */
-    function PThumb($quality,$exifrotation){
+    function __construct($quality, $exifrotation) {
     	$this->thumb_quality = $quality;
     	$this->exif_rotation = $exifrotation;
 		$this -> error_array["fatal"] = array();
