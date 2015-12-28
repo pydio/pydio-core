@@ -46,6 +46,7 @@
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="skipSecureToken" type="xs:boolean"/>
             <xs:attribute name="contentTypedProvider" type="xs:boolean"/>
+            <xs:attribute name="forbidOverride" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="gui">
@@ -614,6 +615,8 @@
         <xs:complexType>
             <xs:attribute name="autoload" type="xs:boolean"/>
             <xs:attribute name="file" use="required"/>
+            <xs:attribute name="fallbackCondition"/>
+            <xs:attribute name="fallbackFile"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="i18n">
@@ -635,6 +638,8 @@
             <xs:attribute name="className" use="required" type="xs:NCName"/>
             <xs:attribute name="file" use="required"/>
             <xs:attribute name="depends"/>
+            <xs:attribute name="fallbackCondition"/>
+            <xs:attribute name="fallbackFile"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="node_provider">

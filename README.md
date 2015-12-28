@@ -1,6 +1,6 @@
 ## Pydio Core
 
-[Homepage](https://pyd.io/) |
+[Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
  [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core)
@@ -15,7 +15,7 @@ This is the main source code repository of Pydio (formerly AjaXplorer), containi
 
 ### Getting support
 
-Please DO NOT send emails to Charles, but use the forum located on http://pyd.io/f/ instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
+Please DO NOT send emails to Charles, but use the forum located on https://pydio.com/forum/ instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
 
 ### How to contribute / Developer Resources
 
@@ -38,4 +38,4 @@ New in latest build, in the Settings panel, you can find a new "Developer" node 
 
 #### Signing the CLA
 
-Please <a href="https://pyd.io/contribute/cla">sign the Contributor License Agreement</a> before contributing.
+Please <a href="https://pydio.com/en/community/contribute/contributor-license-agreement-cla">sign the Contributor License Agreement</a> before contributing.

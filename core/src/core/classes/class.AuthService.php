@@ -140,6 +140,10 @@ class AuthService
          */
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;
+            if(!method_exists($frontendPlugin, "tryToLogUser")){
+                AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
+                continue;
+            }
             $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
             $index ++;
             if($res) break;
@@ -391,6 +395,11 @@ class AuthService
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $user_id, "error" => "Locked user"));
             return -1;
         }
+
+        if(AuthService::$useSession && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+            ConfService::getInstance()->invalidateLoadedRepositories();
+        }
+
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
@@ -620,6 +629,7 @@ class AuthService
     public static function updateDefaultRights(&$userObject)
     {
         if (!$userObject->hasParent()) {
+            /*
             $changes = false;
             $repoList = ConfService::getRepositoriesList("all");
             foreach ($repoList as $repositoryId => $repoObject) {
@@ -633,6 +643,7 @@ class AuthService
             if ($changes) {
                 $userObject->recomputeMergedRole();
             }
+            */
             $rolesList = self::getRolesList(array(), true);
             foreach ($rolesList as $roleId => $roleObject) {
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
@@ -906,8 +917,9 @@ class AuthService
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
         if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
-        $currentGroups = self::listChildrenGroups($baseGroup);
-        if(array_key_exists("/".$groupName, $currentGroups)){
+        $fullGroupPath = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
+        $exists = ConfService::getConfStorageImpl()->groupExists($fullGroupPath);
+        if($exists){
             throw new Exception("Group with this name already exists, please pick another name!");
         }
         if(empty($groupLabel)) $groupLabel = $groupName;

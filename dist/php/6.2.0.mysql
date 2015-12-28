@@ -2,7 +2,7 @@
 ALTER TABLE  `ajxp_log`
   ADD COLUMN `repository_id` VARCHAR(32),
   ADD COLUMN `device` VARCHAR( 255 ),
-  ADD COLUMN `dirname`		VARCHAR(255),
+  ADD COLUMN `dirname` VARCHAR(255),
   ADD COLUMN `basename`  VARCHAR(255),
   ADD INDEX (  `source` ),
   ADD INDEX (  `logdate` ),

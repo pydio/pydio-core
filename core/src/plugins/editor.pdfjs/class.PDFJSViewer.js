@@ -43,13 +43,17 @@ Class.create("PDFJSViewer", AbstractEditor, {
 		if($$('base').length){
 			url = $$("base")[0].getAttribute("href");
 			if(!url.startsWith('http') && !url.startsWith('https')){
+                if (!window.location.origin) {
+                    // Fix for IE when Pydio is inside an iFrame
+                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+                }
 				url = document.location.origin + url;
 			}
 		}
 
 		// Get the direct PDF file link valid for this session.
 		var fileName = nodeOrNodes.getPath();
-		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file=base64encoded:' + base64_encode(fileName));
+		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file=base64encoded:' + base64_encode(fileName) + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(fileName)));
 
 		// Hide the Pydio action bar.
 		this.element.down('.editor_action_bar').setStyle({display:'none'});

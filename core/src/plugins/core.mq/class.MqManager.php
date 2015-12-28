@@ -181,7 +181,7 @@ class MqManager extends AJXP_Plugin
             $input = serialize($input);
             $msg = WebSocketMessage::create($input);
             if (!isset($this->wsClient)) {
-                $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
+                $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_BIND_HOST"].":".$configs["WS_SERVER_BIND_PORT"].$configs["WS_SERVER_PATH"]);
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
                 @$this->wsClient->open();
             }

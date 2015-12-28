@@ -749,6 +749,9 @@ class AJXP_PluginsService
                 if ($childrenSel->length) {
                     if($doNotOverrideChildren) continue;
                     foreach ($childrenSel as $existingNode) {
+                        if($existingNode->getAttribute("forbidOverride") == "true"){
+                            continue;
+                        }
                         // Clone as many as needed
                         $clone = $original->importNode($child, true);
                         $this->mergeChildByTagName($clone, $existingNode);
@@ -795,6 +798,9 @@ class AJXP_PluginsService
                 if ($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing") {
                     $old->appendChild($newChild->cloneNode(true));
                 } else {
+                    if($found->getAttribute("forbidOverride") == "true") {
+                        continue;
+                    }
                     $this->mergeChildByTagName($newChild->cloneNode(true), $found);
                 }
             } else {

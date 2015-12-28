@@ -188,17 +188,21 @@ Class.create("PydioUI", {
             var path = this.getContextNode().getPath();
             var appTitle = pydioObject.Parameters.get("customWording").title || "Pydio";
             document.title = appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-            /*
-            TODO: should be sent somewhere else
-            if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;
+
+            // Auto Save
+            if(pydioObject.skipLsHistory || !pydioObject.user || !pydioObject.user.getActiveRepository()
+                || pydio.getPluginConfigs("core.conf").get("SKIP_USER_HISTORY") === true) {
+                return;
+            }
             window.setTimeout(function(){
-                var data = this.user.getPreference("ls_history", true) || {};
+                var data = pydioObject.user.getPreference("ls_history", true) || {};
                 data = new Hash(data);
-                data.set(this.user.getActiveRepository(), this.getContextNode().getPath());
-                this.user.setPreference("ls_history", data, true);
-                this.user.savePreference("ls_history");
-            }.bind(this), 100 );
-            */
+                data.set(pydioObject.user.getActiveRepository(), pydioObject.getContextNode().getPath());
+                pydioObject.user.setPreference("ls_history", data, true);
+                pydioObject.user.savePreference("ls_history");
+            }.bind(this), 200 );
+
+
         }.bind(pydioObject) );
         modal.updateLoadingProgress('Actions Initialized');
 

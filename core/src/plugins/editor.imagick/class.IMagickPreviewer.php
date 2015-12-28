@@ -56,7 +56,7 @@ class IMagickPreviewer extends AJXP_Plugin
         if (empty($convert)) {
             return false;
         }
-        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
+        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository));
         $selection = new UserSelection($repository, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 

@@ -143,6 +143,12 @@ class AJXP_Plugin implements Serializable
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
+    /**
+     * @param string $optionName
+     * @param string|Repository $repositoryScope
+     * @param null|AbstractAjxpUser $userObject
+     * @return mixed|null
+     */
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
     {
         if(!is_array($this->options)) $this->options = array();
@@ -153,9 +159,12 @@ class AJXP_Plugin implements Serializable
             $loggedUser = AuthService::getLoggedUser();
         }
         if ($loggedUser != null) {
-            if ($repositoryScope == AJXP_REPO_SCOPE_ALL) {
+            if ($repositoryScope === AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
                 if($repo != null) $repositoryScope = $repo->getId();
+            }else if(is_a($repositoryScope, "Repository")){
+                $repo = $repositoryScope;
+                $repositoryScope = $repo->getId();
             }
             $test = $loggedUser->mergedRole->filterParameterValue(
                 $this->getId(),
@@ -168,9 +177,22 @@ class AJXP_Plugin implements Serializable
                     $this->getId(),
                     $optionName,
                     $repo->getParentId(),
-                    isSet($merged[$optionName]) ? $merged[$optionName] : null
+                    null
                 );
-                if($retest != null) $test = $retest;
+                if($retest !== null) {
+                    $test = $retest;
+                }else if($repo->hasOwner()){
+                    // Test shared scope
+                    $retest = $loggedUser->mergedRole->filterParameterValue(
+                        $this->getId(),
+                        $optionName,
+                        AJXP_REPO_SCOPE_SHARED,
+                        null
+                    );
+                    if($retest !== null) {
+                        $test = $retest;
+                    }
+                }
             }
             return $test;
         } else {

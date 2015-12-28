@@ -144,8 +144,10 @@ if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
 if(!is_file(AJXP_PLUGINS_BOOTSTRAP_CACHE)){
     $content = "<?php \n";
     $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/bootstrap.php");
-    foreach($boots as $b){
-        $content .= 'require_once("'.$b.'");'."\n";
+    if($boots !== false){
+        foreach($boots as $b){
+            $content .= 'require_once("'.$b.'");'."\n";
+        }
     }
     $resWriteBootstrapCache = @file_put_contents(AJXP_PLUGINS_BOOTSTRAP_CACHE, $content);
 }

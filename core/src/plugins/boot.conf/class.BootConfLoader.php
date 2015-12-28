@@ -782,4 +782,13 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function pruneTemporaryKeys($keyType, $expiration){}
 
+    /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    public function groupExists($groupPath)
+    {
+        return false;
+    }
 }

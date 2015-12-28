@@ -1360,6 +1360,9 @@ Class.create("FilesList", SelectableElements, {
         child.observe("node_replaced", newItem.REPLACE_OBS);
         child.observe("node_removed", newItem.REMOVE_OBS);
 
+        if(this.bulkUpdating){
+            return;
+        }
         if(this._sortableTable){
             var sortColumn = this.crtContext.getMetadata().get("filesList.sortColumn");
          	var descending = this.crtContext.getMetadata().get("filesList.descending");
@@ -1392,8 +1395,18 @@ Class.create("FilesList", SelectableElements, {
             }
         }
         this.initRows();
+    },
 
+    setBulkUpdatingMode: function(){
+        this.bulkUpdating = true;
+    },
 
+    flushBulkUpdatingMode:function(){
+        this.bulkUpdating = false;
+        this.initRows();
+        if(this._sortableTable){
+            this._sortableTable.sort(0);
+        }
     },
 
     getRenderer : function(){
@@ -1443,7 +1456,7 @@ Class.create("FilesList", SelectableElements, {
 		this.clearParsingCache();
 		var children = ProtoCompat.map2values(contextNode.getChildren());
         var renderer = this.getRenderer();
-		for (var i = 0; i < children.length ; i++) 
+		for (var i = 0; i < children.length ; i++)
 		{
 			var child = children[i];
             if(this._rejectNodeByFilters(child)){

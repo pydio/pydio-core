@@ -45,9 +45,8 @@ class AjxpMailer extends AJXP_Plugin
 
     public function processNotification(AJXP_Notification &$notification)
     {
-        $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
-        if (count($mailers)) {
-            $mailer = array_pop($mailers);
+        $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+        if ($mailer !== false) {
             try {
                 $mailer->sendMail(
                     array($notification->getTarget()),

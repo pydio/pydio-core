@@ -306,7 +306,21 @@ class AjxpScheduler extends AJXP_Plugin
     public function placeConfigNode(&$configTree)
     {
         $mess = ConfService::getMessages();
-        if (isSet($configTree["admin"])) {
+        if (isSet($configTree["parameters"])){
+
+            $configTree["parameters"]["CHILDREN"]["scheduler"] = array(
+                "AJXP_MIME" => "scheduler_zone",
+                "LABEL" => "action.scheduler.18",
+                "DESCRIPTION" => "action.scheduler.22",
+                "ICON" => "preferences_desktop.png",
+                "METADATA" => array(
+                    "icon_class" => "icon-time",
+                    "component"  => "Scheduler.Board"
+                ),
+                "LIST"          => array($this, "listTasks")
+            );
+
+        }else if (isSet($configTree["admin"])) {
             $configTree["admin"]["CHILDREN"]["scheduler"] = array(
                 "LABEL"         => $mess["action.scheduler.18"],
                 "AJXP_MIME"     => "scheduler_zone",
@@ -316,10 +330,10 @@ class AjxpScheduler extends AJXP_Plugin
         }
     }
 
-    public function listTasks($action, $httpVars, $postProcessData)
+    public function listTasks($nodeName, $baseDir)
     {
-        $mess =ConfService::getMessages();
-        AJXP_XMLWriter::renderHeaderNode("/admin/scheduler", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
+        $mess = ConfService::getMessages();
+        AJXP_XMLWriter::renderHeaderNode("/$baseDir/$nodeName", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
                  <column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
                  <column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>

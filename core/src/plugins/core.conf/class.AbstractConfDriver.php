@@ -401,6 +401,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         }
         AuthService::updateAutoApplyRole($abstractUser);
         AuthService::updateAuthProvidedData($abstractUser);
+        $args = array(&$abstractUser);
+        AJXP_Controller::applyIncludeHook("include.user.updateUserObject", $args);
         $kvCache->save("pydio:user:".$userId, $abstractUser);
         return $abstractUser;
     }
@@ -465,6 +467,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     abstract public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false);
 
     /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    abstract public function groupExists($groupPath);
+
+    /**
      * @param string $groupPath
      * @param string $groupLabel
      * @return mixed
@@ -477,7 +486,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @return void
      */
     abstract public function deleteGroup($groupPath);
-
 
     /**
      * @abstract
@@ -756,7 +764,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         throw new Exception($mess["ajxp_conf.43"]);
                     }
                     $loggedUser = AuthService::getLoggedUser();
-                    $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                    $limit = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
                         $count = count($this->getUserChildren($loggedUser->getId()));
                         if ($count >= $limit) {
@@ -1238,14 +1246,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->isAdmin()) {
-                        $context = array("USER" => $httpVars["user_id"]);
+                    if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null
+                        && ( AuthService::getLoggedUser()->getId() == $httpVars["user_id"] || AuthService::getLoggedUser()->isAdmin() )) {
+                        $context = array("USER" => AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS));
                     } else if(AuthService::getLoggedUser() !== null) {
                         $context = array("USER" => AuthService::getLoggedUser()->getId());
                     } else {
                         $context = array();
                     }
-                    $this->loadBinary($context, $httpVars["binary_id"]);
+                    $this->loadBinary($context, AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1258,7 +1267,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    $this->loadBinary(array(), $httpVars["binary_id"]);
+                    $this->loadBinary(array(), AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 

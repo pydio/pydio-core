@@ -138,7 +138,7 @@ class Pydio extends Observable{
             var reload = XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload");
             if(reload){
                 if(reload.getAttribute("repositoryId") != this.repositoryId){
-                    this.loadXmlRegistry(false);
+                    this.loadXmlRegistry(false, null, null, reload.getAttribute("repositoryId"));
                     this.repositoryId = null;
                 }
             }
@@ -151,8 +151,8 @@ class Pydio extends Observable{
      * @param sync Boolean Whether to send synchronously or not.
      * @param xPath String An XPath to load only a subpart of the registry
      */
-    loadXmlRegistry (sync, xPath=null, completeFunc=null){
-        this.Registry.load(sync, xPath, completeFunc, this.repositoryId);
+    loadXmlRegistry (sync, xPath=null, completeFunc=null, targetRepositoryId=null){
+        this.Registry.load(sync, xPath, completeFunc, (targetRepositoryId === null ? Math.random() : targetRepositoryId));
     }
 
     /**
@@ -346,7 +346,7 @@ class Pydio extends Observable{
             if(transport.responseXML){
                 this.Controller.parseXmlMessage(transport.responseXML);
             }
-            this.loadXmlRegistry();
+            this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;
         }.bind(this);
         var root = this._contextHolder.getRootNode();
