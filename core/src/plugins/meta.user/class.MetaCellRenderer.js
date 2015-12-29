@@ -241,8 +241,9 @@ Class.create("MetaCellRenderer", {
 			var content = element.down('span').innerHTML;
 		}catch(e){
 		}
-		if(content) value = parseInt(content);
-        else{
+		if(content && !!parseInt(content)) {
+            value = parseInt(content);
+        } else {
             content = ajxpNode.getMetadata().get(attributeName);
             if(content) value = parseInt(content);
         }
