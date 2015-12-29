@@ -39,6 +39,11 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
         return true;
     }
 
+    public static function isSeekable()
+    {
+        return false;
+    }
+
     /**
      * Initialize the stream from the given path.
      */

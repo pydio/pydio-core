@@ -253,6 +253,11 @@ class sftpAccessWrapper extends fsAccessWrapper
         return true;
     }
 
+    public static function isSeekable()
+    {
+        return false;
+    }
+
     /**
      * Override parent function, testing feof() does not seem to work.
      * We may have performance problems on big files here.

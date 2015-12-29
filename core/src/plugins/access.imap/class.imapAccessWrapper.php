@@ -522,5 +522,13 @@ class imapAccessWrapper implements AjxpWrapper
     }
 
 
-
+    /**
+     * Describe whether the current wrapper can rewind a stream or not.
+     * @static
+     * @return boolean
+     */
+    public static function isSeekable()
+    {
+        return false;
+    }
 }

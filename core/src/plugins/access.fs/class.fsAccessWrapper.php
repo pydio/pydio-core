@@ -246,6 +246,11 @@ class fsAccessWrapper implements AjxpWrapper
         return false;
     }
 
+    public static function isSeekable()
+    {
+        return true;
+    }
+
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");

@@ -943,7 +943,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     break;
                 }
 
-                $countFiles = $this->countFiles($path, !$lsOptions["f"]);
+                $streamIsSeekable = AJXP_MetaStreamWrapper::wrapperIsSeekable($path);
+
+                $sharedHandle = null;
+                if($streamIsSeekable){
+                    $handle = opendir($path);
+                    $sharedHandle = $handle;
+                }
+                $countFiles = $this->countFiles($path, !$lsOptions["f"], false, $sharedHandle);
+                if(isSet($sharedHandle)){
+                    rewind($handle);
+                }
                 if(isSet($crt_nodes)){
                     $crt_nodes += $countFiles;
                 }
@@ -981,28 +991,43 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             "currentOrderDir"=> isSet($orderDirection)?$orderDirection:$defaultDirection
                         );
                     }
+                    $foldersCounts = $this->countFiles($path, TRUE, false, $sharedHandle);
+                    if(isSet($sharedHandle)) {
+                        rewind($sharedHandle);
+                    }
                     AJXP_XMLWriter::renderPaginationData(
                         $countFiles,
                         $crtPage,
                         $totalPages,
-                        $this->countFiles($path, TRUE),
+                        $foldersCounts,
                         $remoteOptions
                     );
                     if (!$lsOptions["f"]) {
                         AJXP_XMLWriter::close();
+                        if(isSet($sharedHandle)) {
+                            closedir($sharedHandle);
+                        }
                         break;
                     }
                 }
 
                 $cursor = 0;
-                $handle = opendir($path);
+                if(isSet($sharedHandle)){
+                    $handle = $sharedHandle;
+                }else{
+                    $handle = opendir($path);
+                }
                 if (!$handle) {
                     throw new AJXP_Exception("Cannot open dir ".$nonPatchedPath);
+                }
+                $nodes = array();
+                while(strlen($file = readdir($handle))>0){
+                    $nodes[] = $file;
                 }
                 closedir($handle);
                 $fullList = array("d" => array(), "z" => array(), "f" => array());
 
-                $nodes = scandir($path);
+                //$nodes = scandir($path);
                 $nodes = $this->orderNodes($nodes, $nonPatchedPath, $orderField, $orderDirection);
 
                 foreach ($nodes as $nodeName) {
@@ -1523,14 +1548,20 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
     }
 
-    public function countFiles($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false)
+    public function countFiles($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHANDLE = null)
     {
-        $handle=@opendir($dirName);
+        if(is_resource($dirHANDLE)){
+            $handle = $dirHANDLE;
+        }else{
+            $handle=@opendir($dirName);
+        }
         if ($handle === false) {
             throw new Exception("Error while trying to open directory ".$dirName);
         }
         if ($foldersOnly && !AJXP_MetaStreamWrapper::wrapperIsRemote($dirName)) {
-            closedir($handle);
+            if($dirHANDLE == null || !is_resource($dirHANDLE)){
+                closedir($handle);
+            }
             $path = AJXP_MetaStreamWrapper::getRealFSReference($dirName, true);
             $dirs = glob($path."/*", GLOB_ONLYDIR|GLOB_NOSORT);
             if($dirs === false) return 0;
@@ -1546,7 +1577,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if($nonEmptyCheckOnly) break;
             }
         }
-        closedir($handle);
+        if($dirHANDLE == null || !is_resource($dirHANDLE)){
+            closedir($handle);
+        }
         return $count;
     }
 
