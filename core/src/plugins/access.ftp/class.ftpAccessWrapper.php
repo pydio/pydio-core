@@ -47,10 +47,10 @@ class ftpAccessWrapper implements AjxpWrapper
     protected $crtTarget;
 
     // Shared vars self::
-    private static $dirContentLoopPath;
-    private static $dirContent;
-    private static $dirContentKeys;
-    private static $dirContentIndex;
+    private static $dirContentLoopPath = array();
+    private static $dirContent = array();
+    private static $dirContentKeys = array();
+    private static $dirContentIndex = array();
 
     private $monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Juil", "Aug", "Sep", "Oct", "Nov", "Dec");
 
@@ -67,6 +67,11 @@ class ftpAccessWrapper implements AjxpWrapper
     }
 
     public static function isRemote()
+    {
+        return true;
+    }
+
+    public static function isSeekable()
     {
         return true;
     }
@@ -200,11 +205,12 @@ class ftpAccessWrapper implements AjxpWrapper
     {
         // We are in an opendir loop
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT", $path);
-        if (self::$dirContent != null && self::$dirContentLoopPath == AJXP_Utils::safeDirname($path)) {
+        $testLoopPath = AJXP_Utils::safeDirname($path);
+        if (is_array(self::$dirContent[$testLoopPath])) {
             $search = AJXP_Utils::safeBasename($path);
             //if($search == "") $search = ".";
-            if (array_key_exists($search, self::$dirContent)) {
-                return self::$dirContent[$search];
+            if (array_key_exists($search, self::$dirContent[$testLoopPath])) {
+                return self::$dirContent[$testLoopPath][$search];
             }
         }
         $parts = $this->parseUrl($path);
@@ -249,49 +255,56 @@ class ftpAccessWrapper implements AjxpWrapper
 
     public function dir_opendir ($url , $options )
     {
+        if(isSet(self::$dirContent[$url])){
+            array_push(self::$dirContentLoopPath, $url);
+            return true;
+        }
         $parts = $this->parseUrl($url);
         $link = $this->createFTPLink();
         $serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
         $contents = $this->rawList($link, $serverPath);
         $folders = $files = array();
         foreach ($contents as $entry) {
-               $result = $this->rawListEntryToStat($entry);
+            $result = $this->rawListEntryToStat($entry);
             AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
-               $isDir = $result["dir"];
-               $statValue = $result["stat"];
-               $file = $result["name"];
+            $isDir = $result["dir"];
+            $statValue = $result["stat"];
+            $file = $result["name"];
             if ($isDir) {
                 $folders[$file] = $statValue;
             } else {
                 $files[$file] = $statValue;
             }
-           }
-           // Append all files keys to folders. Do not use array_merge.
-           foreach ($files as $key => $value) {
-               $folders[$key] = $value;
-           }
-           AJXP_Logger::debug(__CLASS__,__FUNCTION__,"OPENDIR ", $folders);
-        self::$dirContentLoopPath = AJXP_Utils::safeDirname($url);
-        self::$dirContent = $folders;//array_merge($folders, $files);
-        self::$dirContentKeys = array_keys(self::$dirContent);
-        self::$dirContentIndex = 0;
-           return true;
+        }
+        // Append all files keys to folders. Do not use array_merge.
+        foreach ($files as $key => $value) {
+            $folders[$key] = $value;
+        }
+        AJXP_Logger::debug(__CLASS__, __FUNCTION__, "OPENDIR ", $folders);
+        array_push(self::$dirContentLoopPath, $url);
+        self::$dirContent[$url] = $folders;
+        self::$dirContentKeys[$url] = array_keys($folders);
+        self::$dirContentIndex[$url] = 0;
+        return true;
     }
 
     public function dir_closedir  ()
     {
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"CLOSEDIR");
-        self::$dirContent = null;
-        self::$dirContentKeys = null;
-        self::$dirContentLoopPath = null;
-        self::$dirContentIndex = 0;
+        $loopPath = array_pop(self::$dirContentLoopPath);
+        self::$dirContentIndex[$loopPath] = 0;
+        //Make a simple rewind, keep in cache
+        //self::$dirContent[$loopPath] = null;
+        //self::$dirContentKeys[$loopPath] = null;
     }
 
     public function dir_readdir ()
     {
-        self::$dirContentIndex ++;
-        if (isSet(self::$dirContentKeys[self::$dirContentIndex-1])) {
-            return self::$dirContentKeys[self::$dirContentIndex-1];
+        $loopPath = self::$dirContentLoopPath[count(self::$dirContentLoopPath)-1];
+        $index = self::$dirContentIndex[$loopPath];
+        self::$dirContentIndex[$loopPath] ++;
+        if (isSet(self::$dirContentKeys[$loopPath][$index])) {
+            return self::$dirContentKeys[$loopPath][$index];
         } else {
             return false;
         }
@@ -299,7 +312,8 @@ class ftpAccessWrapper implements AjxpWrapper
 
     public function dir_rewinddir ()
     {
-        self::$dirContentIndex = 0;
+        $loopPath = self::$dirContentLoopPath[count(self::$dirContentLoopPath)-1];
+        self::$dirContentIndex[$loopPath] = 0;
     }
 
     protected function rawList($link, $serverPath, $target = 'd', $retry = true)
