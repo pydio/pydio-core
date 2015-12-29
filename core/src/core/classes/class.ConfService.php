@@ -1423,6 +1423,55 @@ class ConfService
     }
 
     /**
+     * @var array Keep loaded labels in memory
+     */
+    private static $usersParametersCache = array();
+
+    /**
+     * @param string $parameterName Plugin parameter name
+     * @param AbstractAjxpUser|string $userIdOrObject
+     * @param string $pluginId Plugin name, core.conf by default
+     * @param null $defaultValue
+     * @return mixed
+     */
+    public static function getUserPersonalParameter($parameterName, $userIdOrObject, $pluginId="core.conf", $defaultValue=null){
+
+        $cacheId = $pluginId."-".$parameterName;
+        if(!isSet(self::$usersParametersCache[$cacheId])){
+            self::$usersParametersCache[$cacheId] = array();
+        }
+        // Passed an already loaded object
+        if(is_a($userIdOrObject, "AbstractAjxpUser")){
+            $value = $userIdOrObject->personalRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+            self::$usersParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
+            return $value;
+        }
+        // Already in memory cache
+        if(isSet(self::$usersParametersCache[$cacheId][$userIdOrObject])){
+            return self::$usersParametersCache[$cacheId][$userIdOrObject];
+        }
+
+        // Try to load personal role if it was already loaded.
+        $uRole = AuthService::getRole("AJXP_USR_/".$userIdOrObject);
+        if($uRole === false){
+            $uObject = self::getConfStorageImpl()->createUserObject($userIdOrObject);
+            if(isSet($uObject)){
+                $uRole = $uObject->personalRole;
+            }
+        }
+        if(empty($uRole)){
+            return $defaultValue;
+        }
+        $value = $uRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+        if(empty($value) && !empty($defaultValue)) {
+            $value = $userIdOrObject;
+        }
+        self::$usersParametersCache[$cacheId][$userIdOrObject] = $value;
+        return $value;
+
+    }
+
+    /**
      * Set the language in the session
      * @static
      * @param string $lang

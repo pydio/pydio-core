@@ -649,9 +649,7 @@ class AJXP_XMLWriter
             $isSharedString = "";
             if ($repoObject->hasOwner()) {
                 $uId = $repoObject->getOwner();
-                $uObject = ConfService::getConfStorageImpl()->createUserObject($uId);
-                $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
-                if(empty($label)) $label = $uId;
+                $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
                 $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
             }
             $descTag = "";

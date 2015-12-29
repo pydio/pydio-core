@@ -365,7 +365,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user_editable"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $userDisplayName = $userObject->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", "ajxp_user", $userId);
+            $userDisplayName = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             echo AJXP_XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
         }
 
@@ -689,14 +689,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         if(array_key_exists($repositoryId, $sharedRepos)){
                             $sharedRepos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
                             $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
-                            $repoOwnerLabel = $repoOwnerId = $repositoryObject->getOwner();
+                            $repoOwnerId = $repositoryObject->getOwner();
                             if(isSet($allReps[$repoParentId])){
                                 $repoParentLabel = SystemTextEncoding::toUTF8($allReps[$repoParentId]->getDisplay());
                             }
-                            $ownerObject = ConfService::getConfStorageImpl()->createUserObject($repoOwnerId);
-                            if(isSet($ownerObject)){
-                                $repoOwnerLabel = $ownerObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $repoOwnerId);
-                            }
+                            $repoOwnerLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
                             $repoDetailed[$repositoryId]["share"] = array(
                                 "parent_user" => $repoOwnerId,
                                 "parent_user_label" => $repoOwnerLabel,
@@ -2375,9 +2372,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $rightsString = implode(", ", $r);
             }
-            $nodeLabel = $userId;
-            $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-            if(!empty($test)) $nodeLabel = $test;
+            $nodeLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             $scheme = AuthService::getAuthScheme($userId);
             $nodeKey = "/data/$root/".$userId;
             $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
