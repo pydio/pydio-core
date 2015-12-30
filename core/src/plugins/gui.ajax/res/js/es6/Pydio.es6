@@ -369,6 +369,9 @@ class Pydio extends Observable{
         var onComplete = function(transport){
             if(transport.responseJSON){
                 this.MessageHash = transport.responseJSON;
+                if(window && window.MessageHash) {
+                    window.MessageHash = this.MessageHash;
+                }
                 for(var key in this.MessageHash){
                     if(this.MessageHash.hasOwnProperty(key)){
                         this.MessageHash[key] = this.MessageHash[key].replace("\\n", "\n");

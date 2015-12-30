@@ -559,9 +559,9 @@ Class.create("PydioUI", {
         messageTags.each(function(tag){
             var messageId = tag.getAttribute("ajxp_message_id");
             try{
-                tag.update(MessageHash[messageId]);
+                tag.update(this._pydio.MessageHash[messageId]);
             }catch(e){}
-        });
+        }.bind(this));
     },
 
     /**
