@@ -2782,7 +2782,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             </columns>';
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($config);
             $date = $parts[count($parts)-1];
-            $logger->xmlLogs($dir, $date, "tree", "/".$root."/logs");
+            $logger->xmlLogs($dir, $date, "tree", "/".$root."/logs", isSet($_POST["cursor"])?intval($_POST["cursor"]):-1);
         } else {
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
             $nodes = $logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), "/".$root."/logs", false);
