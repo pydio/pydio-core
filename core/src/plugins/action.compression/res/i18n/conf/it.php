@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "Tar Archives Support" => "Tar Archives Support",
-    "Create and extract tar, tar.gz and tar.bz2 archives." => "Create and extract tar, tar.gz and tar.bz2 archives.",
+    "Tar Archives Support" => "Supporto Archivi Tar",
+    "Create and extract tar, tar.gz and tar.bz2 archives." => "Crea ed estrae archivi tar, tar.gz e tar.bz2.",
 );
