@@ -135,7 +135,7 @@ $mess=array(
 "112" => "<b>Applica questo ruolo di default</b> per tutti i nuovi utenti.",
 "116" => "Nome Template",
 "117" => "Template Driver",
-"118" => "Nuovo Group",
+"118" => "Nuovo Gruppo",
 "group_access" => "g",
 "119" => "Imposta gruppi di utenti",
 "120" => "Passa a Pro",
@@ -172,8 +172,7 @@ $mess=array(
 "148" => "Definizione Trigger",
 "149" => "Lista di tutti i trigger innescati nell'applicazione, la loro documentazione, dove sono innescati e quale plugin è in loro ascolto.",
 "150" => "Seleziona un repository",
-    "151" => "Root Group",
-    "152" => "Root Group Role",
-    "153" => "Applies to the whole hierarchy of users",
-
+"151" => "Gruppo Principale",
+"152" => "Ruolo Gruppo Principale",
+"153" => "Applica a tutta la gerarchia degli utenti",
 );
