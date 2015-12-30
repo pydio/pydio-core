@@ -52,8 +52,9 @@ class RemoteNodeProvider{
      * @param childCallback Function On child added
      * @param recursive
      * @param depth
+     * @param optionalParameters
      */
-    loadNode (node, nodeCallback=null, childCallback=null, recursive=false, depth=-1){
+    loadNode (node, nodeCallback=null, childCallback=null, recursive=false, depth=-1, optionalParameters=null){
         var params = {
             get_action:'ls',
             options:'al'
@@ -80,6 +81,9 @@ class RemoteNodeProvider{
             this.properties.forEach(function(value, key){
                 params[key] = value + (key == 'dir' && paginationHash ? paginationHash :'');
             });
+        }
+        if(optionalParameters){
+            params = LangUtils.objectMerge(params, optionalParameters);
         }
         var complete = function (transport){
             this.parseNodes(node, transport, nodeCallback, childCallback);

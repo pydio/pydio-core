@@ -49,8 +49,9 @@ class AjxpNode extends Observable{
     /**
      * Loads the node using its own provider or the one passed
      * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
+     * @param additionalParameters Object of optional parameters
      */
-    load(iAjxpNodeProvider){
+    load(iAjxpNodeProvider, additionalParameters=null){
         if(this._isLoading) return;
         if(!iAjxpNodeProvider){
             if(this._iNodeProvider){
@@ -71,7 +72,7 @@ class AjxpNode extends Observable{
             this._isLoading = false;
             this.notify("loaded");
             this.notify("first_load");
-        }.bind(this));
+        }.bind(this), null, false, -1, additionalParameters);
     }
     /**
      * Remove children and reload node
