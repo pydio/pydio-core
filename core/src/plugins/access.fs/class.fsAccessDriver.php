@@ -858,6 +858,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
+                $testPath = @stat($path);
+                if($testPath === null || $testPath === false){
+                    throw new Exception("There was a problem trying to open folder ". $path. ", please check your Administrator");
+                }
                 if(!is_readable($path) && !is_writeable($path)){
                     throw new Exception("You are not allowed to access folder " . $path);
                 }

@@ -238,7 +238,9 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         foreach($nodes as $ajxpNode){
 
             $newValues = array();
-            //$ajxpNode->setDriver($this->accessDriver);
+            if(!is_writable($ajxpNode->getUrl())){
+                throw new Exception("You are not allowed to perform this action");
+            }
             AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
             foreach ($def as $key => $data) {
                 if (isSet($httpVars[$key])) {
