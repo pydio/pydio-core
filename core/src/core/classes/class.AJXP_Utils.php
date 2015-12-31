@@ -198,7 +198,7 @@ class AJXP_Utils
             // Decode entities
             $s = html_entity_decode($s, ENT_NOQUOTES, 'UTF-8');
             // Strip whitespace characters
-            $s = trim($s);
+            $s = ltrim($s);
             $s = str_replace(chr(0), "", $s);
             if($level == AJXP_SANITIZE_FILENAME) $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
             else $s = preg_replace("/[\"\|\?\\\]/", "", $s);
