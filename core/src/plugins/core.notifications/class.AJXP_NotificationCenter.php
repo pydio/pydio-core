@@ -374,10 +374,18 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
                     $nodeToSend->setLabel($nodeToSend->event_description." ". $nodeOcc." ".$nodeToSend->event_date);
                 }else{
-                    $nodeToSend->setLabel(basename($nodeToSend->getPath())." ". $nodeOcc." "." <small class='notif_desc'>".$nodeToSend->event_description." ".$nodeToSend->event_date."</small>");
+                    $baseName = basename($nodeToSend->getPath());
+                    if(empty($baseName) && $nodeToSend->getRepository() != null){
+                        $baseName = $nodeToSend->getRepository()->getDisplay();
+                    }
+                    $nodeToSend->setLabel($baseName." ". $nodeOcc." "." <small class='notif_desc'>".$nodeToSend->event_description." ".$nodeToSend->event_date."</small>");
                 }
             }else{
-                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . $nodeOcc);
+                $baseName = basename($nodeToSend->getPath());
+                if(empty($baseName) && $nodeToSend->getRepository() != null){
+                    $baseName = $nodeToSend->getRepository()->getDisplay();
+                }
+                $nodeToSend->setLabel($baseName . $nodeOcc);
             }
             // Replace PATH
             $nodeToSend->real_path = $path;
