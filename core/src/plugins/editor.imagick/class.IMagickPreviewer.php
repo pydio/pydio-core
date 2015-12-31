@@ -279,7 +279,7 @@ class IMagickPreviewer extends AJXP_Plugin
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
                 } else {
-                    $unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                    $unoconv =  "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
                 putenv('LC_CTYPE='.AJXP_LOCALE);
                 exec($unoconv, $out, $return);
