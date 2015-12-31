@@ -122,6 +122,12 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $this->logDebug("FSMounter::mountFS Should mount" . $user);
         $repo = $this->repository;
 
+        if(isset($this->options["MOUNT_DEVIL"]) && !empty($this->options["MOUNT_DEVIL"]) && $this->options["MOUNT_DEVIL"]) {
+            $udevil = "udevil ";
+        }else{
+            $udevil = "";
+        }
+
         $MOUNT_TYPE = $this->options["FILESYSTEM_TYPE"];
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_POINT_ROOT = $this->getOption("MOUNT_POINT", "", "");
@@ -144,7 +150,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password, false);
 
-        $cmd = "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
+        $cmd = $udevil."mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
         if($this->getOption("MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
@@ -183,7 +189,12 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
 
-        system("umount ".escapeshellarg($MOUNT_POINT), $res);
+        if(isset($this->options["MOUNT_DEVIL"]) && !empty($this->options["MOUNT_DEVIL"]) && $this->options["MOUNT_DEVIL"]) {
+            $udevil = "udevil ";
+        }else{
+            $udevil = "";
+        }
+        system($udevil."umount ".escapeshellarg($MOUNT_POINT), $res);
         if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted() ){
             // Remove mount point
             $testRm = @rmdir($MOUNT_POINT);
