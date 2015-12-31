@@ -918,8 +918,16 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
     }
 
+    public static $allowedGroupList;
+
+    /***
+     * @return array : list of groups according to ldap group filter string
+     */
     public function getLdapGroupListFromDN()
     {
+        if (isset(self::$allowedGroupList) && !(empty(self::$allowedGroupList)) && count(self::$allowedGroupList) > 0)
+            return self::$allowedGroupList;
+
         $origUsersDN = $this->ldapDN;
         $origUsersFilter = $this->ldapFilter;
         $origUsersAttr = $this->ldapUserAttr;
@@ -946,6 +954,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         $this->ldapFilter = $origUsersFilter;
         $this->ldapUserAttr = $origUsersAttr;
 
+        self::$allowedGroupList = $returnArray;
         return $returnArray;
     }
 }
