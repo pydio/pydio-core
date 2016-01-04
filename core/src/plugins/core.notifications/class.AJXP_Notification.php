@@ -72,6 +72,11 @@ class AJXP_Notification
 
     public static $usersCaches = array();
 
+    /**
+     * @var string A hint about the current context (workspace, shared minisite, etc..)
+     */
+    private $locationType;
+
     public static function autoload()
     {
     }
@@ -208,6 +213,14 @@ class AJXP_Notification
 
     public function getDescriptionLocation(){
         $mess = ConfService::getMessages();
+        if(!isSet($this->locationType)){
+            $this->computeLocationType();
+        }
+        return $this->replaceVars($mess["notification.tpl.location.".$this->locationType], $mess);
+    }
+
+    private function computeLocationType(){
+
         $type = "workspace.normal";
         $repo = $this->getNode()->getRepository();
         $crtUserId = "shared";
@@ -222,7 +235,8 @@ class AJXP_Notification
         }else if($repo->hasOwner() && $repo->getOwner() != $crtUserId){
             $type = "workspace.shared";
         }
-        return $this->replaceVars($mess["notification.tpl.location.".$type], $mess);
+
+        $this->locationType = $type;
     }
 
     public function setAction($action)
@@ -286,6 +300,7 @@ class AJXP_Notification
     public function setNode($node)
     {
         $this->node = $node;
+        $this->computeLocationType();
     }
 
     /**
