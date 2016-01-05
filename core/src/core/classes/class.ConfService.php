@@ -328,8 +328,12 @@ class ConfService
 
         $logged = AuthService::getLoggedUser();
         $u = $logged == null ? "shared" : $logged->getId();
-        $r = ConfService::getRepository();
-        $a = $r->getSlug();
+        if($logged !== null){
+            $r = ConfService::getRepository();
+            $a = $r->getSlug();
+        }else{
+            $a = "norepository";
+        }
         $v = $extendedVersion ? "extended":"light";
         return "xml_registry:".$v.":".$u.":".$a;
 
@@ -368,7 +372,7 @@ class ConfService
         }
         $parameters = $loggedUser->mergedRole->listParameters();
         foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
+            if ($scope === AJXP_REPO_SCOPE_ALL || $scope === $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope === AJXP_REPO_SCOPE_SHARED)) {
                 foreach ($paramsPlugs as $plugId => $params) {
                     foreach ($params as $name => $value) {
                         // Search exposed plugin_configs, replace if necessary.

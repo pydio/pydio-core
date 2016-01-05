@@ -130,7 +130,7 @@ class MqManager extends AJXP_Plugin
 
     public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
-        if ($repositoryId == AJXP_REPO_SCOPE_ALL) {
+        if ($repositoryId === AJXP_REPO_SCOPE_ALL) {
             $userId = $targetUserId;
         } else {
             $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
