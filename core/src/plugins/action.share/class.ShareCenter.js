@@ -117,6 +117,7 @@ Class.create("ShareCenter", {
             alert('You are not authorized to share folders');
             return;
         }
+        this.readonlyMode = this.currentNode.getMetadata().get('share_data') ? true : false;
 
         if(type == 'workspace'){
             this.shareFolderMode = 'workspace';
