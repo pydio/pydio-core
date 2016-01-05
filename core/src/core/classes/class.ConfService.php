@@ -328,11 +328,10 @@ class ConfService
 
         $logged = AuthService::getLoggedUser();
         $u = $logged == null ? "shared" : $logged->getId();
-        if($logged !== null){
-            $r = ConfService::getRepository();
+        $a = "norepository";
+        $r = ConfService::getRepository();
+        if($r !== null){
             $a = $r->getSlug();
-        }else{
-            $a = "norepository";
         }
         $v = $extendedVersion ? "extended":"light";
         return "xml_registry:".$v.":".$u.":".$a;
