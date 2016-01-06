@@ -90,7 +90,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             conn.setParameters(toSubmit);
             conn.setMethod("post");
             conn.onComplete = function(transport){
-                pydio.getController().parseXmlMessage(transport.responseXML);
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 this.loadRepository(this.repositoryId);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
@@ -421,7 +421,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         var conn = new Connexion();
         conn.setParameters(params);
         conn.onComplete = function(transport){
-            pydio.getController().parseXmlMessage(transport.responseXML);
+            PydioApi.getClient().parseXmlMessage(transport.responseXML);
             this.loadRepository(this.repositoryId, true);
             if(button && action == "meta_source_edit"){
                 button.addClassName("SF_disabled");

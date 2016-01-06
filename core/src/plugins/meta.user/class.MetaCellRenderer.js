@@ -316,7 +316,7 @@ Class.create("MetaCellRenderer", {
                     }));
                     conn.addParameter(elementName, note);
                     conn.onComplete = function(transport){
-                        pydio.getController().parseXmlMessage(transport.responseXML);
+                        PydioApi.getClient().parseXmlMessage(transport.responseXML);
                     };
                     conn.sendAsync();
                 }, 500);
@@ -364,7 +364,7 @@ Class.create("MetaCellRenderer", {
                 }));
                 conn.addParameter(metaName, values.without(v).join(", "));
                 conn.onComplete = function(transport){
-                    pydio.getController().parseXmlMessage(transport.responseXML);
+                    PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 };
                 conn.sendAsync();
             });

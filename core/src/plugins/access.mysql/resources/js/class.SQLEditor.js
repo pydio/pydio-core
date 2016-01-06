@@ -298,7 +298,7 @@ Class.create("SQLEditor", {
 		parameters.set('current_table', currentTable);
 		var connexion = new Connexion();
 		connexion.setParameters(parameters);		
-		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();
 	},
@@ -316,7 +316,7 @@ Class.create("SQLEditor", {
 		});		
 		var connexion = new Connexion();
 		connexion.setParameters(params);		
-		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();		
 	},

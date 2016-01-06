@@ -41,7 +41,7 @@ Class.create("EtherpadLauncher", AbstractEditor, {
             this.actions.get("downloadFileButton").observe('click', function(){
                 Event.stop(e);
                 if(!this.currentFile) return false;
-                pydio.Controller.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
+                PydioApi.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
                 return false;
             }.bind(this));
         }else{

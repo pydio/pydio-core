@@ -1116,7 +1116,7 @@ Class.create("ShareCenter", {
                             conn.addParameter("repository_id", this._currentRepositoryId);
                         }
                         conn.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     }else{
