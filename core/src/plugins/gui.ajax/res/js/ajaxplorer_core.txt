@@ -5,6 +5,7 @@ js/core/util/LangUtils.js
 js/core/util/XMLUtils.js
 js/core/util/PathUtils.js
 js/core/util/HasherUtils.js
+js/core/util/CookiesManager.js
 js/core/model/Router.js
 js/core/model/AjxpNode.js
 js/core/model/User.js
