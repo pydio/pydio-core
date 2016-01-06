@@ -240,7 +240,6 @@ class RemoteNodeProvider{
         var removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
         var adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
         var updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
-        // TODO: MOVE TO DATAMODEL
         if(removes && removes.length){
             removes.forEach(function(r){
                 var p = r.getAttribute("filename");

@@ -86,7 +86,7 @@
                                 file : node.getPath()
                             });
                             conn.onComplete = function(transport){
-                                pydio.getController().parseXmlMessage(transport.responseXML);
+                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                             };
                             window.metaWatchCmd = null;
                             conn.sendAsync();

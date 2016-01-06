@@ -94,7 +94,7 @@
                             return (c=='x' ? r : (r&0x7|0x8)).toString(16);
                         });
                         oForm.down("#content").setValue(uuid);
-                        pydio.getController().submitForm(oForm);
+                        PydioApi.getClient().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });

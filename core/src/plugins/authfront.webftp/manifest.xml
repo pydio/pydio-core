@@ -35,8 +35,8 @@
 									}
 								});
 								connexion.onComplete = function(transport){
-									pydio.getController().submitForm(oForm, true, function(transport){
-                                        var success = pydio.getController().parseXmlMessage(transport.responseXML);
+									PydioApi.getClient().submitForm(oForm, true, function(transport){
+                                        var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
                                         if(success){
     									    modal.setCloseValidation(null);
     									    hideLightBox(true);

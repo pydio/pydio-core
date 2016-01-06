@@ -164,28 +164,6 @@ class Pydio extends Observable{
     }
 
     /**
-     * Try reading the cookie and sending it to the server
-     */
-    tryLogUserFromCookie (){
-        // TODO: to grab from somewhere else
-        /*
-        var connexion = new Connexion();
-        var rememberData = retrieveRememberData();
-        if(rememberData!=null){
-            connexion.addParameter('get_action', 'login');
-            connexion.addParameter('userid', rememberData.user);
-            connexion.addParameter('password', rememberData.pass);
-            connexion.addParameter('cookie_login', 'true');
-            connexion.onComplete = function(transport){
-                hideLightBox();
-                this.Controller.parseXmlMessage(transport.responseXML);
-            }.bind(this);
-            connexion.sendSync();
-        }
-        */
-    }
-
-    /**
      * Find the current repository (from the current user) and load it.
      */
     loadActiveRepository (){
@@ -344,7 +322,7 @@ class Pydio extends Observable{
         this.fire("trigger_repository_switch");
         var onComplete = function(transport){
             if(transport.responseXML){
-                this.Controller.parseXmlMessage(transport.responseXML);
+                this.ApiClient.parseXmlMessage(transport.responseXML);
             }
             this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;

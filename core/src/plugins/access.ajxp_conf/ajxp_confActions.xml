@@ -389,7 +389,7 @@
 						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
 						conn.addParameter('newLabel', newValue);
 						conn.onComplete = function(transport){
-							pydio.getController().parseXmlMessage(transport.responseXML);
+							PydioApi.getClient().parseXmlMessage(transport.responseXML);
 						};
 						conn.sendSync();
 					};
@@ -483,7 +483,7 @@
 					};
 					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
 						var oForm = modal.getForm();
-						pydio.getController().submitForm(oForm);
+						PydioApi.getClient().submitForm(oForm);
                         if (userSelection.isMultiple()) {
                            var i = 1;
 	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
@@ -498,7 +498,7 @@
                                   	value = meta.get("text");
                                   }
                                   hidden.setAttribute("value", value);
-            					  pydio.getController().submitForm(oForm);
+            					  PydioApi.getClient().submitForm(oForm);
                                   i++;
                               } catch (e)
                               {

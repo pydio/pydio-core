@@ -102,7 +102,7 @@
                                     connexion.addParameter('captcha_code', oForm.captcha_code.value);
                                 }
                                 connexion.onComplete = function(transport){
-                                    var success = pydio.getController().parseXmlMessage(transport.responseXML);
+                                    var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
                                     if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
                                         ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                     }
