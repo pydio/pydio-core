@@ -1181,13 +1181,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $mess = ConfService::getMessages();
                 if ($regexp == null && !$usersOnly) {
-                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
+                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".$mess["447"]."\"><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
                 $indexGroup = 0;
                 if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"$groupLabel\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
                             $indexGroup++;
                         }
                         if($indexGroup == $limit) break;
@@ -1196,7 +1196,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($regexp == null && method_exists($this, "listUserTeams")) {
                     $teams = $this->listUserTeams();
                     foreach ($teams as $tId => $tData) {
-                        $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label='[team] ".$tData["LABEL"]."'><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                        $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
                     }
                 }
                 foreach ($allUsers as $userId => $userObject) {
@@ -1208,7 +1208,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
                             $userDisplay = $userLabel;
                         }
-                        $users .= "<li class='complete_user_entry' data-label='$userLabel' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
+                        $users .= "<li class='complete_user_entry' data-label=\"$userLabel\" data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }
                     if($index == $limit) break;
