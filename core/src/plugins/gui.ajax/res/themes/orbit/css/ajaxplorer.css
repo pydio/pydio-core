@@ -5541,6 +5541,14 @@ div.menu a {
     border-radius: 3px;
 }
 
+.menu.desktop a.menu_item_default{
+    font-family: 'Open Sans Regular', Arial, sans-serif;
+}
+
+.menu.desktop a.menu_item_default span.ajxp_icon_span{
+    opacity: 0.8;
+}
+
 .menu.desktop a:hover u,
 .menu.desktop li.menuAnchorSelected u
 {

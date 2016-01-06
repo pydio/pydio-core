@@ -162,16 +162,21 @@ Class.create("PydioUI", {
         var pydioObject = this._pydio;
 
         protoMenu.options.beforeShow = function(e){
-            this.options.lastElement = Event.element(e);
-            this.options.menuItems = pydioObject.getController().getContextActions(Event.element(e), ["inline"]);
+            var element = Event.element(e);
+            if(element.hasClassName('ajxpNodeProvider') || element.up('.ajxpNodeProvider') || element.hasClassName('selected-webfx-tree-item') || element.up('.selected-webfx-tree-item')){
+                this.options.currentActionsContext = 'selectionContext';
+            }else{
+                this.options.currentActionsContext = 'genericContext';
+            }
+            this.options.menuItems = pydioObject.getController().getContextActions(this.options.currentActionsContext, ["inline"]);
             this.refreshList();
         }.bind(protoMenu);
         protoMenu.options.beforeHide = function(e){
-            this.options.lastElement = null;
+            this.options.currentActionsContext = null;
         }.bind(protoMenu);
         document.observe("ajaxplorer:actions_refreshed", function(){
-            if(this.options.lastElement){
-                this.options.menuItems = pydioObject.getController().getContextActions(this.options.lastElement, ["inline"]);
+            if(this.options.currentActionsContext){
+                this.options.menuItems = pydioObject.getController().getContextActions(this.options.currentActionsContext, ["inline"]);
                 this.refreshList();
             }
         }.bind(protoMenu));
