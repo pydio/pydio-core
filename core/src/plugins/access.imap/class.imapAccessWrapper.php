@@ -527,7 +527,7 @@ class imapAccessWrapper implements AjxpWrapper
      * @static
      * @return boolean
      */
-    public static function isSeekable()
+    public static function isSeekable($url)
     {
         return false;
     }

@@ -71,7 +71,7 @@ class ftpAccessWrapper implements AjxpWrapper
         return true;
     }
 
-    public static function isSeekable()
+    public static function isSeekable($url)
     {
         return true;
     }

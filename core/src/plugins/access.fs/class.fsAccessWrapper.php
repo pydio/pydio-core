@@ -246,8 +246,9 @@ class fsAccessWrapper implements AjxpWrapper
         return false;
     }
 
-    public static function isSeekable()
+    public static function isSeekable($url)
     {
+        if(strpos($url, ".zip/") !== false) return false;
         return true;
     }
 

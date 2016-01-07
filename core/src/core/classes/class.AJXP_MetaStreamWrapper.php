@@ -187,11 +187,12 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
     /**
      * Describe whether the current wrapper operates on a remote server or not.
+     * @param String $url Url of the resource
      * @static
      * @return boolean
      * @throws Exception
      */
-    public static function isSeekable()
+    public static function isSeekable($url)
     {
         throw new Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsSeekable() instead");
     }
@@ -211,7 +212,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      */
     public static function wrapperIsSeekable($url){
         $repositoryId = parse_url($url, PHP_URL_HOST);
-        return call_user_func(array(self::actualRepositoryWrapperClass($repositoryId), "isSeekable"));
+        return call_user_func(array(self::actualRepositoryWrapperClass($repositoryId), "isSeekable"), $url);
     }
 
     public static function nodesUseSameWrappers($url1, $url2){

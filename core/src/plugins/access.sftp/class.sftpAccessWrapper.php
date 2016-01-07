@@ -253,7 +253,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         return true;
     }
 
-    public static function isSeekable()
+    public static function isSeekable($url)
     {
         return false;
     }
