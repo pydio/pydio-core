@@ -37,4 +37,11 @@ $mess=array(
 "User Password" => "Passwort des Benutzers",
 "Default Mailbox" => "Standard Mailbox",
 "Mailbox to connect by default" => "Mailbox-Verbindung die standardmäßig verbunden wird",
+"Repository Options" => "Repository Options",
+"Default Rights" => "Default Rights",
+"This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "This right pattern (empty, r, or rw) will be applied at user creation for this repository.",
+"Pagination Threshold" => "Pagination Threshold",
+"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "When a folder will contain more items than this number, display will switch to pagination mode, for better performances.",
+"#Items per page" => "#Items per page",
+"Once in pagination mode, number of items to display per page." => "Once in pagination mode, number of items to display per page.",
 );

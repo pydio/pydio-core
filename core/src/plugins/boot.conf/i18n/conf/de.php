@@ -58,6 +58,4 @@ $mess = array(
 "Mail address of the user" => "Mailadresse der Benutzern, des Benutzers",
 "Display name" => "Angezeigter Name",
 "Password" => "Passwort wählen",
-"Select how the configurations will be stored" => "Auswählen, wie Konfigurationsdaten gespeichert werden",
-
 );
