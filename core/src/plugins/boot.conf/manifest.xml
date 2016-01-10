@@ -34,16 +34,16 @@
     <registry_contributions>
         <actions>
             <action name="load_installer_form">
-                <processing><serverCallback methodName="loadInstallerForm"/></processing>
+                <processing><serverCallback methodName="loadInstallerForm" restParams="/"/></processing>
             </action>
             <action name="boot_test_sql_connexion">
-                <processing><serverCallback methodName="testConnexions"/></processing>
+                <processing><serverCallback methodName="testConnexions" restParams="/"/></processing>
             </action>
             <action name="boot_test_mailer">
-                <processing><serverCallback methodName="testConnexions"/></processing>
+                <processing><serverCallback methodName="testConnexions" restParams="/"/></processing>
             </action>
             <action name="apply_installer_form">
-                <processing><serverCallback methodName="applyInstallerForm"/></processing>
+                <processing><serverCallback methodName="applyInstallerForm" restParams="/"/></processing>
             </action>
             <action name="ajxp_installer">
                 <gui iconClass="icon-magic" src="" text="installer.1" title="installer.1">
