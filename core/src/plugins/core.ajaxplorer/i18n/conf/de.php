@@ -163,4 +163,8 @@ $mess=array(
 "Default field to sort on" => "Default field to sort on",
 "Remote Sorting Default Direction" => "Remote Sorting Default Direction",
 "Default sorting direction" => "Default sorting direction",
+"Driver" => "Treiber",
+"Driver type (do not touch)" => "Art der Datenbankverbindung",
+"Use PHP MySQLi extension" => "Die Erweiterung PHP MySQLi verwenden",
+"Use MySQLi" => "MySQLi verwenden",
 );
