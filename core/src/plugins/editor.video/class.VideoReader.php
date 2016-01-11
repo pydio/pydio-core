@@ -69,7 +69,11 @@ class VideoReader extends AJXP_Plugin
                     $this->logInfo('Preview', 'Streaming content of '.$filename, array("files" => $filename));
                 }
 
-                $length = floatval($offsets[1]) - $offset + 1;
+                $additionalOffset = 1;
+                if (isset($_SERVER['HTTP_USER_AGENT']) && strlen(strstr($_SERVER['HTTP_USER_AGENT'], 'Firefox')) > 0) {
+                    $additionalOffset = 0;
+                }
+                $length = floatval($offsets[1]) - $offset + $additionalOffset;
 
                 if (!$length) $length = $filesize - $offset;
                 if ($length + $offset > $filesize || $length < 0) $length = $filesize - $offset;
