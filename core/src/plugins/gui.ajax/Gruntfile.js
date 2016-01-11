@@ -27,6 +27,7 @@ module.exports = function(grunt) {
                         'res/js/core/util/XMLUtils.js',
                         'res/js/core/util/PathUtils.js',
                         'res/js/core/util/HasherUtils.js',
+                        'res/js/core/util/CookiesManager.js',
                         'res/js/core/model/Router.js',
                         'res/js/core/model/AjxpNode.js',
                         'res/js/ui/prototype/util/ajxp_utils.js',
@@ -109,7 +110,8 @@ module.exports = function(grunt) {
             },
             nodejs: {
                 files: {
-                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js']
+                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js'],
+                    'res/js/vendor/nodejs/bundle.legacy.min.js': ['res/js/vendor/nodejs/bundle.legacy.prod.js']
                 }
             }
         },
@@ -144,7 +146,8 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js'
+                    'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js',
+                    'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js'
                 }
             }
         },
@@ -158,6 +161,7 @@ module.exports = function(grunt) {
                     'res/js/core/util/XMLUtils.js',
                     'res/js/core/util/PathUtils.js',
                     'res/js/core/util/HasherUtils.js',
+                    'res/js/core/util/CookiesManager.js',
                     'res/js/core/model/Router.js',
                     'res/js/core/model/AjxpNode.js',
                     'res/js/ui/prototype/util/ajxp_utils.js',

@@ -114,7 +114,7 @@ class Pydio extends Observable{
             if(this.UI.modal) this.UI.modal.initForms();
             this.UI.initObjects();
 
-            this.tryLogUserFromCookie();
+            PydioApi.getClient().tryToLogUserFromRememberData();
             this.fire("registry_loaded", this.Registry.getXML());
 
             window.setTimeout(function(){
@@ -138,7 +138,7 @@ class Pydio extends Observable{
             var reload = XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload");
             if(reload){
                 if(reload.getAttribute("repositoryId") != this.repositoryId){
-                    this.loadXmlRegistry(false);
+                    this.loadXmlRegistry(false, null, null, reload.getAttribute("repositoryId"));
                     this.repositoryId = null;
                 }
             }
@@ -151,8 +151,8 @@ class Pydio extends Observable{
      * @param sync Boolean Whether to send synchronously or not.
      * @param xPath String An XPath to load only a subpart of the registry
      */
-    loadXmlRegistry (sync, xPath=null, completeFunc=null){
-        this.Registry.load(sync, xPath, completeFunc, this.repositoryId);
+    loadXmlRegistry (sync, xPath=null, completeFunc=null, targetRepositoryId=null){
+        this.Registry.load(sync, xPath, completeFunc, (targetRepositoryId === null ? Math.random() : targetRepositoryId));
     }
 
     /**
@@ -161,28 +161,6 @@ class Pydio extends Observable{
      */
     getXmlRegistry (){
         return this.Registry.getXML();
-    }
-
-    /**
-     * Try reading the cookie and sending it to the server
-     */
-    tryLogUserFromCookie (){
-        // TODO: to grab from somewhere else
-        /*
-        var connexion = new Connexion();
-        var rememberData = retrieveRememberData();
-        if(rememberData!=null){
-            connexion.addParameter('get_action', 'login');
-            connexion.addParameter('userid', rememberData.user);
-            connexion.addParameter('password', rememberData.pass);
-            connexion.addParameter('cookie_login', 'true');
-            connexion.onComplete = function(transport){
-                hideLightBox();
-                this.Controller.parseXmlMessage(transport.responseXML);
-            }.bind(this);
-            connexion.sendSync();
-        }
-        */
     }
 
     /**
@@ -344,9 +322,9 @@ class Pydio extends Observable{
         this.fire("trigger_repository_switch");
         var onComplete = function(transport){
             if(transport.responseXML){
-                this.Controller.parseXmlMessage(transport.responseXML);
+                this.ApiClient.parseXmlMessage(transport.responseXML);
             }
-            this.loadXmlRegistry();
+            this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;
         }.bind(this);
         var root = this._contextHolder.getRootNode();
@@ -369,6 +347,9 @@ class Pydio extends Observable{
         var onComplete = function(transport){
             if(transport.responseJSON){
                 this.MessageHash = transport.responseJSON;
+                if(window && window.MessageHash) {
+                    window.MessageHash = this.MessageHash;
+                }
                 for(var key in this.MessageHash){
                     if(this.MessageHash.hasOwnProperty(key)){
                         this.MessageHash[key] = this.MessageHash[key].replace("\\n", "\n");

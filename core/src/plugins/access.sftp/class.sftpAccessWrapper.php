@@ -180,8 +180,8 @@ class sftpAccessWrapper extends fsAccessWrapper
             fclose($stream);
 
             if (trim($output != "")) {
-                $res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
-                preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
+                //$res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
+                preg_match_all("/(\w*)=(\w*)\(([\w-]*)\)/", $output, $matches);
                 if (count($matches[0]) == 3) {
                     $uid = $matches[2][0];
                     $gid = $matches[2][1];
@@ -251,6 +251,11 @@ class sftpAccessWrapper extends fsAccessWrapper
     public static function isRemote()
     {
         return true;
+    }
+
+    public static function isSeekable($url)
+    {
+        return false;
     }
 
     /**

@@ -32,7 +32,7 @@
                             conn.addParameter("unlock", "true");
                         }
                         conn.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     ]]></clientCallback>

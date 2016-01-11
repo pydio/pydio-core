@@ -38,5 +38,5 @@ $mess = array(
     "14" => "Estrazione avvenuta correttamente nella cartella '%s'!!",
     "15" => "I file selezionati non sono archivi TAR, TAR.GZ o TAR.BZ2!!",
     "16" => "E' possibile comprimere solo in TAR, TAR.GZ o TAR.BZ2!!",
-    "17" => "You can't compress empty folders."
+    "17" => "Non è possibile comprire una cartella vuota."
 );

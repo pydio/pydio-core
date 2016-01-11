@@ -143,12 +143,11 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     protected function sendSoftLimitAlert()
     {
-        $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
-        if (count($mailers)) {
-            $this->mailer = array_shift($mailers);
+        $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+        if ($mailer !== false) {
             $percent = $this->getFilteredOption("SOFT_QUOTA");
             $quota = $this->getFilteredOption("DEFAULT_QUOTA");
-            $this->mailer->sendMail(
+            $mailer->sendMail(
                 array(AuthService::getLoggedUser()->getId()),
                 "You are close to exceed your quota!",
                 "You are currently using more than $percent% of your authorized quota of $quota!");

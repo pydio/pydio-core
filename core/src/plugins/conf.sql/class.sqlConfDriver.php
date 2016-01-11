@@ -1203,10 +1203,17 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         switch ($actionName) {
             case "user_team_create":
                 $userIds = $httpVars["user_ids"];
-                $teamLabel = $httpVars["team_label"];
+                $teamLabel = AJXP_Utils::sanitize($httpVars["team_label"], AJXP_SANITIZE_HTML_STRICT);
+                if(empty($teamLabel)){
+                    throw new Exception("Empty Team Label!");
+                }
+                if(empty($userIds)){
+                    throw new Exception("Please select some users for this team.");
+                }
                 $teamId = AJXP_Utils::slugify($teamLabel)."-".intval(rand(0,1000));
                 foreach ($userIds as $userId) {
-                    $this->addUserToTeam($teamId, $userId, $teamLabel);
+                    $id = AJXP_Utils::sanitize($userId, AJXP_SANITIZE_EMAILCHARS);
+                    $this->addUserToTeam($teamId, $id, $teamLabel);
                 }
                 echo 'Created Team $teamId';
                 break;

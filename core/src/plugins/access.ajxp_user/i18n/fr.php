@@ -78,4 +78,8 @@ $mess=array(
     "54"=> "Editer les membres",
     "55"=> "Ajouter/retirer des utilisateurs de cette liste",
     "56"=> "Ajouter un identifiant par ligne. Tapez quelques lettres pour voir apparaitre la liste de complétion automatique.",
+    "57" => "Créer une équipe",
+    "58" => "Les équipes sont utilisées comme raccourci pour partager un répertoire avec un ensemble d'utilisateurs prédéfinis.",
+    "59" => "Libellé",
+    "60" => "Utilisateurs de l'équipe",
 );

@@ -328,8 +328,11 @@ class ConfService
 
         $logged = AuthService::getLoggedUser();
         $u = $logged == null ? "shared" : $logged->getId();
+        $a = "norepository";
         $r = ConfService::getRepository();
-        $a = $r->getSlug();
+        if($r !== null){
+            $a = $r->getSlug();
+        }
         $v = $extendedVersion ? "extended":"light";
         return "xml_registry:".$v.":".$u.":".$a;
 
@@ -368,7 +371,7 @@ class ConfService
         }
         $parameters = $loggedUser->mergedRole->listParameters();
         foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
+            if ($scope === AJXP_REPO_SCOPE_ALL || $scope === $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope === AJXP_REPO_SCOPE_SHARED)) {
                 foreach ($paramsPlugs as $plugId => $params) {
                     foreach ($params as $name => $value) {
                         // Search exposed plugin_configs, replace if necessary.
@@ -1118,9 +1121,17 @@ class ConfService
     {
         AJXP_Controller::applyHook("workspace.before_delete", array($repoId));
         $confStorage = self::getConfStorageImpl();
+        $shares = $confStorage->listRepositoriesWithCriteria(array("parent_uuid" => $repoId));
+        $toDelete = array();
+        foreach($shares as $share){
+            $toDelete[] = $share->getId();
+        }
         $res = $confStorage->deleteRepository($repoId);
         if ($res == -1) {
             return $res;
+        }
+        foreach($toDelete as $deleteId){
+            $this->deleteRepositoryInst($deleteId);
         }
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
@@ -1412,6 +1423,55 @@ class ConfService
         $confs = $coreP->getConfigs();
         $confs = AuthService::filterPluginParameters("core.".$coreType, $confs);
         return (isSet($confs[$varName]) ? AJXP_VarsFilter::filter($confs[$varName]) : null);
+    }
+
+    /**
+     * @var array Keep loaded labels in memory
+     */
+    private static $usersParametersCache = array();
+
+    /**
+     * @param string $parameterName Plugin parameter name
+     * @param AbstractAjxpUser|string $userIdOrObject
+     * @param string $pluginId Plugin name, core.conf by default
+     * @param null $defaultValue
+     * @return mixed
+     */
+    public static function getUserPersonalParameter($parameterName, $userIdOrObject, $pluginId="core.conf", $defaultValue=null){
+
+        $cacheId = $pluginId."-".$parameterName;
+        if(!isSet(self::$usersParametersCache[$cacheId])){
+            self::$usersParametersCache[$cacheId] = array();
+        }
+        // Passed an already loaded object
+        if(is_a($userIdOrObject, "AbstractAjxpUser")){
+            $value = $userIdOrObject->personalRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+            self::$usersParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
+            return $value;
+        }
+        // Already in memory cache
+        if(isSet(self::$usersParametersCache[$cacheId][$userIdOrObject])){
+            return self::$usersParametersCache[$cacheId][$userIdOrObject];
+        }
+
+        // Try to load personal role if it was already loaded.
+        $uRole = AuthService::getRole("AJXP_USR_/".$userIdOrObject);
+        if($uRole === false){
+            $uObject = self::getConfStorageImpl()->createUserObject($userIdOrObject);
+            if(isSet($uObject)){
+                $uRole = $uObject->personalRole;
+            }
+        }
+        if(empty($uRole)){
+            return $defaultValue;
+        }
+        $value = $uRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+        if(empty($value) && !empty($defaultValue)) {
+            $value = $userIdOrObject;
+        }
+        self::$usersParametersCache[$cacheId][$userIdOrObject] = $value;
+        return $value;
+
     }
 
     /**

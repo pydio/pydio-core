@@ -207,12 +207,12 @@ class ResourcesManager{
 			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
 					this.addJSResource(
-                        node.childNodes[k].getAttribute('file'),
+                        ResourcesManager.getFileOrFallback(node.childNodes[k]),
                         node.childNodes[k].getAttribute('className'),
                         (node.childNodes[k].getAttribute('autoload') === true)
                     );
 				}else if(node.childNodes[k].nodeName == 'css'){
-					this.addCSSResource(node.childNodes[k].getAttribute('file'));
+					this.addCSSResource(ResourcesManager.getFileOrFallback(node.childNodes[k]));
 				}else if(node.childNodes[k].nodeName == 'img_library'){
 					ResourcesManager.addImageLibrary(node.childNodes[k].getAttribute('alias'), node.childNodes[k].getAttribute('path'));
 				}
@@ -256,9 +256,9 @@ class ResourcesManager{
         ResourcesManager.__dependencies = new Map();
         ResourcesManager.__components = new Map();
         for(node of jsNodes){
-            ResourcesManager.__modules.set(node.getAttribute('className'), node.getAttribute('file'));
+            ResourcesManager.__modules.set(node.getAttribute('className'), ResourcesManager.getFileOrFallback(node));
             if(node.getAttribute('autoload') === "true"){
-                manager.loadJSResource(node.getAttribute('file'), node.getAttribute('className'), null, false);
+                manager.loadJSResource(ResourcesManager.getFileOrFallback(node), node.getAttribute('className'), null, false);
             }
             if(node.getAttribute('depends')){
                 ResourcesManager.__dependencies.set(node.getAttribute('className'), node.getAttribute('depends').split(','));
@@ -266,9 +266,9 @@ class ResourcesManager{
         }
         var compNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/component');
         for(node of compNodes){
-            ResourcesManager.__components.set(node.getAttribute('componentName'), node.getAttribute('file'));
+            ResourcesManager.__components.set(node.getAttribute('componentName'), ResourcesManager.getFileOrFallback(node));
             if(node.getAttribute('autoload') === "true"){
-                manager.loadWebComponents([node.getAttribute('file')]);
+                manager.loadWebComponents([ResourcesManager.getFileOrFallback(node)]);
             }
         }
 		var imgNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
@@ -277,9 +277,17 @@ class ResourcesManager{
         }
 		var cssNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
         for(node of cssNodes){
-			manager.loadCSSResource(node.getAttribute("file"));
+			manager.loadCSSResource(ResourcesManager.getFileOrFallback(node));
         }
 	}
+
+    static getFileOrFallback(node){
+        if(node.getAttribute('fallbackCondition') && eval(node.getAttribute('fallbackCondition'))){
+            return node.getAttribute('fallbackFile');
+        }else{
+            return node.getAttribute('file');
+        }
+    }
 
     /**
      *

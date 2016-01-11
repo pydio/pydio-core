@@ -124,7 +124,7 @@
 							connexion.onComplete = function(transport){
                                 oForm.userid.value = '';
                                 oForm.password.value = '';
-								var success = pydio.getController().parseXmlMessage(transport.responseXML);
+								var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
 								if(success){
         						    $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
         						    oForm.up('.dialogContent').writeAttribute("style", "");
@@ -189,7 +189,7 @@
 					var connexion = new Connexion();
 					connexion.addParameter('get_action', 'logout');
 					connexion.onComplete = function(transport){
-						pydio.getController().parseXmlMessage(transport.responseXML);
+						PydioApi.getClient().parseXmlMessage(transport.responseXML);
 						};
 					connexion.sendAsync();
 					]]></clientCallback>

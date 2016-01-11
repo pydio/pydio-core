@@ -208,8 +208,7 @@ class Controller extends Observable{
 			
 	/**
 	 * Filter the actions given the srcElement passed as arguments.
-     * TODO: SIGNATURE CHANGED, FROM srcElement to actionsSelectorAtt
-	 * @param srcElement String An identifier among selectionContext, genericContext, a webfx object id
+	 * @param actionsSelectorAtt String An identifier among selectionContext, genericContext, a webfx object id
      * @param ignoreGroups Array a list of groups to ignore
 	 * @returns Array
 	 */
@@ -271,14 +270,14 @@ class Controller extends Observable{
             });
 		}.bind(this));
         var first = true, keys = [];
-        if(defaultGroup && contextActionsGroup.has(defaultGroup)){
-            keys.push(defaultGroup);
-        }
         for(var k of contextActionsGroup.keys()){
-            if(k == defaultGroup) continue;
+            if(defaultGroup && k == defaultGroup) continue;
             keys.push(k);
         }
         keys.sort();
+        if(defaultGroup && contextActionsGroup.has(defaultGroup)){
+            keys.unshift(defaultGroup);
+        }
         keys.each(function(key){
             var value = contextActionsGroup.get(key);
             if(!first){

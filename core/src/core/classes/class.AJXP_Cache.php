@@ -84,8 +84,7 @@ class AJXP_Cache
      * @param null $idComputerCallback
      * @return void
      */
-    public function AJXP_Cache($pluginId, $filepath, $dataCallback, $idComputerCallback = NULL)
-    {
+    function __construct($pluginId, $filepath, $dataCallback, $idComputerCallback = NULL) {
         $this->cacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
         $this->masterFile = $filepath;
         $this->dataCallback = $dataCallback;

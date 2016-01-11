@@ -365,7 +365,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user_editable"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $userDisplayName = $userObject->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", "ajxp_user", $userId);
+            $userDisplayName = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             echo AJXP_XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
         }
 
@@ -670,8 +670,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             continue;
                         }
                         $meta = array();
-                        if($repositoryObject->getOption("META_SOURCES") != null){
-                            $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
+                        try{
+                            if($repositoryObject->getOption("META_SOURCES") != null){
+                                $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
+                            }
+                        }catch(Exception $e){
+                            if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
+                            $this->logError("Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
+                            continue;
                         }
                         $repoDetailed[$repositoryId] = array(
                             "label"  => SystemTextEncoding::toUTF8($repositoryObject->getDisplay()),
@@ -683,14 +689,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         if(array_key_exists($repositoryId, $sharedRepos)){
                             $sharedRepos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
                             $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
-                            $repoOwnerLabel = $repoOwnerId = $repositoryObject->getOwner();
+                            $repoOwnerId = $repositoryObject->getOwner();
                             if(isSet($allReps[$repoParentId])){
                                 $repoParentLabel = SystemTextEncoding::toUTF8($allReps[$repoParentId]->getDisplay());
                             }
-                            $ownerObject = ConfService::getConfStorageImpl()->createUserObject($repoOwnerId);
-                            if(isSet($ownerObject)){
-                                $repoOwnerLabel = $ownerObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $repoOwnerId);
-                            }
+                            $repoOwnerLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
                             $repoDetailed[$repositoryId]["share"] = array(
                                 "parent_user" => $repoOwnerId,
                                 "parent_user_label" => $repoOwnerLabel,
@@ -2369,9 +2372,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $rightsString = implode(", ", $r);
             }
-            $nodeLabel = $userId;
-            $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-            if(!empty($test)) $nodeLabel = $test;
+            $nodeLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             $scheme = AuthService::getAuthScheme($userId);
             $nodeKey = "/data/$root/".$userId;
             $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
@@ -2781,7 +2782,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             </columns>';
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($config);
             $date = $parts[count($parts)-1];
-            $logger->xmlLogs($dir, $date, "tree", "/".$root."/logs");
+            $logger->xmlLogs($dir, $date, "tree", "/".$root."/logs", isSet($_POST["cursor"])?intval($_POST["cursor"]):-1);
         } else {
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
             $nodes = $logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), "/".$root."/logs", false);

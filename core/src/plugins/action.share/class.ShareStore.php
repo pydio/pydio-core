@@ -318,6 +318,7 @@ class ShareStore {
                 if($repo == null){
                     throw new Exception("Cannot find associated share");
                 }
+                $element = $share["REPOSITORY"];
             }
             $this->testUserCanEditShare($repo->getOwner());
             $res = ConfService::deleteRepository($element);

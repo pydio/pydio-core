@@ -33,7 +33,7 @@ websocket.onmessage = function(event){console.log(event.data);};
  *     new PeriodicalExecuter(function(pe){
      var conn = new Connexion();
      conn.setParameters($H({get_action:'client_consume_channel',channel:'nodes:0',client_id:'toto'}));
-     conn.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
+     conn.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
      conn.sendAsync();
      }, 5);
  *
@@ -130,7 +130,7 @@ class MqManager extends AJXP_Plugin
 
     public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
-        if ($repositoryId == AJXP_REPO_SCOPE_ALL) {
+        if ($repositoryId === AJXP_REPO_SCOPE_ALL) {
             $userId = $targetUserId;
         } else {
             $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
@@ -181,7 +181,7 @@ class MqManager extends AJXP_Plugin
             $input = serialize($input);
             $msg = WebSocketMessage::create($input);
             if (!isset($this->wsClient)) {
-                $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
+                $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_BIND_HOST"].":".$configs["WS_SERVER_BIND_PORT"].$configs["WS_SERVER_PATH"]);
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
                 @$this->wsClient->open();
             }

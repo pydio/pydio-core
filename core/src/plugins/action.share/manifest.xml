@@ -433,7 +433,7 @@
 						conn.addParameter("get_action", "sharelist-clearExpired");
 						var dm = window.actionManager.getDataModel();
 						conn.onComplete = function(transport){
-							pydio.getController().parseXmlMessage(transport.responseXML);
+							PydioApi.getClient().parseXmlMessage(transport.responseXML);
                             if(window.actionManager){
                                 dm.requireContextChange(dm.getRootNode(), true);
                             }

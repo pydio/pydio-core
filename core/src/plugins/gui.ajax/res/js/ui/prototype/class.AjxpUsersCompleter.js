@@ -230,7 +230,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                                     li.appendToList(listElement);
                                     success = true;
                                 }else{
-                                    pydio.getController().parseXmlMessage(transport.responseXML);
+                                    PydioApi.getClient().parseXmlMessage(transport.responseXML);
                                     success = false;
                                 }
                             };

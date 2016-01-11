@@ -288,38 +288,28 @@ class PydioApi{
     }
 
     userSavePreference(prefName, prefValue){
-        var conn = new Connexion();
-        conn.setMethod('post');
-        conn.discrete = true;
-        conn.addParameter("get_action", "save_user_pref");
-        conn.addParameter("pref_name_" + 0, prefName);
-        conn.addParameter("pref_value_" + 0, prefValue);
-        conn.sendAsync();
+        this.request({get_action:"save_user_pref", "pref_name_0":prefName, "pref_value_0":prefValue}, null, null, {discrete:true, method:'post'});
     }
 
     userSavePreferences(preferences, completeCallback){
-        var conn = new Connexion();
-        conn.addParameter("get_action", "save_user_pref");
+        var params = {'get_action':'save_user_pref'};
         var i=0;
         preferences.forEach(function(value, key){
-            conn.addParameter("pref_name_"+i, key);
-            conn.addParameter("pref_value_"+i, value);
+            params["pref_name_"+i] = key;
+            params["pref_value_"+i] = value;
             i++;
         });
-        conn.onComplete = completeCallback;
-        conn.sendAsync();
-
+        this.request(params, completeCallback, null, {discrete:true, method:'post'});
     }
 
     userSavePassword(oldPass, newPass, seed, completeCallback){
-        var conn = new Connexion();
-        conn.addParameter("get_action", "save_user_pref");
-        conn.addParameter("pref_name_"+i, "password");
-        conn.addParameter("pref_value_"+i, newPass);
-        conn.addParameter("crt", oldPass);
-        conn.addParameter("pass_seed", seed);
-        conn.onComplete = completeCallback;
-        conn.sendAsync();
+        this.request({
+            get_action:'save_user_pref',
+            pref_name_0:"password",
+            pref_value_0:newPass,
+            crt:oldPass,
+            pass_seed:seed
+        }, completeCallback, null, {discrete:true, method:'post'});
 
     }
 
@@ -454,14 +444,9 @@ class PydioApi{
                 if(result == '1')
                 {
                     try{
-                        /*
-                        TODO: REMEMBER COOKIE STUFF
                         if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
-                            var login = childs[i].getAttribute('remember_login');
-                            var pass = childs[i].getAttribute('remember_pass');
-                            storeRememberData(login, pass);
+                            PydioApi.storeRememberData();
                         }
-                        */
                     }catch(e){
                         Logger.error('Error after login, could prevent registry loading!', e);
                     }
@@ -558,8 +543,50 @@ class PydioApi{
      * Trigger a simple download
      * @param url String
      */
-    triggerDownload(url){
+    static triggerDownload(url){
         document.location.href = url;
+    }
+
+    static storeRememberData(){
+        if(!CookiesManager.supported()) return false;
+        var cManager = new CookiesManager({
+            expires: 3600*24*10,
+            path:'/',
+            secure: true
+        });
+        cManager.putCookie('remember', 'true');
+    }
+
+    static clearRememberData(){
+        if(!CookiesManager.supported()) return false;
+        var cManager = new CookiesManager({
+            path:'/',
+            secure: true
+        });
+        return cManager.removeCookie('remember');
+    }
+
+    static hasRememberData(){
+        if(!CookiesManager.supported()) return false;
+        var cManager = new CookiesManager({
+            path:'/',
+            secure: true
+        });
+        return (cManager.getCookie('remember') === 'true');
+    }
+
+    tryToLogUserFromRememberData(){
+        if(!CookiesManager.supported()) return false;
+        if(PydioApi.hasRememberData()){
+            this.request({
+                get_action:'login',
+                userid:'notify',
+                password:'notify',
+                cookie_login:'true'
+            }, function(transport){
+                this.parseXmlMessage(transport.responseXML);
+            }.bind(this), null, {async:false});
+        }
     }
 
 

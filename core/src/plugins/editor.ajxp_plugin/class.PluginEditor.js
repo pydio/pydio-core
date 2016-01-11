@@ -87,7 +87,7 @@ Class.create("PluginEditor", AbstractEditor, {
             conn.setParameters(toSubmit);
             conn.setMethod("post");
             conn.onComplete = function(transport){
-                pydio.getController().parseXmlMessage(transport.responseXML);
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 this.loadPluginConfig();
                 this.setClean();
             }.bind(this);
