@@ -223,6 +223,10 @@ class s3AccessWrapper extends fsAccessWrapper
                 'key'    => $repoObject->getOption("API_KEY"),
                 'secret' => $repoObject->getOption("SECRET_KEY")
             );
+            $signatureVersion = $repoObject->getOption("SIGNATURE_VERSION");
+            if(!empty($signatureVersion)){
+                $options['signature'] = $signatureVersion;
+            }
             $baseURL = $repoObject->getOption("STORAGE_URL");
             if(!empty($baseURL)){
                 $options["base_url"] = $baseURL;
