@@ -22,26 +22,29 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * Check that output buffering is enabled
+ * Check that file uploads is enabled
  * @package AjaXplorer
  * @subpackage Tests
  */
-class PHP_OB extends AbstractTest
+class PHP_file_uploads extends AbstractTest
 {
-    public function __construct() { parent::__construct("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with Pydio."); }
+    protected static $testKey = 'PHP File Uploads enabled';
+    
+    public function __construct() { parent::__construct(self::$testKey, "You should enable php file_uploads parameter for uploading files with Pydio."); }
     public function doTest()
     {
         $this->failedLevel = "warning";
-        $v = @ini_get("output_buffering");
+        $v = @ini_get("file_uploads");
         if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
-            $this->testedParams["PHP Output Buffer disabled"] = "No";
-            return FALSE;
+            $this->failedInfo = "PHP File Uploads is enabled";
+            $this->testedParams[self::$testKey] = "Yes";
+            return TRUE;
         } else if (!isSet($v)) {
-            $this->failedInfo = "Unable to detect the output_buffering value, please make sure that it is disabled (Off) in your php.ini or your virtual host.";
+            $this->failedInfo = "Unable to detect the file_uploads value, please make sure that it is disabled (Off) in your php.ini or your virtual host.";
             return FALSE;
         }
-        $this->failedInfo = "PHP Output Buffering is disabled, this is good for better performances";
-        $this->testedParams["PHP Output Buffer disabled"] = "Yes";
-        return TRUE;
+        $this->failedInfo = "PHP File Uploads is disabled";
+        $this->testedParams[self::$testKey] = "Yes";
+        return false;
     }
 }
