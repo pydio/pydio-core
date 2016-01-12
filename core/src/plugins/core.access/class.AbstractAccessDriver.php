@@ -280,6 +280,8 @@ class AbstractAccessDriver extends AJXP_Plugin
             }
             if (isset($dirRes)) {
                 $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
+            } else if (is_dir($destFile)) {
+                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
             } else {
                 $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
             }
