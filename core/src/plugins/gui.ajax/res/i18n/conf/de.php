@@ -96,7 +96,8 @@ $mess=array(
 "Detected Encoding" => "Server-Encoding",
 "Detected Server Path" => "Server-Pfad",
 "Application Title" => "Titel der Anwendung",
+"Page Background Images" => "Hintergrundbilder",
+"Minisite" => "Minisite",
 "Minisite Logo" => "Logo",
 "Top-right logo displayed on minisite page" => "Logo, das auf Minisites angezeigt wird",
-"Page Background Images" => "Hintergrundbilder",
 );

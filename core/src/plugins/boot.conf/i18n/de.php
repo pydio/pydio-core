@@ -22,7 +22,7 @@
 $mess = array(
     "1" => "Pydio Installationsassistent",
     "2" => "Willkommen beim Pydio Installationsassistenten",
-    "3" => "Danke dass Sie Pydio installieren!</br> Dieser Assistent hilft Ihnen, ihre neue Sharing-Plattform in Kürze aufzusetzen. Blättern Sie durch die verschiedenen Abschnitte um die Grundeinstellungen einzurichten. Zusätzliche Informationen erhalten Sie, wenn Sie den Mauszeiger über die Bezeichnungen halten.<br></br>Sind Sie bereit? ",
+    "3" => "Danke dass Sie sich für Pydio entschieden haben!</br> Dieser Assistent hilft Ihnen, ihre neue Sharing-Plattform aufzusetzen. Blättern Sie durch die verschiedenen Abschnitte um die Grundeinstellungen einzurichten. Zusätzliche Informationen erhalten Sie, wenn Sie den Mauszeiger über die Bezeichnungen halten.",
     "4" => "Assistent starten!",
     "5" => "Bitte warten Sie während Pydio konfiguriert wird! Pydio wird in einigen Sekunden vollständig bereit stehen ...",
     "6" => "Pydio jetzt installieren",

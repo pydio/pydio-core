@@ -12,14 +12,14 @@
     <server_settings>
         <global_param group="CONF_MESSAGE[Main options]" name="sysLegend" type="legend" label="" description="CONF_MESSAGE[Set up application title and create a connexion identifier for the super-administrator user. Make sure to use a strong password, as this user will have full access to the server.]"/>
         <global_param group="CONF_MESSAGE[Main options]" name="APPLICATION_TITLE" type="string" label="CONF_MESSAGE[Application Title]" description="CONF_MESSAGE[Your system title]" default="Pydio" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Main options]" name="APPLICATION_WELCOME" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additional message displayed at startup, on the splash screen and the login screen.]" default="Welcome to Pydio" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Main options]" name="APPLICATION_WELCOME" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additional message displayed at startup, on the splash screen and the login screen.]" default="CONF_MESSAGE[Welcome to Pydio]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Main options]" name="ADMIN_USER_LOGIN" type="string" label="CONF_MESSAGE[Admin Login]" description="CONF_MESSAGE[Alphanumeric login]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Main options]" name="ADMIN_USER_NAME" type="string" label="CONF_MESSAGE[Admin Display Name]" description="CONF_MESSAGE[User-friendly name of the user]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Main options]" name="ADMIN_USER_PASS" type="password" label="CONF_MESSAGE[Admin Password]" description="CONF_MESSAGE[Use a strong password (more than 8 characters, complicated ones.]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Main options]" name="ADMIN_USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" description="CONF_MESSAGE[Confirm password]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Database Connexion]" name="StorageLegend" type="legend" label="" description="CONF_MESSAGE[How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection.]"/>
         <global_param group="CONF_MESSAGE[Database Connexion]" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connection]" description="CONF_MESSAGE[Test Connexion]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Database Connexion]" name="db_type" default="mysql" label="Database" description="Driver type (do not touch)" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
+        <global_param group="CONF_MESSAGE[Database Connexion]" name="db_type" default="mysql" label="CONF_MESSAGE[Database]" description="CONF_MESSAGE[Driver type (do not touch)]" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="AdvancedLegend" type="legend" label="" description="CONF_MESSAGE[Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration.]"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="ENCODING" type="string" label="CONF_MESSAGE[Detected Encoding]" description="CONF_MESSAGE[Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8]" default="" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="SERVER_URI" type="string" label="CONF_MESSAGE[Detected Server Path]" description="CONF_MESSAGE[Make sure this is correct, as it's used to rewrite the htaccess file]" default="/" mandatory="true"/>
@@ -67,7 +67,7 @@
                             </div>
                             <div style="margin-top:40px;" class="dialogLegend installerLang SF_material">
                                 <div class="SF_element" style="float: left;"><select class="SF_input" id="installer_lang"></select><span class="select-styler"></span></div>
-                                <div id="start_button" class="SF_input SF_inlineButton" style="display:block; float:right; width:110px; margin-top: 7px !important; background-color:#F47561 !important;" ajxp_message_id="installer.4">AJXP_MESSAGE[installer.4] <span class="icon-chevron-right"></span></div>
+                                <div id="start_button" class="SF_input SF_inlineButton" style="display:block; float:right; width:180px; margin-top: 7px !important; background-color:#F47561 !important;" ajxp_message_id="installer.4">AJXP_MESSAGE[installer.4] <span class="icon-chevron-right"></span></div>
                             </div>
                             <div id="the_form" class="SF_material" style="display:none; margin:0 5px;"></div>
                             <div id="configuration_progress" class="dialogLegend installerWelcome" style="display:none; margin:0 5px;">
@@ -76,7 +76,7 @@
                                     <span class="icon-spinner rotating spinner_large"></span>
                                 </div>
                             </div>
-                            <div class="SF_input SF_inlineButton" style="display:none; width:150px;" tabIndex="0"><span class="icon-play-circle"></span><span ajxp_message_id="installer.6">AJXP_MESSAGE[installer.6]</span></div>
+                            <div class="SF_input SF_inlineButton" style="display:none; width:180px;" tabIndex="0"><span class="icon-play-circle"></span><span ajxp_message_id="installer.6">AJXP_MESSAGE[installer.6]</span></div>
                         </div>
                     ]]></clientForm>
                     <clientListener name="init"><![CDATA[

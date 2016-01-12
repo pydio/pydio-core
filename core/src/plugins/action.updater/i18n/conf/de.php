@@ -34,9 +34,9 @@ $mess=array(
 "Proxy User" => "Proxy-Benutzer",
 "Predefined proxy user name" => "Proxy-Benutzer festlegen",
 "Proxy Pass" => "Proxy-Passwort",
+"Predefined proxy password" => "Proxy-Passwort festlegen",
+"Proxy configuration" => "Proxy-Einstellungen",
 "Stable" => "Stabil",
 "Development" => "Entwicklung",
 "Testing (blank)" => "Test (leer)",
-"Predefined proxy password" => "Proxy-Passwort festlegen",
-"Proxy configuration" => "Proxy-Einstellungen",
 );

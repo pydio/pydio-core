@@ -1,7 +1,9 @@
 <?php
+
 $mess = array(
 // will be replaced by the application title
 "1" => "%s öffentlicher Download",
+// will be replaced by the filename to download
 "2" => "Klicken Sie auf das Bild, um <b>%s</b> auf Ihre Festplatte zu speichern",
 "3" => "falsches Passwort",
 "4" => "Geben Sie das erforderliche Passwort ein und klicken Sie auf das Bild um <b>%s</b> auf Ihre Festplatte zu speichern",
@@ -47,6 +49,8 @@ $mess = array(
 "44"=> "%s teilt",
 "45"=> "Einladung senden",
 "46"=> "Öffne Arbeitsumgebung %s1 direkt in %s2",
+"46_mini" => "Öffne Vorschau %s1",
+"46_file" => "Öffne Datei %s1",
 "47"=> "Beobachtungsstatus erfolgreich geändert ",
 "48"=> "Sie sind nicht berechtigt auf diese Daten zuzugreifen.",
 "49"=> "Benutzer erstellen",
@@ -162,8 +166,6 @@ $mess = array(
 "154" => "Filmstreifen (gut für Bildergalerien)",
 "155" => "Eingebettet (kleinere Kopfzeile, für Widgets)",
 "156" => "Erfolgreich veröffentliche Links %s",
-"46_mini" => "Öffne Vorschau %s1",
-"46_file" => "Öffne Datei %s1",
 "157" => "Dieser Ordner ist momentan freigegeben. Wenn Sie ihn löschen wird die damit verbunden Freigabe deaktiviert.",
 "158" => "Diese Datei ist momentan freigegeben. Wenn Sie ihn löschen wird die damit verbunden Freigabe deaktiviert. ",
 "159" => "Eigentümer",
