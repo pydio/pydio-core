@@ -142,7 +142,7 @@ class fsAccessWrapper implements AjxpWrapper
                         if ($afterPath != "" && substr_count($afterPath, "/") < 2) {
                             $statValue = array();
                             if (substr_count($afterPath, "/") == 0) {
-                                $statValue[2] = $statValue["mode"] = ($item["folder"]?"00040555":"0100555");
+                                $statValue[2] = $statValue["mode"] = ($item["folder"]?00040555:0100555);
                                 $statValue[7] = $statValue["size"] = $item["size"];
                                 $statValue[8] = $statValue["atime"] = $item["mtime"];
                                 $statValue[9] = $statValue["mtime"] = $item["mtime"];
@@ -160,7 +160,7 @@ class fsAccessWrapper implements AjxpWrapper
                                 $arr = explode("/", $afterPath);
                                 $afterPath = array_shift($arr);
                                 if(isSet($folders[$afterPath]) || isSet($builtFolders[$afterPath])) continue;
-                                $statValue[2] = $statValue["mode"] = "00040555";
+                                $statValue[2] = $statValue["mode"] = 00040555;
                                 $statValue[7] = $statValue["size"] = 0;
                                 $statValue[8] = $statValue["atime"] = $item["mtime"];
                                 $statValue[9] = $statValue["mtime"] = $item["mtime"];
