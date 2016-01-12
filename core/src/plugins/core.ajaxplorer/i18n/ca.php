@@ -635,7 +635,7 @@ $mess=array(
 "539" => "Error en la pujada: arxiu pujat parcialment",
 "540" => "Error en la pujada: no es pot trobar el directori temporal",
 "541" => "Error en la pujada: no es pot escriure en el directori temporal",
-"542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega."
+"542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega.",
 "543" => "Resultats limitats a 100 de %s.",
 "544" => "Mostrar tot",
 
