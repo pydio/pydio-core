@@ -176,4 +176,10 @@ $mess=array(
 "151" => "Root Group",
 "152" => "Root Group Role",
 "153" => "Applies to the whole hierarchy of users",
+"154" => "Vorlagen für Arbeitsumgebungen",
+"155" => "Treiber",
+"156" => "Standard", // user type standard
+"157" => "Administrator",
+"158" => "Freigabebenutzer", // user type shared
+"159" => "Gast",
 );

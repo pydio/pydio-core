@@ -336,7 +336,7 @@ Class.create("ConfigEditor",{
 		if(Prototype.Browser.IE){this.driverSelector.hide();}
 		this.driverSelector.update('<option value="0" selected></option>');
 		if(this.templates.size()){
-			this.driverSelector.insert(new Element('optgroup', {label:"Repository Templates"}));
+			this.driverSelector.insert(new Element('optgroup', {label:MessageHash['ajxp_conf.154']}));
 			this.templates.each(function(pair){
 				var option = new Element('option');
 				option.setAttribute('value', 'ajxp_template_'+pair.key);
@@ -345,7 +345,7 @@ Class.create("ConfigEditor",{
 			}.bind(this));			
 		}
         if(!this.drivers.NOT_ALLOWED){
-            this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
+            this.driverSelector.insert(new Element('optgroup', {label:MessageHash['ajxp_conf.155']}));
             this.drivers.each(function(pair){
                 var option = new Element('option');
                 option.setAttribute('value', pair.key);
