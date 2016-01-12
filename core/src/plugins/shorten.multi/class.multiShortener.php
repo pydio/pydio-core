@@ -90,7 +90,7 @@ class multiShortener extends AJXP_Plugin
                     )
                 );
 
-                $goourl = 'https://www.googleapis.com/urlshortener/v1/url';
+                $goourl = 'https://www.googleapis.com/urlshortener/v1/url?key='.$type["GOOGL_APIKEY"];
                 $context  = stream_context_create( $options );
                 $result = file_get_contents( $goourl, false, $context );
                 $json = (array) json_decode( $result );
