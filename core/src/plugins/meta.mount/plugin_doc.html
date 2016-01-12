@@ -1,9 +1,38 @@
 <p><b>Linux Only</b> : Generic purpose meta plugin that is triggered before the repository is opened, and can be configured to mount any filesystem and unmount it when the user either switch to another repository or logs out.</p>
-        <p>
-            If you have permissions issues, you can use the "sudo" parameter to sudo all system operations.
-            In that case, make sure to set the sudoers permission accordingly: apache user (www-data or httpd generaly) must be allowed to
-            perform a mount operation using sudo.
-        </p>
-        <p>
-            To strengthen the security, use the parameter to pass password via the system environment and not via the command line itself. Sudo file must also be adapted to be allowed for that ( something like defaults@pydio-*-app* env_keep += "PASSWD").
-        </p>
+<p>
+    <b>Update: version 6.2.1</b>
+    <br/>Due to security reason, we removed 'sudo' parameter on version 6.2.0 and use 'udevil' as an alternative. <b>udevil</b> is a command line program which mounts and unmounts removable devices without requirement of 'sudo'.
+    For more information: https://ignorantguru.github.io/udevil/
+    <br/>
+    <br/><b>Installation</b>
+    <br/>
+    Debian 8 / Ubuntu 14:
+    <br/>sudo apt-get install udevil
+    <br/>
+    <br/>CentOS/RedHat:
+    <br/>Can use self-extracting installer: <b>bash udevil-x.x.x-installer.sh</b> See: https://ignorantguru.github.io/udevil/
+    <br/>
+    <br/>
+    After installation, you can configure udevil in /etc/udevil/udevil.conf to allow mount points and protocols
+    <br/>Testing by using command to mount in terminal
+    <br/><b>udevil mount smb://pydio@192.168.0.3/share /media/test/abc</b>
+    <br/>then:
+    <br/><b>udevil umount smb://pydio@192.168.0.3/share /media/test/abc</b>
+    <br> <b>Note: </b> Make sure that the permission of mount point should be owned by apache when you test from Pydio.
+    <br> <b>Warning: </b> Passing password via system evr PASSWD is not supported in 'udevil'.
+</p>
+<br/>
+<img src="metamount_udevil.png"  width="510" alt="Configuration to mount samba with udevil">
+<br/>
+<br/>
+<p>
+    <b>Version 6.0.8</b>
+</p>
+<p>
+    If you have permissions issues, you can use the "sudo" parameter to sudo all system operations.
+    In that case, make sure to set the sudoers permission accordingly: apache user (www-data or httpd generaly) must be allowed to
+    perform a mount operation using sudo.
+</p>
+<p>
+    To strengthen the security, use the parameter to pass password via the system environment and not via the command line itself. Sudo file must also be adapted to be allowed for that ( something like defaults@pydio-*-app* env_keep += "PASSWD").
+</p>

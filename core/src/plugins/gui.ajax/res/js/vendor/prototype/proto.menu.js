@@ -255,7 +255,7 @@ Proto.Menu = Class.create({
                         href: '#',
                         title: item.alt,
                         id:(item.action_id?'action_instance_'+item.action_id:''),
-                        className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled'),
+                        className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled') + (item.isDefault ? ' menu_item_default':''),
                         style:(item.isDefault?'font-weight:bold':'')
                     }), { _callback: item.callback })
                     .writeAttribute('onclick', 'return false;')

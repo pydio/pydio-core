@@ -140,7 +140,8 @@ class plgUserPydio extends JPlugin
         $AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
         $AJXP_GLUE_GLOBALS["plugInAction"] = "login";
         $AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"]);
-           include($this->glueCode);
+        include($this->glueCode);
+        new SessionSwitcher("previous", false, true);
         return true;
     }
 

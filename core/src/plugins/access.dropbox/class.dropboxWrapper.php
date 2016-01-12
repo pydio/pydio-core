@@ -288,4 +288,14 @@ class dropboxWrapper implements AjxpWrapper
         self::$crtHandle = fopen(self::$crtTmpFile, $mode);
         return true;
     }
+
+    /**
+     * Describe whether the current wrapper can rewind a stream or not.
+     * @static
+     * @return boolean
+     */
+    public static function isSeekable($url)
+    {
+        return true;
+    }
 }

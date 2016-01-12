@@ -737,7 +737,7 @@ Class.create("XHRUploader", {
 				item.updateStatus('loaded');
 
                 if (xhr.responseXML){
-                    var result = pydio.getController().parseXmlMessage(xhr.responseXML);
+                    var result = PydioApi.getClient().parseXmlMessage(xhr.responseXML);
                     if(!result) item.updateStatus("error");
                 }else if (xhr.responseText && xhr.responseText != 'OK') {
 					alert(xhr.responseText); // display response.

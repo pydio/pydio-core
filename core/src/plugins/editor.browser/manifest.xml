@@ -49,7 +49,7 @@
 
                         var oForm = modal.getForm();
                         oForm.down("#filename").setValue(oForm.down("#filename").getValue()+ '.url');
-                        pydio.getController().submitForm(oForm);
+                        PydioApi.getClient().submitForm(oForm);
                         hideLightBox(true);
                         return false;
 

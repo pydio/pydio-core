@@ -165,7 +165,7 @@ Class.create("Modal", {
 		}
 		else {
 			newForm.onsubmit = function(){
-				pydio.getController().submitForm(this.getForm());
+				PydioApi.getClient().submitForm(this.getForm());
 				hideLightBox();
 				return false;
             }.bind(this);

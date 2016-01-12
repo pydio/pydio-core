@@ -279,7 +279,7 @@ class IMagickPreviewer extends AJXP_Plugin
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
                 } else {
-                    $unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                    $unoconv =  "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
                 putenv('LC_CTYPE='.AJXP_LOCALE);
                 exec($unoconv, $out, $return);
@@ -314,12 +314,15 @@ class IMagickPreviewer extends AJXP_Plugin
             putenv("PATH=".getenv("PATH").":".$customEnvPath);
         }
         $params = $customOptions." ".( $this->extractAll? $viewerQuality : $thumbQuality );
-        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
+        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".$params." ".escapeshellarg(($masterFile).$pageLimit)." ".escapeshellarg($tmpFileThumb);
         $this->logDebug("IMagick Command : $cmd");
         session_write_close(); // Be sure to give the hand back
         exec($cmd, $out, $return);
         if (is_array($out) && count($out)) {
             throw new AJXP_Exception(implode("\n", $out));
+        }
+        if(!is_file($tmpFileThumb)){
+            throw new AJXP_Exception("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getFilteredOption("IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
         }
         if (!$this->extractAll) {
             rename($tmpFileThumb, $targetFile);

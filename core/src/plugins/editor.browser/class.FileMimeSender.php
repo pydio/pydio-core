@@ -95,6 +95,11 @@ class FileMimeSender extends AJXP_Plugin
             if(empty($fileMime))
                 $fileMime = "application/octet-stream";
 
+            if(strpos($fileMime, "image/svg+xml;") === 0){
+                // Do not open SVG directly in browser.
+                $fileMime = "application/octet-stream";
+            }
+
             //Send headers
             HTMLWriter::generateInlineHeaders(basename($selectedNodeUrl), $filesize, $fileMime);
 

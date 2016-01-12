@@ -24,7 +24,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		$super(oFormObject, options);
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return false;
-			pydio.Controller.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
+			PydioApi.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
 	},
@@ -174,7 +174,7 @@ Class.create("EmlViewer", AbstractEditor, {
                 console.log(connexion._parameters);
 			}
 			connexion.onComplete = function(transport){
-				pydio.getController().parseXmlMessage(transport.responseXML);
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
 			};
 			connexion.sendAsync();
 			hideSelector();

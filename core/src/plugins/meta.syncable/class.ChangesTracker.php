@@ -250,8 +250,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         if(count($masks)){
             $ors = array();
             foreach($masks as $mask){
-                $filterLike = rtrim($mask, "/") . "/";
+                $trimmedMask = rtrim($mask, "/") ;
+                $filterLike = $trimmedMask . "/";
                 $ors[] = array("[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike);
+                $ors[] = array("[source] = %s OR [target] = %s", $trimmedMask, $trimmedMask);
             }
             if(count($ors)){
                 $ands[] = array("%or", $ors);
@@ -279,6 +281,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 unset($row->$att);
             }
             if(!empty($recycle)) $this->cancelRecycleNodes($row, $recycle);
+            if($this->pathOutOfMask($row->node["node_path"], $masks)){
+                $row->node["node_path"] = false;
+            }
             if(!isSet($httpVars["flatten"]) || $httpVars["flatten"] == "false"){
 
                 if(!$this->filterMasks($row, $masks) && !$this->filterRow($row, $filter)){
@@ -316,23 +321,24 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     $previousRow = $row;
                     $previousNodeId = $row->node_id;
                 }
-                $lastSeq = $row->seq;
+                if(!isSet($lastSeq) || $row->seq > $lastSeq){
+                    $lastSeq = $row->seq;
+                }
                 flush();
             }
-	    //CODES HERE HAVE BEEN MOVE OUT OF THE LOOP
         }
 
-        /**********RETURN TO SENDER************/
-        // is 'not NULL' included in isSet()?
-        if ($previousRow && isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+        // SEND LAST ROW IF THERE IS ONE
+        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")
+            && !$this->pathOutOfMask($previousRow->target, $masks) && !$this->filterMasks($previousRow, $masks) && !$this->filterRow($previousRow, $filter)) {
+
             if($valuesSent) echo $separator;
             echo json_encode($previousRow);
-            if ($previousRow->seq > $lastSeq){
+            if (!isSet($lastSeq) || $previousRow->seq > $lastSeq){
                 $lastSeq = $previousRow->seq;
             }
             $valuesSent = true;
         }
-        /*************************************/
 
         if (isSet($lastSeq)) {
             if($stream){
@@ -365,8 +371,8 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
 
     protected function filterRow(&$previousRow, $filter = null){
         if($filter == null) return false;
-        $srcInFilter = strpos($previousRow->source, $filter) === 0;
-        $targetInFilter = strpos($previousRow->target, $filter) === 0;
+        $srcInFilter = strpos($previousRow->source, $filter."/") === 0;
+        $targetInFilter = strpos($previousRow->target, $filter."/") === 0;
         if(!$srcInFilter && !$targetInFilter){
             return true;
         }
@@ -393,16 +399,23 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return false;
     }
 
-    protected function filterMasks(&$previousRow, $masks = array()){
+    protected function pathOutOfMask($testPath, $masks = array()){
         if(!count($masks)) return false;
         $regexps = array();
         foreach($masks as $path){
-            $regexps[] = '^'.preg_quote($path, '/');
+            $regexps[] = '^'.preg_quote($path.'/', '/');
         }
         $regexp = '/'.implode("|", $regexps).'/';
+        $inMask = ($testPath == 'NULL') || $testPath === false || in_array($testPath, $masks) || preg_match($regexp, $testPath);
+        return !$inMask;
+    }
 
-        $srcInFilter = preg_match($regexp, $previousRow->source);
-        $targetInFilter = preg_match($regexp, $previousRow->target);
+    protected function filterMasks(&$previousRow, $masks = array()){
+        if(!count($masks)) return false;
+
+        $srcInFilter = !$this->pathOutOfMask($previousRow->source, $masks);
+        $targetInFilter = !$this->pathOutOfMask($previousRow->target, $masks);
+
         if(!$srcInFilter && !$targetInFilter){
             return true;
         }
@@ -414,18 +427,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 $previousRow->type = 'delete';
                 $previousRow->target = 'NULL';
             }
-        }else if($previousRow->type == 'delete'){
-            if(preg_match($regexp, $previousRow->node['node_path'])){
-                $previousRow->node['node_path'] = false;
-            }
         }
-        /*
-        if($previousRow->type != 'delete'){
-            $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
-        }else if(strpos($previousRow->node['node_path'], $filter) !== 0){
-            $previousRow->node['node_path'] = false;
-        }
-        */
         return false;
     }
 
@@ -515,6 +517,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
                     "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
                 ));
+                if($copy && !$newNode->isLeaf()){
+                    // Make sure to index the content of this file
+                    AJXP_Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
+                }
             } else {
                 $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 if ($oldNode->getPath() == $newNode->getPath()) {

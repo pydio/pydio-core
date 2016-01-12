@@ -422,7 +422,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $id = $this->getIndexedDocumentId($index, $node);
                 if($id != null) $index->delete($id);
             }
-            $this->createIndexedDocument($node, $index);
+            if(file_exists($node->getUrl())){
+                $this->createIndexedDocument($node, $index);
+            }
             $this->logDebug(__FILE__, "Indexation passed ".$node->getUrl());
         } catch (Exception $e){
             $this->logError(__FILE__, "Lucene indexation failed for ".$node->getUrl()." (".$e->getMessage().")");

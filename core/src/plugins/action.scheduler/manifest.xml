@@ -75,7 +75,7 @@
                         var connexion = new Connexion();
                         connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
                         connexion.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -188,7 +188,7 @@
                             conn.setParameters(values);
                             conn.sendAsync();
                             conn.onComplete = function(transport){
-                                var res = pydio.getController().parseXmlMessage(transport.responseXML);
+                                var res = PydioApi.getClient().parseXmlMessage(transport.responseXML);
                                 if(res) hideLightBox();
                             };
                        ]]></dialogOnComplete>
@@ -233,7 +233,7 @@
                             task_id:taskId
                         }));
                         connexion.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
@@ -279,7 +279,7 @@
                         var conn = new Connexion();
                         conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(userSelection.getUniqueNode().getPath()) }));
                         conn.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                          };
                         conn.sendAsync();
 

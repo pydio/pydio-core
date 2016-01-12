@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -51,10 +51,10 @@ class SessionSwitcher
             }
             // Start a default session and save on the handler
             session_start();
-            SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
+            SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name(), 'save_handler' => ini_get('session.save_handler'));
             session_write_close();
         } else {
-            SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
+            SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name(), 'save_handler' => ini_get('session.save_handler'));
         }
         // Please note that there is no start here, session might be already started
         if (session_id() != "") {
@@ -88,6 +88,8 @@ class SessionSwitcher
         if ($loadPreviousSession) {
             AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
             session_id(SessionSwitcher::$sessionArray[0]['id']);
+            $name = SessionSwitcher::$sessionArray[0]['name'];
+            ini_set('session.save_handler', SessionSwitcher::$sessionArray[0]['save_handler']);
         } else {
             $newId = md5(SessionSwitcher::$sessionArray[0]['id'].$name);
             session_id($newId);

@@ -241,8 +241,9 @@ Class.create("MetaCellRenderer", {
 			var content = element.down('span').innerHTML;
 		}catch(e){
 		}
-		if(content) value = parseInt(content);
-        else{
+		if(content && !!parseInt(content)) {
+            value = parseInt(content);
+        } else {
             content = ajxpNode.getMetadata().get(attributeName);
             if(content) value = parseInt(content);
         }
@@ -315,7 +316,7 @@ Class.create("MetaCellRenderer", {
                     }));
                     conn.addParameter(elementName, note);
                     conn.onComplete = function(transport){
-                        pydio.getController().parseXmlMessage(transport.responseXML);
+                        PydioApi.getClient().parseXmlMessage(transport.responseXML);
                     };
                     conn.sendAsync();
                 }, 500);
@@ -363,7 +364,7 @@ Class.create("MetaCellRenderer", {
                 }));
                 conn.addParameter(metaName, values.without(v).join(", "));
                 conn.onComplete = function(transport){
-                    pydio.getController().parseXmlMessage(transport.responseXML);
+                    PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 };
                 conn.sendAsync();
             });

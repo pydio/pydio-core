@@ -131,7 +131,7 @@
                             connexion.setParameters({get_action : "extraction", file : file, currentDir : dir});
 				   		    connexion.sendAsync();
                             connexion.onComplete=function(transport){
-                                pydio.Controller.parseXmlMessage(transport.responseXML);
+                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                             };
                         }
                     ]]></clientCallback>

@@ -68,7 +68,7 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        pydio.getController().submitForm(oForm);
+                        PydioApi.getClient().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -106,7 +106,7 @@
                             alert(MessageHash[125]);
                             return false;
                         }
-                        pydio.getController().submitForm(oForm);
+                        PydioApi.getClient().submitForm(oForm);
                         hideLightBox(true);
                         return false;
                     });
@@ -347,7 +347,7 @@
 						};
 						var closeFunc = function(){
 							userSelection.updateFormOrUrl(modal.getForm());
-							pydio.getController().submitForm(modal.getForm(), true);
+							PydioApi.getClient().submitForm(modal.getForm(), true);
 							hideLightBox();
 						};
 						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);
@@ -552,7 +552,7 @@
 				   connexion.addParameter('get_action', 'restore');
 				   connexion.addParameter('dir', userSelection.getContextNode().getPath());
 				   connexion.onComplete = function(transport){
-				   		pydio.getController().parseXmlMessage(transport.responseXML);
+				   		PydioApi.getClient().parseXmlMessage(transport.responseXML);
 				   };
 				   fileNames.each(function(filename){
 				   		connexion.addParameter('file', filename);
@@ -585,7 +585,7 @@
 						conn.addParameter('file', filename);
 						conn.addParameter('filename_new', newValue);
 						conn.onComplete = function(transport){
-							pydio.getController().parseXmlMessage(transport.responseXML);
+							PydioApi.getClient().parseXmlMessage(transport.responseXML);
 							if(orig && ajaxplorer.getUserSelection()){
 								ajaxplorer.getUserSelection().setSelectionSource(orig);
 							}
@@ -824,8 +824,8 @@
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						pydio.getController().submitForm(oForm, true, function(transport){
-						    var result = this.parseXmlMessage(transport.responseXML);
+						PydioApi.getClient().submitForm(oForm, true, function(transport){
+						    var result = PydioApi.getClient().parseXmlMessage(transport.responseXML);
 						}.bind(pydio.getController()));
 						hideLightBox(true);
 						return false;
@@ -861,7 +861,7 @@
                             return false;
                         }
                         userSelection.updateFormOrUrl(modal.getForm());
-                        pydio.getController().submitForm(modal.getForm());
+                        PydioApi.getClient().submitForm(modal.getForm());
                         hideLightBox();
                         return false;
                     };

@@ -139,7 +139,7 @@ Class.create("SQLEditor", {
 				el.setAttribute('name', 'ajxp_mysql_'+el.getAttribute('name'));
 			}
 		}.bind(this));
-		pydio.getController().submitForm(oForm, true);
+		PydioApi.getClient().submitForm(oForm, true);
 		hideLightBox();
 	},
 	
@@ -283,7 +283,7 @@ Class.create("SQLEditor", {
 			rows.each(function(row){
 				if(row.getAttribute('enabled')=='false') row.remove();
 			});
-			pydio.getController().submitForm(this.oForm);
+			PydioApi.getClient().submitForm(this.oForm);
 			hideLightBox();
 			return false;			
 		}.bind(this);
@@ -298,7 +298,7 @@ Class.create("SQLEditor", {
 		parameters.set('current_table', currentTable);
 		var connexion = new Connexion();
 		connexion.setParameters(parameters);		
-		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();
 	},
@@ -316,7 +316,7 @@ Class.create("SQLEditor", {
 		});		
 		var connexion = new Connexion();
 		connexion.setParameters(params);		
-		connexion.onComplete = function(transport){pydio.getController().parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();		
 	},

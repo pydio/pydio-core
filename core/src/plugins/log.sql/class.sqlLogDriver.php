@@ -303,13 +303,15 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      * @param String $remote_ip Client IP that was logged
      * @param String $log_level Log level of the item
      * @param String $user User who was logged in
+     * @param $source
      * @param String $action The action the user performed.
      * @param String $params Parameters to the action
-     * @param Integer $is_file 0|1 to indicate whether this list item is a file or not.
-     *
+     * @param string $rootPath
+     * @param null $rowId
      * @return String Formatted XML node for insertion into the log reader
+     *
      */
-    public function formatXmlLogItem($node, $icon, $dateattrib, $filename, $remote_ip, $log_level, $user, $source, $action, $params, $rootPath = "/logs")
+    public function formatXmlLogItem($node, $icon, $dateattrib, $filename, $remote_ip, $log_level, $user, $source, $action, $params, $rootPath = "/logs", $rowId=null)
     {
         $remote_ip = $this->inet_dtop($remote_ip);
         $log_unixtime = strtotime($dateattrib);
@@ -322,8 +324,12 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $action = AJXP_Utils::xmlEntities($action);
         $params = AJXP_Utils::xmlEntities($params);
         $source = AJXP_Utils::xmlEntities($source);
+        $rowIdString = "";
+        if($rowId !== null){
+            $rowIdString = "cursor=\"{$rowId}\"";
+        }
 
-        return "<$node icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"true\" filename=\"{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" source=\"{$source}\" params=\"{$params}\"/>";
+        return "<$node $rowIdString icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"true\" filename=\"{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" source=\"{$source}\" params=\"{$params}\"/>";
     }
 
     /**
@@ -525,14 +531,19 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      * @param String $date Assumed to be m-d-y format.
      * @param String [optional] $nodeName
      */
-    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
+    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1)
     {
         $start_time = strtotime($date);
         $end_time = mktime(0,0,0,date('m', $start_time), date('d', $start_time) + 1, date('Y', $start_time));
 
         try {
-            $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t ORDER BY [logdate] DESC';
-            $result = dibi::query($q, $start_time, $end_time);
+            if($cursor != -1){
+                $q = 'SELECT * FROM [ajxp_log] WHERE [id] > %i ORDER BY [logdate] DESC';
+                $result = dibi::query($q, $cursor);
+            }else{
+                $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t ORDER BY [logdate] DESC';
+                $result = dibi::query($q, $start_time, $end_time);
+            }
             $log_items = "";
             $currentCount = 1;
             foreach ($result as $r) {
@@ -553,7 +564,10 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                         $buffer['source'],
                         $buffer['message'].($currentCount > 1?" (".$currentCount.")":""),
                         $buffer['params'],
-                        $rootPath));
+                        $rootPath,
+                        $buffer['id']
+                        )
+                    );
                 }
                 $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
                     $nodeName,
@@ -566,7 +580,9 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     $r['source'],
                     $r['message'],
                     $r['params'],
-                    $rootPath));
+                    $rootPath,
+                    $r['id'])
+                    );
 
                 $currentCount = 1;
 

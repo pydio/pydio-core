@@ -293,7 +293,7 @@ Class.create("RepositorySelect", {
                         var conn = new Connexion();
                         conn.setParameters({get_action:'user_delete_repository', repository_id:repositoryId});
                         conn.onComplete = function(transport){
-                            pydio.getController().parseXmlMessage(transport.responseXML);
+                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
                         };
                         conn.sendAsync();
                     }
