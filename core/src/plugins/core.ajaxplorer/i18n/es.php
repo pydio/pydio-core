@@ -638,6 +638,8 @@ $mess=array(
 "539" => "Error al subir: archivo parcialmente subido",
 "540" => "Error al subir: no puede encontrar el directorio temporal",
 "541" => "Error al subir: no se puede escribir en el directorio temporal",
-"542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga."
+"542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga.",
+"543" => "Resultados limitados a 100 de %s.",
+"544" => "Mostrar todo",
 
 );

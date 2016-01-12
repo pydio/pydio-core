@@ -78,8 +78,13 @@ $mess=array(
 "50"=> "Mis equipos",
 "51"=> "Equipos de usuarios, usados como accesos directos al compartir",
 "52"=> "¿Está seguro que desea eliminar este equipo? Esta acción no eliminará ningún usuario.",
-    "53"=> "Volver a mis repositorios",
-    "54"=> "Actualizar miembros",
-    "55"=> "Agregar/quitar usuarios de este equipo",
-    "56"=> "Agregar un usuario por linea, escriba en el área de texto para ver aparecer la lista de autocompletado.",
+"53"=> "Volver a mis repositorios",
+"54"=> "Actualizar miembros",
+"55"=> "Agregar/quitar usuarios de este equipo",
+"56"=> "Agregar un usuario por linea, escriba en el área de texto para ver aparecer la lista de autocompletado.",
+"57" => "Crear un equipo",
+"58" => "Los equipos se utilizan como acceso directo para compartir rápidamente una carpeta con un conjunto predefinido de usuarios",
+"59" => "Etiqueta del equipo",
+"60" => "Usuarios del equipo",
+
 );

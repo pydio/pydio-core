@@ -630,11 +630,13 @@ $mess=array(
 "plugtype.desc.mailer" => "Eines que permeten a l'aplicació enviar correus electrònics",
 "plugtype.title.mq" => "Missatgeria instantània",
 "plugtype.desc.mq" => "Implementacions d'un simple servidor PUB/SUB",
-    "537" => "L'arxiu és massa gran! La mida màxima autoritzada és %i",
-    "538" => "Error en la pujada: no s'ha trobat cap arxiu al servidor!",
-    "539" => "Error en la pujada: arxiu pujat parcialment",
-    "540" => "Error en la pujada: no es pot trobar el directori temporal",
-    "541" => "Error en la pujada: no es pot escriure en el directori temporal",
-    "542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega."
+"537" => "L'arxiu és massa gran! La mida màxima autoritzada és %i",
+"538" => "Error en la pujada: no s'ha trobat cap arxiu al servidor!",
+"539" => "Error en la pujada: arxiu pujat parcialment",
+"540" => "Error en la pujada: no es pot trobar el directori temporal",
+"541" => "Error en la pujada: no es pot escriure en el directori temporal",
+"542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega."
+"543" => "Resultats limitats a 100 de %s.",
+"544" => "Mostrar tot",
 
 );
