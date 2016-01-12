@@ -93,17 +93,17 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
             var message = '';
             var first = nodes.first();
             var meta = first.getMetadata();
-            meta.each(function(pair){
-                if(exclude.indexOf(pair.key) == -1) {
-                    message += pair.key + '\t';
+            meta.forEach(function(value, key){
+                if(exclude.indexOf(key) == -1) {
+                    message += key + '\t';
                 }
             });
             message += '\n\n';
             nodes.each(function(node){
                 var meta = node.getMetadata();
-                meta.each(function(pair){
-                    if(exclude.indexOf(pair.key) == -1) {
-                        message += pair.value + '\t';
+                meta.forEach(function(value, key){
+                    if(exclude.indexOf(key) == -1) {
+                        message += value + '\t';
                     }
                 });
                 message += '\n';
