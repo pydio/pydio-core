@@ -640,5 +640,7 @@ $mess=array(
 "540" => "Fehler beim Hochladen: Ordner für temporäre Dateien nicht gefunden",
 "541" => "Fehler beim Hochladen: Kein Schreibzugriff auf Ordner für temporäre Dateien",
 "542" => "Fehler beim Hochladen: Hochladen wurde durch PHP-Erweiterung unterbrochen",
+"543" => "Results limited to 100 out of %s.",
+"544" => "Show All",
 /* END SENTENCE */
 );

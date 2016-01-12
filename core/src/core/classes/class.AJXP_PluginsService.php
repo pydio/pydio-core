@@ -475,13 +475,6 @@ class AJXP_PluginsService
         if(isSet($this->activePlugins[$type.".".$name])){
             unset($this->activePlugins[$type.".".$name]);
         }
-        if($type == "core"){
-            $act = array_reverse($this->activePlugins);
-            $act[$type.".".$name] = $active;
-            $this->activePlugins = array_reverse($act);
-        }else{
-            $this->activePlugins[$type.".".$name] = $active;
-        }
         $this->activePlugins[$type.".".$name] = $active;
         if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
             $this->registry[$type][$name] = $updateInstance;

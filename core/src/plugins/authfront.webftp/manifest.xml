@@ -18,7 +18,7 @@
 							document.location.href=loginRedirect;
 						}else{
     					    modal.setCloseValidation(function(){
-                                return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
+                                return (!!ajaxplorer && !!ajaxplorer.user)
                             });
 							modal.showDialogForm('Log In', 'ftp_login_form',
 							function(oForm){
@@ -36,8 +36,11 @@
 								});
 								connexion.onComplete = function(transport){
 									pydio.getController().submitForm(oForm, true, function(transport){
-                                        pydio.getController().parseXmlMessage(transport.responseXML);
-                                        if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                        var success = pydio.getController().parseXmlMessage(transport.responseXML);
+                                        if(success){
+    									    modal.setCloseValidation(null);
+    									    hideLightBox(true);
+                                        }else if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
                                             ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                         }
                                     });

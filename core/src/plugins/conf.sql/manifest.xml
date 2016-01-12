@@ -5,6 +5,7 @@
     <client_settings>
         <resources>
             <i18n namespace="sql_conf" path="plugins/conf.sql/i18n"/>
+            <js className="TeamEditor" file="plugins/conf.sql/class.TeamEditor.js"/>
         </resources>
     </client_settings>
 	<server_settings>
@@ -16,7 +17,24 @@
 		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*,client_configs/*" exclude=""/>
         <actions>
             <action name="user_team_create">
+                <gui src="delete.png" iconClass="icon-create" text="user_dash.57" title="user_dash.57">
+                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
+                </gui>
                 <processing>
+                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
+                        <dialogOnOpen><![CDATA[
+                            var oForm = modal.getForm();
+                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
+                                TeamEditor.prototype.getInstance().open(oForm);
+                            });
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                            TeamEditor.prototype.getInstance().complete(oForm);
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[
+                            TeamEditor.prototype.getInstance().close(oForm);
+                        ]]></dialogOnCancel>
+                    </clientCallback>
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
@@ -35,68 +53,28 @@
                         <dialogOnOpen><![CDATA[
                             var contextHolder = window.actionManager.getDataModel();
                             var oForm = modal.getForm();
-                            oForm.CONTEXT_HOLDER = contextHolder;
-                            var textA = oForm.down('#team_edit_input');
-                            var users = contextHolder.getUniqueNode().getMetadata().get('users').stripTags().strip();
-                            textA.setValue(users.replace(/, /g, '\n') + '\n');
-                            moveCaretToEnd(textA);
-                            var completer = new AjxpUsersCompleter(
-                                oForm.down('#team_edit_input'),
-                                null,
-                                oForm.down('#team_edit_container'),
-                                {
-                                    tmpUsersPrefix:'',
-                                    usersOnly: true,
-                                    existingOnly: true,
-                                    updateUserEntryAfterCreate:null,
-                                    createUserPanel:null,
-                                    indicator: oForm.down("#team_loader"),
-                                    minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS")),
-                                    afterUpdateElement: function(elem, selectedLi){
-                                        var label = selectedLi.readAttribute('data-label');
-                                        var id = selectedLi.readAttribute('data-entry_id') || selectedLi.readAttribute('data-group');
-                                        var isGroup = selectedLi.hasClassName('complete_group_entry');
-                                        var composedLabel = label + ' (' + id + ')';
-                                        var currentValue = textA.getValue().strip();
-                                        currentValue = currentValue.replace(composedLabel, id);
-                                        var users = currentValue.strip().split(new RegExp('[ ,\n]+', 'g'));
-                                        textA.setValue($A(users).uniq().join('\n') + '\n');
-                                        moveCaretToEnd(textA);
-                                    }
-                                }
-                            );
+                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
+                                TeamEditor.prototype.getInstance().open(oForm, contextHolder);
+                            });
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
-                            var contextHolder = modal.getForm().CONTEXT_HOLDER;
-                             var newValues = modal.getForm().down('#team_edit_input').getValue().strip().split(new RegExp('[ ,\n]+', 'g'));
-                             var teamId = getBaseName(contextHolder.getUniqueNode().getPath());
-                             var teamLabel = contextHolder.getUniqueNode().getLabel();
-                             console.log(teamId, newValues);
-                             var c = new Connexion();
-                             c.setParameters($H({
-                                get_action:'user_team_edit_users',
-                                team_id:teamId,
-                                team_label:teamLabel,
-                                'users[]':newValues
-                             }));
-                             c.setMethod('POST');
-                             c.onComplete = function(t){
-                                hideLightBox();
-                                $('team_panel').ajxpPaneObject.reloadDataModel();
-                             };
-                             c.sendAsync();
-                             modal.getForm().CONTEXT_HOLDER = null;
+                            TeamEditor.prototype.getInstance().complete(oForm);
                         ]]></dialogOnComplete>
                         <dialogOnCancel><![CDATA[
-                            modal.getForm().CONTEXT_HOLDER = null;
+                            TeamEditor.prototype.getInstance().close(oForm);
                         ]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="team_edit_form"><![CDATA[
-                         <div id="team_edit_form">
-                            <div class="dialogLegend" style="width: 400px;padding: 10px 0;">AJXP_MESSAGE[user_dash.56]</div>
+                         <div id="team_edit_form" box_width="420">
+                            <div class="dialogContentMainTitle" ajxp_message_id="user_dash.59">AJXP_MESSAGE[user_dash.59]</div>
+                            <input type="text" style="width:394px;margin-bottom:30px;" id="team_edit_label"/>
+
+                            <div class="dialogContentMainTitle" ajxp_message_id="user_dash.60">AJXP_MESSAGE[user_dash.60]</div>
+                            <div class="dialogLegend" ajxp_message_id="user_dash.56">AJXP_MESSAGE[user_dash.56]</div>
                             <div style="position: relative;">
                                 <div id="team_loader" style="position: absolute;top: 2px;right: 3px;font-size: 17px;display: none;"><span class="icon-spinner"></span></div>
-                                <textarea type="text" style="width:410px; min-height: 100px;" id="team_edit_input"></textarea>
+                                <input type="text" style="width:394px;" id="team_edit_input"/>
+                                <div type="text" class="editable_users_list" id="team_edit_entries"></div>
                                 <div id="team_edit_container"></div>
                             </div>
                          </div>

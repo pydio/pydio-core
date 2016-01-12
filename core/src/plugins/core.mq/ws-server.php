@@ -98,6 +98,10 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver
         }
 
         $h = $user->getHeaders();
+        /*
+         * @todo
+         * Handle a REST auth instead of cookie based.
+         */
         $c = WebSocketFunctions::cookie_parse($h["Cookie"]);
 
         $client = new HttpClient($this->host);

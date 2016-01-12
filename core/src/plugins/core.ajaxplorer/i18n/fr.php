@@ -633,6 +633,8 @@ $mess=array(
 "539" => "Erreur de transfert: le fichier est partiellement transferé.",
 "540" => "Erreur de transfert: impossible d'ouvrir le répertoire temporaire.",
 "541" => "Erreur de transfert: impossible d'écrire dans le répertoire temporaire.",
-"542" => "Erreur de transfert: une extension PHP a stoppé le processus."
+"542" => "Erreur de transfert: une extension PHP a stoppé le processus.",
+"543" => "Résultats limités au 100 premiers sur %s.",
+"544" => "Voir tout",
 /* END SENTENCE */
 );

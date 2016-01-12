@@ -13,9 +13,6 @@
             <img_library alias="history_images" path="plugins/meta.git/images"/>
         </resources>
     </client_settings>
-    <dependencies>
-        <pluginResources pluginName="meta.svn"/>
-    </dependencies>
     <registry_contributions>
         <actions>
             <action name="git_history">

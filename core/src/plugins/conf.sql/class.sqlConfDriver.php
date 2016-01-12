@@ -805,6 +805,20 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
+     * Check if group already exists
+     * @param string $groupPath
+     * @return boolean
+     */
+    public function groupExists($groupPath)
+    {
+        $ret = dibi::query("SELECT [groupPath] FROM [ajxp_groups] WHERE [groupPath] = %s", $groupPath);
+        $groups = $ret->fetchSingle();
+        if(!empty($groups)) return true;
+
+        return false;
+    }
+
+    /**
      * @param string $groupPath
      * @param string $groupLabel
      * @return mixed

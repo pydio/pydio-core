@@ -38,4 +38,4 @@ New in latest build, in the Settings panel, you can find a new "Developer" node 
 
 #### Signing the CLA
 
-Please <a href="https://pyd.io/contribute/cla">sign the Contributor License Agreement</a> before contributing.
+Please <a href="https://pydio.com/en/community/contribute/contributor-license-agreement-cla">sign the Contributor License Agreement</a> before contributing.

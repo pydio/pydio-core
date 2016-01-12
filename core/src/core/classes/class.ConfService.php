@@ -1118,9 +1118,17 @@ class ConfService
     {
         AJXP_Controller::applyHook("workspace.before_delete", array($repoId));
         $confStorage = self::getConfStorageImpl();
+        $shares = $confStorage->listRepositoriesWithCriteria(array("parent_uuid" => $repoId));
+        $toDelete = array();
+        foreach($shares as $share){
+            $toDelete[] = $share->getId();
+        }
         $res = $confStorage->deleteRepository($repoId);
         if ($res == -1) {
             return $res;
+        }
+        foreach($toDelete as $deleteId){
+            $this->deleteRepositoryInst($deleteId);
         }
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
@@ -1552,7 +1560,9 @@ class ConfService
         } catch (Exception $e) {
             if(!$rest){
                 // Remove repositories from the lists
-                $this->removeRepositoryFromCache($repository->getId());
+                if(!is_a($e, "AJXP_UserAlertException")){
+                    $this->removeRepositoryFromCache($repository->getId());
+                }
                 if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
                     $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
                 } else {

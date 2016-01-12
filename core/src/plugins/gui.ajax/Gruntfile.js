@@ -109,7 +109,8 @@ module.exports = function(grunt) {
             },
             nodejs: {
                 files: {
-                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js']
+                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js'],
+                    'res/js/vendor/nodejs/bundle.legacy.min.js': ['res/js/vendor/nodejs/bundle.legacy.prod.js']
                 }
             }
         },
@@ -144,7 +145,8 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js'
+                    'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js',
+                    'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js'
                 }
             }
         },

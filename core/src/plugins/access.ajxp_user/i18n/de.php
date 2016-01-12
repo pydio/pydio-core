@@ -78,4 +78,8 @@ $mess=array(
 "54"=> "Mitglieder aktualisieren",
 "55"=> "Benutzer des Teams hinzufügen/entfernen",
 "56"=> "Einen Benutzer pro Zeile hinzufügen. Beim Tippen im Textfeld erscheint die Autovervollständigung.",
+"57" => "Create a Team",
+"58" => "Teams are used as a shortcut to quickly share a folder with a predefined set of users",
+"59" => "Team Label",
+"60" => "Team Users",
 );

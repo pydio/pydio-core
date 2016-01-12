@@ -894,6 +894,21 @@ class AJXP_Utils
     }
 
     /**
+     * @param Repository $repository
+     * @return string
+     */
+    public static function getWorkspaceShortcutURL($repository){
+        $repoSlug = $repository->getSlug();
+        $skipHistory = ConfService::getCoreConf("SKIP_USER_HISTORY", "conf");
+        if($skipHistory){
+            $prefix = "/ws-";
+        }else{
+            $prefix = "?goto=";
+        }
+        return trim(self::detectServerURL(true), "/").$prefix.$repoSlug;
+    }
+
+    /**
      * Modifies a string to remove all non ASCII characters and spaces.
      * @param string $text
      * @return string
