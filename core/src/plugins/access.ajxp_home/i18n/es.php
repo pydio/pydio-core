@@ -20,67 +20,69 @@
 */
 // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
+// spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
-"title"=> "Home",
-"desc" => "Welcome page",
-"39"=> "Select a workspace",
-"40"=> "Welcome, %s",
-"41"=> "Use this workspace as default",
-"42"=> "Enter",
-"43"=> "My Profile",
-"43t"=> "All my personal data",
-"44"=> "My Account",
-"45"=> "Personal data",
-"46"=> "Address Book",
-"47"=> "Users and teams that you created",
-"48"=> "My Users",
-"49"=> "External users that you created",
-"50"=> "My Teams",
-"51"=> "Teams of users, used as shortcuts when sharing",
-"52"=> "Are you sure you want to delete this team? This will not remove any users.",
-    "53"=> "Getting Started",
-    "54"=> "Get started with APPLICATION_TITLE by following How-to videos",
-    "55"=> "Do you need help <a>to get started?</a>",
-    "56"=> "Getting started with APPLICATION_TITLE? Here are some videos for you!",
-    "57"=> "Download APPLICATION_TITLE for...",
-    "58"=> "Android device",
+"title"=> "Inicio",
+"desc" => "Página de bienvenida",
+"39"=> "Seleccione un repositorio",
+"40"=> "Bienvenido/a, %s",
+"41"=> "Usar este repositorio por defecto",
+"42"=> "Entrar",
+"43"=> "Mi perfil",
+"43t"=> "Todos mis datos personales",
+"44"=> "Mi cuenta",
+"45"=> "Datos personales",
+"46"=> "Libreta de direcciones",
+"47"=> "Usuarios y equipos que ha creado",
+"48"=> "Mis usuarios",
+"49"=> "Usuarios externos que ha creado",
+"50"=> "Mis equipos",
+"51"=> "Equipos de usuarios, usados como accesos directos al compartir",
+"52"=> "¿Está seguro de que desea eliminar este equipo? Esta acción no eliminará ningún usuario.",
+    "53"=> "Empezando",
+    "54"=> "Comience con APPLICATION_TITLE siguiendo estos videos How-to",
+    "55"=> "¿Necesita ayuda para <a>empezar?</a>",
+    "56"=> "¿Primeros pasos con APPLICATION_TITLE? ¡Aquí tiene algunos videos!",
+    "57"=> "Descargar APPLICATION_TITLE para...",
+    "58"=> "Dispositivo Android",
     "59"=> "iPhone/iPad",
-    "60"=>"Mac OS",
-    "61"=>"Windows",
-    "62"=>"<h2>Getting started</h2>
-            This video is an introduction to APPLICATION_TITLE web application:
+    "60"=>"Mac OS (Beta)",
+    "61"=>"Windows (Beta)",
+    "62"=>"<h2>Empezando</h2>
+            Este video es una introducción a la aplicación web APPLICATION_TITLE :
             <ul>
-                <li>User Dashboard</li>
-                <li>GUI Overview</li>
-                <li>Managing files and folders</li>
-                <li>Previewing and editing files</li>
-                <li>Quick access through bookmarks and search engine</li>
-                <li>Selection cart</li>
+                <li>Cuadro de mandos del usuario</li>
+                <li>Descripción del interfaz gráfico</li>
+                <li>Administrando ficheros y carpetas</li>
+                <li>Previsualizando y editando ficheros</li>
+                <li>Acceso rápido mediante marcadores y motor de búsqueda</li>
+                <li>Cesta de selección</li>
             </ul>",
-    "63"=>"<h2>Sharing files with APPLICATION_TITLE</h2>
-                            In this tutorial, we will cover the basics of file sharing with APPLICATION_TITLE:
-                            <ul>
-                                <li>Create web links</li>
-                                <li>Send them to internal or external users</li>
-                                <li>Get notified that a link was downloaded</li>
-                                <li>Create a password-protected link</li>
-                                <li>Create many links on one file</li>
-                                <li>Stop sharing a file totally</li>
+    "63"=>"<h2>Compartiendo ficheros usando APPLICATION_TITLE</h2>
+            En este tutorial vamos a cubrir los puntos básicos para el intercambio de ficheros con APPLICATION_TITLE:
+			<ul>
+				<li>Crear enlaces web</li>
+				<li>Enviarlos a usuarios internos o externos</li>
+				<li>Obtener notificaciones cuando un enlace ha sido descargado</li>
+				<li>Crear un enlace con protección por contraseña</li>
+				<li>Crear más de un enlace para un solo archivo</li>
+				<li>Detener completamente la compartición de un fichero</li>
+			</ul>",
+    "64"=>"<h2>Compartiendo carpetas usando APPLICATION_TITLE</h2>
+            Este video muestra las diversas maneras de compartir carpetas en APPLICATION_TITLE
+            <ul>
+            <li>Compartir como un nuevo repositorio</li>
+			<li>Compartir como un minisitio público</li>
             </ul>",
-    "64"=>"<h2>Sharing folders with APPLICATION_TITLE</h2>
-                            This video covers the various options to share folders in APPLICATION_TITLE
-                            <ul>
-                                <li>Share as new workspace</li>
-                                <li>Share as a public minisite</li>
-            </ul>",
-    "65"=> "Discover more on the APPLICATION_TITLE channel!",
-    "66"=>"<h2>Using APPLICATION_TITLE on iOS device</h2>
-                            This video explains how to use the APPLICATION_TITLE application (available on the App Store). Process is quite similar on Android as well.
-<ul><li>Setup the server connection</li>
-<li>Navigating through the files</li>
-<li>Keeping files offline and interacting with external applications</li>
-<li>Protecting the app with a PIN-code</li>
-<li>Using bookmarks and search engine</li></ul>",
-    "67"=> "You are not %s, %logout",
+    "65"=> "¡Descubre más en el canal de APPLICATION_TITLE!",
+    "66"=>"<h2>Usar APPLICATION_TITLE en dispositivos iOS</h2>
+            Este video muestra como usar la aplicación APPLICATION_TITLE (disponible en el App Store). El proceso es bastante similar en Android.
+			<ul>
+				<li>Configurar la conexión del servidor</li>
+				<li>Navegar a través de los ficheros</li>
+				<li>Mantener los archivos fuera de línea y la interacción con aplicaciones externas</li>
+				<li>Protegiendo la aplicación mediante un código PIN</li>
+				<li>Usando marcadores y el motor de búsqueda</li></ul>",
+    "67"=> "¿No eres %s? %logout",
 
 );
