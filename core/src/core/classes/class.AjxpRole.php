@@ -41,7 +41,7 @@ class AjxpRole implements AjxpGroupPathProvider
      * @param string $id
      * @return void
      */
-    public function AjxpRole($id)
+    public function __construct($id)
     {
         $this->id = $id;
     }

@@ -392,9 +392,9 @@ class Crypt_Blowfish extends Crypt_Base
      * @param optional Integer $mode
      * @access public
      */
-    function Crypt_Blowfish($mode = CRYPT_BLOWFISH_MODE_CBC)
+    function __construct($mode = CRYPT_BLOWFISH_MODE_CBC)
     {
-        parent::Crypt_Base($mode);
+        parent::__construct($mode);
     }
 
     /**

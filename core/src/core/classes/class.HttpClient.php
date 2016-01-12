@@ -58,7 +58,7 @@ class HttpClient
 
     public $collectHeaders;
 
-    public function HttpClient($host, $port=80)
+    public function __construct($host, $port=80)
     {
         $this->host = $host;
         $this->port = $port;

@@ -339,9 +339,9 @@ class Crypt_RC2 extends Crypt_Base
      * @param optional Integer $mode
      * @access public
      */
-    function Crypt_RC2($mode = CRYPT_RC2_MODE_CBC)
+    function __construct($mode = CRYPT_RC2_MODE_CBC)
     {
-        parent::Crypt_Base($mode);
+        parent::__construct($mode);
         $this->setKey('');
     }
 
