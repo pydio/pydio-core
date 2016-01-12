@@ -53,7 +53,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         }
         $cdataHead = '<div>
                         <div class="panelHeader infoPanelGroup" colspan="2"><span class="user_meta_change" title="AJXP_MESSAGE[meta.exif.1]">AJXP_MESSAGE[meta.exif.2]</span>AJXP_MESSAGE[meta.exif.3]</div>
-                        <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
+                        <div class="infoPanelTable exifPanelTable" cellspacing="0" border="0" cellpadding="0">';
         $cdataFoot = '</div></div>';
         $cdataParts = "";
         $even = false;

@@ -41,7 +41,7 @@
 						var connexion = new Connexion();
 						connexion.addParameter('get_action', 'ftp_logout');
 						connexion.onComplete = function(transport){
-							pydio.getController().parseXmlMessage(transport.responseXML);
+							PydioApi.getClient().parseXmlMessage(transport.responseXML);
 							};
 						connexion.sendAsync();
 						]]></clientCallback>

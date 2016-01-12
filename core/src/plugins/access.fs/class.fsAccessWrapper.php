@@ -246,6 +246,12 @@ class fsAccessWrapper implements AjxpWrapper
         return false;
     }
 
+    public static function isSeekable($url)
+    {
+        if(strpos($url, ".zip/") !== false) return false;
+        return true;
+    }
+
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");

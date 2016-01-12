@@ -36,4 +36,10 @@ $mess = array(
     "12"=> "Die alte meta.serial-Erweiterung wurde aufgeteilt in metastore.serial und meta.user",
     "13"=> "Migration simulieren",
     "14"=> "Migration nun starten",
+    "15" => "Are you sure that you want to perform the upgrade?",
+    "16" => "The following packages will be downloaded and installed.",
+    "17" => "Checking for available upgrades...",
+    "18" => "No necessary upgrade detected: click to perform a new check.",
+    "19" => "Click to check for new upgrade",
+    "20" => "Check now",
 );

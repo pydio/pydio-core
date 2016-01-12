@@ -84,7 +84,7 @@ Class.create("AjxpMqObserver", {
                     this.ws.onmessage = function(event){
                         var obj = parseXml(event.data);
                         if(obj){
-                            pydio.getController().parseXmlMessage(obj);
+                            PydioApi.getClient().parseXmlMessage(obj);
                             ajaxplorer.notify("server_message", obj);
                         }
                     };
@@ -167,7 +167,7 @@ Class.create("AjxpMqObserver", {
         conn.onComplete = function(transport){
             this.channel_pending = false;
             if(transport.responseXML){
-                pydio.getController().parseXmlMessage(transport.responseXML);
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 ajaxplorer.notify("server_message", transport.responseXML);
             }
         }.bind(this);

@@ -154,6 +154,7 @@ class EmlParser extends AJXP_Plugin
                 $part = $this->_findAttachmentById($structure, $attachId);
                 if ($part !== false) {
                     $fake = new fsAccessDriver("fake", "");
+                    $fake->repository = $repository;
                     $fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
                     exit();
                 } else {

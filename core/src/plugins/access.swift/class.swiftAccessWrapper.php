@@ -237,6 +237,11 @@ class swiftAccessWrapper extends fsAccessWrapper
         return true;
     }
 
+    public static function isSeekable($url)
+    {
+        return false;
+    }
+
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen($path, "r", null, self::$cloudContext);

@@ -47,7 +47,7 @@ Class.create("UserProfileEditor", AjxpPane, {
                 conn.setParameters(params);
                 conn.setMethod("POST");
                 conn.onComplete = function(transport){
-                    pydio.getController().parseXmlMessage(transport.responseXML);
+                    PydioApi.getClient().parseXmlMessage(transport.responseXML);
                     document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
                         if(event.memo != "user/preferences") return;
                         pydio.Registry.logXmlUser(false);

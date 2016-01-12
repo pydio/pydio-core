@@ -27,8 +27,8 @@
 *******************************************************************************/  
 $mess=array(
 "languageLabel" => "Deutsch",
-"date_format"  => "Y/m/d H:i",
 "date_intl_locale" => "de_DE",
+"date_format"  => "Y/m/d H:i",
 "date_relative_date" => "am DATE",
 "date_relative_time" => "TIME",
 "date_relative_date_format" => "d F Y",
@@ -264,6 +264,7 @@ $mess=array(
 "204" => "Die Datei \"",
 "205" => "\" ist größer als die maximal erlaubte Dateigröße (",
 "206" => "Mb).\\nDie Datei konnte nicht hochgeladen werden.",
+/* END SENTENCE */
 "207" => "Sie haben keine Schreibrechte in diesem Ordner",
 "208" => "Sie haben keine Leserechte in diesem Ordner",
 "209" => "Ein interner Serverfehler ist aufgetreten. Wenden Sie sich bitte an den Systemadministrator!",
@@ -439,6 +440,7 @@ $mess=array(
 "375" => "Achtung, Inaktivität seit mehr als __IDLE__. Ein automatischer Logout erfolgt in __LOGOUT__.",
 "376" => "Zum Zurücksetzen irgendwo klicken",
 "378" => "Achtung! Sie haben entweder ein leeres oder ein zu kurzes Passwort eingegeben!",
+/* password strength tester */
 "379" => "Unsicheres Passwort!",
 "380" => "Zu kurz",
 "381" => "Sehr unsicher",
@@ -597,7 +599,6 @@ $mess=array(
 "534" => "Password used to login",
 "535" => "Sende Passwort via E-Mail",
 "536" => "Sende eine Willkommens-E-Mail an den neuen Benutzer (inkl. Passwort )",
-/* Html entity would break tooltip */
 "plugtype.title.access" => "Arbeitsumgebungs-Treiber",
 "plugtype.desc.access" => "Erweiterungen, die bei Arbeitsumgebungen festlegen, wie auf die Daten zugegriffen werden kann",
 "plugtype.title.action" => "Aktionen",
@@ -642,5 +643,4 @@ $mess=array(
 "542" => "Fehler beim Hochladen: Hochladen wurde durch PHP-Erweiterung unterbrochen",
 "543" => "Results limited to 100 out of %s.",
 "544" => "Show All",
-/* END SENTENCE */
 );

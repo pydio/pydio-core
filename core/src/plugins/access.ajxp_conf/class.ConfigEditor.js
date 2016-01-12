@@ -556,7 +556,7 @@ Class.create("ConfigEditor",{
 				this.repositories.set(childs[i].getAttribute('index'), childs[i]);
 			}
 		}
-        pydio.getController().parseXmlMessage(xmlResponse);
+        PydioApi.getClient().parseXmlMessage(xmlResponse);
         if(xmlResponse.documentElement){
             if(XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
                 return false;

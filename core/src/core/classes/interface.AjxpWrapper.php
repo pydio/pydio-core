@@ -61,6 +61,15 @@ interface AjxpWrapper
     public static function isRemote();
 
     /**
+     * Describe whether the current wrapper can rewind a stream or not.
+     * @param String $url Url of the resource
+     * @static
+     * @abstract
+     * @return boolean
+     */
+    public static function isSeekable($url);
+
+    /**
      *
      *
      * @return bool

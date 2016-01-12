@@ -969,7 +969,7 @@ Class.create("SearchEngine", AjxpPane, {
                 connexion.addParameter('fields', this.getSearchColumns().join(','));
             }
             connexion.onComplete = function(transport){
-                pydio.getController().parseXmlMessage(transport.responseXML);
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 this.removeOnLoad($(this._resultsBoxId));
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();

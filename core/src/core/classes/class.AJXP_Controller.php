@@ -161,7 +161,7 @@ class AJXP_Controller
             self::$lastActionNeedsAuth = true;
             return null;
         }
-        $xPath = self::initXPath();
+        $xPath = self::initXPath(true);
         if ($action == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
             if (!$actions->length) {
@@ -471,7 +471,7 @@ class AJXP_Controller
             }
             return;
         }
-        $xPath = self::initXPath();
+        $xPath = self::initXPath(true);
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
         self::$hooksCache[$hookName] = array();

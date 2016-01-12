@@ -86,6 +86,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
      */
     public function dir_closedir()
     {
+        $this->currentDirPath = null;
         if(isSet($this->handle) && is_resource($this->handle)){
             closedir($this->handle);
         }
@@ -130,7 +131,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
      */
     public function dir_rewinddir()
     {
-        $this->currentDirPath = null;
+        //$this->currentDirPath = null;
         if(isSet($this->handle) && is_resource($this->handle)){
             return rewind($this->handle);
         }

@@ -73,9 +73,6 @@ abstract class AbstractLogDriver extends AJXP_Plugin
      * @param null $month
      * @param string $rootPath
      * @return String[]
-     * @internal param $String [optional] $nodeName
-     * @internal param $String [optional] $year
-     * @internal param $String [optional] $month
      */
     abstract public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true);
 
@@ -87,7 +84,6 @@ abstract class AbstractLogDriver extends AJXP_Plugin
      * @param string $nodeName
      * @param string $rootPath
      * @return void
-     * @internal param $String [optional] $nodeName
      */
     abstract public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs");
 

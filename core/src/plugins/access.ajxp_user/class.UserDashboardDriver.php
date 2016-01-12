@@ -266,20 +266,11 @@ class UserDashboardDriver extends AbstractAccessDriver
             <column messageId="user_dash.10" attributeName="users_labels" sortType="String"/>
         </columns>');
         $teams = $conf->listUserTeams();
-        $usersLabels = array();
         foreach ($teams as $teamId => $team) {
             if(empty($team["LABEL"])) continue;
             $team["USERS_LABELS"] = array();
             foreach(array_values($team["USERS"]) as $userId){
-                if(!isSet($usersLabels[$userId])) {
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
-                    if (is_object($userObject)) {
-                        $usersLabels[$userId] = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
-                    } else {
-                        $usersLabels[$userId] = $userId;
-                    }
-                }
-                $team["USERS_LABELS"][] = $usersLabels[$userId];
+                $team["USERS_LABELS"][] = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userId, "core.conf", $userId);
             }
             AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
                     "icon"      => "users-folder.png",
@@ -312,8 +303,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         ksort($userArray);
         foreach ($userArray as $userObject) {
-            //$userObject = new AJXP_SerialUser();
-            $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject);
             $isAdmin = $userObject->isAdmin();
             $userId = $userObject->getId();
             $repoAccesses = array();
@@ -377,8 +367,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             $repoAccesses = array();
             foreach ($users as $userId => $userObject) {
                 if($userObject->getId() == $loggedUser->getId()) continue;
-                $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
-                if(empty($label)) $label = $userId;
+                $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
                 $acl = $userObject->mergedRole->getAcl($repoObject->getId());
                 if(!empty($acl)) $repoAccesses[] = $label. " (".$acl.")";
             }

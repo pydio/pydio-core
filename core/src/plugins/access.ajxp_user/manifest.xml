@@ -225,11 +225,12 @@
 						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
 							var oForm = modal.getForm();
 							dModel.updateFormOrUrl(oForm);
-							pydio.getController().submitForm(oForm, true, function(transport){
-							    this.getController().parseXmlMessage(transport.responseXML);
+							var client = PydioApi.getClient();
+							client.submitForm(oForm, true, function(transport){
+							    client.parseXmlMessage(transport.responseXML);
 							    if(mime == "shared_user" && $('address_book')) $('address_book').ajxpPaneObject.reloadDataModel();
 							    else if(mime == "team" && $('team_panel')) $('team_panel').ajxpPaneObject.reloadDataModel();
-							}.bind(pydio));
+							});
 							hideLightBox(true);
 							return false;
 						});

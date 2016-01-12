@@ -1,5 +1,74 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio Core 6.2.2 is another bugfix release providing compatibility fixes for non-standard plugins to the core. See complete changelog below.
+Thanks to the following contributors for this release: cdujeu, c12simple, Isma91, floffel03, rbrdevs, DepaMarco, Ellega. Olivier Paroz, Stéphane Chadeyron.
+
+[Noticeable changes]
+
+Over-agressive caching could end up creating issues in IE when switching workspaces
+Security: sanitization strengthen for potential XSS attacks.
+Fix regression on "Remember Me" switch
+Fix Video Player for FireFox
+Joomla Bridge Compatibility (broken by last Joomla version).
+
+[Detailed Changelog]
+
+Update Italian translation for plugins: 'access.ajxp_conf', 'action.compression', 'action.share', 'core.ajaxplorer', 'core.notifications' (details)
+Take the active mailer plugin , not the first that comes (details)
+[core.mailer] Update the class which takes the active mailer plugin (details)
+[conf.sql / access.ajxp_user] Improve Team management. (details)
+Websocket: if there's an internal BIND address, it's most likely the address the php server will have to connect to. Added a Todo to handle REST auth. (details)
+Unserialization can fail on some systems, make sure to reload role if it's not an object after waking up object. (details)
+Fix SFTP username containing dash character (git issue #1014) (details)
+[gui.user] Fix display & i18n message (details)
+[gui.ajax] Create a "legacy" version of the bundle without ReactDND, and add fallbackCondition and fallbackFile in the js/css ressources to load alternative versions. (details)
+Make test on personalRole stronger if there is an error at deserialization time. (details)
+IE Caching policy is too agressive, we have to add some random ID to force reload sometime. (details)
+Renamed constructor for PHP7 compatibility (details)
+Update CLA URL (details)
+Handle repository with deleted parent. Should fix #1025 (details)
+Typo in getRelatedNotifications() method (not used). (details)
+Update CONTRIBUTING.md (details)
+[core.notifications] fix getRelatedNotifications() (details)
+Fix #1019 (details)
+Util function to get user label either from role directly or from user object. (details)
+Fixed recursive indexation issue with FTP workspaces. (details)
+Wrappers must declare isSeekable() to enable listing optimizations in fsAccessDriver. (details)
+Make sure not to load an indexed document if the meta.change event comes from a "delete" operation. (details)
+Enforce sanitization of user id when sending to error log. (details)
+Update window.MessageHash when changing i18n. Alternative fix #1021 (details)
+Typo in rest parameter for role_update_right (details)
+Pass optional parameters to the node->load() method. (details)
+Pass optional cursor parameter to the logs. SQL logger can use it as a query limiter to only load data starting from a given id. Return cursor attribute in XML as well. (details)
+Use udevil to mount instead of sudo (details)
+Improve performance: caching ldap search result in class static variable (details)
+Improve notifications on shared resources - Separate Location from the notifications - Avoid empty label in Alerts feed. (details)
+Better catch of imagick call error. (details)
+Fix tmp folder for unoconv (details)
+Strip only left space on dirname - Fix #1023 (details)
+Imagick: Parameters should follow convert command. (details)
+Fix rewind on SchemeTranslator wrapper - Prevent editing meta on non-writeable resource. (details)
+[auth.remote] Make sure to keep the initial session.save_handler - Fix Joomla connector. (details)
+Joomla plugin: make sure to switch back to previous session, as the session content is saved in register_shutdown_handler. (details)
+Compute locationType when setting node, so that it can be serialized/unserialized (details)
+Do not cache Sharing configs - Fix #1013 (details)
+Make sure to use === when comparing to constants, or repo 0 can be considered as repo_scope_all. Enable kvcaching in non-rest controller. (details)
+[ShareCenter] Fix unshare workspaces from My Account zone - Fix readonly mode not being switched correctly in some case. (details)
+Registry Cache Key : repo can be null. (details)
+Fix Exif metadata display in InfoPanel when no GPS parameter is defined in the plugin or no GPS data is present in photo. (details)
+Fix regression on contextual menu content and default item display. (details)
+Fix regression on "Remember Me" feature. (details)
+Replace pydio.getController().parseXmlMessage() by PydioApi.getClient().parseXmlMessage. Same for triggerDownload() moved as static method on PydioApi. (details)
+Fix Eml Attachment Download. (details)
+Replace all Controller.parseXmlMessage calls by PydioApi.getClient().parseXmlMessage in manifests. (details)
+Replace ' by " to avoid label truncating on users/teams listing. Better sanitization and error catching on Team creation. (details)
+Prevent editor.browser to open SVG files directly, always force as attachment. (details)
+Pass the $url to isSeekable(), allowing to return different value depending on the path (=> return false for Zip files in fsAccessWrapper, or it's messed up when browsing zip subfolders). (details)
+Declare restParams on compress in action.powerfs, otherwise API is not working for this action when plugin is active. (details)
+Fix ChangesTracker for filter + mask management. Fix indexation issue when copying folders. (details)
+Specific fix for video player for Firefox (details)
+
+--------------------------
 Pydio Core 6.2.1 is a bugfix release providing compatibility fixes for non-standard plugins to the core. See complete changelog below.
 
 Some servers do not return the "." value, send a fake stat in that case by grabing the stat from AJXP_DATA_PATH. (details)
@@ -57,7 +126,28 @@ Update package.json versions (details)
 
 -------------------
 
-Pydio 6.2.0 - Major Performances Update & Bug Fixes
+
+[Summary]
+
+Pydio 6.2.0 brings massive performance improvements, many bug fixes from previous version, and a couple of new features:
+ * Performances: we gained an average 5 times in performance on every request. Using optional in-memory KeyValue Caching adds a tremendous improvement for Rest calls (sync).
+ * Tar gz / bz2 support: creation and extraction of archives
+ * Web UI: Better mobile support. Under the hood, we started migrating our whole JS platform from legacy libraries to Ecma Script 6. We now use Grunt tasks to compile/minify the JS
+ * Packaging: Rework of our Linux packages from ground up, splitting plugins into separate packages, with packaging best-practice in mind.
+ * PHP7-Ready: we chased language issues that could compatibility problems with PHP7.
+ * And many many bug fixed on all parts of the application, see Changelog below.
+
+Contributors: cdujeu, svetlemodry, rimckenney, c12simple, Isma91, leobouilloux, huzergackl, DepaMarco, ecappa, sespivak, Uggy, sim1st. Thanks to all for making this happen!
+
+[Upgrade notes: please read]
+
+. This new version now requires a php version greater or equal to 5.4. We also dropped support for IE7. Yes we did. Make sure that you meet these requirements before upgrading!
+. If you are using the meta.mount plugin, we removed entirely the "sudo" options for security reasons. If you were relying on that, you will have to hack-it-yourself.
+. The ROOT_ROLE was replaced by a "Root Group" role concept: a role corresponding to the root of all groups, and as such applied automatically to every users.
+
+For archive deployments, upgrade should be straightforward, but for Linux make sure to check our online How-To.
+
+[Detailed Change Log]
 
 Massive refactoring of AjaXplorer class into various subclasses (Registry & PydioUI). (details)
 Reduce global scope pollution. Fix some destroy implementations missing the cache destruction. (details)

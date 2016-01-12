@@ -27,8 +27,15 @@ Class.create("ExifCellRenderer", {
 		if(latiCell && longiCell && latiCell.innerHTML && longiCell.innerHTML){
 			var object = new ExifCellRenderer();
 			object.transformGeoCells(latiCell, longiCell);
-		}else if(latiCell && longiCell){
-            latiCell.up('div.infoPanelTable').up('div').hide();
+		}
+        var parentDiv = htmlElement.down('div.exifPanelTable');
+        parentDiv.select('div.infoPanelValue').each(function(d){
+            if(!d.innerHTML){
+                d.up('div').remove();
+            }
+        });
+        if(!parentDiv.select('div').length){
+            parentDiv.up('div').hide();
         }
 	},
 	

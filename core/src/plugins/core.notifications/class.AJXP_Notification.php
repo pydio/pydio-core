@@ -72,6 +72,11 @@ class AJXP_Notification
 
     public static $usersCaches = array();
 
+    /**
+     * @var string A hint about the current context (workspace, shared minisite, etc..)
+     */
+    private $locationType;
+
     public static function autoload()
     {
     }
@@ -86,28 +91,17 @@ class AJXP_Notification
     {
         $tplString = SystemTextEncoding::fromUTF8($tplString);
         $repoId = $this->getNode()->getRepositoryId();
-        if (ConfService::getRepositoryById($repoId) != null) {
-            $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
+        $repoObject = ConfService::getRepositoryById($repoId);
+        if ($repoObject != null) {
+            $repoLabel = $repoObject->getDisplay();
         } else {
             $repoLabel = "Repository";
         }
         $uLabel = "";
-        if (array_key_exists($this->getAuthor(), self::$usersCaches)) {
-            if(self::$usersCaches[$this->getAuthor()] != 'AJXP_USER_DONT_EXISTS'){
-                $uLabel = self::$usersCaches[$this->getAuthor()];
-            }
-        } else if (strstr($tplString, "AJXP_USER") !== false) {
-            if(AuthService::userExists($this->getAuthor())){
-                $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
-                $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-                self::$usersCaches[$this->getAuthor()] = $uLabel;
-            }else{
-                self::$usersCaches[$this->getAuthor()] = 'AJXP_USER_DONT_EXISTS';
-            }
+        if (strstr($tplString, "AJXP_USER") !== false){
+            $uLabel = $this->getAuthorLabel();
         }
-        if (empty($uLabel)) {
-            $uLabel = $this->getAuthor();
-        }
+
         $em = ($rich ? "<em>" : "");
         $me = ($rich ? "</em>" : "");
 
@@ -123,11 +117,11 @@ class AJXP_Notification
             "AJXP_DATE"             => SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($this->getDate(),$mess)),
         );
 
-        if($replaces["AJXP_NODE_LABEL"]==$em.$me){
-            $replaces["AJXP_NODE_LABEL"] = $em. "[".$replaces["AJXP_REPOSITORY_LABEL"]."]".$me;
+        if($replaces["AJXP_NODE_LABEL"]==$em.$me || $replaces["AJXP_NODE_LABEL"] == $em."/".$me ){
+            $replaces["AJXP_NODE_LABEL"] = $replaces["AJXP_REPOSITORY_LABEL"];
         }
-        if($replaces["AJXP_PARENT_LABEL"] == $em.$me ){
-            $replaces["AJXP_PARENT_LABEL"] = $em. "[".$replaces["AJXP_REPOSITORY_LABEL"]."]".$me;
+        if($replaces["AJXP_PARENT_LABEL"] == $em.$me || $replaces["AJXP_PARENT_LABEL"] == $em."/".$me ){
+            $replaces["AJXP_PARENT_LABEL"] = $replaces["AJXP_REPOSITORY_LABEL"];
         }
         if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
             isSet($this->secondaryNode)
@@ -185,22 +179,64 @@ class AJXP_Notification
     public function getDescriptionLong($skipLink = false)
     {
         $mess = ConfService::getMessages();
+        $tpl = "";
+        if(!$skipLink){
+            $tpl = "[".$this->getDescriptionLocation()."] ";
+        }
 
-        if (count($this->relatedNotifications)) {
+        if (count($this->relatedNotifications) == 1 && $this->relatedNotifications[0]->getNode()->getUrl() != $this->getNode()->getUrl()){
+
             $key = "notification.tpl.group.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action;
-            $tpl = $this->replaceVars($mess[$key], $mess).": ";
+            $tpl .= $this->replaceVars($mess[$key], $mess).": ";
+            $tpl .= "".lcfirst($this->relatedNotifications[0]->getDescriptionLong(true)).".";
+
+        }else if (count($this->relatedNotifications) > 1) {
+
+            $key = "notification.tpl.group.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action;
+            $tpl .= $this->replaceVars($mess[$key], $mess).": ";
             $tpl .= "<ul>";
             foreach ($this->relatedNotifications as $relatedNotification) {
                 $tpl .= "<li>".$relatedNotification->getDescriptionLong(true)."</li>";
             }
             $tpl .= "</ul>";
+
         } else {
-            $tpl = $this->replaceVars($mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action], $mess);
+
+            $tpl .= $this->replaceVars($mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action], $mess);
+
         }
         if (!$skipLink) {
             $tpl .= "<br><br>".$this->replaceVars($mess["notification.tpl.long.ajxp_link"], $mess);
         }
         return $tpl;
+    }
+
+    public function getDescriptionLocation(){
+        $mess = ConfService::getMessages();
+        if(!isSet($this->locationType)){
+            $this->computeLocationType();
+        }
+        return $this->replaceVars($mess["notification.tpl.location.".$this->locationType], $mess);
+    }
+
+    private function computeLocationType(){
+
+        $type = "workspace.normal";
+        $repo = $this->getNode()->getRepository();
+        $crtUserId = "shared";
+        $crtUser = AuthService::getLoggedUser();
+        if($crtUser != null) $crtUserId = $crtUser->getId();
+        if(isSet($_SESSION["CURRENT_MINISITE"])){
+            if($repo->hasContentFilter()){
+                $type = "minisite.file";
+            }else{
+                $type = "minisite.folder";
+            }
+        }else if($repo->hasOwner() && $repo->getOwner() != $crtUserId){
+            $type = "workspace.shared";
+        }
+
+        $this->locationType = $type;
     }
 
     public function setAction($action)
@@ -230,6 +266,9 @@ class AJXP_Notification
             }
         } else if (AuthService::userExists($this->getAuthor())) {
             $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
+            if($obj->isHidden()){
+                return $this->getPublicAuthorLabel();
+            }
             $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             self::$usersCaches[$this->getAuthor()] = $uLabel;
         } else{
@@ -237,6 +276,12 @@ class AJXP_Notification
         }
         if(!empty($uLabel)) return $uLabel;
         else return $this->getAuthor();
+    }
+
+    protected function getPublicAuthorLabel(){
+        $m = ConfService::getMessages();
+        $label = str_replace("%s", AJXP_Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
+        return $label;
     }
 
     public function setDate($date)
@@ -255,6 +300,7 @@ class AJXP_Notification
     public function setNode($node)
     {
         $this->node = $node;
+        $this->computeLocationType();
     }
 
     /**

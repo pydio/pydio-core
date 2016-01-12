@@ -147,7 +147,7 @@ Class.create("CartManager", FetchedResultPane, {
             conn.setMethod("POST");
             conn.setParameters(h);
             conn.onComplete = function(transport){
-                var success = pydio.getController().parseXmlMessage(transport.responseXML);
+                var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 if(success){
                     ajaxplorer.goTo('/'+zipName+'.zip');
                     window.setTimeout(function(){

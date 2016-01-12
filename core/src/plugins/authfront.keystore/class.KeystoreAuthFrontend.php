@@ -107,7 +107,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
         $user = AuthService::getLoggedUser()->getId();
         if(AuthService::getLoggedUser()->isAdmin() && isSet($httpVars["user_id"])){
-            $user = $httpVars["user_id"];
+            $user = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
         }
         switch($action){
             case "keystore_generate_auth_token":
