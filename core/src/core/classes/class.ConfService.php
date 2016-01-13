@@ -1447,6 +1447,7 @@ class ConfService
         if(is_a($userIdOrObject, "AbstractAjxpUser")){
             $value = $userIdOrObject->personalRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
             self::$usersParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
+            if(empty($value) && !empty($defaultValue)) $value = $defaultValue;
             return $value;
         }
         // Already in memory cache
