@@ -1598,6 +1598,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $fullname = $data['filename'];
         $size = $data['size'];
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
+        $realBase = str_replace("\\", "/", $realBase);
         $repoName = $this->urlBase.str_replace($realBase, "", $fullname);
 
         $toNode = new AJXP_Node($repoName);
