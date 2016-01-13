@@ -23,5 +23,5 @@ $mess=array(
     "workspace.shared" => "Shared Folder AJXP_REPOSITORY_LABEL",
     "minisite.file" => "Public File AJXP_REPOSITORY_LABEL",
     "minisite.folder" => "Public Folder AJXP_REPOSITORY_LABEL",
-    "public_user" => "a public user (connection from '%s')"
+    "public_user" => "a public user (connection from '%s')",
 );
