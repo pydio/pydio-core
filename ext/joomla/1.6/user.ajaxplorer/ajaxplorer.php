@@ -34,7 +34,7 @@ class plgUserAjaxplorer extends JPlugin
      * @param 	array  $config  An array that holds the plugin configuration
      * @since 1.6
      */
-    public function plgUserAjaxplorer(& $subject, $config)
+    public function __construct(& $subject, $config)
     {
         parent::__construct($subject, $config);
         $this->_plugin = JPluginHelper::getPlugin( 'user', 'ajaxplorer' );

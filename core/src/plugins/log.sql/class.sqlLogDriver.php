@@ -548,7 +548,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             $currentCount = 1;
             foreach ($result as $r) {
 
-                if(isSet($buffer) && $buffer["user"] == $r["user"] && $buffer["message"] == $r["message"]){
+                if(isSet($buffer) && $buffer["user"] == $r["user"] && $buffer["message"] == $r["message"] && $buffer["params"] == $r["params"]){
                     $currentCount ++;
                     continue;
                 }

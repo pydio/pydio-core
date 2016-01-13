@@ -3,7 +3,8 @@
 [Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
- [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core)
+ [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core) |
+ [![Build Status](https://travis-ci.org/pydio/pydio-core.svg)](https://travis-ci.org/pydio/pydio-core)
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
