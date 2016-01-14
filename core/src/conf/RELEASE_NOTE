@@ -84,7 +84,10 @@ Fix google shortner api key - Close #1030 (details)
 Make sure to not return an empty value. (details)
 Fix some specific zip extraction case on Windows Server. (details)
 Fix multimode value : check instance_name OR group_switch_value (details)
-
+Fix MacOS Yosemite / El Capitan Detection (details)
+Fix italian "Invite" button: missing translation strings. (details)
+HTML Base Tag is not correctly applied in IE10 when dynamically inserting "link". Add an data-hrefRebase tag to be processed (prepending the base) on ie10 only. (details)
+Close session when sending binary files. Could create a race condition with tryLogUserFromCookie. (details)
 
 --------------------------
 Pydio Core 6.2.1 is a bugfix release providing compatibility fixes for non-standard plugins to the core. See complete changelog below.
