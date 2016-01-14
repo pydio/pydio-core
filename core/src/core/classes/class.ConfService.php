@@ -462,11 +462,10 @@ class ConfService
                 }
             }
         } else {
-            /*
-            if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"] == $rootDirIndex) {
-                return;
+            $object = self::getRepositoryById($rootDirIndex);
+            if($object == null || !self::repositoryIsAccessible($rootDirIndex, $object)) {
+                throw new Exception("Trying to switch to an unauthorized repository");
             }
-            */
             if ($temporary && (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null)) {
                 $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 if ($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])) {

@@ -1241,6 +1241,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if (isSet($httpVars["tmp_file"])) {
                     $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
+                        session_write_close();
                         header("Content-Type:image/png");
                         readfile($file);
                     }
@@ -1253,12 +1254,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     } else {
                         $context = array();
                     }
+                    session_write_close();
                     $this->loadBinary($context, AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
             case "get_global_binary_param" :
 
+                session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
                     $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
