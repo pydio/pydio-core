@@ -463,7 +463,7 @@ class ConfService
             }
         } else {
             $object = self::getRepositoryById($rootDirIndex);
-            if($object == null || !self::repositoryIsAccessible($rootDirIndex, $object)) {
+            if($temporary && ($object == null || !self::repositoryIsAccessible($rootDirIndex, $object))) {
                 throw new Exception("Trying to switch to an unauthorized repository");
             }
             if ($temporary && (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null)) {
