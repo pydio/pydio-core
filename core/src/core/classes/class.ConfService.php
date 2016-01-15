@@ -810,7 +810,7 @@ class ConfService
         if($scope == "user"){
             $acls = array();
             if(AuthService::getLoggedUser() != null){
-                $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+                $acls = AuthService::getLoggedUser()->mergedRole->listAcls(true);
             }
             if(!count($acls)) {
                 $drvList = array();
