@@ -23,6 +23,7 @@
                     <context selection="false" dir="" recycle="hidden" actionBar="false"
                              ajxpWidgets="UserWidget" actionBarGroup="utils"/>
                 </gui>
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         var dialogLoadFunction = function(){
