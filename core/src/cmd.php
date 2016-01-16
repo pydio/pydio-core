@@ -146,7 +146,9 @@ if ($optRepoId !== false) {
             }
         }
     }
-    ConfService::switchRootDir($optRepoId, true);
+    try{
+        ConfService::switchRootDir($optRepoId, true);
+    }catch(AJXP_Exception $e){}
 } else {
     if ($optStatusFile) {
         file_put_contents($optStatusFile, "ERROR:You must pass a -r argument specifying either a repository id or alias");
@@ -169,11 +171,14 @@ if (AuthService::usersEnabled() && !empty($optUser)) {
     }
 
     if ($loggedUser != null) {
+        ConfService::switchRootDir($optRepoId, true);
+        /*
         $res = ConfService::switchUserToActiveRepository($loggedUser, $optRepoId);
         if (!$res) {
             AuthService::disconnect();
             $requireAuth = true;
         }
+        */
     }
     if (isset($loggingResult) && $loggingResult != 1) {
         AJXP_XMLWriter::header();
