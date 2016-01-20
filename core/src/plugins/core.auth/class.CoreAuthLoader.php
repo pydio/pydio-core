@@ -67,6 +67,9 @@ class CoreAuthLoader extends AJXP_Plugin
 
                 $mLabel = ""; $sLabel = "";$separator = "";
                 $cacheMasters = true;
+                if(isSet($this->pluginConf["MULTI_MODE"]) && !isSet($this->pluginConf["MULTI_MODE"]["instance_name"])){
+                    $this->pluginConf["MULTI_MODE"]["instance_name"] = $this->pluginConf["MULTI_MODE"]["group_switch_value"];
+                }
                 if ($this->pluginConf["MULTI_MODE"]["instance_name"] == "USER_CHOICE") {
                     $mLabel = $this->pluginConf["MULTI_MODE"]["MULTI_MASTER_LABEL"];
                     $sLabel = $this->pluginConf["MULTI_MODE"]["MULTI_SLAVE_LABEL"];

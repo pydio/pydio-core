@@ -114,7 +114,9 @@ class Pydio extends Observable{
             if(this.UI.modal) this.UI.modal.initForms();
             this.UI.initObjects();
 
-            PydioApi.getClient().tryToLogUserFromRememberData();
+            if(!this.user) {
+                PydioApi.getClient().tryToLogUserFromRememberData();
+            }
             this.fire("registry_loaded", this.Registry.getXML());
 
             window.setTimeout(function(){

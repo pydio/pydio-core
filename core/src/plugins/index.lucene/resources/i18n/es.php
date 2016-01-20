@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
+// spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess = array(
     "1" => "Indexar contenido",
     "2" => "Indexar el contenido de la carpeta",
@@ -28,8 +28,9 @@ $mess = array(
     "6" => "Atención, la carpeta actual está indexándose, inténtelo más tarde.",
     "7" => "Primera indexación de esta carpeta, por favor espere y reintente más tarde su búsqueda",
     "8" => "Indexando %s en segundo plano",
-    "9" => "No puedo encontrar el índice de la carpeta actual! Debería ejecutar la indexación de los datos primero!",
-    "10" => "Indexing subfolders in background",
-    "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
-    "12" => "Workspace is not indexed, try launching indexation manually!"
+    "9" => "¡No puedo encontrar el índice de la carpeta actual! ¡Debería primero ejecutar la indexación de los datos!",
+    "10" => "Indexando subcarpetas en segundo plano",
+    "11" => "El repositorio parece ser que está realizando la indexación, por favor espere 3 minutos y reintente su búsqueda.",
+    "12" => "¡El repositorio no está indexado, por favor lance la indexación manualmente!"
+
 );

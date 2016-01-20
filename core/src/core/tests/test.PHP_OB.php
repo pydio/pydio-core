@@ -22,7 +22,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * Check that DOMXml is enabled
+ * Check that output buffering is enabled
  * @package AjaXplorer
  * @subpackage Tests
  */

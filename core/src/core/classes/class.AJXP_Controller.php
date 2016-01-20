@@ -173,6 +173,12 @@ class AJXP_Controller
         //Check Rights
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
+            if( $actionName != "logout" && AJXP_Controller::actionNeedsRight($action, $xPath, "userLogged", "only") && $loggedUser == null){
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::requireAuth();
+                    AJXP_XMLWriter::close();
+                    exit(1);
+                }
             if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") &&
                 ($loggedUser == null || !$loggedUser->isAdmin())){
                     $mess = ConfService::getMessages();
@@ -538,13 +544,13 @@ class AJXP_Controller
      * @param string $right
      * @return bool
      */
-    public static function actionNeedsRight($actionNode, $xPath, $right)
+    public static function actionNeedsRight($actionNode, $xPath, $right, $expectedValue="true")
     {
         $rights = $xPath->query("rightsContext", $actionNode);
         if(!$rights->length) return false;
         $rightNode =  $rights->item(0);
         $rightAttr = $xPath->query("@".$right, $rightNode);
-        if ($rightAttr->length && $rightAttr->item(0)->value == "true") {
+        if ($rightAttr->length && $rightAttr->item(0)->value == $expectedValue) {
             self::$lastActionNeedsAuth = true;
             return true;
         }

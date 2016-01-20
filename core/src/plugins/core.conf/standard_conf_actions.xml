@@ -21,6 +21,7 @@
 			</processing>
 		</action>
 		<action name="load_repository_info">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Retrieve some plugins-contributed info about the workspace (e.g. Quota, Sharing status, etc).">
                     <output type="JSON" description="Array of plugins informations"/>
@@ -149,6 +150,7 @@
             </processing>
         </action>
 		<action name="get_user_templates_definition">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction"/>
 			</processing>
@@ -159,11 +161,13 @@
 			</processing>
 		</action>
 		<action name="user_delete_repository">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="user_delete_user">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction"/>
 			</processing>
@@ -212,6 +216,7 @@
 			</processing>
 		</action>
         <action name="get_permissions_mask">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <serverCallback methodName="publishPermissionsMask" restParams="/" developerComment="Send the permissions mask for the current workspace, if defined."/>
             </processing>
@@ -232,11 +237,13 @@
 			</processing>
 		</action>
 		<action name="store_binary_temp">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
         <action name="user_list_authorized_users">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <serverCallback methodName="switchAction" restParams="/value" developerComment="List users that are visible to the currently logged users">
                     <input_param name="value" type="string" description="Search string: users will be searched starting with this value. Can be empty."/>
@@ -247,10 +254,10 @@
             </processing>
         </action>
         <action name="custom_data_edit">
-      			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
-      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
-      			</gui>
-                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
+                <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
@@ -283,7 +290,7 @@
                     <div id="custom_data_edit" action="custom_data_edit" box_width="320">
                     </div>
                 ]]></clientForm>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
         <action name="user_update_user">
@@ -360,7 +367,7 @@
                     ]]></dialogOnComplete>
                     <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                 </clientCallback>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
         <action name="user_create_user">
@@ -420,12 +427,12 @@
                     <div id="user_create_user" action="custom_data_edit" box_width="320">
                     </div>
                 ]]></clientForm>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false" iconClass="icon-flag">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
@@ -474,7 +481,7 @@
 						<select id="language_selector" style="margin-left:50px; margin-bottom: 20px;"></select>
 					</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="webdav_preferences">
@@ -583,7 +590,7 @@
 						<input type="hidden" name="get_action" value="webdav_preferences">
 					</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
         <action name="switch_to_user_dashboard">

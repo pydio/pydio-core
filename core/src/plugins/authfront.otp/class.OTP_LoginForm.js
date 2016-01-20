@@ -32,7 +32,7 @@ Class.create("OTP_LoginForm", {
         }
     }
 });
-var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
+var enableModifyGUI = pydio.getPluginConfigs("authfront.otp").get("MODIFY_LOGIN_SCREEN");
 if(!enableModifyGUI){
     window.OTPFORM = new OTP_LoginForm();
 }

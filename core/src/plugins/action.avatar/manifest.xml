@@ -16,6 +16,7 @@
     <registry_contributions>
         <actions>
             <action name="get_avatar_url">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
                     <serverCallback methodName="receiveAction" developerComment="Get avatar URL for currently logged user"/>
                 </processing>

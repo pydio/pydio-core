@@ -278,8 +278,8 @@ class AbstractAccessDriver extends AJXP_Plugin
                 RecycleBinManager::fileToRecycle($srcFile);
                 $messagePart = $mess[123]." ".$mess[122];
             }
-            if (isset($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
+            if (is_dir($destFile)) {
+                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
             } else {
                 $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
             }

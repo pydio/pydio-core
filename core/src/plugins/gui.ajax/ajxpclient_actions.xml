@@ -13,11 +13,6 @@
 				</serverCallback>
 			</processing>
 		</action>
-		<action name="get_editors_registry">
-			<processing>
-				<serverCallback methodName="switchAction"/>
-			</processing>
-		</action>
 		<action name="display_doc">
 			<processing>
 				<serverCallback methodName="switchAction" restParams="/doc_file" developerComment="Load a doc file">
@@ -92,7 +87,7 @@
 				</context>
                 <selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					document.fire("ajaxplorer:add_bookmark");

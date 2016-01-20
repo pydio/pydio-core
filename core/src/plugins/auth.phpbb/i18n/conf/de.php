@@ -19,6 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
+"Remote authentication" => "Remote authentication",
 "Authentication on PHPBB is done remotely (useful in CMS system)." => "Authentifizierung über PHPBB-System.",
 "Authentication mode" => "Authentifizierung-Modus",
 "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required",

@@ -113,14 +113,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $obj = null;
             }
         } else {
-            if(PHP_OS == "Darwin") $option = "-sk";
+            if((PHP_OS == "Darwin") || (PHP_OS == "FreeBSD")) $option = "-sk";
             else $option = "-sb";
             $cmd = '/usr/bin/du '.$option.' ' . escapeshellarg($dir);
             $io = popen ( $cmd , 'r' );
             $size = fgets ( $io, 4096);
             $size = trim(str_replace($dir, "", $size));
             $size =  floatval($size);
-            if(PHP_OS == "Darwin") $size = $size * 1024;
+            if((PHP_OS == "Darwin") || (PHP_OS == "FreeBSD")) $size = $size * 1024;
             pclose ( $io );
         }
         if($size != -1){
@@ -1598,6 +1598,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $fullname = $data['filename'];
         $size = $data['size'];
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
+        $realBase = str_replace("\\", "/", $realBase);
         $repoName = $this->urlBase.str_replace($realBase, "", $fullname);
 
         $toNode = new AJXP_Node($repoName);

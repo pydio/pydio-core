@@ -462,11 +462,10 @@ class ConfService
                 }
             }
         } else {
-            /*
-            if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"] == $rootDirIndex) {
-                return;
+            $object = self::getRepositoryById($rootDirIndex);
+            if($temporary && ($object == null || !self::repositoryIsAccessible($rootDirIndex, $object))) {
+                throw new AJXP_Exception("Trying to switch to an unauthorized repository");
             }
-            */
             if ($temporary && (isSet($_SESSION['REPO_ID']) || $this->contextRepositoryId != null)) {
                 $crtId =  self::$useSession ? $_SESSION['REPO_ID']  : $this->contextRepositoryId;
                 if ($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])) {
@@ -811,7 +810,7 @@ class ConfService
         if($scope == "user"){
             $acls = array();
             if(AuthService::getLoggedUser() != null){
-                $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+                $acls = AuthService::getLoggedUser()->mergedRole->listAcls(true);
             }
             if(!count($acls)) {
                 $drvList = array();
@@ -1447,6 +1446,7 @@ class ConfService
         if(is_a($userIdOrObject, "AbstractAjxpUser")){
             $value = $userIdOrObject->personalRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
             self::$usersParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
+            if(empty($value) && !empty($defaultValue)) $value = $defaultValue;
             return $value;
         }
         // Already in memory cache

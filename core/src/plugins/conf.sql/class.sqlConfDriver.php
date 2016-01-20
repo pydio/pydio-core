@@ -897,6 +897,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
+            dibi::query('DELETE FROM [ajxp_user_teams] WHERE [owner_id] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
             foreach ($children as $childId) {

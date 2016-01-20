@@ -60,6 +60,10 @@ class s3AccessDriver extends fsAccessDriver
                 'key'    => $this->repository->getOption("API_KEY"),
                 'secret' => $this->repository->getOption("SECRET_KEY")
             );
+            $signatureVersion = $this->repository->getOption("SIGNATURE_VERSION");
+            if(!empty($signatureVersion) && $signatureVersion != "-1"){
+                $options['signature'] = $signatureVersion;
+            }
             $baseURL = $this->repository->getOption("STORAGE_URL");
             if(!empty($baseURL)){
                 $options["base_url"] = $baseURL;
