@@ -73,6 +73,7 @@
                 <gui text="notification_center.7" title="notification_center.7" iconClass="icon-remove-sign" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="inline-notifications" contextMenu="false" infoPanel="false"/>
                 </gui>
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
                     <clientCallback><![CDATA[
                     var selection = window.actionArguments[0];

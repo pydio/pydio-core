@@ -326,6 +326,17 @@ Class.create("PydioUI", {
         return requiredClasses;
     },
 
+    updateHrefBase: function(cdataContent){
+        if(!Prototype.Browser.IE10){
+            return cdataContent;
+        }
+        var base = $$('base')[0].getAttribute("href");
+        if(!base){
+            return cdataContent;
+        }
+        return cdataContent.replace('data-hrefRebase="', 'href="'+base);
+    },
+
     /**
      * Parses a client_configs/template_part node
      */
@@ -355,6 +366,7 @@ Class.create("PydioUI", {
             var cdataContent = "";
             if(parts[i].firstChild && parts[i].firstChild.nodeType == 4 && parts[i].firstChild.nodeValue != ""){
                 cdataContent = parts[i].firstChild.nodeValue;
+                cdataContent = this.updateHrefBase(cdataContent);
             }
             if(ajxpId){
                 toUpdate[ajxpId] = [ajxpClassName, ajxpOptionsString, cdataContent];
@@ -530,7 +542,7 @@ Class.create("PydioUI", {
                 else target = $$(target)[0];
                 if(passedTarget) target = passedTarget;
                 var position = tNodes[i].getAttribute("position");
-                var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
+                var obj = {}; obj[position] = this.updateHrefBase(tNodes[i].firstChild.nodeValue);
                 target.insert(obj);
                 obj[position].evalScripts();
             }

@@ -599,7 +599,7 @@ class AuthService
     {
         $loggedUser = self::getLoggedUser();
         if($loggedUser == null) return 0;
-        $acls = $loggedUser->mergedRole->listAcls();
+        $acls = $loggedUser->mergedRole->listAcls(true);
         foreach($acls as $key => $right){
             if (!empty($right) && ConfService::getRepositoryById($key) != null) return $key;
         }

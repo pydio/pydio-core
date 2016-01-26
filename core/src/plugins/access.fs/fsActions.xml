@@ -956,6 +956,7 @@
             </processing>
         </action>
         <action name="purge">
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <serverCallback methodName="switchAction" restParams="/" developerComment="If the workspace has a PURGE configured parameter, finds the expired files and delete them. Can be typically called from command line."/>
             </processing>

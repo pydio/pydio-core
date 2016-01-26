@@ -158,12 +158,22 @@ class AJXP_Role implements AjxpGroupPathProvider
         }
         return "";
     }
+
     /**
+     * @param bool $accessibleOnly If set to true, return only r, w, or rw.
      * @return array Associative array[REPO_ID] => RIGHT_STRING (r / w / rw / AJXP_VALUE_CLEAR)
      */
-    public function listAcls()
+    public function listAcls($accessibleOnly = false)
     {
-        return $this->acls;
+        if(!$accessibleOnly){
+            return $this->acls;
+        }
+        $output = array();
+        foreach ($this->acls as $id => $acl) {
+            if(empty($acl) || $acl == AJXP_VALUE_CLEAR) continue;
+            $output[$id] = $acl;
+        }
+        return $output;
     }
 
     public function clearAcls()

@@ -554,7 +554,7 @@
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":60,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
                     </div>
 				</div>
-                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<script>
                     document.observe("ajaxplorer:afterApply-login", function(){
                         AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
@@ -681,7 +681,7 @@
                         <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
                     </div>
 				</div>
-                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<script>
                     document.observe("ajaxplorer:afterApply-login", function(){
                         AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
@@ -798,7 +798,7 @@
                         <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
                     </div>
 				</div>
-                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<script>
 				    document.observe("ajaxplorer:user_logged", function(){
                         try{
@@ -831,7 +831,7 @@
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
-				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;} div#overlay.form-login_form_dynamic { opacity: 1; }</style>
                 <script>
                     document.observe("ajaxplorer:afterApply-login", function(){
@@ -848,7 +848,7 @@
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
-				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }  div#overlay.form-login_form_dynamic { opacity: 1; }</style>
 				<script>
                     document.observe("ajaxplorer:afterApply-login", function(){
