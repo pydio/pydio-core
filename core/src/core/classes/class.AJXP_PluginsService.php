@@ -40,9 +40,24 @@ class AJXP_PluginsService
      * @var AbstractConfDriver
      */
     private $confStorage;
+    private $cacheStorage;
     private $mixinsDoc;
     private $mixinsXPath;
 
+
+    /**
+     * @return bool
+     */
+    private function loadRegistryFromCacheService() {
+
+        $res = $this->cacheStorage->fetch("plugins_registry");
+
+        if (!$res) return false;
+
+        $this->registry = $res;
+
+        return true;
+    }
 
     /**
      * @return bool
@@ -59,14 +74,22 @@ class AJXP_PluginsService
                     }
                     require_once($fileName);
                 }
-                $kvCache = ConfService::getInstance()->getKeyValueCache();
-                $test = $kvCache->fetch("plugins_registry");
+                $test=FALSE;
+
+                //$test = CacheService::fetch("plugins_registry");
+
                 if($test !== FALSE) {
-                    $this->registry = $test;
+                    AJXP_Logger::debug(__CLASS__, __FUNCTION__, 'Loaded from cache');
+
+                    $this->registry=$test;
+
                 }else{
+                    AJXP_Logger::debug(__CLASS__, __FUNCTION__, 'Saving registry');
                     $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                    $this->registry = $res;
-                    $kvCache->save("plugins_registry", $res);
+
+                    //CacheService::save("plugins_registry", $res);
+
+                    $this->registry=$res;
                 }
                 // Refresh streamWrapperPlugins
                 foreach ($this->registry as $plugs) {
@@ -76,6 +99,8 @@ class AJXP_PluginsService
                         }
                     }
                 }
+
+
                 return true;
             }else{
                 return false;
@@ -92,13 +117,18 @@ class AJXP_PluginsService
      * @param AbstractConfDriver $confStorage
      * @param bool $rewriteCache Force a cache rewriting
      */
-    public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false)
+    public function loadPluginsRegistry($pluginFolder, $confStorage, $cacheStorage, $rewriteCache = false)
     {
         if(!$rewriteCache){
             if(!empty($this->registry)){
                 return;
             }
+            $this->cacheStorage = $cacheStorage;
+            if($this->loadRegistryFromCacheService()) {
+                return;
+            }
             if($this->loadRegistryFromCache()){
+                CacheService::save("plugins_registry", $this->registry);
                 return;
             }
         }
@@ -138,6 +168,7 @@ class AJXP_PluginsService
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
         }
+        $this->cacheStorage->save("plugins_registry", $this->registry);
     }
 
     /**
@@ -210,28 +241,32 @@ class AJXP_PluginsService
      * @param array $pluginOptions
      * @return AJXP_Plugin
      */
-    public function softLoad($pluginId, $pluginOptions)
+    public function softLoad($pluginId, $pluginOptions, $skipCache = false)
     {
-        if(empty($this->registry)){
-            $this->loadRegistryFromCache();
-        }
-        // Try to get from cache
-        list($type, $name) = explode(".", $pluginId);
-        if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
-            /**
-             * @var AJXP_Plugin $plugin
-             */
-            $plugin = $this->registry[$type][$name];
-            $plugin->init($pluginOptions);
-            return clone $plugin;
-        }
+        if (!$skipCache)
+        {
+            if(empty($this->registry)){
+                $this->loadRegistryFromCache();
+            }
 
+            // Try to get from cache
+            list($type, $name) = explode(".", $pluginId);
+            if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+                /**
+                 * @var AJXP_Plugin $plugin
+                 */
+                $plugin = $this->registry[$type][$name];
+                $plugin->init($pluginOptions);
+                return clone $plugin;
+            }
+        }
 
         $plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
         $plugin->loadConfigs(array()); // Load default
         $plugin->init($pluginOptions);
+
         return $plugin;
     }
 
@@ -245,6 +280,7 @@ class AJXP_PluginsService
     {
         $definition = $plugin->getClassFile();
         if(!$definition) return $plugin;
+
         $filename = AJXP_INSTALL_PATH."/".$definition["filename"];
         $className = $definition["classname"];
         if (is_file($filename)) {
