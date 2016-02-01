@@ -45,6 +45,7 @@ class ConfService
      */
     public function confPluginSoftLoad()
     {
+        $this->booter = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array());
         $coreConfigs = $this->booter->loadPluginConfig("core", "conf");
         $corePlug = AJXP_PluginsService::getInstance()->softLoad("core.conf", array());
         $corePlug->loadConfigs($coreConfigs);
@@ -58,10 +59,10 @@ class ConfService
      */
     public function cachePluginSoftLoad()
     {
-
-        $coreConfigs = $this->booter->loadPluginConfig("core", "cache");
+        $coreConfigs = array();
         $corePlug = AJXP_PluginsService::getInstance()->softLoad("core.cache", array());
-        $corePlug->loadConfigs($coreConfigs);
+        CoreConfLoader::loadBootstrapConfForPlugin("core.cache", $coreConfigs);
+        if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getCacheImpl();
     }
 
@@ -82,17 +83,17 @@ class ConfService
      * @static
      * @return void
      */
-    public static function init()
+    public static function init($installPath=AJXP_INSTALL_PATH, $pluginDir="plugins")
     {
         $inst = self::getInstance();
-        $inst->initInst();
+        $inst->initInst($installPath.DIRECTORY_SEPARATOR.$pluginDir);
     }
 
     /**
      * Load the boostrap_* files and their configs
      * @return void
      */
-    public function initInst()
+    public function initInst($pluginDirPath)
     {
         // INIT AS GLOBAL
         $this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
@@ -113,19 +114,20 @@ class ConfService
             $this->configs["DEFAULT_REPOSITORIES"] = array();
         }
 
-        // Launching bootloader (no cache)
-        $this->booter = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array(), true);
+        AJXP_PluginsService::deferBuildingRegistry();
 
-        // Soft Load (order is important - cache before conf)
+        // Try to load instance from cache first
         $this->cachePlugin = $this->cachePluginSoftLoad();
+        if (AJXP_PluginsService::getInstance()->loadPluginsRegistryFromCache($this->cachePlugin)) {
+            return;
+        }
 
-        //AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", self::getConfStorageImpl()->getName());
-
+        $this->booter = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array());
         $this->confPlugin = $this->confPluginSoftLoad();
 
         // Loading the registry
         try {
-            AJXP_PluginsService::getInstance()->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $this->confPlugin, $this->cachePlugin);
+            AJXP_PluginsService::getInstance()->loadPluginsRegistry($pluginDirPath, $this->confPlugin);
         } catch (Exception $e) {
             die("Severe error while loading plugins registry : ".$e->getMessage());
         }
@@ -286,7 +288,7 @@ class ConfService
     /**
      * @param $confStorage AbstractConfDriver
      * @param $authStorage AbstractAuthDriver
-     * @paran $cacheStorage AbstractCacheDriver
+     * @param $cacheStorage AbstractCacheDriver
      */
     public static function setTmpStorageImplementations($confStorage, $authStorage, $cacheStorage)
     {
@@ -325,10 +327,7 @@ class ConfService
     public static function getCacheDriverImpl()
     {
         if(isSet(self::$tmpCacheStorageImpl)) return self::$tmpCacheStorageImpl;
-        $inst = AJXP_PluginsService::getInstance();
-        $plug = $inst->getPluginById("core.cache");
-        $cache = $plug->getCacheImpl();
-        return $cache;
+        return AJXP_PluginsService::getInstance()->getPluginById("core.cache")->getCacheImpl();
     }
 
     public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
@@ -354,8 +353,8 @@ class ConfService
             AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
         }
 
-        if($useCache && isSet($kvCache) && isSet($cacheKey)){
-            $kvCache->save($cacheKey, $registry->saveXML());
+        if($useCache && isSet($cacheKey)){
+            CacheService::save($cacheKey, $registry->saveXML());
         }
 
         if($clone){

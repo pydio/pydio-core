@@ -104,9 +104,13 @@ class AJXP_Plugin implements Serializable
         $this->extensionsDependencies = array();
     }
 
+    public static function getWorkDirForPluginId($pluginId) {
+        return AJXP_DATA_PATH.DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$pluginId;
+    }
+
     protected function getPluginWorkDir($check = false)
     {
-        $d = AJXP_DATA_PATH.DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$this->getId();
+        $d = self::getWorkDirForPluginId($this->getId());
         if(!$check) return $d;
         if (!is_dir($d)) {
             $res = @mkdir($d, 0755, true);

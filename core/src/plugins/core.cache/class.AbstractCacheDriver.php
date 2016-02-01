@@ -60,9 +60,8 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
         $cacheDriver = $this->getCacheDriver();
 
         if (isset($cacheDriver) && $cacheDriver->contains($id)) {
-            AJXP_Logger::debug(__CLASS__,__FUNCTION__,'Fetching '.$id);
-           $result = $cacheDriver->fetch($id);
-           return $result;
+            $result = $cacheDriver->fetch($id);
+            return $result;
         }
 
         return false;

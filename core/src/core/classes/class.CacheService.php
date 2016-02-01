@@ -44,18 +44,14 @@ class CacheService
 
         if ($cacheDriver) {
             return $cacheDriver->save($id, $object, $timelimit = 0);
-        } else {
-            AJXP_Logger::debug(__CLASS__,__FUNCTION__,'error '.$cacheDriver);
         }
 
         return false;
     }
 
     public static function fetch($id) {
-        //var_dump('Fetch' . $id);
         $cacheDriver = ConfService::getCacheDriverImpl();
 
-        return false;
         if ($cacheDriver) {
             $data = $cacheDriver->fetch($id);
             return $data;

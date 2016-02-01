@@ -37,7 +37,6 @@ class CoreCacheLoader extends AJXP_Plugin
     {
         if (!isSet(self::$cacheInstance) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$cacheInstance->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Instantiating ");
                 $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
 
                 if ($this->pluginInstance != false) {

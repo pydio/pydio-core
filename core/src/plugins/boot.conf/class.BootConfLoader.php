@@ -448,6 +448,7 @@ class BootConfLoader extends AbstractConfDriver
     public function _loadPluginConfig($pluginId, &$options)
     {
         $internal = self::getInternalConf();
+
         if ($pluginId == "core.conf" && isSet($internal["CONF_DRIVER"])) {
             // Reformat
             $options["UNIQUE_INSTANCE_CONFIG"] = array(
@@ -459,7 +460,6 @@ class BootConfLoader extends AbstractConfDriver
             return;
 
         } else if ($pluginId == "core.auth" && isSet($internal["AUTH_DRIVER"])) {
-
             $options = $this->authLegacyToBootConf($internal["AUTH_DRIVER"]);
             return;
 
@@ -469,11 +469,8 @@ class BootConfLoader extends AbstractConfDriver
             );
             return;
         }
-        $jsonPath = $this->getPluginWorkDir(false)."/bootstrap.json";
-        $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
-        if (is_array($jsonData) && isset($jsonData[$pluginId])) {
-            $options = array_merge($options, $jsonData[$pluginId]);
-        }
+
+        CoreConfLoader::loadBootstrapConfForPlugin($pluginId, $options);
     }
 
     protected function authLegacyToBootConf($legacy)
@@ -506,10 +503,11 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function _savePluginConfig($pluginId, $options)
     {
-        $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
-        $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
+        $jsonData = CoreConfLoader::getBootstrapConf();
+
         if(!is_array($jsonData)) $jsonData = array();
         $jsonData[$pluginId] = $options;
+
         if ($pluginId == "core.conf" || $pluginId == "core.auth" || $pluginId == "core.cache") {
             $testKey = ($pluginId == "core.conf" || $pluginId == "core.cache" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
             $current = array();
@@ -518,10 +516,9 @@ class BootConfLoader extends AbstractConfDriver
                 $forceDisconnexion = $pluginId;
             }
         }
-        if (file_exists($jsonPath)) {
-            copy($jsonPath, $jsonPath.".bak");
-        }
-        AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
+
+        CoreConfLoader::saveBootstrapConf($jsonData);
+
         if (isSet($forceDisconnexion)) {
             if ($pluginId == "core.conf") {
                 // DISCONNECT
