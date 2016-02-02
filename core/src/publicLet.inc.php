@@ -24,8 +24,6 @@ require_once("base.conf.php");
 
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
-$confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
 $confDriver = ConfService::getConfStorageImpl();

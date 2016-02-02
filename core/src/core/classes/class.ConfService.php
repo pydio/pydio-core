@@ -30,6 +30,9 @@ class ConfService
     private static $instance;
     public static $useSession = true;
 
+    private $booter;
+    private $confPlugin;
+    private $cachePlugin;
     private $errors = array();
     private $configs = array();
 
@@ -37,22 +40,30 @@ class ConfService
     private $contextCharset;
 
     /**
-     * @var AJXP_KeyValueCache
-     */
-    private $keyValueCache;
-
-    /**
      * @param AJXP_PluginsService $ajxpPluginService
      * @return AbstractConfDriver
      */
-    public function confPluginSoftLoad($ajxpPluginService)
+    public function confPluginSoftLoad()
     {
-        $booter = $ajxpPluginService->softLoad("boot.conf", array());
-        $coreConfigs = $booter->loadPluginConfig("core", "conf");
-        $corePlug = $ajxpPluginService->softLoad("core.conf", array());
+        $this->booter = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array());
+        $coreConfigs = $this->booter->loadPluginConfig("core", "conf");
+        $corePlug = AJXP_PluginsService::getInstance()->softLoad("core.conf", array());
         $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getConfImpl();
 
+    }
+
+    /**
+     * @param AJXP_PluginsService $ajxpPluginService
+     * @return AbstractCacheDriver
+     */
+    public function cachePluginSoftLoad()
+    {
+        $coreConfigs = array();
+        $corePlug = AJXP_PluginsService::getInstance()->softLoad("core.cache", array());
+        CoreConfLoader::loadBootstrapConfForPlugin("core.cache", $coreConfigs);
+        if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
+        return $corePlug->getCacheImpl();
     }
 
     /**
@@ -72,16 +83,17 @@ class ConfService
      * @static
      * @return void
      */
-    public static function init()
+    public static function init($installPath=AJXP_INSTALL_PATH, $pluginDir="plugins")
     {
         $inst = self::getInstance();
-        $inst->initInst();
+        $inst->initInst($installPath.DIRECTORY_SEPARATOR.$pluginDir);
     }
+
     /**
      * Load the boostrap_* files and their configs
      * @return void
      */
-    public function initInst()
+    public function initInst($pluginDirPath)
     {
         // INIT AS GLOBAL
         $this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
@@ -94,7 +106,6 @@ class ConfService
         $this->configs["JS_DEBUG"] = AJXP_CLIENT_DEBUG;
         $this->configs["SERVER_DEBUG"] = AJXP_SERVER_DEBUG;
 
-
         if (is_file(AJXP_CONF_PATH."/bootstrap_repositories.php")) {
             $REPOSITORIES = array();
             include(AJXP_CONF_PATH."/bootstrap_repositories.php");
@@ -102,7 +113,24 @@ class ConfService
         } else {
             $this->configs["DEFAULT_REPOSITORIES"] = array();
         }
+
+        // Try to load instance from cache first
+        $this->cachePlugin = $this->cachePluginSoftLoad();
+        if (AJXP_PluginsService::getInstance()->loadPluginsRegistryFromCache($this->cachePlugin)) {
+            return;
+        }
+
+        $this->booter = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array());
+        $this->confPlugin = $this->confPluginSoftLoad();
+
+        // Loading the registry
+        try {
+            AJXP_PluginsService::getInstance()->loadPluginsRegistry($pluginDirPath, $this->confPlugin);
+        } catch (Exception $e) {
+            die("Severe error while loading plugins registry : ".$e->getMessage());
+        }
     }
+
     /**
      * Start the singleton
      * @static
@@ -161,17 +189,10 @@ class ConfService
         return self::$useSession ? $_SESSION["REPO_ID"] : $this->contextRepositoryId;
     }
 
-    public function getKeyValueCache(){
-        if(!isSet($this->keyValueCache)){
-            $this->keyValueCache = new AJXP_KeyValueCache();
-        }
-        return $this->keyValueCache;
-    }
-
     public static function clearAllCaches(){
         AJXP_PluginsService::clearPluginsCache();
         self::clearMessagesCache();
-        self::getInstance()->getKeyValueCache()->deleteAll();
+        CacheService::deleteAll();
         if(function_exists('opcache_reset')){
             opcache_reset();
         }
@@ -194,6 +215,7 @@ class ConfService
         if (isSet($globalsArray["instance_name"])) {
             $pName = $globalsArray["instance_name"];
             unset($globalsArray["instance_name"]);
+
             $plugin = AJXP_PluginsService::getInstance()->softLoad($pName, $globalsArray);
             $plugin->performChecks();
         }
@@ -209,6 +231,7 @@ class ConfService
         return $plugin;
 
     }
+
     /**
      * Check if the STDIN constant is defined
      * @static
@@ -255,15 +278,21 @@ class ConfService
      * @var AbstractAuthDriver
      */
     private static $tmpAuthStorageImpl;
+    /**
+     * @var AbstractCacheDriver
+     */
+    private static $tmpCacheStorageImpl;
 
     /**
      * @param $confStorage AbstractConfDriver
      * @param $authStorage AbstractAuthDriver
+     * @param $cacheStorage AbstractCacheDriver
      */
-    public static function setTmpStorageImplementations($confStorage, $authStorage)
+    public static function setTmpStorageImplementations($confStorage, $authStorage, $cacheStorage)
     {
         self::$tmpConfStorageImpl = $confStorage;
         self::$tmpAuthStorageImpl = $authStorage;
+        self::$tmpCacheStorageImpl = $cacheStorage;
     }
 
     /**
@@ -288,12 +317,22 @@ class ConfService
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
 
+    /**
+     * Get auth driver implementation
+     *
+     * @return AbstractCacheDriver
+     */
+    public static function getCacheDriverImpl()
+    {
+        if(isSet(self::$tmpCacheStorageImpl)) return self::$tmpCacheStorageImpl;
+        return AJXP_PluginsService::getInstance()->getPluginById("core.cache")->getCacheImpl();
+    }
+
     public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
 
         if($useCache){
-            $kvCache = ConfService::getInstance()->getKeyValueCache();
             $cacheKey = self::getRegistryCacheKey($extendedVersion);
-            $cachedXml = $kvCache->fetch($cacheKey);
+            $cachedXml = CacheService::fetch($cacheKey);
             if($cachedXml !== false){
                 $registry = new DOMDocument("1.0", "utf-8");
                 $registry->loadXML($cachedXml);
@@ -312,8 +351,8 @@ class ConfService
             AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
         }
 
-        if($useCache && isSet($kvCache) && isSet($cacheKey)){
-            $kvCache->save($cacheKey, $registry->saveXML());
+        if($useCache && isSet($cacheKey)){
+            CacheService::save($cacheKey, $registry->saveXML());
         }
 
         if($clone){
@@ -542,7 +581,7 @@ class ConfService
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
-        $this->getKeyValueCache()->deleteAll();
+        CacheService::deleteAll();
     }
 
     private function cacheRepository($repoId, $repository){
@@ -1007,20 +1046,20 @@ class ConfService
         if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
-        $test = $this->getKeyValueCache()->fetch("repository:".$repoId);
+        $test = CacheService::fetch("repository:".$repoId);
         if($test !== false){
             return $test;
         }
         $test =  $this->getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
-            $this->getKeyValueCache()->save("repository:".$repoId, $test);
+            CacheService::save("repository:".$repoId, $test);
             return $test;
         }
         // Finally try to search in default repositories
         if (isSet($this->configs["DEFAULT_REPOSITORIES"]) && isSet($this->configs["DEFAULT_REPOSITORIES"][$repoId])) {
             $repo = self::createRepositoryFromArray($repoId, $this->configs["DEFAULT_REPOSITORIES"][$repoId]);
             $repo->setWriteable(false);
-            $this->keyValueCache->save("repository:".$repoId, $repo);
+            CacheService::save("repository:".$repoId, $repo);
             return $repo;
         }
         return null;

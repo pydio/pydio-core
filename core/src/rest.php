@@ -30,14 +30,12 @@ ConfService::$useSession = false;
 AuthService::$useSession = false;
 
 ConfService::init();
-$confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
 ConfService::start();
+
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 //session_name("AjaXplorer");
 //session_start();
-
 
 AJXP_PluginsService::getInstance()->initActivePlugins();
 AuthService::preLogUser(array_merge($_GET, $_POST));
