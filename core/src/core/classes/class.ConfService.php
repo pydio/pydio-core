@@ -322,7 +322,7 @@ class ConfService
     /**
      * Get auth driver implementation
      *
-     * @return AbstractAuthDriver
+     * @return AbstractCacheDriver
      */
     public static function getCacheDriverImpl()
     {

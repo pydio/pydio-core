@@ -305,7 +305,7 @@ class BootConfLoader extends AbstractConfDriver
 
         $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
-        $newCachePlugin = ConfService::instanciatePluginFromGlobalParans($coreCache["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
+        $newCachePlugin = ConfService::instanciatePluginFromGlobalParams($coreCache["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
 
         $sqlPlugs = array(
             "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
@@ -324,7 +324,7 @@ class BootConfLoader extends AbstractConfDriver
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
-        return array($newConfigPlugin, $newAuthPlugin);
+        return array($newConfigPlugin, $newAuthPlugin, $newCachePlugin);
     }
 
     /**

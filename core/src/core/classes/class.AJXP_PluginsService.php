@@ -63,14 +63,14 @@ class AJXP_PluginsService
 
                 $res = null;
 
-		// Retrieving Registry from Server Cache
+                // Retrieving Registry from Server Cache
                 if ($this->cacheStorage) {
                     $res = $this->cacheStorage->fetch('plugins_registry');
 
                     $this->registry=$res;
                 }
 
-		// Retrieving Registry from files cache
+                // Retrieving Registry from files cache
                 if (empty($res)) {
                     $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                     $this->registry=$res;
@@ -116,7 +116,7 @@ class AJXP_PluginsService
      * Save plugin registry to cache
      *
      */
-    public function savePluginsRegistryToCache($cacheStorage = null) {
+    public function savePluginsRegistryToCache() {
         if (!empty ($this->cacheStorage)) {
             $this->cacheStorage->save("plugins_registry", $this->registry);
         }

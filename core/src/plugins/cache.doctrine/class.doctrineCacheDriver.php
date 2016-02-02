@@ -36,6 +36,9 @@ use \Doctrine\Common\Cache;
  */
 class doctrineCacheDriver extends AbstractCacheDriver
 {
+
+    private $cacheDriver;
+
     /**
      * Close file handle on objects destructor.
      */
@@ -109,33 +112,33 @@ class doctrineCacheDriver extends AbstractCacheDriver
     }
 
     public function _memcache_init() {
-        $this->memcache = new Memcache();
-        @$running = $this->memcache->connect($this->options['MEMCACHE_HOSTNAME'], $this->options['MEMCACHE_PORT']);
+        $memcache = new Memcache();
+        @$running = $memcache->connect($this->options['MEMCACHE_HOSTNAME'], $this->options['MEMCACHE_PORT']);
 
         if (! $running) return;
 
         $this->cacheDriver = new Cache\MemcacheCache();
-        $this->cacheDriver->setMemcache($this->memcache);
+        $this->cacheDriver->setMemcache($memcache);
     }
 
     public function _memcached_init() {
-        $this->memcached = new Memcached();
-        @$running = $this->memcached->addServer($this->options['MEMCACHED_HOSTNAME'], $this->options['MEMCACHED_PORT']);
+        $memcached = new Memcached();
+        @$running = $memcached->addServer($this->options['MEMCACHED_HOSTNAME'], $this->options['MEMCACHED_PORT']);
 
         if (! $running) return;
 
         $this->cacheDriver = new Cache\MemcachedCache();
-        $this->cacheDriver->setMemcached($this->memcached);
+        $this->cacheDriver->setMemcached($memcached);
     }
 
     public function _redis_init() {
-        $this->redis = new Redis();
-        @$running = $this->redis->connect($this->options['REDIS_HOSTNAME'], $this->options['REDIS_PORT']);
+        $redis = new Redis();
+        @$running = $redis->connect($this->options['REDIS_HOSTNAME'], $this->options['REDIS_PORT']);
 
         if (! $running) return;
 
         $this->cacheDriver = new \Doctrine\Common\Cache\RedisCache();
-        $this->cacheDriver->setRedis($this->redis);
+        $this->cacheDriver->setRedis($redis);
     }
 
     public function _xcache_init() {

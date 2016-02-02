@@ -137,7 +137,7 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
         $cacheDriver = $this->getCacheDriver();
 
         if (isset($cacheDriver)) {
-           $result = $cacheDriver->deleteAll($id);
+           $result = $cacheDriver->deleteAll();
            return $result;
         }
 

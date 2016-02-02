@@ -35,17 +35,20 @@ class CoreCacheLoader extends AJXP_Plugin
 
     public function getCacheImpl()
     {
+
+        $pluginInstance = null;
+
         if (!isSet(self::$cacheInstance) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$cacheInstance->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
+                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
 
-                if ($this->pluginInstance != false) {
-                    AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $this->pluginInstance->getName(), $this->pluginInstance);
+                if ($pluginInstance != false) {
+                    AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
                 }
             }
         }
 
-        self::$cacheInstance = $this->pluginInstance;
+        self::$cacheInstance = $pluginInstance;
         return self::$cacheInstance;
     }
 }
