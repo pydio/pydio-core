@@ -114,8 +114,6 @@ class ConfService
             $this->configs["DEFAULT_REPOSITORIES"] = array();
         }
 
-        AJXP_PluginsService::deferBuildingRegistry();
-
         // Try to load instance from cache first
         $this->cachePlugin = $this->cachePluginSoftLoad();
         if (AJXP_PluginsService::getInstance()->loadPluginsRegistryFromCache($this->cachePlugin)) {
