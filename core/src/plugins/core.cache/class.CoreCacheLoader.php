@@ -46,9 +46,9 @@ class CoreCacheLoader extends AJXP_Plugin
                     AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
                 }
             }
+            self::$cacheInstance = $pluginInstance;
         }
 
-        self::$cacheInstance = $pluginInstance;
         return self::$cacheInstance;
     }
 }

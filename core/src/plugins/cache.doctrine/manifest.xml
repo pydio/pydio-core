@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cachedriver name="memcache" enabled="no" label="CONF_MESSAGE[Doctrine Cache driver]" description="CONF_MESSAGE[Use doctrine as main caching driver.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/cache.doctrine/class.doctrineCacheDriver.php" classname="doctrineCacheDriver"/>
+    <class_definition filename="plugins/cache.doctrine/class.DoctrineCacheDriver.php" classname="DoctrineCacheDriver"/>
     <client_settings>
         <resources>
             <i18n namespace="doctrine_cachedriver" path="plugins/log.text/i18n"/>
