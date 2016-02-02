@@ -274,9 +274,7 @@ class BootConfLoader extends AbstractConfDriver
             "group_switch_value"=> "auth.sql",
             "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
         ));
-        $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array(
-            "instance_name"=> "cache.apc"
-        ));
+        $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
         $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
