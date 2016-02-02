@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class CoreCacheLoader extends AJXP_Plugin
 {
     /**
-     * @var AbstractCachegDriver
+     * @var AbstractCacheDriver
      */
     protected static $cacheInstance;
 
