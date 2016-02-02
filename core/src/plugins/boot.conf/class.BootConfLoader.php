@@ -149,11 +149,11 @@ class BootConfLoader extends AbstractConfDriver
         $data = array();
         AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "");
 
-        list($newConfigPlugin, $newAuthPlugin) = $this->createBootstrapConf($data);
+        list($newConfigPlugin, $newAuthPlugin, $newCachePlugin) = $this->createBootstrapConf($data);
 
         $this->feedPluginsOptions($newConfigPlugin, $data);
 
-        ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin);
+        ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin, $newCachePlugin);
         $this->createUsers($data);
 
         $this->setAdditionalData($data);
@@ -247,11 +247,13 @@ class BootConfLoader extends AbstractConfDriver
     public function createBootstrapConf($data){
 
         // Create a custom bootstrap.json file
-        $coreConf = array(); $coreAuth = array();
+        $coreConf = array(); $coreAuth = array(); $coreCache = array();
         $this->_loadPluginConfig("core.conf", $coreConf);
         $this->_loadPluginConfig("core.auth", $coreAuth);
+        $this->_loadPluginConfig("core.cache", $coreCache);
         if(!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
         if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
+        if(!isSet($coreCache["UNIQUE_INSTANCE_CONFIG"])) $coreCache["UNIQUE_INSTANCE_CONFIG"] = array();
         $coreConf["AJXP_CLI_SECRET_KEY"] = AJXP_Utils::generateRandomString(24, true);
 
         // REWRITE BOOTSTRAP.JSON
@@ -272,6 +274,7 @@ class BootConfLoader extends AbstractConfDriver
             "group_switch_value"=> "auth.sql",
             "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
         ));
+        $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
         $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
@@ -290,7 +293,7 @@ class BootConfLoader extends AbstractConfDriver
             copy($oldBoot, $oldBoot.".bak");
             unlink($oldBoot);
         }
-        $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth);
+        $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth, "core.cache" => $coreCache);
         AJXP_Utils::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
 
 
@@ -300,6 +303,7 @@ class BootConfLoader extends AbstractConfDriver
 
         $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
+        $newCachePlugin = ConfService::instanciatePluginFromGlobalParams($coreCache["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
 
         $sqlPlugs = array(
             "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
@@ -318,7 +322,7 @@ class BootConfLoader extends AbstractConfDriver
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
-        return array($newConfigPlugin, $newAuthPlugin);
+        return array($newConfigPlugin, $newAuthPlugin, $newCachePlugin);
     }
 
     /**
@@ -442,6 +446,7 @@ class BootConfLoader extends AbstractConfDriver
     public function _loadPluginConfig($pluginId, &$options)
     {
         $internal = self::getInternalConf();
+
         if ($pluginId == "core.conf" && isSet($internal["CONF_DRIVER"])) {
             // Reformat
             $options["UNIQUE_INSTANCE_CONFIG"] = array(
@@ -453,16 +458,17 @@ class BootConfLoader extends AbstractConfDriver
             return;
 
         } else if ($pluginId == "core.auth" && isSet($internal["AUTH_DRIVER"])) {
-
             $options = $this->authLegacyToBootConf($internal["AUTH_DRIVER"]);
             return;
 
+        } else if ($pluginId == "core.cache" && isSet($internal["CACHE_DRIVER"])) {
+            $options['UNIQUE_INSTANCE_CONFIG'] = array(
+                "instance_name" => "cache.".$internal["CACHE_DRIVER"]["NAME"]
+            );
+            return;
         }
-        $jsonPath = $this->getPluginWorkDir(false)."/bootstrap.json";
-        $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
-        if (is_array($jsonData) && isset($jsonData[$pluginId])) {
-            $options = array_merge($options, $jsonData[$pluginId]);
-        }
+
+        CoreConfLoader::loadBootstrapConfForPlugin($pluginId, $options);
     }
 
     protected function authLegacyToBootConf($legacy)
@@ -495,22 +501,22 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function _savePluginConfig($pluginId, $options)
     {
-        $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
-        $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
+        $jsonData = CoreConfLoader::getBootstrapConf();
+
         if(!is_array($jsonData)) $jsonData = array();
         $jsonData[$pluginId] = $options;
-        if ($pluginId == "core.conf" || $pluginId == "core.auth") {
-            $testKey = ($pluginId == "core.conf" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
+
+        if ($pluginId == "core.conf" || $pluginId == "core.auth" || $pluginId == "core.cache") {
+            $testKey = ($pluginId == "core.conf" || $pluginId == "core.cache" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
             $current = array();
             $this->_loadPluginConfig($pluginId, $current);
             if (isSet($current[$testKey]["instance_name"]) && $current[$testKey]["instance_name"] != $options[$testKey]["instance_name"]) {
                 $forceDisconnexion = $pluginId;
             }
         }
-        if (file_exists($jsonPath)) {
-            copy($jsonPath, $jsonPath.".bak");
-        }
-        AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
+
+        CoreConfLoader::saveBootstrapConf($jsonData);
+
         if (isSet($forceDisconnexion)) {
             if ($pluginId == "core.conf") {
                 // DISCONNECT

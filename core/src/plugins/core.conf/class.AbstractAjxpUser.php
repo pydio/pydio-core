@@ -433,9 +433,8 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     abstract public function load();
 
     public function save($context = "superuser"){
-        $kvCache = ConfService::getInstance()->getKeyValueCache();
         $this->_save($context);
-        $kvCache->save("pydio:user:".$this->getId(), $this);
+        CacheService::save("pydio:user:".$this->getId(), $this);
     }
 
     abstract protected function _save($context = "superuser");

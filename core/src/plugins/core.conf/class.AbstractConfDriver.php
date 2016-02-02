@@ -217,7 +217,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     protected function pluginUsesBootConf($pluginId)
     {
         return ($pluginId == "core.conf" || strpos($pluginId, "conf.") === 0
-            || $pluginId == "core.auth" || strpos($pluginId, "auth.") === 0);
+          || $pluginId == "core.auth" || strpos($pluginId, "auth.") === 0
+          || $pluginId == "core.cache" || strpos($pluginId, "cache.") === 0);
     }
 
     /**
@@ -385,8 +386,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function createUserObject($userId)
     {
-        $kvCache = ConfService::getInstance()->getKeyValueCache();
-        $test = $kvCache->fetch("pydio:user:".$userId);
+        $test=CacheService::fetch("pydio:user:".$userId);
         if($test !== false && is_a($test, "AbstractAjxpUser")){
             if($test->personalRole == null){
                 $test->personalRole = $test->roles["AJXP_USR_/".$userId];
@@ -403,7 +403,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         AuthService::updateAuthProvidedData($abstractUser);
         $args = array(&$abstractUser);
         AJXP_Controller::applyIncludeHook("include.user.updateUserObject", $args);
-        $kvCache->save("pydio:user:".$userId, $abstractUser);
+        CacheService::save("pydio:user:".$userId, $abstractUser);
         return $abstractUser;
     }
 
