@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+  //	Spanish translation: Salva Gómez <salva.gomez at gmail.com> 2016
 $mess=array(
 "1" => "Nueva ventana",
 "2" => "Navegador en nueva ventana",
