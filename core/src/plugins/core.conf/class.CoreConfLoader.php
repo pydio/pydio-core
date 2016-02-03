@@ -46,5 +46,37 @@ class CoreConfLoader extends AJXP_Plugin
 
     }
 
+    /*
+     * @return str filepath
+     */
+    public static function _getBootstrapFilePath() {
+        return AJXP_Plugin::getWorkDirForPluginId("boot.conf").DIRECTORY_SEPARATOR."bootstrap.json";
+    }
+
+    /*
+     * @return array jsonData
+     */
+    public static function getBootstrapConf() {
+       return AJXP_Utils::loadSerialFile(self::_getBootstrapFilePath(), false, "json");
+    }
+
+    /*
+     * @load json array into options
+     */
+    public static function loadBootstrapConfForPlugin($pluginId, &$options) {
+        $jsonData = self::getBootstrapConf();
+
+        if (is_array($jsonData) && isset($jsonData[$pluginId])) {
+            $options = array_merge($options, $jsonData[$pluginId]);
+        }
+    }
+
+    public static function saveBootstrapConf($jsonData) {
+        $jsonPath = self::_getBootstrapFilePath();
+        if (file_exists($jsonPath)) {
+            copy($jsonPath, $jsonPath.".bak");
+        }
+        AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
+    }
 
 }

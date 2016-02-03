@@ -31,10 +31,7 @@ class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite
 
     protected function setUp()
     {
-        $pServ = AJXP_PluginsService::getInstance();
         ConfService::init();
-        $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-        $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
         ConfService::start();
     }
 

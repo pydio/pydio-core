@@ -1147,7 +1147,7 @@ class AuthService
     public static function updateRole($roleObject, $userObject = null)
     {
         ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
-        ConfService::getInstance()->getKeyValueCache()->deleteAll();
+        CacheService::deleteAll();
     }
     /**
      * Delete a role by its id
@@ -1158,7 +1158,7 @@ class AuthService
     public static function deleteRole($roleId)
     {
         ConfService::getConfStorageImpl()->deleteRole($roleId);
-        ConfService::getInstance()->getKeyValueCache()->deleteAll();
+        CacheService::deleteAll();
     }
 
     public static function filterPluginParameters($pluginId, $params, $repoId = null)

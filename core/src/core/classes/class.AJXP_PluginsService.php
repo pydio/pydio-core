@@ -40,6 +40,7 @@ class AJXP_PluginsService
      * @var AbstractConfDriver
      */
     private $confStorage;
+    private $cacheStorage;
     private $mixinsDoc;
     private $mixinsXPath;
 
@@ -47,7 +48,7 @@ class AJXP_PluginsService
     /**
      * @return bool
      */
-    private function loadRegistryFromCache(){
+    private function _loadRegistryFromCache(){
 
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
             $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
@@ -59,15 +60,23 @@ class AJXP_PluginsService
                     }
                     require_once($fileName);
                 }
-                $kvCache = ConfService::getInstance()->getKeyValueCache();
-                $test = $kvCache->fetch("plugins_registry");
-                if($test !== FALSE) {
-                    $this->registry = $test;
-                }else{
-                    $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                    $this->registry = $res;
-                    $kvCache->save("plugins_registry", $res);
+
+                $res = null;
+
+                // Retrieving Registry from Server Cache
+                if ($this->cacheStorage) {
+                    $res = $this->cacheStorage->fetch('plugins_registry');
+
+                    $this->registry=$res;
                 }
+
+                // Retrieving Registry from files cache
+                if (empty($res)) {
+                    $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $this->registry=$res;
+                    $this->savePluginsRegistryToCache();
+                }
+
                 // Refresh streamWrapperPlugins
                 foreach ($this->registry as $plugs) {
                     foreach ($plugs as $plugin) {
@@ -76,6 +85,7 @@ class AJXP_PluginsService
                         }
                     }
                 }
+
                 return true;
             }else{
                 return false;
@@ -87,6 +97,32 @@ class AJXP_PluginsService
     }
 
     /**
+     * Loads the full registry, from the cache only
+     *
+     */
+    public function loadPluginsRegistryFromCache($cacheStorage = null) {
+
+        $this->cacheStorage = $cacheStorage;
+
+        if(!empty($this->registry)){
+            return true;
+        }
+        if($this->_loadRegistryFromCache()){
+            return true;
+        }
+    }
+
+    /**
+     * Save plugin registry to cache
+     *
+     */
+    public function savePluginsRegistryToCache() {
+        if (!empty ($this->cacheStorage)) {
+            $this->cacheStorage->save("plugins_registry", $this->registry);
+        }
+    }
+
+    /**
      * Loads the full registry, from the cache or not
      * @param String $pluginFolder
      * @param AbstractConfDriver $confStorage
@@ -95,16 +131,13 @@ class AJXP_PluginsService
     public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false)
     {
         if(!$rewriteCache){
-            if(!empty($this->registry)){
-                return;
-            }
-            if($this->loadRegistryFromCache()){
-                return;
-            }
+            if ($this->loadPluginsRegistryFromCache()) return;
         }
+
         if (is_string($pluginFolder)) {
             $pluginFolder = array($pluginFolder);
         }
+
         $this->confStorage = $confStorage;
         $pluginsPool = array();
 
@@ -131,12 +164,15 @@ class AJXP_PluginsService
                 $this->recursiveLoadPlugin($plugin, $pluginsPool);
             }
         }
+
         if (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false) {
             AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
             AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
             if (is_file(AJXP_PLUGINS_QUERIES_CACHE)) {
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
+
+            $this->savePluginsRegistryToCache();
         }
     }
 
@@ -212,9 +248,6 @@ class AJXP_PluginsService
      */
     public function softLoad($pluginId, $pluginOptions)
     {
-        if(empty($this->registry)){
-            $this->loadRegistryFromCache();
-        }
         // Try to get from cache
         list($type, $name) = explode(".", $pluginId);
         if(!empty($this->registry) && isSet($this->registry[$type][$name])) {

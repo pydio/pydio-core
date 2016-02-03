@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Caching Driver]" description="CONF_MESSAGE[Setup the caching system]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="CoreCacheLoader" filename="plugins/core.cache/class.CoreCacheLoader.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core.cache" path="plugins/core.cache/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="cache.doctrine"/>
+    </server_settings>
+</ajxp_plugin>
