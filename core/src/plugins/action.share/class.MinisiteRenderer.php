@@ -54,19 +54,21 @@ class MinisiteRenderer
                 $templateName = "ajxp_shared_folder";
             }
         }
-        if(!isSet($templateName)){
+        if(isSet($repository)){
             $repoObject = ConfService::getRepositoryById($repository);
             if(!is_object($repoObject)){
                 $mess = ConfService::getMessages();
                 $error = $mess["share_center.166"];
                 $templateName = "ajxp_unique_strip";
+                $repoObject = null;
+            }
+        }
+        if(!isSet($templateName) && isSet($repoObject)){
+            $filter = $repoObject->getContentFilter();
+            if(!empty($filter) && count($filter->virtualPaths) == 1){
+                $templateName = "ajxp_unique_strip";
             }else{
-                $filter = $repoObject->getContentFilter();
-                if(!empty($filter) && count($filter->virtualPaths) == 1){
-                    $templateName = "ajxp_unique_strip";
-                }else{
-                    $templateName = "ajxp_shared_folder";
-                }
+                $templateName = "ajxp_shared_folder";
             }
         }
         // UPDATE TEMPLATE
@@ -76,7 +78,7 @@ class MinisiteRenderer
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
-        if(isSet($repository)){
+        if(isSet($repository) && isSet($repoObject)){
             $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
             $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         }
