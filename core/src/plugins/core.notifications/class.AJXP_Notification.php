@@ -147,7 +147,7 @@ class AJXP_Notification
             $hash = $_SESSION["CURRENT_MINISITE"];
             $shareCenter = ShareCenter::getShareCenter();
             if(!empty($shareCenter)){
-                return $shareCenter->buildPublicletLink($hash);
+                return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
             }
         }
         return AJXP_Utils::getWorkspaceShortcutURL($this->getNode()->getRepository()).$this->getNode()->getPath();

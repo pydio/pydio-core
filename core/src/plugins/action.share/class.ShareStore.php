@@ -447,6 +447,30 @@ class ShareStore {
         ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= $this->getCurrentDownloadCounter($hash));
     }
 
+    /**
+     * @param array $data
+     * @param AbstractAccessDriver $accessDriver
+     * @param Repository $repository
+     */
+    public function storeSafeCredentialsIfNeeded(&$data, $accessDriver, $repository){
+        $storeCreds = false;
+        if ($repository->getOption("META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            foreach ($options["META_SOURCES"] as $metaSource) {
+                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
+                    $storeCreds = true;
+                    break;
+                }
+            }
+        }
+        if ($storeCreds || $accessDriver->hasMixin("credentials_consumer")) {
+            $cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repository);
+            if (isSet($cred["user"]) && isset($cred["password"])) {
+                $data["SAFE_USER"] = $cred["user"];
+                $data["SAFE_PASS"] = $cred["password"];
+            }
+        }
+    }
 
 
     /**

@@ -219,7 +219,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         $userId = $loggedUser->getId();
 
         $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
-        $downloadBase = $shareCenter->buildPublicDlURL();
+        $downloadBase = $shareCenter->getPublicAccessManager()->buildPublicDlURL();
         $publicLets = $shareCenter->listShares(true, null);
 
         $minisites = array();

@@ -43,6 +43,11 @@ class ShareCenter extends AJXP_Plugin
     private $shareStore;
 
     /**
+     * @var PublicAccessManager
+     */
+    private $publicAccessManager;
+
+    /**
      * @var MetaWatchRegister
      */
     private $watcher = false;
@@ -153,6 +158,19 @@ class ShareCenter extends AJXP_Plugin
             );
         }
         return $this->shareStore;
+    }
+
+    public function getPublicAccessManager(){
+
+        if(!isSet($this->publicAccessManager)){
+            require_once("class.PublicAccessManager.php");
+            $options = array(
+                "USE_REWRITE_RULE" => $this->getFilteredOption("USE_REWRITE_RULE", $this->repository) == true
+            );
+            $this->publicAccessManager = new PublicAccessManager($options);
+        }
+        return $this->publicAccessManager;
+
     }
 
     public function preProcessDownload($action, &$httpVars, &$fileVars){
@@ -273,27 +291,6 @@ class ShareCenter extends AJXP_Plugin
                         }
                     }
                     print($url);
-                } else {
-                    $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
-                    $customData = array();
-                    foreach ($httpVars as $key => $value) {
-                        if (substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_") {
-                            $customData[substr($key, strlen("PLUGINS_DATA_"))] = $value;
-                        }
-                    }
-                    if (count($customData)) {
-                        $data["PLUGINS_DATA"] = $customData;
-                    }
-                    list($hash, $url) = $this->writePubliclet($data, $this->accessDriver, $this->repository);
-                    $newMeta = array("id" => $hash, "type" => "file");
-                    if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
-                        header("Content-type:application/json");
-                        echo json_encode(array("element_id" => $hash, "publiclet_link" => $url));
-                    } else {
-                        header("Content-type:text/plain");
-                        echo $url;
-                    }
-                    flush();
                 }
                 if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
                     $this->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"], $originalHash);
@@ -850,7 +847,7 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
-     * @param Array $data
+     * @param array $data
      * @param AbstractAccessDriver $accessDriver
      * @param Repository $repository
      */
@@ -874,292 +871,10 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
-    /** Cypher the publiclet object data and write to disk.
-     * @param Array $data The publiclet data array to write
-                     The data array must have the following keys:
-                     - DRIVER      The driver used to get the file's content
-                     - OPTIONS     The driver options to be successfully constructed (usually, the user and password)
-                     - FILE_PATH   The path to the file's content
-                     - PASSWORD    If set, the written publiclet will ask for this password before sending the content
-                     - ACTION      If set, action to perform
-                     - USER        If set, the AJXP user
-                     - EXPIRE_TIME If set, the publiclet will deny downloading after this time, and probably self destruct.
-     *               - AUTHOR_WATCH If set, will post notifications for the publiclet author each time the file is loaded
-     * @param AbstractAccessDriver $accessDriver
-     * @param Repository $repository
-     * @return array An array containing the hash (0) and the generated url (1)
-    */
-    public function writePubliclet(&$data, $accessDriver, $repository)
-    {
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if (!is_dir($downloadFolder)) {
-            return "ERROR : Public URL folder does not exist!";
-        }
-        if (!function_exists("mcrypt_create_iv")) {
-            return "ERROR : MCrypt must be installed to use publiclets!";
-        }
-        $this->initPublicFolder($downloadFolder);
-        $data["PLUGIN_ID"] = $accessDriver->getId();
-        $data["BASE_DIR"] = $accessDriver->getBaseDir();
-        //$data["REPOSITORY"] = $repository;
-        if (AuthService::usersEnabled()) {
-            $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
-        }
-        $this->storeSafeCredentialsIfNeeded($data, $accessDriver, $repository);
-
-        // Force expanded path in publiclet
-        $copy = clone $repository;
-        $copy->addOption("PATH", $repository->getOption("PATH"));
-        $data["REPOSITORY"] = $copy;
-        if ($data["ACTION"] == "") $data["ACTION"] = "download";
-
-        try{
-            $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "publiclet");
-        }catch(Exception $e){
-            return $e->getMessage();
-        }
-
-        $this->getShareStore()->resetDownloadCounter($hash, AuthService::getLoggedUser()->getId());
-        $url = $this->buildPublicletLink($hash);
-        $this->logInfo("New Share", array(
-            "file" => "'".$copy->display.":/".$data['FILE_PATH']."'",
-            "files" => "'".$copy->display.":/".$data['FILE_PATH']."'",
-            "url" => $url,
-            "expiration" => $data['EXPIRE_TIME'],
-            "limit" => $data['DOWNLOAD_LIMIT'],
-            "repo_uuid" => $copy->uuid
-        ));
-        AJXP_Controller::applyHook("node.share.create", array(
-            'type' => 'file',
-            'repository' => &$copy,
-            'accessDriver' => &$accessDriver,
-            'data' => &$data,
-            'url' => $url,
-        ));
-        return array($hash, $url);
-    }
-
-    public function buildPublicDlURL()
-    {
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if (!empty($dlURL)) {
-            $parts = parse_url($dlURL);
-            if($parts['scheme']) {
-                return rtrim($dlURL, "/");
-            } else {
-                $host = AJXP_Utils::detectServerURL();
-                return rtrim($host, "/")."/".trim($dlURL, "/");
-            }
-        } else {
-            $fullUrl = AJXP_Utils::detectServerURL(true);
-            return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
-        }
-    }
-
-    public function computeMinisiteToServerURL()
-    {
-        $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
-        $server = rtrim(parse_url( AJXP_Utils::detectServerURL(true), PHP_URL_PATH), "/");
-        return AJXP_Utils::getTravelPath($minisite, $server);
-    }
-
-    public function buildPublicletLink($hash)
-    {
-        $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
-        if ($this->getFilteredOption("USE_REWRITE_RULE", $this->repository) == true) {
-            if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
-            else return $this->buildPublicDlURL()."/".$hash;
-        } else {
-            if($addLang) return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
-            else return $this->buildPublicDlURL()."/".$hash.".php";
-        }
-    }
-
-    public function initPublicFolder($downloadFolder)
-    {
-        if (is_file($downloadFolder."/grid_t.png")) {
-            return;
-        }
-        $language = ConfService::getLanguage();
-        $pDir = dirname(__FILE__);
-        $messages = array();
-        if (is_file($pDir."/res/i18n/".$language.".php")) {
-            include($pDir."/res/i18n/".$language.".php");
-        } else {
-            include($pDir."/res/i18n/en.php");
-        }
-        if (isSet($mess)) $messages = $mess;
-        $sTitle = sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"));
-        $sLegend = $messages[20];
-
-        @copy($pDir."/res/dl.png", $downloadFolder."/dl.png");
-        @copy($pDir."/res/favi.png", $downloadFolder."/favi.png");
-        @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
-        @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
-        @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-        $dlUrl = $this->buildPublicDlURL();
-        $htaccessContent = "Order Deny,Allow\nAllow from all\n";
-        $htaccessContent .= "\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
-        $path = parse_url($dlUrl, PHP_URL_PATH);
-        $htaccessContent .= '
-        <IfModule mod_rewrite.c>
-        RewriteEngine on
-        RewriteBase '.$path.'
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^([.a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
-        RewriteRule ^([.a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
-        RewriteRule ^([.a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
-        </IfModule>
-        ';
-        file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
-        $content404 = file_get_contents($pDir."/res/404.html");
-        $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
-        file_put_contents($downloadFolder."/404.html", $content404);
-
-    }
-
     public static function loadMinisite($data, $hash = '', $error = null)
     {
-        if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-            $mess = ConfService::getMessages();
-            $error = $mess['share_center.164'];
-        }
-        $repository = $data["REPOSITORY"];
-        AJXP_PluginsService::getInstance()->initActivePlugins();
-        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
-        $confs = $shareCenter->getConfigs();
-        $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
-        if(!empty($confs["CUSTOM_MINISITE_LOGO"])){
-            $logoPath = $confs["CUSTOM_MINISITE_LOGO"];
-            if (strpos($logoPath, "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$logoPath)) {
-                $minisiteLogo = $logoPath;
-            }else{
-                $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
-            }
-        }
-        // Default value
-        if(isSet($data["AJXP_TEMPLATE_NAME"])){
-            $templateName = $data["AJXP_TEMPLATE_NAME"];
-            if($templateName == "ajxp_film_strip" && AJXP_Utils::userAgentIsMobile()){
-                $templateName = "ajxp_shared_folder";
-            }
-        }
-        if(!isSet($templateName)){
-            $repoObject = ConfService::getRepositoryById($repository);
-            if(!is_object($repoObject)){
-                $mess = ConfService::getMessages();
-                $error = $mess["share_center.166"];
-                $templateName = "ajxp_unique_strip";
-            }else{
-                $filter = $repoObject->getContentFilter();
-                if(!empty($filter) && count($filter->virtualPaths) == 1){
-                    $templateName = "ajxp_unique_strip";
-                }else{
-                    $templateName = "ajxp_shared_folder";
-                }
-            }
-        }
-        // UPDATE TEMPLATE
-        $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
-        AJXP_Controller::applyHook("tpl.filter_html", array(&$html));
-        $html = AJXP_XMLWriter::replaceAjxpXmlKeywords($html);
-        $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
-        $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
-        $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
-        if(isSet($repository)){
-            $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
-            $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
-        }
-        $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
-        $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
-        $html = str_replace("AJXP_LINK_HASH", $hash, $html);
-        $guiConfigs = AJXP_PluginsService::findPluginById("gui.ajax")->getConfigs();
-        $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
-
-        if(isSet($_GET["dl"]) && isSet($_GET["file"])){
-            AuthService::$useSession = false;
-        }else{
-            session_name("AjaXplorer_Shared".str_replace(".","_",$hash));
-            session_start();
-            AuthService::disconnect();
-        }
-
-        if (!empty($data["PRELOG_USER"])) {
-            AuthService::logUser($data["PRELOG_USER"], "", true);
-            $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
-        } else if(isSet($data["PRESET_LOGIN"])) {
-            $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
-            $_SESSION["PENDING_FOLDER"] = "/";
-            $html = str_replace("AJXP_PRELOGED_USER", $data["PRESET_LOGIN"], $html);
-        } else{
-            $html = str_replace("AJXP_PRELOGED_USER", "ajxp_legacy_minisite", $html);
-        }
-        if(isSet($hash)){
-            $_SESSION["CURRENT_MINISITE"] = $hash;
-        }
-
-        if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
-            ConfService::switchRootDir($repository);
-            ConfService::loadRepositoryDriver();
-            AJXP_PluginsService::deferBuildingRegistry();
-            AJXP_PluginsService::getInstance()->initActivePlugins();
-            AJXP_PluginsService::flushDeferredRegistryBuilding();
-            $errMessage = null;
-            try {
-                $params = $_GET;
-                $ACTION = "download";
-                if(isset($_GET["ct"])){
-                    $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
-                    if (count($editors)) {
-                        foreach ($editors as $editor) {
-                            $xPath = new DOMXPath($editor->ownerDocument);
-                            $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
-                            if ($callbacks->length) {
-                                $ACTION = $callbacks->item(0)->getAttribute("name");
-                                if($ACTION == "audio_proxy") {
-                                    $params["file"] = "base64encoded:".base64_encode($params["file"]);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                AJXP_Controller::registryReset();
-                AJXP_Controller::findActionAndApply($ACTION, $params, null);
-            } catch (Exception $e) {
-                $errMessage = $e->getMessage();
-            }
-            if($errMessage == null) return;
-            $html = str_replace('AJXP_HASH_LOAD_ERROR', $errMessage, $html);
-        }
-
-        if (isSet($_GET["lang"])) {
-            $loggedUser = &AuthService::getLoggedUser();
-            if ($loggedUser != null) {
-                $loggedUser->setPref("lang", $_GET["lang"]);
-            } else {
-                setcookie("AJXP_lang", $_GET["lang"]);
-            }
-        }
-
-        if (!empty($data["AJXP_APPLICATION_BASE"])) {
-            $tPath = $data["AJXP_APPLICATION_BASE"];
-        } else {
-            $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
-        }
-        // Update Host dynamically if it differ from registered one.
-        $registeredHost = parse_url($tPath, PHP_URL_HOST);
-        $currentHost = parse_url(AJXP_Utils::detectServerURL("SERVER_URL"), PHP_URL_HOST);
-        if($registeredHost != $currentHost){
-            $tPath = str_replace($registeredHost, $currentHost, $tPath);
-        }
-        $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
-        HTMLWriter::internetExplorerMainDocumentHeader();
-        HTMLWriter::charsetHeader();
-        echo($html);
+        include_once("class.MinisiteRenderer.php");
+        MinisiteRenderer::loadMinisite($data, $hash, $error);
     }
 
     public static function loadShareByHash($hash){
@@ -1191,6 +906,18 @@ class ShareCenter extends AJXP_Plugin
         }
 
     }
+
+    /**
+     * @static
+     * @param array $data
+     * @return void
+     */
+    public static function loadPubliclet($data)
+    {
+        require_once("class.LegacyPubliclet.php");
+        LegacyPubliclet::render($data);
+    }
+
 
     private function deleteExpiredPubliclet($elementId, $data){
 
@@ -1227,153 +954,6 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
-    /**
-     * @static
-     * @param Array $data
-     * @return void
-     */
-    public static function loadPubliclet($data)
-    {
-        if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-            self::loadMinisite($data, "false");
-            return;
-        }
-        // create driver from $data
-        $className = $data["DRIVER"]."AccessDriver";
-        $u = parse_url($_SERVER["REQUEST_URI"]);
-        $shortHash = pathinfo(basename($u["path"]), PATHINFO_FILENAME);
-
-        // Load language messages
-        $language = ConfService::getLanguage();
-        if (isSet($_GET["lang"])) {
-            $language = basename($_GET["lang"]);
-        }
-        $messages = array();
-        if (is_file(dirname(__FILE__)."/res/i18n/".$language.".php")) {
-            include(dirname(__FILE__)."/res/i18n/".$language.".php");
-        } else {
-            include(dirname(__FILE__)."/res/i18n/en.php");
-        }
-        if(isSet($mess)) $messages = $mess;
-
-        $AJXP_LINK_HAS_PASSWORD = false;
-        $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
-        AJXP_PluginsService::getInstance()->initActivePlugins();
-
-        $shareCenter = self::getShareCenter();
-
-        ConfService::setLanguage($language);
-        $mess = ConfService::getMessages();
-        if ($shareCenter->getShareStore()->isShareExpired($shortHash, $data))
-        {
-            self::loadMinisite(array(), $shortHash, $mess["share_center.165"]);
-            return;
-        }
-
-
-        $customs = array("title", "legend", "legend_pass", "background_attributes_1","text_color", "background_color", "textshadow_color");
-        $images = array("button", "background_1");
-        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
-        $confs = $shareCenter->getConfigs();
-        $confs["CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1"] = "background-repeat:repeat;background-position:50% 50%;";
-        $confs["CUSTOM_SHAREPAGE_BACKGROUND_1"] = "plugins/action.share/res/hi-res/02.jpg";
-        $confs["CUSTOM_SHAREPAGE_TEXT_COLOR"] = "#ffffff";
-        $confs["CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR"] = "rgba(0,0,0,5)";
-        foreach ($customs as $custom) {
-            $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
-            $$varName = $confs[$varName];
-        }
-        $dlFolder = realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
-        foreach ($images as $custom) {
-            $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
-            if (!empty($confs[$varName])) {
-                if (strpos($confs[$varName], "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$confs[$varName])) {
-                    $realFile = AJXP_INSTALL_PATH."/".$confs[$varName];
-                    copy($realFile, $dlFolder."/binary-".basename($realFile));
-                    $$varName = "binary-".basename($realFile);
-                } else {
-                    $$varName = "binary-".$confs[$varName];
-                    if(is_file($dlFolder."/binary-".$confs[$varName])) continue;
-                    $copiedImageName = $dlFolder."/binary-".$confs[$varName];
-                    $imgFile = fopen($copiedImageName, "wb");
-                    ConfService::getConfStorageImpl()->loadBinary(array(), $confs[$varName], $imgFile);
-                    fclose($imgFile);
-                }
-
-            }
-        }
-
-        HTMLWriter::charsetHeader();
-        // Check password
-        if (strlen($data["PASSWORD"])) {
-            if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"])) {
-                $AJXP_LINK_HAS_PASSWORD = true;
-                $AJXP_LINK_WRONG_PASSWORD = (isSet($_POST['password']) && ($_POST['password'] != $data["PASSWORD"]));
-                include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
-                $res = ('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>');
-                AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
-                echo($res);
-                return;
-            }
-        } else {
-            if (!isSet($_GET["dl"])) {
-                include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
-                $res = '<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>';
-                AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
-                echo($res);
-                return;
-            }
-        }
-        $filePath = AJXP_INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
-        if (!is_file($filePath)) {
-            die("Warning, cannot find driver for conf storage! ($className, $filePath)");
-        }
-        require_once($filePath);
-        $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
-        $driver->loadManifest();
-
-        //$hash = md5(serialize($data));
-        $shareCenter->getShareStore()->incrementDownloadCounter($shortHash);
-
-        //AuthService::logUser($data["OWNER_ID"], "", true);
-        AuthService::logTemporaryUser($data["OWNER_ID"], $shortHash);
-        if (isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])) {
-            // FORCE SESSION MODE
-            AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
-            AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
-        }
-
-        $repoObject = $data["REPOSITORY"];
-        ConfService::switchRootDir($repoObject->getId());
-        ConfService::loadRepositoryDriver();
-        AJXP_PluginsService::getInstance()->initActivePlugins();
-        try {
-            $params = array("file" => SystemTextEncoding::toUTF8($data["FILE_PATH"]));
-            if (isSet($data["PLUGINS_DATA"])) {
-                $params["PLUGINS_DATA"] = $data["PLUGINS_DATA"];
-            }
-            if (isset($_GET["ct"]) && $_GET["ct"] == "true") {
-                $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
-                if (count($editors)) {
-                    foreach ($editors as $editor) {
-                        $xPath = new DOMXPath($editor->ownerDocument);
-                        $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
-                        if ($callbacks->length) {
-                            $data["ACTION"] = $callbacks->item(0)->getAttribute("name");
-                            if($data["ACTION"] == "audio_proxy") $params["file"] = base64_encode($params["file"]);
-                            break;
-                        }
-                    }
-                }
-            }
-            AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
-            register_shutdown_function(array("AuthService", "clearTemporaryUser"), $shortHash);
-        } catch (Exception $e) {
-            AuthService::clearTemporaryUser($shortHash);
-            die($e->getMessage());
-        }
-    }
 
     /**
      * @param String $repoId
@@ -1473,6 +1053,7 @@ class ShareCenter extends AJXP_Plugin
      * @param Repository $repository
      * @param AbstractAccessDriver $accessDriver
      * @return mixed An array containing the hash (0) and the generated url (1)
+     * @throws Exception
      */
     public function createSharedMinisite($httpVars, $repository, $accessDriver)
     {
@@ -1564,8 +1145,8 @@ class ShareCenter extends AJXP_Plugin
         if(!is_a($newRepo, "Repository")) return $newRepo;
 
         $newId = $newRepo->getId();
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        $this->initPublicFolder($downloadFolder);
+
+        $this->getPublicAccessManager()->initFolder();
 
         if(isset($existingData)){
             $repo = ConfService::getRepositoryById($existingData["REPOSITORY"]);
@@ -1626,7 +1207,7 @@ class ShareCenter extends AJXP_Plugin
             }catch(Exception $e){
                 return $e->getMessage();
             }
-            $url = $this->buildPublicletLink($hash);
+            $url = $this->getPublicAccessManager()->buildPublicLink($hash);
             $files = $userSelection->getFiles();
             $this->logInfo("New Share", array(
                 "file" => "'".$httpVars['file']."'",
@@ -1660,7 +1241,7 @@ class ShareCenter extends AJXP_Plugin
             }catch(Exception $e){
                 return $e->getMessage();
             }
-            $url = $this->buildPublicletLink($hash);
+            $url = $this->getPublicAccessManager()->buildPublicLink($hash);
             $this->logInfo("Update Share", array(
                 "file" => "'".$httpVars['file']."'",
                 "files" => "'".$httpVars['file']."'",
@@ -1683,7 +1264,7 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
-     * @param Array $httpVars
+     * @param array $httpVars
      * @param Repository $repository
      * @param AbstractAccessDriver $accessDriver
      * @param null $uniqueUser
@@ -2141,11 +1722,11 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
                     $meta["share_type_readable"] = "Repository or Minisite (legacy)";
                 }
-                $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->buildPublicletLink($hash));
+                $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->getPublicAccessManager()->buildPublicLink($hash));
                 $meta["shared_element_hash"] = $hash;
                 $meta["owner"] = $repoObject->getOwner();
                 if($shareType != "repository") {
-                    $meta["copy_url"]  = $this->buildPublicletLink($hash);
+                    $meta["copy_url"]  = $this->getPublicAccessManager()->buildPublicLink($hash);
                 }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
                 if(!empty($parent)) {
@@ -2183,7 +1764,7 @@ class ShareCenter extends AJXP_Plugin
                 $meta["share_type_readable"] = "Publiclet (legacy)";
                 $meta["text"] = basename($shareData["FILE_PATH"]);
                 $meta["icon"] = "mime_empty.png";
-                $meta["share_data"] = $meta["copy_url"] = $this->buildPublicletLink($hash);
+                $meta["share_data"] = $meta["copy_url"] = $this->getPublicAccessManager()->buildPublicLink($hash);
                 $meta["share_link"] = true;
                 $meta["shared_element_hash"] = $hash;
                 $meta["ajxp_shared_publiclet"] = $hash;
@@ -2345,7 +1926,7 @@ class ShareCenter extends AJXP_Plugin
 
     /**
      * @param AJXP_Node $node
-     * @param Array $shares
+     * @param array $shares
      * @param bool $updateIfNotExists
      */
     public function getSharesFromMeta($node, &$shares, $updateIfNotExists = false){
@@ -2421,7 +2002,7 @@ class ShareCenter extends AJXP_Plugin
 
     /**
      * @param String $shareId
-     * @param Array $shareData
+     * @param array $shareData
      * @param AJXP_Node $node
      * @throws Exception
      * @return array|bool
@@ -2446,7 +2027,7 @@ class ShareCenter extends AJXP_Plugin
             if (isSet($shareData["short_form_url"])) {
                 $link = $shareData["short_form_url"];
             } else {
-                $link = $this->buildPublicletLink($shareId);
+                $link = $this->getPublicAccessManager()->buildPublicLink($shareId);
             }
             if ($this->watcher != false && $node != null) {
                 $result = array();
@@ -2492,7 +2073,7 @@ class ShareCenter extends AJXP_Plugin
                 if (isSet($shareData["short_form_url"])) {
                     $minisiteLink = $shareData["short_form_url"];
                 } else {
-                    $minisiteLink = $this->buildPublicletLink($shareId);
+                    $minisiteLink = $this->getPublicAccessManager()->buildPublicLink($shareId);
                 }
 
             }
