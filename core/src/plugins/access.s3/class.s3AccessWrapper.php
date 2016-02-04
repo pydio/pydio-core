@@ -230,14 +230,21 @@ class s3AccessWrapper extends fsAccessWrapper
             $baseURL = $repoObject->getOption("STORAGE_URL");
             if(!empty($baseURL)){
                 $options["base_url"] = $baseURL;
-            }else{
-                $options["region"] = $repoObject->getOption("REGION");
+            }
+            $region = $repoObject->getOption("REGION");
+            if(!empty($region)){
+                $options["region"] = $region;
             }
             $proxy = $repoObject->getOption("PROXY");
             if(!empty($proxy)){
                 $options['request.options'] = array('proxy' => $proxy);
             }
             $s3Client = S3Client::factory($options);
+
+            if($repoObject->getOption("VHOST_NOT_SUPPORTED")){
+                require_once("ForcePathStyleListener.php");
+                $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+            }
 
             $bucket = $repoObject->getOption("CONTAINER");
             $basePath = $repoObject->getOption("PATH");
