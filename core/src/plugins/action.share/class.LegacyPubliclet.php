@@ -30,7 +30,12 @@ class LegacyPubliclet
         MinisiteRenderer::renderError($data, $hash, $message);
     }
 
-    public static function render($data){
+    /**
+     * @param array $data
+     * @param array $options
+     * @param ShareStore $shareStore
+     */
+    public static function render($data, $options, $shareStore){
 
         if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
             self::renderError($data, "false");
@@ -52,17 +57,17 @@ class LegacyPubliclet
         } else {
             include(dirname(__FILE__)."/res/i18n/en.php");
         }
-        if(isSet($mess)) $messages = $mess;
+        if(isSet($mess)) {
+            $messages = $mess;
+        }
 
         $AJXP_LINK_HAS_PASSWORD = false;
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
         AJXP_PluginsService::getInstance()->initActivePlugins();
 
-        $shareCenter = self::getShareCenter();
-
         ConfService::setLanguage($language);
         $mess = ConfService::getMessages();
-        if ($shareCenter->getShareStore()->isShareExpired($shortHash, $data))
+        if ($shareStore->isShareExpired($shortHash, $data))
         {
             self::renderError(array(), $shortHash, $mess["share_center.165"]);
             return;
@@ -71,8 +76,7 @@ class LegacyPubliclet
 
         $customs = array("title", "legend", "legend_pass", "background_attributes_1","text_color", "background_color", "textshadow_color");
         $images = array("button", "background_1");
-        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
-        $confs = $shareCenter->getConfigs();
+        $confs = $options;
         $confs["CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1"] = "background-repeat:repeat;background-position:50% 50%;";
         $confs["CUSTOM_SHAREPAGE_BACKGROUND_1"] = "plugins/action.share/res/hi-res/02.jpg";
         $confs["CUSTOM_SHAREPAGE_TEXT_COLOR"] = "#ffffff";
@@ -131,7 +135,7 @@ class LegacyPubliclet
         $driver->loadManifest();
 
         //$hash = md5(serialize($data));
-        $shareCenter->getShareStore()->incrementDownloadCounter($shortHash);
+        $shareStore->incrementDownloadCounter($shortHash);
 
         //AuthService::logUser($data["OWNER_ID"], "", true);
         AuthService::logTemporaryUser($data["OWNER_ID"], $shortHash);
@@ -190,7 +194,7 @@ class LegacyPubliclet
      * @param Repository $repository
      * @param ShareStore $shareStore
      * @param PublicAccessManager $publicAccessManager
-     * @return array An array containing the hash (0) and the generated url (1)
+     * @return string|array An array containing the hash (0) and the generated url (1)
      */
     public function writePubliclet(&$data, $accessDriver, $repository, $shareStore, $publicAccessManager)
     {

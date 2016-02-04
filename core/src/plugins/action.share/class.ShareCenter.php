@@ -221,7 +221,6 @@ class ShareCenter extends AJXP_Plugin
                     }
                 }
                 $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
-                $file = $userSelection->getUniqueFile();
                 $ajxpNode = $userSelection->getUniqueNode();
                 if (!file_exists($ajxpNode->getUrl())) {
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
@@ -829,7 +828,7 @@ class ShareCenter extends AJXP_Plugin
 
                 } else {
 
-                    if(isSet($publicLink["FILE_PATH"])){
+                    if(isset($publicLink) && is_array($publicLink) && isSet($publicLink["FILE_PATH"])){
                         $publicLink["FILE_PATH"] = str_replace($oldNode->getPath(), $newNode->getPath(), $publicLink["FILE_PATH"]);
                         $this->getShareStore()->deleteShare("file", $id);
                         $this->getShareStore()->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
@@ -915,7 +914,10 @@ class ShareCenter extends AJXP_Plugin
     public static function loadPubliclet($data)
     {
         require_once("class.LegacyPubliclet.php");
-        LegacyPubliclet::render($data);
+        $shareCenter = self::getShareCenter();
+        $options = $shareCenter->getConfigs();
+        $shareStore = $shareCenter->getShareStore();
+        LegacyPubliclet::render($data, $options, $shareStore);
     }
 
 

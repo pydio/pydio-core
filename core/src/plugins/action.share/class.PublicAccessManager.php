@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class PublicAccessManager
 {
     /**
-     * @var AJXP_Plugin
+     * @var array
      */
     private $options;
 
@@ -37,6 +37,9 @@ class PublicAccessManager
         $this->options = $options;
     }
 
+    /**
+     * Initialize download folder if not already done
+     */
     public function initFolder()
     {
         $downloadFolder = $this->getPublicDownloadFolder();
@@ -75,6 +78,11 @@ class PublicAccessManager
 
     }
 
+    /**
+     * Compute external link from the given hash
+     * @param string $hash
+     * @return string
+     */
     public function buildPublicLink($hash)
     {
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
@@ -87,7 +95,10 @@ class PublicAccessManager
         }
     }
 
-
+    /**
+     * Compute base URL for external links
+     * @return mixed|string
+     */
     public function buildPublicDlURL()
     {
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
@@ -113,11 +124,18 @@ class PublicAccessManager
         return AJXP_Utils::getTravelPath($minisite, $server);
     }
 
-
+    /**
+     * Get download folder path from configuration
+     * @return string
+     */
     public function getPublicDownloadFolder(){
         return ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
     }
 
+    /**
+     * Build download folder URL from configuration and current URL
+     * @return string|null
+     */
     public function getPublicDownloadUrl(){
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
