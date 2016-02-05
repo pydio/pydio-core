@@ -71,6 +71,9 @@ class MinisiteRenderer
                 $templateName = "ajxp_shared_folder";
             }
         }
+        if(!isSet($templateName) && isSet($error)){
+            $templateName = "ajxp_unique_strip";
+        }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         AJXP_Controller::applyHook("tpl.filter_html", array(&$html));

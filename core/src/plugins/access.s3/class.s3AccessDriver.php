@@ -67,14 +67,23 @@ class s3AccessDriver extends fsAccessDriver
             $baseURL = $this->repository->getOption("STORAGE_URL");
             if(!empty($baseURL)){
                 $options["base_url"] = $baseURL;
-            }else{
-                $options["region"] = $this->repository->getOption("REGION");
+            }
+            $region = $this->repository->getOption("REGION");
+            if(!empty($region)){
+                $options["region"] = $region;
             }
             $proxy = $this->repository->getOption("PROXY");
             if(!empty($proxy)){
                 $options['request.options'] = array('proxy' => $proxy);
             }
             $this->s3Client = S3Client::factory($options);
+
+            if($this->repository->getOption("VHOST_NOT_SUPPORTED")){
+                // Use virtual hosted buckets when possible
+                require_once("ForcePathStyleListener.php");
+                $this->s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+            }
+
             $this->s3Client->registerStreamWrapper();
         }
         return parent::detectStreamWrapper($register);
