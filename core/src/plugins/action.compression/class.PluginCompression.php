@@ -267,8 +267,10 @@ class PluginCompression extends AJXP_Plugin
                 throw new AJXP_Exception($e);
             }
             file_put_contents($progressExtractFileName, "SUCCESS");
+            $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
+            AJXP_Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
         }
-        elseif ($action == "check_extraction_status") {
+    elseif ($action == "check_extraction_status") {
             $currentDirUrl = $httpVars["currentDirUrl"];
             $onlyFileName = $httpVars["onlyFileName"];
             $progressExtract = file_get_contents($progressExtractFileName);
