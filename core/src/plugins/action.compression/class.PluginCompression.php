@@ -194,7 +194,7 @@ class PluginCompression extends AJXP_Plugin
                     unlink($progressCompressionFileName);
                 }
             }
-        }
+    }
         elseif ($action == "extraction") {
             $fileArchive = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
             $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
@@ -221,7 +221,7 @@ class PluginCompression extends AJXP_Plugin
             $lastPosOnlyFileName =  strrpos($onlyFileName, "-");
             $tmpOnlyFileName = substr($onlyFileName, 0, $lastPosOnlyFileName);
             $counterDuplicate = substr($onlyFileName, $lastPosOnlyFileName + 1);
-            if ($lastPosOnlyFileName == false) {
+            if (!is_int($lastPosOnlyFileName) || !is_int($counterDuplicate)) {
                 $tmpOnlyFileName = $onlyFileName;
                 $counterDuplicate = 1;
             }
@@ -259,8 +259,6 @@ class PluginCompression extends AJXP_Plugin
                         file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
                         throw new AJXP_Exception($e);
                     }
-                    $newNode = new AJXP_Node($currentDirUrl . $onlyFileName . DIRECTORY_SEPARATOR . $fileNameInArchive);
-                    AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                     $counterExtract++;
                     file_put_contents($progressExtractFileName, sprintf($messages["compression.13"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
@@ -275,14 +273,14 @@ class PluginCompression extends AJXP_Plugin
             $onlyFileName = $httpVars["onlyFileName"];
             $progressExtract = file_get_contents($progressExtractFileName);
             $substrProgressExtract = substr($progressExtract, 0, 5);
-            if ($progressExtract != "SUCCESS" && $substrProgressExtract != "Error") {
+            if ($progressExtract != "SUCCESS" && $progressExtract != "INDEX" && $substrProgressExtract != "Error") {
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_extraction_status", array(
                     "repository_id" => $repository->getId(),
                     "extraction_id" => $extractId,
                     "currentDirUrl" => $currentDirUrl,
                     "onlyFileName" => $onlyFileName
-                ), $progressExtract, true, 5);
+                ), $progressExtract, true, 4);
                 AJXP_XMLWriter::close();
             } elseif ($progressExtract == "SUCCESS") {
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
@@ -290,6 +288,9 @@ class PluginCompression extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
+                AJXP_XMLWriter::triggerBgAction("check_index_status", array(
+                    "repository_id" => $newNode->getRepositoryId()
+                ), "starting indexation", true, 5);
                 AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
                 AJXP_XMLWriter::close();
                 if (file_exists($progressExtractFileName)) {
