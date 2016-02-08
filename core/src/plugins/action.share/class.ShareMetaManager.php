@@ -30,12 +30,16 @@ class ShareMetaManager
     var $shareStore;
 
     /**
+     * @var bool
+     */
+    var $META_USER_SCOPE_PRIVATE = true;
+
+    /**
      * ShareMetaManager constructor.
      * @param ShareStore $shareStore
      */
     public function __construct($shareStore){
         $this->shareStore = $shareStore;
-        $this->META_USER_SCOPE_PRIVATE = true;
     }
 
     /**
@@ -70,11 +74,12 @@ class ShareMetaManager
      * @param string|null $originalShareId
      */
     public function addShareInMeta($node, $shareType, $shareId, $originalShareId=null){
+        $shares = array();
         $this->shareStore->getMetaManager()->getSharesFromMeta($node, $shares, true);
         if(empty($shares)){
             $shares = array();
         }
-        if(!empty($shares) && $originalShareId != null && isSet($shares[$originalShareId])){
+        if(!empty($shares) && $originalShareId !== null && isSet($shares[$originalShareId])){
             unset($shares[$originalShareId]);
         }
         $shares[$shareId] = array("type" => $shareType);
@@ -87,6 +92,7 @@ class ShareMetaManager
      * @param $shareId
      */
     public function removeShareFromMeta($node, $shareId){
+        $shares = array();
         $this->shareStore->getMetaManager()->getSharesFromMeta($node, $shares);
         if(!empty($shares) && isSet($shares[$shareId])){
             unset($shares[$shareId]);

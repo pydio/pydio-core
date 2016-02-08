@@ -225,6 +225,7 @@ class ShareCenter extends AJXP_Plugin
      */
     public function isShared($ajxpNode)
     {
+        $shares = array();
         $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, true);
         return count($shares) > 0;
     }
@@ -384,6 +385,7 @@ class ShareCenter extends AJXP_Plugin
                     $folder = true;
                     $selectedNode = new AJXP_Node("pydio://". AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
                 }
+                $shares = array();
                 $this->getShareStore()->getMetaManager()->getSharesFromMeta($shareNode, $shares, false);
                 if(!count($shares)){
                     break;
@@ -444,6 +446,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
+                    $parsedMeta = array();
                     $this->getShareStore()->getMetaManager()->getSharesFromMeta($node, $parsedMeta, true);
                 }
 
@@ -478,6 +481,7 @@ class ShareCenter extends AJXP_Plugin
 
                     $userSelection = new UserSelection($this->repository, $httpVars);
                     $ajxpNode = $userSelection->getUniqueNode();
+                    $shares = array();
                     $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
                     if(count($shares)){
                         if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
@@ -627,7 +631,7 @@ class ShareCenter extends AJXP_Plugin
     public function nodeSharedMetadata(&$ajxpNode)
     {
         if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
-
+        $shares = array();
         $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, true);
         if(!empty($shares) && count($shares)){
             $merge = array(
