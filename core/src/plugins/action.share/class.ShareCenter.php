@@ -52,6 +52,31 @@ class ShareCenter extends AJXP_Plugin
      */
     private $watcher = false;
 
+    /**************************/
+    /* PLUGIN LIFECYCLE METHODS
+    /**************************/
+    /**
+     * AJXP_Plugin initializer
+     * @param array $options
+     */
+    public function init($options)
+    {
+        parent::init($options);
+        $this->repository = ConfService::getRepository();
+        if (!is_a($this->repository->driverInstance, "AjxpWrapperProvider")) {
+            return;
+        }
+        $this->accessDriver = $this->repository->driverInstance;
+        $this->urlBase = "pydio://". $this->repository->getId();
+        if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
+            $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
+        }
+    }
+
+    /**
+     * Extend parent
+     * @param DOMNode $contribNode
+     */
     protected function parseSpecificContributions(&$contribNode)
     {
         parent::parseSpecificContributions($contribNode);
@@ -106,20 +131,15 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
-    public function init($options)
-    {
-        parent::init($options);
-        $this->repository = ConfService::getRepository();
-        if (!is_a($this->repository->driverInstance, "AjxpWrapperProvider")) {
-            return;
-        }
-        $this->accessDriver = $this->repository->driverInstance;
-        $this->urlBase = "pydio://". $this->repository->getId();
-        if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
-            $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
-        }
-    }
-
+    /**************************/
+    /* UTILS & ACCESSORS
+    /**************************/
+    /**
+     * Compute right to create shares based on plugin options
+     * @param string $nodeType "file"|"folder"
+     * @param string $shareType
+     * @return bool
+     */
     protected function getAuthorization($nodeType, $shareType = "any"){
         if($nodeType == "file"){
             return $this->getFilteredOption("ENABLE_FILE_PUBLIC_LINK") !== false;
@@ -142,10 +162,33 @@ class ShareCenter extends AJXP_Plugin
         return AJXP_PluginsService::findPluginById("action.share");
     }
 
+    public static function currentContextIsLinkDownload(){
+        return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");
+    }
+
+    /**
+     * Check if the hash seems to correspond to the serialized data.
+     * Kept there only for backward compatibility
+     * @static
+     * @param String $outputData serialized data
+     * @param String $hash Id to check
+     * @return bool
+     */
+    public static function checkHash($outputData, $hash)
+    {
+        // Never return false, otherwise it can break listing due to hardcore exit() call;
+        // Rechecked later
+        return true;
+
+        //$full = md5($outputData);
+        //return (!empty($hash) && strpos($full, $hash."") === 0);
+    }
+
+
     /**
      * @return ShareStore
      */
-    private function getShareStore(){
+    public function getShareStore(){
         if(!isSet($this->shareStore)){
             require_once("class.ShareStore.php");
             $hMin = 32;
@@ -160,6 +203,9 @@ class ShareCenter extends AJXP_Plugin
         return $this->shareStore;
     }
 
+    /**
+     * @return PublicAccessManager
+     */
     public function getPublicAccessManager(){
 
         if(!isSet($this->publicAccessManager)){
@@ -173,6 +219,26 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return boolean
+     */
+    public function isShared($ajxpNode)
+    {
+        $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, true);
+        return count($shares) > 0;
+    }
+
+    /**************************/
+    /* CALLBACKS FOR ACTIONS
+    /**************************/
+    /**
+     * Added as preprocessor on Download action to handle download Counter.
+     * @param string $action
+     * @param array $httpVars
+     * @param array $fileVars
+     * @throws Exception
+     */
     public function preProcessDownload($action, &$httpVars, &$fileVars){
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             $this->logDebug(__FUNCTION__, "Do something here!");
@@ -189,6 +255,14 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
+    /**
+     * Main callback for all share- actions.
+     * @param string $action
+     * @param array $httpVars
+     * @param array $fileVars
+     * @return null
+     * @throws Exception
+     */
     public function switchAction($action, $httpVars, $fileVars)
     {
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
@@ -292,7 +366,7 @@ class ShareCenter extends AJXP_Plugin
                     print($url);
                 }
                 if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
-                    $this->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"], $originalHash);
+                    $this->getShareStore()->getMetaManager()->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"], $originalHash);
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                 // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
@@ -310,7 +384,7 @@ class ShareCenter extends AJXP_Plugin
                     $folder = true;
                     $selectedNode = new AJXP_Node("pydio://". AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
                 }
-                $this->getSharesFromMeta($shareNode, $shares, false);
+                $this->getShareStore()->getMetaManager()->getSharesFromMeta($shareNode, $shares, false);
                 if(!count($shares)){
                     break;
                 }
@@ -370,7 +444,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
-                    $this->getSharesFromMeta($node, $parsedMeta, true);
+                    $this->getShareStore()->getMetaManager()->getSharesFromMeta($node, $parsedMeta, true);
                 }
 
                 $flattenJson = false;
@@ -404,7 +478,7 @@ class ShareCenter extends AJXP_Plugin
 
                     $userSelection = new UserSelection($this->repository, $httpVars);
                     $ajxpNode = $userSelection->getUniqueNode();
-                    $this->getSharesFromMeta($ajxpNode, $shares, false);
+                    $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
                     if(count($shares)){
                         if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
                             $elementId = $httpVars["element_id"];
@@ -418,7 +492,7 @@ class ShareCenter extends AJXP_Plugin
                             $t = "file";
                         }
                         $this->getShareStore()->deleteShare($t, $elementId);
-                        $this->removeShareFromMeta($ajxpNode, $elementId);
+                        $this->getShareStore()->getMetaManager()->removeShareFromMeta($ajxpNode, $elementId);
                         AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     }
 
@@ -442,11 +516,7 @@ class ShareCenter extends AJXP_Plugin
 
                     $userSelection = new UserSelection($this->repository, $httpVars);
                     $ajxpNode = $userSelection->getUniqueNode();
-                    $metadata = $ajxpNode->retrieveMetadata(
-                        "ajxp_shared",
-                        true,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
+                    $metadata = $this->getShareStore()->getMetaManager()->getNodeMeta($ajxpNode);
                     if(!isSet($metadata["shares"]) || !is_array($metadata["shares"])){
                         return null;
                     }
@@ -473,21 +543,13 @@ class ShareCenter extends AJXP_Plugin
                 $ajxpNode = $userSelection->getUniqueNode();
                 if($this->getShareStore()->shareIsLegacy($hash)){
                     // Store in metadata
-                    $metadata = $ajxpNode->retrieveMetadata(
-                        "ajxp_shared",
-                        true,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
+                    $metadata = $this->getShareStore()->getMetaManager()->getNodeMeta($ajxpNode);
                     if (isSet($metadata["shares"][$httpVars["element_id"]])) {
                         if (!is_array($metadata["shares"][$httpVars["element_id"]])) {
                             $metadata["shares"][$httpVars["element_id"]] = array();
                         }
                         $metadata["shares"][$httpVars["element_id"]][$httpVars["p_name"]] = $httpVars["p_value"];
-                        $ajxpNode->setMetadata(
-                            "ajxp_shared",
-                            $metadata,
-                            true,
-                            AJXP_METADATA_SCOPE_REPOSITORY);
+                        $this->getShareStore()->getMetaManager()->setNodeMeta($ajxpNode, $metadata);
                     }
                 }else{
                     $this->getShareStore()->updateShareProperty($hash, $httpVars["p_name"], $httpVars["p_value"]);
@@ -535,7 +597,7 @@ class ShareCenter extends AJXP_Plugin
 
                 $accessType = ConfService::getRepository()->getAccessType();
                 $currentUser  = ($accessType != "ajxp_conf" && $accessType != "ajxp_admin");
-                $count = $this->clearExpiredFiles($currentUser);
+                $count = $this->getShareStore()->clearExpiredFiles($currentUser);
                 AJXP_XMLWriter::header();
                 if($count){
                     AJXP_XMLWriter::sendMessage("Removed ".count($count)." expired links", null);
@@ -554,8 +616,11 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
-
+    /**************************/
+    /* CALLBACKS FOR HOOKS
+    /**************************/
     /**
+     * Hook node.info
      * @param AJXP_Node $ajxpNode
      * @return void
      */
@@ -563,7 +628,7 @@ class ShareCenter extends AJXP_Plugin
     {
         if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
 
-        $this->getSharesFromMeta($ajxpNode, $shares, true);
+        $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, true);
         if(!empty($shares) && count($shares)){
             $merge = array(
                 "ajxp_shared"      => "true",
@@ -587,15 +652,73 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
-     * @return boolean
+     * Hook node.change
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
+     * @param bool $copy
      */
-    public function isShared($ajxpNode)
-    {
-        $this->getSharesFromMeta($ajxpNode, $shares, true);
-        return count($shares) > 0;
+    public function updateNodeSharedData($oldNode=null, $newNode=null, $copy = false){
+
+        if($oldNode != null && !$copy){
+            $this->logDebug("Should update node");
+
+            $delete = false;
+            if($newNode == null) {
+                $delete = true;
+            }else{
+                $repo = $newNode->getRepository();
+                $recycle = $repo->getOption("RECYCLE_BIN");
+                if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
+                    $delete = true;
+                }
+            }
+            $shareStore = $this->getShareStore();
+            // Find shares in children
+            $result = $shareStore->getMetaManager()->collectSharesIncludingChildren($oldNode);
+            foreach($result as $path => $metadata){
+                $changeOldNode = new AJXP_Node("pydio://".$oldNode->getRepositoryId().$path);
+
+                foreach($metadata as $ownerId => $meta){
+                    if(!isSet($meta["shares"])){
+                        // Old school, migrate?
+                        continue;
+                    }
+                    $changeOldNode->setUser($ownerId);
+                    /// do something
+                    $changeNewNode = null;
+                    if(!$delete){
+                        $newPath = preg_replace('#^'.preg_quote($oldNode->getPath(), '#').'#', $newNode->getPath(), $path);
+                        $changeNewNode = new AJXP_Node("pydio://".$newNode->getRepositoryId().$newPath);
+                        $changeNewNode->setUser($ownerId);
+                    }
+                    $newShares = $shareStore->moveSharesFromMeta($meta["shares"], $delete?"delete":"move", $changeOldNode, $changeNewNode);
+                    $shareStore->getMetaManager()->clearNodeMeta($changeOldNode);
+                    if(!$delete && count($newShares)){
+                        $shareStore->getMetaManager()->setNodeMeta($changeNewNode, array("shares" => $newShares));
+                    }
+                }
+            }
+            return;
+        }
     }
 
+    /**
+     * Hook user.after_delete
+     * make sure to clear orphan shares
+     * @param String $userId
+     */
+    public function cleanUserShares($userId){
+        $shares = $this->getShareStore()->listShares($userId);
+        foreach($shares as $hash => $data){
+            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash);
+        }
+    }
+
+
+    /************************************/
+    /* EVENTS FORWARDING BETWEEN
+    /* PARENTS AND CHILDREN WORKSPACES
+    /************************************/
     /**
      * @param AJXP_Node $node
      * @param String|null $direction "UP", "DOWN"
@@ -605,7 +728,7 @@ class ShareCenter extends AJXP_Plugin
         $result = array();
         if($direction !== "UP"){
             $upmetas = array();
-            $node->collectMetadataInParents("ajxp_shared", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_REPOSITORY, false, $upmetas);
+            $this->getShareStore()->getMetaManager()->collectSharesInParent($node, $upmetas);
             foreach($upmetas as $metadata){
                 if (is_array($metadata) && !empty($metadata["shares"])) {
                     foreach($metadata["shares"] as $sId => $sData){
@@ -765,86 +888,10 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
-    /**
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
-     * @param bool $copy
-     */
-    public function updateNodeSharedData($oldNode=null, $newNode=null, $copy = false){
 
-        if($oldNode != null && !$copy){
-            $this->logDebug("Should update node");
-
-            $delete = false;
-            if($newNode == null) {
-                $delete = true;
-            }else{
-                $repo = $newNode->getRepository();
-                $recycle = $repo->getOption("RECYCLE_BIN");
-                if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
-                    $delete = true;
-                }
-            }
-
-            $this->getSharesFromMeta($oldNode, $shares, true);
-            if(empty($shares)) {
-                return;
-            }
-
-            $newShares = array();
-            foreach($shares as $id => $data){
-                $type = $data["type"];
-                if($delete){
-                    $this->getShareStore()->deleteShare($type, $id);
-                    continue;
-                }
-
-                if($type == "minisite"){
-                    $share = $this->getShareStore()->loadShare($id);
-                    $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
-                }else if($type == "repository"){
-                    $repo = ConfService::getRepositoryById($id);
-                }else if($type == "file"){
-                    $publicLink = $this->getShareStore()->loadShare($id);
-                }
-                if(isSet($repo)){
-
-                    $cFilter = $repo->getContentFilter();
-                    $path = $repo->getOption("PATH", true);
-                    $save = false;
-                    if(isSet($cFilter)){
-                        $cFilter->movePath($oldNode->getPath(), $newNode->getPath());
-                        $repo->setContentFilter($cFilter);
-                        $save = true;
-                    }else if(!empty($path)){
-                        $path = str_replace($oldNode->getPath(), $newNode->getPath(), $path);
-                        $repo->addOption("PATH", $path);
-                        $save = true;
-                    }
-                    if($save){
-                        ConfService::getConfStorageImpl()->saveRepository($repo, true);
-                        $newShares[$id] = $data;
-                    }
-
-                } else {
-
-                    if(isset($publicLink) && is_array($publicLink) && isSet($publicLink["FILE_PATH"])){
-                        $publicLink["FILE_PATH"] = str_replace($oldNode->getPath(), $newNode->getPath(), $publicLink["FILE_PATH"]);
-                        $this->getShareStore()->deleteShare("file", $id);
-                        $this->getShareStore()->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
-                        $newShares[$id] = $data;
-                    }
-
-                }
-            }
-            $oldNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            if($newNode != null && count($newShares)){
-                $newNode->setMetadata("ajxp_shared", array("shares" => $newShares), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            }
-
-        }
-    }
-
+    /**************************/
+    /* BOOTLOADERS FOR LINKS
+    /**************************/
     public static function loadMinisite($data, $hash = '', $error = null)
     {
         include_once("class.MinisiteRenderer.php");
@@ -858,7 +905,7 @@ class ShareCenter extends AJXP_Plugin
             ConfService::setLanguage($_GET["lang"]);
         }
         $shareCenter = self::getShareCenter();
-        $data = $shareCenter->loadPublicletData($hash);
+        $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = ConfService::getMessages();
         if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
             AuthService::disconnect();
@@ -896,42 +943,9 @@ class ShareCenter extends AJXP_Plugin
     }
 
 
-    private function deleteExpiredPubliclet($elementId, $data){
-
-        if(AuthService::getLoggedUser() == null ||  AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){
-            AuthService::logUser($data["OWNER_ID"], "", true);
-        }
-        $repoObject = $data["REPOSITORY"];
-        if(!is_a($repoObject, "Repository")) {
-            $repoObject = ConfService::getRepositoryById($data["REPOSITORY"]);
-        }
-        $repoLoaded = false;
-
-        if(!empty($repoObject)){
-            try{
-                ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
-                $repoLoaded = true;
-            }catch (Exception $e){
-                // Cannot load this repository anymore.
-            }
-        }
-        if($repoLoaded){
-            AJXP_Controller::registryReset();
-            $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
-        }
-        $this->getShareStore()->deleteShare("file", $elementId);
-        if(isSet($ajxpNode)){
-            try{
-                $this->removeShareFromMeta($ajxpNode, $elementId);
-            }catch (Exception $e){
-
-            }
-            gc_collect_cycles();
-        }
-
-    }
-
-
+    /**************************/
+    /* CREATE / EDIT SHARES
+    /**************************/
     /**
      * @param String $repoId
      * @param $mixUsersAndGroups
@@ -1618,26 +1632,9 @@ class ShareCenter extends AJXP_Plugin
     }
 
 
-    /**
-     * @param String $type
-     * @param String $element
-     * @param AbstractAjxpUser $loggedUser
-     * @throws Exception
-     */
-    public function deleteSharedElement($type, $element, $loggedUser)
-    {
-        $this->getShareStore()->deleteShare($type, $element);
-    }
-
-    public function loadPublicletData($id)
-    {
-        return $this->getShareStore()->loadShare($id);
-    }
-
-    public function findSharesForRepo($repositoryId){
-        return $this->getShareStore()->findSharesForRepo($repositoryId);
-    }
-
+    /**************************/
+    /* LISTING FUNCTIONS
+    /**************************/
     /**
      * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
@@ -1764,219 +1761,6 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
-    public function migrateOldSharedWorkspaces($parentRepositoryId){
-
-        // Load only children of a given repository
-        $repos = ConfService::listRepositoriesWithCriteria(
-            array(
-                "parent_uuid" => $parentRepositoryId
-            ), $count
-        );
-        $count = 0;
-        foreach($repos as $repoId => $repoObject){
-
-            $shares = $this->getShareStore()->findSharesForRepo($repoId);
-            if(! count($shares)){
-                $count ++;
-                $this->getShareStore()->storeShare($parentRepositoryId, array(
-                    "REPOSITORY"    => $repoObject->getUniqueId(),
-                    "OWNER_ID"      => $repoObject->getOwner()), "repository");
-            }
-
-        }
-        return $count;
-
-    }
-
-    public function clearExpiredFiles($currentUser = true)
-    {
-        if($currentUser){
-            $loggedUser = AuthService::getLoggedUser();
-            $userId = $loggedUser->getId();
-            $originalUser = null;
-        }else{
-            $originalUser = AuthService::getLoggedUser()->getId();
-            $userId = null;
-        }
-        $deleted = array();
-        $switchBackToOriginal = false;
-
-        $publicLets = $this->getShareStore()->listShares($currentUser? $userId: '');
-        foreach ($publicLets as $hash => $publicletData) {
-            if($publicletData === false) continue;
-            if ($currentUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId )) {
-                continue;
-            }
-            if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
-                if(!$currentUser) $switchBackToOriginal = true;
-                $this->deleteExpiredPubliclet($hash, $publicletData);
-                $deleted[] = $publicletData["FILE_PATH"];
-
-            }
-        }
-        if($switchBackToOriginal){
-            AuthService::logUser($originalUser, "", true);
-        }
-        return $deleted;
-    }
-
-    /**
-     * Hooked to user.after_delete event, make sure to clear orphan shares
-     * @param String $userId
-     */
-    public function cleanUserShares($userId){
-        $shares = $this->getShareStore()->listShares($userId);
-        foreach($shares as $hash => $data){
-            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash);
-        }
-    }
-
-
-    public static function currentContextIsLinkDownload(){
-        return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");
-    }
-
-    /**
-     * Check if the hash seems to correspond to the serialized data.
-     * Kept there only for backward compatibility
-     * @static
-     * @param String $outputData serialized data
-     * @param String $hash Id to check
-     * @return bool
-     */
-    public static function checkHash($outputData, $hash)
-    {
-        // Never return false, otherwise it can break listing due to hardcore exit() call;
-        // Rechecked later
-        return true;
-
-        //$full = md5($outputData);
-        //return (!empty($hash) && strpos($full, $hash."") === 0);
-    }
-
-    /**
-     * @param AJXP_Node $node
-     * @param $shareType
-     * @param $shareId
-     */
-    public function addShareInMeta($node, $shareType, $shareId, $originalShareId=null){
-        $this->getSharesFromMeta($node, $shares, true);
-        if(empty($shares)){
-            $shares = array();
-        }
-        if(!empty($shares) && $originalShareId != null && isSet($shares[$originalShareId])){
-            unset($shares[$originalShareId]);
-        }
-        $shares[$shareId] = array("type" => $shareType);
-        $node->setMetadata("ajxp_shared", array("shares" => $shares), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-    }
-
-    /**
-     * @param AJXP_Node $node
-     * @param $shareId
-     * @param $type
-     */
-    public function getShareFromMeta($node, $shareId, &$type){
-        $this->getSharesFromMeta($node, $shares, true);
-        if(!empty($shares) && isSet($shares[$shareId])){
-            $type = $shares[$shareId];
-        }
-    }
-
-    /**
-     * @param AJXP_Node $node
-     * @param $shareId
-     */
-    public function removeShareFromMeta($node, $shareId){
-        $this->getSharesFromMeta($node, $shares);
-        if(!empty($shares) && isSet($shares[$shareId])){
-            unset($shares[$shareId]);
-            if(count($shares)){
-                $node->setMetadata("ajxp_shared", array("shares" => $shares), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            }else{
-                $node->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            }
-        }
-
-    }
-
-    /**
-     * @param AJXP_Node $node
-     * @param array $shares
-     * @param bool $updateIfNotExists
-     */
-    public function getSharesFromMeta($node, &$shares, $updateIfNotExists = false){
-
-        $meta = $node->retrieveMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-
-        // NEW FORMAT
-        if(isSet($meta["shares"])){
-            $shares = array();
-            $update = false;
-            foreach($meta["shares"] as $hashOrRepoId => $shareData){
-                if(!$updateIfNotExists || $this->getShareStore()->shareExists($shareData["type"],$hashOrRepoId)){
-                    $shares[$hashOrRepoId] = $shareData;
-                }else{
-                    $update = true;
-                }
-            }
-            if($update){
-                if (count($shares) > 0) {
-                    $meta["shares"] = $shares;
-                    $node->setMetadata("ajxp_shared", $meta, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                } else {
-                    $node->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                }
-
-            }
-            return;
-        }
-
-        // OLD FORMAT
-        if(isSet($meta["minisite"])){
-            $type = "minisite";
-        }else{
-            $type = "detect";
-        }
-        $els = array();
-        if(is_string($meta["element"])) $els[] = $meta["element"];
-        else if (is_array($meta["element"])) $els = $meta["element"];
-        if($updateIfNotExists){
-            $update = false;
-            $shares = array();
-            foreach($els as $hashOrRepoId => $additionalData){
-                if(is_string($additionalData)) {
-                    $hashOrRepoId = $additionalData;
-                    $additionalData = array();
-                }
-                if($type == "detect"){
-                    if(ConfService::getRepositoryById($hashOrRepoId) != null) $type = "repository";
-                    else $type = "file";
-                }
-                if($this->getShareStore()->shareExists($type,$hashOrRepoId)){
-                    $shares[$hashOrRepoId] = array_merge($additionalData, array("type" => $type));
-                }else{
-                    $update = true;
-                }
-            }
-            if($update){
-                if (count($shares) > 0) {
-                    unset($meta["element"]);
-                    if(isSet($meta["minisite"])) unset($meta["minisite"]);
-                    $meta["shares"] = $shares;
-                    $node->setMetadata("ajxp_shared", $meta, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                } else {
-                    $node->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                }
-
-            }
-        }else{
-            $shares = $els;
-        }
-
-    }
-
     /**
      * @param String $shareId
      * @param array $shareData
@@ -2068,7 +1852,7 @@ class ShareCenter extends AJXP_Plugin
             $repo = ConfService::getRepositoryById($repoId);
             if($repoId == null || ($repo == null && $node != null)){
                 if($minisite){
-                    $this->removeShareFromMeta($node, $shareId);
+                    $this->getShareStore()->getMetaManager()->removeShareFromMeta($node, $shareId);
                 }
                 return $notExistsData;
             } else if (!AuthService::getLoggedUser()->isAdmin() && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
@@ -2140,5 +1924,6 @@ class ShareCenter extends AJXP_Plugin
         return $jsonData;
 
     }
+
 
 }

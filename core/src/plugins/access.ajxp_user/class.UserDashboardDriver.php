@@ -142,6 +142,9 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $files = $selection->getFiles();
                 AJXP_XMLWriter::header();
                 $minisites = $this->listSharedFiles("minisites");
+                /**
+                 * @var ShareCenter $shareCenter
+                 */
                 $shareCenter = AJXP_PluginsService::findPluginById("action.share");
                 foreach ($files as $index => $element) {
                     $element = basename($element);
@@ -151,7 +154,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $mime = "minisite";
                         $element = $minisites[$element];
                     }
-                    $shareCenter->deleteSharedElement($mime, $element, $loggedUser);
+                    $shareCenter->getShareStore()->deleteShare($mime, $element);
                     if($mime == "repository" || $mime == "minisite") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
                     else if($mime == "file") $out = $mess["user_dash.13"];
@@ -163,8 +166,11 @@ class UserDashboardDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
+                /**
+                 * @var ShareCenter $shareCenter
+                 */
                 $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
-                $deleted = $shareCenter->clearExpiredFiles(true);
+                $deleted = $shareCenter->getShareStore()->clearExpiredFiles(true);
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["user_dash.23"], count($deleted).""), null);

@@ -303,6 +303,78 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         }
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @param string $nameSpace
+     * @param string $userScope
+     * @return array
+     */
+    public function collectChildrenWithRepositoryMeta($ajxpNode, $nameSpace, $userScope){
+        $result = array();
+        $repositoryId = $ajxpNode->getRepositoryId();
+        $metaFile = $this->globalMetaFile."_".$repositoryId;
+        $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
+        if(!is_file($metaFile)) return $result;
+        $raw_data = file_get_contents($metaFile);
+        if($raw_data === false) return $result;
+        $metadata = unserialize($raw_data);
+        if($metadata === false || !is_array($metadata)) return $result;
+        $srcPath = $ajxpNode->getPath();
+        foreach($metadata as $path => $data){
+            preg_match("#^".preg_quote($srcPath, "#")."/#", $path, $matches);
+            if($path == $srcPath || count($matches)) {
+                foreach($data as $userId => $meta){
+                    if(($userScope == $userId || $userScope == AJXP_METADATA_ALLUSERS) && isSet($meta[$nameSpace])){
+                        if(!isSet($result[$path])) $result[$path] = array();
+                        $result[$path][$userId] = $meta[$nameSpace];
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param AJXP_Node|null $srcNode
+     * @param AJXP_Node|null $destNode
+     * @param bool|false $copy
+     */
+    public function nodeChangeHook($srcNode = null, $destNode = null, $copy = false){
+        // This is not called, it's the responsibility of the meta provider/setter to
+        // handle the node.change event.
+        // For example, it would break the ShareCenter "shares" management.
+        /*
+        if($srcNode == null || $copy) return;
+        $operation = $destNode == null ? "delete" : "move";
+        $repositoryId = $srcNode->getRepositoryId();
+        $metaFile = $this->globalMetaFile."_".$repositoryId;
+        $metaFile = $this->updateSecurityScope($metaFile, $srcNode->getRepositoryId(), $srcNode->getUser());
+        if(!is_file($metaFile)) return;
+        $raw_data = file_get_contents($metaFile);
+        if($raw_data === false) return;
+        $metadata = unserialize($raw_data);
+        if($metadata === false || !is_array($metadata)) return;
+        $changes = false;
+        $srcPath = $srcNode->getPath();
+        foreach($metadata as $path => $data){
+            preg_match("#^".preg_quote($srcPath, "#")."/#", $path, $matches);
+            if($path == $srcPath || count($matches)){
+                if($operation == "move"){
+                    if($path == $srcPath) $newPath = $destNode->getPath();
+                    else $newPath = preg_replace("#^".preg_quote($srcPath, "#")."#", $destNode->getPath(), $path);
+                    $metadata[$newPath] = $data;
+                }
+                unset($metadata[$path]);
+                $changes = true;
+            }
+        }
+        if($changes){
+            // Should update $metadata now.
+            @file_put_contents($metaFile, serialize($metadata));
+        }
+        */
+    }
+
     protected function upgradeDataFromMetaSerial($data)
     {
         $new = array();

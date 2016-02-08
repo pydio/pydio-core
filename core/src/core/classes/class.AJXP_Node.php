@@ -322,6 +322,15 @@ class AJXP_Node
 
     }
 
+    public function collectRepositoryMetadatasInChildren($nameSpace, $userScope){
+        $result = array();
+        $metaStore = $this->getMetaStore();
+        if($metaStore !== false && method_exists($metaStore, "collectChildrenWithRepositoryMeta")){
+            $result = $metaStore->collectChildrenWithRepositoryMeta($this, $nameSpace, $userScope);
+        }
+        return $result;
+    }
+
     /**
      * @param bool $boolean Leaf or Collection?
      * @return void
