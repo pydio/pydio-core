@@ -136,6 +136,8 @@ class ShareStore {
                 if(!empty($data)){
                     $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
                     $data["SECURITY_MODIFIED"] = false;
+                    // TMP TESTS
+                    // $data["SHARE_ACCESS"] = "public";
                     return $data;
                 }
             }
@@ -288,8 +290,17 @@ class ShareStore {
         return $dbLets;
     }
 
-    public function testUserCanEditShare($userId){
+    /**
+     * @param string $userId Share OWNER user ID / Will be compared to the currently logged user ID
+     * @param array $shareData Share Data
+     * @return bool Wether currently logged user can view/edit this share or not.
+     * @throws Exception
+     */
+    public function testUserCanEditShare($userId, $shareData){
 
+        if(isSet($shareData["SHARE_ACCESS"]) && $shareData["SHARE_ACCESS"] == "public"){
+            return true;
+        }
         if(empty($userId)){
             $mess = ConfService::getMessages();
             throw new Exception($mess["share_center.160"]);
@@ -319,9 +330,9 @@ class ShareStore {
         if ($type == "repository") {
             if(strpos($element, "repo-") === 0) $element = str_replace("repo-", "", $element);
             $repo = ConfService::getRepositoryById($element);
+            $share = $this->loadShare($element);
             if($repo == null) {
                 // Maybe a share has
-                $share = $this->loadShare($element);
                 if(is_array($share) && isSet($share["REPOSITORY"])){
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
                 }
@@ -330,7 +341,7 @@ class ShareStore {
                 }
                 $element = $share["REPOSITORY"];
             }
-            $this->testUserCanEditShare($repo->getOwner());
+            $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             $res = ConfService::deleteRepository($element);
             if ($res == -1) {
                 throw new Exception($mess[427]);
@@ -353,7 +364,7 @@ class ShareStore {
             if ($repo == null) {
                 return false;
             }
-            $this->testUserCanEditShare($repo->getOwner());
+            $this->testUserCanEditShare($repo->getOwner(), $minisiteData);
             $res = ConfService::deleteRepository($repoId);
             if ($res == -1) {
                 throw new Exception($mess[427]);
@@ -374,11 +385,11 @@ class ShareStore {
                 $this->confStorage->simpleStoreClear("share", $element);
             }
         } else if ($type == "user") {
-            $this->testUserCanEditShare($element);
+            $this->testUserCanEditShare($element, array());
             AuthService::deleteUser($element);
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
-            if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"])) {
+            if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {
                 PublicletCounter::delete($element);
                 if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
                     unlink($publicletData["PUBLICLET_PATH"]);
@@ -486,7 +497,7 @@ class ShareStore {
         if ($repo == null) {
             throw new Exception("Cannot find associated share");
         }
-        $this->testUserCanEditShare($repo->getOwner());
+        $this->testUserCanEditShare($repo->getOwner(), $data);
         PublicletCounter::reset($hash);
     }
 

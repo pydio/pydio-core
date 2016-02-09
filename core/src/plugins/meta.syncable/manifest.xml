@@ -36,6 +36,7 @@
    			<serverCallback hookName="node.index" methodName="indexNode"/>
    			<serverCallback hookName="node.index.recursive.start" methodName="clearIndexForNode"/>
             <serverCallback hookName="workspace.after_delete" methodName="clearIndexForWorkspaceId"/>
+            <serverCallback hookName="workspace.share_metasources" methodName="setIndexationRequiredFlag"/>
         </hooks>
     </registry_contributions>
 </meta>

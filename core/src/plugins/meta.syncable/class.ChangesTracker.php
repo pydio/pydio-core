@@ -611,6 +611,15 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         $this->updateNodesIndex($node, null, false);
     }
 
+    /**
+     * @param array $metaSourcesOptions
+     */
+    public function setIndexationRequiredFlag(&$metaSourcesOptions){
+        if(isSet($metaSourcesOptions["meta.syncable"]) && (!isSet($metaSourcesOptions["meta.syncable"]["REPO_SYNCABLE"]) || $metaSourcesOptions["meta.syncable"]["REPO_SYNCABLE"] === true )){
+            $metaSourcesOptions["meta.syncable"]["REQUIRES_INDEXATION"] = true;
+        }
+    }
+
     public function installSQLTables($param)
     {
         $p = AJXP_Utils::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"])?$param["SQL_DRIVER"]:$this->sqlDriver);

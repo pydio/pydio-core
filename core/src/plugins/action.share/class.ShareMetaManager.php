@@ -32,7 +32,7 @@ class ShareMetaManager
     /**
      * @var bool
      */
-    var $META_USER_SCOPE_PRIVATE = true;
+    var $META_USER_SCOPE_PRIVATE = false;
 
     /**
      * ShareMetaManager constructor.
@@ -44,11 +44,13 @@ class ShareMetaManager
 
     /**
      * @param AJXP_Node $node
-     * @param bool $collectForAllUsers
      * @return array mixed
      */
-    public function getNodeMeta($node, $collectForAllUsers = false){
-        return $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, ($collectForAllUsers ? AJXP_METADATA_ALLUSERS : $this->META_USER_SCOPE_PRIVATE), AJXP_METADATA_SCOPE_REPOSITORY, true);
+    public function getNodeMeta($node){
+        $private = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        $shared  = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, false, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        return array_merge_recursive($private, $shared);
+        //return $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, ($collectForAllUsers ? AJXP_METADATA_ALLUSERS : $this->META_USER_SCOPE_PRIVATE), AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 
     /**
@@ -56,6 +58,12 @@ class ShareMetaManager
      * @param array $meta
      */
     public function setNodeMeta($node, $meta){
+        $otherScope = ! $this->META_USER_SCOPE_PRIVATE;
+        $otherScopeMeta = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, $otherScope, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        // The scope has changed. Let's clear the old value
+        if(count($otherScopeMeta)){
+            $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, $otherScope, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        }
         $node->setMetadata(AJXP_SHARED_META_NAMESPACE, $meta, $this->META_USER_SCOPE_PRIVATE, AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 

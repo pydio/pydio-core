@@ -2051,6 +2051,24 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if ($repository->getOption("USE_SESSION_CREDENTIALS")===true) {
             $newOptions["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
         }
+        $customData = array();
+        foreach ($httpVars as $key => $value) {
+            if (substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_") {
+                $customData[substr($key, strlen("PLUGINS_DATA_"))] = $value;
+            }
+        }
+        if (count($customData)) {
+            $newOptions["PLUGINS_DATA"] = $customData;
+        }
+        if ($repository->getOption("META_SOURCES")) {
+            $newOptions["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            foreach ($newOptions["META_SOURCES"] as $index => &$data) {
+                if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
+                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+                }
+            }
+            AJXP_Controller::applyHook("workspace.share_metasources", array(&$newOptions["META_SOURCES"]));
+        }
         return $newOptions;
     }
 
