@@ -1004,8 +1004,13 @@ class ShareCenter extends AJXP_Plugin
         if(isSet($httpVars["repository_id"]) && isSet($httpVars["guest_user_id"])){
 
             $existingData = $this->getShareStore()->loadShare($httpVars["hash"]);
+            if($existingData === false){
+                throw new Exception("Oups, something went wrong: cannot find corresponding share!");
+            }
             $repo = ConfService::getRepositoryById($existingData["REPOSITORY"]);
-            if($repo == null) throw new Exception("Oups, something went wrong");
+            if($repo == null) {
+                throw new Exception("Oups, something went wrong: cannot find shared repository!");
+            }
             $this->getShareStore()->testUserCanEditShare($repo->getOwner(), $existingData);
 
             $existingU = "";

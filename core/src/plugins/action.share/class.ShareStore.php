@@ -292,13 +292,13 @@ class ShareStore {
 
     /**
      * @param string $userId Share OWNER user ID / Will be compared to the currently logged user ID
-     * @param array $shareData Share Data
+     * @param array|null $shareData Share Data
      * @return bool Wether currently logged user can view/edit this share or not.
      * @throws Exception
      */
     public function testUserCanEditShare($userId, $shareData){
 
-        if(isSet($shareData["SHARE_ACCESS"]) && $shareData["SHARE_ACCESS"] == "public"){
+        if($shareData !== null && isSet($shareData["SHARE_ACCESS"]) && $shareData["SHARE_ACCESS"] == "public"){
             return true;
         }
         if(empty($userId)){

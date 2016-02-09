@@ -35,14 +35,14 @@ class ShareRightsManager
      */
     var $tmpUsersPrefix;
     /**
-     * @var bool|MetaWatchRegister
+     * @var MetaWatchRegister|bool
      */
     var $watcher;
 
     /**
      * ShareRightsManager constructor.
      * @param string $tmpUsersPrefix
-     * @param bool $watcher
+     * @param MetaWatchRegister|bool $watcher
      */
     public function __construct($tmpUsersPrefix = "", $watcher = false)
     {
@@ -162,7 +162,7 @@ class ShareRightsManager
     public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $watcherNode = null)
     {
         $roles = AuthService::getRolesForRepository($repoId);
-        $sharedEntries = $sharedGroups = $sharedRoles = array();
+        $sharedEntries = $sharedGroups = array();
         $mess = ConfService::getMessages();
         foreach($roles as $rId){
             $role = AuthService::getRole($rId);
@@ -271,7 +271,7 @@ class ShareRightsManager
                     $userObject->personalRole->setAcl($repoId, "");
                     $userObject->save("superuser");
                 }
-                if($this->watcher !== false){
+                if($this->watcher !== false && $watcherNode !== null){
                     $this->watcher->removeWatchFromFolder(
                         $watcherNode,
                         $user,
@@ -330,7 +330,6 @@ class ShareRightsManager
         $userObject->setGroupPath($parentUser->getGroupPath());
         $userObject->setProfile("shared");
         if($isHidden){
-            $mess = ConfService::getMessages();
             $userObject->setHidden(true);
             $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $display);
         }

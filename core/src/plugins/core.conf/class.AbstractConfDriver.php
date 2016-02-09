@@ -445,7 +445,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param string $repositoryId
      * @param string $rolePrefix
      * @param bool $countOnly
-     * @return AJXP_Role[]
+     * @return array An array of role ids
      */
     abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false);
     /**
@@ -453,7 +453,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param string $repositoryId
      * @param boolean $details
      * @param boolean $admin
-     * @return Integer|Array
+     * @return Integer|array
      */
     abstract public function countUsersForRepository($repositoryId, $details = false, $admin = false);
 
