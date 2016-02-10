@@ -66,8 +66,8 @@ class ShareRightsManager
         $httpVars["right_read_0"] = (isSet($httpVars["simple_right_read"]) ? "true" : "false");
         $httpVars["right_write_0"] = (isSet($httpVars["simple_right_write"]) ? "true" : "false");
         $httpVars["right_watch_0"] = "false";
-        $httpVars["disable_download"] = (isSet($httpVars["simple_right_download"]) ? false : true);
-        if ($httpVars["right_read_0"] == "false" && !$httpVars["disable_download"]) {
+        $disableDownload = (isSet($httpVars["simple_right_download"]) ? false : true);
+        if ($httpVars["right_read_0"] == "false" && !$disableDownload) {
             $httpVars["right_read_0"] = "true";
         }
         if ($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false") {
