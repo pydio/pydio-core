@@ -22,6 +22,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once("class.PublicletCounter.php");
+require_once("class.ShareLink.php");
 
 class ShareStore {
 
@@ -46,6 +47,9 @@ class ShareStore {
         }
     }
 
+    /**
+     * @return ShareMetaManager
+     */
     public function getMetaManager(){
         if(!isSet($this->shareMetaManager)){
             require_once("class.ShareMetaManager.php");
@@ -54,6 +58,10 @@ class ShareStore {
         return $this->shareMetaManager;
     }
 
+    /**
+     * Create a share.php file in the download folder.
+     * @throws Exception
+     */
     private function createGenericLoader(){
         if(!is_file($this->downloadFolder."/share.php")){
             $loader_content = '<'.'?'.'php
@@ -126,6 +134,39 @@ class ShareStore {
 
     }
 
+    /**
+     * Initialize an empty ShareLink object.
+     * @return ShareLink
+     */
+    public function createEmptyShareObject(){
+        $shareObject = new ShareLink($this);
+        if(AuthService::usersEnabled()){
+            $shareObject->setOwnerId(AuthService::getLoggedUser()->getId());
+        }
+        return $shareObject;
+    }
+
+    /**
+     * Initialize a ShareLink from persisted data.
+     * @param string $hash
+     * @return ShareLink
+     * @throws Exception
+     */
+    public function loadShareObject($hash){
+        $data = $this->loadShare($hash);
+        if($data === false){
+            throw new Exception("Cannot find share with hash ".$hash);
+        }
+        $shareObject = new ShareLink($this, $data);
+        $shareObject->setHash($hash);
+        return $shareObject;
+    }
+
+    /**
+     * Load data persisted on DB or on publiclet files.
+     * @param $hash
+     * @return array|bool|mixed
+     */
     public function loadShare($hash){
 
         $dlFolder = $this->downloadFolder;
@@ -178,12 +219,25 @@ class ShareStore {
 
     }
 
+    /**
+     * Test if hash.php is a real file.
+     * @param string $hash
+     * @return bool
+     */
     public function shareIsLegacy($hash){
         $dlFolder = $this->downloadFolder;
         $file = $dlFolder."/".$hash.".php";
         return is_file($file);
     }
 
+    /**
+     * Update a single share property
+     * @param string $hash
+     * @param string $pName
+     * @param string $pValue
+     * @return bool
+     * @throws Exception
+     */
     public function updateShareProperty($hash, $pName, $pValue){
         if(!$this->sqlSupported) return false;
         $relatedObjectId = $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
@@ -195,11 +249,20 @@ class ShareStore {
         return false;
     }
 
+    /**
+     * List shares based on child repository ID;
+     * @param $repositoryId
+     * @return array
+     */
     public function findSharesForRepo($repositoryId){
         if(!$this->sqlSupported) return array();
         return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
 
+    /**
+     * Update share type from legacy values to new ones.
+     * @param $shareData
+     */
     protected function updateShareType(&$shareData){
         if ( isSet($shareData["SHARE_TYPE"]) && $shareData["SHARE_TYPE"] == "publiclet" ) {
             $shareData["SHARE_TYPE"] = "file";
@@ -210,6 +273,14 @@ class ShareStore {
         }
     }
 
+    /**
+     * List all shares persisted in DB and on file.
+     * @param string $limitToUser
+     * @param string $parentRepository
+     * @param null $cursor
+     * @param null $shareType
+     * @return array
+     */
     public function listShares($limitToUser = '', $parentRepository = '', $cursor = null, $shareType = null){
 
         $dbLets = array();
@@ -477,19 +548,34 @@ class ShareStore {
                 $this->confStorage->simpleStoreGet("share", $element, "serial", $data);
                 if(is_array($data)) return true;
             }
-            return false;
         }
+        return false;
     }
 
 
+    /**
+     * Get download counter
+     * @param string $hash
+     * @return int
+     */
     public function getCurrentDownloadCounter($hash){
         return PublicletCounter::getCount($hash);
     }
 
+    /**
+     * Add a unit to the current download counter value.
+     * @param $hash
+     */
     public function incrementDownloadCounter($hash){
         PublicletCounter::increment($hash);
     }
 
+    /**
+     * Set the counter value to 0.
+     * @param string $hash
+     * @param string $userId
+     * @throws Exception
+     */
     public function resetDownloadCounter($hash, $userId){
         $data = $this->loadShare($hash);
         $repoId = $data["REPOSITORY"];
@@ -501,11 +587,22 @@ class ShareStore {
         PublicletCounter::reset($hash);
     }
 
+    /**
+     * Check if share is expired
+     * @param string $hash
+     * @param array $data
+     * @return bool
+     */
     public function isShareExpired($hash, $data){
         return ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
         ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= $this->getCurrentDownloadCounter($hash));
     }
 
+    /**
+     * Find all expired shares and remove them.
+     * @param bool|true $currentUser
+     * @return array
+     */
     public function clearExpiredFiles($currentUser = true)
     {
         if($currentUser){
@@ -539,6 +636,12 @@ class ShareStore {
         return $deleted;
     }
 
+    /**
+     * Find all expired legacy publiclets and remove them.
+     * @param $elementId
+     * @param $data
+     * @throws Exception
+     */
     private function deleteExpiredPubliclet($elementId, $data){
 
         if(AuthService::getLoggedUser() == null ||  AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){

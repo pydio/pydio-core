@@ -246,4 +246,58 @@ class LegacyPubliclet
         return array($hash, $url);
     }
 
+    /**
+     * @param string $shareId
+     * @param ShareStore $shareStore
+     * @param PublicAccessManager $publicAccessManager
+     * @param MetaWatchRegister|null $watcher
+     * @return array|false
+     * @throws Exception
+     */
+    public static function publicletToJson($shareId, $shareMeta, $shareStore, $publicAccessManager, $watcher, $node){
+
+        $messages = ConfService::getMessages();
+        $elementWatch = false;
+
+        $pData = $shareStore->loadShare($shareId);
+        if (!count($pData)) {
+            return false;
+        }
+        foreach($shareStore->modifiableShareKeys as $key){
+            if(isSet($pData[$key])) $shareMeta[$key] = $pData[$key];
+        }
+        if ($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId() && !AuthService::getLoggedUser()->isAdmin()) {
+            throw new Exception($messages["share_center.48"]);
+        }
+        if (isSet($shareMeta["short_form_url"])) {
+            $link = $shareMeta["short_form_url"];
+        } else {
+            $link = $publicAccessManager->buildPublicLink($shareId);
+        }
+        if ($watcher != false && $node != null) {
+            $result = array();
+            $elementWatch = $watcher->hasWatchOnNode(
+                $node,
+                AuthService::getLoggedUser()->getId(),
+                MetaWatchRegister::$META_WATCH_USERS_NAMESPACE,
+                $result
+            );
+            if ($elementWatch && !in_array($shareId, $result)) {
+                $elementWatch = false;
+            }
+        }
+        $jsonData = array_merge(array(
+            "element_id"       => $shareId,
+            "publiclet_link"   => $link,
+            "download_counter" => $shareStore->getCurrentDownloadCounter($shareId),
+            "download_limit"   => $pData["DOWNLOAD_LIMIT"],
+            "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
+            "has_password"     => (!empty($pData["PASSWORD"])),
+            "element_watch"    => $elementWatch,
+            "is_expired"       => $shareStore->isShareExpired($shareId, $pData)
+        ), $shareMeta);
+
+        return $jsonData;
+    }
+
 }

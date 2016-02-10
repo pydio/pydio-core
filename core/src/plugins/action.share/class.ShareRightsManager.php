@@ -54,25 +54,28 @@ class ShareRightsManager
      * @param array $httpVars
      * @param string $userId
      * @param string|null $userPass
-     * @throws Exception
+     * @param bool|false $update
+     * @return array
      */
-    public function makeUniqueUserParameters(&$httpVars, $userId, $userPass = null){
+    public function createHiddenUserEntry($httpVars, $userId, $userPass = null, $update = false){
 
-        if(isSet($userPass)) {
-            $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
+        $entry = array("ID" => $userId, "TYPE" => "user", "HIDDEN" => true);
+        $read = isSet($httpVars["simple_right_read"]) ;
+        $write = isSet($httpVars["simple_right_write"]);
+        $disableDownload = !isSet($httpVars["simple_right_download"]);
+        if (!$read && !$disableDownload) {
+            $read = true;
         }
-        $httpVars["user_0"] = $userId;
-        $httpVars["entry_type_0"] = "user";
-        $httpVars["right_read_0"] = (isSet($httpVars["simple_right_read"]) ? "true" : "false");
-        $httpVars["right_write_0"] = (isSet($httpVars["simple_right_write"]) ? "true" : "false");
-        $httpVars["right_watch_0"] = "false";
-        $disableDownload = (isSet($httpVars["simple_right_download"]) ? false : true);
-        if ($httpVars["right_read_0"] == "false" && !$disableDownload) {
-            $httpVars["right_read_0"] = "true";
+        $entry["RIGHT"] = ($read?"r":"").($write?"w":"");
+        $entry["WATCH"] = false;
+        if(isSet($userPass)){
+            if($update){
+                $entry["UPDATE_PASSWORD"] = $userPass;
+            }else{
+                $entry["PASSWORD"] = $userPass;
+            }
         }
-        if ($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false") {
-            throw new Exception("Insufficient rights");
-        }
+        return $entry;
 
     }
 
@@ -85,6 +88,10 @@ class ShareRightsManager
     public function createUsersFromParameters($httpVars, &$users = array(), &$groups = array()){
 
         $index = 0;
+        $allowCrossUserSharing = ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf");
+        $allowSharedUsersCreation = ConfService::getCoreConf("USER_CREATE_USERS", "conf");
+        $loggedUser = AuthService::getLoggedUser();
+        $confDriver = ConfService::getConfStorageImpl();
 
         while (isSet($httpVars[PARAM_USER_LOGIN_PREFIX.$index])) {
 
@@ -102,14 +109,25 @@ class ShareRightsManager
             if ($eType == "user") {
 
                 $u = AJXP_Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index], AJXP_SANITIZE_EMAILCHARS);
-                if (!AuthService::userExists($u) && !isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
+                $userExistsRead = AuthService::userExists($u);
+                if (!$userExistsRead && !isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     $index++;
                     continue;
                 } else if (AuthService::userExists($u, "w") && isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     throw new Exception("User $u already exists, please choose another name.");
                 }
-                if(!AuthService::userExists($u, "r") && !empty($this->tmpUsersPrefix) && strpos($u, $this->tmpUsersPrefix)!==0 ){
-                    $u = $this->tmpUsersPrefix . $u;
+                if($userExistsRead){
+                    $userObject = $confDriver->createUserObject($u);
+                    if ( $allowCrossUserSharing != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId() ) ) {
+                        throw new Exception("You are not allowed to share with other users, except your internal users.");
+                    }
+                }else{
+                    if(!$allowSharedUsersCreation || AuthService::isReservedUserId($u)){
+                        throw new Exception("You are not allowed to create users.");
+                    }
+                    if(!empty($this->tmpUsersPrefix) && strpos($u, $this->tmpUsersPrefix)!==0 ){
+                        $u = $this->tmpUsersPrefix . $u;
+                    }
                 }
                 $entry = array("ID" => $u, "TYPE" => "user");
 
@@ -119,7 +137,6 @@ class ShareRightsManager
 
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
-                    $confDriver = ConfService::getConfStorageImpl();
                     if (method_exists($confDriver, "teamIdToUsers")) {
                         $teamUsers = $confDriver->teamIdToUsers(str_replace("/AJXP_TEAM/", "", $u));
                         foreach ($teamUsers as $userId) {
@@ -298,12 +315,12 @@ class ShareRightsManager
      * @param AbstractAjxpUser $parentUser
      * @param string $userName
      * @param string $password
-     * @param string $display
      * @param bool $isHidden
+     * @param string $display
      * @return AbstractAjxpUser
      * @throws Exception
      */
-    public function createNewUser($parentUser, $userName, $password, $display, $isHidden){
+    public function createNewUser($parentUser, $userName, $password, $isHidden, $display){
 
         $confDriver = ConfService::getConfStorageImpl();
         if (ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
@@ -401,7 +418,6 @@ class ShareRightsManager
             $newRole->bunchUpdate($newData);
             AuthService::updateRole($newRole);
             return $newRole;
-//            $userObject->addRole($newRole);
         }
         return null;
     }

@@ -50,7 +50,6 @@ class ShareMetaManager
         $private = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         $shared  = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, false, AJXP_METADATA_SCOPE_REPOSITORY, true);
         return array_merge_recursive($private, $shared);
-        //return $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, ($collectForAllUsers ? AJXP_METADATA_ALLUSERS : $this->META_USER_SCOPE_PRIVATE), AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 
     /**
@@ -143,6 +142,10 @@ class ShareMetaManager
             $shares = array();
             $update = false;
             foreach($meta["shares"] as $hashOrRepoId => $shareData){
+                $type = $shareData["type"];
+                if(is_array($type)) {
+                    $shareData["type"] = $type[0];
+                }
                 if(!$updateIfNotExists || $this->shareStore->shareExists($shareData["type"],$hashOrRepoId)){
                     $shares[$hashOrRepoId] = $shareData;
                 }else{

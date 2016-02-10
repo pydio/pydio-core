@@ -266,6 +266,29 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
+    /**
+     * @param $label
+     * @param Repository|null $editingRepo
+     * @return bool
+     */
+    protected function checkRepoWithSameLabel($label, $editingRepo = null){
+        if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository) == true) {
+            $count = 0;
+            $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
+            if($count && !isSet($editingRepo)){
+                return true;
+            }
+            if($count && isSet($editingRepo)){
+                foreach($similarLabelRepos as $slr){
+                    if($slr->getUniqueId() != $editingRepo->getUniqueId()){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /**************************/
     /* CALLBACKS FOR ACTIONS
     /**************************/
@@ -671,7 +694,7 @@ class ShareCenter extends AJXP_Plugin
     {
         if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
         $shares = array();
-        $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, true);
+        $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
         if(!empty($shares) && count($shares)){
             $merge = array(
                 "ajxp_shared"      => "true",
@@ -743,6 +766,7 @@ class ShareCenter extends AJXP_Plugin
             }
             return;
         }
+
     }
 
     /**
@@ -935,12 +959,22 @@ class ShareCenter extends AJXP_Plugin
     /**************************/
     /* BOOTLOADERS FOR LINKS
     /**************************/
+    /**
+     * Loader for minisites
+     * @param array $data
+     * @param string $hash
+     * @param null $error
+     */
     public static function loadMinisite($data, $hash = '', $error = null)
     {
         include_once("class.MinisiteRenderer.php");
         MinisiteRenderer::loadMinisite($data, $hash, $error);
     }
 
+    /**
+     * Loader used by the generic loader.
+     * @param string $hash
+     */
     public static function loadShareByHash($hash){
         AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
         AJXP_PluginsService::getInstance()->initActivePlugins();
@@ -972,6 +1006,7 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
+     * Loader for legacy publiclets
      * @static
      * @param array $data
      * @return void
@@ -991,107 +1026,16 @@ class ShareCenter extends AJXP_Plugin
     /**************************/
 
     /**
-     * @param $httpVars
-     * @param Repository $repository
-     * @param AbstractAccessDriver $accessDriver
-     * @return mixed An array containing the hash (0) and the generated url (1)
+     * @param array $httpVars
+     * @param UserSelection $userSelection
+     * @return int
      * @throws Exception
      */
-    public function createSharedMinisite($httpVars, $repository, $accessDriver)
-    {
-        // PREPARE HIDDEN USER DATA
-        $userPass = null;
-        $data = array();
-        $keepPresetLogin = false;
-        if(isSet($httpVars["repository_id"])){
-
-            // THIS IS AN EXISTING SHARE
-            // FIND SHARE AND EXISTING HIDDEN USER ID
-            $data = $this->getShareStore()->loadShare($httpVars["hash"]);
-            if($data === false){
-                throw new Exception("Oups, something went wrong: cannot find corresponding share!");
-            }
-            $existingRepo = ConfService::getRepositoryById($data["REPOSITORY"]);
-            if($existingRepo == null) {
-                throw new Exception("Oups, something went wrong: cannot find shared repository!");
-            }
-            $this->getShareStore()->testUserCanEditShare($existingRepo->getOwner(), $data);
-
-            if(isSet($data["PRELOG_USER"])) {
-                $uniqueUser = $data["PRELOG_USER"];
-                unset($data["PRELOG_USER"]);
-            } else {
-                $uniqueUser = $data["PRESET_LOGIN"];
-                unset($data["PRESET_LOGIN"]);
-            }
-
-            if(isset($httpVars["guest_user_pass"]) && strlen($httpVars["guest_user_pass"])){
-
-                AuthService::updatePassword($uniqueUser, $httpVars["guest_user_pass"]);
-
-            }else if(isSet($data["PRESET_LOGIN"]) && !(isSet($httpVars["guest_user_pass"]) && $httpVars["guest_user_pass"] == "")){
-
-                $keepPresetLogin = true;
-
-            }
-
-        }else /*if (isSet($httpVars["create_guest_user"]))*/ {
-
-            // GENERATE AN ID FOR HIDDEN USER
-            $userId = substr(md5(time()), 0, 12);
-            $pref = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository);
-            if (!empty($pref)) {
-                $userId = $pref.$userId;
-            }
-            if(!empty($httpVars["guest_user_pass"])){
-                $userPass = $httpVars["guest_user_pass"];
-            }else{
-                $userPass = substr(md5(time()), 13, 24);
-            }
-            $uniqueUser = $userId;
-
-        }
-
-        if(empty($httpVars["guest_user_pass"]) && !$keepPresetLogin){
-            $data["PRELOG_USER"] = $uniqueUser;
-        }else{
-            $data["PRESET_LOGIN"] = $uniqueUser;
-        }
-
-        $data["DOWNLOAD_DISABLED"] = $disableDownload = (isSet($httpVars["simple_right_download"]) ? false : true);
-        $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
-        if(isSet($httpVars["minisite_layout"])){
-            $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
-        }
-        if(isSet($httpVars["expiration"])){
-            if(intval($httpVars["expiration"]) > 0){
-                $data["EXPIRE_TIME"] = time() + intval($httpVars["expiration"]) * 86400;
-            }else if(isSet($data["EXPIRE_TIME"])) {
-                unset($data["EXPIRE_TIME"]);
-            }
-        }
-        if(isSet($httpVars["downloadlimit"])){
-            if(intval($httpVars["downloadlimit"]) > 0){
-                $data["DOWNLOAD_LIMIT"] = intval($httpVars["downloadlimit"]);
-            }else if(isSet($data["DOWNLOAD_LIMIT"])){
-                unset($data["DOWNLOAD_LIMIT"]);
-            }
-        }
-        if(AuthService::usersEnabled()){
-            $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
-        }
-
-        try{
-            $this->getRightsManager()->makeUniqueUserParameters($httpVars, $uniqueUser, $userPass);
-        }catch(Exception $e){
-            return "share_center.58";
-        }
-
+    public function filterHttpVarsForMinisitePath(&$httpVars, $userSelection){
         // ANALYSE SELECTION
         // TO CREATE PROPER FILTER / PATH FOR SHARED REPO
         $httpVars["minisite"] = true;
         $httpVars["selection"] = true;
-        $userSelection = new UserSelection($repository, $httpVars);
         $setFilter = false;
         if($userSelection->isUnique()){
             $node = $userSelection->getUniqueNode();
@@ -1112,7 +1056,7 @@ class ShareCenter extends AJXP_Plugin
             else $hasDir = true;
         }
         if( ( $hasDir && !$this->getAuthorization("folder", "minisite") ) || ($hasFile && !$this->getAuthorization("file"))){
-            return 103;
+            throw new Exception(103);
         }
         if($setFilter){ // Either it's a file, or many nodes are shared
             $httpVars["filter_nodes"] = $nodes;
@@ -1122,51 +1066,76 @@ class ShareCenter extends AJXP_Plugin
             $httpVars["repo_label"] = SystemTextEncoding::toUTF8($first->getLabel());
         }
 
-        // ANALYSE IF CUSTOM HANDLE NEEDS AN UPDATE
-        $newCustomHandle = null;
-        if(isSet($httpVars["custom_handle"]) && !empty($httpVars["custom_handle"]) && (!isSet($httpVars["hash"]) || $httpVars["custom_handle"] != $httpVars["hash"])){
-            // Existing already
-            $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
-            $value = strtolower($value);
-            $test = $this->getShareStore()->loadShare($value);
-            $mess = ConfService::getMessages();
-            if(!empty($test)) {
-                throw new Exception($mess["share_center.172"]);
+    }
+
+    /**
+     * @param $httpVars
+     * @param Repository $repository
+     * @param AbstractAccessDriver $accessDriver
+     * @return mixed An array containing the hash (0) and the generated url (1)
+     * @throws Exception
+     */
+    public function createSharedMinisite($httpVars, $repository, $accessDriver)
+    {
+        // PREPARE HIDDEN USER DATA
+        $userPass = null;
+        $data = array();
+        if(isSet($httpVars["repository_id"])){
+
+            // THIS IS AN EXISTING SHARE
+            // FIND SHARE AND EXISTING HIDDEN USER ID
+            $update = true;
+            $shareObject = $this->getShareStore()->loadShareObject($httpVars["hash"]);
+            $existingRepo = $shareObject->getRepository();
+            $this->getShareStore()->testUserCanEditShare($existingRepo->getOwner(), $existingRepo->options);
+            $uniqueUser = $shareObject->getUniqueUser();
+
+            if(isset($httpVars["guest_user_pass"]) && strlen($httpVars["guest_user_pass"])) {
+                $userPass = $httpVars["guest_user_pass"];
+                $shareObject->setUniqueUser($uniqueUser, true);
+            }else if(!$shareObject->shouldRequirePassword() || (isSet($httpVars["guest_user_pass"]) && $httpVars["guest_user_pass"] == "")){
+                $shareObject->setUniqueUser($uniqueUser, false);
             }
-            $newCustomHandle = $value;
+
+        } else {
+
+            $update = false;
+            $shareObject = $this->getShareStore()->createEmptyShareObject();
+            $shareObject->createHiddenUserId(
+                $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository),
+                !empty($httpVars["guest_user_pass"])
+            );
+            if(!empty($httpVars["guest_user_pass"])){
+                $userPass = $httpVars["guest_user_pass"];
+            }else{
+                $userPass = $shareObject->createHiddenUserPassword();
+            }
+            $uniqueUser = $shareObject->getUniqueUser();
         }
 
-        $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver);
+        $shareObject->parseHttpVars($httpVars);
+        $userSelection = new UserSelection($repository, $httpVars);
+        $this->filterHttpVarsForMinisitePath($httpVars, $userSelection);
+
+        $hiddenUserEntry = $this->getRightsManager()->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
+        if(empty($hiddenUserEntry["RIGHT"])){
+            throw new Exception("share_center.58");
+        }
+        $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $hiddenUserEntry, $shareObject->disableDownload());
         if(!is_a($newRepo, "Repository")) {
-            // ERROR
-            return $newRepo;
+            throw new Exception($newRepo);
         }
-        if(!isset($existingRepo)){
-            $data["REPOSITORY"] = $newRepo->getId();
-        }
+
+        $shareObject->setParentRepositoryId($repository->getId());
+        $shareObject->attachToRepository($newRepo->getId());
 
         // STORE DATA & HASH IN SHARE STORE
         $this->getPublicAccessManager()->initFolder();
-        if(!isSet($existingRepo)){
-            try{
-                $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $newCustomHandle);
-            }catch(Exception $e){
-                return $e->getMessage();
-            }
-            $edit = false;
-        }else{
-            try{
-                $hash = $httpVars["hash"];
-                $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash, $newCustomHandle);
-            }catch(Exception $e){
-                return $e->getMessage();
-            }
-            $edit = true;
-        }
+        $hash = $shareObject->save();
 
         // LOG AND PUBLISH EVENT
         $url = $this->getPublicAccessManager()->buildPublicLink($hash);
-        $this->logInfo(($edit?"Update":"New")." Share", array(
+        $this->logInfo(($update?"Update":"New")." Share", array(
             "file" => "'".$userSelection->getUniqueFile()."'",
             "files" => $userSelection->getFiles(),
             "url" => $url,
@@ -1174,7 +1143,7 @@ class ShareCenter extends AJXP_Plugin
             "limit" => $data['DOWNLOAD_LIMIT'],
             "repo_uuid" => $repository->uuid
         ));
-        AJXP_Controller::applyHook("node.share.".($edit?"update":"create"), array(
+        AJXP_Controller::applyHook("node.share.".($update?"update":"create"), array(
             'type' => 'minisite',
             'repository' => &$repository,
             'accessDriver' => &$accessDriver,
@@ -1190,11 +1159,12 @@ class ShareCenter extends AJXP_Plugin
      * @param array $httpVars
      * @param Repository $repository
      * @param AbstractAccessDriver $accessDriver
+     * @param array|null $hiddenUserEntry
      * @param bool $disableDownload
      * @return int|Repository
      * @throws Exception
      */
-    public function createSharedRepository($httpVars, $repository, $accessDriver, $disableDownload = false)
+    public function createSharedRepository($httpVars, $repository, $accessDriver, $hiddenUserEntry = null, $disableDownload = false)
     {
         // ERRORS
         // 100 : missing args
@@ -1218,44 +1188,25 @@ class ShareCenter extends AJXP_Plugin
             $editingRepo = ConfService::getRepositoryById($httpVars["repository_id"]);
         }
 
-        // CHECK USER & REPO DOES NOT ALREADY EXISTS
+        // CHECK REPO DOES NOT ALREADY EXISTS WITH SAME LABEL
         $label = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["repo_label"]), AJXP_SANITIZE_HTML);
         $description = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["repo_description"]), AJXP_SANITIZE_HTML);
-        if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository) == true) {
-            $count = 0;
-            $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
-            if($count && !isSet($editingRepo)){
-                return 101;
-            }
-            if($count && isSet($editingRepo)){
-                foreach($similarLabelRepos as $slr){
-                    if($slr->getUniqueId() != $editingRepo->getUniqueId()){
-                        return 101;
-                    }
-                }
-            }
+        $exists = $this->checkRepoWithSameLabel($label, isSet($editingRepo)?$editingRepo:null);
+        if($exists){
+            return 101;
         }
 
+        $confDriver = ConfService::getConfStorageImpl();
         $users = array();
         $groups = array();
-        $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
-
-        $confDriver = ConfService::getConfStorageImpl();
-        foreach ($users as $userName => $userEntry) {
-            if (AuthService::userExists($userName)) {
-                // check that it's a child user
-                $userObject = $confDriver->createUserObject($userName);
-                if ( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ) {
-                    return 102;
-                }
-            } else {
-                if ( ($httpVars["create_guest_user"] != "true" && !ConfService::getCoreConf("USER_CREATE_USERS", "conf")) || AuthService::isReservedUserId($userName)) {
-                    return 102;
-                }
-                if (!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") {
-                    return 100;
-                }
-            }
+        try{
+            $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
+        }catch(Exception $e){
+            return $e->getMessage();
+            // return 102 ?
+        }
+        if(isSet($hiddenUserEntry)){
+            $users[$hiddenUserEntry["ID"]] = $hiddenUserEntry;
         }
 
         $selection = new UserSelection($this->repository, $httpVars);
@@ -1322,10 +1273,13 @@ class ShareCenter extends AJXP_Plugin
 
             if (AuthService::userExists($userName, "r")) {
                 $userObject = $confDriver->createUserObject($userName);
+                if(isSet($userEntry["HIDDEN"]) && isSet($userEntry["UPDATE_PASSWORD"])){
+                    AuthService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
+                }
             } else {
                 $mess = ConfService::getMessages();
-                $userLabel = "[".$mess["share_center.109"]."] ". AJXP_Utils::sanitize($newRepo->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
-                $userObject = $this->getRightsManager()->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], $userLabel, isset($httpVars["minisite"]));
+                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". AJXP_Utils::sanitize($newRepo->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
+                $userObject = $this->getRightsManager()->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], isset($userEntry["HIDDEN"]), $hiddenUserLabel);
             }
 
             // ASSIGN NEW REPO RIGHTS
@@ -1338,7 +1292,7 @@ class ShareCenter extends AJXP_Plugin
             }
 
             // CREATE A DEDICATED ROLE FOR THIS MINISITE
-            if (isSet($httpVars["minisite"])) {
+            if (isSet($userEntry["HIDDEN"])) {
                 $minisiteRole = $this->getRightsManager()->createRoleForMinisite($newRepoUniqueId, $disableDownload, isset($editingRepo));
                 if($minisiteRole != null){
                     $userObject->addRole($minisiteRole);
@@ -1536,66 +1490,37 @@ class ShareCenter extends AJXP_Plugin
 
     /**
      * @param String $shareId
-     * @param array $shareData
+     * @param array $shareMeta
      * @param AJXP_Node $node
      * @throws Exception
      * @return array|bool
      */
-    public function shareToJson($shareId, $shareData, $node = null){
+    public function shareToJson($shareId, $shareMeta, $node = null){
 
         $messages = ConfService::getMessages();
         $jsonData = array();
         $elementWatch = false;
-        if($shareData["type"] == "file"){
+        if($shareMeta["type"] == "file"){
 
-            $pData = $this->getShareStore()->loadShare($shareId);
-            if (!count($pData)) {
-                return false;
-            }
-            foreach($this->getShareStore()->modifiableShareKeys as $key){
-                if(isSet($pData[$key])) $shareData[$key] = $pData[$key];
-            }
-            if ($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId() && !AuthService::getLoggedUser()->isAdmin()) {
-                throw new Exception($messages["share_center.48"]);
-            }
-            if (isSet($shareData["short_form_url"])) {
-                $link = $shareData["short_form_url"];
-            } else {
-                $link = $this->getPublicAccessManager()->buildPublicLink($shareId);
-            }
-            if ($this->watcher != false && $node != null) {
-                $result = array();
-                $elementWatch = $this->watcher->hasWatchOnNode(
-                    $node,
-                    AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_WATCH_USERS_NAMESPACE,
-                    $result
-                );
-                if ($elementWatch && !in_array($shareId, $result)) {
-                    $elementWatch = false;
-                }
-            }
-            $jsonData = array_merge(array(
-                "element_id"       => $shareId,
-                "publiclet_link"   => $link,
-                "download_counter" => $this->getShareStore()->getCurrentDownloadCounter($shareId),
-                "download_limit"   => $pData["DOWNLOAD_LIMIT"],
-                "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
-                "has_password"     => (!empty($pData["PASSWORD"])),
-                "element_watch"    => $elementWatch,
-                "is_expired"       => $this->getShareStore()->isShareExpired($shareId, $pData)
-            ), $shareData);
+            require_once("class.LegacyPubliclet.php");
+            $jsonData = LegacyPubliclet::publicletToJson(
+                $shareId,
+                $shareMeta,
+                $this->getShareStore(),
+                $this->getPublicAccessManager(),
+                $this->watcher,
+                $node
+            );
 
-
-        }else if($shareData["type"] == "minisite" || $shareData["type"] == "repository"){
+        }else if($shareMeta["type"] == "minisite" || $shareMeta["type"] == "repository"){
 
             $repoId = $shareId;
             if(strpos($repoId, "repo-") === 0){
                 // Legacy
                 $repoId = str_replace("repo-", "", $repoId);
-                $shareData["type"] = "repository";
+                $shareMeta["type"] = "repository";
             }
-            $minisite = ($shareData["type"] == "minisite");
+            $minisite = ($shareMeta["type"] == "minisite");
             $minisiteIsPublic = false;
             $dlDisabled = false;
             $minisiteLink = '';
@@ -1604,8 +1529,8 @@ class ShareCenter extends AJXP_Plugin
                 $repoId = $storedData["REPOSITORY"];
                 $minisiteIsPublic = isSet($storedData["PRELOG_USER"]);
                 $dlDisabled = isSet($storedData["DOWNLOAD_DISABLED"]) && $storedData["DOWNLOAD_DISABLED"] === true;
-                if (isSet($shareData["short_form_url"])) {
-                    $minisiteLink = $shareData["short_form_url"];
+                if (isSet($shareMeta["short_form_url"])) {
+                    $minisiteLink = $shareMeta["short_form_url"];
                 } else {
                     $minisiteLink = $this->getPublicAccessManager()->buildPublicLink($shareId);
                 }
@@ -1690,7 +1615,7 @@ class ShareCenter extends AJXP_Plugin
                     "public_link"       => $minisiteLink,
                     "disable_download"  => $dlDisabled,
                     "hash"              => $shareId,
-                    "hash_is_shorten"   => isSet($shareData["short_form_url"])
+                    "hash_is_shorten"   => isSet($shareMeta["short_form_url"])
                 );
                 foreach($this->getShareStore()->modifiableShareKeys as $key){
                     if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
