@@ -264,6 +264,66 @@ class ShareRightsManager
     }
 
     /**
+     * @param Repository $parentRepository
+     * @param Repository $childRepository
+     * @param bool $isUpdate
+     * @param array $users
+     * @param array $groups
+     * @param UserSelection $selection
+     * @param bool|false $disableDownload
+     * @throws Exception
+     */
+    public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection, $disableDownload = false){
+
+        $childRepoId = $childRepository->getId();
+        if($isUpdate){
+            $this->unregisterRemovedUsers($childRepoId, $users, $groups, $selection->getUniqueNode());
+        }
+        $confDriver = ConfService::getConfStorageImpl();
+        $loggedUser = AuthService::getLoggedUser();
+        foreach ($users as $userName => $userEntry) {
+
+            if (AuthService::userExists($userName, "r")) {
+                $userObject = $confDriver->createUserObject($userName);
+                if(isSet($userEntry["HIDDEN"]) && isSet($userEntry["UPDATE_PASSWORD"])){
+                    AuthService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
+                }
+            } else {
+                $mess = ConfService::getMessages();
+                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". AJXP_Utils::sanitize($childRepository->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
+                $userObject = $this->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], isset($userEntry["HIDDEN"]), $hiddenUserLabel);
+            }
+
+            // ASSIGN NEW REPO RIGHTS
+            $userObject->personalRole->setAcl($childRepoId, $userEntry["RIGHT"]);
+
+            // FORK MASK IF THERE IS ANY
+            $childMask = $this->forkMaskIfAny($loggedUser, $parentRepository->getId(), $selection->getUniqueNode());
+            if($childMask != null){
+                $userObject->personalRole->setMask($childRepoId, $childMask);
+            }
+
+            // CREATE A MINISITE-LIKE ROLE FOR THIS REPOSITORY
+            if (isSet($userEntry["HIDDEN"])) {
+                $minisiteRole = $this->createRoleForMinisite($childRepoId, $disableDownload, $isUpdate);
+                if($minisiteRole != null){
+                    $userObject->addRole($minisiteRole);
+                }
+            }
+
+            $userObject->save("superuser");
+        }
+
+        foreach ($groups as $group => $groupEntry) {
+            $r = $groupEntry["RIGHT"];
+            $grRole = AuthService::getRole($group, true);
+            $grRole->setAcl($childRepoId, $r);
+            AuthService::updateRole($grRole);
+        }
+
+    }
+
+    /**
      * @param string $repoId
      * @param array $newUsers
      * @param array $newGroups

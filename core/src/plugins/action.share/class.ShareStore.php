@@ -177,8 +177,6 @@ class ShareStore {
                 if(!empty($data)){
                     $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
                     $data["SECURITY_MODIFIED"] = false;
-                    // TMP TESTS
-                    // $data["SHARE_ACCESS"] = "public";
                     return $data;
                 }
             }
@@ -435,7 +433,7 @@ class ShareStore {
             if ($repo == null) {
                 return false;
             }
-            $this->testUserCanEditShare($repo->getOwner(), $minisiteData);
+            $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             $res = ConfService::deleteRepository($repoId);
             if ($res == -1) {
                 throw new Exception($mess[427]);
@@ -474,15 +472,90 @@ class ShareStore {
     }
 
     /**
+     * @param AJXP_Node $baseNode
+     * @param bool $delete
+     * @param string $oldPath
+     * @param string $newPath
+     * @param string|null $parentRepositoryPath
+     */
+    public function moveSharesFromMetaRecursive($baseNode, $delete = false, $oldPath, $newPath, $parentRepositoryPath = null){
+
+        // Find shares in children
+        try{
+            $result = $this->getMetaManager()->collectSharesIncludingChildren($baseNode);
+        }catch(Exception $e){
+            // Error while loading node, ignore
+            return;
+        }
+        $basePath = $baseNode->getPath();
+        foreach($result as $relativePath => $metadata){
+            if($relativePath == "/") {
+                $relativePath = "";
+            }
+            $changeOldNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$oldPath.$relativePath);
+
+            foreach($metadata as $ownerId => $meta){
+                if(!isSet($meta["shares"])){
+                    continue;
+                }
+                $changeOldNode->setUser($ownerId);
+                /// do something
+                $changeNewNode = null;
+                if(!$delete){
+                    //$newPath = preg_replace('#^'.preg_quote($oldPath, '#').'#', $newPath, $path);
+                    $changeNewNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$newPath.$relativePath);
+                    $changeNewNode->setUser($ownerId);
+                }
+                $collectedRepositories = array();
+                list($privateShares, $publicShares) = $this->moveSharesFromMeta($meta["shares"], $delete?"delete":"move", $changeOldNode, $changeNewNode, $collectedRepositories, $parentRepositoryPath);
+
+                if($basePath == "/"){
+                    // Just update target node!
+                    $changeMetaNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$relativePath);
+                    $changeMetaNode->setUser($ownerId);
+                    $this->getMetaManager()->clearNodeMeta($changeMetaNode);
+                    if(count($privateShares)){
+                        $this->getMetaManager()->setNodeMeta($changeMetaNode, array("shares" => $privateShares), true);
+                    }
+                    if(count($publicShares)){
+                        $this->getMetaManager()->setNodeMeta($changeMetaNode, array("shares" => $privateShares), false);
+                    }
+                }else{
+                    $this->getMetaManager()->clearNodeMeta($changeOldNode);
+                    if(!$delete){
+                        if(count($privateShares)){
+                            $this->getMetaManager()->setNodeMeta($changeNewNode, array("shares" => $privateShares), true);
+                        }
+                        if(count($publicShares)){
+                            $this->getMetaManager()->setNodeMeta($changeNewNode, array("shares" => $privateShares), false);
+                        }
+                    }
+                }
+
+                foreach($collectedRepositories as $sharedRepoId => $parentRepositoryPath){
+                    $this->moveSharesFromMetaRecursive(new AJXP_Node("pydio://".$sharedRepoId."/"), $delete, $changeOldNode->getPath(), $changeNewNode->getPath(), $parentRepositoryPath);
+                }
+
+            }
+        }
+
+
+    }
+
+    /**
      * @param array $shares
      * @param String $operation
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
+     * @param array $collectRepositories
+     * @param string|null $parentRepositoryPath
      * @return array
+     * @throws Exception
      */
-    public function moveSharesFromMeta($shares, $operation="move", $oldNode, $newNode=null){
+    public function moveSharesFromMeta($shares, $operation="move", $oldNode, $newNode=null, &$collectRepositories = array(), $parentRepositoryPath = null){
 
-        $newShares = array();
+        $privateShares = array();
+        $publicShares = array();
         foreach($shares as $id => $data){
             $type = $data["type"];
             if($operation == "delete"){
@@ -504,17 +577,27 @@ class ShareStore {
                 $path = $repo->getOption("PATH", true);
                 $save = false;
                 if(isSet($cFilter)){
-                    $cFilter->movePath($oldNode->getPath(), $newNode->getPath());
-                    $repo->setContentFilter($cFilter);
+                    if($parentRepositoryPath !== null){
+                        $repo->addOption("PATH", $parentRepositoryPath);
+                    }else{
+                        $cFilter->movePath($oldNode->getPath(), $newNode->getPath());
+                        $repo->setContentFilter($cFilter);
+                    }
                     $save = true;
                 }else if(!empty($path)){
-                    $path = str_replace($oldNode->getPath(), $newNode->getPath(), $path);
+                    $path = preg_replace("#".preg_quote($oldNode->getPath(), "#")."$#", $newNode->getPath(), $path);
                     $repo->addOption("PATH", $path);
                     $save = true;
+                    $collectRepositories[$repo->getId()] = $path;
                 }
                 if($save){
                     ConfService::getConfStorageImpl()->saveRepository($repo, true);
-                    $newShares[$id] = $data;
+                }
+                $access = $repo->getOption("SHARE_ACCESS");
+                if(!empty($access) && $access == "PUBLIC"){
+                    $publicShares[$id] = $data;
+                }else{
+                    $privateShares[$id] = $data;
                 }
 
             } else {
@@ -523,11 +606,11 @@ class ShareStore {
                     $publicLink["FILE_PATH"] = str_replace($oldNode->getPath(), $newNode->getPath(), $publicLink["FILE_PATH"]);
                     $this->deleteShare("file", $id);
                     $this->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
-                    $newShares[$id] = $data;
+                    $privateShares[$id] = $data;
                 }
             }
         }
-        return $newShares;
+        return array($privateShares, $publicShares);
     }
 
     /**
@@ -583,7 +666,7 @@ class ShareStore {
         if ($repo == null) {
             throw new Exception("Cannot find associated share");
         }
-        $this->testUserCanEditShare($repo->getOwner(), $data);
+        $this->testUserCanEditShare($repo->getOwner(), $repo->options);
         PublicletCounter::reset($hash);
     }
 

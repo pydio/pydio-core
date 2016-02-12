@@ -30,11 +30,6 @@ class ShareMetaManager
     var $shareStore;
 
     /**
-     * @var bool
-     */
-    var $META_USER_SCOPE_PRIVATE = false;
-
-    /**
      * ShareMetaManager constructor.
      * @param ShareStore $shareStore
      */
@@ -55,22 +50,25 @@ class ShareMetaManager
     /**
      * @param AJXP_Node $node
      * @param array $meta
+     * @param bool $private
      */
-    public function setNodeMeta($node, $meta){
-        $otherScope = ! $this->META_USER_SCOPE_PRIVATE;
+    public function setNodeMeta($node, $meta, $private = true){
+        $otherScope = ! $private;
         $otherScopeMeta = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, $otherScope, AJXP_METADATA_SCOPE_REPOSITORY, true);
         // The scope has changed. Let's clear the old value
         if(count($otherScopeMeta)){
             $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, $otherScope, AJXP_METADATA_SCOPE_REPOSITORY, true);
         }
-        $node->setMetadata(AJXP_SHARED_META_NAMESPACE, $meta, $this->META_USER_SCOPE_PRIVATE, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        $node->setMetadata(AJXP_SHARED_META_NAMESPACE, $meta, $private, AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 
     /**
      * @param AJXP_Node $node
      */
     public function clearNodeMeta($node){
-        $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, $this->META_USER_SCOPE_PRIVATE, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        // Try to remove both scopes
+        $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, false, AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 
 
@@ -78,11 +76,12 @@ class ShareMetaManager
      * @param AJXP_Node $node
      * @param $shareType
      * @param $shareId
+     * @param $publicScope
      * @param string|null $originalShareId
      */
-    public function addShareInMeta($node, $shareType, $shareId, $originalShareId=null){
+    public function addShareInMeta($node, $shareType, $shareId, $publicScope, $originalShareId=null){
         $shares = array();
-        $this->shareStore->getMetaManager()->getSharesFromMeta($node, $shares, true);
+        $this->shareStore->getMetaManager()->getSharesFromMeta($node, $shares, false);
         if(empty($shares)){
             $shares = array();
         }
@@ -90,7 +89,7 @@ class ShareMetaManager
             unset($shares[$originalShareId]);
         }
         $shares[$shareId] = array("type" => $shareType);
-        $this->setNodeMeta($node, array("shares" => $shares));
+        $this->setNodeMeta($node, array("shares" => $shares), !$publicScope);
     }
 
 
@@ -131,9 +130,9 @@ class ShareMetaManager
     /**
      * @param AJXP_Node $node
      * @param array $shares
-     * @param bool $updateIfNotExists
+     * @param bool $clearIfEmpty
      */
-    public function getSharesFromMeta($node, &$shares, $updateIfNotExists = false){
+    public function getSharesFromMeta($node, &$shares, $clearIfEmpty = false){
 
         $meta = $this->getNodeMeta($node);
 
@@ -146,20 +145,14 @@ class ShareMetaManager
                 if(is_array($type)) {
                     $shareData["type"] = $type[0];
                 }
-                if(!$updateIfNotExists || $this->shareStore->shareExists($shareData["type"],$hashOrRepoId)){
+                if(!$clearIfEmpty || $this->shareStore->shareExists($shareData["type"],$hashOrRepoId)){
                     $shares[$hashOrRepoId] = $shareData;
                 }else{
                     $update = true;
                 }
             }
-            if($update){
-                if (count($shares) > 0) {
-                    $meta["shares"] = $shares;
-                    $this->setNodeMeta($node, $meta);
-                } else {
-                    $this->clearNodeMeta($node);
-                }
-
+            if($update && !count($shares)){
+                $this->clearNodeMeta($node);
             }
             return;
         }
@@ -173,7 +166,7 @@ class ShareMetaManager
         $els = array();
         if(is_string($meta["element"])) $els[] = $meta["element"];
         else if (is_array($meta["element"])) $els = $meta["element"];
-        if($updateIfNotExists){
+        if($clearIfEmpty){
             $update = false;
             $shares = array();
             foreach($els as $hashOrRepoId => $additionalData){
@@ -191,16 +184,8 @@ class ShareMetaManager
                     $update = true;
                 }
             }
-            if($update){
-                if (count($shares) > 0) {
-                    unset($meta["element"]);
-                    if(isSet($meta["minisite"])) unset($meta["minisite"]);
-                    $meta["shares"] = $shares;
-                    $this->setNodeMeta($node, $meta);
-                } else {
-                    $this->clearNodeMeta($node);
-                }
-
+            if($update && !count($shares)){
+                $this->clearNodeMeta($node);
             }
         }else{
             $shares = $els;
