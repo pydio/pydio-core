@@ -320,13 +320,16 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $metadata = unserialize($raw_data);
         if($metadata === false || !is_array($metadata)) return $result;
         $srcPath = $ajxpNode->getPath();
+        if($srcPath == "/") $srcPath = "";
         foreach($metadata as $path => $data){
             preg_match("#^".preg_quote($srcPath, "#")."/#", $path, $matches);
             if($path == $srcPath || count($matches)) {
+                $relativePath = substr($path, strlen($srcPath)); // REMOVE ORIGINAL NODE PATH
+                if($relativePath === false) $relativePath = "/";
                 foreach($data as $userId => $meta){
                     if(($userScope == $userId || $userScope == AJXP_METADATA_ALLUSERS) && isSet($meta[$nameSpace])){
-                        if(!isSet($result[$path])) $result[$path] = array();
-                        $result[$path][$userId] = $meta[$nameSpace];
+                        if(!isSet($result[$relativePath])) $result[$relativePath] = array();
+                        $result[$relativePath][$userId] = $meta[$nameSpace];
                     }
                 }
             }
