@@ -484,7 +484,7 @@ class fsAccessWrapper implements AjxpWrapper
         if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) {
             $cmd = "stat -L -c%s ".escapeshellarg($file);
             $val = trim(`$cmd`);
-            if (strlen($val) == 0 || floatval($val) == 0) {
+            if (!is_numeric($val) || $val == -1) {
                 // No stat on system
                 $cmd = "ls -1s --block-size=1 ".escapeshellarg($file);
                 $val = trim(`$cmd`);
