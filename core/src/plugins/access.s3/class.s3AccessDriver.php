@@ -19,11 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
-
 defined('AJXP_EXEC') or die( 'Access not allowed');
-use Aws\S3\S3Client;
 use Guzzle\Plugin\Log\LogPlugin;
-
+use AccessS3\S3Client;
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
@@ -56,9 +54,10 @@ class s3AccessDriver extends fsAccessDriver
 
         if(isSet($this->repository)){
             require_once("aws.phar");
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'class.pydioS3Client.php';
             $options = array(
                 'key'    => $this->repository->getOption("API_KEY"),
-                'secret' => $this->repository->getOption("SECRET_KEY")
+                'secret' => $this->repository->getOption("SECRET_KEY"),
             );
             $signatureVersion = $this->repository->getOption("SIGNATURE_VERSION");
             if(!empty($signatureVersion) && $signatureVersion != "-1"){
@@ -76,13 +75,26 @@ class s3AccessDriver extends fsAccessDriver
             if(!empty($proxy)){
                 $options['request.options'] = array('proxy' => $proxy);
             }
-            $this->s3Client = S3Client::factory($options);
-
-            if($this->repository->getOption("VHOST_NOT_SUPPORTED")){
-                // Use virtual hosted buckets when possible
-                require_once("ForcePathStyleListener.php");
-                $this->s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+            $apiVersion = $this->repository->getOption("API_VERSION");
+            if ($apiVersion === "") {
+                $apiVersion = "latest";
             }
+            $sdkVersion = $this->getFilteredOption("SDK_VERSION");
+            if ($sdkVersion === "v3") {
+                $this->s3Client = new S3Client([
+                    "version" => $apiVersion,
+                    "region"  => $region,
+                    "credentials" => $options
+                ]);
+            } else {
+                $this->s3Client = S3Client::factory($options);
+                if($this->repository->getOption("VHOST_NOT_SUPPORTED")){
+                    // Use virtual hosted buckets when possible
+                    require_once("ForcePathStyleListener.php");
+                    $this->s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+                }
+            }
+
 
             $this->s3Client->registerStreamWrapper();
         }
