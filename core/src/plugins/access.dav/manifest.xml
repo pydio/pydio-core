@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="dav" enabled="false" label="CONF_MESSAGE[DAV]" description="CONF_MESSAGE[Access WebDAV through Guzzle and SabreDAV]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.dav/class.DAVAccessDriver.php" classname="DAVAccessDriver"/>
+    <client_settings icon="plugins/access.fs/icon.png" description_template="{HOST}/{PATH}" iconClass="icon-sitemap">
+        <resources>
+            <i18n namespace="dav_access" path="plugins/access.dav/i18n"/>
+        </resources>
+    </client_settings>
+
+    <server_settings>
+        <param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host for the WebDAV server]" mandatory="true" default=""/>
+        <param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Path for the WebDAV server]" mandatory="true"/>
+        <param name="SECURE" type="boolean" label="CONF_MESSAGE[Secure]" description="CONF_MESSAGE[Use secure connection over https]" mandatory="true"/>
+        <param name="USERNAME" type="string" label="CONF_MESSAGE[Username]" description="CONF_MESSAGE[Username]" mandatory="true" default=""/>
+        <param name="PASSWORD" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password]" mandatory="true"/>
+    </server_settings>
+    <registry_contributions>
+        <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+    </registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/core.access/src/Stream/StreamWrapper.php" classname="CoreAccess\Stream\StreamWrapper" protocol="ajxp.dav"/>
+</ajxpdriver>
