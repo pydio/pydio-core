@@ -60,4 +60,5 @@ js/ui/prototype/class.DataModelProperty.js
 js/ui/prototype/class.MultiDownloader.js
 js/ui/prototype/class.ActivityMonitor.js
 js/ui/prototype/class.AjxpReactComponent.js
+js/ui/prototype/class.AjxpReactDialogLoader.js
 js/ui/prototype/class.PydioUI.js
