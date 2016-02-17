@@ -294,7 +294,6 @@
 				</div>
 			]]></template>
             <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
-                <link rel="stylesheet" type="text/css" data-hrefRebase="plugins/access.ajxp_admin/mui/pydio-mui.css" href="plugins/access.ajxp_admin/mui/pydio-mui.css"/>
                 <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
                     <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
                         <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
@@ -319,7 +318,7 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
 			]]></template>
-<template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
+            <template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
 				<div id="toolbars">
 					<div>
 						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
