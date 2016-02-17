@@ -1086,8 +1086,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case "user_list_authorized_users" :
 
                 $defaultFormat = "html";
-
-                HTMLWriter::charsetHeader();
+                if(isSet($httpVars["format"]) && $httpVars["format"] == "xml"){
+                    header('Content-Type: text/xml; charset=UTF-8');
+                    header('Cache-Control: no-cache');
+                    print('<?xml version="1.0" encoding="UTF-8"?>');
+                }else{
+                    HTMLWriter::charsetHeader();
+                }
                 if (!ConfService::getAuthDriverImpl()->usersEditable()) {
                     break;
                 }
@@ -1203,12 +1208,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if($userObject->getId() == $loggedUser->getId()) continue;
                     if ( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
                         $userLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                        $userAvatar = ConfService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
                         //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
                         if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
                             $userDisplay = $userLabel;
                         }
-                        $users .= "<li class='complete_user_entry' data-label=\"$userLabel\" data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
+                        $userIsExternal = $userObject->hasParent() ? "true":"false";
+                        $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"$userLabel\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }
                     if($index == $limit) break;
