@@ -189,13 +189,17 @@ class ShareRightsManager
             if (empty($RIGHT)) continue;
             $ID = $rId;
             $WATCH = false;
+            $HIDDEN = false;
+            $AVATAR = false;
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
                 $role = AuthService::getRole($rId);
                 $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
                 $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+                $AVATAR = $role->filterParameterValue("core.conf", "avatar", AJXP_REPO_SCOPE_ALL, "");
                 if(empty($LABEL)) $LABEL = $userId;
                 $TYPE = $userObject->hasParent()?"tmp_user":"user";
+                $HIDDEN = $userObject->isHidden();
                 if ($this->watcher !== false && $watcherNode != null) {
                     $WATCH = $this->watcher->hasWatchOnNode(
                         $watcherNode,
@@ -248,6 +252,8 @@ class ShareRightsManager
                 "RIGHT" => $RIGHT
             );
             if($WATCH) $entry["WATCH"] = $WATCH;
+            if($HIDDEN) $entry["HIDDEN"] = true;
+            if($AVATAR !== false) $entry["AVATAR"] = $AVATAR;
             if($TYPE == "group"){
                 $sharedGroups[$entry["ID"]] = $entry;
             } else {

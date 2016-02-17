@@ -63,13 +63,15 @@ class ShareLink
      * @throws Exception
      */
     public function save(){
-        return $this->store->storeShare(
+        $newHash = $this->store->storeShare(
             $this->getParentRepositoryId(),
             $this->internal,
             "minisite",
             $this->getHash(),
             $this->getNewHash()
         );
+        $this->setHash($newHash);
+        return $newHash;
     }
 
     /**
@@ -84,6 +86,10 @@ class ShareLink
      */
     public function attachToRepository($repositoryId){
         $this->internal["REPOSITORY"] = $repositoryId;
+    }
+
+    public function isAttachedToRepository(){
+        return isSet($this->internal["REPOSITORY"]);
     }
 
     /**

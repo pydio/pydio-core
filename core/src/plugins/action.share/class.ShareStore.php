@@ -391,7 +391,7 @@ class ShareStore {
      * @throws Exception
      * @return bool
      */
-    public function deleteShare($type, $element)
+    public function deleteShare($type, $element, $keepRepository = false)
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
@@ -406,7 +406,7 @@ class ShareStore {
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
                 }
                 if($repo == null){
-                    throw new Exception("Cannot find associated share");
+                    throw new Exception("repo-not-found");
                 }
                 $element = $share["REPOSITORY"];
             }
@@ -431,12 +431,14 @@ class ShareStore {
             $repoId = $minisiteData["REPOSITORY"];
             $repo = ConfService::getRepositoryById($repoId);
             if ($repo == null) {
-                return false;
+                throw new Exception('repo-not-found');
             }
             $this->testUserCanEditShare($repo->getOwner(), $repo->options);
-            $res = ConfService::deleteRepository($repoId);
-            if ($res == -1) {
-                throw new Exception($mess[427]);
+            if(!$keepRepository){
+                $res = ConfService::deleteRepository($repoId);
+                if ($res == -1) {
+                    throw new Exception($mess[427]);
+                }
             }
             // Silently delete corresponding role if it exists
             AuthService::deleteRole("AJXP_SHARED-".$repoId);
