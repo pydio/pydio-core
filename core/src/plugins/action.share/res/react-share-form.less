@@ -1,0 +1,272 @@
+// Color variables (appears count calculates by raw css)
+@color0: #4aceb0;
+@color1: #47b092;
+@color2: #43987c;
+@color3: rgb(67, 141, 179);
+
+// Width variables (appears count calculates by raw css)
+@width0: 370px; // Appears 2 times
+@width2: 32px; // Appears 2 times
+
+// Height variables (appears count calculates by raw css)
+@height1: 32px; // Appears 2 times
+
+div.form-react_share_form {
+  div.dialogTitle {
+    display: none;
+  }
+}
+
+div#react_share_form {
+  * {
+    font-family: Roboto;
+  }
+  [class^="icon-"],[class*="icon-"]{
+    font-family: FontAwesome;
+  }
+  font-size:13px;
+  div.headerPanel {
+    background-color: @color0 !important;
+  }
+  .mui-tabs-container {
+    .mui-tab-item-container {
+      background-color: @color0 !important;
+    }
+    .mui-tab-template {
+      min-height: 300px;
+    }
+  }
+  .shared-users-rights-header {
+    color: #ADADAD;
+    padding-right: 50px;
+    text-align: right;
+    span {
+      display: inline-block;
+      font-size: 10px;
+      margin: 0 6px;
+      text-transform: uppercase;
+    }
+  }
+  .suggest-search.icon-search {
+    color: #C1C1C1;
+    font-size: 18px;
+    position: absolute;
+    right: 15px;
+    top: 2px;
+  }
+  .save-as-team-container{
+    text-align: right;
+    margin-top: 6px;
+    padding-right: 15px;
+    a{
+      color:#c1c1c1;
+      text-decoration: underline;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  }
+  div.mui-drop-down-menu.full-width{
+    width: 400px;
+    margin-left: -10px;
+    .mui-menu-control .mui-menu-label{
+      white-space: nowrap;
+      width: 365px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .public-link-container{
+    padding: 3px 6px 15px;
+    background-color: #F1F1F1;
+    border-radius: 8px;
+    margin: 16px 0 6px;
+    .public-link{
+      width: 350px;
+      font-size: 20px;
+      input{
+        text-align: center;
+        color: @color2;
+      }
+    }
+    &.edit-link{
+      > span{
+        font-size: 20px;
+        text-align: right;
+        display: inline-block;
+        width: 160px;
+        color: @color2;
+      }
+      .mui-raised-button{
+        margin-left: 10px;
+      }
+      .mui-text-field{
+        font-size: 20px;
+        width: 100px;
+      }
+    }
+  }
+  .custom-link-button.icon-edit-sign{
+    color: #ddd;
+    font-size: 20px;
+    cursor: pointer;
+    display: inline-block;
+    padding-left: 5px;
+  }
+  .custom-link-button.icon-edit-sign:hover{
+    color: @color1;
+  }
+  .password-container,
+  .expires
+  {
+    margin-top: -10px;
+    .mui-text-field{
+      width: 96%;
+    }
+  }
+  .label-desc-edit{
+    .mui-text-field{
+      width: 100%;
+      margin-top: -10px;
+    }
+  }
+  .section-legend{
+
+  }
+  h3{
+    font-size: 22px;
+  }
+  h4{
+    padding-top: 10px;
+    font-weight: normal;
+    font-size: 17px;
+  }
+  .ownership-form{
+    .mui-text-field{
+      margin-top: -20px;
+      width: 230px;
+      margin-right: 10px;
+    }
+  }
+  div.user-badge {
+    border-bottom: 1px solid #e2e2e2;
+    clear: both;
+    font-size: 16px;
+    margin-left: 50px;
+    margin-right: 11px;
+    padding-top: 1px;
+    &:last-of-type {
+      border-bottom: 0;
+    }
+    span.icon-ellipsis-vertical.mui-font-icon {
+      color: #6F6F6F;
+      font-size: 18px;
+    }
+    span.avatar {
+      background-color: @color0;
+      border-radius: 30px;
+      color: white;
+      display: inline-block;
+      font-size: 17px;
+      height: @height1;
+      margin: 5px 14px 7px -44px;
+      padding: 6px;
+      text-align: center;
+      width: @width2;
+    }
+    &.user-type-group{
+      span.avatar{
+        background-color: @color1;
+      }
+    }
+    &.user-type-tmp_user{
+      span.avatar{
+        background-color: @color3;
+      }
+    }
+    img {
+      background-color: @color0;
+      border-radius: 30px;
+      color: white;
+      display: inline-block;
+      font-size: 17px;
+      height: @height1;
+      margin: 5px 14px 7px -44px;
+      padding: 6px;
+      text-align: center;
+      width: @width2;
+    }
+    div.user-badge-menu-box {
+      float: right;
+      font-size: 13px;
+      position: relative;
+      div.mui-menu.mui-visible {
+        box-shadow: 0 0 5px rgba(0,0,0,0.43);
+        position: absolute;
+        right: 0;
+        top:0;
+        width: 200px;
+        z-index: 120;
+      }
+      div.mui-menu {
+        span.icon-check {
+          float: right;
+          font-size: 16px;
+          margin-top: 15px;
+        }
+      }
+    }
+    span.user-badge-rights-container {
+      float: right;
+      padding: 11px;
+      input[name="write"] {
+        margin-left: 28px;
+      }
+    }
+  }
+}
+div.react-autosuggest {
+  padding-left: 4px;
+  .react-autosuggest__suggestion--focused {
+    background-color: aliceblue;
+  }
+  input.react-autosuggest__input {
+    width: @width0;
+  }
+  .react-autosuggest__suggestions {
+    background-color: white;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.63);
+    display: block;
+    margin-top: 1px;
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    width: @width0;
+    z-index: 20;
+  }
+  input#users-autosuggest {
+    font-size: 18px;
+    padding-bottom: 9px !important;
+    padding-left: 4px !important;
+  }
+}
+.dialogContent div.reset-pydio-forms{
+  input{
+    border:0;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    height: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    &:disabled{
+      background-color: transparent !important;
+    }
+  }
+  .mui-text-field.mui-has-floating-labels .mui-text-field-input{
+    padding-top: 24px !important;
+  }
+  input[type="checkbox"], .dialogContent input[type="radio"]{
+    height: 100%;
+    width: 100%;
+  }
+}

@@ -31,12 +31,35 @@
     <client_settings>
         <resources>
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
+            <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
             <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
             <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
+            <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
+            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
+            <action name="share_react">
+                <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden" actionBar="true" actionBarGroup="change" contextMenu="true" infoPanel="false"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="false"/>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(!pydio.getController().shareDialogLoader) {
+                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
+                                selection:pydio.getUserSelection()
+                            });
+                        }
+                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
+                    ]]></clientCallback>
+                    <clientForm id="react_share_form"><![CDATA[
+                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
+                    ]]></clientForm>
+                </processing>
+            </action>
             <action name="share">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
