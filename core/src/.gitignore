@@ -11,4 +11,5 @@ node_modules/
 .DS_Store
 .jshintignore
 .jshintrc
+/plugins/gui.ajax/res/mui/mui-sources
 .validate.json
