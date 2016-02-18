@@ -341,7 +341,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     continue;
                 }
                 try {
-                    $node->loadNodeInfo();
+                    @$node->loadNodeInfo();
                 } catch (Exception $e) {
                     if($notification->alert_id){
                         $this->eventStore->dismissAlertById($notification->alert_id);
