@@ -35,7 +35,7 @@
     z-index:1015;
     background-color: rgb(0, 0, 0);
     -moz-opacity: 0.6;
-    opacity: .60;
+    opacity: .20;
     filter: alpha(opacity=60);
 }
 

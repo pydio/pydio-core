@@ -429,10 +429,9 @@ DIALOG BOXES
 {
     background-color: #eee;
 }
-#all_forms div{display:none;}
+#all_forms > div{display:none;}
 #all_forms form{display:inline;}
 
-#all_forms div div,
 #all_forms div.shadow_class
 {display:block;}
 
@@ -452,7 +451,7 @@ div.shadow_class
     z-index: 1018;
     font-size: 11px;
     padding: 0;
-    border-radius: 3px;
+    border-radius: 0px;
     min-width: 420px;
 }
 
@@ -479,14 +478,22 @@ div.shadow_class
     padding-top: 2px;
 }
 
+div.dialogTitle .ajxp_icon_span {
+    display: none;
+}
+
 .dialogTitle span#modalCloseBtn{
-    font-size: 17px;
+    font-size: 14px;
     margin-top: 0;
-    color: #AFAFAF;
+    color: #FFFFFF;
+    padding: 7px 12px;
 }
 
 .dialogTitle span.string-only-title {
-    font-family: "Open Sans Regular", Helvetica, sans-serif;
+    font-family: "Open Sans Light", Helvetica, sans-serif;
+    font-size: 16px;
+    display: inline-block;
+    padding-top: 3px;
 }
 
 .dialogContent
@@ -494,7 +501,7 @@ div.shadow_class
     background-color: #ffffff;
     padding: 10px 10px;
     -moz-border-radius: 0 0 5px 5px;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 0 0px 0px;
     /* background-image: url('../images/grid_tl.png'); */
     border-top: 0;
     color: #5C5C5C;
@@ -1720,15 +1727,9 @@ div#navigation_toolbar {
 
 
 .dialogTitle{
-    /*
-    border-radius: 2px 2px 0 0;
-    background-color: #4dc5c3;
-    border-bottom: 1px solid rgb(67, 156, 155);
-    */
-    border-radius: 4px 4px 0 0;
-    background-color: #F3F3F3;
-    border-bottom: 1px solid #CFCFCF;
-    color: #555;
+    border-radius: 0 0 0 0;
+    background-color: rgb(107, 107, 107);
+    color: #FFF;
     padding: 11px 4px 13px 10px;
 }
 
@@ -5927,7 +5928,7 @@ div.menuActions img{
 .dialogBox, div.dialogBox.css_boxshadow{
     -moz-box-shadow: 5px 5px 60px #222;
     -webkit-box-shadow: 5px 5px 60px #222;
-    box-shadow: 1px 2px 4px rgba(0,0,0,0.4);
+    box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
 }
 
 div.dialogBox div.dialogBox.css_boxshadow{
