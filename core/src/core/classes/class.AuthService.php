@@ -1028,7 +1028,7 @@ class AuthService
                 call_user_func($loopCallback, $index);
             }
 
-            if ($paginated) {
+            if (empty($regexp) && $paginated) {
                 // Make sure to reload all children objects
                 foreach ($confDriver->getUserChildren($userId) as $childObject) {
                     $allUsers[$childObject->getId()] = $childObject;
@@ -1037,7 +1037,7 @@ class AuthService
         }
         self::$cacheRoles = false;
 
-        if ($paginated && $cleanLosts) {
+        if (empty($regexp) && $paginated && $cleanLosts) {
             // Remove 'lost' items (children without parents).
             foreach ($allUsers as $id => $object) {
                 if ($object->hasParent() && !array_key_exists($object->getParent(), $allUsers)) {
