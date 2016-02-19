@@ -50,7 +50,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     /**
      * @var bool
      */
-    private $hidden;
+    protected $hidden;
 
     /**
      * @param bool $hidden

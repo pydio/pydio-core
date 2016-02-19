@@ -65,24 +65,38 @@ div#react_share_form {
       cursor: pointer;
     }
   }
+  .form-legend {
+    color: #bbb;
+    margin-top: -5px !important;
+    font-size: 11px;
+  }
   div.mui-drop-down-menu.full-width{
-    width: 400px;
-    margin-left: -10px;
+    width: 100%;
+    margin-left: 0;
+    height: 43px;
     .mui-menu-control .mui-menu-label{
+      font-size: 16px;
       white-space: nowrap;
-      width: 365px;
+      width: 95%;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding-left: 0;
+    }
+    .mui-menu-drop-down-icon{
+      right: 0;
+    }
+    .mui-menu-control-underline{
+      margin: 0;
     }
   }
   .public-link-container{
-    padding: 3px 6px 15px;
+    padding: 7px 13px 11px;
     background-color: #F1F1F1;
     border-radius: 8px;
     margin: 16px 0 6px;
     .public-link{
-      width: 350px;
-      font-size: 20px;
+      width: 300px;
+      font-size: 18px;
       input{
         text-align: center;
         color: @color2;
@@ -104,16 +118,37 @@ div#react_share_form {
         width: 100px;
       }
     }
-  }
-  .custom-link-button.icon-edit-sign{
-    color: #ddd;
-    font-size: 20px;
-    cursor: pointer;
-    display: inline-block;
-    padding-left: 5px;
-  }
-  .custom-link-button.icon-edit-sign:hover{
-    color: @color1;
+    .custom-link-button.icon-edit-sign,
+    .copy-link-button
+    {
+      color: #ddd;
+      font-size: 24px;
+      cursor: pointer;
+      display: block;
+      padding-left: 7px;
+      float: right;
+      margin-top: 16px;
+    }
+    .custom-link-button.icon-edit-sign:hover,
+    .copy-link-button:hover
+    {
+      color: @color1;
+    }
+    .copy-link-button{
+      font-size: 13px !important;
+      margin-top: 18px;
+      background-color: #ddd;
+      color: #F1F1F1;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .copy-link-button:hover{
+      background-color: @color1;
+      color: #F1F1F1;
+    }
+    .section-legend{
+      margin-top: 10px;
+    }
   }
   .password-container,
   .expires
@@ -133,7 +168,10 @@ div#react_share_form {
 
   }
   h3{
-    font-size: 22px;
+    font-size: 18px;
+    margin-bottom: 0;
+    margin-top: 4px;
+    color: #999;
   }
   h4{
     padding-top: 10px;

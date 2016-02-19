@@ -116,18 +116,22 @@
         triggerModelSave: function(){
             this.props.shareModel.save();
         },
+        triggerModelRevert:function(){
+            this.props.shareModel.revertChanges();
+        },
         render: function(){
             if(this.props.shareModel.getStatus() == 'modified'){
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
+                        <a className="revert-button" onClick={this.triggerModelRevert}>Revert Changes</a>
                         <ReactMUI.FlatButton secondary={true} label="Save" onClick={this.triggerModelSave}/>
-                        <ReactMUI.FlatButton secondary={false} label="Cancel" onClick={this.props.onClick}/>
+                        <ReactMUI.FlatButton secondary={false} label="Close" onClick={this.props.onClick}/>
                     </div>
                 );
             }else{
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
-                        <ReactMUI.FlatButton secondary={true} label="Close" onClick={this.props.onClick}/>
+                        <ReactMUI.FlatButton secondary={false} label="Close" onClick={this.props.onClick}/>
                     </div>
                 );
             }
@@ -600,12 +604,6 @@
                     <PublicLinkPermissions shareModel={this.props.shareModel} key="public-perm" />,
                     <PublicLinkSecureOptions shareModel={this.props.shareModel} key="public-secure" />
                 ];
-                /*
-                var layoutData = ReactModel.Share.compileLayoutData(this.props.pydio, this.props.shareModel.getNode());
-                if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1){
-                    publicLinkPanes.push(<PublicLinkTemplate {...this.props} key="public-template" layoutData={layoutData}/>);
-                }
-                */
             }
             return (
                 <div style={{padding:16}} className="reset-pydio-forms">
@@ -624,7 +622,7 @@
             onChange: React.PropTypes.func
         },
         getInitialState: function(){
-            return {editLink: false}
+            return {editLink: false, copyMessage:''};
         },
         toggleEditMode: function(){
             if(this.state.editLink && this.state.customLink){
@@ -634,6 +632,52 @@
         },
         changeLink:function(event){
             this.setState({customLink: event.target.value});
+        },
+        clearCopyMessage:function(){
+            global.setTimeout(function(){
+                this.setState({copyMessage:''});
+            }.bind(this), 5000);
+        },
+
+        attachClipboard: function(){
+            this.detachClipboard();
+            if(this.refs['copy-button']){
+                this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
+                    text: function(trigger) {
+                        return this.props.shareModel.getPublicLink();
+                    }.bind(this)
+                });
+                this._clip.on('success', function(){
+                    this.setState({copyMessage:'Link has been copied to clipboard!'}, this.clearCopyMessage);
+                }.bind(this));
+                this._clip.on('error', function(){
+                    var copyMessage;
+                    if( global.navigator.platform.indexOf("Mac") === 0 ){
+                        copyMessage = global.pydio.MessageHash['share_center.144'];
+                    }else{
+                        copyMessage = global.pydio.MessageHash['share_center.143'];
+                    }
+                    this.refs['public-link-field'].focus();
+                    this.setState({copyMessage:copyMessage}, this.clearCopyMessage);
+                }.bind(this));
+            }
+        },
+        detachClipboard: function(){
+            if(this._clip){
+                this._clip.destroy();
+            }
+        },
+
+        componentDidUpdate: function(prevProps, prevState){
+            this.attachClipboard();
+        },
+
+        componentDidMount: function(){
+            this.attachClipboard();
+        },
+
+        componentWillUnmount: function(){
+            this.detachClipboard();
         },
 
         render: function(){
@@ -652,15 +696,10 @@
                 if(editAllowed && publicLink){
                     var editButton = <span className="custom-link-button icon-edit-sign" title="Customize link last part" onClick={this.toggleEditMode}/>;
                 }
-                var copyMessage;
-                if( global.navigator.platform.indexOf("Mac") === 0 ){
-                    copyMessage = global.pydio.MessageHash['share_center.144'];
-                }else{
-                    copyMessage = global.pydio.MessageHash['share_center.143'];
-                }
+                var copyButton = <span ref="copy-button" className="copy-link-button icon-paste" title="Copy link to clipboard"/>;
                 var setHtml = function(){
-                    return {__html:copyMessage};
-                };
+                    return {__html:this.state.copyMessage};
+                }.bind(this);
                 if(publicLink){
                     var focus = function(e){
                         e.target.select();
@@ -671,15 +710,16 @@
                                 className="public-link"
                                 type="text"
                                 name="Link"
+                                ref="public-link-field"
                                 value={this.props.shareModel.getPublicLink()}
                                 onFocus={focus}
-                            /> {editButton}
+                            /> {editButton} {copyButton}
                             <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
                         </div>
                     );
                 }else{
                     return (
-                        <div className="form-legend" style={{marginTop:20}}>This file is not currently publicly accessible. Enabling a public link will create a unique access that you can send to anyone. If you want to share with existing Pydio users, use the "Users" tab.</div>
+                        <div className="section-legend" style={{marginTop:20}}>This file is not currently publicly accessible. Enabling a public link will create a unique access that you can send to anyone. If you want to share with existing Pydio users, use the "Users" tab.</div>
                     );
                 }
             }
@@ -793,38 +833,6 @@
         }
     });
 
-    var PublicLinkTemplate = React.createClass({
-
-        onDropDownChange: function(event, index, item){
-            this.props.shareModel.setTemplate(item.payload);
-        },
-
-        render: function(){
-            var index = 0, crtIndex = 0;
-            var selected = this.props.shareModel.getTemplate();
-            var menuItems=this.props.layoutData.map(function(l){
-                if(selected && l.LAYOUT_ELEMENT == selected) {
-                    crtIndex = index;
-                }
-                index ++;
-                return {payload:l.LAYOUT_ELEMENT, text:l.LAYOUT_LABEL};
-            });
-            return (
-                <div>
-                    <h3>Link Layout</h3>
-                    <div className="section-legend">You can select the appearance of the link as it will appear in the browser.</div>
-                    <ReactMUI.DropDownMenu
-                        autoWidth={false}
-                        className="full-width"
-                        menuItems={menuItems}
-                        selectedIndex={crtIndex}
-                        onChange={this.onDropDownChange}
-                    />
-                </div>
-            );
-        }
-    });
-
     /**************************/
     /* ADVANCED PANEL
     /**************************/
@@ -836,7 +844,7 @@
         render: function(){
 
             var layoutData = ReactModel.Share.compileLayoutData(this.props.pydio, this.props.shareModel.getNode());
-            if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1){
+            if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1 && this.props.shareModel.hasPublicLink()){
                 var layoutPane = <PublicLinkTemplate {...this.props} layoutData={layoutData}/>;
             }
 
@@ -862,23 +870,32 @@
         },
 
         render: function(){
+            if(!this.props.shareModel.getNode().isLeaf()){
+                var label = (
+                    <ReactMUI.TextField
+                        floatingLabelText="Label"
+                        name="label"
+                        onChange={this.updateLabel}
+                        value={this.props.shareModel.getGlobal('label')}
+                    />
+                );
+                var labelLegend = (
+                    <div className="form-legend">Title displayed to the user</div>
+                );
+            }
             return (
                 <div className="reset-pydio-forms">
-                    <h3 style={{paddingTop:0}}>Share Label</h3>
-                    <div className="section-legend">These are displayed to the user accessing this share.</div>
+                    <h3 style={{paddingTop:0}}>Additional description</h3>
                     <div className="label-desc-edit">
-                        <ReactMUI.TextField
-                            floatingLabelText="Label"
-                            name="label"
-                            onChange={this.updateLabel}
-                            value={this.props.shareModel.getGlobal('label')}
-                        />
+                        {label}
+                        {labelLegend}
                         <ReactMUI.TextField
                             floatingLabelText="Description"
                             name="description"
                             onChange={this.updateDescription}
                             value={this.props.shareModel.getGlobal('description')}
                         />
+                        <div className="form-legend">Add an optional comment</div>
                     </div>
                 </div>
             );
@@ -901,7 +918,6 @@
             return (
                 <div>
                     <h3>Notification</h3>
-                    <div className="section-legend">Be alerted whenever a user accesses a file.</div>
                     <ReactMUI.DropDownMenu
                         autoWidth={false}
                         className="full-width"
@@ -909,6 +925,39 @@
                         selectedIndex={selectedIndex}
                         onChange={this.dropDownChange}
                     />
+                    <div className="form-legend">Be alerted whenever a user accesses a file.</div>
+                </div>
+            );
+        }
+    });
+
+    var PublicLinkTemplate = React.createClass({
+
+        onDropDownChange: function(event, index, item){
+            this.props.shareModel.setTemplate(item.payload);
+        },
+
+        render: function(){
+            var index = 0, crtIndex = 0;
+            var selected = this.props.shareModel.getTemplate();
+            var menuItems=this.props.layoutData.map(function(l){
+                if(selected && l.LAYOUT_ELEMENT == selected) {
+                    crtIndex = index;
+                }
+                index ++;
+                return {payload:l.LAYOUT_ELEMENT, text:l.LAYOUT_LABEL};
+            });
+            return (
+                <div>
+                    <h3>Link Layout</h3>
+                    <ReactMUI.DropDownMenu
+                        autoWidth={false}
+                        className="full-width"
+                        menuItems={menuItems}
+                        selectedIndex={crtIndex}
+                        onChange={this.onDropDownChange}
+                    />
+                    <div className="form-legend">You can select the appearance of the link as it will appear in the browser.</div>
                 </div>
             );
         }

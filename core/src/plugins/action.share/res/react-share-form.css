@@ -49,25 +49,39 @@ div#react_share_form .save-as-team-container a {
   font-size: 14px;
   cursor: pointer;
 }
+div#react_share_form .form-legend {
+  color: #bbb;
+  margin-top: -5px !important;
+  font-size: 11px;
+}
 div#react_share_form div.mui-drop-down-menu.full-width {
-  width: 400px;
-  margin-left: -10px;
+  width: 100%;
+  margin-left: 0;
+  height: 43px;
 }
 div#react_share_form div.mui-drop-down-menu.full-width .mui-menu-control .mui-menu-label {
+  font-size: 16px;
   white-space: nowrap;
-  width: 365px;
+  width: 95%;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-left: 0;
+}
+div#react_share_form div.mui-drop-down-menu.full-width .mui-menu-drop-down-icon {
+  right: 0;
+}
+div#react_share_form div.mui-drop-down-menu.full-width .mui-menu-control-underline {
+  margin: 0;
 }
 div#react_share_form .public-link-container {
-  padding: 3px 6px 15px;
+  padding: 7px 13px 11px;
   background-color: #F1F1F1;
   border-radius: 8px;
   margin: 16px 0 6px;
 }
 div#react_share_form .public-link-container .public-link {
-  width: 350px;
-  font-size: 20px;
+  width: 300px;
+  font-size: 18px;
 }
 div#react_share_form .public-link-container .public-link input {
   text-align: center;
@@ -87,15 +101,34 @@ div#react_share_form .public-link-container.edit-link .mui-text-field {
   font-size: 20px;
   width: 100px;
 }
-div#react_share_form .custom-link-button.icon-edit-sign {
+div#react_share_form .public-link-container .custom-link-button.icon-edit-sign,
+div#react_share_form .public-link-container .copy-link-button {
   color: #ddd;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
-  display: inline-block;
-  padding-left: 5px;
+  display: block;
+  padding-left: 7px;
+  float: right;
+  margin-top: 16px;
 }
-div#react_share_form .custom-link-button.icon-edit-sign:hover {
+div#react_share_form .public-link-container .custom-link-button.icon-edit-sign:hover,
+div#react_share_form .public-link-container .copy-link-button:hover {
   color: #47b092;
+}
+div#react_share_form .public-link-container .copy-link-button {
+  font-size: 13px !important;
+  margin-top: 18px;
+  background-color: #ddd;
+  color: #F1F1F1;
+  padding: 4px;
+  border-radius: 4px;
+}
+div#react_share_form .public-link-container .copy-link-button:hover {
+  background-color: #47b092;
+  color: #F1F1F1;
+}
+div#react_share_form .public-link-container .section-legend {
+  margin-top: 10px;
 }
 div#react_share_form .password-container,
 div#react_share_form .expires {
@@ -110,7 +143,10 @@ div#react_share_form .label-desc-edit .mui-text-field {
   margin-top: -10px;
 }
 div#react_share_form h3 {
-  font-size: 22px;
+  font-size: 18px;
+  margin-bottom: 0;
+  margin-top: 4px;
+  color: #999;
 }
 div#react_share_form h4 {
   padding-top: 10px;

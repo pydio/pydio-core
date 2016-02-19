@@ -2820,6 +2820,9 @@
   height: 56px;
   padding-top: 15px;
 }
+.react-mui-context label {
+  margin: 0;
+}
 .react-mui-context .main-layout-nav-to-stack,
 .react-mui-context .horizontal-layout,
 .react-mui-context .vertical-layout,

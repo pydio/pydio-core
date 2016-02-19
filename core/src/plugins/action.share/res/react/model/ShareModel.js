@@ -85,6 +85,11 @@
             }
         }
 
+        revertChanges(){
+            this._pendingData = {};
+            this._setStatus('idle');
+        }
+
         getSharedUsers(){
             var data = [], sharedData = [];
             if(this._pendingData['entries']){

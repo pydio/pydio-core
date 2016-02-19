@@ -983,6 +983,7 @@ Class.create("ShareCenter", {
             conn.discrete = true;
         }
         conn.addParameter("get_action", "load_shared_element_data");
+        conn.addParameter("merged", "true");
         this._prepareShareActionParameters(uniqueNode, conn);
         conn.onComplete = function(transport){
             jsonCallback(transport.responseJSON);
