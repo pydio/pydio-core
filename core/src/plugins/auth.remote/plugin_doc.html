@@ -2,11 +2,11 @@
 <br>
 Generic plugin used for integration with various CMS. In master mode, when you login, Pydio will silently call a predefined URL to also log you on the external application. In slave mode, the plugin is not straightforward to implement, you should check the wordpress and joomla implementation for more examples.&nbsp;Basically, in slave mode, it works as follow :<br>
 <ul><br>
-	<li>Install Pydio with a "&nbsp;standard&nbsp;" authentification plugin, and update your "&nbsp;admin&nbsp;" user with your own password.</li><br>
+	<li>Install Pydio with a "&nbsp;standard&nbsp;" authentication plugin, and update your "&nbsp;admin&nbsp;" user with your own password.</li><br>
 	<li>Then switch to this auth.remote plugin in the server/conf/conf.php file.</li><br>
 	<li>In the config, set a secret key (can be anything, not necessary your admin password, beware of "&nbsp;anti-slashing&nbsp;" $ symbol).</li><br>
 	<li>It's ready to use on the Pydio part</li><br>
-	<li>In your CMS, create an authentification mechanism (generally there is also a plugin system) that can be configured with the secret key.</li><br>
+	<li>In your CMS, create an authentication mechanism (generally there is also a plugin system) that can be configured with the secret key.</li><br>
 	<li>This mechanism must, at login time, include the plugins/auth.remote/glueCode.php file, the secret key being set as GLOBAL before the inclusion, as well as the $plugInAction variable, and other variable depending on the action (login, logout, addUser, etc).. See the glueCode file to check the implemented actions.</li><br>
 	<li>This way, the glueCode file switches dynamically the session to an Pydio session, logs in a user, then give back the hand to the CMS.</li><br>
 	<li>Once logged in your CMS, you should be able to access Pydio logged in as the same user.</li><br>

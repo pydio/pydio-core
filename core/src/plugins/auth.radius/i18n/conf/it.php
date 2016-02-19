@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"RADIUS Authentification" => "Autenticazione RADIUS",
+"RADIUS Authentication" => "Autenticazione RADIUS",
 "Authenticate user by directly connecting to an RADIUS server" => "Autentica gli utenti connettendosi automaticamente ad un server RADIUS.",
 "Server" => "Server",
 "IP or DNS name of the RADIUS server" => "Indirizzo IP o nome DNS del server RADIUS",
