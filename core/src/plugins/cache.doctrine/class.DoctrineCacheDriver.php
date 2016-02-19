@@ -65,6 +65,9 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
         $this->cacheDriver = null;
         $this->options = $this->getFilteredOption("DRIVER");
+        if(!is_array($this->options)){
+            return;
+        }
 
         switch ($this->options['driver']) {
             case "apc":
