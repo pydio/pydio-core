@@ -1,17 +1,22 @@
 <?php
-/**
- * Copyright 2010-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://aws.amazon.com/apache2.0
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
  */
 
 namespace CoreAccess\Stream;
@@ -36,12 +41,7 @@ use GuzzleHttp\Stream\CachingStream;
 class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 {
     /**
-     * @var resource|null Stream context (this is set by PHP when a context is used)
-     */
-    public $context;
-
-    /**
-     * @var Client Client used to send requests
+     * @var AbstractClient Client used to send requests
      */
     protected static $client;
 
@@ -61,7 +61,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     protected $params;
 
     /**
-     * @var ListObjectsIterator Iterator used with opendir() and subsequent readdir() calls
+     * @var DirIterator Iterator used with opendir() and subsequent readdir() calls
      */
     protected $objectIterator;
 
@@ -98,7 +98,6 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      */
     public function stream_open($path, $mode, $options, &$opened_path)
     {
-        // We don't care about the binary flag
         $this->mode = $mode = rtrim($mode, 'bt');
         $this->params = $params = $this->getParams($path);
         $errors = array();
@@ -139,24 +138,13 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 
         $this->body->seek(0);
 
-        /*$params = $this->params;
-        $params['Body'] = $this->body;
-
-        // TODO 
-        // Attempt to guess the ContentType of the upload based on the
-        // file extension of the key
-        if (!isset($params['ContentType']) &&
-            ($type = Mimetypes::getInstance()->fromFilename($params['Key']))
-        ) {
-            $params['ContentType'] = $type;
-        }
-
         try {
-            static::$client->putObject($params);
+            static::$client->put($params);
             return true;
         } catch (\Exception $e) {
             return $this->triggerError($e->getMessage());
-        }*/
+        }
+
         return true;
     }
 
@@ -217,7 +205,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         try {
             $this->clearStatInfo($path);
-            static::$client->deleteObject($this->getParams($path));
+            static::$client->delete($this->getParams($path));
             return true;
         } catch (\Exception $e) {
             return $this->triggerError($e->getMessage());
@@ -252,15 +240,20 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         $params = $this->getParams($path);
 
-        $path = basename($params['path']); // Sanitized path
+        $key = $params['itemname'];
 
-        if (isset(static::$nextStat[$path])) {
-            return static::$nextStat[$path];
+        if (isset(static::$nextStat[$key])) {
+            return static::$nextStat[$key];
         }
 
-        $result = static::$client->stat($params);
+        try {
+            $result = static::$client->stat($params);
+            $result = static::$client->formatUrlStat($result);
 
-        static::$nextStat[$path] = $result;
+            static::$nextStat[$path] = $result;
+        } catch (Exception $e) {
+            return false;
+        }
         return $result;
     }
 
@@ -313,13 +306,11 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      */
     public function dir_opendir($path, $options)
     {
-        // Reset the cache
-        //$this->clearStatInfo();
         $params = $this->getParams($path);
 
-        $this->objectIterator = static::$client->ls($params);
+        $result = static::$client->ls($params);
 
-        $this->objectIterator->next();
+        $this->objectIterator = static::$client->getIterator($result);
 
         return true;
     }
@@ -343,10 +334,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      */
     public function dir_rewinddir()
     {
-        //$this->clearStatInfo();
-
         $this->objectIterator->rewind();
-        $this->objectIterator->next();
 
         return true;
     }
@@ -370,7 +358,6 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
         $this->objectIterator->next();
 
         static::$nextStat[$current[0]] = $current[1];
-
 
         return $current[0];
     }
@@ -396,33 +383,6 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 
         $result = static::$client->rename($params);
         return $result;
-    }
-
-    /**
-     * Get the stream context options available to the current stream
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        $context = $this->context ?: stream_context_get_default();
-        $options = stream_context_get_options($context);
-
-        return isset($options['sabredav']) ? $options['sabredav'] : array();
-    }
-
-    /**
-     * Get a specific stream context option
-     *
-     * @param string $name Name of the option to retrieve
-     *
-     * @return mixed|null
-     */
-    protected function getOption($name)
-    {
-        $options = $this->getOptions();
-
-        return isset($options[$name]) ? $options[$name] : null;
     }
 
     /**

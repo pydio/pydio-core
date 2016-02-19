@@ -1,0 +1,117 @@
+{
+    "name" : "WebDAV Client",
+    "description" : "WebDAV REST API client",
+    "operations" : {
+        "Open" : {
+            "httpMethod" : "GET",
+            "uri" : "{fullpath}/{itemname}",
+            "summary" : "Open the object as a stream for the StreamWrapper to access",
+            "responseClass" : "OpenOutput",
+            "parameters" : {
+                "fullpath" : {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                }
+            }
+        },
+        "Stat" : {
+            "httpMethod" : "PROPFIND",
+            "uri" : "{fullpath}/{itemname}",
+            "summary" : "Returns the stat of a specific object",
+            "responseClass" : "StatOutput",
+            "parameters" : {
+                "DAV:prop" : {
+                    "required" : true,
+                    "location" : "xml"
+                },
+                "fullpath" : {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                }
+            }
+        },
+        "Mkdir" : {
+            "httpMethod" : "MKCOL",
+            "uri" : "{fullpath}/{itemname}",
+            "responseClass" : "MkdirOutput",
+            "parameters" : {
+                "fullpath" : {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                }
+            }
+        },
+        "Rmdir" : {
+            "httpMethod" : "DELETE",
+            "uri" : "{fullpath}/{itemname}",
+            "responseClass" : "RmdirOutput",
+            "parameters" : {
+                "fullpath":  {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                }
+            }
+        },
+        "Rename" : {
+            "httpMethod" : "MOVE",
+            "uri" : "{fullpath}/{itemname}",
+            "responseClass" : "MoveOutput",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "pathTo" : {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "header",
+                    "sentAs" : "Destination"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                }
+            }
+        }
+    },
+    "models" : {
+        "OpenOutput" : {
+            "type" : "object"
+        },
+        "StatOutput" : {
+            "type" : "object"
+        },
+        "MkdirOutput" : {
+            "type" : "object"
+        },
+        "RmdirOutput" : {
+            "type" : "object"
+        }
+    }
+}

@@ -1,25 +1,28 @@
 <?php
-/**
- * Copyright 2010-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://aws.amazon.com/apache2.0
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
  */
-
 
 namespace CoreAccess\Stream\Client;
 
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Client to interact with SabreDAV Client
  *
@@ -31,13 +34,26 @@ abstract class AbstractClient extends GuzzleClient
 {
     const LATEST_API_VERSION = '2016-01-01';
 
-    protected static $client;
-    protected static $description;
+    public static $STAT_TEMPLATE = [
+        0  => 0,  'dev'     => 0,
+        1  => 0,  'ino'     => 0,
+        2  => 0,  'mode'    => 0,
+        3  => 0,  'nlink'   => 0,
+        4  => 0,  'uid'     => 0,
+        5  => 0,  'gid'     => 0,
+        6  => -1, 'rdev'    => -1,
+        7  => 0,  'size'    => 0,
+        8  => 0,  'atime'   => 0,
+        9  => 0,  'mtime'   => 0,
+        10 => 0,  'ctime'   => 0,
+        11 => -1, 'blksize' => -1,
+        12 => -1, 'blocks'  => -1,
+    ];
 
     /**
-     * @param array|Collection $config Client configuration data
-     *
-     * @return Client
+     * @param ClientInterface      $client      HTTP client to use.
+     * @param DescriptionInterface $description Guzzle service description
+     * @param array                $config      Configuration options
      */
     public function __construct__(
         ClientInterface $client,
@@ -46,53 +62,63 @@ abstract class AbstractClient extends GuzzleClient
     ) {
         parent::__construct($client, $config);
 
-        $this->client = $client;
-        $this->description = $description;
         $this->processConfig($config);
     }
 
-    public static abstract function factory($config);
-
+    /**
+     * Register this client on the StreamWrapper
+     */
     public abstract function registerStreamWrapper();
 
     /**
-     * Prepare a url_stat result array
+     * Redefine a file stat
      *
-     * @param string|array $result Data to add
+     * @param array $arr
      *
-     * @return array Returns the modified url_stat result
+     * @return array Associative array containing the stats
      */
-    protected function formatUrlStat($result = null)
+    public abstract function formatUrlStat($arr);
+
+    /**
+     * Get a Directory Iterator based on the given array
+     *
+     * @param array $arr
+     *
+     * @return DirIterator
+     */
+    public abstract function getIterator($arr);
+
+    /**
+     * Get the params from the passed path
+     *
+     * @param string $path Path passed to the stream wrapper
+     *
+     * @return array Hash of custom params
+     */
+    public function getParams($path, $defaults = array())
     {
-        static $statTemplate = array(
-            0  => 0,  'dev'     => 0,
-            1  => 0,  'ino'     => 0,
-            2  => 0,  'mode'    => 0,
-            3  => 0,  'nlink'   => 0,
-            4  => 0,  'uid'     => 0,
-            5  => 0,  'gid'     => 0,
-            6  => -1, 'rdev'    => -1,
-            7  => 0,  'size'    => 0,
-            8  => 0,  'atime'   => 0,
-            9  => 0,  'mtime'   => 0,
-            10 => 0,  'ctime'   => 0,
-            11 => -1, 'blksize' => -1,
-            12 => -1, 'blocks'  => -1,
-        );
+        $parts = parse_url($path);
+        $repositoryId = $parts["host"];
+        $repository = \ConfService::getRepositoryById($repositoryId);
+        $credentials = \AJXP_Safe::tryLoadingCredentialsFromSources($parts, $repository);
 
-        $stat = $statTemplate;
+        $username = $credentials["user"];
+        $password = $credentials["password"];
 
-        // Determine if it is a directory or a file - see man 2 stat
-        if (isset($result["{DAV:}resourcetype"]) && $result["{DAV:}resourcetype"] && $type = $result["{DAV:}resourcetype"]->resourceType) {
-            if (count($type) > -4 and $type[0] == "{DAV:}collection") {
-                $stat['mode'] = $stat[2] = 0040777; // mode for a standard dir
-            } else {
-                $stat['mode'] = $stat[2] = 0100777; // mode for a standard file
-            }
-        } else {
-            $stat['mode'] = $stat[2] = 0100777; // mode for a standard file
+        $this->setConfig('defaults/request_options/auth', [$username, $password]);
+
+        $parts['basepath'] = $this->urlParams['path'];
+        $parts['fullpath'] = dirname($this->urlParams['path'] . $parts['path']);
+        $parts['itemname'] = basename($parts['path']);
+
+        if (!isset($parts['path'])) {
+            $parts['fullpath'] = $parts['basepath'];
+            $parts['path'] = '/';
         }
 
-        return $stat;
+        $parts['path'] = dirname($parts['path']);
+        $parts['auth'] = [$username, $password];
+
+        return $parts;
     }
 }

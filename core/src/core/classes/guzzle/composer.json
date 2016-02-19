@@ -1,0 +1,8 @@
+{
+    "require": {
+        "guzzlehttp/guzzle": "~5",
+        "guzzlehttp/command": "~0.7",
+        "guzzlehttp/guzzle-services": "~0.5",
+        "gimler/guzzle-description-loader" : "*"
+    }
+}
