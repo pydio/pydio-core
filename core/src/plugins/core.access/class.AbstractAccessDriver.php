@@ -117,7 +117,7 @@ class AbstractAccessDriver extends AJXP_Plugin
     {
         ConfService::detectRepositoryStreams(true);
         $mess = ConfService::getMessages();
-        $selection = new UserSelection();
+        $selection = new UserSelection(ConfService::getRepository());
         $selection->initFromHttpVars($httpVars);
         $files = $selection->getFiles();
 
