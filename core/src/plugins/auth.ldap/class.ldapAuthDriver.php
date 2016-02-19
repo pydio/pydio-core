@@ -47,7 +47,10 @@ class ldapAuthDriver extends AbstractAuthDriver
     public $separateGroup = "";
 
     public $hasGroupsMapping = false;
-    public $attrMemberInGroup = true;
+    public $attrMemberInGroup = 'dn';
+	public $attrUserFakeMemberOf = null;
+
+	public $useTLS = false;
 
 
     /**
@@ -67,8 +70,12 @@ class ldapAuthDriver extends AbstractAuthDriver
         parent::init($options);
         $options = $this->options;
         $this->ldapUrl = $options["LDAP_URL"];
-        if (isSet($options["LDAP_PROTOCOL"]) && $options["LDAP_PROTOCOL"] == "ldaps") {
-            $this->ldapUrl = "ldaps://" . $this->ldapUrl;
+        if (isSet($options["LDAP_PROTOCOL"])) {
+			if($options["LDAP_PROTOCOL"] == "ldaps") {
+	            $this->ldapUrl = "ldaps://" . $this->ldapUrl;
+			}elseif($options["LDAP_PROTOCOL"] == "tls") {
+				$this->useTLS = true;
+			}
         }
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
@@ -76,9 +83,10 @@ class ldapAuthDriver extends AbstractAuthDriver
         if (!empty($options["LDAP_FAKE_MEMBEROF"])) $this->fakeAttrMemberOf = $options["LDAP_FAKE_MEMBEROF"];
         if (isset($options["LDAP_VALUE_MEMBERATTR_IN_GROUP"])) {
             $this->attrMemberInGroup = $options["LDAP_VALUE_MEMBERATTR_IN_GROUP"];
-        }else{
-            $this->attrMemberInGroup = true;
         }
+		if(isset($options['LDAP_FAKE_MEMBEROF_USER_ATTR'])) {
+			$this->attrUserFakeMemberOf = $options['LDAP_FAKE_MEMBEROF_USER_ATTR'];
+		}
 
         if ($options["LDAP_PAGE_SIZE"]) $this->pageSize = $options["LDAP_PAGE_SIZE"];
         if ($options["LDAP_GROUP_PREFIX"]) $this->mappedRolePrefix = $options["LDAP_GROUP_PREFIX"];
@@ -153,8 +161,12 @@ class ldapAuthDriver extends AbstractAuthDriver
     public function testLDAPConnexion($options)
     {
         $this->ldapUrl = $options["LDAP_URL"];
-        if (isSet($options["LDAP_PROTOCOL"]) && $options["LDAP_PROTOCOL"] == "ldaps") {
-            $this->ldapUrl = "ldaps://" . $this->ldapUrl;
+        if (isSet($options["LDAP_PROTOCOL"])) {
+			if($options["LDAP_PROTOCOL"] == "ldaps") {
+	            $this->ldapUrl = "ldaps://" . $this->ldapUrl;
+			}elseif($options["LDAP_PROTOCOL"] == "tls") {
+				$this->useTLS = true;
+			}
         }
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
@@ -213,6 +225,9 @@ class ldapAuthDriver extends AbstractAuthDriver
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
             //ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+			if($this->useTLS) {
+				ldap_start_tls($ldapconn);
+			}
 
             if ($this->ldapAdminUsername === null) {
                 //connecting anonymously
@@ -364,18 +379,33 @@ class ldapAuthDriver extends AbstractAuthDriver
                         }
 
                         // fake memberOf
-                        if (($this->fakeAttrMemberOf) && method_exists($this, "fakeMemberOf") && in_array(strtolower("memberof"), array_map("strtolower", $expected))) {
-                            if($this->attrMemberInGroup){
+                        if (($this->fakeAttrMemberOf) && in_array("memberof", array_map("strtolower", $expected))) {
+							$uid = null;
+
+                            if($this->attrMemberInGroup == 'dn'){
                                 $uid = $entry["dn"];
-                            }else{
+                            }elseif($this->attrMemberInGroup == 'cn'){
                                 $uidWithEqual = explode(",", $entry["dn"]);
                                 $uidShort = explode("=",$uidWithEqual[0]);
                                 $uid = $uidShort[1];
-                            }
+                            }elseif(!empty($this->attrUserFakeMemberOf) && isset($entry[$this->attrUserFakeMemberOf]) && $entry[$this->attrUserFakeMemberOf]['count'] > 0) {
+								$uid = $entry[$this->attrUserFakeMemberOf][0];
+							}
 
-                            $strldap = "(&" . $this->ldapGFilter . "(" .$this->fakeAttrMemberOf. "=" . $uid . "))";
-                            $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
+							if(isset($uid))
+							{
+								$strldap = "(&" . $this->ldapGFilter . "(" .$this->fakeAttrMemberOf. "=" . $uid . "))";
+								$this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
+							}
                         }
+
+						if(isset($entry['jpegphoto']))
+						{
+							for($i = 0; $i < $entry['jpegphoto']['count']; ++$i)
+							{
+								$entry['jpegphoto'][$i] = 'data:image/jpeg;base64,' . base64_encode($entry['jpegphoto'][$i]);
+							}
+						}
 
                         $allEntries[] = $entry;
                         $index++;

@@ -257,10 +257,14 @@ Class.create("FormManager", {
                 element += '</select><span class="select-styler"></span>';
             }else if(type == "image" && param.get("uploadAction")){
                 if(defaultValue){
-                    var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
-                    if(param.get("binary_context")){
-                        imgSrc += "&" + param.get("binary_context");
-                    }
+					if(defaultValue.substring(0, 5) == 'data:'){
+						var imgSrc = defaultValue;
+					}else{
+						var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
+						if(param.get("binary_context")){
+							imgSrc += "&" + param.get("binary_context");
+						}
+					}
                 }else if(param.get("defaultImage")){
                     imgSrc = param.get("defaultImage");
                 }
