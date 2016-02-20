@@ -357,7 +357,7 @@
             }
             if(this._node.isLeaf()){
                 if(this.getPublicLinkPermission('read')){
-                    this._data['minisite_layout'] = 'ajxp_unique_preview';
+                    this._data['minisite_layout'] = 'ajxp_unique_strip';
                 }else{
                     this._data['minisite_layout'] = 'ajxp_unique_dl';
                 }
