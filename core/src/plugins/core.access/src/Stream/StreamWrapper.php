@@ -138,6 +138,9 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 
         $this->body->seek(0);
 
+        $params = $this->params;
+        $params['body'] = $this->body;
+
         try {
             static::$client->put($params);
             return true;
@@ -246,14 +249,14 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
             return static::$nextStat[$key];
         }
 
-        try {
-            $result = static::$client->stat($params);
+        $result = static::$client->stat($params);
+
+        if ($result) {
             $result = static::$client->formatUrlStat($result);
 
             static::$nextStat[$path] = $result;
-        } catch (Exception $e) {
-            return false;
         }
+
         return $result;
     }
 
@@ -373,16 +376,17 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      */
     public function rename($path_from, $path_to)
     {
-        $params = $this->getParams($path_from);
-        $paramsTo = $this->getParams($path_to);
+        $params = $this->getParams($path_from, "from") + $this->getParams($path_to, "to");
+
+        $params['pathFrom'] = $params['fromfullpath'] . '/' . $params['fromitemname'];
+        $params['pathTo'] = $params['base_url'] . '/' . $params['tofullpath'] . '/' . $params['toitemname'];
 
         $this->clearStatInfo($path_from);
         $this->clearStatInfo($path_to);
 
-        $params["pathTo"] = $paramsTo["path"];
-
         $result = static::$client->rename($params);
-        return $result;
+
+        return true;
     }
 
     /**
@@ -392,9 +396,9 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      *
      * @return array Hash of custom params
      */
-    protected function getParams($path)
+    protected function getParams($path, $prefix = "")
     {
-        return static::$client->getParams($path);
+        return static::$client->getParams($path, $prefix);
     }
 
     /**
@@ -536,6 +540,11 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
             fwrite($stream, $data, strlen($data));
         }
         fclose($fp);
+    }
+
+    public static function changeMode($path, $chmodValue)
+    {
+        @chmod($path, $chmodValue);
     }
 
     public static function isSeekable($url) {

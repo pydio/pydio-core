@@ -78,10 +78,10 @@
         },
         "Rename" : {
             "httpMethod" : "MOVE",
-            "uri" : "{fullpath}/{itemname}",
+            "uri" : "{pathFrom}",
             "responseClass" : "MoveOutput",
             "parameters" : {
-                "path" : {
+                "pathFrom" : {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -91,6 +91,38 @@
                     "type" : "string",
                     "location" : "header",
                     "sentAs" : "Destination"
+                }
+            }
+        },
+        "Put" : {
+            "httpMethod" : "PUT",
+            "uri": "{fullpath}/{itemname}",
+            "responseClass" : "PutOutput",
+            "parameters" : {
+                "fullpath":  {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "itemname": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "body" : {
+                    "location" : "body"
+                }
+            }
+        },
+        "Delete" : {
+            "httpMethod": "DELETE",
+            "uri": "{fullpath}/{itemname}",
+            "responseClass": "DeleteOutput",
+            "parameters": {
+                "fullpath":  {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
                 },
                 "itemname": {
                     "required" : true,
@@ -111,6 +143,15 @@
             "type" : "object"
         },
         "RmdirOutput" : {
+            "type" : "object"
+        },
+        "MoveOutput" : {
+            "type": "object"
+        },
+        "PutOutput": {
+            "type" : "object"
+        },
+        "DeleteOutput": {
             "type" : "object"
         }
     }

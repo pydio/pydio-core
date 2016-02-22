@@ -95,7 +95,7 @@ abstract class AbstractClient extends GuzzleClient
      *
      * @return array Hash of custom params
      */
-    public function getParams($path, $defaults = array())
+    public function getParams($path, $prefix = "")
     {
         $parts = parse_url($path);
         $repositoryId = $parts["host"];
@@ -107,17 +107,21 @@ abstract class AbstractClient extends GuzzleClient
 
         $this->setConfig('defaults/request_options/auth', [$username, $password]);
 
-        $parts['basepath'] = $this->urlParams['path'];
-        $parts['fullpath'] = dirname($this->urlParams['path'] . $parts['path']);
-        $parts['itemname'] = basename($parts['path']);
+        $parts[$prefix . 'path'] = $parts['path'];
 
-        if (!isset($parts['path'])) {
-            $parts['fullpath'] = $parts['basepath'];
-            $parts['path'] = '/';
+        $parts[$prefix . 'basepath'] = $this->urlParams['path'];
+        $parts[$prefix . 'fullpath'] = dirname($this->urlParams['path'] . $parts[$prefix . 'path']);
+        $parts[$prefix . 'itemname'] = basename($parts[$prefix . 'path']);
+
+        if (!isset($parts[$prefix . 'path']) || $parts[$prefix . 'path'] == '/') {
+            $parts[$prefix . 'fullpath'] = $parts[$prefix . 'basepath'];
+            $parts[$prefix . 'path'] = '/';
         }
 
-        $parts['path'] = dirname($parts['path']);
-        $parts['auth'] = [$username, $password];
+        $parts[$prefix . 'path'] = dirname($parts[$prefix . 'path']);
+        $parts[$prefix . 'auth'] = [$username, $password];
+
+        $parts['base_url'] = $this->urlParams['scheme'] . '://' . $this->urlParams['host'];
 
         return $parts;
     }

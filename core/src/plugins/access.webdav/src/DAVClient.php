@@ -27,6 +27,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Command\Guzzle\Description as GuzzleDescription;
 use Symfony\Component\Config\FileLocator;
 use Sabre\DAV\Client as SabreDAVClient;
+use Sabre\DAV\Exception\NotFound;
 
 /**
  * Client to interact with a WebDAV FS
@@ -137,6 +138,8 @@ class DAVClient extends AbstractClient
                     '{DAV:}resourcetype'
                 ]
             );
+        } catch (NotFound $e) {
+            return false;
         } catch (Exception $e) {
             return false;
         }
@@ -194,6 +197,10 @@ class DAVClient extends AbstractClient
         $this->files = array();
 
         $keys = array_keys($response);
+
+        // First element is "."
+        array_shift($keys);
+
         foreach ($keys as $key) {
 
             $formattedStat = $this->_formatUrlStat($response[$key]);
