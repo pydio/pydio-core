@@ -20,8 +20,6 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-use Guzzle\Plugin\Log\LogPlugin;
-use AccessS3\S3Client;
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
@@ -54,7 +52,6 @@ class s3AccessDriver extends fsAccessDriver
 
         if(isSet($this->repository)){
             require_once("aws.phar");
-            require_once __DIR__ . DIRECTORY_SEPARATOR . 'class.pydioS3Client.php';
             $options = array(
                 'key'    => $this->repository->getOption("API_KEY"),
                 'secret' => $this->repository->getOption("SECRET_KEY"),
@@ -81,13 +78,14 @@ class s3AccessDriver extends fsAccessDriver
             }
             $sdkVersion = $this->getFilteredOption("SDK_VERSION");
             if ($sdkVersion === "v3") {
-                $this->s3Client = new S3Client([
+                require_once ("class.PydioS3Client.php");
+                $this->s3Client = new AccessS3\S3Client([
                     "version" => $apiVersion,
                     "region"  => $region,
                     "credentials" => $options
                 ]);
             } else {
-                $this->s3Client = S3Client::factory($options);
+                $this->s3Client = Aws\S3\S3Client::factory($options);
                 if($this->repository->getOption("VHOST_NOT_SUPPORTED")){
                     // Use virtual hosted buckets when possible
                     require_once("ForcePathStyleListener.php");

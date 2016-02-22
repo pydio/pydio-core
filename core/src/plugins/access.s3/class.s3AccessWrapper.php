@@ -20,7 +20,6 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-use Aws\S3\S3Client;
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
@@ -239,11 +238,26 @@ class s3AccessWrapper extends fsAccessWrapper
             if(!empty($proxy)){
                 $options['request.options'] = array('proxy' => $proxy);
             }
-            $s3Client = S3Client::factory($options);
+            $apiVersion = $repoObject->getOption("API_VERSION");
+            if ($apiVersion === "") {
+                $apiVersion = "latest";
+            }
+            $sdkVersion = $repoObject->getOption("SDK_VERSION");
 
-            if($repoObject->getOption("VHOST_NOT_SUPPORTED")){
-                require_once("ForcePathStyleListener.php");
-                $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+            if ($sdkVersion === "v3") {
+                require_once ("class.PydioS3Client.php");
+                $s3Client = new AccessS3\S3Client([
+                    "version" => $apiVersion,
+                    "region"  => $region,
+                    "credentials" => $options
+                ]);
+            } else {
+                $s3Client = Aws\S3\S3Client::factory($options);
+                if($repoObject->getOption("VHOST_NOT_SUPPORTED")){
+                    // Use virtual hosted buckets when possible
+                    require_once("ForcePathStyleListener.php");
+                    $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+                }
             }
 
             $bucket = $repoObject->getOption("CONTAINER");
