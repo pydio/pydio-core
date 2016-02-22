@@ -321,7 +321,7 @@ class IMagickPreviewer extends AJXP_Plugin
         if (is_array($out) && count($out)) {
             throw new AJXP_Exception(implode("\n", $out));
         }
-        if(!is_file($tmpFileThumb)){
+        if(!(is_file($tmpFileThumb) || is_file(str_replace(".jpg", "-0.jpg", $tmpFileThumb)))){
             throw new AJXP_Exception("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getFilteredOption("IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
         }
         if (!$this->extractAll) {
