@@ -1425,6 +1425,7 @@ class ShareCenter extends AJXP_Plugin
 
         $hiddenUserEntry = null;
         $downloadDisabled = false;
+        $originalHttpVars = $httpVars;
         if(isSet($httpVars["enable_public_link"])){
             // PREPARE HIDDEN USER DATA
             if(isSet($httpVars["hash"])){
@@ -1457,7 +1458,7 @@ class ShareCenter extends AJXP_Plugin
         }
         if(!count($users) && !count($groups)){
             ob_start();
-            $this->switchAction("unshare", $httpVars, array());
+            $this->switchAction("unshare", $originalHttpVars, array());
             ob_end_clean();
             return null;
         }
