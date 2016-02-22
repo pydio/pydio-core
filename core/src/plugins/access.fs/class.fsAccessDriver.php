@@ -936,11 +936,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                                 $node->mergeMetadata(array("page_position" => floor($index / $limitPerPage) +1));
                             }
                         }
-                        if($this->repository->hasContentFilter()){
-                            $externalPath = $this->repository->getContentFilter()->externalPath($node);
-                            $node->setUrl($this->urlBase.$externalPath);
-                        }
-
                         AJXP_XMLWriter::renderAjxpNode($node);
                     }
                     AJXP_XMLWriter::close();
@@ -1025,7 +1020,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     throw new AJXP_Exception("Cannot open dir ".$nonPatchedPath);
                 }
                 $nodes = array();
-                while(strlen($file = readdir($handle))>0){
+                while(false !== ($file = readdir($handle))){
                     $nodes[] = $file;
                 }
                 closedir($handle);
@@ -1087,12 +1082,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if(isSet($orderField) && $orderField != "ajxp_label" && !(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true" )) {
                         $nodeType = "f";
                     }
-
-                    if($this->repository->hasContentFilter()){
-                        $externalPath = $this->repository->getContentFilter()->externalPath($node);
-                        $node->setUrl($this->urlBase.$externalPath);
-                    }
-
                     $fullList[$nodeType][$nodeName] = $node;
                     $cursor ++;
                 }
@@ -1573,7 +1562,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
         $count = 0;
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
-        while (strlen($file = readdir($handle)) > 0) {
+        while (false !== ($file = readdir($handle))) {
             if($file != "." && $file !=".."
                 && !(AJXP_Utils::isHidden($file) && !$showHiddenFiles)){
                 if($foldersOnly && is_file($dirName."/".$file)) continue;

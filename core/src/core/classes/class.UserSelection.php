@@ -77,9 +77,6 @@ class UserSelection
             $this->initFromArray($_GET);
             $this->initFromArray($_POST);
         }
-        if(isSet($this->repository) && $this->repository->hasContentFilter()){
-            $this->repository->getContentFilter()->filterUserSelection($this);
-        }
     }
 
     /**

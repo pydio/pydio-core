@@ -68,7 +68,11 @@ class ContentFilter {
     }
 
     function getBaseDir(){
-        return dirname($this->filters[0]);
+        return dirname(array_keys($this->filters)[0]);
+    }
+
+    function getUniquePath(){
+        return basename(array_keys($this->filters)[0]);
     }
 
     /**
@@ -119,6 +123,11 @@ class ContentFilter {
             $data["virtualPaths"][SystemTextEncoding::toUTF8($k)] = SystemTextEncoding::toUTF8($v);
         }
         return $data;
+    }
+
+    public function fromFilterArray($filters){
+        $this->filters = $filters;
+        $this->virtualPaths = array_flip($this->filters);
     }
 
 } 

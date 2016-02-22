@@ -50,6 +50,8 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
     protected static $cachedRepositoriesWrappers = array();
 
+    protected $currentUniquePath;
+
     /**
      * Register the stack of protocols/wrappers.
      * @param null $registered_wrappers
@@ -89,9 +91,31 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
     }
 
-    protected static function translateScheme($url){
+    /**
+     * @param string $url
+     * @param AJXP_MetaStreamWrapper $crtInstance
+     * @return string
+     * @throws Exception
+     */
+    protected static function translateScheme($url, $crtInstance = null){
         $currentScheme = parse_url($url, PHP_URL_SCHEME);
         $newScheme = self::getNextScheme($url);
+        $repository = ConfService::getRepositoryById(parse_url($url, PHP_URL_HOST));
+        if($currentScheme == "pydio" && $repository->hasContentFilter()){
+            $baseDir = $repository->getContentFilter()->getBaseDir();
+            if($crtInstance != null){
+                $crtInstance->currentUniquePath = $repository->getContentFilter()->getUniquePath();
+            }
+            if(!empty($baseDir) || $baseDir != "/"){
+                $crtPath = parse_url($url, PHP_URL_PATH);
+                $crtBase = basename($crtPath);
+                if(!empty($crtPath) && $crtPath != "/" && $crtBase != $repository->getContentFilter()->getUniquePath() && $crtBase != ".ajxp_meta"){
+                    throw new Exception("Cannot find file ".$crtBase);
+                }
+                // Prepend baseDir in path
+                $url = str_replace($currentScheme."://".$repository->getId().$crtPath, $currentScheme."://".$repository->getId().rtrim($baseDir.$crtPath, "/"), $url);
+            }
+        }
         return str_replace($currentScheme."://", $newScheme."://", $url);
     }
 
@@ -242,7 +266,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      */
     public function dir_opendir($path, $options)
     {
-        $newPath = self::translateScheme($path);
+        $newPath = self::translateScheme($path, $this);
         $this->handle = opendir($newPath);
         if($this->handle !== false){
             $this->currentDirPath = parse_url($path, PHP_URL_PATH);
@@ -253,17 +277,39 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
     }
 
     /**
-     * Enter description here...
+     * Standard readdir() implementation
      *
      * @return string
      */
     public function dir_readdir()
     {
         if(isSet($this->handle) && is_resource($this->handle)){
-            return readdir($this->handle);
+            if($this->currentUniquePath != null){
+                return $this->innerReadDirFiltered($this->handle);
+            }else{
+                return readdir($this->handle);
+            }
         }
         return false;
     }
+
+    /**
+     * Skip values until correct one is found
+     * @param Resource $resource
+     * @return string
+     */
+    protected function innerReadDirFiltered($resource){
+        $test = readdir($resource);
+        if($test === false || $test == "." || $test == ".."){
+            return $test;
+        }
+        if($this->currentUniquePath == $test) {
+            return $test;
+        }
+        // Return next one
+        return $this->innerReadDirFiltered($resource);
+    }
+
 
     /**
      * Enter description here...
