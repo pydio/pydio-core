@@ -218,6 +218,19 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $userObj->addRole(AuthService::getRole($cas_RoleID, true));
                     AuthService::updateUser($userObj);
                 }
+
+                // try to log to DEFAULT START REPO
+                $userObj->recomputeMergedRole();
+                $loggedUser = $userObj;
+                $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+                $passId = -1;
+                if (isSet($httpVars["tmp_repository_id"])) {
+                    $passId = $httpVars["tmp_repository_id"];
+                } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
+                    $passId = $force;
+                }
+                ConfService::switchUserToActiveRepository($loggedUser, $passId);
+
                 return true;
             }
         }
