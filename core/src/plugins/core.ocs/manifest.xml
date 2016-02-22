@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Open Cloud Specification]" description="CONF_MESSAGE[Implement Open Cloud Specification]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="OCS_Router" filename="plugins/core.ocs/class.OCS_Router.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core.ocs" path="plugins/core.ocs/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
+                      description="CONF_MESSAGE[Enable Federated Sharing]" default="true" mandatory="true"/>
+    </server_settings>
+</ajxp_plugin>
