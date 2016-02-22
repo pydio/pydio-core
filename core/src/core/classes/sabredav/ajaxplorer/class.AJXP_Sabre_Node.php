@@ -52,8 +52,15 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     }
 
     /**
+     * @param Repository $repository
+     */
+    public function updateRepository($repository){
+        $this->repository = $repository;
+    }
+
+    /**
      * @return AjxpWrapperProvider
-     * @throws Sabre\DAV\Exception\FileNotFound
+     * @throws \Sabre\DAV\Exception\NotFound
      */
     public function getAccessDriver()
     {
