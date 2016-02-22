@@ -451,17 +451,17 @@ class fsAccessWrapper implements AjxpWrapper
     {
         $this->closeWrapper();
         if ($this->dH == -1) {
-            return true;
+            return;
         } else {
-            return closedir($this->dH);
+            closedir($this->dH);
         }
     }
     public function dir_readdir ()
     {
         if ($this->dH == -1) {
             if (isSet(self::$currentListingKeys[self::$currentListingIndex])) {
-                self::$currentListingIndex ++;
-                return self::$currentListingKeys[self::$currentListingIndex-1];
+                self::$currentListingIndex++;
+                return self::$currentListingKeys[self::$currentListingIndex - 1];
             } else {
                 return false;
             }
