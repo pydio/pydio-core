@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="inbox" label="CONF_MESSAGE[Inbox Workspace]" description="CONF_MESSAGE[Received Files]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.inbox/class.inboxAccessDriver.php" classname="inboxAccessDriver"/>
+	<registry_contributions>
+        <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='download_all']|actions/action[@name='download']"/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+        <actions>
+            <action name="open_shared_repository" dirDefault="true">
+                <gui text="462" title="462" src="download_manager.png" iconClass="icon-signin" accessKey="download_access_key" hasAccessKey="true">
+                    <context dir="" recycle="false" selection="true" actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="get,inline,info_panel"/>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true" allowedMimes="shared_folder"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var repo = pydio.getUserSelection().getUniqueNode().getMetadata().get("shared_repository_id");
+                        if(repo){
+                            pydio.triggerRepositoryChange(repo);
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="download" fileDefault="false">
+                <gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
+                    <context selection="true" dir="" recycle="false"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="get,inline,info_panel">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" enableRoot="false"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+					var userSelection = ajaxplorer.getUserSelection();
+                    if(window.gaTrackEvent){
+                        var fileNames = userSelection.getFileNames();
+                        for(var i=0; i<fileNames.length;i++){
+                            window.gaTrackEvent("Data", "Download", fileNames[i]);
+                        }
+                    }
+                    PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
+					]]></clientCallback>
+                    <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
+                        <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                        <output type="stream"/>
+                    </serverCallback>
+                </processing>
+            </action>
+        </actions>
+	</registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/access.inbox/class.inboxAccessWrapper.php" classname="inboxAccessWrapper" protocol="ajxp.inbox"/>
+</ajxpdriver>
