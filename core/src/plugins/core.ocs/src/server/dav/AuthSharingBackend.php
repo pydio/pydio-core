@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -26,11 +27,11 @@ use Sabre\HTTP;
 
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
 
-class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
+class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {
 
     /**
-     * @var AJXP_Sabre_Collection
+     * @var \AJXP_Sabre_Collection
      */
     var $rootCollection;
     /**
@@ -40,7 +41,7 @@ class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
 
     /**
      * OCS_DavAuthSharingBackend constructor.
-     * @param AJXP_Sabre_Collection $rootCollection Repository object will be updated once authentication is passed
+     * @param \AJXP_Sabre_Collection $rootCollection Repository object will be updated once authentication is passed
      */
     public function __construct($rootCollection){
         $this->rootCollection = $rootCollection;
@@ -59,9 +60,9 @@ class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
     protected function validateUserPass($username, $password)
     {
         if(isSet($this->shareData["PRESET_LOGIN"])){
-            $res = AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
+            $res = \AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
         }else{
-            $res = AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
+            $res = \AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
         }
         return $res === 1;
     }
@@ -80,8 +81,7 @@ class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
      */
     public function authenticate(DAV\Server $server, $realm) {
 
-        require_once("class.OCS_DavBasicAuthNoPass.php");
-        $auth = new OCS_DavBasicAuthNoPass();
+        $auth = new BasicAuthNoPass();
         $auth->setHTTPRequest($server->httpRequest);
         $auth->setHTTPResponse($server->httpResponse);
         $auth->setRealm($realm);
@@ -93,7 +93,7 @@ class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+        $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;
@@ -107,9 +107,9 @@ class OCS_DavAuthSharingBackend extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
 
         $repositoryId = $this->shareData["REPOSITORY"];
-        $repository = ConfService::getRepositoryById($repositoryId);
+        $repository = \ConfService::getRepositoryById($repositoryId);
         if ($repository == null) {
-            $repository = ConfService::getRepositoryByAlias($repositoryId);
+            $repository = \ConfService::getRepositoryByAlias($repositoryId);
         }
         if ($repository == null) {
             throw new DAV\Exception\NotAuthenticated('Username cannot access any repository');

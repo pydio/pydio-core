@@ -18,11 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\OCS;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+require_once("vendor/autoload.php");
 
-class OCS_Router extends AJXP_Plugin{
+class Router extends \AJXP_Plugin{
 
     public function federatedEnabled(){
         return $this->getConfigs()["ENABLE_FEDERATED_SHARING"] === true;
@@ -52,8 +54,7 @@ class OCS_Router extends AJXP_Plugin{
 
         if($endpoint == "dav" && $this->federatedEnabled()){
 
-            require_once("service/class.OCS_DavServer.php");
-            $server = new OCS_DavServer();
+            $server = new Server\Dav\Server();
             $server->start("/ocs/v2/dav");
 
         }else if($endpoint == "shares" && $this->federatedEnabled()){
@@ -101,7 +102,7 @@ class OCS_Router extends AJXP_Plugin{
 
     protected function array2xml($array, $node_name="root")
     {
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $root = $dom->createElement($node_name);
         $dom->appendChild($root);

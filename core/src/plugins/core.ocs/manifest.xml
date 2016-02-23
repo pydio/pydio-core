@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Open Cloud Specification]" description="CONF_MESSAGE[Implement Open Cloud Specification]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="OCS_Router" filename="plugins/core.ocs/class.OCS_Router.php"/>
+    <class_definition classname="Pydio\OCS\Router" filename="plugins/core.ocs/Router.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core.ocs" path="plugins/core.ocs/i18n"/>
