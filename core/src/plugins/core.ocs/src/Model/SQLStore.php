@@ -98,10 +98,10 @@ class SQLStore implements IStore
     {
         $id = $remoteShare->getId();
         if(empty($id)){
-            $id = $remoteShare->getOcsToken()."###".$remoteShare->getUser();
+            $id = $remoteShare->getOcsRemoteId();
+            $remoteShare->setId($id);
         }
         $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_REMOTE_SHARE, $id, $remoteShare, OCS_SQLSTORE_FORMAT, $remoteShare->getUser());
-        $remoteShare->setId($id);
         return $remoteShare;
 
     }
