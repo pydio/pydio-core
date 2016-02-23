@@ -716,7 +716,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             "REPOSITORIES" => $repos,
                             "SHARED_REPOSITORIES" => $sharedRepos,
                             "REPOSITORIES_DETAILS" => $repoDetailed,
-                            "PROFILES" => array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest")
+                            "PROFILES" => array("standard|".$mess["ajxp_conf.156"],"admin|".$mess["ajxp_conf.157"],"shared|".$mess["ajxp_conf.158"],"guest|".$mess["ajxp_conf.159"])
                         )
                     );
                     if (isSet($userObject)) {

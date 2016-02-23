@@ -72,8 +72,8 @@ $mess=array(
 "40" => "Einschalten",
 "41" => "Entfernen",
 "42" => "Rollen-Daten",
-"43" => "Select one or more",
-"44" => "Plugins Parameter Fein-Einstellungen",
+"43" => "Bitte auswählen",
+"44" => "Fein-Einstellungen für Erweiterungs-Parameter",
 "45" => "Zugriffssteuerungsliste",
 "46" => "Ausgeschaltete Aktionen",
 );
