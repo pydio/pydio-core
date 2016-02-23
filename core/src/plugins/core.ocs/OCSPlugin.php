@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once("vendor/autoload.php");
 
-class Router extends \AJXP_Plugin{
+class OCSPlugin extends \AJXP_Plugin{
 
     public function federatedEnabled(){
         return $this->getConfigs()["ENABLE_FEDERATED_SHARING"] === true;
@@ -69,8 +69,9 @@ class Router extends \AJXP_Plugin{
 
         }
 
-
     }
+
+
 
     public function buildResponse($status = "ok", $code = 200, $message = null, $data = null){
 

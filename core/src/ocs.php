@@ -32,7 +32,7 @@ $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
 /**
- * @var Pydio\OCS\Router $coreLoader
+ * @var Pydio\OCS\OCSPlugin $coreLoader
  */
 $coreLoader = $pServ->getPluginById("core.ocs");
 $configs = $coreLoader->getConfigs();
