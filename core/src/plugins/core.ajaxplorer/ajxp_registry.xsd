@@ -765,7 +765,7 @@
     </xs:element>
     <xs:element name="class_definition">
         <xs:complexType>
-            <xs:attribute name="classname" use="required" type="xs:NCName"/>
+            <xs:attribute name="classname" use="required" type="xs:string"/>
             <xs:attribute name="filename" use="required"/>
         </xs:complexType>
     </xs:element>
