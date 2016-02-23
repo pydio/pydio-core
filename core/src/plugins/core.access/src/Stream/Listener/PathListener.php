@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace CoreAccess\Stream\Listener;
+namespace Pydio\Access\Core\Stream\Listener;
 
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Command\Event\PreparedEvent;

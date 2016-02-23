@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace CoreAccess\Stream\Iterator;
+namespace Pydio\Access\Core\Stream\Iterator;
 
 class DirIterator implements \Iterator {
 

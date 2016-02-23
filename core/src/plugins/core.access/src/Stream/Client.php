@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace CoreAccess\Stream\Client;
+namespace Pydio\Access\Core\Stream;
 
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 
@@ -30,7 +30,7 @@ use GuzzleHttp\Command\Guzzle\GuzzleClient;
  * @link http://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-s3.html User guide
  * @link http://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.S3.S3Client.html API docs
  */
-abstract class AbstractClient extends GuzzleClient
+class Client extends GuzzleClient implements ClientInterface
 {
     const LATEST_API_VERSION = '2016-01-01';
 
@@ -68,7 +68,9 @@ abstract class AbstractClient extends GuzzleClient
     /**
      * Register this client on the StreamWrapper
      */
-    public abstract function registerStreamWrapper();
+    public function registerStreamWrapper() {
+        StreamWrapper::register($this);
+    }
 
     /**
      * Redefine a file stat
@@ -77,7 +79,9 @@ abstract class AbstractClient extends GuzzleClient
      *
      * @return array Associative array containing the stats
      */
-    public abstract function formatUrlStat($arr);
+    public function formatUrlStat($arr) {
+        return $STAT_TEMPLATE;
+    }
 
     /**
      * Get a Directory Iterator based on the given array
@@ -86,7 +90,9 @@ abstract class AbstractClient extends GuzzleClient
      *
      * @return DirIterator
      */
-    public abstract function getIterator($arr);
+    public function getIterator($arr) {
+        return new Iterator\DirIterator($arr);
+    }
 
     /**
      * Get the params from the passed path
@@ -98,14 +104,6 @@ abstract class AbstractClient extends GuzzleClient
     public function getParams($path, $prefix = "")
     {
         $parts = parse_url($path);
-        $repositoryId = $parts["host"];
-        $repository = \ConfService::getRepositoryById($repositoryId);
-        $credentials = \AJXP_Safe::tryLoadingCredentialsFromSources($parts, $repository);
-
-        $username = $credentials["user"];
-        $password = $credentials["password"];
-
-        $this->setConfig('defaults/request_options/auth', [$username, $password]);
 
         $parts[$prefix . 'path'] = $parts['path'];
 

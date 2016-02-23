@@ -14,14 +14,16 @@
  * permissions and limitations under the License.
  */
 
-namespace CoreAccess\Stream\Client;
+namespace Pydio\Access\WebDAV;
 
 require_once(__DIR__ . '/../../../core/classes/guzzle/vendor/autoload.php');
 require_once(__DIR__ . '/../../../core/classes/sabredav/lib/Sabre/autoload.php');
 
-use CoreAccess\Stream\StreamWrapper;
-use CoreAccess\Stream\Listener\PathListener;
-use CoreAccess\Stream\Iterator\DirIterator;
+
+use Pydio\Access\Core\Stream\Client as CoreClient;
+use Pydio\Access\Core\Stream\Listener\PathListener;
+use Pydio\Access\Core\Stream\Iterator\DirIterator;
+use Pydio\Access\Core\Stream\StreamWrapper;
 use Guzzle\Service\Loader\JsonLoader;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Command\Guzzle\Description as GuzzleDescription;
@@ -33,9 +35,9 @@ use Sabre\DAV\Exception\NotFound;
  * Client to interact with a WebDAV FS
  *
  */
-class DAVClient extends AbstractClient
+class Client extends CoreClient
 {
-    const PROTOCOL = "dav";
+    const PROTOCOL = "pydio.dav";
     const RESOURCES_PATH = "Resources";
     const RESOURCES_FILE = "dav.json";
 
@@ -74,7 +76,7 @@ class DAVClient extends AbstractClient
      */
     public function registerStreamWrapper()
     {
-        StreamWrapper::register($this);
+        StreamWrapper::register($this, self::PROTOCOL);
 
         return $this;
     }
@@ -113,8 +115,8 @@ class DAVClient extends AbstractClient
     private function _getSabreDAVClient($params) {
         return new SabreDAVClient([
             'baseUri' => $this->urlParams["scheme"] . "://" . $this->urlParams['host'],
-            'userName' => $params['auth'][0],
-            'password' => $params['auth'][1]
+            'userName' => $params['user'],
+            'password' => $params['password']
         ]);
     }
 

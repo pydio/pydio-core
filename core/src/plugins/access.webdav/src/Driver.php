@@ -20,19 +20,16 @@
  *
  */
 
+namespace Pydio\Access\WebDAV;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
-
-use CoreAccess\Stream\Client\DAVClient;
-use CoreAccess\Stream\StreamWrapper;
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class webdavAccessDriver extends fsAccessDriver
+class Driver extends \fsAccessDriver
 {
     /**
     * @var Repository
@@ -58,6 +55,9 @@ class webdavAccessDriver extends fsAccessDriver
      */
     public function initRepository()
     {
+
+        $this->detectStreamWrapper(true);
+
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
         } else {
@@ -72,34 +72,22 @@ class webdavAccessDriver extends fsAccessDriver
 
         // Connexion
         $settings = array(
-            'baseUri' => $this->getSanitizedUrl($hostParts) . "/" . trim($path, '/'),
+            'baseUri' => \AJXP_Utils::getSanitizedUrl($hostParts) . "/" . trim($path, '/'),
         );
 
-        $this->client = new DAVClient($settings);
+        $this->client = new Client($settings);
         $this->client->registerStreamWrapper();
+
 
         // Params
         $recycle = $this->repository->getOption("RECYCLE_BIN");
 
         // Config
-        ConfService::setConf("PROBE_REAL_SIZE", false);
+        \ConfService::setConf("PROBE_REAL_SIZE", false);
         $this->urlBase = "pydio://".$this->repository->getId();
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            \RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
-    }
-
-    /**
-     * Sanitize a URL removin all unwanted / trailing slashes
-     *
-     * @param array url_parts
-     * return string url
-     */
-    public function getSanitizedUrl($arr) {
-        $credentials = join(':', array_filter([$arr['user'], $arr['pass']]));
-        $hostname = join(':', array_filter([$arr['host'], $arr['port']]));
-        $domain = join('@', array_filter([$credentials, $hostname]));
-        return $arr['scheme'] . '://' . join('/', array_filter([$domain, $arr['path']]));
     }
 
 

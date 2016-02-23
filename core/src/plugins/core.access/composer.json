@@ -1,7 +1,10 @@
 {
-    "autoload" : {
+    "name": "CoreAccess",
+    "description": "Pydio Core Access to Filesystems",
+    "homepage": "https://pydio.com/",
+    "autoload": {
         "psr-4": {
-            "CoreAccess\\": "src/"
+            "Pydio\\Access\\Core\\": "./src"
         }
     }
 }

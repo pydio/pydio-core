@@ -1617,6 +1617,19 @@ class AJXP_Utils
     }
 
     /**
+     * Sanitize a URL removin all unwanted / trailing slashes
+     *
+     * @param array url_parts
+     * return string url
+     */
+    public function getSanitizedUrl($arr) {
+        $credentials = join(':', array_filter([$arr['user'], $arr['pass']]));
+        $hostname = join(':', array_filter([$arr['host'], $arr['port']]));
+        $domain = join('@', array_filter([$credentials, $hostname]));
+        return $arr['scheme'] . '://' . join('/', array_filter([$domain, $arr['path']]));
+    }
+
+    /**
      * @static
      * @param string $url
      * @return bool|mixed|string
@@ -2092,5 +2105,5 @@ class AJXP_Utils
     public static function winSetHidden($file)
     {
         @shell_exec("attrib +H " . escapeshellarg($file));
-    }	
+    }
 }

@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace CoreAccess\Stream;
+namespace Pydio\Access\Core\Stream;
 
 use \AJXP_Utils;
-use CoreAccess\Stream\Client\AbstractClient;
+use Pydio\Access\Core\Stream\ClientInterface;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Stream\CachingStream;
 
@@ -66,6 +66,11 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     protected $objectIterator;
 
     /**
+     * @var string the current protocol
+     */
+    private $protocol = 's3';
+
+    /**
      * @var array The next key to retrieve when using a directory iterator. Helps for fast directory traversal.
      */
     protected static $nextStat = array();
@@ -75,9 +80,21 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      *
      * @param Client $client to use with the stream wrapper
      */
-    public static function register(AbstractClient $client)
-    {
-        static::$client = $client;
+    public static function register(
+        ClientInterface $client,
+        $protocol
+    ) {
+        if (in_array($protocol, stream_get_wrappers())) {
+            stream_wrapper_unregister($protocol);
+        }
+
+        // Set the client passed in as the default stream context client
+        stream_wrapper_register($protocol, get_called_class(), STREAM_IS_URL);
+
+        $default = stream_context_get_options(stream_context_get_default());
+        $default[$protocol]['client'] = $client;
+
+        stream_context_set_default($default);
     }
 
     /**
@@ -142,7 +159,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
         $params['body'] = $this->body;
 
         try {
-            static::$client->put($params);
+            $this->getClient()->put($params);
             return true;
         } catch (\Exception $e) {
             return $this->triggerError($e->getMessage());
@@ -208,7 +225,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         try {
             $this->clearStatInfo($path);
-            static::$client->delete($this->getParams($path));
+            $this->getClient()->delete($this->getParams($path));
             return true;
         } catch (\Exception $e) {
             return $this->triggerError($e->getMessage());
@@ -249,10 +266,10 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
             return static::$nextStat[$key];
         }
 
-        $result = static::$client->stat($params);
+        $result = $this->getClient()->stat($params);
 
         if ($result) {
-            $result = static::$client->formatUrlStat($result);
+            $result = $this->getClient()->formatUrlStat($result);
 
             static::$nextStat[$path] = $result;
         }
@@ -275,7 +292,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         $params = $this->getParams($path);
 
-        $result = static::$client->mkdir($params);
+        $result = $this->getClient()->mkdir($params);
 
         return $result;
     }
@@ -293,7 +310,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         $params = $this->getParams($path);
 
-        $result = static::$client->rmdir($params);
+        $result = $this->getClient()->rmdir($params);
 
         return $result;
     }
@@ -311,9 +328,9 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         $params = $this->getParams($path);
 
-        $result = static::$client->ls($params);
+        $result = $this->getClient()->ls($params);
 
-        $this->objectIterator = static::$client->getIterator($result);
+        $this->objectIterator = $this->getClient()->getIterator($result);
 
         return true;
     }
@@ -384,7 +401,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
         $this->clearStatInfo($path_from);
         $this->clearStatInfo($path_to);
 
-        $result = static::$client->rename($params);
+        $result = $this->getClient()->rename($params);
 
         return true;
     }
@@ -398,7 +415,12 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      */
     protected function getParams($path, $prefix = "")
     {
-        return static::$client->getParams($path, $prefix);
+        $parts = explode('://', $path, 2);
+        $this->protocol = $parts[0];
+
+        $default = stream_context_get_options(stream_context_get_default());
+
+        return $this->getClient()->getParams($path, $prefix) + $default[$this->protocol];
     }
 
     /**
@@ -412,7 +434,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     protected function openReadStream(array $params, array &$errors)
     {
         // Create the command and serialize the request
-        $response = static::$client->open($params);
+        $response = $this->getClient()->open($params);
 
         $this->body = $response->getBody();
 
@@ -446,7 +468,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         try {
             $this->body->seek(0, SEEK_END);
-        } catch (S3Exception $e) {
+        } catch (\Exception $e) {
             // The object does not exist, so use a simple write stream
             $this->openWriteStream($params, $errors);
         }
@@ -553,5 +575,22 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 
     public static function isRemote() {
         return true;
+    }
+
+    /**
+     * Gets the client from the stream context
+     *
+     * @return Client
+     * @throws Exception if no client has been configured
+     */
+    private function getClient()
+    {
+        $default = stream_context_get_options(stream_context_get_default());
+
+        if (!$client = $default[$this->protocol]['client']) {
+            throw new \Exception('No client defined for '. $this->protocol);
+        }
+
+        return $client;
     }
 }

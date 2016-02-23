@@ -4,8 +4,8 @@
     "homepage": "http://pydio.com/",
     "autoload": {
         "psr-4": {
-            "CoreAccess\\": "../core.access/src",
-            "CoreAccess\\Stream\\Client\\": "./src/"
+            "Pydio\\Access\\Core\\": "../core.access/src",
+            "Pydio\\Access\\WebDAV\\": "./src/"
         }
     }
 }

@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'CoreAccess\\' => array($baseDir . '/src'),
+    'Pydio\\Access\\Core\\' => array($baseDir . '/src'),
 );

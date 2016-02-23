@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="webdav" enabled="false" label="CONF_MESSAGE[WebDAV]" description="CONF_MESSAGE[Access WebDAV through Guzzle and SabreDAV]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-<class_definition filename="plugins/access.webdav/class.webdavAccessDriver.php" classname="webdavAccessDriver"/>
+    <class_definition filename="plugins/access.webdav/vendor/autoload.php" classname="Pydio\Access\WebDAV\Driver"/>
     <client_settings icon="plugins/access.fs/icon.png" description_template="{HOST}/{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="dav_access" path="plugins/access.webdav/i18n"/>
@@ -22,5 +22,5 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/core.access/src/Stream/StreamWrapper.php" classname="CoreAccess\Stream\StreamWrapper" protocol="ajxp.dav"/>
+    <class_stream_wrapper filename="plugins/core.access/vendor/autoload.php" classname="Pydio\Access\WebDAV\Wrapper" protocol="ajxp.dav"/>
 </ajxpdriver>

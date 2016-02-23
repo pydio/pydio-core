@@ -6,6 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'CoreAccess\\Stream\\Client\\' => array($baseDir . '/src'),
-    'CoreAccess\\' => array($baseDir . '/../core.access/src'),
+    'Pydio\\Access\\WebDAV\\' => array($baseDir . '/src'),
+    'Pydio\\Access\\Core\\' => array($baseDir . '/../core.access/src'),
 );
