@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"FTP Authentification" => "Autenticazione FTP",
+"FTP Authentication" => "Autenticazione FTP",
 "Authenticate user directly to an FTP server, and connect him to this server." => "Autenticazione diretta degli utenti sul server FTP, e connessione ad esso.",
 "FTP Login Screen" => "Schermata Login FTP Login",
 "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Mostrare una generica finestra 'Connessione FTP' all'avvio (consentendo all'utente di inserire il proprio host o la propria porta) o la finestra standard di login.",

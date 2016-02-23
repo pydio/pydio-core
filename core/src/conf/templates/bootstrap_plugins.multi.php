@@ -39,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * each type of operation, there are multiple implementation
  * possible. Check the content of the plugins folder.
  * CONF = users and repositories definition,
- * AUTH = users authentification mechanism,
+ * AUTH = users authentication mechanism,
  * LOG = logs of the application.
  *
  * This template shows how to configure the auth.remote plugin
