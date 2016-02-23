@@ -158,4 +158,13 @@ $mess=array(
 "Driver type (do not touch)" => "Driver type (do not touch)",
 "Use PHP MySQLi extension" => "Use PHP MySQLi extension",
 "Use MySQLi" => "Use MySQLi",
+"Ascending" => "Ascending",
+"Descending" => "Descending",
+"Name" => "Name",
+"Modification date" => "Modification date",
+"File size" => "File size",
+"File Type" => "File Type",
+"Read Only" => "Read Only",
+"Read and Write" => "Read and Write",
+"Write Only (upload)" => "Write Only (upload)",
 );

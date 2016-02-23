@@ -19,10 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"Subversion Repository" => "Subversion repozitář",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrahovat SVN informace (revize, log změn, atd.) pokud je workspace pracovní kopií, a SVN je dostupné na příkazové řádce.",
 );

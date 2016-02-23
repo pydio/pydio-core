@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"MQ SQL" => "MQ SQL",
+"Store persistant and worker queues in database" => "Ukládá trvalé a pracovní fronty v databázi",
+"Install SQL Tables" => "Instalovat SQL tabulky",
+"SQL Tables" => "SQL tabulky",
+"SQL Driver" => "SQL ovladač",
+"SQL Connexion Parameters" => "SQL parametry připojení",
 );

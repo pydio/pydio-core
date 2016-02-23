@@ -19,10 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"Dropbox" => "Dropbox",
+"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Tento zásuvný modul umožňuje přístup ke dropbox účtu. Stále experimentální, vyžaduje rozšíření PEAR/HTTP_OAuth.",
+"Consumer Key" => "Klíč uživatele",
+"Key" => "Klíč",
+"Consumer Secret" => "Tajemství uživatele",
+"Secret" => "Tajemství",
+"User Mail" => "Email uživatele",
+"User account" => "Uživatelský účet",
+"Password" => "Heslo",
+"User Password" => "Uživatelské heslo",
 );

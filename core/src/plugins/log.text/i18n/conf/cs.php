@@ -19,10 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"Text logger" => "Textové logy",
+"Stores the logs as readable tab delimited text." => "Ukládá logy v čitelném děleném textu.",
+"The path to where the logs are kept." => "Cesta k úložišti logů.",
+"The name of the log file" => "Jméno souboru logu",
+"Files Permissions" => "Oprávnění souborů",
+"Log Folder" => "Adresář logů",
+"Files Name Pattern" => "Vzor jmen souborů",
 );

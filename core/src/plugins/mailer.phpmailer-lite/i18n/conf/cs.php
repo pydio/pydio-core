@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"PHPMailer-lite" => "PHPMailer-lite",
+"A simple mailer" => "Jednoduchý mailer",
+"Mailer" => "Mailer",
+"Php mailer to use (see phpmail-lite documentation)." => "Použít PHP mailer (pročtěte si phpmail-lite dokumentaci).",
+"Sendmail Path" => "Sendmail cesta",
+"Path to sendmail if not the default one" => "Cesta k sendmail, pokud mimo obvyklé umístění",
 );

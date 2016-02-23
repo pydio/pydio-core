@@ -175,4 +175,10 @@ $mess=array(
 "151" => "Gruppo Principale",
 "152" => "Ruolo Gruppo Principale",
 "153" => "Applica a tutta la gerarchia degli utenti",
+"154" => "Repository Templates",
+"155" => "Access Drivers",
+"156" => "Standard", // user type standard
+"157" => "Administrator",
+"158" => "Shared", // user type shared
+"159" => "Guest",
 );

@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentification" => "SMB Authentification",
+"SMB Authentication" => "SMB Authentication",
 "Authenticate user by directly connecting to an SMB share" => "Authenticate user by directly connecting to an SMB share",
 "Repository" => "Repository",
 "Id of the repository to use for testing connexion" => "Id of the repository to use for testing connection",

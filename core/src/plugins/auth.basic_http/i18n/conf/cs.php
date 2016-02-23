@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"Basic HTTP" => "Základní HTTP",
+"Use the standard http authentication." => "Použít standartní http ověření.",
+"Users" => "Uživatelé",
+"The users list" => "Seznam uživatelů",
+"Logout URL" => "URL odhlášení",
+"Redirect to the given URL on loggin out" => "Po odhlášení přesměrovat na zadanou URL",
 );

@@ -19,10 +19,17 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"SMB Authentication" => "Autenticação SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticar um utilizador ligando directamente a uma partilha SMB",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "Id do repositório a usar para testar a ligação",
-"Admin user" => "Utilizador Administrador",
-"The ID of an existing admin for Pydio (using conf.serial)" => "ID de um utilizador administrador do AjaxPlorer (a usar conf.serial)",
+"DB Storage" => "DB úložiště",
+"Login URL" => "Přihlašovací URL",
+"if direct access, redirect to the given URL" => "při přímém přístupu, přesměrovat na danou URL",
+"Logout URL" => "URL odhlášení",
+"Redirect to the given URL on loggin out" => "Po odhlášení přesměrovat na zadanou URL",
+"Secret key" => "Tajný klíč",
+"This key must only be known by remote end" => "Tento klíč musí být znám pouze vzdálenému konci",
+"Connexion" => "Připojení",
+"The Database Connexion" => "Databázové připojení",
+"Prefix tables" => "Předpona tabulek",
+"Prefix of CMSMS tables " => "Předpona CMSMS tabulek ",
+"CMSMS Authentication" => "CMSMS ověření",
+"Stores the Authentication data in CMSMS FEU" => "Ukládá ověřovací údaje v CMSMS FEU",
 );

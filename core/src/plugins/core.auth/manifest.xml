@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="core.auth" label="CONF_MESSAGE[Authentification]" description="CONF_MESSAGE[Options applied to all auth drivers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpcore id="core.auth" label="CONF_MESSAGE[Authentication]" description="CONF_MESSAGE[Options applied to all auth drivers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/core.auth/class.CoreAuthLoader.php" classname="CoreAuthLoader"/>
     <client_settings>
         <resources>
@@ -18,7 +18,7 @@
 		<global_param name="DISABLE_BRUTE_FORCE_CHECK" group="CONF_MESSAGE[Login Form]"  type="boolean" label="CONF_MESSAGE[Disable Brute Force Check (Captcha)]" description="CONF_MESSAGE[Disable the check of failed login attempts, will disable the Captcha display]" default="false"/>
         <global_param type="plugin_instance:auth" name="MASTER_INSTANCE_CONFIG" group="CONF_MESSAGE[Main Instance]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="auth.serial"/>
 
-        <global_param group="CONF_MESSAGE[Multiple Instances Mode]" name="MULTI_MODE" type="group_switch:multimode" label="CONF_MESSAGE[Mode]" description="CONF_MESSAGE[Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup.]" mandatory="true" default="MASTER_SLAVE"/>
+        <global_param group="CONF_MESSAGE[Multiple Instances Mode]" name="MULTI_MODE" type="group_switch:multimode" label="CONF_MESSAGE[Mode]" description="CONF_MESSAGE[Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentication method at startup.]" mandatory="true" default="MASTER_SLAVE"/>
         <global_param group_switch_name="multimode" group_switch_label="CONF_MESSAGE[Master/Slave]" group_switch_value="MASTER_SLAVE" description="" label="Master slave" name="instance_name" type="hidden" default="MASTER_SLAVE" mandatory="true"/>
         <global_param group_switch_name="multimode" group_switch_label="CONF_MESSAGE[Master/Slave]" group_switch_value="MASTER_SLAVE" description="CONF_MESSAGE[Create a local copy (at login time) of master users inside slave base]" label="CONF_MESSAGE[Cache master users]" name="CACHE_MASTER_USERS_TO_SLAVE" type="boolean" default="true" mandatory="false"/>
         <global_param group_switch_name="multimode" group_switch_label="CONF_MESSAGE[User Choice]" group_switch_value="USER_CHOICE" description="" label="User choice" name="instance_name" type="hidden" default="USER_CHOICE" mandatory="true"/>

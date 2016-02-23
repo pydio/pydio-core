@@ -431,7 +431,7 @@ class ftpAccessWrapper implements AjxpWrapper
         $this->repositoryId = $urlParts["host"];
         $repository = ConfService::getRepositoryById($this->repositoryId);
         if ($repository == null) {
-            throw new Exception("Cannot find repository for dynamic ftp authentification.");
+            throw new Exception("Cannot find repository for dynamic ftp authentication.");
         }
         $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
         $this->user = $credentials["user"];

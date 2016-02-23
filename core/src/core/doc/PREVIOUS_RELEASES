@@ -1251,13 +1251,13 @@ Backup compatibility: Domain/ or domain\ or domain without slash. Default is / (
 Backward compatibility: Domain/ or domain\ or domain without slash. Default is / (details)
 Change and trigger docker to rebuilt (details)
 Update Dockerfile (details)
-go to welcome page after authentification on CAS (details)
+go to welcome page after authentication on CAS (details)
 Update class.AbstractConfDriver.php (details)
 Unescape val column of ajxp_user_prefs when using postgresql (details)
 update user list by command: action name=cli_update_user_list (details)
 Add selection on listing Role by user roles or all roles Hide prefix on role/group label (details)
 val unescaped with dibi::unescape is unusuable, use db decoding instead (details)
-revert: go to welcome page after authentification on CAS (details)
+revert: go to welcome page after authentication on CAS (details)
 Update Client.php (details)
 Bypass authfont.cas for authentication on minisite (details)
 New plugin to use a third party DB with custom schema as an readonly auth backend. (details)
@@ -2962,7 +2962,7 @@ AjaXplorer 5.0.3 Release Note
 This is a bugfix and security release. Update is highly recommended and automatic using the in-app upgrade mechanism. Most important fixes are:
 
 - Vulnerabilities fixed and security enforced: new algorithm used for hashing passwords, enforce tokens generation, etc. PHP Mcrypt extension is now more than ever required.
-- Stabilize authentification (groups, LDAP) on the 5.X branch
+- Stabilize authentication (groups, LDAP) on the 5.X branch
 - Stabilize alternative uploaders remote drivers (Jumploader)
 - Many GUI bugs fixed
 
@@ -3634,7 +3634,7 @@ Add Lucene by default to FTP, SFTP and SMB drivers
 [uploader.html] Fix #12 Files duplicated with drag and drop upload
 [access.ftp] Merge pull request #26 from ultreia-es/issue-17 Workaround for PHP bug #62035
 Issue 17: Workaround for PHP bug #62035 about PHP not being able to handle properly some FTP responses.
-[auth.cas] CAS Authentification plugin, contributed by Ultreia Communicaciones
+[auth.cas] CAS Authentication plugin, contributed by Ultreia Communicaciones
 Fixes on WebSocket server
 [core.ajaxplorer/i18n] updated hu.php added translation for untranslated strings
 
