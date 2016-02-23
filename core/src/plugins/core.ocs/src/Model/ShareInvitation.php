@@ -21,10 +21,11 @@
 namespace Pydio\OCS\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
-define('OCS_INVITATION_STATUS_PENDING', 1);
-define('OCS_INVITATION_STATUS_ACCEPTED', 2);
-define('OCS_INVITATION_STATUS_REJECTED', 4);
+if(!defined('OCS_INVITATION_STATUS_PENDING')){
+    define('OCS_INVITATION_STATUS_PENDING', 1);
+    define('OCS_INVITATION_STATUS_ACCEPTED', 2);
+    define('OCS_INVITATION_STATUS_REJECTED', 4);
+}
 
 class ShareInvitation
 {

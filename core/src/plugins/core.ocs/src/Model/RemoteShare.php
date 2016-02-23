@@ -21,7 +21,11 @@
 namespace Pydio\OCS\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
+if(!defined('OCS_INVITATION_STATUS_PENDING')){
+    define('OCS_INVITATION_STATUS_PENDING', 1);
+    define('OCS_INVITATION_STATUS_ACCEPTED', 2);
+    define('OCS_INVITATION_STATUS_REJECTED', 4);
+}
 
 class RemoteShare
 {
@@ -97,6 +101,33 @@ class RemoteShare
     }
 
     /**
+     * @return \Repository
+     */
+    public function buildVirtualRepository(){
+        $repositoryId = "ocs_remote_share_".$this->getOcsToken();
+        // Create REPO
+        $parts = parse_url($this->getOcsDavUrl());
+        $data = array(
+            "DISPLAY"		=>	$this->getDocumentName(). "[remote]",
+            "DESCRIPTION"   =>  "Shared by ".$this->getSender(),
+            "AJXP_SLUG"		=>  "remote-".$this->getOcsToken(),
+            "DRIVER"		=>	"webdav",
+            "DRIVER_OPTIONS"=> array(
+                "HOST"			=>	$parts["scheme"]."://".$parts["host"],
+                "PATH"          =>  $parts["path"],
+                "USER"		    =>	$this->getOcsToken(),
+                "PASS" 	        => 	($this->hasPassword()?$this->getPassword() : ""),
+                "DEFAULT_RIGHTS"=>  "",
+                "META_SOURCES"		=> array()
+            )
+        );
+        $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
+        $repo->setWriteable(false);
+        $repo->setOwnerData(null, $this->getSender()." [remote]");
+        return $repo;
+    }
+
+    /**
      * @return string
      */
     public function getStatus()
@@ -155,7 +186,7 @@ class RemoteShare
     /**
      * @return boolean
      */
-    public function isHasPassword()
+    public function hasPassword()
     {
         return $this->hasPassword;
     }
@@ -198,6 +229,110 @@ class RemoteShare
     public function getDocumentName()
     {
         return $this->documentName;
+    }
+
+    /**
+     * @param string $ocsToken
+     */
+    public function setOcsToken($ocsToken)
+    {
+        $this->ocsToken = $ocsToken;
+    }
+
+    /**
+     * @param int $ocsRemoteId
+     */
+    public function setOcsRemoteId($ocsRemoteId)
+    {
+        $this->ocsRemoteId = $ocsRemoteId;
+    }
+
+    /**
+     * @param string $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @param string $sender
+     */
+    public function setSender($sender)
+    {
+        $this->sender = $sender;
+    }
+
+    /**
+     * @param string $ocsServiceUrl
+     */
+    public function setOcsServiceUrl($ocsServiceUrl)
+    {
+        $this->ocsServiceUrl = $ocsServiceUrl;
+    }
+
+    /**
+     * @param int $receptionDate
+     */
+    public function setReceptionDate($receptionDate)
+    {
+        $this->receptionDate = $receptionDate;
+    }
+
+    /**
+     * @param string $documentName
+     */
+    public function setDocumentName($documentName)
+    {
+        $this->documentName = $documentName;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @param string $ocsDavUrl
+     */
+    public function setOcsDavUrl($ocsDavUrl)
+    {
+        $this->ocsDavUrl = $ocsDavUrl;
+    }
+
+    /**
+     * @param boolean $hasPassword
+     */
+    public function setHasPassword($hasPassword)
+    {
+        $this->hasPassword = $hasPassword;
+    }
+
+    /**
+     * @param null|string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @param int $answerDate
+     */
+    public function setAnswerDate($answerDate)
+    {
+        $this->answerDate = $answerDate;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
     }
 
 

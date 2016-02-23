@@ -37,7 +37,7 @@ class SQLStore implements IStore
     {
         $storage = \ConfService::getConfStorageImpl();
         if($storage->getId() == "conf.sql") {
-            $this->confStorage = $storage;
+            $this->storage = $storage;
         }
     }
 
@@ -52,7 +52,7 @@ class SQLStore implements IStore
         if(empty($id)){
             $id = $this->getGUID();
         }
-        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
+        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, $invitation, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
         $invitation->setId($id);
         return $invitation;
     }
@@ -86,6 +86,7 @@ class SQLStore implements IStore
     public function deleteInvitation(ShareInvitation $invitation)
     {
         $this->storage->simpleStoreClear(OCS_SQLSTORE_NS_INVITATION, $invitation->getId());
+        return true;
     }
 
     /**
@@ -97,9 +98,9 @@ class SQLStore implements IStore
     {
         $id = $remoteShare->getId();
         if(empty($id)){
-            $id = $this->getGUID();
+            $id = $remoteShare->getOcsToken()."###".$remoteShare->getUser();
         }
-        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_REMOTE_SHARE, $id, OCS_SQLSTORE_FORMAT, $remoteShare->getUser());
+        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_REMOTE_SHARE, $id, $remoteShare, OCS_SQLSTORE_FORMAT, $remoteShare->getUser());
         $remoteShare->setId($id);
         return $remoteShare;
 
@@ -133,7 +134,8 @@ class SQLStore implements IStore
      */
     public function deleteRemoteShare(RemoteShare $remoteShare)
     {
-        return $this->storage->simpleStoreClear(OCS_SQLSTORE_NS_REMOTE_SHARE, $remoteShare->getId());
+        $this->storage->simpleStoreClear(OCS_SQLSTORE_NS_REMOTE_SHARE, $remoteShare->getId());
+        return true;
     }
 
     protected function getGUID(){

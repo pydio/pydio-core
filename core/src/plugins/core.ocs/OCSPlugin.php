@@ -20,11 +20,20 @@
  */
 namespace Pydio\OCS;
 
+use Pydio\OCS\Server\Dummy;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once("vendor/autoload.php");
 
 class OCSPlugin extends \AJXP_Plugin{
+
+    public function init($options)
+    {
+        parent::init($options);
+        \AJXP_Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
+        \AJXP_Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
+    }
 
     public function federatedEnabled(){
         return $this->getConfigs()["ENABLE_FEDERATED_SHARING"] === true;
@@ -50,8 +59,6 @@ class OCSPlugin extends \AJXP_Plugin{
 
     public function route($endpoint, $uriParts, $parameters){
 
-        $format = isSet($parameters["format"]) && in_array($parameters["format"], array("json", "xml")) ? $parameters["format"] : "json";
-
         if($endpoint == "dav" && $this->federatedEnabled()){
 
             $server = new Server\Dav\Server();
@@ -59,75 +66,58 @@ class OCSPlugin extends \AJXP_Plugin{
 
         }else if($endpoint == "shares" && $this->federatedEnabled()){
 
-            $response = $this->buildResponse("ok", 200, null, array("shares" => $uriParts));
-            $this->sendResponse($response, $format);
+            $server = new Server\Federated\Server();
+            $server->run($uriParts, $parameters);
 
         }else{
 
-            $response = $this->buildResponse("fail", 503, "Federated Sharing is not active on this server");
-            $this->sendResponse($response, $format);
+            Dummy::notImplemented($uriParts, $parameters);
 
         }
 
     }
 
-
-
-    public function buildResponse($status = "ok", $code = 200, $message = null, $data = null){
-
-        $ocs = array(
-            "ocs" => array(
-                "meta" => array(
-                    "status" => $status,
-                    "statuscode" => $code,
-                    "message" => $message
-                )
-            )
-        );
-        if(!empty($data)){
-            $ocs["ocs"]["data"] = $data;
+    /**
+     * Triggered on repository list loading
+     * @param array $wsList
+     * @param string $scope
+     * @param bool $includeShared
+     */
+    public function populateRemotes(&$wsList, $scope = "user", $includeShared = true){
+        if(!$includeShared || $scope != "user"){
+            return;
         }
-        return $ocs;
-
-    }
-
-    public function sendResponse($response, $format = "json"){
-        if($format == "json"){
-            header("Content-Type: text/json");
-            print json_encode($response);
-        }else if($format == "xml"){
-            header("Content-Type: text/xml");
-            print $this->array2xml($response["ocs"], "ocs");
+        $loggedUser = \AuthService::getLoggedUser();
+        if($loggedUser == null){
+            return;
+        }
+        $store = new Model\SQLStore();
+        $shares = $store->remoteSharesForUser($loggedUser->getId());
+        foreach($shares as $share){
+            $repo = $share->buildVirtualRepository();
+            $loggedUser->personalRole->setAcl($repo->getId(), "rw");
+            $wsList[$repo->getId()] = $repo;
+        }
+        if(count($shares)){
+            $loggedUser->recomputeMergedRole();
+            \AuthService::updateUser($loggedUser);
         }
     }
 
-    protected function array2xml($array, $node_name="root")
-    {
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
-        $root = $dom->createElement($node_name);
-        $dom->appendChild($root);
-
-        $array2xml = function ($node, $array) use ($dom, &$array2xml) {
-            foreach ($array as $key => $value) {
-                if (is_array($value)) {
-                    $n = $dom->createElement($key);
-                    $node->appendChild($n);
-                    $array2xml($n, $value);
-                } else {
-                    if(is_numeric($key)){
-                        $n = $dom->createElement('element', $value);
-                    }else{
-                        $n = $dom->createElement($key, $value);
-                    }
-                    $node->appendChild($n);
-                }
-            }
-        };
-
-        $array2xml($root, $array);
-
-        return $dom->saveXML();
+    public function remoteRepositoryById($repositoryId, &$repoObject){
+        if(strpos($repositoryId, "ocs_remote_share_") !== 0){
+            return;
+        }
+        $store = new Model\SQLStore();
+        $remoteShareId = str_replace("ocs_remote_share_", "", $repositoryId);
+        $share = $store->remoteShareById($remoteShareId);
+        if($share != null){
+            $repoObject = $share->buildVirtualRepository();
+            $loggedUser = \AuthService::getLoggedUser();
+            $loggedUser->personalRole->setAcl($repoObject->getId(), "rw");
+            $loggedUser->recomputeMergedRole();
+            \AuthService::updateUser($loggedUser);
+        }
     }
 
 }
