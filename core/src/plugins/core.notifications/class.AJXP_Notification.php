@@ -93,7 +93,7 @@ class AJXP_Notification
         $repoId = $this->getNode()->getRepositoryId();
         $repoObject = ConfService::getRepositoryById($repoId);
         if ($repoObject != null) {
-            $repoLabel = $repoObject->getDisplay();
+            $repoLabel = SystemTextEncoding::fromUTF8($repoObject->getDisplay());
         } else {
             $repoLabel = "Repository";
         }
