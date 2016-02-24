@@ -177,7 +177,10 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
     public static function applyInitPathHook($path) {
         $currentScheme = parse_url($path, PHP_URL_SCHEME);
         $wrapper = self::findWrapperClassName($currentScheme);
-        call_user_func(array($wrapper, "applyInitPathHook"), $path);
+
+        if (is_callable(array($wrapper, "applyInitPathHook"))){
+            call_user_func(array($wrapper, "applyInitPathHook"), $path);
+        }
     }
 
     /**

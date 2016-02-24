@@ -98,7 +98,7 @@ class StreamWrapper
         stream_context_set_default($default);
     }
 
-    public static function initPath($url) {
+    public static function applyInitPathHook($url) {
         // Do nothing
     }
 
