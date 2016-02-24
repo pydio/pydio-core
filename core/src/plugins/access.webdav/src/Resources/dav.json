@@ -4,16 +4,16 @@
     "operations" : {
         "Open" : {
             "httpMethod" : "GET",
-            "uri" : "{fullpath}/{itemname}",
+            "uri" : "{path/fullpath}/{path/itemname}",
             "summary" : "Open the object as a stream for the StreamWrapper to access",
             "responseClass" : "OpenOutput",
             "parameters" : {
-                "fullpath" : {
+                "path/fullpath" : {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -22,7 +22,7 @@
         },
         "Stat" : {
             "httpMethod" : "PROPFIND",
-            "uri" : "{fullpath}/{itemname}",
+            "uri" : "{path/fullpath}/{path/itemname}",
             "summary" : "Returns the stat of a specific object",
             "responseClass" : "StatOutput",
             "parameters" : {
@@ -30,12 +30,12 @@
                     "required" : true,
                     "location" : "xml"
                 },
-                "fullpath" : {
+                "path/fullpath" : {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -44,15 +44,15 @@
         },
         "Mkdir" : {
             "httpMethod" : "MKCOL",
-            "uri" : "{fullpath}/{itemname}",
+            "uri" : "{path/fullpath}/{path/itemname}",
             "responseClass" : "MkdirOutput",
             "parameters" : {
-                "fullpath" : {
+                "path/fullpath" : {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -61,15 +61,15 @@
         },
         "Rmdir" : {
             "httpMethod" : "DELETE",
-            "uri" : "{fullpath}/{itemname}",
+            "uri" : "{path/fullpath}/{path/itemname}",
             "responseClass" : "RmdirOutput",
             "parameters" : {
-                "fullpath":  {
+                "path/fullpath":  {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -96,15 +96,15 @@
         },
         "Put" : {
             "httpMethod" : "PUT",
-            "uri": "{fullpath}/{itemname}",
+            "uri": "{path/fullpath}/{path/itemname}",
             "responseClass" : "PutOutput",
             "parameters" : {
-                "fullpath":  {
+                "path/fullpath":  {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -116,15 +116,15 @@
         },
         "Delete" : {
             "httpMethod": "DELETE",
-            "uri": "{fullpath}/{itemname}",
+            "uri": "{path/fullpath}/{path/itemname}",
             "responseClass": "DeleteOutput",
             "parameters": {
-                "fullpath":  {
+                "path/fullpath":  {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "itemname": {
+                "path/itemname": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"

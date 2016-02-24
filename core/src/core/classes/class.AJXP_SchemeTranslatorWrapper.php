@@ -41,6 +41,13 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
     protected $currentDirPath;
 
 
+    /*
+     * Initialise the path for a file
+     */
+    public static function initPath($path) {
+        // Not defined
+    }
+
     /**
      * Get a "usable" reference to a file : the real file or a tmp copy.
      *

@@ -116,20 +116,30 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
                 $url = str_replace($currentScheme."://".$repository->getId().$crtPath, $currentScheme."://".$repository->getId().rtrim($baseDir.$crtPath, "/"), $url);
             }
         }
-        return str_replace($currentScheme."://", $newScheme."://", $url);
+
+        $newUrl = str_replace($currentScheme."://", $newScheme."://", $url);
+
+        self::initPath($newUrl);
+
+        return $newUrl;
+    }
+
+    protected static function findWrapperClassName($scheme){
+        if(isSet(self::$metaWrappers[$scheme])){
+            $wrapper = self::$metaWrappers[$scheme];
+        }else{
+            $wrapper = AJXP_PluginsService::getInstance()->getWrapperClassName($scheme);
+        }
+        if(empty($wrapper)) {
+            throw new Exception("Cannot find any wrapper for the scheme " . $scheme);
+        }
+        return $wrapper;
     }
 
     protected static function findSubWrapperClassName($url){
         $nextScheme = self::getNextScheme($url);
-        if(isSet(self::$metaWrappers[$nextScheme])){
-            $wrapper = self::$metaWrappers[$nextScheme];
-        }else{
-            $wrapper = AJXP_PluginsService::getInstance()->getWrapperClassName($nextScheme);
-        }
-        if(empty($wrapper)) {
-            throw new Exception("Cannot find any wrapper for this scheme");
-        }
-        return $wrapper;
+
+        return self::findWrapperClassName($nextScheme);
     }
 
     protected static function actualRepositoryWrapperData($repositoryId){
@@ -159,6 +169,16 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         return $data["classname"];
     }
 
+    /**
+     * Call Init function for a translated Path if defined
+     *
+     * @param string $path
+     */
+    public static function initPath($path) {
+        $currentScheme = parse_url($path, PHP_URL_SCHEME);
+        $wrapper = self::findWrapperClassName($currentScheme);
+        call_user_func(array($wrapper, "initPath"), $path);
+    }
 
     /**
      * Get a "usable" reference to a file : the real file or a tmp copy.

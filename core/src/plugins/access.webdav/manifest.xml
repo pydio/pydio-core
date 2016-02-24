@@ -22,5 +22,5 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/core.access/vendor/autoload.php" classname="Pydio\Access\WebDAV\Wrapper" protocol="ajxp.dav"/>
+    <class_stream_wrapper filename="plugins/core.access/vendor/autoload.php" classname="Pydio\Access\Core\Stream\StreamWrapper" protocol="pydio.dav"/>
 </ajxpdriver>

@@ -21,7 +21,9 @@
 
 namespace Pydio\Access\Core\Stream;
 
-use \AJXP_Utils;
+use AJXP_Utils;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 use Pydio\Access\Core\Stream\ClientInterface;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Stream\CachingStream;
@@ -38,7 +40,7 @@ use GuzzleHttp\Stream\CachingStream;
  * - file_exists, filesize, is_file, is_dir
  *
  */
-class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
+class StreamWrapper
 {
     /**
      * @var AbstractClient Client used to send requests
@@ -68,7 +70,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     /**
      * @var string the current protocol
      */
-    private $protocol = 's3';
+    private $protocol;
 
     /**
      * @var array The next key to retrieve when using a directory iterator. Helps for fast directory traversal.
@@ -80,7 +82,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
      *
      * @param Client $client to use with the stream wrapper
      */
-    public static function register(
+    public static function register (
         ClientInterface $client,
         $protocol
     ) {
@@ -93,8 +95,11 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
 
         $default = stream_context_get_options(stream_context_get_default());
         $default[$protocol]['client'] = $client;
-
         stream_context_set_default($default);
+    }
+
+    public static function initPath($url) {
+        // Do nothing
     }
 
     /**
@@ -260,7 +265,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
     {
         $params = $this->getParams($path);
 
-        $key = $params['itemname'];
+        $key = $params['path/itemname'];
 
         if (isset(static::$nextStat[$key])) {
             return static::$nextStat[$key];
@@ -271,7 +276,7 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
         if ($result) {
             $result = $this->getClient()->formatUrlStat($result);
 
-            static::$nextStat[$path] = $result;
+            static::$nextStat[$key] = $result;
         }
 
         return $result;
@@ -418,9 +423,23 @@ class StreamWrapper extends \AJXP_SchemeTranslatorWrapper
         $parts = explode('://', $path, 2);
         $this->protocol = $parts[0];
 
+        $params = [];
+
         $default = stream_context_get_options(stream_context_get_default());
 
-        return $this->getClient()->getParams($path, $prefix) + $default[$this->protocol];
+        $it = new RecursiveArrayIterator($default[$this->protocol]);
+
+        foreach ($it as $k => $v) {
+            $prefix = $k . "/";
+
+            $itchild = new RecursiveArrayIterator($default[$this->protocol][$k]);
+
+            foreach ($itchild as $kChild => $vChild) {
+                $params[$prefix . $kChild] = $vChild;
+            }
+        }
+
+        return $params;
     }
 
     /**

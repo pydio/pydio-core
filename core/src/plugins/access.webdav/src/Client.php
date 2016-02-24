@@ -50,12 +50,8 @@ class Client extends CoreClient
      */
     public function __construct($config = array())
     {
-        $this->urlParams = parse_url($config['baseUri']);
-
         // Creating Guzzle instances
-        $httpClient = new GuzzleClient([
-            'base_url' => $this->urlParams["scheme"] . "://" . $this->urlParams['host'],
-        ]);
+        $httpClient = new GuzzleClient($config);
 
         $configDirectories = array(__DIR__ . "/" . self::RESOURCES_PATH);
         $locator = new FileLocator($configDirectories);
@@ -67,6 +63,8 @@ class Client extends CoreClient
         parent::__construct($httpClient, $description);
 
         $this->getEmitter()->attach(new PathListener());
+
+        $this->registerStreamWrapper();
     }
 
     /**
@@ -114,9 +112,9 @@ class Client extends CoreClient
      */
     private function _getSabreDAVClient($params) {
         return new SabreDAVClient([
-            'baseUri' => $this->urlParams["scheme"] . "://" . $this->urlParams['host'],
-            'userName' => $params['user'],
-            'password' => $params['password']
+            'baseUri' => $params['path/base_url'],
+            'userName' => $params['auth/user'],
+            'password' => $params['auth/password']
         ]);
     }
 
@@ -133,7 +131,7 @@ class Client extends CoreClient
 
         try {
             $result = $sabreDAVClient->propFind(
-                join('/', array_filter([$params['fullpath'], $params['itemname']])),
+                join('/', array_filter([$params['path/fullpath'], $params['path/itemname']])),
                 [
                     '{DAV:}getlastmodified',
                     '{DAV:}getcontentlength',
@@ -173,7 +171,7 @@ class Client extends CoreClient
 
         try {
             $response = $sabreDAVClient->propFind(
-                join('/', [$params['fullpath'], $params['itemname']]),
+                join('/', [$params['path/fullpath'], $params['path/itemname']]),
                 [
                     '{DAV:}getlastmodified',
                     '{DAV:}getcontentlength',

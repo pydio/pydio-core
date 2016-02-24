@@ -39,6 +39,21 @@ interface ClientInterface
     public function registerStreamWrapper();
 
     /**
+     *
+     * Set the authentication parameters
+     *
+     * @param array $params
+     */
+    public function setAuth($arr);
+
+    /**
+     * Set the default url of the client
+     *
+     * @param string $url
+     */
+    public function setDefaultUrl($url);
+
+    /**
      * Redefine a file stat
      *
      * @param array $arr
@@ -55,13 +70,4 @@ interface ClientInterface
      * @return DirIterator
      */
     public function getIterator($arr);
-
-    /**
-     * Get the params from the passed path
-     *
-     * @param string $path Path passed to the stream wrapper
-     *
-     * @return array Hash of custom params
-     */
-    public function getParams($path, $prefix = "");
 }

@@ -24,6 +24,11 @@ namespace Pydio\Access\WebDAV;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+use AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Stream\StreamWrapper as AccessStreamWrapper;
+use ConfService;
+use RecycleBinManager;
+
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
@@ -40,21 +45,14 @@ class Driver extends \fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
-    /*
-     * @param bool $register
-     * @return array|bool|void
-     * Override parent to register underlying wrapper
-     */
-    public function detectStreamWrapper($register = false){
-        return parent::detectStreamWrapper(true);
-    }
-
     /**
      * Repository Initialization
      *
      */
     public function initRepository()
     {
+        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\Access\Core\Stream\AuthWrapper");
+        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\Access\Core\Stream\PathWrapper");
 
         $this->detectStreamWrapper(true);
 
@@ -64,31 +62,19 @@ class Driver extends \fsAccessDriver
             $this->driverConf = array();
         }
 
-        // Params
-        $host = $this->repository->getOption("HOST");
-        $path = $this->repository->getOption("PATH");
-
-        $hostParts = parse_url($host);
-
-        // Connexion
-        $settings = array(
-            'baseUri' => \AJXP_Utils::getSanitizedUrl($hostParts) . "/" . trim($path, '/'),
-        );
-
-        $this->client = new Client($settings);
-        $this->client->registerStreamWrapper();
-
+        $client = new Client([
+            'base_url' => $this->repository->getOption("HOST")
+        ]);
 
         // Params
         $recycle = $this->repository->getOption("RECYCLE_BIN");
 
         // Config
-        \ConfService::setConf("PROBE_REAL_SIZE", false);
+        ConfService::setConf("PROBE_REAL_SIZE", false);
         $this->urlBase = "pydio://".$this->repository->getId();
         if ($recycle != "") {
-            \RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
     }
-
 
 }

@@ -24,11 +24,8 @@ namespace Pydio\Access\Core\Stream;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 
 /**
- * Client to interact with SabreDAV Client
+ * Client to interact with Guzzle Client
  *
- *
- * @link http://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-s3.html User guide
- * @link http://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.S3.S3Client.html API docs
  */
 class Client extends GuzzleClient implements ClientInterface
 {
@@ -73,6 +70,25 @@ class Client extends GuzzleClient implements ClientInterface
     }
 
     /**
+     *
+     * Set the authentication parameters
+     *
+     * @param array $params
+     */
+    public function setAuth($arr) {
+        $this->setConfig('defaults/request_options/auth', [$arr['user'], $arr['password']]);
+    }
+
+    /**
+     * Set the default url of the client
+     *
+     * @param string $url
+     */
+    public function setDefaultUrl($url) {
+        $this->setConfig('defaults/base_url', $url);
+    }
+
+    /**
      * Redefine a file stat
      *
      * @param array $arr
@@ -94,33 +110,4 @@ class Client extends GuzzleClient implements ClientInterface
         return new Iterator\DirIterator($arr);
     }
 
-    /**
-     * Get the params from the passed path
-     *
-     * @param string $path Path passed to the stream wrapper
-     *
-     * @return array Hash of custom params
-     */
-    public function getParams($path, $prefix = "")
-    {
-        $parts = parse_url($path);
-
-        $parts[$prefix . 'path'] = $parts['path'];
-
-        $parts[$prefix . 'basepath'] = $this->urlParams['path'];
-        $parts[$prefix . 'fullpath'] = dirname($this->urlParams['path'] . $parts[$prefix . 'path']);
-        $parts[$prefix . 'itemname'] = basename($parts[$prefix . 'path']);
-
-        if (!isset($parts[$prefix . 'path']) || $parts[$prefix . 'path'] == '/') {
-            $parts[$prefix . 'fullpath'] = $parts[$prefix . 'basepath'];
-            $parts[$prefix . 'path'] = '/';
-        }
-
-        $parts[$prefix . 'path'] = dirname($parts[$prefix . 'path']);
-        $parts[$prefix . 'auth'] = [$username, $password];
-
-        $parts['base_url'] = $this->urlParams['scheme'] . '://' . $this->urlParams['host'];
-
-        return $parts;
-    }
 }
