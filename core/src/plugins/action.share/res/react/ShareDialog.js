@@ -589,8 +589,8 @@
         },
 
         addUser:function(){
-            var h = this.refs["host"].getDOMNode().value;
-            var u = this.refs["user"].getDOMNode().value;
+            var h = this.refs["host"].getValue();
+            var u = this.refs["user"].getValue();
             this.props.shareModel.addOcsInvitation(h, u);
         },
 
@@ -608,9 +608,12 @@
             }.bind(this));
             return (
                 <div>
-                    <input ref="host" type="text"/>
-                    <input ref="user" type="text"/>
-                    <ReactMUI.FlatButton label="Add" onClick={this.addUser}/>
+                    <h3>Remote Users</h3>
+                    <div className="remote-users-add reset-pydio-forms">
+                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host"/>
+                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser"/>
+                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser}/>
+                    </div>
                     <div>{inv}</div>
                 </div>
             );

@@ -228,6 +228,25 @@ div#react_share_form div.user-badge span.user-badge-rights-container {
 div#react_share_form div.user-badge span.user-badge-rights-container input[name="write"] {
   margin-left: 28px;
 }
+div#react_share_form div.remote-users-add {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  margin-top: -23px;
+  padding-left: 12px;
+}
+div#react_share_form div.remote-users-add div.host {
+  width: 66%;
+  margin-right: 6px;
+}
+div#react_share_form div.remote-users-add div.user {
+  margin-top: 1px;
+  width: 40%;
+}
+div#react_share_form div.remote-users-add button.mui-icon-button {
+  margin-top: 26px;
+  color: #ccc;
+}
 div.react-autosuggest {
   padding-left: 4px;
 }
