@@ -188,7 +188,8 @@ div#react_share_form div.user-badge span.avatar {
 div#react_share_form div.user-badge.user-type-group span.avatar {
   background-color: #47b092;
 }
-div#react_share_form div.user-badge.user-type-tmp_user span.avatar {
+div#react_share_form div.user-badge.user-type-tmp_user span.avatar,
+div#react_share_form div.user-badge.user-type-remote_user span.avatar {
   background-color: #438db3;
 }
 div#react_share_form div.user-badge img {
@@ -245,7 +246,10 @@ div#react_share_form div.remote-users-add div.user {
 }
 div#react_share_form div.remote-users-add button.mui-icon-button {
   margin-top: 26px;
-  color: #ccc;
+  color: #438db3;
+}
+div#react_share_form div.remote-users-add button.mui-icon-button.mui-is-disabled {
+  color: #eee;
 }
 div.react-autosuggest {
   padding-left: 4px;

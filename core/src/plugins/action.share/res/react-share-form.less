@@ -216,7 +216,8 @@ div#react_share_form {
         background-color: @color1;
       }
     }
-    &.user-type-tmp_user{
+    &.user-type-tmp_user,
+    &.user-type-remote_user{
       span.avatar{
         background-color: @color3;
       }
@@ -275,7 +276,10 @@ div#react_share_form {
     }
     button.mui-icon-button{
       margin-top: 26px;
-      color: #ccc;
+      color: @color3;
+      &.mui-is-disabled{
+        color: #eee;
+      }
     }
   }
 }

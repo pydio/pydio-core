@@ -74,8 +74,10 @@
             }
             if( (model.getNode().isLeaf() && auth.file_workspaces) || (!model.getNode().isLeaf() && auth.folder_workspaces)){
                 var users = model.getSharedUsers();
+                var ocsUsers = model.getOcsInvitations();
+                var totalUsers = users.length + ocsUsers.length;
                 panels.push(
-                    <ReactMUI.Tab key="target-users" label={'Users' + (users.length?' ('+users.length+')':'')}>
+                    <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
                         <UsersPanel shareModel={model}/>
                     </ReactMUI.Tab>
                 );
@@ -259,8 +261,10 @@
             }*/
             if(this.props.type == 'group') {
                 avatar = <span className="avatar icon-group"/>;
-            }else if(this.props.type == 'temporary'){
+            }else if(this.props.type == 'temporary') {
                 avatar = <span className="avatar icon-plus"/>;
+            }else if(this.props.type == 'remote_user'){
+                avatar = <span className="avatar icon-cloud"/>;
             }else{
                 avatar = <span className="avatar icon-user"/>;
             }
@@ -588,6 +592,10 @@
             shareModel: React.PropTypes.instanceOf(ReactModel.Share)
         },
 
+        getInitialState: function(){
+            return {addDisabled: true};
+        },
+
         addUser:function(){
             var h = this.refs["host"].getValue();
             var u = this.refs["user"].getValue();
@@ -598,21 +606,45 @@
             this.props.shareModel.removeOcsInvitation(invite);
         },
 
+        monitorInput:function(){
+            var h = this.refs["host"].getValue();
+            var u = this.refs["user"].getValue();
+            this.setState({addDisabled:!(h && u)});
+        },
+
         render: function(){
 
             var inv = this.props.shareModel.getOcsInvitations().map(function(invite){
                 var rem = function(){
                     this.removeUser(invite);
                 }.bind(this);
-                return <div>{invite.HOST} -- {invite.USER} -- <span onClick={rem}>X</span></div>;
+                var status;
+                if(!invite.STATUS){
+                    status = 'not sent';
+                }else if(invite.STATUS == 1){
+                    status = 'pending';
+                }else if(invite.STATUS == 2){
+                    status = 'accepted';
+                }else if(invite.STATUS == 4){
+                    status = 'rejected';
+                }
+                var menuItems = [{text:'Remove', callback:rem}];
+                return (
+                    <UserBadge
+                        label={invite.USER + " @ " + invite.HOST + " (" + status + ")"}
+                        avatar={null}
+                        type={"remote_user"}
+                        menus={menuItems}
+                    />
+                );
             }.bind(this));
             return (
                 <div>
                     <h3>Remote Users</h3>
                     <div className="remote-users-add reset-pydio-forms">
-                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host"/>
-                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser"/>
-                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser}/>
+                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host" onChange={this.monitorInput}/>
+                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser" onChange={this.monitorInput}/>
+                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
                     </div>
                     <div>{inv}</div>
                 </div>
