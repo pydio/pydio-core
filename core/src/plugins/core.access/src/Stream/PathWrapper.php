@@ -17,7 +17,7 @@ use ConfService;
 
 class PathWrapper extends AJXP_SchemeTranslatorWrapper
 {
-    public static function initPath($url)
+    public static function applyInitPathHook($url)
     {
         $params = [];
         $parts = AJXP_Utils::safeParseUrl($url);

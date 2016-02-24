@@ -17,7 +17,7 @@ use ConfService;
 
 class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 {
-    public static function initPath($url) {
+    public static function applyInitPathHook($url) {
         $urlParts = AJXP_Utils::safeParseUrl($url);
 
         $repository = ConfService::getRepositoryById($urlParts["host"]);

@@ -119,7 +119,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
         $newUrl = str_replace($currentScheme."://", $newScheme."://", $url);
 
-        self::initPath($newUrl);
+        self::applyInitPathHook($newUrl);
 
         return $newUrl;
     }
@@ -174,10 +174,10 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      *
      * @param string $path
      */
-    public static function initPath($path) {
+    public static function applyInitPathHook($path) {
         $currentScheme = parse_url($path, PHP_URL_SCHEME);
         $wrapper = self::findWrapperClassName($currentScheme);
-        call_user_func(array($wrapper, "initPath"), $path);
+        call_user_func(array($wrapper, "applyInitPathHook"), $path);
     }
 
     /**
