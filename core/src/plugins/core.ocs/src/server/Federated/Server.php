@@ -40,11 +40,11 @@ class Server extends Dummy
         }else if(count($uriParts) == 2){
 
             $remoteId = $uriParts[0];
-            $action = $uriParts[2];
+            $action = $uriParts[1];
             if(!array_key_exists("token", $parameters) || !in_array($action, array("accept", "decline", "unshare"))){
                 throw new InvalidArgumentsException();
             }
-            call_user_func(array($this, "action".ucfirst($action)), $remoteId, $parameters["token"]);
+            call_user_func(array($this, "action".ucfirst($action)), $remoteId, $parameters["token"], $parameters);
 
         }else{
 
@@ -71,6 +71,10 @@ class Server extends Dummy
             throw new InvalidArgumentsException();
         }
 
+        // TODO:
+        // -- Ping Remote to discover OcsServiceUrl & OcsDavURL
+        // -- Ping Dav endpoint to detect if password & if file or folder
+
         $share = new RemoteShare();
         $share->setUser($targetUser);
         $share->setOcsRemoteId($remoteId);
@@ -78,9 +82,13 @@ class Server extends Dummy
         $share->setDocumentName($documentName);
         $share->setSender($sender);
         $share->setReceptionDate(time());
+        $share->setStatus(OCS_INVITATION_STATUS_PENDING);
+
         $share->setOcsServiceUrl($remote);
         $share->setOcsDavUrl(rtrim($remote, "/")."/ocs/v2/dav");
-        $share->setStatus(OCS_INVITATION_STATUS_PENDING);
+        if(isset($parameters["isFile"]) && $parameters["isFile"] == "true"){
+            $share->setDocumentIsLeaf(true);
+        }
 
         $store = new SQLStore();
         $newShare = $store->storeRemoteShare($share);
@@ -89,15 +97,29 @@ class Server extends Dummy
 
     }
 
-    protected function actionAccept($remoteId, $token){
+    protected function actionAccept($remoteId, $token, $parameters){
 
     }
 
-    protected function actionDecline($remoteId, $token){
+    protected function actionDecline($remoteId, $token, $parameters){
 
     }
 
-    protected function actionUnshare($remoteId, $token){
+    protected function actionUnshare($remoteId, $token, $parameters){
+
+        $token          = \AJXP_Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
+        $remoteId       = \AJXP_Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
+        $store = new SQLStore();
+        $remoteShare = $store->remoteShareById($remoteId);
+        if(empty($remoteShare)){
+            throw new InvalidArgumentsException();
+        }
+        if($token !== $remoteShare->getOcsToken()){
+            throw new InvalidArgumentsException();
+        }
+        $store->deleteRemoteShare($remoteShare);
+        $response = $this->buildResponse("ok", 200, "Successfully removed share.");
+        $this->sendResponse($response, $this->getFormat($parameters));
 
     }
 

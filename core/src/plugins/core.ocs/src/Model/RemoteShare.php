@@ -87,6 +87,10 @@ class RemoteShare
      * @var string
      */
     var $documentName;
+    /**
+     * @var bool
+     */
+    var $documentIsLeaf;
 
     /**
      * @return int
@@ -124,7 +128,30 @@ class RemoteShare
         $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
         $repo->setWriteable(false);
         $repo->setOwnerData(null, $this->getSender()." [remote]");
+        /*
+        if($this->isDocumentIsLeaf()){
+            $contentFilter = new \ContentFilter(array());
+            $contentFilter->filters["/".$this->getDocumentName()] = "/".$this->getDocumentName();
+            $repo->setContentFilter($contentFilter);
+        }
+        */
         return $repo;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDocumentIsLeaf()
+    {
+        return $this->documentIsLeaf;
+    }
+
+    /**
+     * @param boolean $documentIsLeaf
+     */
+    public function setDocumentIsLeaf($documentIsLeaf)
+    {
+        $this->documentIsLeaf = $documentIsLeaf;
     }
 
     /**

@@ -52,8 +52,8 @@ class SQLStore implements IStore
         if(empty($id)){
             $id = $this->getGUID();
         }
-        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, $invitation, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
         $invitation->setId($id);
+        $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, $invitation, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
         return $invitation;
     }
 
@@ -145,13 +145,13 @@ class SQLStore implements IStore
             mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
             $charid = strtoupper(md5(uniqid(rand(), true)));
             $hyphen = chr(45);// "-"
-            $uuid = chr(123)// "{"
+            $uuid = ""//chr(123)// "{"
                 .substr($charid, 0, 8).$hyphen
                 .substr($charid, 8, 4).$hyphen
                 .substr($charid,12, 4).$hyphen
                 .substr($charid,16, 4).$hyphen
-                .substr($charid,20,12)
-                .chr(125);// "}"
+                .substr($charid,20,12);
+                //.chr(125);// "}"
             return $uuid;
         }
     }

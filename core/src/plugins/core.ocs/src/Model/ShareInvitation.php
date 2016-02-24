@@ -27,7 +27,7 @@ if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_REJECTED', 4);
 }
 
-class ShareInvitation
+class ShareInvitation implements \JsonSerializable
 {
     /**
      * @var integer
@@ -118,7 +118,69 @@ class ShareInvitation
         return $this->targetUser;
     }
 
+    /**
+     * @param string $linkHash
+     */
+    public function setLinkHash($linkHash)
+    {
+        $this->linkHash = $linkHash;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * @param string $owner
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+    }
+
+    /**
+     * @param string $targetHost
+     */
+    public function setTargetHost($targetHost)
+    {
+        $this->targetHost = $targetHost;
+    }
+
+    /**
+     * @param string $targetUser
+     */
+    public function setTargetUser($targetUser)
+    {
+        $this->targetUser = $targetUser;
+    }
 
 
-
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return array(
+            "HOST" => $this->targetHost,
+            "USER" => $this->targetUser,
+            "STATUS" => $this->status,
+            "INVITATION_ID" => $this->id
+        );
+    }
 }
