@@ -157,7 +157,11 @@ class ShareStore {
         if($data === false){
             throw new Exception("Cannot find share with hash ".$hash);
         }
-        $shareObject = new ShareLink($this, $data);
+        if(isSet($data["TARGET"]) && $data["TARGET"] == "remote"){
+            $shareObject = new Pydio\OCS\Model\TargettedLink($this, $data);
+        }else{
+            $shareObject = new ShareLink($this, $data);
+        }
         $shareObject->setHash($hash);
         return $shareObject;
     }
@@ -624,6 +628,8 @@ class ShareStore {
     {
         if ($type == "repository") {
             return (ConfService::getRepositoryById($element) != null);
+        } else if($type == "ocs_remote"){
+            return true;
         } else if ($type == "file" || $type == "minisite") {
             $fileExists = is_file($this->downloadFolder."/".$element.".php");
             if($fileExists) {

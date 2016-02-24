@@ -83,6 +83,12 @@
                     this._pendingData['entries'] = JSON.parse(JSON.stringify(this._data['entries']));
                 }
             }
+            if(!this._pendingData['ocs_invitations']){
+                this._pendingData['ocs_invitations'] = [];
+                if(this._data["ocs"]){
+                    this._pendingData['ocs_invitations'] = JSON.parse(JSON.stringify(this._data['ocs']['invitations']));
+                }
+            }
         }
 
         revertChanges(){
@@ -389,6 +395,47 @@
         }
 
         /*********************************/
+        /*  OCS DATA                     */
+        /*********************************/
+        hasOcsData(){
+            return this._data["ocs"] ? true : false;
+        }
+
+        getOcsInvitations(){
+            if(this._pendingData && this._pendingData["ocs_invitations"]){
+                return this._pendingData["ocs_invitations"];
+            }else{
+                return this._data["ocs"] ? this._data["ocs"]["invitations"] : [];
+            }
+        }
+
+        addOcsInvitation(host, user){
+            this._initPendingData();
+            this._pendingData["ocs_invitations"].push({HOST:host, USER:user, TMP_ID:Math.random()});
+            this._setStatus("modified");
+        }
+
+        removeOcsInvitation(invitation){
+            var update = [];
+            this.getOcsInvitations().map(function(i){
+                if((invitation.TMP_ID && i.TMP_ID && invitation.TMP_ID == i.TMP_ID )
+                    || (invitation.INVITATION_ID && i.INVITATION_ID && invitation.INVITATION_ID == i.INVITATION_ID)
+                ){
+                    return null;
+                }
+                update.push(i);
+            });
+            this._pendingData["ocs_invitations"] = update;
+            this._setStatus("modified");
+        }
+
+        _ocsDataToParameters(params){
+            var newData = this._data["ocs"] || {};
+            newData["invitations"] = this.getOcsInvitations();
+            params["ocs_data"] = JSON.stringify(newData);
+        }
+
+        /*********************************/
         /* GENERIC: STATUS / LOAD / SAVE */
         /*********************************/
         _setStatus(status){
@@ -455,6 +502,7 @@
             this._templateToParameter(params);
             this._visibilityDataToParameters(params);
             this._sharedUsersToParameters(params);
+            this._ocsDataToParameters(params);
             if(this._pendingData && this._pendingData['minisite'] && this._pendingData['minisite']['custom_link']){
                 params['custom_handle'] = this._pendingData['minisite']['custom_link'];
             }

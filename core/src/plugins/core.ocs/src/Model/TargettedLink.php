@@ -22,7 +22,7 @@
 namespace Pydio\OCS\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareLink.php");
 class TargettedLink extends \ShareLink
 {
     public function __construct($store, $storeData = array()){

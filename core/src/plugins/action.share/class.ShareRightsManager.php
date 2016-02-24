@@ -171,6 +171,34 @@ class ShareRightsManager
     }
 
     /**
+     * @param array $ocsData
+     * @param Pydio\OCS\Model\ShareInvitation[] $existingInvitations
+     * @param array $newOcsUsers
+     * @param array $unshareInvitations
+     * @return int
+     */
+    public function remoteUsersFromParameters($ocsData, $existingInvitations, &$newOcsUsers, &$unshareInvitations){
+        $totalInvitations = count($ocsData["invitations"]);
+        $newOcsUsers = array();
+        $unshareInvitations = array();
+
+        $resentIds = array();
+        foreach($ocsData["invitations"] as $invitationData){
+            if(isSet($invitationData["INVITATION_ID"])){
+                $resentIds[] = $invitationData["INVITATION_ID"];
+            }else{
+                $newOcsUsers[] = $invitationData;
+            }
+        }
+        foreach($existingInvitations as $invitation){
+            if(!in_array($invitation->getId(), $resentIds)){
+                $unshareInvitations[] = $invitation;
+            }
+        }
+        return $totalInvitations;
+    }
+
+    /**
      * @param String $repoId
      * @param bool $mixUsersAndGroups
      * @param AJXP_Node|null $watcherNode

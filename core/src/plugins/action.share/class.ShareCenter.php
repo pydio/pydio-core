@@ -447,7 +447,16 @@ class ShareCenter extends AJXP_Plugin
                             'new_repository' => &$result
                         ));
 
-                        $newMeta = array("id" => $result->getUniqueId(), "type" => "repository");
+                        if ($ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
+                            $this->getShareStore()->getMetaManager()->addShareInMeta(
+                                $ajxpNode,
+                                "repository",
+                                $result->getUniqueId(),
+                                ($shareScope == "public"),
+                                $originalHash
+                            );
+                        }
+
                         $plainResult = 200;
                     } else {
                         $plainResult = $result;
@@ -463,10 +472,16 @@ class ShareCenter extends AJXP_Plugin
                         $url = $result;
                     } else {
                         list($hash, $url) = $result;
-                        $newMeta = array("id" => $hash, "type" => "minisite");
-                        if($httpHash != null && $hash != $httpHash){
-                            $originalHash = $httpHash;
+                        if ($ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
+                            $this->getShareStore()->getMetaManager()->addShareInMeta(
+                                $ajxpNode,
+                                "minisite",
+                                $hash,
+                                ($shareScope == "public"),
+                                ($httpHash != null && $hash != $httpHash) ? $httpHash : null
+                            );
                         }
+
                     }
                     $plainResult = $url;
 
@@ -475,20 +490,39 @@ class ShareCenter extends AJXP_Plugin
                     $httpVars["return_json"] = true;
                     if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
 
-                    $shareOrRepo = $this->shareNode($httpVars, $isUpdate);
-
-                    if(is_a($shareOrRepo, "ShareLink")){
-                        $hash = $shareOrRepo->getHash();
-                        $newMeta = array("id" => $hash, "type" => "minisite");
-                        if($httpHash != null && $hash != $httpHash){
-                            $originalHash = $httpHash;
+                    $results = $this->shareNode($httpVars, $isUpdate);
+                    if(is_array($results) && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()){
+                        foreach($results as $shareObject){
+                            if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
+                                $hash = $shareObject->getHash();
+                                $this->getShareStore()->getMetaManager()->addShareInMeta(
+                                    $ajxpNode,
+                                    "ocs_remote",
+                                    $hash,
+                                    ($shareScope == "public"),
+                                    $hash
+                                );
+                            }else if(is_a($shareObject, "ShareLink")){
+                                $hash = $shareObject->getHash();
+                                $this->getShareStore()->getMetaManager()->addShareInMeta(
+                                    $ajxpNode,
+                                    "minisite",
+                                    $hash,
+                                    ($shareScope == "public"),
+                                    ($httpHash != null && $hash != $httpHash) ? $httpHash : null
+                                );
+                            }else if(is_a($shareObject, "Repository")){
+                                $this->getShareStore()->getMetaManager()->addShareInMeta(
+                                    $ajxpNode,
+                                    "repository",
+                                    $shareObject->getUniqueId(),
+                                    ($shareScope == "public"),
+                                    null
+                                );
+                            }
                         }
-                    }else if(is_a($shareOrRepo, "Repository")){
-                        $newMeta = array("id"  => $shareOrRepo->getUniqueId(), "type" => "repository");
-                    }else{
-                        // Share has been removed
-                    }
 
+                    }
                 }
 
                 if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
@@ -596,11 +630,22 @@ class ShareCenter extends AJXP_Plugin
 
                 $flattenJson = false;
                 $jsonData = array();
+                $ocsMeta = null;
                 foreach($parsedMeta as $shareId => $shareMeta){
 
-                    $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
-                    if($shareMeta["type"] != "file"){
-                        $flattenJson = true;
+                    if($shareMeta["type"] == "ocs_remote"){
+                        $fullOcsMeta = $this->shareToJson($shareId, array("type"=>"minisite"), $node);
+                        if(isSet($fullOcsMeta["minisite"])){
+                            $ocsMeta = $fullOcsMeta["minisite"];
+                            $ocsStore = new Pydio\OCS\Model\SQLStore();
+                            $existingInvitations = $ocsStore->invitationsForLink($ocsMeta["hash"]);
+                            $ocsMeta["invitations"] = array_values($existingInvitations);
+                        }
+                    }else{
+                        $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
+                        if($shareMeta["type"] != "file"){
+                            $flattenJson = true;
+                        }
                     }
 
                 }
@@ -618,6 +663,9 @@ class ShareCenter extends AJXP_Plugin
 
                 }else if($flattenJson && count($jsonData)) {
                     $jsonData = $jsonData[0];
+                }
+                if(!empty($ocsMeta)){
+                    $jsonData["ocs"] = $ocsMeta;
                 }
                 echo json_encode($jsonData);
 
@@ -1426,7 +1474,12 @@ class ShareCenter extends AJXP_Plugin
         $hiddenUserEntry = null;
         $downloadDisabled = false;
         $originalHttpVars = $httpVars;
+        $ocsStore = new Pydio\OCS\Model\SQLStore();
+        $ocsClient = new Pydio\OCS\Client\OCSClient();
+
+        // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
+
             // PREPARE HIDDEN USER DATA
             if(isSet($httpVars["hash"])){
                 $shareObject = $this->getShareStore()->loadShareObject($httpVars["hash"]);
@@ -1441,13 +1494,50 @@ class ShareCenter extends AJXP_Plugin
             );
             $shareObject->parseHttpVars($httpVars);
             $downloadDisabled = $shareObject->disableDownload();
+
         }else if(isSet($httpVars["disable_public_link"])){
-            // TODO: Check if we need to keep the repository
-            // or not depending on other users
-            // $hasOtherUsers = false;
+
             $this->getShareStore()->deleteShare("minisite", $httpVars["disable_public_link"], true);
-            // Todo : seems like metadata is not deleted
+
         }
+
+        if(isSet($httpVars["ocs_data"])){
+
+            $ocsData = json_decode($httpVars["ocs_data"], true);
+            $existingOcsHash = isSet($ocsData["hash"]) ? AJXP_Utils::sanitize($ocsData["hash"], AJXP_SANITIZE_ALPHANUM) : null;
+
+            if(!empty($existingOcsHash)){
+                $existingInvitations = $ocsStore->invitationsForLink($existingOcsHash);
+                $totalInvitations = $this->getRightsManager()->remoteUsersFromParameters($ocsData, $existingInvitations, $newOcsUsers, $unShareInvitations);
+                if(!$totalInvitations){
+                    $this->getShareStore()->deleteShare("minisite", $existingOcsHash, true);
+                }else{
+                    $ocsLink = $this->getShareStore()->loadShareObject($existingOcsHash);
+                }
+            }else{
+                $totalInvitations = $this->getRightsManager()->remoteUsersFromParameters($ocsData, array(), $newOcsUsers, $unShareInvitations);
+                if($totalInvitations > 0){
+                    $ocsLink = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
+                    if(AuthService::usersEnabled()){
+                        $ocsLink->setOwnerId(AuthService::getLoggedUser()->getId());
+                    }
+                }
+            }
+            if(isSet($ocsLink)){
+                $ocsLink->parseHttpVars($httpVars);
+                if(isSet($shareObject)){
+                    $ocsLink->setUniqueUser($shareObject->getUniqueUser(), $shareObject->shouldRequirePassword());
+                }else{
+                    $hiddenUserEntry = $this->prepareSharedUserEntry(
+                        $httpVars,
+                        $ocsLink,
+                        isSet($httpVars["hash"]) || isSet($ocsData["hash"]),
+                        isSet($httpVars["guest_user_pass"])?$httpVars["guest_user_pass"]:null
+                    );
+                }
+            }
+        }
+
         $userSelection = new UserSelection($this->repository, $httpVars);
         $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
 
@@ -1465,21 +1555,47 @@ class ShareCenter extends AJXP_Plugin
 
         $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups, $downloadDisabled);
 
+
+        if(!isSet($shareObject) && !isSet($ocsLink)){
+
+            return array($newRepo);
+
+        }
+        $return = array();
         if(isSet($shareObject)){
 
             $shareObject->setParentRepositoryId($this->repository->getId());
             $shareObject->attachToRepository($newRepo->getId());
             // STORE DATA & HASH IN SHARE STORE
             $this->getPublicAccessManager()->initFolder();
-            $hash = $shareObject->save();
-            return $shareObject;
-
-        }else{
-
-            return $newRepo;
+            $shareObject->save();
+            $return[] = $shareObject;
 
         }
+        if(isSet($ocsLink)){
 
+            // Update OCS link
+            $ocsLink->setParentRepositoryId($this->repository->getId());
+            $ocsLink->attachToRepository($newRepo->getId());
+            $ocsLink->save();
+
+            if(isSet($newOcsUsers)){
+                foreach($newOcsUsers as $ocsUser){
+                    $invitation = $ocsLink->createInvitation($ocsUser["HOST"], $ocsUser["USER"]);
+                    $ocsStore->storeInvitation($invitation);
+                    $ocsClient->sendInvitation($invitation);
+                }
+            }
+            $return[] = $ocsLink;
+        }
+        if(isSet($unShareInvitations)){
+            foreach($unShareInvitations as $invitation){
+                $ocsClient->cancelInvitation($invitation);
+                $ocsStore->deleteInvitation($invitation);
+            }
+        }
+
+        return $return;
 
     }
 
@@ -1644,6 +1760,7 @@ class ShareCenter extends AJXP_Plugin
                 $repoId = str_replace("repo-", "", $repoId);
                 $shareMeta["type"] = "repository";
             }
+
             $minisite = ($shareMeta["type"] == "minisite");
             $minisiteIsPublic = false;
             $dlDisabled = false;
@@ -1696,7 +1813,10 @@ class ShareCenter extends AJXP_Plugin
             }else{
                 $sharedEntries = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, null);
             }
-
+            if(empty($sharedEntries) && $minisite){
+                $this->getShareStore()->getMetaManager()->removeShareFromMeta($node, $shareId);
+                return $notExistsData;
+            }
             $cFilter = $repo->getContentFilter();
             if(!empty($cFilter)){
                 $cFilter = $cFilter->toArray();

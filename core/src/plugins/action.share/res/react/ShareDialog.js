@@ -176,6 +176,7 @@
                         onUsersUpdate={this.onUsersUpdate}
                         saveSelectionAsTeam={this.props.shareModel.saveSelectionSupported(global.pydio)?this.onSaveSelection:null}
                     />
+                    <RemoteUsers shareModel={this.props.shareModel}/>
                 </div>
             );
         }
@@ -578,6 +579,42 @@
                 values={this.state.values}
                 onChange={this.onValuesChange}
             />
+        }
+    });
+
+    var RemoteUsers = React.createClass({
+
+        propTypes:{
+            shareModel: React.PropTypes.instanceOf(ReactModel.Share)
+        },
+
+        addUser:function(){
+            var h = this.refs["host"].getDOMNode().value;
+            var u = this.refs["user"].getDOMNode().value;
+            this.props.shareModel.addOcsInvitation(h, u);
+        },
+
+        removeUser: function(invite){
+            this.props.shareModel.removeOcsInvitation(invite);
+        },
+
+        render: function(){
+
+            var inv = this.props.shareModel.getOcsInvitations().map(function(invite){
+                var rem = function(){
+                    this.removeUser(invite);
+                }.bind(this);
+                return <div>{invite.HOST} -- {invite.USER} -- <span onClick={rem}>X</span></div>;
+            }.bind(this));
+            return (
+                <div>
+                    <input ref="host" type="text"/>
+                    <input ref="user" type="text"/>
+                    <ReactMUI.FlatButton label="Add" onClick={this.addUser}/>
+                    <div>{inv}</div>
+                </div>
+            );
+
         }
     });
 

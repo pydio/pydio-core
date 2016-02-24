@@ -30,27 +30,27 @@ class ShareLink
     /**
      * @var string
      */
-    private $hash;
+    protected $hash;
 
     /**
      * @var ShareStore
      */
-    private $store;
+    protected $store;
 
     /**
      * @var array
      */
-    private $internal;
+    protected $internal;
 
     /**
      * @var string
      */
-    private $newHash;
+    protected $newHash;
 
     /**
      * @var string
      */
-    private $parentRepositoryId;
+    protected $parentRepositoryId;
 
     public function __construct($store, $storeData = array()){
         $this->store = $store;
@@ -158,6 +158,10 @@ class ShareLink
         if(!empty($ownerId)){
             $this->internal["OWNER_ID"] = $ownerId;
         }
+    }
+
+    public function getOwnerId(){
+        return $this->internal["OWNER_ID"];
     }
 
     /**
