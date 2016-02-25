@@ -45,15 +45,24 @@ class Driver extends \fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
+    /*
+     * Driver Initialization
+     *
+     */
+    public function init($repository, $options = array())
+    {
+        parent::init($repository, $options);
+
+        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\Access\Core\Stream\AuthWrapper", "pydio.dav");
+        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\Access\Core\Stream\PathWrapper", "pydio.dav");
+    }
+
     /**
      * Repository Initialization
      *
      */
     public function initRepository()
     {
-        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\Access\Core\Stream\AuthWrapper");
-        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\Access\Core\Stream\PathWrapper");
-
         $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {

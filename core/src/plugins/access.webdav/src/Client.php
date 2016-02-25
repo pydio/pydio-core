@@ -202,10 +202,9 @@ class Client extends CoreClient
         array_shift($keys);
 
         foreach ($keys as $key) {
-
             $formattedStat = $this->_formatUrlStat($response[$key]);
             $this->files[] = [
-                basename($key),
+                urldecode(basename($key)),
                 $formattedStat
             ];
         }
