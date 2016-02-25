@@ -40,9 +40,10 @@ class TargettedLink extends \ShareLink
     /**
      * @param string $remoteServer
      * @param string $remoteUser
+     * @param string $documentName
      * @return ShareInvitation
      */
-    public function createInvitation($remoteServer, $remoteUser){
+    public function createInvitation($remoteServer, $remoteUser, $documentName){
 
         $invitation = new ShareInvitation();
         $invitation->setStatus(OCS_INVITATION_STATUS_PENDING);
@@ -50,6 +51,7 @@ class TargettedLink extends \ShareLink
         $invitation->setOwner($this->getOwnerId());
         $invitation->setTargetHost($remoteServer);
         $invitation->setTargetUser($remoteUser);
+        $invitation->setDocumentName($documentName);
 
         return $invitation;
 
@@ -58,9 +60,10 @@ class TargettedLink extends \ShareLink
     /**
      * @param string $remoteServer
      * @param string $remoteUser
+     * @param $documentName
      */
-    public function prepareInvitation($remoteServer, $remoteUser){
-        $this->pendingInvitation = array("host" => $remoteServer, "user" => $remoteUser);
+    public function prepareInvitation($remoteServer, $remoteUser, $documentName){
+        $this->pendingInvitation = array("host" => $remoteServer, "user" => $remoteUser, "documentName" => $documentName);
     }
 
     /**
@@ -68,7 +71,7 @@ class TargettedLink extends \ShareLink
      */
     public function getPendingInvitation(){
         if(isSet($this->pendingInvitation)){
-            return $this->createInvitation($this->pendingInvitation["host"], $this->pendingInvitation["user"]);
+            return $this->createInvitation($this->pendingInvitation["host"], $this->pendingInvitation["user"], $this->pendingInvitation["documentName"]);
         }
         return null;
     }

@@ -1459,6 +1459,8 @@ class ShareCenter extends AJXP_Plugin
         $originalHttpVars = $httpVars;
         $ocsStore = new Pydio\OCS\Model\SQLStore();
         $ocsClient = new Pydio\OCS\Client\OCSClient();
+        $userSelection = new UserSelection($this->repository, $httpVars);
+
         /**
          * @var ShareLink[] $shareObjects
          */
@@ -1507,7 +1509,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $link = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
                     if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
-                    $link->prepareInvitation($linkData["HOST"], $linkData["USER"]);
+                    $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $userSelection->getUniqueNode()->getLabel());
                 }
                 $hiddenUserEntries[] = $this->prepareSharedUserEntry(
                     $linkData,
@@ -1520,47 +1522,6 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        /*
-        // OCS LINK
-        if(isSet($httpVars["ocs_data"])){
-
-            $ocsData = json_decode($httpVars["ocs_data"], true);
-            $existingOcsHash = isSet($ocsData["hash"]) ? AJXP_Utils::sanitize($ocsData["hash"], AJXP_SANITIZE_ALPHANUM) : null;
-
-            if(!empty($existingOcsHash)){
-                $existingInvitations = $ocsStore->invitationsForLink($existingOcsHash);
-                $totalInvitations = $this->getRightsManager()->remoteUsersFromParameters($ocsData, $existingInvitations, $newOcsUsers, $unShareInvitations);
-                if(!$totalInvitations){
-                    $this->getShareStore()->deleteShare("minisite", $existingOcsHash, true);
-                }else{
-                    $ocsLink = $this->getShareStore()->loadShareObject($existingOcsHash);
-                }
-            }else{
-                $totalInvitations = $this->getRightsManager()->remoteUsersFromParameters($ocsData, array(), $newOcsUsers, $unShareInvitations);
-                if($totalInvitations > 0){
-                    $ocsLink = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
-                    if(AuthService::usersEnabled()){
-                        $ocsLink->setOwnerId(AuthService::getLoggedUser()->getId());
-                    }
-                }
-            }
-            if(isSet($ocsLink)){
-                $ocsLink->parseHttpVars($httpVars);
-                if(isSet($shareObject)){
-                    $ocsLink->setUniqueUser($shareObject->getUniqueUser(), $shareObject->shouldRequirePassword());
-                }else{
-                    $hiddenUserEntry = $this->prepareSharedUserEntry(
-                        $httpVars,
-                        $ocsLink,
-                        isSet($httpVars["hash"]) || isSet($ocsData["hash"]),
-                        isSet($httpVars["guest_user_pass"])?$httpVars["guest_user_pass"]:null
-                    );
-                }
-            }
-        }
-        */
-
-        $userSelection = new UserSelection($this->repository, $httpVars);
         $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
 
         $users = array(); $groups = array();
@@ -1867,39 +1828,6 @@ class ShareCenter extends AJXP_Plugin
                 $shareLink->setAdditionalMeta($shareMeta);
                 $jsonData["minisite"] = $shareLink->getJsonData($this->getPublicAccessManager(), $messages);
             }
-            /*
-            if ($minisite && isSet($storedData)) {
-                if(!empty($storedData["DOWNLOAD_LIMIT"]) && !$dlDisabled){
-                    $jsonData["download_counter"] = $this->getShareStore()->getCurrentDownloadCounter($shareId);
-                    $jsonData["download_limit"] = $storedData["DOWNLOAD_LIMIT"];
-                }
-                if(!empty($storedData["EXPIRE_TIME"])){
-                    $delta = $storedData["EXPIRE_TIME"] - time();
-                    $days = round($delta / (60*60*24));
-                    $jsonData["expire_time"] = date($messages["date_format"], $storedData["EXPIRE_TIME"]);
-                    $jsonData["expire_after"] = $days;
-                }else{
-                    $jsonData["expire_after"] = 0;
-                }
-                $jsonData["is_expired"] = $this->getShareStore()->isShareExpired($shareId, $storedData);
-                if(isSet($storedData["AJXP_TEMPLATE_NAME"])){
-                    $jsonData["minisite_layout"] = $storedData["AJXP_TEMPLATE_NAME"];
-                }
-                if(!$minisiteIsPublic){
-                    $jsonData["has_password"] = true;
-                }
-                $jsonData["minisite"] = array(
-                    "public"            => $minisiteIsPublic?"true":"false",
-                    "public_link"       => $minisiteLink,
-                    "disable_download"  => $dlDisabled,
-                    "hash"              => $shareId,
-                    "hash_is_shorten"   => isSet($shareMeta["short_form_url"])
-                );
-                foreach($this->getShareStore()->modifiableShareKeys as $key){
-                    if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
-                }
-
-            }*/
 
         }
 
