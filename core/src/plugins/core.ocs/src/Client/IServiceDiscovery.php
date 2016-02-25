@@ -25,5 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 interface IServiceDiscovery
 {
-    public function findEndpointsForServer($remoteHost);
+    public static function findEndpointsForURL($url);
+
+    public static function findEndpointsForClient($client);
 }
