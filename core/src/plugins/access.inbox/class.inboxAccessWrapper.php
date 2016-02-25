@@ -45,7 +45,7 @@ class inboxAccessWrapper implements AjxpWrapper
         $repos = ConfService::getAccessibleRepositories();
         self::$output = array();
         foreach($repos as $repo){
-            if(!$repo->hasParent()){
+            if(!$repo->hasOwner()){
                 continue;
             }
             if($repo->hasContentFilter()){
@@ -94,7 +94,12 @@ class inboxAccessWrapper implements AjxpWrapper
         }
         if($pydioScheme){
             $node = new AJXP_Node($url);
-            ConfService::loadDriverForRepository($node->getRepository());
+            $node->getRepository()->driverInstance = null;
+            try{
+                ConfService::loadDriverForRepository($node->getRepository());
+            }catch (Exception $e){
+
+            }
             $node->getRepository()->detectStreamWrapper(true);
         }
         return $url;
@@ -389,7 +394,7 @@ class inboxAccessWrapper implements AjxpWrapper
         if(self::$linkNode !== null){
             ConfService::loadDriverForRepository(self::$linkNode->getRepository());
         }
-        $this->disableWriteInStat($stat);
+        //$this->disableWriteInStat($stat);
         return $stat;
     }
 

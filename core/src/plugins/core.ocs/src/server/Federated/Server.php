@@ -72,12 +72,7 @@ class Server extends Dummy
             throw new InvalidArgumentsException();
         }
 
-        // TODO:
-        // -- Ping Remote to discover OcsServiceUrl & OcsDavURL
-        // -- Ping Dav endpoint to detect if password & if file or folder
-        // -- Can we not use the Virtual repo there ?? Better if access was done through access.webdav
         $endpoints = OCSClient::findEndpointsForURL($remote);
-        //$parameters += OCSClient::pingDAVEndpoint();
 
         $share = new RemoteShare();
         $share->setUser($targetUser);
@@ -88,13 +83,10 @@ class Server extends Dummy
         $share->setReceptionDate(time());
         $share->setStatus(OCS_INVITATION_STATUS_PENDING);
 
-        $share->setOcsServiceUrl($endpoints['shares']);
-        $share->setOcsDavUrl($endpoints['dav']);
+        $share->setOcsServiceUrl(rtrim($remote, '/').$endpoints['share']);
+        $share->setOcsDavUrl(rtrim($remote, '/').$endpoints['webdav']);
 
-        // Populated from the DAV ping above
-        if(isset($parameters["isFile"]) && $parameters["isFile"] == "true"){
-            $share->setDocumentIsLeaf(true);
-        }
+        $share->pingRemoteDAVPoint();
 
         $store = new SQLStore();
         $newShare = $store->storeRemoteShare($share);

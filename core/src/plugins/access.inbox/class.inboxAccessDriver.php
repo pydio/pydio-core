@@ -38,11 +38,17 @@ class inboxAccessDriver extends fsAccessDriver
             $targetUrl = inboxAccessWrapper::translateURL($ajxpNode->getUrl());
             $repoId = parse_url($targetUrl, PHP_URL_HOST);
             $r = ConfService::getRepositoryById($repoId);
-            $owner = $r->getOwner();
+            if(!is_null($r)){
+                $owner = $r->getOwner();
+                $creationTime = $r->getOption("CREATION_TIME");
+            }else{
+                $owner = "http://".parse_url($targetUrl, PHP_URL_HOST);
+                $creationTime = time();
+            }
             $leaf = $ajxpNode->isLeaf();
             $meta = array(
                 "shared_repository_id" => $repoId,
-                "ajxp_description" => ($leaf?"File":"Folder")." shared by ".$owner. " ". AJXP_Utils::relativeDate($r->getOption("CREATION_TIME"), $mess)
+                "ajxp_description" => ($leaf?"File":"Folder")." shared by ".$owner. " ". AJXP_Utils::relativeDate($creationTime, $mess)
                 );
             if(!$leaf){
                 $meta["ajxp_mime"] = "shared_folder";

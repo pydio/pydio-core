@@ -31,6 +31,8 @@ ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
+$pServ->initActivePlugins();
+
 /**
  * @var Pydio\OCS\OCSPlugin $coreLoader
  */
