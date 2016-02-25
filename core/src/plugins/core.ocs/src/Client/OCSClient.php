@@ -53,7 +53,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'body' => [
                 'shareWith' => $invitation->getTargetUser(),
                 'token' => $invitation->getLinkHash(),
-                'name' => 'Documents',
+                'name' => $invitation->getName(),
                 'remoteId' => $invitation->getId(),
                 'owner' => $invitation->getOwner(),
                 'remote' => AJXP_Utils::detectServerUrl()
