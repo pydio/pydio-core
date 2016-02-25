@@ -36,6 +36,10 @@ class ShareInvitation implements \JsonSerializable
     /**
      * @var string
      */
+    var $documentName;
+    /**
+     * @var string
+     */
     var $linkHash;
     /**
      * @var integer
@@ -68,6 +72,18 @@ class ShareInvitation implements \JsonSerializable
 
     public function setId($id){
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocumentName()
+    {
+        return $this->documentName;
+    }
+
+    public function setDocumentName($documentName){
+        $this->documentName = $documentName;
     }
 
     /**
