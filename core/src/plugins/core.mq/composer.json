@@ -1,0 +1,14 @@
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Devristo/phpws"
+    }
+  ],
+  "require": {
+    "devristo/phpws": "dev-master"
+  },
+  "config": {
+    "vendor-dir": "vendor/phpws"
+  }
+}

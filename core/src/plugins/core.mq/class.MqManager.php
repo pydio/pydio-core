@@ -167,7 +167,7 @@ class MqManager extends AJXP_Plugin
         $configs = $this->getConfigs();
         if ($configs["WS_SERVER_ACTIVE"]) {
 
-            require_once($this->getBaseDir()."/vendor/phpws/websocket.client.php");
+            require_once(__DIR__ . "/vendor/phpws/autoload.php");
             // Publish for websockets
             $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
             if(isSet($userId)){
@@ -178,14 +178,35 @@ class MqManager extends AJXP_Plugin
             if(count($nodePathes)) {
                 $input["NODE_PATHES"] = $nodePathes;
             }
-            $input = serialize($input);
-            $msg = WebSocketMessage::create($input);
+
             if (!isset($this->wsClient)) {
-                $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_BIND_HOST"].":".$configs["WS_SERVER_BIND_PORT"].$configs["WS_SERVER_PATH"]);
-                $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
-                @$this->wsClient->open();
+                $loop = \React\EventLoop\Factory::create();
+                $logger = new \Zend\Log\Logger();
+                if (AJXP_SERVER_DEBUG) {
+                    $writer = new Zend\Log\Writer\Stream("php://output");
+                }else {
+                    $writer = new Zend\Log\Writer\Noop;
+                }
+                $logger->addWriter($writer);
+                $this->loop = $loop;
+                //little workaround,... it seems phpws cannot resolv ip for localhost ? :-)
+                if($configs['WS_SERVER_BIND_HOST'] == 'localhost') $configs['WS_SERVER_BIND_HOST']  = '127.0.0.1';
+                $this->wsClient = new \Devristo\Phpws\Client\WebSocket('ws://'.$configs['WS_SERVER_BIND_HOST'].':'.$configs['WS_SERVER_BIND_PORT'].$configs['WS_SERVER_PATH'], $loop, $logger);
+                $wsClient = $this->wsClient;
+                $this->wsClient->on("connect", function () use ($logger, $wsClient, $input, $loop) {
+                    $wsClient->send(serialize($input));
+                    $loop->stop();
+                });
+                $this->wsClient->on("request", function ($handshake) use ($logger, $configs) {
+                    $handshake->getHeaders()->addHeaderLine("Admin-Key", $configs["WS_SERVER_ADMIN"]);
+                });
+
+                $this->wsClient->open();
+                $loop->run();
+            }else{
+                $this->wsClient->send(serialize($input));
+                $this->loop->tick();
             }
-            @$this->wsClient->sendMessage($msg);
         }
 
     }
@@ -346,8 +367,13 @@ class MqManager extends AJXP_Plugin
             $unixProcess = new UnixProcess();
             $unixProcess->setPid($pId);
             $status = $unixProcess->status();
-            if($status) return "ON";
-            else return "OFF";
+            if($status){
+                return "ON";
+            }
+            else{
+                @unlink($pidFile); // remove pid file if no process exists
+                return "OFF";
+            }
         }
 
     }
