@@ -20,36 +20,186 @@
  */
 namespace Pydio\OCS\Client;
 
+defined('AJXP_EXEC') or die('Access not allowed');
+defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
+
+require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
+
+use AJXP_Utils;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\ShareInvitation;
+use GuzzleHttp\Client as GuzzleClient;
 
-defined('AJXP_EXEC') or die('Access not allowed');
 
 class OCSClient implements IFederated, IServiceDiscovery
 {
-
+    /**
+     *
+     * Sends an invitation to a remote user on a remote server
+     *
+     * @param ShareInvitation $invitation
+     * @return boolean success
+     * @throws Exception
+     */
     public function sendInvitation(ShareInvitation $invitation)
     {
-        // TODO: Implement sendInvitation() method.
+        $client = new GuzzleClient([
+            'base_url' => $invitation->getTargetHost()
+        ]);
+
+        $endpoints = self::findEndpointsForServer($client);
+
+        $response = $client->post($endpoints['shares'], [
+            'body' => [
+                'shareWith' => $invitation->getTargetUser(),
+                'token' => $invitation->getLinkHash(),
+                'name' => 'Documents',
+                'remoteId' => $invitation->getId(),
+                'owner' => $invitation->getOwner(),
+                'remote' => AJXP_Utils::detectServerUrl()
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception($response->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
+    /**
+     *
+     * Cancels a sent invitation
+     *
+     * @param ShareInvitation $inviation
+     * @return boolean success
+     * @throws Exception
+     */
     public function cancelInvitation(ShareInvitation $invitation)
     {
-        // TODO: Implement cancelInvitation() method.
+        $client = new GuzzleClient([
+            'base_url' => $invitation->getTargetHost()
+        ]);
+
+        $endpoints = self::findEndpointsForServer($client);
+
+        $response = $client->post($endpoints['shares'] . '/' . $invitation->getId() . '/unshare', [
+            'body' => [
+                'token' => $invitation->getLinkHash()
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception($response->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
+    /**
+     *
+     * Accepts the invitation sent by the original owner on a remote server
+     *
+     * @param RemoteShare $remoteShare
+     * @return boolean success
+     * @throws Exception
+     */
     public function acceptInvitation(RemoteShare $remoteShare)
     {
-        // TODO: Implement acceptInvitation() method.
+        $client = new GuzzleClient([
+            'base_url' => $remoteShare->getOcsServiceUrl()
+        ]);
+
+        $response = $client->post($remoteShare->getOcsRemoteId() . '/accept', [
+            'body' => [
+                'token' => $remoteShare->getOcsToken(),
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception($response->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
+    /**
+     *
+     * Declines the invitation sent by the original owner on a remote server
+     *
+     * @param RemoteShare $remoteShare
+     * @return boolean success
+     * @throws Exception
+     */
     public function declineInvitation(RemoteShare $remoteShare)
     {
-        // TODO: Implement declineInvitation() method.
+        $client = new GuzzleClient([
+            'base_url' => $remoteShare->getOcsServiceUrl()
+        ]);
+
+        $response = $client->post($remoteShare->getOcsRemoteId() . '/decline', [
+            'body' => [
+                'token' => $remoteShare->getOcsToken(),
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception($response->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
-    public function findEndpointsForServer($remoteHost)
+    /**
+     *
+     * Retrieves the OCS Provider endpoints for the URL
+     *
+     */
+    public static function findEndpointsForURL($url) {
+        $client = new GuzzleClient([
+            'base_url' => $url
+        ]);
+
+        return self::findEndpointsForClient($client);
+    }
+
+    /**
+     *
+     * Retrieves the OCS Provider endpoints for the Guzzle Client via a GET request
+     *
+     * @param GuzzleClient $client
+     * @return array endpoints location
+     * @throws Exception
+     */
+    public static function findEndpointsForClient($client)
     {
-        // TODO: Implement findEndpointsForServer() method.
+        // WARNING - This needs to be relative... :/
+        $response = $client->get('ocs-provider/');
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception('Could not get OCS Provider endpoints');
+            return array();
+        }
+
+        $contentType = $response->getHeader('Content-Type');
+        if (array_search($contentType, ['text/json', 'application/json']) !== false) {
+            $response = $response->json();
+        } else if (array_search($contentType, ['text/xml', 'application/xml']) !== false) {
+            $response = $response->xml();
+        }
+
+        // Flattening response coz Owncloud are not respecting the API
+        $response = array_merge((array) $response, (array) $response['services']);
+
+        if (!isset($response['FEDERATED_SHARING']['endpoints'])) {
+            throw new Exception('Provider endpoints response not valid');
+            return array();
+        }
+
+        return $response['services']['FEDERATED_SHARING']['endpoints'];
     }
 }
