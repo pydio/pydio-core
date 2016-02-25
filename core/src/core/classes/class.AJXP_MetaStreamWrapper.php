@@ -44,9 +44,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      */
     protected $currentDirPath;
 
-    protected static $metaWrappers = array(
-        "pydio" => "AJXP_MetaStreamWrapper"
-    );
+    protected static $metaWrappers = [
+        'core' => [
+            'pydio' => 'AJXP_MetaStreamWrapper'
+        ]
+    ];
 
     protected static $cachedRepositoriesWrappers = array();
 
@@ -60,7 +62,8 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         if($registered_wrappers == null){
             $registered_wrappers = stream_get_wrappers();
         }
-        foreach(self::$metaWrappers as $protocol => $className){
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator(self::$metaWrappers));
+        foreach($it as $protocol => $className){
             if(!in_array($protocol, $registered_wrappers)){
                 stream_wrapper_register($protocol, $className);
             }
@@ -72,14 +75,18 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * @param $name string
      * @param $className string
      */
-    public static function appendMetaWrapper($name, $className){
-        self::$metaWrappers[$name] = $className;
+    public static function appendMetaWrapper($name, $className, $parent = "core"){
+        self::$metaWrappers[$parent][$name] = $className;
         self::register();
     }
 
-    protected static function getNextScheme($url){
+    protected static function getMetaWrappers($scheme) {
+        return array_merge((array) self::$metaWrappers['core'], (array) self::$metaWrappers[$scheme]);
+    }
+
+    protected static function getNextScheme($url, $context='core'){
         $parts = parse_url($url);
-        $metaWrapperKeys = array_keys(self::$metaWrappers);
+        $metaWrapperKeys = array_keys(self::getMetaWrappers($context));
         $key = array_search($parts["scheme"], $metaWrapperKeys);
         if($key < count($metaWrapperKeys) - 1){
             // Return next registered meta wrapper
@@ -98,8 +105,10 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * @throws Exception
      */
     protected static function translateScheme($url, $crtInstance = null){
-        $currentScheme = parse_url($url, PHP_URL_SCHEME);
-        $newScheme = self::getNextScheme($url);
+        $parts=parse_url($url);
+        $currentScheme = $parts['scheme'];
+        $context = self::actualRepositoryWrapperProtocol($parts['host']);
+        $newScheme = self::getNextScheme($url, $context);
         $repository = ConfService::getRepositoryById(parse_url($url, PHP_URL_HOST));
         if($currentScheme == "pydio" && $repository->hasContentFilter()){
             $baseDir = $repository->getContentFilter()->getBaseDir();
@@ -119,27 +128,33 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
         $newUrl = str_replace($currentScheme."://", $newScheme."://", $url);
 
-        self::applyInitPathHook($newUrl);
+        self::applyInitPathHook($newUrl, $context);
 
         return $newUrl;
     }
 
-    protected static function findWrapperClassName($scheme){
-        if(isSet(self::$metaWrappers[$scheme])){
-            $wrapper = self::$metaWrappers[$scheme];
+    // TODO - problem here
+    protected static function findWrapperClassName($scheme, $context = "core"){
+
+        $metaWrappers = self::getMetaWrappers($context);
+
+        if(isSet($metaWrappers[$scheme])){
+            $wrapper = $metaWrappers[$scheme];
         }else{
             $wrapper = AJXP_PluginsService::getInstance()->getWrapperClassName($scheme);
         }
         if(empty($wrapper)) {
-            throw new Exception("Cannot find any wrapper for the scheme " . $scheme);
+            throw new Exception("Cannot find any wrapper for the scheme " . $scheme . " in context " . $context);
         }
         return $wrapper;
     }
 
     protected static function findSubWrapperClassName($url){
-        $nextScheme = self::getNextScheme($url);
+        $repositoryId = parse_url($url, PHP_URL_HOST);
+        $context = self::actualRepositoryWrapperProtocol($repositoryId);
+        $nextScheme = self::getNextScheme($url, $context);
 
-        return self::findWrapperClassName($nextScheme);
+        return self::findWrapperClassName($nextScheme, $context);
     }
 
     protected static function actualRepositoryWrapperData($repositoryId){
@@ -158,6 +173,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
     }
 
+
     /**
      * Return the final ajxp.XX wrapper class name.
      * @param $repositoryId
@@ -170,13 +186,26 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
     }
 
     /**
+     * Return the final ajxp.XX wrapper protocol.
+     * @param $repositoryId
+     * @return string mixed
+     * @throws Exception
+     */
+    public static function actualRepositoryWrapperProtocol($repositoryId){
+        $data = self::actualRepositoryWrapperData($repositoryId);
+        return $data["protocol"];
+    }
+
+
+
+    /**
      * Call Init function for a translated Path if defined
      *
      * @param string $path
      */
-    public static function applyInitPathHook($path) {
+    public static function applyInitPathHook($path, $context = 'core') {
         $currentScheme = parse_url($path, PHP_URL_SCHEME);
-        $wrapper = self::findWrapperClassName($currentScheme);
+        $wrapper = self::findWrapperClassName($currentScheme, $context);
 
         if (is_callable(array($wrapper, "applyInitPathHook"))){
             call_user_func(array($wrapper, "applyInitPathHook"), $path);
