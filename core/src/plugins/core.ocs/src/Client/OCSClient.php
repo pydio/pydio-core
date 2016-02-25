@@ -39,7 +39,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * @param ShareInvitation $invitation
      * @return boolean success
-     * @throws Exception
+     * @throws \Exception
      */
     public function sendInvitation(ShareInvitation $invitation)
     {
@@ -53,7 +53,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'body' => [
                 'shareWith' => $invitation->getTargetUser(),
                 'token' => $invitation->getLinkHash(),
-                'name' => $invitation->getName(),
+                'name' => $invitation->getDocumentName(),
                 'remoteId' => $invitation->getId(),
                 'owner' => $invitation->getOwner(),
                 'remote' => AJXP_Utils::detectServerUrl()
@@ -61,8 +61,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
 
         if ($response->getStatusCode() != 200) {
-            throw new Exception($response->getMessage());
-            return false;
+            throw new \Exception($response->getReasonPhrase());
         }
 
         return true;
@@ -74,7 +73,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * @param ShareInvitation $inviation
      * @return boolean success
-     * @throws Exception
+     * @throws \Exception
      */
     public function cancelInvitation(ShareInvitation $invitation)
     {
@@ -91,8 +90,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
 
         if ($response->getStatusCode() != 200) {
-            throw new Exception($response->getMessage());
-            return false;
+            throw new \Exception($response->getReasonPhrase());
         }
 
         return true;
@@ -104,7 +102,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * @param RemoteShare $remoteShare
      * @return boolean success
-     * @throws Exception
+     * @throws \Exception
      */
     public function acceptInvitation(RemoteShare $remoteShare)
     {
@@ -119,8 +117,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
 
         if ($response->getStatusCode() != 200) {
-            throw new Exception($response->getMessage());
-            return false;
+            throw new \Exception($response->getReasonPhrase());
         }
 
         return true;
@@ -132,7 +129,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * @param RemoteShare $remoteShare
      * @return boolean success
-     * @throws Exception
+     * @throws \Exception
      */
     public function declineInvitation(RemoteShare $remoteShare)
     {
@@ -147,8 +144,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
 
         if ($response->getStatusCode() != 200) {
-            throw new Exception($response->getMessage());
-            return false;
+            throw new \Exception($response->getReasonPhrase());
         }
 
         return true;
@@ -173,7 +169,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * @param GuzzleClient $client
      * @return array endpoints location
-     * @throws Exception
+     * @throws \Exception
      */
     public static function findEndpointsForClient($client)
     {
@@ -181,8 +177,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         $response = $client->get('ocs-provider/');
 
         if ($response->getStatusCode() != 200) {
-            throw new Exception('Could not get OCS Provider endpoints');
-            return array();
+            throw new \Exception('Could not get OCS Provider endpoints');
         }
 
         $contentType = $response->getHeader('Content-Type');
@@ -196,8 +191,7 @@ class OCSClient implements IFederated, IServiceDiscovery
         $response = array_merge((array) $response, (array) $response['services']);
 
         if (!isset($response['FEDERATED_SHARING']['endpoints'])) {
-            throw new Exception('Provider endpoints response not valid');
-            return array();
+            throw new \Exception('Provider endpoints response not valid');
         }
 
         return $response['services']['FEDERATED_SHARING']['endpoints'];
