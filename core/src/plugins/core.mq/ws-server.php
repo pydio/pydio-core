@@ -132,7 +132,7 @@ $server->on('connect', function(Devristo\Phpws\Protocol\WebSocketTransportHybi $
     $err = $xPath->query("//message[@type='ERROR']");
     if ($err->length) {
         //$this->say($err->item(0)->firstChild->nodeValue);
-        $user->disconnect();
+        $user->close();
     } else {
         $userRepositories = array();
         $repos = $xPath->query('/tree/user/repositories/repo');
