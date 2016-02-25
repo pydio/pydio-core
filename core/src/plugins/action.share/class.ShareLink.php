@@ -48,6 +48,11 @@ class ShareLink
     protected $newHash;
 
     /**
+     * @var array
+     */
+    protected $additionalMeta;
+
+    /**
      * @var string
      */
     protected $parentRepositoryId;
@@ -90,6 +95,26 @@ class ShareLink
 
     public function isAttachedToRepository(){
         return isSet($this->internal["REPOSITORY"]);
+    }
+
+    public function getRepositoryId(){
+        return $this->internal["REPOSITORY"];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalMeta()
+    {
+        return $this->additionalMeta;
+    }
+
+    /**
+     * @param array $additionalMeta
+     */
+    public function setAdditionalMeta($additionalMeta)
+    {
+        $this->additionalMeta = $additionalMeta;
     }
 
     /**
@@ -148,6 +173,60 @@ class ShareLink
                 $this->newHash = $value;
             }
         }
+
+    }
+
+    /**
+     * @param PublicAccessManager $publicAccessManager
+     * @param array $messages
+     * @return mixed
+     */
+    public function getJsonData($publicAccessManager, $messages){
+
+        $storedData = $this->internal;
+        $minisiteIsPublic = isSet($storedData["PRELOG_USER"]);
+        $dlDisabled = isSet($storedData["DOWNLOAD_DISABLED"]) && $storedData["DOWNLOAD_DISABLED"] === true;
+        $shareMeta = isSet($this->additionalMeta) ? $this->additionalMeta : array();
+
+        $jsonData = array(
+            "public"            => $minisiteIsPublic?"true":"false",
+            "disable_download"  => $dlDisabled,
+            "hash"              => $this->getHash(),
+            "hash_is_shorten"   => isSet($shareMeta["short_form_url"])
+        );
+
+        if(!isSet($storedData["TARGET"]) || $storedData["TARGET"] == "public"){
+            if (isSet($shareMeta["short_form_url"])) {
+                $jsonData["public_link"] = $shareMeta["short_form_url"];
+            } else {
+                $jsonData["public_link"] = $publicAccessManager->buildPublicLink($this->getHash());
+            }
+        }
+
+        if(!empty($storedData["DOWNLOAD_LIMIT"]) && !$dlDisabled){
+            $jsonData["download_counter"] = $this->store->getCurrentDownloadCounter($this->getHash());
+            $jsonData["download_limit"] = $storedData["DOWNLOAD_LIMIT"];
+        }
+        if(!empty($storedData["EXPIRE_TIME"])){
+            $delta = $storedData["EXPIRE_TIME"] - time();
+            $days = round($delta / (60*60*24));
+            $jsonData["expire_time"] = date($messages["date_format"], $storedData["EXPIRE_TIME"]);
+            $jsonData["expire_after"] = $days;
+        }else{
+            $jsonData["expire_after"] = 0;
+        }
+        $jsonData["is_expired"] = $this->store->isShareExpired($this->getHash(), $storedData);
+        if(isSet($storedData["AJXP_TEMPLATE_NAME"])){
+            $jsonData["minisite_layout"] = $storedData["AJXP_TEMPLATE_NAME"];
+        }
+        if(!$minisiteIsPublic){
+            $jsonData["has_password"] = true;
+        }
+        foreach($this->store->modifiableShareKeys as $key){
+            if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
+        }
+
+        return $jsonData;
 
     }
 

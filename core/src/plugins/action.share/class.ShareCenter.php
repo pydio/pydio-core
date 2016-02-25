@@ -20,6 +20,7 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+require_once("class.CompositeShare.php");
 
 /**
  * @package AjaXplorer_Plugins
@@ -542,11 +543,13 @@ class ShareCenter extends AJXP_Plugin
                     header("Content-Type: text/plain");
                     print($plainResult);
                 }else{
-                    $this->switchAction(
-                        "load_shared_element_data",
-                        array("file" => $ajxpNode->getPath(), "merged" => "true"),
-                        array()
-                    );
+                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
+                    header("Content-type:application/json");
+                    if(!empty($compositeShare)){
+                        echo json_encode($this->compositeShareToJson($compositeShare));
+                    }else{
+                        echo json_encode(array());
+                    }
                 }
                 // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
                 flush();
@@ -617,57 +620,30 @@ class ShareCenter extends AJXP_Plugin
             case "load_shared_element_data":
 
                 $node = null;
-                if(isSet($httpVars["hash"])){
-                    $t = "minisite";
-                    if(isSet($httpVars["element_type"]) && $httpVars["element_type"] == "file") $t = "file";
-                    $parsedMeta = array($httpVars["hash"] => array("type" => $t));
+                if(isSet($httpVars["hash"]) && $httpVars["element_type"] == "file"){
+
+                    // LEGACY LINKS
+                    $parsedMeta = array($httpVars["hash"] => array("type" => "file"));
+                    $jsonData = array();
+                    foreach($parsedMeta as $shareId => $shareMeta){
+                        $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
+                    }
+                    header("Content-type:application/json");
+                    echo json_encode($jsonData);
+
                 }else{
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
-                    $parsedMeta = array();
-                    $this->getShareStore()->getMetaManager()->getSharesFromMeta($node, $parsedMeta, true);
-                }
-
-                $flattenJson = false;
-                $jsonData = array();
-                $ocsMeta = null;
-                foreach($parsedMeta as $shareId => $shareMeta){
-
-                    if($shareMeta["type"] == "ocs_remote"){
-                        $fullOcsMeta = $this->shareToJson($shareId, array("type"=>"minisite"), $node);
-                        if(isSet($fullOcsMeta["minisite"])){
-                            $ocsMeta = $fullOcsMeta["minisite"];
-                            $ocsStore = new Pydio\OCS\Model\SQLStore();
-                            $existingInvitations = $ocsStore->invitationsForLink($ocsMeta["hash"]);
-                            $ocsMeta["invitations"] = array_values($existingInvitations);
-                        }
+                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
+                    header("Content-type:application/json");
+                    if(!empty($compositeShare)){
+                        $json = $this->compositeShareToJson($compositeShare, $node);
+                        echo json_encode($json);
                     }else{
-                        $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
-                        if($shareMeta["type"] != "file"){
-                            $flattenJson = true;
-                        }
+                        echo json_encode(array());
                     }
+                }
 
-                }
-                header("Content-type:application/json");
-                if(isSet($httpVars['merged']) && count($jsonData)){
-                    // Send minisite ( = more complete ) if any, or send repository
-                    foreach($jsonData as $data){
-                        if(isSet($data['minisite'])){
-                            $minisiteData = $data;
-                            break;
-                        }
-                    }
-                    if(isSet($minisiteData)) $jsonData = $minisiteData;
-                    else $jsonData = $jsonData[0];
-
-                }else if($flattenJson && count($jsonData)) {
-                    $jsonData = $jsonData[0];
-                }
-                if(!empty($ocsMeta)){
-                    $jsonData["ocs"] = $ocsMeta;
-                }
-                echo json_encode($jsonData);
 
             break;
 
@@ -1480,6 +1456,14 @@ class ShareCenter extends AJXP_Plugin
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
 
+            $minisiteData = $httpVars;
+            if(isSet($httpVars["minisite"])){
+                $decoded = json_decode($httpVars["minisite"], true);
+                if(is_array($decoded)){
+                    $minisiteData = $decoded;
+                }
+            }
+
             // PREPARE HIDDEN USER DATA
             if(isSet($httpVars["hash"])){
                 $shareObject = $this->getShareStore()->loadShareObject($httpVars["hash"]);
@@ -1730,6 +1714,47 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
+     * @param CompositeShare $compositeShare
+     * @return array
+     */
+    public function compositeShareToJson($compositeShare){
+
+        $repoId = $compositeShare->getRepositoryId();
+        $repo = $compositeShare->getRepository();
+        $messages = ConfService::getMessages();
+
+        $notExistsData = array(
+            "error"         => true,
+            "repositoryId"  => $repoId,
+            "users_number"  => 0,
+            "label"         => "Error - Cannot find shared data",
+            "description"   => "Cannot find repository",
+            "entries"       => array(),
+            "element_watch" => false,
+            "repository_url"=> ""
+        );
+
+        if($repoId == null || $repo == null){
+            //CLEAR AND ASSOCIATED LINKS HERE ?
+            //$this->getShareStore()->getMetaManager()->removeShareFromMeta($node, $shareId);
+            return $notExistsData;
+        }
+        try{
+            $this->getShareStore()->testUserCanEditShare($compositeShare->getOwner(), array("SHARE_ACCESS" => $compositeShare->getVisibilityScope()));
+        }catch(Exception $e){
+            $notExistsData["label"] = $e->getMessage();
+            return $notExistsData;
+        }
+
+        $jsonData = $compositeShare->toJson($this->watcher, $this->getRightsManager(), $this->getPublicAccessManager(), $messages);
+        if($jsonData === false){
+            return $notExistsData;
+        }
+        return $jsonData;
+
+    }
+
+    /**
      * @param String $shareId
      * @param array $shareMeta
      * @param AJXP_Node $node
@@ -1763,19 +1788,9 @@ class ShareCenter extends AJXP_Plugin
             }
 
             $minisite = ($shareMeta["type"] == "minisite");
-            $minisiteIsPublic = false;
-            $dlDisabled = false;
-            $minisiteLink = '';
             if ($minisite) {
-                $storedData = $this->getShareStore()->loadShare($shareId);
-                $repoId = $storedData["REPOSITORY"];
-                $minisiteIsPublic = isSet($storedData["PRELOG_USER"]);
-                $dlDisabled = isSet($storedData["DOWNLOAD_DISABLED"]) && $storedData["DOWNLOAD_DISABLED"] === true;
-                if (isSet($shareMeta["short_form_url"])) {
-                    $minisiteLink = $shareMeta["short_form_url"];
-                } else {
-                    $minisiteLink = $this->getPublicAccessManager()->buildPublicLink($shareId);
-                }
+                $shareLink = $this->getShareStore()->loadShareObject($shareId);
+                $repoId = $shareLink->getRepositoryId();
             }
             $notExistsData = array(
                 "error"         => true,
@@ -1834,6 +1849,11 @@ class ShareCenter extends AJXP_Plugin
                 "share_owner"   => $repo->getOwner(),
                 "share_scope"    => (isSet($repo->options["SHARE_ACCESS"]) ? $repo->options["SHARE_ACCESS"] : "private")
             );
+            if($minisite && isSet($shareLink)){
+                $shareLink->setAdditionalMeta($shareMeta);
+                $jsonData["minisite"] = $shareLink->getJsonData($this->getPublicAccessManager(), $messages);
+            }
+            /*
             if ($minisite && isSet($storedData)) {
                 if(!empty($storedData["DOWNLOAD_LIMIT"]) && !$dlDisabled){
                     $jsonData["download_counter"] = $this->getShareStore()->getCurrentDownloadCounter($shareId);
@@ -1865,7 +1885,7 @@ class ShareCenter extends AJXP_Plugin
                     if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
                 }
 
-            }
+            }*/
 
         }
 

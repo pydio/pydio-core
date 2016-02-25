@@ -37,39 +37,42 @@
         }
 
         hasPublicLink(){
-            return (this._data['minisite'] && this._data['minisite']['public_link']);
+            var publicLinks = this.getPublicLinks();
+            return publicLinks.length > 0;
         }
 
-        getPublicLink(){
-            if(this.hasPublicLink()){
-                return this._data['minisite']['public_link'];
-            }else{
-                return null;
-            }
+        getPublicLink(linkId){
+            return this._data['links'][linkId]['public_link'];
         }
 
-        getPublicLinkHash(){
-            if(this.hasPublicLink()){
-                return this._data['minisite']['hash'];
-            }else{
-                return null;
-            }
+        getPublicLinkHash(linkId){
+            return this._data['links'][linkId]['hash'];
         }
 
-        publicLinkIsShorten(){
-            if(this.hasPublicLink()){
-                return this._data['minisite']['hash_is_shorten'];
-            }else{
-                return false;
-            }
+        publicLinkIsShorten(linkId){
+            return this._data['links'][linkId]['hash_is_shorten'];
         }
 
         togglePublicLink(){
-            this._pendingData['enable_public_link'] = !this.hasPublicLink();
+            var publicLinks = this.getPublicLinks();
+            this._pendingData['enable_public_link'] = !publicLinks.length;
+            if(!this._data['links']){
+                this._data['links'] = {};
+            }
             this.save();
         }
 
         _initPendingData(){
+            if(!this._pendingData['links']){
+                this._pendingData['links'] = {};
+                if(this._data['links']){
+                    for(var k in this._data['links']){
+                        if(this._data['links'].hasOwnProperty(k)){
+                            this._pendingData['links'][k] = {};
+                        }
+                    }
+                }
+            }
             if(!this._pendingData['minisite']){
                 this._pendingData['minisite'] = {
                     permissions:{},
@@ -240,34 +243,67 @@
             }
         }
 
+        /*****************************************/
+        /*  DETECT PUBLIC LINKS VS. REMOTE LINKS
+        /*****************************************/
+        getPublicLinks(){
+            if(!this._data["links"]) return [];
+            var result = [];
+            for(var key in this._data['links']){
+                if(!this._data['links'].hasOwnProperty(key)) continue;
+                if(this._data['links'][key]['public_link']){
+                    result.push(this._data['links'][key]);
+                }
+            }
+            return result;
+        }
+
+        getOcsLinks(){
+            if(!this._data["links"]) return [];
+            var result = [];
+            for(var key in this._data['links']){
+                if(!this._data['links'].hasOwnProperty(key)) continue;
+                if(!this._data['links'][key]['public_link']){
+                    result.push(this._data['links'][key]);
+                }
+            }
+            return result;
+        }
+
+        findPendingKeyForLink(linkId, key){
+            var result;
+            try{
+                result = this._pendingData['links'][linkId][key];
+                return result;
+            }catch(e){
+                return null;
+            }
+        }
 
         /****************************/
         /* PUBLIC LINK PASSWORD     */
         /****************************/
-        hasHiddenPassword(){
-            return this._data['has_password'];
+        hasHiddenPassword(linkId){
+            return this._data['links'][linkId]['has_password'];
         }
-        getPassword(){
-            if(this._pendingData['minisite'] && this._pendingData['minisite']['password']){
-                return this._pendingData['minisite']['password'];
-            }
-            return '';
+        getPassword(linkId){
+            return this.findPendingKeyForLink(linkId, 'password') || '';
         }
-        updatePassword(newValue){
+        updatePassword(linkId, newValue){
             this._initPendingData();
-            this._pendingData['minisite']['password'] = newValue;
+            this._pendingData['links'][linkId]['password'] = newValue;
             this._setStatus('modified');
         }
-        resetPassword(){
-            this._data['has_password'] = false;
-            this._data['password_cleared'] = true;
-            this.updatePassword('');
+        resetPassword(linkId){
+            this._data['links'][linkId]['has_password'] = false;
+            this._data['links'][linkId]['password_cleared'] = true;
+            this.updatePassword(linkId, '');
         }
 
-        _passwordAsParameter(params){
-            if(this._pendingData['minisite'] && this._pendingData['minisite']['password']){
-                params['guest_user_pass'] = this._pendingData['minisite']['password'];
-            }else if(this._data['password_cleared']){
+        _passwordAsParameter(linkId, params){
+            if(this._pendingData['links'] && this._pendingData['links'][linkId] && this._pendingData['links'][linkId]['password']){
+                params['guest_user_pass'] = this._pendingData['links'][linkId]['password'];
+            }else if(this._data['links'] && this._data['links'][linkId] && this._data['links'][linkId]['password_cleared']){
                 params['guest_user_pass'] = '';
             }
         }
@@ -275,16 +311,17 @@
         /****************************/
         /* PUBLIC LINK EXPIRATION   */
         /****************************/
-        getExpirationFor(name){
-            if(this._pendingData['minisite'] && this._pendingData['minisite']['expiration'][name] !== undefined){
-                return this._pendingData['minisite']['expiration'][name];
+        getExpirationFor(linkId, name){
+            var pendingExpiration = this.findPendingKeyForLink(linkId, 'expiration');
+            if(pendingExpiration && pendingExpiration[name] !== undefined){
+                return pendingExpiration[name];
             }
             var current; var defaults={days:0, downloads:0};
-            if(this._data['minisite']){
+            if(this._data['links'][linkId]){
                 if(name == 'days'){
-                    current = this._data['expire_after'];
+                    current = this._data['links'][linkId]['expire_after'];
                 }else if(name == 'downloads'){
-                    current = this._data['download_limit'];
+                    current = this._data['links'][linkId]['download_limit'];
                 }
             }else{
                 current = defaults[name];
@@ -292,24 +329,27 @@
             return current;
         }
 
-        setExpirationFor(name, value){
+        setExpirationFor(linkId, name, value){
             this._initPendingData();
-            this._pendingData['minisite']['expiration'][name] = value;
+            var expiration = this.findPendingKeyForLink(linkId, "expiration") || {};
+            expiration[name] = value;
+            this._pendingData['links'][linkId]['expiration'] = expiration;
             this._setStatus('modified');
         }
 
-        _expirationsToParameters(params){
-            if(this.getExpirationFor('days')) params['expiration'] = this.getExpirationFor('days');
-            if(this.getExpirationFor('downloads')) params['downloadlimit'] = this.getExpirationFor('downloads');
+        _expirationsToParameters(linkId, params){
+            if(this.getExpirationFor(linkId, 'days')) params['expiration'] = this.getExpirationFor(linkId, 'days');
+            if(this.getExpirationFor(linkId, 'downloads')) params['downloadlimit'] = this.getExpirationFor(linkId, 'downloads');
         }
 
 
         /****************************/
         /* PUBLIC LINKS PERMISSIONS */
         /****************************/
-        getPublicLinkPermission(name){
-            if(this._pendingData['minisite'] && this._pendingData['minisite']['permissions'][name] !== undefined){
-                return this._pendingData['minisite']['permissions'][name];
+        getPublicLinkPermission(linkId, name){
+            var permissions = this.findPendingKeyForLink(linkId, "permissions");
+            if(permissions && permissions[name] !== undefined){
+                return permissions[name];
             }
             var current;
             var defaults = {
@@ -317,12 +357,12 @@
                 download: true,
                 write:false
             };
-            if(this._data['minisite']){
+            if(this._data['links'][linkId]){
                 var json = this._data;
                 if(name == 'download'){
-                    current = ! json['minisite']['disable_download'];
+                    current = ! json['links'][linkId]['disable_download'];
                 }else if(name == 'read'){
-                    current = (json.entries[0].RIGHT.indexOf('r') !== -1 && json['minisite_layout']!='ajxp_unique_dl');
+                    current = (json.entries[0].RIGHT.indexOf('r') !== -1 && json['links'][linkId]['minisite_layout']!='ajxp_unique_dl');
                 }else if(name == 'write'){
                     current = (json.entries[0].RIGHT.indexOf('w') !== -1);
                 }
@@ -336,61 +376,65 @@
             return (this._previewEditors && this._previewEditors.length == 0);
         }
 
-        setPublicLinkPermission(name, value){
+        setPublicLinkPermission(linkId, name, value){
             this._initPendingData();
-            this._pendingData['minisite']['permissions'][name] = value;
+            var permissions = this._pendingData['links'][linkId]['permissions'] || {};
+            permissions[name] = value;
+            this._pendingData['links'][linkId]['permissions'] = permissions;
             this._setStatus('modified');
         }
 
-        _permissionsToParameters(params){
-            if(this.getPublicLinkPermission('read')){
+        _permissionsToParameters(linkId, params){
+            if(this.getPublicLinkPermission(linkId, 'read')){
                 params['simple_right_read'] = 'on';
             }
-            if(this.getPublicLinkPermission('download')){
+            if(this.getPublicLinkPermission(linkId, 'download')){
                 params['simple_right_download'] = 'on';
             }
-            if(this.getPublicLinkPermission('write')){
+            if(this.getPublicLinkPermission(linkId, 'write')){
                 params['simple_right_write'] = 'on';
             }
         }
 
         /****************************/
         /* PUBLIC LINKS TEMPLATE    */
+        /* TODO: INFER FROM DEFAULT PUBLIC LINK
         /****************************/
-        getTemplate(){
-            if(this._pendingData["minisite"] && this._pendingData["minisite"]["layout"]){
-                return this._pendingData["minisite"]["layout"];
+        getTemplate(linkId){
+            if(this._pendingData["links"] && this._pendingData["links"][linkId] && this._pendingData["links"][linkId]["layout"]){
+                return this._pendingData["links"][linkId]["layout"];
             }
             if(this._node.isLeaf()){
-                if(this.getPublicLinkPermission('read')){
-                    this._data['minisite_layout'] = 'ajxp_unique_strip';
+                if(this.getPublicLinkPermission(linkId, 'read')){
+                    return 'ajxp_unique_strip';
                 }else{
-                    this._data['minisite_layout'] = 'ajxp_unique_dl';
+                    return 'ajxp_unique_dl';
                 }
-            }
-            if(this._data['minisite_layout']){
-                return this._data['minisite_layout'];
+           }
+            if(this._data['links'] && this._data['links'][linkId] && this._data['links'][linkId]['minisite_layout']){
+                return this._data['links'][linkId]['minisite_layout'];
             }
         }
 
-        setTemplate(tplName){
+        setTemplate(linkId, tplName){
             this._initPendingData();
-            this._pendingData["minisite"]["layout"] = tplName;
+            this._pendingData["links"][linkId]["layout"] = tplName;
+            console.log(this._pendingData);
             this._setStatus('modified');
         }
 
-        _templateToParameter(params){
-            if(this.getTemplate()){
-                params['minisite_layout'] = this.getTemplate();
+        _templateToParameter(linkId, params){
+            if(this.getTemplate(linkId)){
+                params['minisite_layout'] = this.getTemplate(linkId);
             }
         }
 
         /**********************/
         /* CUSTOM LINK HANDLE */
         /**********************/
-        updateCustomLink(newValue){
+        updateCustomLink(linkId, newValue){
             this._initPendingData();
-            this._pendingData['minisite']['custom_link'] = newValue;
+            this._pendingData['links'][linkId]['custom_link'] = newValue;
             this.save();
         }
 
@@ -477,10 +521,10 @@
             if(this._pendingData["enable_public_link"] !== undefined){
                 if(this._pendingData["enable_public_link"]) {
                     params["enable_public_link"] = "true";
-                } else if(this._data["minisite"]){
-                    params["disable_public_link"] = this._data["minisite"]["hash"];
+                } else {
+                    params["disable_public_link"] = this.getPublicLinks()[0]['hash'];
                 }
-            }else if(this._data["minisite"]){
+            }else if(this.getPublicLinks().length){
                 params["enable_public_link"] = "true";
             }
             params['repo_label'] = this._node.getLabel();
@@ -491,21 +535,35 @@
                 params["element_type"] = this._node.isLeaf() ? "file" : this._node.getMetadata().get("ajxp_shared_minisite")? "minisite" : "repository";
                 params['create_guest_user'] =  'true';
             }
-            if(this._data.minisite){
-                params['guest_user_id'] = this._data.entries[0].ID;
-                params['hash'] = this._data.minisite.hash;
-            }
             this._globalsAsParameters(params);
-            this._permissionsToParameters(params);
-            this._expirationsToParameters(params);
-            this._passwordAsParameter(params);
-            this._templateToParameter(params);
+
+            var publicLinks = this.getPublicLinks();
+            if(publicLinks.length){
+                var pLinkId = publicLinks[0]['hash'];
+                params['guest_user_id'] = this._data.entries[0].ID;
+                params['hash'] = pLinkId;
+                // PUBLIC LINKS
+                this._permissionsToParameters(pLinkId, params);
+                this._expirationsToParameters(pLinkId, params);
+                this._passwordAsParameter(pLinkId, params);
+                this._templateToParameter(pLinkId, params);
+                if(this._pendingData['links'] && this._pendingData['links'][pLinkId] && this._pendingData['links'][pLinkId]['custom_link']){
+                    params['custom_handle'] = this._pendingData['links'][pLinkId]['custom_link'];
+                }
+            }else if(this._pendingData["enable_public_link"] === true){
+                this._permissionsToParameters('ajxp_create_public_link', params);
+                this._expirationsToParameters('ajxp_create_public_link', params);
+                this._passwordAsParameter('ajxp_create_public_link', params);
+            }
+
+
+            // GENERIC
             this._visibilityDataToParameters(params);
             this._sharedUsersToParameters(params);
-            this._ocsDataToParameters(params);
-            if(this._pendingData && this._pendingData['minisite'] && this._pendingData['minisite']['custom_link']){
-                params['custom_handle'] = this._pendingData['minisite']['custom_link'];
-            }
+
+            // OCS LINK
+            // this._ocsDataToParameters(params);
+
             PydioApi.getClient().request(params, function(transport){
                 var _data = transport.responseJSON;
                 if(_data !== null){
