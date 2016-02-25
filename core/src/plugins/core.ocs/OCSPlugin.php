@@ -114,9 +114,11 @@ class OCSPlugin extends \AJXP_Plugin{
         if($share != null){
             $repoObject = $share->buildVirtualRepository();
             $loggedUser = \AuthService::getLoggedUser();
-            $loggedUser->personalRole->setAcl($repoObject->getId(), "rw");
-            $loggedUser->recomputeMergedRole();
-            \AuthService::updateUser($loggedUser);
+            if($loggedUser != null){
+                $loggedUser->personalRole->setAcl($repoObject->getId(), "rw");
+                $loggedUser->recomputeMergedRole();
+                \AuthService::updateUser($loggedUser);
+            }
         }
     }
 

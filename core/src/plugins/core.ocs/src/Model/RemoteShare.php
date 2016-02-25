@@ -20,6 +20,9 @@
  */
 namespace Pydio\OCS\Model;
 
+use Sabre\DAV;
+use Sabre\DAV\Exception;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_PENDING', 1);
@@ -93,6 +96,11 @@ class RemoteShare
     var $documentIsLeaf;
 
     /**
+     * @var bool
+     */
+    var $documentTypeResolved;
+
+    /**
      * @return int
      */
     public function getId()
@@ -118,7 +126,7 @@ class RemoteShare
             "DRIVER"		=>	"webdav",
             "DRIVER_OPTIONS"=> array(
                 "HOST"			=>	$parts["scheme"]."://".$parts["host"],
-                "PATH"          =>  $parts["path"],
+                "PATH"          =>  $parts["path"].($this->isDocumentIsLeaf()? "":"/".$this->getDocumentName()),
                 "USER"		    =>	$this->getOcsToken(),
                 "PASS" 	        => 	($this->hasPassword()?$this->getPassword() : ""),
                 "DEFAULT_RIGHTS"=>  "",
@@ -134,6 +142,41 @@ class RemoteShare
             $repo->setContentFilter($contentFilter);
         }
         return $repo;
+    }
+
+    public function pingRemoteDAVPoint(){
+
+        $fullPath = rtrim($this->getOcsDavUrl(), "/")."/".$this->getDocumentName();
+        $parts = parse_url($fullPath);
+        $client = new DAV\Client(array(
+            'baseUri' => $parts["scheme"]."://".$parts["host"],
+            'userName' => $this->getOcsToken(),
+            'password' => ''
+        ));
+        try {
+            $result = $client->propFind($parts["path"],
+                [
+                    '{DAV:}getlastmodified',
+                    '{DAV:}getcontentlength',
+                    '{DAV:}resourcetype'
+                ]
+            );
+        } catch (Exception\NotFound $e) {
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+        /**
+         * @var \Sabre\DAV\Property\ResourceType $resType;
+         */
+        $resType = $result["{DAV:}resourcetype"];
+        if($resType->is("{DAV:}collection")) {
+            $this->setDocumentIsLeaf(false);
+        } else{
+            $this->setDocumentIsLeaf(true);
+        }
+        $this->documentTypeResolved = true;
+        return true;
     }
 
     /**

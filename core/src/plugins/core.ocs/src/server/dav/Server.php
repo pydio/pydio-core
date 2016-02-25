@@ -22,14 +22,47 @@
 namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
 
 use Sabre;
 
 class Server
 {
+    /**
+     * @param $baseUri
+     * @return \AJXP_Sabre_Collection|SharingCollection
+     * @throws \Exception
+     */
+    protected function initCollectionForFileOrFolder(&$baseUri){
+        try{
+            $testBackend = new BasicAuthNoPass();
+            $userPass = $testBackend->getUserPass();
+            if(isSet($userPass[0])){
+                $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareData = $shareStore->loadShare($userPass[0]);
+                if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
+                    $repo = \ConfService::getRepositoryById($shareData["REPOSITORY"]);
+                    if(!empty($repo) && !$repo->hasContentFilter()){
+                        $baseDir = basename($repo->getOption("PATH"));
+                    }
+                }
+            }
+        }catch (\Exception $e){}
+        $rootCollection =  new \AJXP_Sabre_Collection("/", null, null);
+        if(isSet($baseDir)){
+            $currentPath = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+            if($currentPath == $baseUri || $currentPath == $baseUri."/"){
+                $rootCollection = new SharingCollection("/", null, null);
+            }else{
+                $baseUri .= "/$baseDir";
+            }
+        }
+        return $rootCollection;
+    }
+
     public function start($baseUri = "/"){
 
-        $rootCollection =  new \AJXP_Sabre_Collection("/", null, null);
+        $rootCollection = $this->initCollectionForFileOrFolder($baseUri);
         $server = new Sabre\DAV\Server($rootCollection);
         $server->setBaseUri($baseUri);
 
