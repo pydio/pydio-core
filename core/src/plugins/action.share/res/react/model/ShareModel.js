@@ -9,7 +9,7 @@
             this._node = userSelection.getUniqueNode();
             this._status = 'idle';
             this._edit = false;
-            this._data = {};
+            this._data = {link:{}};
             this._pendingData = {};
             this._pydio = pydio;
             if(this._node.getMetadata().get('ajxp_shared')){
@@ -282,7 +282,7 @@
         /* PUBLIC LINK PASSWORD     */
         /****************************/
         hasHiddenPassword(linkId){
-            return this._data['links'][linkId]['has_password'];
+            return this._data['links'][linkId] && this._data['links'][linkId]['has_password'];
         }
         getPassword(linkId){
             return this.findPendingKeyForLink(linkId, 'password') || '';
@@ -315,7 +315,7 @@
                 return pendingExpiration[name];
             }
             var current; var defaults={days:0, downloads:0};
-            if(this._data['links'][linkId]){
+            if(this._data['links'] && this._data['links'][linkId]){
                 if(name == 'days'){
                     current = this._data['links'][linkId]['expire_after'];
                 }else if(name == 'downloads'){
@@ -355,7 +355,7 @@
                 download: true,
                 write:false
             };
-            if(this._data['links'][linkId]){
+            if(this._data['links'] && this._data['links'][linkId]){
                 var json = this._data;
                 if(name == 'download'){
                     current = ! json['links'][linkId]['disable_download'];
