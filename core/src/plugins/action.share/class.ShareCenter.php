@@ -1500,6 +1500,7 @@ class ShareCenter extends AJXP_Plugin
                 $invitations = $ocsStore->invitationsForLink($linkHash);
                 foreach($invitations as $invitation){
                     $ocsStore->deleteInvitation($invitation);
+                    $ocsClient->cancelInvitation($invitation);
                 }
             }
             $newLinks = $ocsData["LINKS"];

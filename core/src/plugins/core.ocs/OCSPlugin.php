@@ -47,7 +47,7 @@ class OCSPlugin extends \AJXP_Plugin{
                 "version" => 1,
                 "endpoints" => array(
                     "share" => "/ocs/v2/shares",
-                    "wevdav" => "/ocs/v2/dav"
+                    "webdav" => "/ocs/v2/dav"
                 )
             );
         }

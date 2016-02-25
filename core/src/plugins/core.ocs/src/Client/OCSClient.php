@@ -49,7 +49,7 @@ class OCSClient implements IFederated, IServiceDiscovery
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post($endpoints['shares'], [
+        $response = $client->post($endpoints['share'], [
             'body' => [
                 'shareWith' => $invitation->getTargetUser(),
                 'token' => $invitation->getLinkHash(),
@@ -83,7 +83,7 @@ class OCSClient implements IFederated, IServiceDiscovery
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post($endpoints['shares'] . '/' . $invitation->getId() . '/unshare', [
+        $response = $client->post($endpoints['share'] . '/' . $invitation->getId() . '/unshare', [
             'body' => [
                 'token' => $invitation->getLinkHash()
             ]
