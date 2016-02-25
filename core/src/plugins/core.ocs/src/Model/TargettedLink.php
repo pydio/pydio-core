@@ -25,6 +25,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareLink.php");
 class TargettedLink extends \ShareLink
 {
+    /**
+     * @var array
+     */
+    protected $pendingInvitation;
+
     public function __construct($store, $storeData = array()){
         parent::__construct($store, $storeData);
         $this->store = $store;
@@ -48,6 +53,39 @@ class TargettedLink extends \ShareLink
 
         return $invitation;
 
+    }
+
+    /**
+     * @param string $remoteServer
+     * @param string $remoteUser
+     */
+    public function prepareInvitation($remoteServer, $remoteUser){
+        $this->pendingInvitation = array("host" => $remoteServer, "user" => $remoteUser);
+    }
+
+    /**
+     * @return null|ShareInvitation
+     */
+    public function getPendingInvitation(){
+        if(isSet($this->pendingInvitation)){
+            return $this->createInvitation($this->pendingInvitation["host"], $this->pendingInvitation["user"]);
+        }
+        return null;
+    }
+
+    /**
+     * @param \PublicAccessManager $publicAccessManager
+     * @param array $messages
+     * @return mixed
+     */
+    public function getJsonData($publicAccessManager, $messages){
+        $jsonData = parent::getJsonData($publicAccessManager, $messages);
+        $ocsStore = new SQLStore();
+        $invitations = $ocsStore->invitationsForLink($this->getHash());
+        if(count($invitations)){
+            $jsonData["invitation"] = array_shift($invitations)->jsonSerialize();
+        }
+        return $jsonData;
     }
 
 }

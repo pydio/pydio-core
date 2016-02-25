@@ -129,6 +129,69 @@ class ShareMetaManager
 
     /**
      * @param AJXP_Node $node
+     * @param string $scope
+     * @return CompositeShare[]
+     */
+    protected function compositeShareFromMetaWithScope($node, $scope = "private"){
+
+        $meta = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, ($scope == "private"), AJXP_METADATA_SCOPE_REPOSITORY, true);
+        $shares = array();
+        $composites = array();
+        if(!isSet($meta["shares"])){
+            return $shares;
+        }
+        foreach($meta["shares"] as $id => $shareData){
+            $type = $shareData["type"];
+            if($type == "repository"){
+                if(!isSet($shares[$id])) {
+                    $shares[$id] = array("repository" => $id, "links" => array());
+                }
+            }else if($type == "minisite" || $type == "ocs_remote"){
+                $link = $this->shareStore->loadShareObject($id);
+                if(!empty($link)){
+                    $link->setAdditionalMeta($shareData);
+                    $linkRepoId = $link->getRepositoryId();
+                    if(empty($linkRepoId)) {
+                        continue;
+                    }
+                    if(!isSet($shares[$linkRepoId])) {
+                        $shares[$linkRepoId] = array("repository" => $linkRepoId, "links" => array());
+                    }
+                    $shares[$linkRepoId]["links"][] = $link;
+                }
+            }
+        }
+        foreach($shares as $repoId => $repoData){
+            $composite = new CompositeShare($node, $repoId);
+            foreach($repoData["links"] as $link){
+                $composite->addLink($link);
+            }
+            $composites[] = $composite;
+        }
+        return $composites;
+
+    }
+
+
+    /**
+     * @param AJXP_Node $node
+     * @return CompositeShare|null
+     */
+    public function getCompositeShareForNode($node){
+        $private = $this->compositeShareFromMetaWithScope($node, "private");
+        if(count($private)) {
+            return $private[0];
+        }else{
+            $public = $this->compositeShareFromMetaWithScope($node, "public");
+            if(count($public)){
+                return $public[0];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param AJXP_Node $node
      * @param array $shares
      * @param bool $clearIfEmpty
      */

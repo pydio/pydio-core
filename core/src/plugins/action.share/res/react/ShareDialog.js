@@ -66,16 +66,22 @@
             var panels = [];
             var auth = ReactModel.Share.getAuthorizations(this.props.pydio);
             if((model.getNode().isLeaf() && auth.file_public_link) || (!model.getNode().isLeaf() && auth.folder_public_link)){
+                var publicLinks = model.getPublicLinks();
+                if(publicLinks.length){
+                    var linkData = publicLinks[0];
+                }
                 panels.push(
                     <ReactMUI.Tab key="public-link" label={'Public Link' + (model.hasPublicLink()?' (active)':'')}>
-                        <PublicLinkPanel pydio={this.props.pydio} shareModel={model} authorizations={auth}/>
+                        <PublicLinkPanel linkData={linkData} pydio={this.props.pydio} shareModel={model} authorizations={auth}/>
                     </ReactMUI.Tab>
                 );
             }
             if( (model.getNode().isLeaf() && auth.file_workspaces) || (!model.getNode().isLeaf() && auth.folder_workspaces)){
                 var users = model.getSharedUsers();
+                var ocsUsers = model.getOcsLinks();
+                var totalUsers = users.length + ocsUsers.length;
                 panels.push(
-                    <ReactMUI.Tab key="target-users" label={'Users' + (users.length?' ('+users.length+')':'')}>
+                    <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
                         <UsersPanel shareModel={model}/>
                     </ReactMUI.Tab>
                 );
@@ -259,8 +265,10 @@
             }*/
             if(this.props.type == 'group') {
                 avatar = <span className="avatar icon-group"/>;
-            }else if(this.props.type == 'temporary'){
+            }else if(this.props.type == 'temporary') {
                 avatar = <span className="avatar icon-plus"/>;
+            }else if(this.props.type == 'remote_user'){
+                avatar = <span className="avatar icon-cloud"/>;
             }else{
                 avatar = <span className="avatar icon-user"/>;
             }
@@ -588,31 +596,63 @@
             shareModel: React.PropTypes.instanceOf(ReactModel.Share)
         },
 
+        getInitialState: function(){
+            return {addDisabled: true};
+        },
+
         addUser:function(){
             var h = this.refs["host"].getValue();
             var u = this.refs["user"].getValue();
-            this.props.shareModel.addOcsInvitation(h, u);
+            this.props.shareModel.createRemoteLink(h, u);
         },
 
-        removeUser: function(invite){
-            this.props.shareModel.removeOcsInvitation(invite);
+        removeUser: function(linkId){
+            this.props.shareModel.removeRemoteLink(linkId);
+        },
+
+        monitorInput:function(){
+            var h = this.refs["host"].getValue();
+            var u = this.refs["user"].getValue();
+            this.setState({addDisabled:!(h && u)});
         },
 
         render: function(){
 
-            var inv = this.props.shareModel.getOcsInvitations().map(function(invite){
+            var inv = this.props.shareModel.getOcsLinks().map(function(link){
                 var rem = function(){
-                    this.removeUser(invite);
+                    this.removeUser(link.hash);
                 }.bind(this);
-                return <div>{invite.HOST} -- {invite.USER} -- <span onClick={rem}>X</span></div>;
+                var status;
+                if(!link.invitation){
+                    status = 'not sent';
+                }else {
+                    if(link.invitation.STATUS == 1){
+                        status = 'pending';
+                    }else if(link.invitation.STATUS == 2){
+                        status = 'accepted';
+                    }else if(link.invitation.STATUS == 4){
+                        status = 'rejected';
+                    }
+                }
+                var menuItems = [{text:'Remove', callback:rem}];
+                var host = link.HOST || link.invitation.HOST;
+                var user = link.USER || link.invitation.USER;
+                return (
+                    <UserBadge
+                        label={user + " @ " + host + " (" + status + ")"}
+                        avatar={null}
+                        type={"remote_user"}
+                        menus={menuItems}
+                    />
+                );
             }.bind(this));
             return (
                 <div>
                     <h3>Remote Users</h3>
                     <div className="remote-users-add reset-pydio-forms">
-                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host"/>
-                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser"/>
-                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser}/>
+                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host" onChange={this.monitorInput}/>
+                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser" onChange={this.monitorInput}/>
+                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
                     </div>
                     <div>{inv}</div>
                 </div>
@@ -627,6 +667,7 @@
     var PublicLinkPanel = React.createClass({
 
         propTypes: {
+            linkData:React.PropTypes.object,
             pydio:React.PropTypes.instanceOf(Pydio),
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
             authorizations: React.PropTypes.object
@@ -638,17 +679,22 @@
 
         render: function(){
 
-
-            if(this.props.shareModel.hasPublicLink()){
-                var publicLinkPanes = [
-                    <PublicLinkPermissions shareModel={this.props.shareModel} key="public-perm" />,
-                    <PublicLinkSecureOptions shareModel={this.props.shareModel} key="public-secure" />
+            var publicLinkPanes;
+            if(this.props.linkData){
+                publicLinkPanes = [
+                    <PublicLinkField linkData={this.props.linkData} shareModel={this.props.shareModel} editAllowed={this.props.authorizations.editable_hash} />,
+                    <PublicLinkPermissions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-perm" />,
+                    <PublicLinkSecureOptions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-secure" />
+                ];
+            }else{
+                publicLinkPanes = [
+                    <div className="section-legend" style={{marginTop:20}}>This file is not currently publicly accessible. Enabling a public link will create a unique access that you can send to anyone. If you want to share with existing Pydio users, use the "Users" tab.</div>
                 ];
             }
+
             return (
                 <div style={{padding:16}} className="reset-pydio-forms">
-                    <ReactMUI.Checkbox onCheck={this.toggleLink} checked={this.props.shareModel.getPublicLink()?true:false} label="Enable Public Link"/>
-                    <PublicLinkField shareModel={this.props.shareModel} editAllowed={this.props.authorizations.editable_hash} />
+                    <ReactMUI.Checkbox onCheck={this.toggleLink} checked={!!this.props.linkData} label="Enable Public Link"/>
                     {publicLinkPanes}
                 </div>
             );
@@ -657,6 +703,7 @@
 
     var PublicLinkField = React.createClass({
         propTypes: {
+            linkData:React.PropTypes.object.isRequired,
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
             editAllowed: React.PropTypes.bool,
             onChange: React.PropTypes.func
@@ -666,7 +713,7 @@
         },
         toggleEditMode: function(){
             if(this.state.editLink && this.state.customLink){
-                this.props.shareModel.updateCustomLink(this.state.customLink);
+                this.props.shareModel.updateCustomLink(this.props.linkData.hash, this.state.customLink);
             }
             this.setState({editLink: !this.state.editLink});
         },
@@ -684,7 +731,7 @@
             if(this.refs['copy-button']){
                 this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
                     text: function(trigger) {
-                        return this.props.shareModel.getPublicLink();
+                        return this.props.linkData['public_link'];
                     }.bind(this)
                 });
                 this._clip.on('success', function(){
@@ -721,67 +768,67 @@
         },
 
         render: function(){
-            var publicLink = this.props.shareModel.getPublicLink();
-            var editAllowed = this.props.editAllowed && !this.props.shareModel.publicLinkIsShorten();
+            var publicLink = this.props.linkData['public_link'];
+            var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'];
             if(this.state.editLink && editAllowed){
                 return (
                     <div className="public-link-container edit-link">
                         <span>{publicLink.split('://')[0]}://[..]/{PathUtils.getBasename(PathUtils.getDirname(publicLink)) + '/'}</span>
-                        <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink || this.props.shareModel.getPublicLinkHash()}/>
+                        <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink || this.props.linkData['hash']}/>
                         <ReactMUI.RaisedButton label="Ok" onClick={this.toggleEditMode}/>
                         <div className="section-legend">You can customize the last part of the link.</div>
                     </div>
                 );
             }else{
-                if(editAllowed && publicLink){
+                if(editAllowed){
                     var editButton = <span className="custom-link-button icon-edit-sign" title="Customize link last part" onClick={this.toggleEditMode}/>;
                 }
                 var copyButton = <span ref="copy-button" className="copy-link-button icon-paste" title="Copy link to clipboard"/>;
                 var setHtml = function(){
                     return {__html:this.state.copyMessage};
                 }.bind(this);
-                if(publicLink){
-                    var focus = function(e){
-                        e.target.select();
-                    };
-                    return (
-                        <div className="public-link-container">
-                            <ReactMUI.TextField
-                                className="public-link"
-                                type="text"
-                                name="Link"
-                                ref="public-link-field"
-                                value={this.props.shareModel.getPublicLink()}
-                                onFocus={focus}
-                            /> {editButton} {copyButton}
-                            <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
-                        </div>
-                    );
-                }else{
-                    return (
-                        <div className="section-legend" style={{marginTop:20}}>This file is not currently publicly accessible. Enabling a public link will create a unique access that you can send to anyone. If you want to share with existing Pydio users, use the "Users" tab.</div>
-                    );
-                }
+                var focus = function(e){
+                    e.target.select();
+                };
+                return (
+                    <div className="public-link-container">
+                        <ReactMUI.TextField
+                            className="public-link"
+                            type="text"
+                            name="Link"
+                            ref="public-link-field"
+                            value={publicLink}
+                            onFocus={focus}
+                        /> {editButton} {copyButton}
+                        <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
+                    </div>
+                );
             }
         }
     });
 
     var PublicLinkPermissions = React.createClass({
 
+        propTypes: {
+            linkData: React.PropTypes.object.isRequired,
+            shareModel: React.PropTypes.instanceOf(ReactModel.Share)
+        },
+
         changePermission: function(event){
             var name = event.target.name;
             var checked = event.target.checked;
-            this.props.shareModel.setPublicLinkPermission(name, checked);
+            this.props.shareModel.setPublicLinkPermission(this.props.linkData.hash, name, checked);
         },
 
         render: function(){
+            var linkId = this.props.linkData.hash;
             var perms = [], previewWarning;
             perms.push({NAME:'read',LABEL:'Preview'});
             perms.push({NAME:'download', LABEL:'Download'});
             if(!this.props.shareModel.getNode().isLeaf()){
                 perms.push({NAME:'write', LABEL:'Upload'});
             }
-            if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission('read')){
+            if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission(linkId, 'read')){
                 previewWarning = <div>Warning, there is no embedded viewer for this file, except opening in a new tab of your browser: this may trigger a download automatically when user opens the link.</div>;
             }
             return (
@@ -797,7 +844,7 @@
                                         name={p.NAME}
                                         label={p.LABEL}
                                         onCheck={this.changePermission}
-                                        checked={this.props.shareModel.getPublicLinkPermission(p.NAME)}
+                                        checked={this.props.shareModel.getPublicLinkPermission(linkId, p.NAME)}
                                     />
                                 </div>
                             );
@@ -811,28 +858,34 @@
 
     var PublicLinkSecureOptions = React.createClass({
 
+        propTypes: {
+            linkData: React.PropTypes.object.isRequired,
+            shareModel: React.PropTypes.instanceOf(ReactModel.Share)
+        },
+
         updateDLExpirationField: function(event){
             var newValue = event.currentTarget.getValue();
-            this.props.shareModel.setExpirationFor("downloads", newValue);
+            this.props.shareModel.setExpirationFor(this.props.linkData.hash, "downloads", newValue);
         },
 
         updateDaysExpirationField: function(event){
             var newValue = event.currentTarget.getValue();
-            this.props.shareModel.setExpirationFor("days", newValue);
+            this.props.shareModel.setExpirationFor(this.props.linkData.hash, "days", newValue);
         },
 
         resetPassword: function(){
-            this.props.shareModel.resetPassword();
+            this.props.shareModel.resetPassword(this.props.linkData.hash);
         },
 
         updatePassword: function(event){
             var newValue = event.currentTarget.getValue();
-            this.props.shareModel.updatePassword(newValue);
+            this.props.shareModel.updatePassword(this.props.linkData.hash, newValue);
         },
 
         render: function(){
+            var linkId = this.props.linkData.hash;
             var passPlaceHolder, resetPassword;
-            if(this.props.shareModel.hasHiddenPassword()){
+            if(this.props.shareModel.hasHiddenPassword(linkId)){
                 passPlaceHolder = '********';
                 resetPassword = <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label="Reset Password"/>
             }
@@ -845,7 +898,7 @@
                             <ReactMUI.TextField
                                 floatingLabelText="Password Protection"
                                 disabled={passPlaceHolder ? true : false}
-                                value={passPlaceHolder? passPlaceHolder : this.props.shareModel.getPassword()}
+                                value={passPlaceHolder? passPlaceHolder : this.props.shareModel.getPassword(linkId)}
                                 onChange={this.updatePassword}
                             />
                         </div>
@@ -857,13 +910,13 @@
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
                                    floatingLabelText="Expire after (days)"
-                                   value={this.props.shareModel.getExpirationFor('days') === 0 ? "" : this.props.shareModel.getExpirationFor('days')}
+                                   value={this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days')}
                                    onChange={this.updateDaysExpirationField}/>
                             </div>
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
                                floatingLabelText="Expire after (downloads)"
-                               value={this.props.shareModel.getExpirationFor('downloads') === 0 ? "" : this.props.shareModel.getExpirationFor('downloads')}
+                               value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                                onChange={this.updateDLExpirationField}
                             />
                         </div>
@@ -885,7 +938,7 @@
 
             var layoutData = ReactModel.Share.compileLayoutData(this.props.pydio, this.props.shareModel.getNode());
             if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1 && this.props.shareModel.hasPublicLink()){
-                var layoutPane = <PublicLinkTemplate {...this.props} layoutData={layoutData}/>;
+                var layoutPane = <PublicLinkTemplate {...this.props} linkData={this.props.shareModel.getPublicLinks()[0]} layoutData={layoutData}/>;
             }
 
             return (
@@ -973,13 +1026,17 @@
 
     var PublicLinkTemplate = React.createClass({
 
+        propTypes:{
+            linkData:React.PropTypes.object
+        },
+
         onDropDownChange: function(event, index, item){
-            this.props.shareModel.setTemplate(item.payload);
+            this.props.shareModel.setTemplate(this.props.linkData.hash, item.payload);
         },
 
         render: function(){
             var index = 0, crtIndex = 0;
-            var selected = this.props.shareModel.getTemplate();
+            var selected = this.props.shareModel.getTemplate(this.props.linkData.hash);
             var menuItems=this.props.layoutData.map(function(l){
                 if(selected && l.LAYOUT_ELEMENT == selected) {
                     crtIndex = index;
