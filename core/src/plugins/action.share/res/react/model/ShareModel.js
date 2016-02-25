@@ -73,12 +73,6 @@
                     }
                 }
             }
-            if(!this._pendingData['minisite']){
-                this._pendingData['minisite'] = {
-                    permissions:{},
-                    expiration:{}
-                };
-            }
             if(!this._pendingData['entries']){
                 this._pendingData['entries'] = [];
                 if(this._data['entries']){
@@ -86,11 +80,12 @@
                     this._pendingData['entries'] = JSON.parse(JSON.stringify(this._data['entries']));
                 }
             }
-            if(!this._pendingData['ocs_invitations']){
-                this._pendingData['ocs_invitations'] = [];
-                if(this._data["ocs"]){
-                    this._pendingData['ocs_invitations'] = JSON.parse(JSON.stringify(this._data['ocs']['invitations']));
-                }
+            if(!this._pendingData['ocs_links']){
+                var links = {};
+                this.getOcsLinks().map(function(l){
+                    links[l.hash] = JSON.parse(JSON.stringify(l));
+                });
+                this._pendingData['ocs_links'] = links;
             }
         }
 
@@ -259,9 +254,12 @@
         }
 
         getOcsLinks(){
+            if(this._pendingData["ocs_links"]){
+                return Object.values(this._pendingData["ocs_links"]);
+            }
             if(!this._data["links"]) return [];
-            var result = [];
-            for(var key in this._data['links']){
+            var key, result = [];
+            for(key in this._data['links']){
                 if(!this._data['links'].hasOwnProperty(key)) continue;
                 if(!this._data['links'][key]['public_link']){
                     result.push(this._data['links'][key]);
@@ -441,6 +439,58 @@
         /*********************************/
         /*  OCS DATA                     */
         /*********************************/
+        createRemoteLink(host, user){
+            this._initPendingData();
+            var newId = Math.random();
+            this._pendingData['ocs_links'][newId] = {
+                hash:newId,
+                NEW:true,
+                HOST:host,
+                USER:user
+            };
+            this._setStatus("modified");
+        }
+
+        removeRemoteLink(linkId){
+            this._initPendingData();
+            if(this._pendingData["ocs_links"][linkId]){
+                delete this._pendingData["ocs_links"][linkId];
+            }
+            this._setStatus("modified");
+        }
+
+        _ocsLinksToParameters(params){
+            var ocsData = {
+                LINKS:[],
+                REMOVE:[]
+            };
+            if(this._pendingData["ocs_links"]){
+                for(var key in this._data["links"]){
+                    if(!this._data["links"].hasOwnProperty(key) || this._data["links"][key]["public_link"]) {
+                        continue;
+                    }
+                    if(!this._pendingData["ocs_links"][key]){
+                        ocsData.REMOVE.push(key);
+                    }
+                }
+            }
+            this.getOcsLinks().map(function(link){
+                var pLinkId = link.hash;
+                this._permissionsToParameters(pLinkId, link);
+                this._expirationsToParameters(pLinkId, link);
+                this._passwordAsParameter(pLinkId, link);
+                this._templateToParameter(pLinkId, link);
+                if(link.NEW){
+                    delete link['hash'];
+                    delete link['NEW'];
+                }
+                ocsData.LINKS.push(link);
+            }.bind(this));
+            console.log(ocsData);
+            params["ocs_data"] = JSON.stringify(ocsData);
+        }
+
+        /*
         hasOcsData(){
             return this._data["ocs"] ? true : false;
         }
@@ -478,6 +528,7 @@
             newData["invitations"] = this.getOcsInvitations();
             params["ocs_data"] = JSON.stringify(newData);
         }
+        */
 
         /*********************************/
         /* GENERIC: STATUS / LOAD / SAVE */
@@ -562,7 +613,7 @@
             this._sharedUsersToParameters(params);
 
             // OCS LINK
-            // this._ocsDataToParameters(params);
+            this._ocsLinksToParameters(params);
 
             PydioApi.getClient().request(params, function(transport){
                 var _data = transport.responseJSON;

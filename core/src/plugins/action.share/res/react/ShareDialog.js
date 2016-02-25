@@ -78,7 +78,7 @@
             }
             if( (model.getNode().isLeaf() && auth.file_workspaces) || (!model.getNode().isLeaf() && auth.folder_workspaces)){
                 var users = model.getSharedUsers();
-                var ocsUsers = model.getOcsInvitations();
+                var ocsUsers = model.getOcsLinks();
                 var totalUsers = users.length + ocsUsers.length;
                 panels.push(
                     <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
@@ -603,11 +603,11 @@
         addUser:function(){
             var h = this.refs["host"].getValue();
             var u = this.refs["user"].getValue();
-            this.props.shareModel.addOcsInvitation(h, u);
+            this.props.shareModel.createRemoteLink(h, u);
         },
 
-        removeUser: function(invite){
-            this.props.shareModel.removeOcsInvitation(invite);
+        removeUser: function(linkId){
+            this.props.shareModel.removeRemoteLink(linkId);
         },
 
         monitorInput:function(){
@@ -618,24 +618,28 @@
 
         render: function(){
 
-            var inv = this.props.shareModel.getOcsInvitations().map(function(invite){
+            var inv = this.props.shareModel.getOcsLinks().map(function(link){
                 var rem = function(){
-                    this.removeUser(invite);
+                    this.removeUser(link.hash);
                 }.bind(this);
                 var status;
-                if(!invite.STATUS){
+                if(!link.invitation){
                     status = 'not sent';
-                }else if(invite.STATUS == 1){
-                    status = 'pending';
-                }else if(invite.STATUS == 2){
-                    status = 'accepted';
-                }else if(invite.STATUS == 4){
-                    status = 'rejected';
+                }else {
+                    if(link.invitation.STATUS == 1){
+                        status = 'pending';
+                    }else if(link.invitation.STATUS == 2){
+                        status = 'accepted';
+                    }else if(link.invitation.STATUS == 4){
+                        status = 'rejected';
+                    }
                 }
                 var menuItems = [{text:'Remove', callback:rem}];
+                var host = link.HOST || link.invitation.HOST;
+                var user = link.USER || link.invitation.USER;
                 return (
                     <UserBadge
-                        label={invite.USER + " @ " + invite.HOST + " (" + status + ")"}
+                        label={user + " @ " + host + " (" + status + ")"}
                         avatar={null}
                         type={"remote_user"}
                         menus={menuItems}

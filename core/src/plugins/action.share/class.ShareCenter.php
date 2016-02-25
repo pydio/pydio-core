@@ -829,6 +829,13 @@ class ShareCenter extends AJXP_Plugin
         if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
         $shares = array();
         $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
+        if(!empty($shares)){
+            $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
+            if(empty($compositeShare)){
+                $this->getShareStore()->getMetaManager()->clearNodeMeta($ajxpNode);
+                return;
+            }
+        }
         if(!empty($shares) && count($shares)){
             $merge = array(
                 "ajxp_shared"      => "true",
@@ -1442,27 +1449,23 @@ class ShareCenter extends AJXP_Plugin
     /**
      * @param array $httpVars
      * @param bool $update
-     * @return Repository|ShareLink
+     * @return Repository[]|ShareLink[]
      * @throws Exception
      */
     public function shareNode($httpVars, &$update){
 
-        $hiddenUserEntry = null;
+        $hiddenUserEntries = array();
         $downloadDisabled = false;
         $originalHttpVars = $httpVars;
         $ocsStore = new Pydio\OCS\Model\SQLStore();
         $ocsClient = new Pydio\OCS\Client\OCSClient();
+        /**
+         * @var ShareLink[] $shareObjects
+         */
+        $shareObjects = array();
 
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
-
-            $minisiteData = $httpVars;
-            if(isSet($httpVars["minisite"])){
-                $decoded = json_decode($httpVars["minisite"], true);
-                if(is_array($decoded)){
-                    $minisiteData = $decoded;
-                }
-            }
 
             // PREPARE HIDDEN USER DATA
             if(isSet($httpVars["hash"])){
@@ -1470,7 +1473,7 @@ class ShareCenter extends AJXP_Plugin
             }else{
                 $shareObject = $this->getShareStore()->createEmptyShareObject();
             }
-            $hiddenUserEntry = $this->prepareSharedUserEntry(
+            $hiddenUserEntries[] = $this->prepareSharedUserEntry(
                 $httpVars,
                 $shareObject,
                 isSet($httpVars["hash"]),
@@ -1478,6 +1481,7 @@ class ShareCenter extends AJXP_Plugin
             );
             $shareObject->parseHttpVars($httpVars);
             $downloadDisabled = $shareObject->disableDownload();
+            $shareObjects[] = $shareObject;
 
         }else if(isSet($httpVars["disable_public_link"])){
 
@@ -1485,6 +1489,38 @@ class ShareCenter extends AJXP_Plugin
 
         }
 
+        if(isSet($httpVars["ocs_data"])){
+            $ocsData = json_decode($httpVars["ocs_data"], true);
+            $removeLinks = $ocsData["REMOVE"];
+            foreach($removeLinks as $linkHash){
+                // Delete Link, delete invitation(s)
+                $this->getShareStore()->deleteShare("minisite", $linkHash, true);
+                $invitations = $ocsStore->invitationsForLink($linkHash);
+                foreach($invitations as $invitation){
+                    $ocsStore->deleteInvitation($invitation);
+                }
+            }
+            $newLinks = $ocsData["LINKS"];
+            foreach($newLinks as $linkData){
+                if(isSet($linkData["hash"])){
+                    $link = $this->getShareStore()->loadShareObject($httpVars["hash"]);
+                }else{
+                    $link = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
+                    if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
+                    $link->prepareInvitation($linkData["HOST"], $linkData["USER"]);
+                }
+                $hiddenUserEntries[] = $this->prepareSharedUserEntry(
+                    $linkData,
+                    $link,
+                    isSet($linkData["hash"]),
+                    (isSet($linkData["guest_user_pass"])?$linkData["guest_user_pass"]:null)
+                );
+                $link->parseHttpVars($linkData);
+                $shareObjects[] = $link;
+            }
+        }
+
+        /*
         // OCS LINK
         if(isSet($httpVars["ocs_data"])){
 
@@ -1522,14 +1558,15 @@ class ShareCenter extends AJXP_Plugin
                 }
             }
         }
+        */
 
         $userSelection = new UserSelection($this->repository, $httpVars);
         $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
 
         $users = array(); $groups = array();
         $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
-        if(isSet($hiddenUserEntry)){
-            $users[$hiddenUserEntry["ID"]] = $hiddenUserEntry;
+        foreach($hiddenUserEntries as $entry){
+            $users[$entry["ID"]] = $entry;
         }
         if(!count($users) && !count($groups)){
             ob_start();
@@ -1540,47 +1577,24 @@ class ShareCenter extends AJXP_Plugin
 
         $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups, $downloadDisabled);
 
-
-        if(!isSet($shareObject) && !isSet($ocsLink)){
-
-            return array($newRepo);
-
-        }
-        $return = array();
-        if(isSet($shareObject)){
+        foreach($shareObjects as $shareObject){
 
             $shareObject->setParentRepositoryId($this->repository->getId());
             $shareObject->attachToRepository($newRepo->getId());
-            // STORE DATA & HASH IN SHARE STORE
-            $this->getPublicAccessManager()->initFolder();
             $shareObject->save();
-            $return[] = $shareObject;
-
-        }
-        if(isSet($ocsLink)){
-
-            // Update OCS link
-            $ocsLink->setParentRepositoryId($this->repository->getId());
-            $ocsLink->attachToRepository($newRepo->getId());
-            $ocsLink->save();
-
-            if(isSet($newOcsUsers)){
-                foreach($newOcsUsers as $ocsUser){
-                    $invitation = $ocsLink->createInvitation($ocsUser["HOST"], $ocsUser["USER"]);
+            if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
+                $invitation = $shareObject->getPendingInvitation();
+                if(!empty($invitation)){
                     $ocsStore->storeInvitation($invitation);
                     $ocsClient->sendInvitation($invitation);
                 }
+            }else{
+                $this->getPublicAccessManager()->initFolder();
             }
-            $return[] = $ocsLink;
-        }
-        if(isSet($unShareInvitations)){
-            foreach($unShareInvitations as $invitation){
-                $ocsClient->cancelInvitation($invitation);
-                $ocsStore->deleteInvitation($invitation);
-            }
-        }
 
-        return $return;
+        }
+        $shareObjects[] = $newRepo;
+        return $shareObjects;
 
     }
 
