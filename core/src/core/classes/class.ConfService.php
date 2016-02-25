@@ -565,9 +565,12 @@ class ConfService
      */
     private function getLoadedRepositories()
     {
-        if (isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])){
-            $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
-            return $_SESSION["REPOSITORIES"];
+        if (!isSet($this->configs["REPOSITORIES"]) && isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])){
+            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            if($sessionNotCorrupted){
+                $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
+                return $_SESSION["REPOSITORIES"];
+            }
         }
         if (isSet($this->configs["REPOSITORIES"])) {
             return $this->configs["REPOSITORIES"];
@@ -687,7 +690,7 @@ class ConfService
         }
         $res = null;
         $args = array($repositoryId, $repositoryObject, $userObject, &$res);
-        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
+        AJXP_Controller::applyIncludeHook("repository.test_access", $args);
         if($res === false){
             return false;
         }
@@ -889,8 +892,8 @@ class ConfService
                 $objList[$key] = $value;
             }
         }
-        $args = array(&$objList);
-        AJXP_Controller::applyIncludeHook("sec.access_ws", $args);
+        $args = array(&$objList, $scope, $includeShared);
+        AJXP_Controller::applyIncludeHook("repository.list", $args);
         return $objList;
     }
     /**
@@ -1061,6 +1064,12 @@ class ConfService
             $repo->setWriteable(false);
             CacheService::save("repository:".$repoId, $repo);
             return $repo;
+        }
+        $hookedRepo = null;
+        $args = array($repoId, &$hookedRepo);
+        AJXP_Controller::applyIncludeHook("repository.search", $args);
+        if($hookedRepo !== null){
+            return $hookedRepo;
         }
         return null;
     }
