@@ -15,6 +15,7 @@
         <resources>
             <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
             <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js"/>
+            <js file="plugins/core.mailer/js/build/PydioMailer.js" className="PydioMailer" depends="React,UsersCompleter"/>
         </resources>
     </client_settings>
     <registry_contributions>

@@ -19,7 +19,6 @@
  */
 (function(global) {
 
-    var UserBadge;
     var MainPanel = React.createClass({
 
         propTypes: {
@@ -49,8 +48,25 @@
         getInitialState: function(){
             return {
                 status: 'idle',
+                mailerData: false,
                 model: new ReactModel.Share(this.props.pydio, this.props.selection)
             };
+        },
+
+        showMailer:function(subject, message, users = []){
+            global.ResourcesManager.loadClassesAndApply(['PydioMailer'], function(){
+                this.setState({
+                    mailerData: {
+                        subject:subject,
+                        message:message,
+                        users:users
+                    }
+                });
+            }.bind(this));
+        },
+
+        dismissMailer:function(){
+            this.setState({mailerData:false});
         },
 
         componentDidMount: function(){
@@ -72,7 +88,13 @@
                 }
                 panels.push(
                     <ReactMUI.Tab key="public-link" label={'Public Link' + (model.hasPublicLink()?' (active)':'')}>
-                        <PublicLinkPanel linkData={linkData} pydio={this.props.pydio} shareModel={model} authorizations={auth}/>
+                        <PublicLinkPanel
+                            showMailer={this.showMailer}
+                            linkData={linkData}
+                            pydio={this.props.pydio}
+                            shareModel={model}
+                            authorizations={auth}
+                        />
                     </ReactMUI.Tab>
                 );
             }
@@ -82,16 +104,31 @@
                 var totalUsers = users.length + ocsUsers.length;
                 panels.push(
                     <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
-                        <UsersPanel shareModel={model}/>
+                        <UsersPanel
+                            showMailer={this.showMailer}
+                            shareModel={model}
+                        />
                     </ReactMUI.Tab>
                 );
             }
             if(panels.length > 0){
                 panels.push(
                     <ReactMUI.Tab  key="share-permissions" label="Advanced">
-                        <AdvancedPanel pydio={this.props.pydio} shareModel={model}/>
+                        <AdvancedPanel
+                            showMailer={this.showMailer}
+                            pydio={this.props.pydio}
+                            shareModel={model}
+                        />
                     </ReactMUI.Tab>
                 );
+            }
+            if(this.state.mailerData){
+                var mailer = (<PydioMailer.Pane
+                    {...this.state.mailerData}
+                    onDismiss={this.dismissMailer}
+                    overlay={true}
+                    className="share-center-mailer"
+                />);
             }
 
             return(
@@ -99,6 +136,7 @@
                     <HeaderPanel {...this.props} shareModel={this.state.model}/>
                     <ReactMUI.Tabs onChange={this.refreshDialogPosition}>{panels}</ReactMUI.Tabs>
                     <ButtonsPanel {...this.props} shareModel={this.state.model} onClick={this.clicked}/>
+                    {mailer}
                 </div>
             );
         }
@@ -168,19 +206,30 @@
             };
             this.props.shareModel.updateSharedUser('add', newEntry.ID, newEntry);
         },
+        completerRenderSuggestion: function(userObject){
+            return (
+                <UserBadge
+                    label={userObject.getExtendedLabel() || userObject.getLabel()}
+                    avatar={userObject.getAvatar()}
+                    type={userObject.getGroup() ? 'group' : (userObject.getTemporary()?'temporary' : (userObject.getExternal()?'tmp_user':'user'))}
+                />
+            );
+        },
+
         render: function(){
             var currentUsers = this.props.shareModel.getSharedUsers();
             const excludes = currentUsers.map(function(u){return u.ID});
             return (
                 <div style={{padding:'30px 20px 10px'}}>
-                    <UsersLoader
+                    <UsersCompleter.Input
+                        renderSuggestion={this.completerRenderSuggestion}
                         onValueSelected={this.valueSelected}
                         excludes={excludes}
                     />
                     <SharedUsersBox
                         users={currentUsers}
                         onUsersUpdate={this.onUsersUpdate}
-                        saveSelectionAsTeam={this.props.shareModel.saveSelectionSupported(global.pydio)?this.onSaveSelection:null}
+                        saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
                     />
                     <RemoteUsers shareModel={this.props.shareModel}/>
                 </div>
@@ -188,7 +237,7 @@
         }
     });
 
-    UserBadge = React.createClass({
+    var UserBadge = React.createClass({
         propTypes: {
             label: React.PropTypes.string,
             avatar: React.PropTypes.string,
@@ -370,226 +419,6 @@
         }
     });
 
-    var UsersLoader = React.createClass({
-
-        propTypes:{
-            onValueSelected:React.PropTypes.func.isRequired,
-            excludeValues:React.PropTypes.array.isRequired
-        },
-
-        getInitialState:function(){
-            return {createUser: null};
-        },
-
-        getSuggestions(input, callback){
-
-            var excludes = this.props.excludes;
-            PydioApi.getClient().request({get_action:'user_list_authorized_users', value:input, format:'xml'}, function(transport){
-                const lis = XMLUtils.XPathSelectNodes(transport.responseXML, '//li');
-                var suggestions = [];
-                lis.map(function(li){
-                    var id = li.getAttribute('data-entry_id');
-                    if(id && excludes.indexOf(id) !== -1){
-                        return;
-                    }
-                    var spanLabel = XMLUtils.XPathGetSingleNodeText(li, 'span[@class="user_entry_label"]');
-                    suggestions.push({
-                        label:li.getAttribute('data-label'),
-                        spanLabel:spanLabel,
-                        id:li.getAttribute('data-entry_id'),
-                        type:li.getAttribute('class'),
-                        group:li.getAttribute('data-group'),
-                        avatar:li.getAttribute('data-avatar'),
-                        temporary:li.getAttribute('data-temporary')?true:false,
-                        external:li.getAttribute('data-external') == 'true'
-                    });
-                });
-                callback(null, suggestions);
-            });
-
-        },
-
-        renderSuggestion: function(suggestion, input){
-            return (
-                <UserBadge
-                    label={suggestion['spanLabel'] || suggestion['label']}
-                    avatar={suggestion.avatar}
-                    type={suggestion.group ? 'group' : (suggestion.temporary?'temporary' : (suggestion.external?'tmp_user':'user'))}
-                />
-            );
-        },
-
-        suggestionValue: function(suggestion){
-            return '';//suggestion.id || suggestion.label;
-        },
-
-        onSuggestionSelected: function(suggestion, event){
-            if(!suggestion) return;
-            var blur = true;
-            if(suggestion.group){
-                this.props.onValueSelected(suggestion.group, suggestion.label, 'group');
-            }else if(suggestion.id) {
-                this.props.onValueSelected(suggestion.id, suggestion.label, suggestion.external?'tmp_user':'user');
-            }else if(suggestion.temporary){
-                this.setState({createUser:suggestion.label});
-                blur = false;
-            }
-            if(blur){
-                this.refs.autosuggest.refs.input.getDOMNode().blur();
-                global.setTimeout(function(){
-                    this.refs.autosuggest.refs.input.getDOMNode().blur();
-                }.bind(this), 50);
-            }
-        },
-
-        submitCreationForm: function(){
-
-            var values = this.refs['creationForm'].getValuesForPost();
-            values['get_action'] = 'user_create_user';
-            PydioApi.getClient().request(values, function(transport){
-                console.log(transport.responseText);
-                var display = values.NEW_USER_DISPLAY_NAME || values.NEW_new_user_id;
-                this.props.onValueSelected(values.NEW_new_user_id, display, 'user');
-                this.setState({createUser:null});
-            }.bind(this));
-
-        },
-
-        cancelCreationForm:function(){
-            this.setState({createUser:null});
-        },
-
-        render: function(){
-
-            if(this.state.createUser){
-
-                return (
-                    <div className="react-autosuggest">
-                        <input type="text" id="users-autosuggest" className="react-autosuggest__input" value={'Create User ' + this.state.createUser}/>
-                        <div className="react-autosuggest__suggestions">
-                            <UserCreationForm ref="creationForm" newUserName={this.state.createUser} />
-                            <div style={{padding:16, textAlign:'right', paddingTop:0}}>
-                                <ReactMUI.FlatButton label="Save & add" secondary={true} onClick={this.submitCreationForm} />
-                                <ReactMUI.FlatButton label="Cancel" onClick={this.cancelCreationForm} />
-                            </div>
-                        </div>
-
-                    </div>
-                );
-
-            }else{
-                const inputAttributes = {
-                    id: 'users-autosuggest',
-                    name: 'users-autosuggest',
-                    className: 'react-autosuggest__input',
-                    placeholder: 'Filter users or create one...',
-                    value: ''   // Initial value
-                };
-                return (
-                    <div style={{position:'relative'}}>
-                        <span className="suggest-search icon-search"/>
-                        <ReactAutoSuggest
-                            ref="autosuggest"
-                            showWhen = {input => true }
-                            inputAttributes={inputAttributes}
-                            suggestions={this.getSuggestions}
-                            suggestionRenderer={this.renderSuggestion}
-                            suggestionValue={this.suggestionValue}
-                            onSuggestionSelected={this.onSuggestionSelected}
-                        />
-                    </div>
-                );
-            }
-        }
-
-    });
-
-    var UserCreationForm = React.createClass({
-
-        propTypes:{
-            newUserName:React.PropTypes.string.isRequired
-        },
-
-        getParameters: function(){
-
-            if(this._parsedParameters){
-                return this._parsedParameters;
-            }
-
-            var basicParameters = [];
-            basicParameters.push({
-                description: MessageHash['533'],
-                editable: false,
-                expose: "true",
-                label: MessageHash['522'],
-                name: "new_user_id",
-                scope: "user",
-                type: "string",
-                mandatory: "true"
-            },{
-                description: MessageHash['534'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['523'],
-                name: "new_password",
-                scope: "user",
-                type: "password",
-                mandatory: "true"
-            },{
-                description: MessageHash['536'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['535'],
-                name: "send_email",
-                scope: "user",
-                type: "boolean",
-                mandatory: true
-            });
-
-            var params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
-            for(var i=0;i<params.length;i++){
-                params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-            }
-            var xPath = params.join('|');
-            PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
-                basicParameters.push(el);
-            });
-
-            this._parsedParameters = basicParameters;
-
-            return basicParameters;
-        },
-
-        getValuesForPost: function(){
-            return PydioForm.Manager.getValuesForPOST(this.getParameters(), this.state.values, 'NEW_');
-        },
-
-        getInitialState: function(){
-            return {
-                values:{
-                    new_user_id:this.props.newUserName,
-                    lang:global.pydio.currentLanguage,
-                    new_password:'',
-                    send_email:true
-                }
-            };
-        },
-
-        onValuesChange:function(newValues){
-            this.setState({values:newValues});
-        },
-
-        render:function(){
-            return <PydioForm.FormPanel
-                className="reset-pydio-forms"
-                depth={-1}
-                parameters={this.getParameters()}
-                values={this.state.values}
-                onChange={this.onValuesChange}
-            />
-        }
-    });
-
     var RemoteUsers = React.createClass({
 
         propTypes:{
@@ -670,7 +499,8 @@
             linkData:React.PropTypes.object,
             pydio:React.PropTypes.instanceOf(Pydio),
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
-            authorizations: React.PropTypes.object
+            authorizations: React.PropTypes.object,
+            showMailer:React.PropTypes.func
         },
 
         toggleLink: function(event){
@@ -682,7 +512,7 @@
             var publicLinkPanes;
             if(this.props.linkData){
                 publicLinkPanes = [
-                    <PublicLinkField linkData={this.props.linkData} shareModel={this.props.shareModel} editAllowed={this.props.authorizations.editable_hash} />,
+                    <PublicLinkField showMailer={this.props.showMailer} linkData={this.props.linkData} shareModel={this.props.shareModel} editAllowed={this.props.authorizations.editable_hash} />,
                     <PublicLinkPermissions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-perm" />,
                     <PublicLinkSecureOptions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-secure" />
                 ];
@@ -706,7 +536,8 @@
             linkData:React.PropTypes.object.isRequired,
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
             editAllowed: React.PropTypes.bool,
-            onChange: React.PropTypes.func
+            onChange: React.PropTypes.func,
+            showMailer:React.PropTypes.func
         },
         getInitialState: function(){
             return {editLink: false, copyMessage:''};
@@ -767,6 +598,10 @@
             this.detachClipboard();
         },
 
+        openMailer: function(){
+            this.props.showMailer('Subject', 'Message', []);
+        },
+
         render: function(){
             var publicLink = this.props.linkData['public_link'];
             var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'];
@@ -801,6 +636,7 @@
                             onFocus={focus}
                         /> {editButton} {copyButton}
                         <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
+                        <span onClick={this.openMailer}>Send Invitation</span>
                     </div>
                 );
             }

@@ -1,3 +1,4 @@
+/plugins/core.mailer/js/build
 /plugins/gui.ajax/res/js/ui/reactjs/build/
 .idea/
 data/cache/*

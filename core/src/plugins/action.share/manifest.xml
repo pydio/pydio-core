@@ -35,7 +35,7 @@
             <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
             <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
-            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm"/>
+            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
         </resources>
     </client_settings>
     <registry_contributions>

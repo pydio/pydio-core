@@ -170,20 +170,12 @@
             });
         }
 
-        saveSelectionSupported(pydio){
-            return pydio.getController().actions.get('user_team_create') !== undefined;
-        }
-
         saveSelectionAsTeam(teamName){
             var userIds = [];
             this.getSharedUsers().map(function(e){
                 if(e.TYPE == 'user') userIds.push(e.ID);
             });
-            PydioApi.getClient().request({
-                get_action:'user_team_create',
-                team_label:teamName,
-                'user_ids[]':userIds
-            }, function(){
+            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, function(){
                 // Flatten Team?
             });
         }
