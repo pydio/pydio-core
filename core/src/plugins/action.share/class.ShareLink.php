@@ -297,7 +297,7 @@ class ShareLink
      * @return bool
      */
     public function disableDownload(){
-        return $this->internal["DISABLE_DOWNLOAD"];
+        return $this->internal["DOWNLOAD_DISABLED"];
     }
 
     /**

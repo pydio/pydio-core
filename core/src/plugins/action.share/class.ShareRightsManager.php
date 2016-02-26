@@ -31,24 +31,92 @@ define('PARAM_USER_ENTRY_TYPE', "entry_type_");
 class ShareRightsManager
 {
     /**
-     * @var string
-     */
-    var $tmpUsersPrefix;
-    /**
      * @var MetaWatchRegister|bool
      */
     var $watcher;
+    /**
+     * @var ShareStore $store
+     */
+    var $store;
+
+    /**
+     * @var array $options
+     */
+    var $options;
 
     /**
      * ShareRightsManager constructor.
-     * @param string $tmpUsersPrefix
+     * @param array $options
+     * @param ShareStore $store
      * @param MetaWatchRegister|bool $watcher
      */
-    public function __construct($tmpUsersPrefix = "", $watcher = false)
+    public function __construct($options, $store, $watcher = false)
     {
-        $this->tmpUsersPrefix = $tmpUsersPrefix;
+        $this->options = $options;
         $this->watcher = $watcher;
+        $this->store = $store;
     }
+
+    /**
+     * @param array $httpVars
+     * @param ShareLink $shareObject
+     * @param bool $update
+     * @param null $guestUserPass
+     * @return array
+     * @throws Exception
+     */
+    public function prepareSharedUserEntry($httpVars, &$shareObject, $update, $guestUserPass = null){
+        $userPass = null;
+
+        $forcePassword = $this->options["SHARE_FORCE_PASSWORD"];
+        if($forcePassword && (
+                (isSet($httpVars["create_guest_user"]) && $httpVars["create_guest_user"] == "true" && empty($guestUserPass))
+                || (isSet($httpVars["guest_user_id"]) && isSet($guestUserPass) && strlen($guestUserPass) == 0)
+            )){
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["share_center.175"]);
+        }
+
+        if($update){
+
+            // THIS IS AN EXISTING SHARE
+            // FIND SHARE AND EXISTING HIDDEN USER ID
+            if($shareObject->isAttachedToRepository()){
+                $existingRepo = $shareObject->getRepository();
+                $this->store->testUserCanEditShare($existingRepo->getOwner(), $existingRepo->options);
+            }
+            $uniqueUser = $shareObject->getUniqueUser();
+
+            if($guestUserPass !== null && strlen($guestUserPass)) {
+                $userPass = $guestUserPass;
+                $shareObject->setUniqueUser($uniqueUser, true);
+            }else if(!$shareObject->shouldRequirePassword() || ($guestUserPass !== null && $guestUserPass == "")){
+                $shareObject->setUniqueUser($uniqueUser, false);
+            }
+
+        } else {
+
+            $update = false;
+            $shareObject->createHiddenUserId(
+                $this->options["SHARED_USERS_TMP_PREFIX"],
+                !empty($guestUserPass)
+            );
+            if(!empty($guestUserPass)){
+                $userPass = $guestUserPass;
+            }else{
+                $userPass = $shareObject->createHiddenUserPassword();
+            }
+            $uniqueUser = $shareObject->getUniqueUser();
+        }
+
+        $hiddenUserEntry = $this->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
+        if(empty($hiddenUserEntry["RIGHT"])){
+            throw new Exception("share_center.58");
+        }
+        $hiddenUserEntry["DISABLE_DOWNLOAD"] = $shareObject->disableDownload();
+        return $hiddenUserEntry;
+    }
+
 
     /**
      * @param array $httpVars
@@ -125,7 +193,7 @@ class ShareRightsManager
                     if(!$allowSharedUsersCreation || AuthService::isReservedUserId($u)){
                         throw new Exception("You are not allowed to create users.");
                     }
-                    if(!empty($this->tmpUsersPrefix) && strpos($u, $this->tmpUsersPrefix)!==0 ){
+                    if(!empty($this->options["SHARED_USERS_TMP_PREFIX"]) && strpos($u, $this->options["SHARED_USERS_TMP_PREFIX"])!==0 ){
                         $u = $this->tmpUsersPrefix . $u;
                     }
                 }
@@ -307,7 +375,7 @@ class ShareRightsManager
      * @param bool|false $disableDownload
      * @throws Exception
      */
-    public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection, $disableDownload = false){
+    public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection){
 
         $childRepoId = $childRepository->getId();
         if($isUpdate){
@@ -339,7 +407,7 @@ class ShareRightsManager
 
             // CREATE A MINISITE-LIKE ROLE FOR THIS REPOSITORY
             if (isSet($userEntry["HIDDEN"])) {
-                $minisiteRole = $this->createRoleForMinisite($childRepoId, $disableDownload, $isUpdate);
+                $minisiteRole = $this->createRoleForMinisite($childRepoId, $userEntry["DISABLE_DOWNLOAD"], $isUpdate);
                 if($minisiteRole != null){
                     $userObject->addRole($minisiteRole);
                 }

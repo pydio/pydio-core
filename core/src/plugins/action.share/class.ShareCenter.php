@@ -242,7 +242,14 @@ class ShareCenter extends AJXP_Plugin
     protected function getRightsManager(){
         if(!isSet($this->rightsManager)){
             require_once("class.ShareRightsManager.php");
-            $this->rightsManager = new ShareRightsManager($this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository), $this->watcher);
+            $options = array(
+                "SHARED_USERS_TMP_PREFIX" => $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository),
+                "SHARE_FORCE_PASSWORD" => $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository)
+            );
+            $this->rightsManager = new ShareRightsManager(
+                $options,
+                $this->getShareStore(),
+                $this->watcher);
         }
         return $this->rightsManager;
     }
@@ -1283,65 +1290,6 @@ class ShareCenter extends AJXP_Plugin
 
     /**
      * @param array $httpVars
-     * @param ShareLink $shareObject
-     * @param bool $update
-     * @param null $guestUserPass
-     * @return array
-     * @throws Exception
-     */
-    protected function prepareSharedUserEntry($httpVars, &$shareObject, $update, $guestUserPass = null){
-        $userPass = null;
-
-        $forcePassword = $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository);
-        if($forcePassword && (
-                (isSet($httpVars["create_guest_user"]) && $httpVars["create_guest_user"] == "true" && empty($guestUserPass))
-                || (isSet($httpVars["guest_user_id"]) && isSet($guestUserPass) && strlen($guestUserPass) == 0)
-            )){
-            $mess = ConfService::getMessages();
-            throw new Exception($mess["share_center.175"]);
-        }
-
-        if($update){
-
-            // THIS IS AN EXISTING SHARE
-            // FIND SHARE AND EXISTING HIDDEN USER ID
-            if($shareObject->isAttachedToRepository()){
-                $existingRepo = $shareObject->getRepository();
-                $this->getShareStore()->testUserCanEditShare($existingRepo->getOwner(), $existingRepo->options);
-            }
-            $uniqueUser = $shareObject->getUniqueUser();
-
-            if($guestUserPass !== null && strlen($guestUserPass)) {
-                $userPass = $guestUserPass;
-                $shareObject->setUniqueUser($uniqueUser, true);
-            }else if(!$shareObject->shouldRequirePassword() || ($guestUserPass !== null && $guestUserPass == "")){
-                $shareObject->setUniqueUser($uniqueUser, false);
-            }
-
-        } else {
-
-            $update = false;
-            $shareObject->createHiddenUserId(
-                $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository),
-                !empty($guestUserPass)
-            );
-            if(!empty($guestUserPass)){
-                $userPass = $guestUserPass;
-            }else{
-                $userPass = $shareObject->createHiddenUserPassword();
-            }
-            $uniqueUser = $shareObject->getUniqueUser();
-        }
-
-        $hiddenUserEntry = $this->getRightsManager()->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
-        if(empty($hiddenUserEntry["RIGHT"])){
-            throw new Exception("share_center.58");
-        }
-        return $hiddenUserEntry;
-    }
-
-    /**
-     * @param array $httpVars
      * @param bool $update
      * @return mixed An array containing the hash (0) and the generated url (1)
      * @throws Exception
@@ -1354,20 +1302,20 @@ class ShareCenter extends AJXP_Plugin
         }else{
             $shareObject = $this->getShareStore()->createEmptyShareObject();
         }
-        $hiddenUserEntry = $this->prepareSharedUserEntry(
+        $shareObject->parseHttpVars($httpVars);
+        $hiddenUserEntry = $this->getRightsManager()->prepareSharedUserEntry(
             $httpVars,
             $shareObject,
             isSet($httpVars["hash"]),
             (isSet($httpVars["guest_user_pass"])?$httpVars["guest_user_pass"]:null)
         );
-        $shareObject->parseHttpVars($httpVars);
         $userSelection = new UserSelection($this->repository, $httpVars);
         $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
 
         $users = array(); $groups = array();
         $users[$hiddenUserEntry["ID"]] = $hiddenUserEntry;
 
-        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups, $shareObject->disableDownload());
+        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups);
 
         $shareObject->setParentRepositoryId($this->repository->getId());
         $shareObject->attachToRepository($newRepo->getId());
@@ -1402,12 +1350,12 @@ class ShareCenter extends AJXP_Plugin
     /**
      * @param array $httpVars
      * @param bool $update
-     * @param array|null $hiddenUserEntry
-     * @param bool $disableDownload
+     * @param array $users
+     * @param array $groups
      * @return Repository
      * @throws Exception
      */
-    public function createSharedRepository($httpVars, &$update, $users=array(), $groups=array(), $disableDownload = false)
+    public function createSharedRepository($httpVars, &$update, $users=array(), $groups=array())
     {
         // ERRORS
         // 100 : missing args
@@ -1425,7 +1373,7 @@ class ShareCenter extends AJXP_Plugin
         $newRepo = $this->createOrLoadSharedRepository($httpVars, $update);
 
         $selection = new UserSelection($this->repository, $httpVars);
-        $this->getRightsManager()->assignSharedRepositoryPermissions($this->repository, $newRepo, $update, $users, $groups, $selection, $disableDownload);
+        $this->getRightsManager()->assignSharedRepositoryPermissions($this->repository, $newRepo, $update, $users, $groups, $selection);
 
         // HANDLE WATCHES ON CHILDREN AND PARENT
         foreach($users as $userName => $userEntry){
@@ -1444,6 +1392,37 @@ class ShareCenter extends AJXP_Plugin
 
 
         return $newRepo;
+    }
+
+    /**
+     * @param array $linkData
+     * @param array $hiddenUserEntries
+     * @param array $shareObjects
+     * @param string $type
+     * @param string $invitationLabel
+     * @return ShareLink
+     * @throws Exception
+     */
+    protected function shareObjectFromParameters($linkData, &$hiddenUserEntries, &$shareObjects,  $type = "public", $invitationLabel = ""){
+        if(isSet($linkData["hash"])){
+            $link = $this->getShareStore()->loadShareObject($linkData["hash"]);
+        }else{
+            if($type == "public"){
+                $link = $this->getShareStore()->createEmptyShareObject();
+            }else{
+                $link = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
+                if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
+                $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $invitationLabel);
+            }
+        }
+        $link->parseHttpVars($linkData);
+        $hiddenUserEntries[] = $this->getRightsManager()->prepareSharedUserEntry(
+            $linkData,
+            $link,
+            isSet($linkData["hash"]),
+            (isSet($linkData["guest_user_pass"])?$linkData["guest_user_pass"]:null)
+        );
+        $shareObjects[] = $link;
     }
 
     /**
@@ -1468,27 +1447,9 @@ class ShareCenter extends AJXP_Plugin
 
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
-
-            // PREPARE HIDDEN USER DATA
-            if(isSet($httpVars["hash"])){
-                $shareObject = $this->getShareStore()->loadShareObject($httpVars["hash"]);
-            }else{
-                $shareObject = $this->getShareStore()->createEmptyShareObject();
-            }
-            $hiddenUserEntries[] = $this->prepareSharedUserEntry(
-                $httpVars,
-                $shareObject,
-                isSet($httpVars["hash"]),
-                (isSet($httpVars["guest_user_pass"])?$httpVars["guest_user_pass"]:null)
-            );
-            $shareObject->parseHttpVars($httpVars);
-            $downloadDisabled = $shareObject->disableDownload();
-            $shareObjects[] = $shareObject;
-
+            $this->shareObjectFromParameters($httpVars, $hiddenUserEntries, $shareObjects, "public");
         }else if(isSet($httpVars["disable_public_link"])){
-
             $this->getShareStore()->deleteShare("minisite", $httpVars["disable_public_link"], true);
-
         }
 
         if(isSet($httpVars["ocs_data"])){
@@ -1505,21 +1466,7 @@ class ShareCenter extends AJXP_Plugin
             }
             $newLinks = $ocsData["LINKS"];
             foreach($newLinks as $linkData){
-                if(isSet($linkData["hash"])){
-                    $link = $this->getShareStore()->loadShareObject($httpVars["hash"]);
-                }else{
-                    $link = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
-                    if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
-                    $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $userSelection->getUniqueNode()->getLabel());
-                }
-                $hiddenUserEntries[] = $this->prepareSharedUserEntry(
-                    $linkData,
-                    $link,
-                    isSet($linkData["hash"]),
-                    (isSet($linkData["guest_user_pass"])?$linkData["guest_user_pass"]:null)
-                );
-                $link->parseHttpVars($linkData);
-                $shareObjects[] = $link;
+                $this->shareObjectFromParameters($linkData, $hiddenUserEntries, $shareObjects, "targetted", $userSelection->getUniqueNode()->getLabel());
             }
         }
 
@@ -1537,7 +1484,7 @@ class ShareCenter extends AJXP_Plugin
             return null;
         }
 
-        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups, $downloadDisabled);
+        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups);
 
         foreach($shareObjects as $shareObject){
 
