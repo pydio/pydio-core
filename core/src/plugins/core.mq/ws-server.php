@@ -146,9 +146,8 @@ $server->on('connect', function(Devristo\Phpws\Protocol\WebSocketTransportHybi $
             $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
             if (!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
         }
+        $logger->notice('[ECHO] User \'' . $user->ajxpId . '\' connected with ' . count($user->ajxpRepositories) . ' registered repositories ');
     }
-    $logger->notice('[ECHO] User \'' . $user->ajxpId . '\' connected with ' . count($user->ajxpRepositories) . ' registered repositories ');
-
 });
 
 // Bind the server
