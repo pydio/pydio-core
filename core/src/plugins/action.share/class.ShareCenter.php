@@ -671,29 +671,29 @@ class ShareCenter extends AJXP_Plugin
                     $ajxpNode = $userSelection->getUniqueNode();
                     $shares = array();
                     $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
+                    if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
+                        $elementId = $httpVars["element_id"];
+                        if(isSet($shares[$elementId])){
+                            $shares = array($elementId => $shares[$elementId]);
+                        }
+                    }
                     if(count($shares)){
-                        if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
-                            $elementId = $httpVars["element_id"];
-                        }else{
-                            $sKeys = array_keys($shares);
-                            $elementId = $sKeys[0];
-                        }
-                        if(isSet($shares[$elementId]) && isSet($shares[$elementId]["type"])){
-                            $t = $shares[$elementId]["type"];
-                        }else{
-                            $t = "file";
-                        }
-                        try{
-                            $result = $this->getShareStore()->deleteShare($t, $elementId);
-                        }catch(Exception $e){
-                            if($e->getMessage() == "repo-not-found"){
-                                $result = true;
-                            }else{
-                                throw $e;
+                        $res = true;
+                        foreach($shares as $shareId =>  $share){
+                            $t = isSet($share["type"]) ? $share["type"] : "file";
+                            try{
+                                $result = $this->getShareStore()->deleteShare($t, $shareId);
+                            }catch(Exception $e){
+                                if($e->getMessage() == "repo-not-found"){
+                                    $result = true;
+                                }else{
+                                    throw $e;
+                                }
                             }
+                            $this->getShareStore()->getMetaManager()->removeShareFromMeta($ajxpNode, $shareId);
+                            $res = $result && $res;
                         }
-                        if($result !== false){
-                            $this->getShareStore()->getMetaManager()->removeShareFromMeta($ajxpNode, $elementId);
+                        if($res !== false){
                             AJXP_XMLWriter::header();
                             AJXP_XMLWriter::sendMessage("Successfully unshared element", null);
                             AJXP_XMLWriter::close();
@@ -1434,7 +1434,6 @@ class ShareCenter extends AJXP_Plugin
     public function shareNode($httpVars, &$update){
 
         $hiddenUserEntries = array();
-        $downloadDisabled = false;
         $originalHttpVars = $httpVars;
         $ocsStore = new Pydio\OCS\Model\SQLStore();
         $ocsClient = new Pydio\OCS\Client\OCSClient();
@@ -1479,6 +1478,7 @@ class ShareCenter extends AJXP_Plugin
         }
         if(!count($users) && !count($groups)){
             ob_start();
+            unset($originalHttpVars["hash"]);
             $this->switchAction("unshare", $originalHttpVars, array());
             ob_end_clean();
             return null;
