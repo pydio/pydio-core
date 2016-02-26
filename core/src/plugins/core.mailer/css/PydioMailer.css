@@ -1,0 +1,31 @@
+div.react-mailer-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding-top: 77px;
+  z-index: 3;
+}
+div.react-mailer-overlay div.react-mailer {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  margin: 16px;
+  padding: 16px;
+}
+div.react-mailer .pydio-mailer-users .pydio-mailer-user {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  background-color: #999;
+  color: white;
+  border-radius: 2px;
+  font-weight: 500;
+}
+div.react-mailer .pydio-mailer-users .pydio-mailer-user span.icon-remove {
+  color: white;
+  display: inline-block;
+  margin-left: 10px;
+  cursor: pointer;
+}

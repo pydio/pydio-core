@@ -19,6 +19,25 @@
  */
 (function(global){
 
+    var UserEntry = React.createClass({
+        propTypes:{
+            id:React.PropTypes.string,
+            label:React.PropTypes.string,
+            onRemove:React.PropTypes.func
+        },
+        remove: function(){
+            this.props.onRemove(this.props.id);
+        },
+        render:function(){
+            return (
+                <div className="pydio-mailer-user">
+                    {this.props.label}
+                    <span className="icon-remove" onClick={this.remove}/>
+                </div>
+            );
+        }
+    });
+
     var Mailer = React.createClass({
 
         propTypes:{
@@ -28,15 +47,20 @@
             onDismiss:React.PropTypes.func,
             className:React.PropTypes.string,
             overlay:React.PropTypes.bool,
-            users:React.PropTypes.array
+            users:React.PropTypes.object
         },
 
         getInitialState: function(){
             return {
-                users:this.props.users || [],
+                users:this.props.users || {},
                 subject:this.props.subject,
                 message:this.props.message
             };
+        },
+
+        componentDidMount(){
+            var res = new ResourcesManager();
+            res.loadCSSResource("plugins/core.mailer/css/PydioMailer.css");
         },
 
         updateSubject: function(event){
@@ -49,14 +73,19 @@
 
         addUser: function(userId, userLabel){
             var users = this.state.users;
-            users.push(userId);
+            users[userId] = userLabel || userId ;
             this.setState({users:users});
+        },
+
+        removeUser: function(userId){
+            delete this.state.users[userId];
+            this.setState({users:this.state.users});
         },
 
         postEmail : function(){
             var params = {
                 get_action:"send_mail",
-                'emails[]':this.state.users,
+                'emails[]': Object.keys(this.state.users),
                 mailer_input_field:'Subject of the mail',
                 message:this.props.message
             };
@@ -76,7 +105,12 @@
         },
 
         render: function(){
-            var className = [this.props.className, "react-mui-context", "reset-pydio-forms"].join(" ");
+            const className = [this.props.className, "react-mailer", "react-mui-context", "reset-pydio-forms"].join(" ");
+            const users = Object.keys(this.state.users).map(function(uId){
+                return (
+                    <UserEntry key={uId} id={uId} label={this.state.users[uId]} onRemove={this.removeUser}/>
+                );
+            }.bind(this));
             var content = (
                 <div className={className}>
                     <div>
@@ -84,10 +118,10 @@
                             usersOnly={true}
                             existingOnly={true}
                             onValueSelected={this.addUser}
-                            excludes={this.state.users}
+                            excludes={Object.keys(this.state.users)}
                             renderSuggestion={this.usersLoaderRenderSuggestion}
                         />
-                        <div>{this.state.users.map(function(u){return <span>{u}</span>;})}</div>
+                        <div className="pydio-mailer-users">{users}</div>
                         <ReactMUI.TextField floatingLabelText="Subjet" value={this.state.subject} onChange={this.updateSubject}/>
                         <ReactMUI.TextField floatingLabelText="Message" value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
                         <div>
