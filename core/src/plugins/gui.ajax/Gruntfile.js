@@ -66,6 +66,7 @@ module.exports = function(grunt) {
                         'res/js/core/model/Repository.js',
                         'res/js/core/model/BackgroundTasksManager.js',
                         'res/js/core/http/PydioApi.js',
+                        'res/js/core/http/PydioUsersApi.js',
                         'res/js/core/model/Action.js',
                         'res/js/core/model/Controller.js',
                         'res/js/core/model/PydioDataModel.js',
@@ -276,5 +277,9 @@ module.exports = function(grunt) {
         'env:dev',
         'uglify:nodejs',
         'babel:pydio'
+    ]);
+    grunt.registerTask('build-core', [
+        'babel:dist',
+        'uglify:js'
     ]);
 };

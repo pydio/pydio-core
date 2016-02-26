@@ -58,13 +58,9 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
     },
 
     cancel: function(oForm){
-        console.log('cancel');
-
     },
 
     submit: function(oForm){
-        console.log('submit');
-
     },
 
     dismiss: function(oForm){
@@ -73,6 +69,11 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
     },
 
     dialogLoaded: function(oForm){
+
+        oForm.observe("submit", function(e){
+            e.preventDefault();
+            Event.stop(e);
+        });
 
         this.options.closeAjxpDialog = function(){
             this.dismiss(oForm);
@@ -92,7 +93,6 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
     },
 
     dialogWillClose: function(oForm){
-        console.log('close');
         this.reactComponent = null;
         React.unmountComponentAtNode(oForm.down('#'+this.rootNodeId));
     }
