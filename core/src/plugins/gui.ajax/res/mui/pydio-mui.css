@@ -2823,6 +2823,12 @@
 .react-mui-context label {
   margin: 0;
 }
+.react-mui-context .mui-error-as-hint hr.mui-text-field-focus-underline {
+  border-color: #009688 !important;
+}
+.react-mui-context .mui-text-field .mui-text-field-error {
+  right: 0;
+}
 .react-mui-context .main-layout-nav-to-stack,
 .react-mui-context .horizontal-layout,
 .react-mui-context .vertical-layout,

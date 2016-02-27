@@ -784,17 +784,34 @@
             this.props.shareModel.resetPassword(this.props.linkData.hash);
         },
 
-        updatePassword: function(event){
-            var newValue = event.currentTarget.getValue();
+        updatePassword: function(newValue, oldValue){
+            //var newValue = event.currentTarget.getValue();
             this.props.shareModel.updatePassword(this.props.linkData.hash, newValue);
         },
 
         render: function(){
             var linkId = this.props.linkData.hash;
-            var passPlaceHolder, resetPassword;
+            var passwordField;
             if(this.props.shareModel.hasHiddenPassword(linkId)){
-                passPlaceHolder = '********';
-                resetPassword = <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label="Reset Password"/>
+                var resetPassword = (
+                    <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label="Reset Password"/>
+                );
+                passwordField = (
+                    <ReactMUI.TextField
+                        floatingLabelText="Password Protection"
+                        disabled={true}
+                        value={'********'}
+                        onChange={this.updatePassword}
+                    />
+                );
+            }else{
+                passwordField = (
+                    <PydioForm.ValidPassword
+                        attributes={{label:"Password Protection"}}
+                        value={this.props.shareModel.getPassword(linkId)}
+                        onChange={this.updatePassword}
+                    />
+                );
             }
             return (
                 <div>
@@ -802,12 +819,7 @@
                     <div className="section-legend">Protect the link with a password, or make it expire automatically.</div>
                     <div className="password-container">
                         <div style={{width:'50%', display:'inline-block'}}>
-                            <ReactMUI.TextField
-                                floatingLabelText="Password Protection"
-                                disabled={passPlaceHolder ? true : false}
-                                value={passPlaceHolder? passPlaceHolder : this.props.shareModel.getPassword(linkId)}
-                                onChange={this.updatePassword}
-                            />
+                            {passwordField}
                         </div>
                         <div style={{width:'50%', display:'inline-block'}}>
                             {resetPassword}

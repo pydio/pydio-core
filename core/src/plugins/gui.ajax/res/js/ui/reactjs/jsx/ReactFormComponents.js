@@ -219,6 +219,78 @@
 
     });
 
+    var ValidPassword = React.createClass({
+
+        mixins:[FormMixin],
+
+        isValid:function(){
+            return (this.state.value && this.checkMinLength(this.state.value));
+        },
+
+        checkMinLength:function(value){
+            var minLength = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
+            return !(value && value.length < minLength);
+        },
+
+        getMessage:function(messageId){
+            if(this.context && this.context.getMessage){
+                return this.context.getMessage(messageId, '');
+            }else if(global.pydio && global.pydio.MessageHash){
+                return global.pydio.MessageHash[messageId];
+            }
+        },
+
+        getComplexityString:function(value){
+            var response;
+            PassUtils.checkPasswordStrength(value, function(segment, percent){
+                var responseString;
+                if(global.pydio && global.pydio.MessageHash){
+                    responseString = this.getMessage(PassUtils.Options.pydioMessages[segment]);
+                }else{
+                    responseString = PassUtils.Options.messages[segment];
+                }
+                response = {
+                    segment:segment,
+                    color:(segment>1) ? PassUtils.Options.colors[segment] : null,
+                    responseString:responseString
+                };
+            }.bind(this));
+            return response;
+        },
+
+        render:function(){
+            if(this.isDisplayGrid() && !this.state.editMode){
+                var value = this.state.value;
+                return <div onClick={this.props.disabled?function(){}:this.toggleEditMode} className={value?'':'paramValue-empty'}>{!value?'Empty':value}</div>;
+            }else{
+                var errorText = this.state.errorText;
+                if(this.state.value){
+                    var response = this.getComplexityString(this.state.value);
+                    errorText = <span style={{color: response.color}}>{response.responseString}</span>;
+                    if(response.segment > 1){
+                        var className = "mui-error-as-hint";
+                    }
+                }
+                return(
+                    <span>
+                        <ReactMUI.TextField
+                            floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                            className={className}
+                            value={this.state.value}
+                            onChange={this.onChange}
+                            onKeyDown={this.enterToToggle}
+                            type='password'
+                            multiLine={false}
+                            disabled={this.props.disabled}
+                            errorText={errorText}
+                        />
+                    </span>
+                );
+            }
+        }
+
+    });
+
     /**
      * Checkboxk input
      */
@@ -1583,17 +1655,20 @@
                 case 'password':
                     value = <InputText {...props}/>;
                     break;
+                case 'valid-password':
+                    value = <ValidPassword {...props}/>;
+                    break;
                 case 'integer':
-                    value = <PydioForm.InputInteger {...props}/>;
+                    value = <InputInteger {...props}/>;
                     break;
                 case 'button':
-                    value = <PydioForm.InputButton {...props}/>;
+                    value = <InputButton {...props}/>;
                     break;
                 case 'image':
-                    value = <PydioForm.InputImage {...props}/>;
+                    value = <InputImage {...props}/>;
                     break;
                 case 'select':
-                    value = <PydioForm.InputSelectBox {...props}/>;
+                    value = <InputSelectBox {...props}/>;
                     break;
                 case 'legend':
                     value = null;
@@ -1752,6 +1827,7 @@
     PydioForm.createFormElement = PydioFormManager.createFormelement;
     PydioForm.Manager = PydioFormManager;
     PydioForm.InputText = InputText;
+    PydioForm.ValidPassword = ValidPassword;
     PydioForm.InputBoolean = InputBoolean;
     PydioForm.InputInteger = InputInteger;
     PydioForm.InputButton = InputButton;

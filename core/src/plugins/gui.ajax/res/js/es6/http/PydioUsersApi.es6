@@ -141,7 +141,7 @@
                 label: MessageHash['523'],
                 name: "new_password",
                 scope: "user",
-                type: "password",
+                type: "valid-password",
                 mandatory: "true"
             },{
                 description: MessageHash['536'],

@@ -6,6 +6,7 @@ var gui_ajax_core = [
     'res/js/core/util/XMLUtils.js',
     'res/js/core/util/PathUtils.js',
     'res/js/core/util/HasherUtils.js',
+    'res/js/core/util/PassUtils.js',
     'res/js/core/util/CookiesManager.js',
     'res/js/core/model/Router.js',
     'res/js/core/model/AjxpNode.js',

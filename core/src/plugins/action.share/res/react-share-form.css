@@ -123,7 +123,7 @@ div#react_share_form .public-link-container .copy-link-button {
   background-color: #ddd;
   color: #F1F1F1;
   padding: 6px;
-  border-radius: 0;
+  border-radius: 4px 4px 4px 0;
 }
 div#react_share_form .public-link-container .copy-link-button:hover {
   background-color: #47b092;
