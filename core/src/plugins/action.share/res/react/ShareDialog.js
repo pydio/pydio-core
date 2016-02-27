@@ -248,7 +248,10 @@
                         onUserUpdate={this.onUserUpdate}
                         saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
                     />
-                    <RemoteUsers shareModel={this.props.shareModel}/>
+                    <RemoteUsers
+                        shareModel={this.props.shareModel}
+                        onUserUpdate={this.onUserUpdate}
+                    />
                 </div>
             );
         }
@@ -341,10 +344,10 @@
             var menu = this.renderMenu();
             return (
                 <div className={"user-badge user-type-" + this.props.type}>
-                    {menu}
                     {avatar}
                     <span className="user-badge-label">{this.props.label}</span>
                     {this.props.children}
+                    {menu}
                 </div>
             );
         }
@@ -468,7 +471,8 @@
     var RemoteUsers = React.createClass({
 
         propTypes:{
-            shareModel: React.PropTypes.instanceOf(ReactModel.Share)
+            shareModel: React.PropTypes.instanceOf(ReactModel.Share),
+            onUserUpdate:React.PropTypes.func.isRequired
         },
 
         getInitialState: function(){
@@ -494,30 +498,12 @@
         render: function(){
 
             var inv = this.props.shareModel.getOcsLinks().map(function(link){
-                var rem = function(){
-                    this.removeUser(link.hash);
-                }.bind(this);
-                var status;
-                if(!link.invitation){
-                    status = 'not sent';
-                }else {
-                    if(link.invitation.STATUS == 1){
-                        status = 'pending';
-                    }else if(link.invitation.STATUS == 2){
-                        status = 'accepted';
-                    }else if(link.invitation.STATUS == 4){
-                        status = 'rejected';
-                    }
-                }
-                var menuItems = [{text:'Remove', callback:rem}];
-                var host = link.HOST || link.invitation.HOST;
-                var user = link.USER || link.invitation.USER;
                 return (
-                    <UserBadge
-                        label={user + " @ " + host + " (" + status + ")"}
-                        avatar={null}
-                        type={"remote_user"}
-                        menus={menuItems}
+                    <RemoteUserEntry
+                        shareModel={this.props.shareModel}
+                        linkData={link}
+                        onRemoveUser={this.removeUser}
+                        onUserUpdate={this.props.onUserUpdate}
                     />
                 );
             }.bind(this));
@@ -534,6 +520,76 @@
             );
 
         }
+    });
+
+    var RemoteUserEntry = React.createClass({
+
+        propTypes:{
+            shareModel:React.PropTypes.instanceOf(ReactModel.Share),
+            linkData:React.PropTypes.object.isRequired,
+            onRemoveUser:React.PropTypes.func.isRequired,
+            onUserUpdate:React.PropTypes.func.isRequired
+        },
+
+        getInitialState(){
+            return {
+                internalUser: this.props.shareModel.getSharedUser(this.props.linkData['internal_user_id'])
+            };
+        },
+
+        componentWillReceiveProps(newProps, oldProps){
+            this.setState({
+                internalUser:newProps.shareModel.getSharedUser(newProps.linkData['internal_user_id'])
+            });
+        },
+
+        buildLabel: function(){
+            var link = this.props.linkData;
+
+            var status;
+            if(!link.invitation){
+                status = 'not sent';
+            }else {
+                if(link.invitation.STATUS == 1){
+                    status = 'pending';
+                }else if(link.invitation.STATUS == 2){
+                    status = 'accepted';
+                }else if(link.invitation.STATUS == 4){
+                    status = 'rejected';
+                }
+            }
+
+            var host = link.HOST || link.invitation.HOST;
+            var user = link.USER || link.invitation.USER;
+            return user + " @ " + host + " (" + status + ")";
+        },
+
+        removeUser: function(){
+            this.props.onRemoveUser(this.props.linkData['hash']);
+        },
+
+        onUpdateRight:function(event){
+            var target = event.target;
+            this.props.onUserUpdate('update_right', this.state.internalUser.ID, {right:target.name, add:target.checked});
+        },
+
+        render: function(){
+            var menuItems = [{text:'Remove', callback:this.removeUser}];
+            return (
+                <UserBadge
+                    label={this.buildLabel()}
+                    avatar={null}
+                    type={"remote_user"}
+                    menus={menuItems}
+                >
+                    <span className="user-badge-rights-container">
+                        <input type="checkbox" name="read" checked={this.state.internalUser.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="write" checked={this.state.internalUser.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
+                    </span>
+                </UserBadge>
+            );
+        }
+
     });
 
     /**************************/

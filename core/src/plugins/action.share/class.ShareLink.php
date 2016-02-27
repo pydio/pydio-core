@@ -192,7 +192,8 @@ class ShareLink
             "public"            => $minisiteIsPublic?"true":"false",
             "disable_download"  => $dlDisabled,
             "hash"              => $this->getHash(),
-            "hash_is_shorten"   => isSet($shareMeta["short_form_url"])
+            "hash_is_shorten"   => isSet($shareMeta["short_form_url"]),
+            "internal_user_id"   => (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"])
         );
 
         if(!isSet($storedData["TARGET"]) || $storedData["TARGET"] == "public"){

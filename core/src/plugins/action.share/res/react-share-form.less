@@ -197,6 +197,15 @@ div#react_share_form {
     margin-left: 50px;
     margin-right: 11px;
     padding-top: 1px;
+    display: flex;
+    flex-direction: row;
+    .user-badge-label {
+      flex: 5;
+      padding: 13px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     &:last-of-type {
       border-bottom: 0;
     }
@@ -240,7 +249,6 @@ div#react_share_form {
       width: @width2;
     }
     div.user-badge-menu-box {
-      float: right;
       font-size: 13px;
       position: relative;
       div.mui-menu.mui-visible {
@@ -297,6 +305,11 @@ div#react_share_form {
 
 div.react-autosuggest {
   padding-left: 4px;
+  li.react-autosuggest__suggestion{
+    .user-badge{
+      display: block !important;
+    }
+  }
   .react-autosuggest__suggestion--focused {
     background-color: aliceblue;
   }

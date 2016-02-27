@@ -108,6 +108,21 @@
             return sharedData;
         }
 
+        getSharedUser(userId){
+            var data = [], user = null;
+            if(this._pendingData['entries']){
+                data = this._pendingData['entries'];
+            }else if(this._data['entries']){
+                data = this._data['entries'];
+            }
+            data.map(function(entry){
+                if(entry['ID'] == userId) {
+                    user = entry;
+                }
+            });
+            return user;
+        }
+
         getSharedUsersAsObjects(){
             var map = {};
             this.getSharedUsers().map(function(uData){
@@ -275,6 +290,25 @@
             return result;
         }
 
+        userEntryForLink(linkId){
+            var linkData;
+            if(this._pendingData["ocs_links"] && this._pendingData["ocs_links"][linkId]){
+                linkData = this._pendingData["ocs_links"][linkId];
+            }else{
+                for(var key in this._data['links']){
+                    if(!this._data['links'].hasOwnProperty(key)) continue;
+                    if(this._data['links'][key]['hash'] == linkId){
+                        linkData = this._data['links'][key];
+                    }
+                }
+            }
+            if(linkData && linkData['internal_user_id']){
+                return this.getSharedUser(linkData['internal_user_id']);
+            }
+            return false;
+        }
+
+
         findPendingKeyForLink(linkId, key){
             var result;
             try{
@@ -356,20 +390,26 @@
             if(permissions && permissions[name] !== undefined){
                 return permissions[name];
             }
+            var userEntry = this.userEntryForLink(linkId);
             var current;
             var defaults = {
                 read : (!this._previewEditors || this._previewEditors.length > 0),
                 download: true,
                 write:false
             };
-            if(this._data['links'] && this._data['links'][linkId]){
-                var json = this._data;
+            var json;
+            if(this._data['ocs_links'] && this._data['ocs_links'][linkId]) {
+                json = this._data['ocs_links'][linkId];
+            }else if(this._data['links'] && this._data['links'][linkId]){
+                json = this._data['links'][linkId];
+            }
+            if(json){
                 if(name == 'download'){
-                    current = ! json['links'][linkId]['disable_download'];
+                    current = ! json['disable_download'];
                 }else if(name == 'read'){
-                    current = (json.entries[0].RIGHT.indexOf('r') !== -1 && json['links'][linkId]['minisite_layout']!='ajxp_unique_dl');
+                    current = (userEntry.RIGHT.indexOf('r') !== -1 && json['minisite_layout']!='ajxp_unique_dl');
                 }else if(name == 'write'){
-                    current = (json.entries[0].RIGHT.indexOf('w') !== -1);
+                    current = (userEntry.RIGHT.indexOf('w') !== -1);
                 }
             }else{
                 current = defaults[name];
@@ -389,11 +429,12 @@
             this._setStatus('modified');
         }
 
-        _permissionsToParameters(linkId, params){
+        _permissionsToParameters(linkId, params, isSharedLink = false){
+            console.log(linkId);
             if(this.getPublicLinkPermission(linkId, 'read')){
                 params['simple_right_read'] = 'on';
             }
-            if(this.getPublicLinkPermission(linkId, 'download')){
+            if(!isSharedLink && this.getPublicLinkPermission(linkId, 'download')){
                 params['simple_right_download'] = 'on';
             }
             if(this.getPublicLinkPermission(linkId, 'write')){
@@ -454,7 +495,7 @@
                 HOST:host,
                 USER:user
             };
-            this._setStatus("modified");
+            this.save();
         }
 
         removeRemoteLink(linkId){
@@ -482,7 +523,7 @@
             }
             this.getOcsLinks().map(function(link){
                 var pLinkId = link.hash;
-                this._permissionsToParameters(pLinkId, link);
+                this._permissionsToParameters(pLinkId, link, true);
                 this._expirationsToParameters(pLinkId, link);
                 this._passwordAsParameter(pLinkId, link);
                 this._templateToParameter(pLinkId, link);
@@ -556,7 +597,8 @@
             var publicLinks = this.getPublicLinks();
             if(publicLinks.length){
                 var pLinkId = publicLinks[0]['hash'];
-                params['guest_user_id'] = this._data.entries[0].ID;
+                var userEntry = this.userEntryForLink(pLinkId);
+                params['guest_user_id'] = userEntry['internal_user_id'];
                 params['hash'] = pLinkId;
                 // PUBLIC LINKS
                 this._permissionsToParameters(pLinkId, params);

@@ -170,6 +170,22 @@ div#react_share_form div.user-badge {
   margin-left: 50px;
   margin-right: 11px;
   padding-top: 1px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+}
+div#react_share_form div.user-badge .user-badge-label {
+  -webkit-box-flex: 5;
+  -webkit-flex: 5;
+          flex: 5;
+  padding: 13px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 div#react_share_form div.user-badge:last-of-type {
   border-bottom: 0;
@@ -210,7 +226,6 @@ div#react_share_form div.user-badge img {
   width: 32px;
 }
 div#react_share_form div.user-badge div.user-badge-menu-box {
-  float: right;
   font-size: 13px;
   position: relative;
 }
@@ -264,6 +279,9 @@ div#react_share_form a.revert-button {
 }
 div.react-autosuggest {
   padding-left: 4px;
+}
+div.react-autosuggest li.react-autosuggest__suggestion .user-badge {
+  display: block !important;
 }
 div.react-autosuggest .react-autosuggest__suggestion--focused {
   background-color: aliceblue;
