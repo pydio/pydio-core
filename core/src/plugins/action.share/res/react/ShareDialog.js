@@ -54,6 +54,12 @@
         },
 
         showMailer:function(subject, message, users = []){
+            if(ReactModel.Share.forceMailerOldSchool()){
+                subject = encodeURIComponent(subject);
+                message = encodeURIComponent(message);
+                global.location.href = "mailto:custom-email@domain.com?Subject="+subject+"&Body="+message;
+                return;
+            }
             global.ResourcesManager.loadClassesAndApply(['PydioMailer'], function(){
                 this.setState({
                     mailerData: {
@@ -80,6 +86,7 @@
         render: function(){
             var model = this.state.model;
             var panels = [];
+            var showMailer = ReactModel.Share.mailerActive() ? this.showMailer : null;
             var auth = ReactModel.Share.getAuthorizations(this.props.pydio);
             if((model.getNode().isLeaf() && auth.file_public_link) || (!model.getNode().isLeaf() && auth.folder_public_link)){
                 var publicLinks = model.getPublicLinks();
@@ -89,7 +96,7 @@
                 panels.push(
                     <ReactMUI.Tab key="public-link" label={'Public Link' + (model.hasPublicLink()?' (active)':'')}>
                         <PublicLinkPanel
-                            showMailer={this.showMailer}
+                            showMailer={showMailer}
                             linkData={linkData}
                             pydio={this.props.pydio}
                             shareModel={model}
@@ -105,7 +112,7 @@
                 panels.push(
                     <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
                         <UsersPanel
-                            showMailer={this.showMailer}
+                            showMailer={showMailer}
                             shareModel={model}
                         />
                     </ReactMUI.Tab>
@@ -115,7 +122,7 @@
                 panels.push(
                     <ReactMUI.Tab  key="share-permissions" label="Advanced">
                         <AdvancedPanel
-                            showMailer={this.showMailer}
+                            showMailer={showMailer}
                             pydio={this.props.pydio}
                             shareModel={model}
                         />
@@ -128,6 +135,7 @@
                     onDismiss={this.dismissMailer}
                     overlay={true}
                     className="share-center-mailer"
+                    panelTitle={this.props.pydio.MessageHash["share_center.45"]}
                 />);
             }
 
@@ -187,9 +195,10 @@
     /**************************/
     var UsersPanel = React.createClass({
         propTypes:{
-            shareModel:React.PropTypes.instanceOf(ReactModel.Share)
+            shareModel:React.PropTypes.instanceOf(ReactModel.Share),
+            showMailer:React.PropTypes.func
         },
-        onUsersUpdate: function(operation, userId, userData){
+        onUserUpdate: function(operation, userId, userData){
             this.props.shareModel.updateSharedUser(operation, userId, userData);
         },
         onSaveSelection:function(){
@@ -216,19 +225,27 @@
             );
         },
 
+        sendInvitations:function(userObjects){
+            var mailData = this.props.shareModel.prepareEmail("repository");
+            this.props.showMailer(mailData.subject, mailData.message, userObjects);
+        },
+
         render: function(){
             var currentUsers = this.props.shareModel.getSharedUsers();
             const excludes = currentUsers.map(function(u){return u.ID});
             return (
                 <div style={{padding:'30px 20px 10px'}}>
                     <UsersCompleter.Input
+                        fieldLabel="Pick a user or create one"
                         renderSuggestion={this.completerRenderSuggestion}
                         onValueSelected={this.valueSelected}
                         excludes={excludes}
                     />
                     <SharedUsersBox
                         users={currentUsers}
-                        onUsersUpdate={this.onUsersUpdate}
+                        userObjects={this.props.shareModel.getSharedUsersAsObjects()}
+                        sendInvitations={this.props.showMailer ? this.sendInvitations : null}
+                        onUserUpdate={this.onUserUpdate}
                         saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
                     />
                     <RemoteUsers shareModel={this.props.shareModel}/>
@@ -336,22 +353,45 @@
     var SharedUsersBox = React.createClass({
         propTypes: {
             users:React.PropTypes.array.isRequired,
-            onUsersUpdate:React.PropTypes.func.isRequired,
-            saveSelectionAsTeam:React.PropTypes.func
+            userObjects:React.PropTypes.object.isRequired,
+            onUserUpdate:React.PropTypes.func.isRequired,
+            saveSelectionAsTeam:React.PropTypes.func,
+            sendInvitations:React.PropTypes.func
+        },
+        sendInvitationToAllUsers:function(){
+            this.props.sendInvitations(this.props.userObjects);
+        },
+        clearAllUsers:function(){
+            this.props.users.map(function(entry){
+                this.props.onUserUpdate('remove', entry.ID, entry);
+            }.bind(this));
         },
         render: function(){
             // sort by group/user then by ID;
             const userEntries = this.props.users.sort(function(a,b) {
                 return (b.TYPE == "group") ? 1 : ((a.TYPE == "group") ? -1 : (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
             } ).map(function(u){
-                return <SharedUserEntry userEntry={u} key={u.ID} onUserUpdate={this.props.onUsersUpdate}/>
+                return <SharedUserEntry
+                    userEntry={u}
+                    userObject={this.props.userObjects[u.ID]}
+                    key={u.ID}
+                    shareModel={this.props.shareModel}
+                    onUserUpdate={this.props.onUserUpdate}
+                    sendInvitations={this.props.sendInvitations}
+                />
             }.bind(this));
+            var actionLinks = [];
+            if(this.props.users.length){
+                actionLinks.push(<a key="clear" onClick={this.clearAllUsers}>Remove All</a>);
+            }
+            if(this.props.sendInvitations && this.props.users.length){
+                actionLinks.push(<a key="invite" onClick={this.sendInvitationToAllUsers}>Send Invitation</a>);
+            }
             if(this.props.saveSelectionAsTeam && this.props.users.length > 1){
-                var saveSelection = (
-                    <div className="save-as-team-container">
-                        <a onClick={this.props.saveSelectionAsTeam}>Save users as a team</a>
-                    </div>
-                );
+                actionLinks.push(<a key="team" onClick={this.props.saveSelectionAsTeam}>Save as a Team</a>);
+            }
+            if(actionLinks.length){
+                var linkActions = <div className="additional-actions-links">{actionLinks}</div>;
             }
             var rwHeader;
             if(this.props.users.length){
@@ -372,7 +412,7 @@
                 <div style={{marginTop: 10}}>
                     {rwHeader}
                     <div>{userEntries}</div>
-                    {saveSelection}
+                    {linkActions}
                 </div>
             );
         }
@@ -381,7 +421,9 @@
     var SharedUserEntry = React.createClass({
         propTypes: {
             userEntry:React.PropTypes.object.isRequired,
-            onUserUpdate:React.PropTypes.func.isRequired
+            userObject:React.PropTypes.instanceOf(PydioUsers.User).isRequired,
+            onUserUpdate:React.PropTypes.func.isRequired,
+            sendInvitations:React.PropTypes.func
         },
         onRemove:function(){
             this.props.onUserUpdate('remove', this.props.userEntry.ID, this.props.userEntry);
@@ -390,7 +432,9 @@
             this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:'watch', add:!this.props.userEntry['WATCH']});
         },
         onInvite:function(){
-
+            var targets = {};
+            targets[this.props.userObject.getId()] = this.props.userObject;
+            this.props.sendInvitations(targets);
         },
         onUpdateRight:function(event){
             var target = event.target;
@@ -400,7 +444,9 @@
             var menuItems = [];
             if(this.props.userEntry.TYPE != 'group'){
                 menuItems.push({text:'Notify on content changes', callback:this.onToggleWatch, checked:this.props.userEntry.WATCH});
-                menuItems.push({text:'Send invitation', callback:this.onInvite});
+                if(this.props.sendInvitations){
+                    menuItems.push({text:'Send invitation', callback:this.onInvite});
+                }
             }
             menuItems.push({text:'Remove', callback:this.onRemove});
             return (
@@ -512,9 +558,22 @@
             var publicLinkPanes;
             if(this.props.linkData){
                 publicLinkPanes = [
-                    <PublicLinkField showMailer={this.props.showMailer} linkData={this.props.linkData} shareModel={this.props.shareModel} editAllowed={this.props.authorizations.editable_hash} />,
-                    <PublicLinkPermissions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-perm" />,
-                    <PublicLinkSecureOptions linkData={this.props.linkData} shareModel={this.props.shareModel} key="public-secure" />
+                    <PublicLinkField
+                        showMailer={this.props.showMailer}
+                        linkData={this.props.linkData}
+                        shareModel={this.props.shareModel}
+                        editAllowed={this.props.authorizations.editable_hash}
+                        key="public-link"
+                    />,
+                    <PublicLinkPermissions
+                        linkData={this.props.linkData}
+                        shareModel={this.props.shareModel}
+                        key="public-perm" />,
+                    <PublicLinkSecureOptions
+                        linkData={this.props.linkData}
+                        shareModel={this.props.shareModel}
+                        key="public-secure"
+                    />
                 ];
             }else{
                 publicLinkPanes = [
@@ -599,7 +658,8 @@
         },
 
         openMailer: function(){
-            this.props.showMailer('Subject', 'Message', []);
+            var mailData = this.props.shareModel.prepareEmail("link", this.props.linkData.hash);
+            this.props.showMailer(mailData.subject, mailData.message, []);
         },
 
         render: function(){
@@ -615,9 +675,6 @@
                     </div>
                 );
             }else{
-                if(editAllowed){
-                    var editButton = <span className="custom-link-button icon-edit-sign" title="Customize link last part" onClick={this.toggleEditMode}/>;
-                }
                 var copyButton = <span ref="copy-button" className="copy-link-button icon-paste" title="Copy link to clipboard"/>;
                 var setHtml = function(){
                     return {__html:this.state.copyMessage};
@@ -625,6 +682,20 @@
                 var focus = function(e){
                     e.target.select();
                 };
+                var actionLinks = [];
+                if(this.props.showMailer){
+                    actionLinks.push(<a key="invitation" onClick={this.openMailer}>Send Invitation</a>);
+                }
+                if(editAllowed){
+                    actionLinks.push(<a key="customize" onClick={this.toggleEditMode}>Customize link</a>);
+                }
+                if(actionLinks.length){
+                    actionLinks = (
+                        <div className="additional-actions-links">{actionLinks}</div>
+                    ) ;
+                }else{
+                    actionLinks = null;
+                }
                 return (
                     <div className="public-link-container">
                         <ReactMUI.TextField
@@ -634,9 +705,9 @@
                             ref="public-link-field"
                             value={publicLink}
                             onFocus={focus}
-                        /> {editButton} {copyButton}
+                        /> {copyButton}
                         <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
-                        <span onClick={this.openMailer}>Send Invitation</span>
+                        {actionLinks}
                     </div>
                 );
             }

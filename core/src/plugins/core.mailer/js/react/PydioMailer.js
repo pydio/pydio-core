@@ -19,20 +19,47 @@
  */
 (function(global){
 
+    var DestBadge = React.createClass({
+        propTypes:{
+            user:React.PropTypes.instanceOf(PydioUsers.User)
+        },
+        render: function(){
+            const userObject = this.props.user;
+            return (
+                <div className={"user-badge user-type-" + (userObject.getTemporary() ? "tmp_user" : "user")}>
+                    <span className={"avatar icon-" + (userObject.getTemporary()?"envelope":"user")}/>
+                    <span className="user-badge-label">{userObject.getExtendedLabel() || userObject.getLabel()}</span>
+                </div>
+            );
+        }
+    });
+
     var UserEntry = React.createClass({
         propTypes:{
-            id:React.PropTypes.string,
-            label:React.PropTypes.string,
+            user:React.PropTypes.instanceOf(PydioUsers.User),
             onRemove:React.PropTypes.func
         },
         remove: function(){
-            this.props.onRemove(this.props.id);
+            this.props.onRemove(this.props.user.getId());
+        },
+        toggleRemove:function(){
+            var current = this.state && this.state.remove;
+            this.setState({remove:!current});
         },
         render:function(){
+            var icon, className = 'pydio-mailer-user ' + 'user-type-' + (this.props.user.getTemporary() ? "email" : "user");
+            var clik = function(){};
+            if(this.state && this.state.remove){
+                clik = this.remove;
+                icon = <span className="avatar icon-remove"/>;
+                className += ' remove';
+            }else{
+                icon = <span className={"avatar icon-" + (this.props.user.getTemporary()?"envelope":"user")}/>;
+            }
             return (
-                <div className="pydio-mailer-user">
-                    {this.props.label}
-                    <span className="icon-remove" onClick={this.remove}/>
+                <div className={className} onMouseOver={this.toggleRemove} onMouseOut={this.toggleRemove} onClick={clik}>
+                    {icon}
+                    {this.props.user.getLabel()}
                 </div>
             );
         }
@@ -47,14 +74,16 @@
             onDismiss:React.PropTypes.func,
             className:React.PropTypes.string,
             overlay:React.PropTypes.bool,
-            users:React.PropTypes.object
+            users:React.PropTypes.object,
+            panelTitle:React.PropTypes.string
         },
 
         getInitialState: function(){
             return {
                 users:this.props.users || {},
                 subject:this.props.subject,
-                message:this.props.message
+                message:this.props.message,
+                errorMessage:null
             };
         },
 
@@ -71,10 +100,10 @@
             this.setState({message:event.currentTarget.getValue()});
         },
 
-        addUser: function(userId, userLabel){
+        addUser: function(userId, userLabel, type, userObject){
             var users = this.state.users;
-            users[userId] = userLabel || userId ;
-            this.setState({users:users});
+            users[userId] = userObject;
+            this.setState({users:users, errorMessage:null});
         },
 
         removeUser: function(userId){
@@ -83,6 +112,10 @@
         },
 
         postEmail : function(){
+            if(!Object.keys(this.state.users).length){
+                this.setState({errorMessage:'Please pick a user or a mail address'});
+                return;
+            }
             var params = {
                 get_action:"send_mail",
                 'emails[]': Object.keys(this.state.users),
@@ -94,40 +127,48 @@
             }
             var client = PydioApi.getClient();
             client.request(params, function(transport){
-                client.parseXmlMessage(transport.responseXML);
-            });
+                const res = client.parseXmlMessage(transport.responseXML);
+                if(res !== false){
+                    this.props.onDismiss();
+                }
+            }.bind(this));
         },
 
         usersLoaderRenderSuggestion(userObject){
-            return (
-                <div>{userObject.getExtendedLabel() || userObject.getLabel()}</div>
-            );
+            return <DestBadge user={userObject}/> ;
         },
 
         render: function(){
             const className = [this.props.className, "react-mailer", "react-mui-context", "reset-pydio-forms"].join(" ");
             const users = Object.keys(this.state.users).map(function(uId){
                 return (
-                    <UserEntry key={uId} id={uId} label={this.state.users[uId]} onRemove={this.removeUser}/>
+                    <UserEntry key={uId} user={this.state.users[uId]} onRemove={this.removeUser}/>
                 );
             }.bind(this));
+            if(this.state.errorMessage){
+                var errorDiv = <div className="error">{this.state.errorMessage}</div>
+            }
             var content = (
                 <div className={className}>
-                    <div>
+                    <h3>{this.props.panelTitle}</h3>
+                    {errorDiv}
+                    <div className="users-block">
                         <UsersCompleter.Input
+                            fieldLabel="Pick a user or type an address"
                             usersOnly={true}
                             existingOnly={true}
+                            freeValueAllowed={true}
                             onValueSelected={this.addUser}
                             excludes={Object.keys(this.state.users)}
                             renderSuggestion={this.usersLoaderRenderSuggestion}
                         />
                         <div className="pydio-mailer-users">{users}</div>
-                        <ReactMUI.TextField floatingLabelText="Subjet" value={this.state.subject} onChange={this.updateSubject}/>
-                        <ReactMUI.TextField floatingLabelText="Message" value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
-                        <div>
-                            <ReactMUI.FlatButton label="Close" onClick={this.props.onDismiss}/>
-                            <ReactMUI.FlatButton primary={true} label="Send" onClick={this.postEmail}/>
-                        </div>
+                    </div>
+                    <ReactMUI.TextField floatingLabelText="Subjet" value={this.state.subject} onChange={this.updateSubject}/>
+                    <ReactMUI.TextField floatingLabelText="Message" value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
+                    <div style={{textAlign:'right'}}>
+                        <ReactMUI.FlatButton label="Cancel" onClick={this.props.onDismiss}/>
+                        <ReactMUI.FlatButton primary={true} label="Send" onClick={this.postEmail}/>
                     </div>
                 </div>
             );

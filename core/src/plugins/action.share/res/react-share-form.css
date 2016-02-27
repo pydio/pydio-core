@@ -38,16 +38,18 @@ div#react_share_form .suggest-search.icon-search {
   right: 15px;
   top: 2px;
 }
-div#react_share_form .save-as-team-container {
+div#react_share_form .additional-actions-links {
   text-align: right;
   margin-top: 6px;
   padding-right: 15px;
 }
-div#react_share_form .save-as-team-container a {
+div#react_share_form .additional-actions-links a {
   color: #c1c1c1;
   text-decoration: underline;
   font-size: 14px;
   cursor: pointer;
+  display: inline-block;
+  margin-left: 10px;
 }
 div#react_share_form .form-legend {
   color: #bbb;
@@ -80,7 +82,7 @@ div#react_share_form .public-link-container {
   margin: 16px 0 6px;
 }
 div#react_share_form .public-link-container .public-link {
-  width: 300px;
+  width: 337px;
   font-size: 18px;
 }
 div#react_share_form .public-link-container .public-link input {
@@ -117,11 +119,11 @@ div#react_share_form .public-link-container .copy-link-button:hover {
 }
 div#react_share_form .public-link-container .copy-link-button {
   font-size: 13px !important;
-  margin-top: 18px;
+  margin-top: 15px;
   background-color: #ddd;
   color: #F1F1F1;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 0;
 }
 div#react_share_form .public-link-container .copy-link-button:hover {
   background-color: #47b092;
@@ -129,6 +131,9 @@ div#react_share_form .public-link-container .copy-link-button:hover {
 }
 div#react_share_form .public-link-container .section-legend {
   margin-top: 10px;
+}
+div#react_share_form .public-link-container .additional-actions-links {
+  text-align: center;
 }
 div#react_share_form .password-container,
 div#react_share_form .expires {
@@ -250,6 +255,12 @@ div#react_share_form div.remote-users-add button.mui-icon-button {
 }
 div#react_share_form div.remote-users-add button.mui-icon-button.mui-is-disabled {
   color: #eee;
+}
+div#react_share_form a.revert-button {
+  color: #bbb;
+  display: inline-block;
+  margin-right: 5px;
+  cursor: pointer;
 }
 div.react-autosuggest {
   padding-left: 4px;

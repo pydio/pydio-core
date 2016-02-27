@@ -108,6 +108,21 @@
             return sharedData;
         }
 
+        getSharedUsersAsObjects(){
+            var map = {};
+            this.getSharedUsers().map(function(uData){
+                map[uData.ID] = new PydioUsers.User(
+                    uData["ID"], uData["LABEL"], uData["TYPE"]
+                );
+            });
+            return map;
+        }
+
+        getSharedUserAsObject(userId){
+            const map = this.getSharedUsersAsObjects();
+            return map[userId];
+        }
+
         updateSharedUser(operation, userId, userData){
             this._initPendingData();
             if(userData['ID']) {
@@ -409,7 +424,6 @@
         setTemplate(linkId, tplName){
             this._initPendingData();
             this._pendingData["links"][linkId]["layout"] = tplName;
-            console.log(this._pendingData);
             this._setStatus('modified');
         }
 
@@ -478,49 +492,8 @@
                 }
                 ocsData.LINKS.push(link);
             }.bind(this));
-            console.log(ocsData);
             params["ocs_data"] = JSON.stringify(ocsData);
         }
-
-        /*
-        hasOcsData(){
-            return this._data["ocs"] ? true : false;
-        }
-
-        getOcsInvitations(){
-            if(this._pendingData && this._pendingData["ocs_invitations"]){
-                return this._pendingData["ocs_invitations"];
-            }else{
-                return this._data["ocs"] ? this._data["ocs"]["invitations"] : [];
-            }
-        }
-
-        addOcsInvitation(host, user){
-            this._initPendingData();
-            this._pendingData["ocs_invitations"].push({HOST:host, USER:user, TMP_ID:Math.random()});
-            this._setStatus("modified");
-        }
-
-        removeOcsInvitation(invitation){
-            var update = [];
-            this.getOcsInvitations().map(function(i){
-                if((invitation.TMP_ID && i.TMP_ID && invitation.TMP_ID == i.TMP_ID )
-                    || (invitation.INVITATION_ID && i.INVITATION_ID && invitation.INVITATION_ID == i.INVITATION_ID)
-                ){
-                    return null;
-                }
-                update.push(i);
-            });
-            this._pendingData["ocs_invitations"] = update;
-            this._setStatus("modified");
-        }
-
-        _ocsDataToParameters(params){
-            var newData = this._data["ocs"] || {};
-            newData["invitations"] = this.getOcsInvitations();
-            params["ocs_data"] = JSON.stringify(newData);
-        }
-        */
 
         /*********************************/
         /* GENERIC: STATUS / LOAD / SAVE */
@@ -709,34 +682,49 @@
                 values.push({LAYOUT_NAME:name, LAYOUT_ELEMENT:element, LAYOUT_LABEL: label});
             });
             return values;
-            /*
-            var read;
-            if(node.isLeaf() && linkRightsToTemplates && values["unique_preview_file"] && values["unique_preview_download"]){
-                read = oForm.down("#simple_right_read");
-                var download = oForm.down("#simple_right_download");
-                var observer = function(){
-                    if(!read.checked && !download.checked){
-                        download.checked = true;
-                    }
-                    if(read.checked){
-                        chooser.setValue(values["unique_preview_file"]);
-                    }else{
-                        chooser.setValue(values["unique_preview_download"]);
-                    }
-                };
-                read.observe("click", observer);
-                download.observe("click", observer);
 
-            }else if(noEditorsFound){
-                read = oForm.down("#simple_right_read");
-                read.checked = false;
-                read.disabled = true;
-                read.next("label").insert(" (no preview for this file)");
+        }
+
+        static mailerActive(){
+            return global.pydio.Registry.hasPluginOfType("mailer");
+        }
+
+        static forceMailerOldSchool(){
+            return global.pydio.getPluginConfigs("action.share").get("EMAIL_INVITE_EXTERNAL");
+        }
+
+        prepareEmail(shareType, linkId = null){
+            var MessageHash = global.pydio.MessageHash;
+            var ApplicationTitle = global.pydio.appTitle;
+
+            var s, message, link = '';
+            if(shareType == "link"){
+                s = MessageHash["share_center.42"];
+                if(s) s = s.replace("%s", ApplicationTitle);
+                link = this.getPublicLink(linkId);
+                message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
+            }else{
+                s = MessageHash["share_center." + (this.getNode().isLeaf() ? "42" : "43")];
+                if(s) s = s.replace("%s", ApplicationTitle);
+                if(this._data['repository_url']){
+                    link = this._data['repository_url'];
+                }
+                //if(this.shareFolderMode == 'workspace'){
+                message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                //}else{
+                //    message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46" + (this.currentNode.isLeaf()?'_file':'_mini')].replace("%s1", this._currentRepositoryLabel) + "</a>";
+                //}
             }
-            return chooser;
-
-            */
-
+            var usersList = null;
+            if(this.shareFolderMode == 'workspace' && oForm) {
+                usersList = oForm.down(".editable_users_list");
+            }
+            var subject = MessageHash["share_center.44"].replace("%s", ApplicationTitle);
+            var panelTitle = MessageHash["share_center.45"];
+            return {
+                subject: subject,
+                message: message
+            };
 
         }
 

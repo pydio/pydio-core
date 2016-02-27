@@ -24,18 +24,26 @@
         propTypes:{
             renderSuggestion:React.PropTypes.func.isRequired,
             onValueSelected:React.PropTypes.func.isRequired,
+            fieldLabel:React.PropTypes.string.isRequired,
             excludes:React.PropTypes.array.isRequired,
             usersOnly:React.PropTypes.bool,
-            existingOnly:React.PropTypes.bool
+            existingOnly:React.PropTypes.bool,
+            freeValueAllowed:React.PropTypes.bool
         },
 
         getInitialState:function(){
-            return {createUser: null};
+            return {createUser: null, showComplete: true};
         },
 
         getSuggestions(input, callback){
             var excludes = this.props.excludes;
+            var disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
             PydioUsers.Client.authorizedUsersStartingWith(input, function(users){
+                if(disallowTemporary){
+                    users = users.filter(function(user){
+                        return !user.getTemporary();
+                    });
+                }
                 if(excludes && excludes.length){
                     users = users.filter(function(user){
                         return excludes.indexOf(user.getId()) == -1;
@@ -54,18 +62,20 @@
             var suggestion = userObject.asObject();
             var blur = true;
             if(suggestion.group){
-                this.props.onValueSelected(suggestion.group, suggestion.label, 'group');
+                this.props.onValueSelected(suggestion.group, suggestion.label, 'group', userObject);
             }else if(suggestion.id) {
-                this.props.onValueSelected(suggestion.id, suggestion.label, suggestion.external?'tmp_user':'user');
+                this.props.onValueSelected(suggestion.id, suggestion.label, suggestion.external?'tmp_user':'user', userObject);
             }else if(suggestion.temporary){
                 this.setState({createUser:suggestion.label});
                 blur = false;
             }
             if(blur){
-                this.refs.autosuggest.refs.input.getDOMNode().blur();
-                global.setTimeout(function(){
-                    this.refs.autosuggest.refs.input.getDOMNode().blur();
-                }.bind(this), 50);
+                this.setState({showComplete: false}, function(){
+                    global.setTimeout(function(){
+                        this.refs['autosuggest'].refs['input'].getDOMNode().blur();
+                        this.setState({showComplete: true});
+                    }.bind(this), 10);
+                });
             }
         },
 
@@ -74,8 +84,10 @@
             var prefix = PydioUsers.Client.getCreateUserPostPrefix();
             var values = this.refs['creationForm'].getValuesForPost(prefix);
             PydioUsers.Client.createUserFromPost(values, function(values){
-                var display = values[prefix + 'USER_DISPLAY_NAME'] || values[prefix + 'new_user_id'];
-                this.props.onValueSelected(values[prefix + 'new_user_id'], display, 'user');
+                var id = values[prefix + 'new_user_id'];
+                var display = values[prefix + 'USER_DISPLAY_NAME'] || id;
+                var fakeUser = new PydioUsers.User(id, display, 'user');
+                this.props.onValueSelected(id, display, 'user', fakeUser);
                 this.setState({createUser:null});
             }.bind(this));
 
@@ -108,7 +120,7 @@
                     id: 'users-autosuggest',
                     name: 'users-autosuggest',
                     className: 'react-autosuggest__input',
-                    placeholder: 'Filter users or create one...',
+                    placeholder: this.props.fieldLabel,
                     value: ''   // Initial value
                 };
                 return (
@@ -117,7 +129,7 @@
                         <ReactAutoSuggest
                             ref="autosuggest"
                             cache={false}
-                            showWhen = {input => true }
+                            showWhen = {input => this.state.showComplete }
                             inputAttributes={inputAttributes}
                             suggestions={this.getSuggestions}
                             suggestionRenderer={this.props.renderSuggestion}

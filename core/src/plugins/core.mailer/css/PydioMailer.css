@@ -11,21 +11,52 @@ div.react-mailer-overlay {
 div.react-mailer-overlay div.react-mailer {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   margin: 16px;
-  padding: 16px;
+  padding: 20px;
+}
+div.react-mailer h3 {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-bottom: 10px !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-size: 24px !important;
+}
+div.react-mailer .error {
+  color: rgba(218, 22, 45, 0.84);
+}
+div.react-mailer .users-block .react-autosuggest {
+  padding-left: 0;
+  border-bottom: 1px solid #e2e2e2;
+  margin-bottom: 5px;
+}
+div.react-mailer .users-block .react-autosuggest #users-autosuggest {
+  padding-left: 0 !important;
+  padding-bottom: 3px !important;
+}
+div.react-mailer .mui-text-field {
+  width: 100%;
+}
+div.react-mailer textarea {
+  font-size: 16px !important;
 }
 div.react-mailer .pydio-mailer-users .pydio-mailer-user {
   display: inline-block;
   padding: 5px 12px;
   margin-right: 4px;
   margin-bottom: 4px;
-  background-color: #999;
   color: white;
   border-radius: 2px;
   font-weight: 500;
+  background-color: #4aceb0;
+  cursor: pointer;
 }
-div.react-mailer .pydio-mailer-users .pydio-mailer-user span.icon-remove {
+div.react-mailer .pydio-mailer-users .pydio-mailer-user.user-type-email {
+  background-color: #438db3;
+}
+div.react-mailer .pydio-mailer-users .pydio-mailer-user:hover {
+  background-color: rgba(218, 22, 45, 0.84);
+}
+div.react-mailer .pydio-mailer-users .pydio-mailer-user span.avatar {
   color: white;
   display: inline-block;
-  margin-left: 10px;
-  cursor: pointer;
+  margin-right: 5px;
 }

@@ -54,7 +54,7 @@ div#react_share_form {
     right: 15px;
     top: 2px;
   }
-  .save-as-team-container{
+  .additional-actions-links{
     text-align: right;
     margin-top: 6px;
     padding-right: 15px;
@@ -63,6 +63,8 @@ div#react_share_form {
       text-decoration: underline;
       font-size: 14px;
       cursor: pointer;
+      display: inline-block;
+      margin-left: 10px;
     }
   }
   .form-legend {
@@ -95,7 +97,7 @@ div#react_share_form {
     border-radius: 8px;
     margin: 16px 0 6px;
     .public-link{
-      width: 300px;
+      width: 337px;
       font-size: 18px;
       input{
         text-align: center;
@@ -136,11 +138,11 @@ div#react_share_form {
     }
     .copy-link-button{
       font-size: 13px !important;
-      margin-top: 18px;
+      margin-top: 15px;
       background-color: #ddd;
       color: #F1F1F1;
-      padding: 4px;
-      border-radius: 4px;
+      padding: 6px;
+      border-radius: 0;
     }
     .copy-link-button:hover{
       background-color: @color1;
@@ -148,6 +150,9 @@ div#react_share_form {
     }
     .section-legend{
       margin-top: 10px;
+    }
+    .additional-actions-links{
+      text-align: center;
     }
   }
   .password-container,
@@ -281,6 +286,12 @@ div#react_share_form {
         color: #eee;
       }
     }
+  }
+  a.revert-button{
+    color: #bbb;
+    display: inline-block;
+    margin-right: 5px;
+    cursor: pointer;
   }
 }
 

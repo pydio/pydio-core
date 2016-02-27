@@ -55,6 +55,14 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
             bSkipButtons,
             bUseNextButton
         );
+        this._enterKeyEvent = this.enterKeyEvent.bind(this);
+        document.observe("keydown", this._enterKeyEvent);
+    },
+
+    enterKeyEvent:function(keyEvent){
+        if(keyEvent.keyCode == Event.KEY_RETURN){
+            Event.stop(keyEvent);
+        }
     },
 
     cancel: function(oForm){
@@ -93,6 +101,7 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
     },
 
     dialogWillClose: function(oForm){
+        document.stopObserving("keydown", this._enterKeyEvent);
         this.reactComponent = null;
         React.unmountComponentAtNode(oForm.down('#'+this.rootNodeId));
     }
