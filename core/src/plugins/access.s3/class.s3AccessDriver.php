@@ -78,7 +78,7 @@ class s3AccessDriver extends fsAccessDriver
             }
             $sdkVersion = $this->getFilteredOption("SDK_VERSION");
             if ($sdkVersion === "v3") {
-                require_once ("class.PydioS3Client.php");
+                require_once ("class.pydioS3Client.php");
                 $this->s3Client = new AccessS3\S3Client([
                     "version" => $apiVersion,
                     "region"  => $region,
