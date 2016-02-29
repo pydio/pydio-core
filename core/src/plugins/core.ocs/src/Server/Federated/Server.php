@@ -93,6 +93,13 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully received share, waiting for user response.", array("id" => $newShare->getId()));
         $this->sendResponse($response, $this->getFormat($parameters));
 
+        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        if($userRole !== false){
+            // Artificially "touch" user role
+            // to force repositories reload if he is logged in
+            \AuthService::updateRole($userRole);
+        }
+
     }
 
     protected function actionAccept($remoteId, $token, $parameters){
@@ -115,9 +122,17 @@ class Server extends Dummy
         if($token !== $remoteShare->getOcsToken()){
             throw new InvalidArgumentsException();
         }
+        $targetUser = $remoteShare->getUser();
         $store->deleteRemoteShare($remoteShare);
         $response = $this->buildResponse("ok", 200, "Successfully removed share.");
         $this->sendResponse($response, $this->getFormat($parameters));
+
+        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        if($userRole !== false){
+            // Artificially "touch" user role
+            // to force repositories reload if he is logged in
+            \AuthService::updateRole($userRole);
+        }
 
     }
 

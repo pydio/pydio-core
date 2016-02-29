@@ -618,7 +618,12 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
             $newRoles = AuthService::getRolesList(array_keys($this->roles));
             foreach($newRoles as $rId => $newRole){
-                $this->roles[$rId] = $newRoles[$rId];
+                if(strpos($rId, "AJXP_USR_/") === 0){
+                    $this->personalRole = $newRole;
+                    $this->roles[$rId] = $this->personalRole;
+                }else{
+                    $this->roles[$rId] = $newRole;
+                }
             }
             $this->recomputeMergedRole();
             return true;
