@@ -19,7 +19,40 @@
  */
 (function(global) {
 
+    var MessagesConsumerMixin = {
+        contextTypes: {
+            messages:React.PropTypes.object,
+            getMessage:React.PropTypes.func
+        }
+    };
+
+    var MessagesProviderMixin = {
+
+        childContextTypes: {
+            messages:React.PropTypes.object,
+            getMessage:React.PropTypes.func
+        },
+
+        getChildContext: function() {
+            var messages = this.props.pydio.MessageHash;
+            return {
+                messages: messages,
+                getMessage: function(messageId, namespace='share_center'){
+                    try{
+                        return messages[namespace + (namespace?".":"") + messageId] || messageId;
+                    }catch(e){
+                        return messageId;
+                    }
+                }
+            };
+        }
+
+    };
+
+
     var MainPanel = React.createClass({
+
+        mixins:[MessagesProviderMixin],
 
         propTypes: {
             closeAjxpDialog: React.PropTypes.func.isRequired,
@@ -83,6 +116,10 @@
             this.props.closeAjxpDialog();
         },
 
+        getMessage: function(key, namespace = 'share_center'){
+            return this.props.pydio.MessageHash[namespace + (namespace?'.':'') + key];
+        },
+
         render: function(){
             var model = this.state.model;
             var panels = [];
@@ -94,7 +131,7 @@
                     var linkData = publicLinks[0];
                 }
                 panels.push(
-                    <ReactMUI.Tab key="public-link" label={'Public Link' + (model.hasPublicLink()?' (active)':'')}>
+                    <ReactMUI.Tab key="public-link" label={this.getMessage(121) + (model.hasPublicLink()?' (' + this.getMessage(178) + ')':'')}>
                         <PublicLinkPanel
                             showMailer={showMailer}
                             linkData={linkData}
@@ -110,7 +147,7 @@
                 var ocsUsers = model.getOcsLinks();
                 var totalUsers = users.length + ocsUsers.length;
                 panels.push(
-                    <ReactMUI.Tab key="target-users" label={'Users' + (totalUsers?' ('+totalUsers+')':'')}>
+                    <ReactMUI.Tab key="target-users" label={this.getMessage(249, '') + (totalUsers?' ('+totalUsers+')':'')}>
                         <UsersPanel
                             showMailer={showMailer}
                             shareModel={model}
@@ -120,7 +157,7 @@
             }
             if(panels.length > 0){
                 panels.push(
-                    <ReactMUI.Tab  key="share-permissions" label="Advanced">
+                    <ReactMUI.Tab  key="share-permissions" label={this.getMessage(486, '')}>
                         <AdvancedPanel
                             showMailer={showMailer}
                             pydio={this.props.pydio}
@@ -152,16 +189,22 @@
     });
 
     var HeaderPanel = React.createClass({
+        mixins:[MessagesConsumerMixin],
         render: function(){
             return (
                 <div className="headerPanel">
-                    <div style={{fontSize: 24, color:'white', padding:'20px 16px 14px'}}>Share {PathUtils.getBasename(this.props.shareModel.getNode().getPath())}</div>
+                    <div
+                        style={{fontSize: 24, color:'white', padding:'20px 16px 14px'}}
+                    >{this.context.getMessage('44').replace('%s', PathUtils.getBasename(this.props.shareModel.getNode().getPath()))}</div>
                 </div>
             );
         }
     });
 
     var ButtonsPanel = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         propTypes: {
             onClick: React.PropTypes.func.isRequired
         },
@@ -175,15 +218,15 @@
             if(this.props.shareModel.getStatus() == 'modified'){
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
-                        <a className="revert-button" onClick={this.triggerModelRevert}>Revert Changes</a>
-                        <ReactMUI.FlatButton secondary={true} label="Save" onClick={this.triggerModelSave}/>
-                        <ReactMUI.FlatButton secondary={false} label="Close" onClick={this.props.onClick}/>
+                        <a className="revert-button" onClick={this.triggerModelRevert}>{this.context.getMessage('179')}</a>
+                        <ReactMUI.FlatButton secondary={true} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
+                        <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
                     </div>
                 );
             }else{
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
-                        <ReactMUI.FlatButton secondary={false} label="Close" onClick={this.props.onClick}/>
+                        <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
                     </div>
                 );
             }
@@ -194,6 +237,9 @@
     /* USERS PANEL
     /**************************/
     var UsersPanel = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         propTypes:{
             shareModel:React.PropTypes.instanceOf(ReactModel.Share),
             showMailer:React.PropTypes.func
@@ -202,7 +248,7 @@
             this.props.shareModel.updateSharedUser(operation, userId, userData);
         },
         onSaveSelection:function(){
-            var label = window.prompt(global.pydio.MessageHash[510]);
+            var label = window.prompt(this.context.getMessage(510, ''));
             if(!label) return;
             this.props.shareModel.saveSelectionAsTeam(label);
         },
@@ -236,7 +282,7 @@
             return (
                 <div style={{padding:'30px 20px 10px'}}>
                     <UsersCompleter.Input
-                        fieldLabel="Pick a user or create one"
+                        fieldLabel={this.context.getMessage('34')}
                         renderSuggestion={this.completerRenderSuggestion}
                         onValueSelected={this.valueSelected}
                         excludes={excludes}
@@ -354,6 +400,9 @@
     });
 
     var SharedUsersBox = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         propTypes: {
             users:React.PropTypes.array.isRequired,
             userObjects:React.PropTypes.object.isRequired,
@@ -385,13 +434,13 @@
             }.bind(this));
             var actionLinks = [];
             if(this.props.users.length){
-                actionLinks.push(<a key="clear" onClick={this.clearAllUsers}>Remove All</a>);
+                actionLinks.push(<a key="clear" onClick={this.clearAllUsers}>{this.context.getMessage('180')}</a>);
             }
             if(this.props.sendInvitations && this.props.users.length){
-                actionLinks.push(<a key="invite" onClick={this.sendInvitationToAllUsers}>Send Invitation</a>);
+                actionLinks.push(<a key="invite" onClick={this.sendInvitationToAllUsers}>{this.context.getMessage('45')}</a>);
             }
             if(this.props.saveSelectionAsTeam && this.props.users.length > 1){
-                actionLinks.push(<a key="team" onClick={this.props.saveSelectionAsTeam}>Save as a Team</a>);
+                actionLinks.push(<a key="team" onClick={this.props.saveSelectionAsTeam}>{this.context.getMessage('509', '')}</a>);
             }
             if(actionLinks.length){
                 var linkActions = <div className="additional-actions-links">{actionLinks}</div>;
@@ -401,14 +450,14 @@
                 rwHeader = (
                     <div>
                         <div className="shared-users-rights-header">
-                            <span className="read">Read</span>
-                            <span className="read">Modify</span>
+                            <span className="read">{this.context.getMessage('361', '')}</span>
+                            <span className="read">{this.context.getMessage('181')}</span>
                         </div>
                     </div>
                 );
             }else{
                 rwHeader = (
-                    <div className="section-legend" style={{padding:10}}>Use the field above to pick a user from the internal directory or from your personal address book. If you want to create a new user, just type in a new identifier and hit Enter.</div>
+                    <div className="section-legend" style={{padding:10}}>{this.context.getMessage('182')}</div>
                 );
             }
             return (
@@ -422,6 +471,9 @@
     });
 
     var SharedUserEntry = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         propTypes: {
             userEntry:React.PropTypes.object.isRequired,
             userObject:React.PropTypes.instanceOf(PydioUsers.User).isRequired,
@@ -446,12 +498,22 @@
         render: function(){
             var menuItems = [];
             if(this.props.userEntry.TYPE != 'group'){
-                menuItems.push({text:'Notify on content changes', callback:this.onToggleWatch, checked:this.props.userEntry.WATCH});
+                menuItems.push({
+                    text:this.context.getMessage('183'),
+                    callback:this.onToggleWatch,
+                    checked:this.props.userEntry.WATCH
+                });
                 if(this.props.sendInvitations){
-                    menuItems.push({text:'Send invitation', callback:this.onInvite});
+                    menuItems.push({
+                        text:this.context.getMessage('45'),
+                        callback:this.onInvite
+                    });
                 }
             }
-            menuItems.push({text:'Remove', callback:this.onRemove});
+            menuItems.push({
+                text:this.context.getMessage('257', ''),
+                callback:this.onRemove
+            });
             return (
                 <UserBadge
                     label={this.props.userEntry.LABEL || this.props.userEntry.ID }
@@ -469,6 +531,8 @@
     });
 
     var RemoteUsers = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
 
         propTypes:{
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
@@ -509,11 +573,12 @@
             }.bind(this));
             return (
                 <div>
-                    <h3>Remote Users</h3>
+                    <h3>{this.context.getMessage('207')}</h3>
+                    <div className="section-legend">{this.context.getMessage('208')}</div>
                     <div className="remote-users-add reset-pydio-forms">
-                        <ReactMUI.TextField className="host" ref="host" floatingLabelText="Remote Host" onChange={this.monitorInput}/>
-                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText="RemoteUser" onChange={this.monitorInput}/>
-                        <ReactMUI.IconButton tooltip="Add" iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
+                        <ReactMUI.TextField className="host" ref="host" floatingLabelText={this.context.getMessage('209')} onChange={this.monitorInput}/>
+                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText={this.context.getMessage('210')} onChange={this.monitorInput}/>
+                        <ReactMUI.IconButton tooltip={this.context.getMessage('45')} iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
                     </div>
                     <div>{inv}</div>
                 </div>
@@ -523,6 +588,8 @@
     });
 
     var RemoteUserEntry = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
 
         propTypes:{
             shareModel:React.PropTypes.instanceOf(ReactModel.Share),
@@ -548,16 +615,17 @@
 
             var status;
             if(!link.invitation){
-                status = 'not sent';
+                status = '214';
             }else {
                 if(link.invitation.STATUS == 1){
-                    status = 'pending';
+                    status = '211';
                 }else if(link.invitation.STATUS == 2){
-                    status = 'accepted';
+                    status = '212';
                 }else if(link.invitation.STATUS == 4){
-                    status = 'rejected';
+                    status = '213';
                 }
             }
+            status = this.context.getMessage(status);
 
             var host = link.HOST || link.invitation.HOST;
             var user = link.USER || link.invitation.USER;
@@ -574,7 +642,10 @@
         },
 
         render: function(){
-            var menuItems = [{text:'Remove', callback:this.removeUser}];
+            var menuItems = [{
+                text:this.context.getMessage('257', ''),
+                callback:this.removeUser
+            }];
             return (
                 <UserBadge
                     label={this.buildLabel()}
@@ -596,6 +667,8 @@
     /* PUBLIC LINK PANEL
      /**************************/
     var PublicLinkPanel = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
 
         propTypes: {
             linkData:React.PropTypes.object,
@@ -633,13 +706,13 @@
                 ];
             }else{
                 publicLinkPanes = [
-                    <div className="section-legend" style={{marginTop:20}}>This file is not currently publicly accessible. Enabling a public link will create a unique access that you can send to anyone. If you want to share with existing Pydio users, use the "Users" tab.</div>
+                    <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('190')}</div>
                 ];
             }
 
             return (
                 <div style={{padding:16}} className="reset-pydio-forms">
-                    <ReactMUI.Checkbox onCheck={this.toggleLink} checked={!!this.props.linkData} label="Enable Public Link"/>
+                    <ReactMUI.Checkbox onCheck={this.toggleLink} checked={!!this.props.linkData} label={this.context.getMessage('189')}/>
                     {publicLinkPanes}
                 </div>
             );
@@ -647,6 +720,9 @@
     });
 
     var PublicLinkField = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         propTypes: {
             linkData:React.PropTypes.object.isRequired,
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
@@ -681,7 +757,7 @@
                     }.bind(this)
                 });
                 this._clip.on('success', function(){
-                    this.setState({copyMessage:'Link has been copied to clipboard!'}, this.clearCopyMessage);
+                    this.setState({copyMessage:this.context.getMessage('192')}, this.clearCopyMessage);
                 }.bind(this));
                 this._clip.on('error', function(){
                     var copyMessage;
@@ -727,11 +803,11 @@
                         <span>{publicLink.split('://')[0]}://[..]/{PathUtils.getBasename(PathUtils.getDirname(publicLink)) + '/'}</span>
                         <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink || this.props.linkData['hash']}/>
                         <ReactMUI.RaisedButton label="Ok" onClick={this.toggleEditMode}/>
-                        <div className="section-legend">You can customize the last part of the link.</div>
+                        <div className="section-legend">{this.context.getMessage('194')}</div>
                     </div>
                 );
             }else{
-                var copyButton = <span ref="copy-button" className="copy-link-button icon-paste" title="Copy link to clipboard"/>;
+                var copyButton = <span ref="copy-button" className="copy-link-button icon-paste" title={this.context.getMessage('191')}/>;
                 var setHtml = function(){
                     return {__html:this.state.copyMessage};
                 }.bind(this);
@@ -740,10 +816,10 @@
                 };
                 var actionLinks = [];
                 if(this.props.showMailer){
-                    actionLinks.push(<a key="invitation" onClick={this.openMailer}>Send Invitation</a>);
+                    actionLinks.push(<a key="invitation" onClick={this.openMailer}>{this.context.getMessage('45')}</a>);
                 }
                 if(editAllowed){
-                    actionLinks.push(<a key="customize" onClick={this.toggleEditMode}>Customize link</a>);
+                    actionLinks.push(<a key="customize" onClick={this.toggleEditMode}>{this.context.getMessage('193')}</a>);
                 }
                 if(actionLinks.length){
                     actionLinks = (
@@ -772,6 +848,8 @@
 
     var PublicLinkPermissions = React.createClass({
 
+        mixins:[MessagesConsumerMixin],
+
         propTypes: {
             linkData: React.PropTypes.object.isRequired,
             shareModel: React.PropTypes.instanceOf(ReactModel.Share)
@@ -786,18 +864,18 @@
         render: function(){
             var linkId = this.props.linkData.hash;
             var perms = [], previewWarning;
-            perms.push({NAME:'read',LABEL:'Preview'});
-            perms.push({NAME:'download', LABEL:'Download'});
+            perms.push({NAME:'read',LABEL:this.context.getMessage('72')});
+            perms.push({NAME:'download', LABEL:this.context.getMessage('73')});
             if(!this.props.shareModel.getNode().isLeaf()){
-                perms.push({NAME:'write', LABEL:'Upload'});
+                perms.push({NAME:'write', LABEL:this.context.getMessage('74')});
             }
             if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission(linkId, 'read')){
-                previewWarning = <div>Warning, there is no embedded viewer for this file, except opening in a new tab of your browser: this may trigger a download automatically when user opens the link.</div>;
+                previewWarning = <div>{this.context.getMessage('195')}</div>;
             }
             return (
                 <div>
-                    <h3>Permissions</h3>
-                    <div className="section-legend">How users are allowed to preview/modify content.</div>
+                    <h3>{this.context.getMessage('71')}</h3>
+                    <div className="section-legend">{this.context.getMessage('70r')}</div>
                     <div style={{margin:'10px 0 20px'}}>
                         {perms.map(function(p){
                             return (
@@ -820,6 +898,8 @@
     });
 
     var PublicLinkSecureOptions = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
 
         propTypes: {
             linkData: React.PropTypes.object.isRequired,
@@ -850,11 +930,11 @@
             var passwordField;
             if(this.props.shareModel.hasHiddenPassword(linkId)){
                 var resetPassword = (
-                    <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label="Reset Password"/>
+                    <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label={this.context.getMessage('174')}/>
                 );
                 passwordField = (
                     <ReactMUI.TextField
-                        floatingLabelText="Password Protection"
+                        floatingLabelText={this.context.getMessage('23')}
                         disabled={true}
                         value={'********'}
                         onChange={this.updatePassword}
@@ -863,7 +943,7 @@
             }else{
                 passwordField = (
                     <PydioForm.ValidPassword
-                        attributes={{label:"Password Protection"}}
+                        attributes={{label:this.context.getMessage('23')}}
                         value={this.props.shareModel.getPassword(linkId)}
                         onChange={this.updatePassword}
                     />
@@ -871,8 +951,8 @@
             }
             return (
                 <div>
-                    <h3>Secure Access</h3>
-                    <div className="section-legend">Protect the link with a password, or make it expire automatically.</div>
+                    <h3>{this.context.getMessage('196')}</h3>
+                    <div className="section-legend">{this.context.getMessage('24')}</div>
                     <div className="password-container">
                         <div style={{width:'50%', display:'inline-block'}}>
                             {passwordField}
@@ -884,13 +964,13 @@
                     <div className="expires">
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
-                                   floatingLabelText="Expire after (days)"
+                                   floatingLabelText={this.context.getMessage('21')}
                                    value={this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days')}
                                    onChange={this.updateDaysExpirationField}/>
                             </div>
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
-                               floatingLabelText="Expire after (downloads)"
+                               floatingLabelText={this.context.getMessage('22')}
                                value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                                onChange={this.updateDLExpirationField}
                             />
@@ -929,6 +1009,8 @@
 
     var LabelDescriptionPanel = React.createClass({
 
+        mixins:[MessagesConsumerMixin],
+
         updateLabel: function(event){
             this.props.shareModel.setGlobal("label", event.currentTarget.value);
         },
@@ -941,19 +1023,19 @@
             if(!this.props.shareModel.getNode().isLeaf()){
                 var label = (
                     <ReactMUI.TextField
-                        floatingLabelText="Label"
+                        floatingLabelText={this.context.getMessage('35')}
                         name="label"
                         onChange={this.updateLabel}
                         value={this.props.shareModel.getGlobal('label')}
                     />
                 );
                 var labelLegend = (
-                    <div className="form-legend">Title displayed to the user</div>
+                    <div className="form-legend">{this.context.getMessage('146')}</div>
                 );
             }
             return (
                 <div className="reset-pydio-forms">
-                    <h3 style={{paddingTop:0}}>Additional description</h3>
+                    <h3 style={{paddingTop:0}}>{this.context.getMessage('145')}</h3>
                     <div className="label-desc-edit">
                         {label}
                         {labelLegend}
@@ -963,7 +1045,7 @@
                             onChange={this.updateDescription}
                             value={this.props.shareModel.getGlobal('description')}
                         />
-                        <div className="form-legend">Add an optional comment</div>
+                        <div className="form-legend">{this.context.getMessage('197')}</div>
                     </div>
                 </div>
             );
@@ -972,15 +1054,17 @@
 
     var NotificationPanel = React.createClass({
 
+        mixins:[MessagesConsumerMixin],
+
         dropDownChange:function(event, index, item){
             this.props.shareModel.setGlobal('watch', (index!=0));
         },
 
         render: function(){
             var menuItems = [
-                {payload:'no_watch', text:'Do not notify me'},
-                {payload:'watch_read', text:'Notify me when share is accessed'},
-                {payload:'watch_write', text:'Notify me when share is modified'}
+                {payload:'no_watch', text:this.context.getMessage('187')},
+                {payload:'watch_read', text:this.context.getMessage('184')}
+                /*,{payload:'watch_write', text:'Notify me when share is modified'}*/
             ];
             var selectedIndex = this.props.shareModel.getGlobal('watch') ? 1 : 0;
             return (
@@ -993,13 +1077,15 @@
                         selectedIndex={selectedIndex}
                         onChange={this.dropDownChange}
                     />
-                    <div className="form-legend">Be alerted whenever a user accesses a file.</div>
+                    <div className="form-legend">{this.context.getMessage('188')}</div>
                 </div>
             );
         }
     });
 
     var PublicLinkTemplate = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
 
         propTypes:{
             linkData:React.PropTypes.object
@@ -1021,7 +1107,7 @@
             });
             return (
                 <div>
-                    <h3>Link Layout</h3>
+                    <h3>{this.context.getMessage('151')}</h3>
                     <ReactMUI.DropDownMenu
                         autoWidth={false}
                         className="full-width"
@@ -1029,13 +1115,16 @@
                         selectedIndex={crtIndex}
                         onChange={this.onDropDownChange}
                     />
-                    <div className="form-legend">You can select the appearance of the link as it will appear in the browser.</div>
+                    <div className="form-legend">{this.context.getMessage('198')}</div>
                 </div>
             );
         }
     });
 
     var VisibilityPanel = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
         toggleVisibility: function(){
             this.props.shareModel.toggleVisibility();
         },
@@ -1046,10 +1135,14 @@
             var currentIsOwner = global.pydio.user.id == this.props.shareModel.getShareOwner();
 
             var legend;
-            if(currentIsOwner){
-                legend = "Other users who access to the current workspace can update the links parameters, but they cannot delete it. Only you can stop this share or toggle its visibility";
+            if(this.props.shareModel.isPublic()){
+                if(currentIsOwner){
+                    legend = this.context.getMessage('201');
+                }else{
+                    legend = this.context.getMessage('202');
+                }
             }else{
-                legend = "Other users who access to the current workspace can update the links parameters. You are not the owner of the share so you cannot delete it or toggle its visibility";
+                legend = this.context.getMessage('206');
             }
             var showToggle = (
                 <div>
@@ -1058,7 +1151,7 @@
                            disabled={!currentIsOwner}
                            onCheck={this.toggleVisibility}
                            checked={this.props.shareModel.isPublic()}
-                           label="Visible to other users"
+                           label={this.context.getMessage('200')}
                     />
                     <div className="section-legend">{legend}</div>
                 </div>
@@ -1066,10 +1159,10 @@
             if(this.props.shareModel.isPublic() && currentIsOwner){
                 var showTransfer = (
                     <div className="ownership-form">
-                        <h4>Transfer Ownership</h4>
-                        <div className="section-legend">If the share is publicly visible and you want another user to manage this share, you can transfer its ownership.</div>
+                        <h4>{this.context.getMessage('203')}</h4>
+                        <div className="section-legend">{this.context.getMessage('204')}</div>
                         <div>
-                            <ReactMUI.TextField ref="newOwner" floatingLabelText="Transfer to ... (user identifier)"/>
+                            <ReactMUI.TextField ref="newOwner" floatingLabelText={this.context.getMessage('205')}/>
                             <ReactMUI.RaisedButton label="Transfer" onClick={this.transferOwnership}/>
                         </div>
                     </div>
@@ -1077,7 +1170,7 @@
             }
             return (
                 <div className="reset-pydio-forms">
-                    <h3>Share Visibility</h3>
+                    <h3>{this.context.getMessage('199')}</h3>
                     {showToggle}
                     {showTransfer}
                 </div>

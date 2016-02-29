@@ -26,5 +26,5 @@ $mess = array(
     "5" => "To",
     "6" => "Subject",
     "7" => "Message",
-    "8" => "User or email",
+    "8" => "Pick a user or type an address",
 );

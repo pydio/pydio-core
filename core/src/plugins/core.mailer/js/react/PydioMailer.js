@@ -111,6 +111,16 @@
             this.setState({users:this.state.users});
         },
 
+        getMessage: function(messageId, nameSpace = undefined){
+            try{
+                if(nameSpace === undefined) nameSpace = 'core.mailer';
+                if(nameSpace) nameSpace += ".";
+                return global.pydio.MessageHash[ nameSpace + messageId ];
+            }catch(e){
+                return messageId;
+            }
+        },
+
         postEmail : function(){
             if(!Object.keys(this.state.users).length){
                 this.setState({errorMessage:'Please pick a user or a mail address'});
@@ -119,8 +129,8 @@
             var params = {
                 get_action:"send_mail",
                 'emails[]': Object.keys(this.state.users),
-                mailer_input_field:'Subject of the mail',
-                message:this.props.message
+                mailer_input_field:this.state.subject,
+                message:this.state.message
             };
             if(this.props.link){
                 params['link'] = this.props.link;
@@ -154,7 +164,7 @@
                     {errorDiv}
                     <div className="users-block">
                         <UsersCompleter.Input
-                            fieldLabel="Pick a user or type an address"
+                            fieldLabel={this.getMessage('8')}
                             usersOnly={true}
                             existingOnly={true}
                             freeValueAllowed={true}
@@ -164,11 +174,11 @@
                         />
                         <div className="pydio-mailer-users">{users}</div>
                     </div>
-                    <ReactMUI.TextField floatingLabelText="Subjet" value={this.state.subject} onChange={this.updateSubject}/>
-                    <ReactMUI.TextField floatingLabelText="Message" value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
+                    <ReactMUI.TextField floatingLabelText={this.getMessage('6')} value={this.state.subject} onChange={this.updateSubject}/>
+                    <ReactMUI.TextField floatingLabelText={this.getMessage('7')} value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
                     <div style={{textAlign:'right'}}>
-                        <ReactMUI.FlatButton label="Cancel" onClick={this.props.onDismiss}/>
-                        <ReactMUI.FlatButton primary={true} label="Send" onClick={this.postEmail}/>
+                        <ReactMUI.FlatButton label={this.getMessage('54', '')} onClick={this.props.onDismiss}/>
+                        <ReactMUI.FlatButton primary={true} label={this.getMessage('77', '')} onClick={this.postEmail}/>
                     </div>
                 </div>
             );
