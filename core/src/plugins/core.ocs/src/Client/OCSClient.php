@@ -43,21 +43,27 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public function sendInvitation(ShareInvitation $invitation)
     {
+        $url = rtrim($invitation->getTargetHost(), "/");
+        $path = parse_url($url, PHP_URL_PATH);
+        if($path == "/") $path = "";
+
         $client = new GuzzleClient([
-            'base_url' => $invitation->getTargetHost()
+            'base_url' => $url."/"
         ]);
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post($endpoints['share'], [
-            'body' => [
-                'shareWith' => $invitation->getTargetUser(),
-                'token' => $invitation->getLinkHash(),
-                'name' => $invitation->getDocumentName(),
-                'remoteId' => $invitation->getId(),
-                'owner' => $invitation->getOwner(),
-                'remote' => AJXP_Utils::detectServerUrl()
-            ]
+        $body = [
+            'shareWith' => $invitation->getTargetUser(),
+            'token' => $invitation->getLinkHash(),
+            'name' => $invitation->getDocumentName(),
+            'remoteId' => $invitation->getId(),
+            'owner' => $invitation->getOwner(),
+            'remote' => AJXP_Utils::detectServerUrl()
+        ];
+
+        $response = $client->post($path.$endpoints['share'], [
+            'body' => $body
         ]);
 
         if ($response->getStatusCode() != 200) {
@@ -71,19 +77,23 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      * Cancels a sent invitation
      *
-     * @param ShareInvitation $inviation
-     * @return boolean success
+     * @param ShareInvitation $invitation
+     * @return bool success
      * @throws \Exception
      */
     public function cancelInvitation(ShareInvitation $invitation)
     {
+        $url = rtrim($invitation->getTargetHost(), "/");
+        $path = parse_url($url, PHP_URL_PATH);
+        if($path == "/") $path = "";
+
         $client = new GuzzleClient([
-            'base_url' => $invitation->getTargetHost()
+            'base_url' => $url."/"
         ]);
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post($endpoints['share'] . '/' . $invitation->getId() . '/unshare', [
+        $response = $client->post($path.$endpoints['share'] . '/' . $invitation->getId() . '/unshare', [
             'body' => [
                 'token' => $invitation->getLinkHash()
             ]
@@ -157,7 +167,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public static function findEndpointsForURL($url) {
         $client = new GuzzleClient([
-            'base_url' => $url
+            'base_url' => rtrim($url, "/") . "/"
         ]);
 
         return self::findEndpointsForClient($client);
