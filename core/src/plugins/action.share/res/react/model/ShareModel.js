@@ -584,7 +584,6 @@
             }else if(this.getPublicLinks().length){
                 params["enable_public_link"] = "true";
             }
-            params['repo_label'] = this._node.getLabel();
             params["file"] = this._node.getPath();
             if(this._data['repositoryId']){
                 params['repository_id'] = this._data['repositoryId'];
@@ -593,6 +592,9 @@
                 params['create_guest_user'] =  'true';
             }
             this._globalsAsParameters(params);
+            if(!params['repo_label']){
+                params['repo_label'] = this._node.getLabel();
+            }
 
             var publicLinks = this.getPublicLinks();
             if(publicLinks.length){
