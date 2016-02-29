@@ -187,13 +187,17 @@ class ShareLink
         $minisiteIsPublic = isSet($storedData["PRELOG_USER"]);
         $dlDisabled = isSet($storedData["DOWNLOAD_DISABLED"]) && $storedData["DOWNLOAD_DISABLED"] === true;
         $shareMeta = isSet($this->additionalMeta) ? $this->additionalMeta : array();
+        $internalUserId = (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"]);
+        if(empty($internalUserId)){
+            throw new Exception("Oups, link ".$this->getHash()." has no internal user id, this is not normal.");
+        }
 
         $jsonData = array(
             "public"            => $minisiteIsPublic?"true":"false",
             "disable_download"  => $dlDisabled,
             "hash"              => $this->getHash(),
             "hash_is_shorten"   => isSet($shareMeta["short_form_url"]),
-            "internal_user_id"   => (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"])
+            "internal_user_id"   => $internalUserId
         );
 
         if(!isSet($storedData["TARGET"]) || $storedData["TARGET"] == "public"){

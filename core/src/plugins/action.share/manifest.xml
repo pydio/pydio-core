@@ -35,6 +35,7 @@
             <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
             <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
+            <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
         </resources>
     </client_settings>
@@ -431,16 +432,14 @@
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
-                            if(!pydio.getController().shareCenter) {
-                                pydio.getController().shareCenter = new ShareCenter();
-                            }
-                            if(window.actionArguments && window.actionArguments.length){
-                                pydio.getController().shareCenter.performShareAction(window.actionArguments[0]);
-                            }else if(window.actionManager){
-                                pydio.getController().shareCenter.performShareAction(window.actionManager.getDataModel());
-                            }
-                        });
+                        var dataModel;
+                        if(window.actionArguments && window.actionArguments.length){
+                            dataModel = window.actionArguments[0];
+                        }else if(window.actionManager){
+                            dataModel = window.actionManager.getDataModel();
+                        }
+                        var dialog = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {selection:dataModel});
+                        dialog.openDialog('react_share_form', true);
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -534,7 +533,7 @@
         </actions>
         <client_configs>
             <component_config className="InfoPanel">
-                <infoPanelExtension mime="meta:ajxp_shared" attributes="" modifier="ShareCenter.prototype.loadInfoPanel">
+                <infoPanelExtension mime="meta:ajxp_shared" attributes="" modifier="ShareInfoPanel.loader">
                     <messages>
                         <message key="type_string" id="share_center.50"/>
                     </messages>

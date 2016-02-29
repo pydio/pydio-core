@@ -82,7 +82,7 @@
             return {
                 status: 'idle',
                 mailerData: false,
-                model: new ReactModel.Share(this.props.pydio, this.props.selection)
+                model: new ReactModel.Share(this.props.pydio, this.props.selection.getUniqueNode())
             };
         },
 
@@ -762,9 +762,9 @@
                 this._clip.on('error', function(){
                     var copyMessage;
                     if( global.navigator.platform.indexOf("Mac") === 0 ){
-                        copyMessage = global.pydio.MessageHash['share_center.144'];
+                        copyMessage = this.context.getMessage('144');
                     }else{
-                        copyMessage = global.pydio.MessageHash['share_center.143'];
+                        copyMessage = this.context.getMessage('143');
                     }
                     this.refs['public-link-field'].focus();
                     this.setState({copyMessage:copyMessage}, this.clearCopyMessage);

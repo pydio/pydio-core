@@ -2,19 +2,15 @@
 
     class ShareModel extends Observable {
 
-
-        constructor(pydio, userSelection){
+        constructor(pydio, node){
             super();
-            this._userSelection = userSelection;
-            this._node = userSelection.getUniqueNode();
+            this._node = node;
             this._status = 'idle';
-            this._edit = false;
             this._data = {link:{}};
             this._pendingData = {};
             this._pydio = pydio;
             if(this._node.getMetadata().get('ajxp_shared')){
                 this.load();
-                this._edit = true;
             }
             if(this._node.isLeaf()){
                 this._previewEditors = pydio.Registry.findEditorsForMime(this._node.getAjxpMime()).filter(function(entry){
@@ -551,9 +547,11 @@
             if(this._status == 'loading') return;
             this._setStatus('loading');
             ShareModel.loadSharedElementData(this._node, function(transport){
-                this._data = transport.responseJSON;
-                this._pendingData = {};
-                this._setStatus('idle');
+                if(transport.responseJSON){
+                    this._data = transport.responseJSON;
+                    this._pendingData = {};
+                    this._setStatus('idle');
+                }
             }.bind(this));
         }
 
@@ -584,7 +582,13 @@
             }else if(this.getPublicLinks().length){
                 params["enable_public_link"] = "true";
             }
-            params["file"] = this._node.getPath();
+            if(this._node.getMetadata().get('shared_element_hash')){
+                params["tmp_repository_id"] = this._node.getMetadata().get('shared_element_parent_repository');
+                params["file"] = this._node.getMetadata().get("original_path");
+            }else{
+                params["file"] = this._node.getPath();
+            }
+
             if(this._data['repositoryId']){
                 params['repository_id'] = this._data['repositoryId'];
             }else{
@@ -655,12 +659,13 @@
                 merged      : 'true'
             };
             if(meta.get('shared_element_hash')){
-                options["hash"] = meta.get('shared_element_hash');
+                //options["hash"] = meta.get('shared_element_hash');
+                //options["element_type"] = meta.get('share_type');
                 options["tmp_repository_id"] = meta.get('shared_element_parent_repository');
-                options["element_type"] = meta.get('share_type');
+                options["file"] = meta.get("original_path");
             }else{
                 options["file"] = node.getPath();
-                options["element_type"] = node.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository";
+                //options["element_type"] = node.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository";
             }
             PydioApi.getClient().request(options, completeCallback, errorCallback, settings);
         }

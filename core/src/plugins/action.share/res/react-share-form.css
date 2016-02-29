@@ -325,3 +325,53 @@ div.react-autosuggest input#users-autosuggest {
   height: 100%;
   width: 100%;
 }
+div#ajxp_shared_info_panel .infoPanelLabel {
+  color: black;
+}
+div#ajxp_shared_info_panel input.share_info_panel_link {
+  box-sizing: border-box;
+  width: 100%;
+}
+div#ajxp_shared_info_panel .copy-button {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.87);
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 0 2px 2px 0;
+}
+div#ajxp_shared_info_panel .copy-message {
+  text-align: center;
+  font-size: 13px;
+}
+div#ajxp_shared_info_panel .uUserEntry {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  font-size: 0.8em;
+  padding: 2px 0;
+  color: black;
+}
+div#ajxp_shared_info_panel .uUserEntry:last-of-type {
+  border-bottom: 0;
+}
+div#ajxp_shared_info_panel .uUserEntry .uLabel {
+  -webkit-box-flex: 5;
+  -webkit-flex: 5;
+          flex: 5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div#ajxp_shared_info_panel .uUserEntry .uRight,
+div#ajxp_shared_info_panel .uUserEntry .uStatus {
+  display: none;
+  font-size: 0.8em;
+  color: #6D6D6D;
+}
+div#ajxp_shared_info_panel .uUserEntry:hover .uRight,
+div#ajxp_shared_info_panel .uUserEntry:hover .uStatus {
+  display: inline;
+}

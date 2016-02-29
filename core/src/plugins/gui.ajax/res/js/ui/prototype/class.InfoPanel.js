@@ -503,8 +503,9 @@ Class.create("InfoPanel", AjxpPane, {
             }
             this.insertedTemplates.push(registeredTemplates[i]);
 			if(tModifier){
-                var cContainer = this.contentContainer;
-                ResourcesManager.detectModuleToLoadAndApply(tModifier, function(){
+                const cContainer = this.contentContainer;
+                var className = tModifier.split('.',1).shift();
+                ResourcesManager.loadClassesAndApply([className], function(){
                     if(!cContainer) return;
                     try{
                         var modifierFunc = eval(tModifier);
