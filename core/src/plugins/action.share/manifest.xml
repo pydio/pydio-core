@@ -42,8 +42,8 @@
         <actions>
             <action name="share_react">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden" actionBar="true" actionBarGroup="change" contextMenu="true" infoPanel="false"/>
-                    <selectionContext dir="true" file="true" recycle="false" unique="false"/>
+                    <context selection="true" dir="true" recycle="hidden" actionBar="true" actionBarGroup="get,info_panel_share" contextMenu="true"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
@@ -58,6 +58,22 @@
                     <clientForm id="react_share_form"><![CDATA[
                         <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>
+                </processing>
+            </action>
+            <action name="share-edit-shared">
+                <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
+                    <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(!pydio.getController().shareDialogLoader) {
+                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
+                                selection:pydio.getUserSelection()
+                            });
+                        }
+                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
+                    ]]></clientCallback>
                 </processing>
             </action>
             <action name="share">
@@ -291,6 +307,7 @@
                     </serverCallback>
                     </processing>
             </action>
+            <!--
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
                     <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
@@ -355,6 +372,7 @@
                     ]]></clientCallback>
                 </processing>
             </action>
+            -->
             <action name="load_shared_element_data">
                 <processing>
                     <serverCallback methodName="switchAction" restParams="/file+" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
