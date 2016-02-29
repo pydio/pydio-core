@@ -57,12 +57,12 @@ class OCSPlugin extends \AJXP_Plugin{
 
     }
 
-    public function route($endpoint, $uriParts, $parameters){
+    public function route($baseUri, $endpoint, $uriParts, $parameters){
 
         if($endpoint == "dav" && $this->federatedEnabled()){
 
             $server = new Server\Dav\Server();
-            $server->start("/ocs/v2/dav");
+            $server->start($baseUri."/ocs/v2/dav");
 
         }else if($endpoint == "shares" && $this->federatedEnabled()){
 

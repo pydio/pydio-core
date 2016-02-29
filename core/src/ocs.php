@@ -41,7 +41,12 @@ $configs = $coreLoader->getConfigs();
 
 $uri = $_SERVER["REQUEST_URI"];
 $parts = explode("/", trim(parse_url($uri, PHP_URL_PATH), "/"));
+$baseUri = array();
 $root = array_shift($parts);
+while(!in_array($root, array("ocs-provider", "ocs")) && count($parts)){
+    $baseUri[] = $root;
+    $root = array_shift($parts);
+}
 if( $root == "ocs-provider"){
 
     $services = array();
@@ -50,18 +55,25 @@ if( $root == "ocs-provider"){
 }else if($root == "ocs"){
 
     if(count($parts) < 2){
-        $response = $coreLoader->buildResponse("fail", "400", "Wrong URI");
-        $coreLoader->sendResponse($response);
+        $d = new \Pydio\OCS\Server\Dummy();
+        $response = $d->buildResponse("fail", "400", "Wrong URI");
+        $d->sendResponse($response);
         return;
     }
 
     $version = array_shift($parts);
     if($version != "v2"){
-        $response = $coreLoader->buildResponse("fail", "400", "Api version not supported - Please switch to v2.");
-        $coreLoader->sendResponse($response);
+        $d = new \Pydio\OCS\Server\Dummy();
+        $response = $d->buildResponse("fail", "400", "Api version not supported - Please switch to v2.");
+        $d->sendResponse($response);
         return;
     }
     $endpoint = array_shift($parts);
-    $coreLoader->route($endpoint, $parts, array_merge($_GET, $_POST));
+    if(count($baseUri)){
+        $baseUriStr = "/".implode("/", $baseUri);
+    }else{
+        $baseUriStr = "";
+    }
+    $coreLoader->route($baseUriStr, $endpoint, $parts, array_merge($_GET, $_POST));
 
 }
