@@ -59,7 +59,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'name' => $invitation->getDocumentName(),
             'remoteId' => $invitation->getId(),
             'owner' => $invitation->getOwner(),
-            'remote' => AJXP_Utils::detectServerUrl()
+            'remote' => AJXP_Utils::detectServerUrl(true)
         ];
 
         $response = $client->post($path.$endpoints['share'], [
@@ -190,7 +190,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             throw new \Exception('Could not get OCS Provider endpoints');
         }
 
-        $contentType = $response->getHeader('Content-Type');
+        $contentType = array_shift(explode(";", $response->getHeader('Content-Type')));
         if (array_search($contentType, ['text/json', 'application/json']) !== false) {
             $response = $response->json();
         } else if (array_search($contentType, ['text/xml', 'application/xml']) !== false) {
