@@ -140,7 +140,7 @@ class Client extends CoreClient
             );
         } catch (NotFound $e) {
             return false;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 
@@ -179,7 +179,7 @@ class Client extends CoreClient
                 ],
                 1
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 
