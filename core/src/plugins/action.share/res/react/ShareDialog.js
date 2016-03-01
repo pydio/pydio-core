@@ -634,26 +634,22 @@
             });
         },
 
+        getStatus:function(){
+            var link = this.props.linkData;
+            if(!link.invitation) return -1;
+            else return link.invitation.STATUS;
+        },
+
+        getStatusString: function(){
+            const statuses = {'s-1':214, 's1':211, 's2':212, 's4':213};
+            return this.context.getMessage(statuses['s'+this.getStatus()]);
+        },
+
         buildLabel: function(){
             var link = this.props.linkData;
-
-            var status;
-            if(!link.invitation){
-                status = '214';
-            }else {
-                if(link.invitation.STATUS == 1){
-                    status = '211';
-                }else if(link.invitation.STATUS == 2){
-                    status = '212';
-                }else if(link.invitation.STATUS == 4){
-                    status = '213';
-                }
-            }
-            status = this.context.getMessage(status);
-
             var host = link.HOST || link.invitation.HOST;
             var user = link.USER || link.invitation.USER;
-            return user + " @ " + host + " (" + status + ")";
+            return user + " @ " + host ;
         },
 
         removeUser: function(){
@@ -673,6 +669,21 @@
                     callback:this.removeUser
                 }];
             }
+            var status = this.getStatus();
+            var additionalItem;
+            if(status == 2){
+                additionalItem = (
+                    <span className="user-badge-rights-container">
+                        <input type="checkbox" name="read"  disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="write" disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
+                    </span>
+                );
+            }else{
+                additionalItem = (
+                    <span className="user-badge-rights-container">{this.getStatusString()}</span>
+                );
+            }
+
             return (
                 <UserBadge
                     label={this.buildLabel()}
@@ -680,10 +691,7 @@
                     type={"remote_user"}
                     menus={menuItems}
                 >
-                    <span className="user-badge-rights-container">
-                        <input type="checkbox" name="read"  disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
-                        <input type="checkbox" name="write" disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
-                    </span>
+                    {additionalItem}
                 </UserBadge>
             );
         }

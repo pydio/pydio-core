@@ -426,7 +426,6 @@
         }
 
         _permissionsToParameters(linkId, params, isSharedLink = false){
-            console.log(linkId);
             if(this.getPublicLinkPermission(linkId, 'read')){
                 params['simple_right_read'] = 'on';
             }

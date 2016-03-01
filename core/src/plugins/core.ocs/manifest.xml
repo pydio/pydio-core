@@ -11,4 +11,18 @@
         <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
                       description="CONF_MESSAGE[Enable Federated Sharing]" default="true" mandatory="true" expose="true"/>
     </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="accept_invitation">
+                <processing>
+                    <serverCallback methodName="applyActions" restParams="/remote_share_id" />
+                </processing>
+            </action>
+            <action name="reject_invitation">
+                <processing>
+                    <serverCallback methodName="applyActions" restParams="/remote_share_id" />
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
 </ajxp_plugin>

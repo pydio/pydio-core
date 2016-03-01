@@ -44,7 +44,7 @@ interface IStore
      * @param $invitationId
      * @return ShareInvitation|null
      */
-    public function invitationById(string $invitationId);
+    public function invitationById($invitationId);
 
     /**
      * Delete an invitation

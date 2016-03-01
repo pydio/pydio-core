@@ -117,7 +117,7 @@ class OCSClient implements IFederated, IServiceDiscovery
     public function acceptInvitation(RemoteShare $remoteShare)
     {
         $client = new GuzzleClient([
-            'base_url' => $remoteShare->getOcsServiceUrl()
+            'base_url' => $remoteShare->getOcsServiceUrl()."/"
         ]);
 
         $response = $client->post($remoteShare->getOcsRemoteId() . '/accept', [
@@ -144,7 +144,7 @@ class OCSClient implements IFederated, IServiceDiscovery
     public function declineInvitation(RemoteShare $remoteShare)
     {
         $client = new GuzzleClient([
-            'base_url' => $remoteShare->getOcsServiceUrl()
+            'base_url' => $remoteShare->getOcsServiceUrl()."/"
         ]);
 
         $response = $client->post($remoteShare->getOcsRemoteId() . '/decline', [

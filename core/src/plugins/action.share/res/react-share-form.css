@@ -267,6 +267,9 @@ div#react_share_form div.user-badge div.user-badge-menu-box div.mui-menu span.ic
 div#react_share_form div.user-badge span.user-badge-rights-container {
   float: right;
   padding: 11px;
+  color: gray;
+  font-size: 11px;
+  line-height: 25px;
 }
 div#react_share_form div.user-badge span.user-badge-rights-container input[name="write"] {
   margin-left: 28px;

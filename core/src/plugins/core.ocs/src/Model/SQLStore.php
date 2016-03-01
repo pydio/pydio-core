@@ -72,7 +72,7 @@ class SQLStore implements IStore
      * @param $invitationId
      * @return ShareInvitation|null
      */
-    public function invitationById(string $invitationId)
+    public function invitationById($invitationId)
     {
         $this->storage->simpleStoreGet(OCS_SQLSTORE_NS_INVITATION, $invitationId, OCS_SQLSTORE_FORMAT, $data);
         return $data;

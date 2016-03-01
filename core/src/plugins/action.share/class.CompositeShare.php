@@ -134,6 +134,16 @@ class CompositeShare
         );
         $jsonData["links"]  = array();
         foreach ($this->shareLinks as $shareLink) {
+            $uniqueUser = $shareLink->getUniqueUser();
+            $found = false;
+            foreach($sharedEntries as $entry){
+                if($entry["ID"] == $uniqueUser) $found = true;
+            }
+            if(!$found){
+                // STRANGE, THE ASSOCIATED USER IS MISSING
+                error_log("Found shareLink orphan with uniqueUser ".$uniqueUser);
+                continue;
+            }
             $jsonData["links"][$shareLink->getHash()] = $shareLink->getJsonData($publicAccessManager, $messages);
         }
         return $jsonData;

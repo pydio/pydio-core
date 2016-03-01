@@ -20,6 +20,7 @@
  */
 namespace Pydio\OCS;
 
+use Aws\AutoScaling\Exception\ScalingActivityInProgressException;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -28,11 +29,28 @@ require_once("vendor/autoload.php");
 
 class OCSPlugin extends \AJXP_Plugin{
 
+    /**
+     * @var ActionsController $controller
+     */
+    protected $controller;
+
     public function init($options)
     {
         parent::init($options);
         \AJXP_Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
         \AJXP_Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
+    }
+
+    protected function getController(){
+        if($this->controller == null){
+            require_once ("ActionsController.php");
+            $this->controller = new ActionsController();
+        }
+        return $this->controller;
+    }
+
+    public function applyActions($actionName, $httpVars, $fileVars){
+        return $this->getController()->switchActions($actionName, $httpVars, $fileVars);
     }
 
     public function federatedEnabled(){

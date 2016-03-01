@@ -104,9 +104,36 @@ class Server extends Dummy
 
     protected function actionAccept($remoteId, $token, $parameters){
 
+        $store = new SQLStore();
+        $invitation = $store->invitationById($remoteId);
+        if(empty($invitation)){
+            throw new InvalidArgumentsException();
+        }
+        if($token !== $invitation->getLinkHash()){
+            throw new InvalidArgumentsException();
+        }
+        $invitation->setStatus(OCS_INVITATION_STATUS_ACCEPTED);
+        $store->storeInvitation($invitation);
+        $response = $this->buildResponse("ok", 200, "Successfully accepted invitation", array("remoteId" => $remoteId));
+        $this->sendResponse($response, $this->getFormat($parameters));
+
+
     }
 
     protected function actionDecline($remoteId, $token, $parameters){
+
+        $store = new SQLStore();
+        $invitation = $store->invitationById($remoteId);
+        if(empty($invitation)){
+            throw new InvalidArgumentsException();
+        }
+        if($token !== $invitation->getLinkHash()){
+            throw new InvalidArgumentsException();
+        }
+        $invitation->setStatus(OCS_INVITATION_STATUS_REJECTED);
+        $store->storeInvitation($invitation);
+        $response = $this->buildResponse("ok", 200, "Successfully rejected invitation", array("remoteId" => $remoteId));
+        $this->sendResponse($response, $this->getFormat($parameters));
 
     }
 
