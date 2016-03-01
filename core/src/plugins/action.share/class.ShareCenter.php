@@ -644,7 +644,7 @@ class ShareCenter extends AJXP_Plugin
                     $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
                     header("Content-type:application/json");
                     if(!empty($compositeShare)){
-                        $json = $this->compositeShareToJson($compositeShare, $node);
+                        $json = $this->compositeShareToJson($compositeShare);
                         echo json_encode($json);
                     }else{
                         echo json_encode(array());

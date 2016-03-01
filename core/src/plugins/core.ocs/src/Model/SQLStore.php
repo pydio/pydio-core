@@ -50,7 +50,7 @@ class SQLStore implements IStore
     {
         $id = $invitation->getId();
         if(empty($id)){
-            $id = $this->getGUID();
+            $id = $this->findAvailableID(OCS_SQLSTORE_NS_INVITATION);
         }
         $invitation->setId($id);
         $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, $invitation, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
@@ -136,6 +136,18 @@ class SQLStore implements IStore
     {
         $this->storage->simpleStoreClear(OCS_SQLSTORE_NS_REMOTE_SHARE, $remoteShare->getId());
         return true;
+    }
+
+    protected function findAvailableID($namespace){
+        $id = 0;
+        while(true){
+            $id = rand();
+            $this->storage->simpleStoreGet($namespace, $id, OCS_SQLSTORE_FORMAT, $data);
+            if(empty($data)) {
+                break;
+            }
+        }
+        return $id;
     }
 
     protected function getGUID(){
