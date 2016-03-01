@@ -179,7 +179,7 @@ class Client extends CoreClient
                 ],
                 1
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 
