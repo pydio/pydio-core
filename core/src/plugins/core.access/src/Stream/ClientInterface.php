@@ -69,5 +69,5 @@ interface ClientInterface
      *
      * @return DirIterator
      */
-    public function getIterator($arr);
+    public function getIterator($arr, $params);
 }

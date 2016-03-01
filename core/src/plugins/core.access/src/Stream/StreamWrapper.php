@@ -228,9 +228,11 @@ class StreamWrapper
      */
     public function unlink($path)
     {
+        $params = $this->getParams($path);
+
         try {
             $this->clearStatInfo($path);
-            $this->getClient()->delete($this->getParams($path));
+            $this->getClient()->delete($params);
             return true;
         } catch (\Exception $e) {
             return $this->triggerError($e->getMessage());
@@ -265,18 +267,23 @@ class StreamWrapper
     {
         $params = $this->getParams($path);
 
-        $key = $params['path/itemname'];
+        $key = $params['path/key'];
 
         if (isset(static::$nextStat[$key])) {
             return static::$nextStat[$key];
         }
 
-        $result = $this->getClient()->stat($params);
+        try {
+            $result = $this->getClient()->stat($params);
 
-        if ($result) {
-            $result = $this->getClient()->formatUrlStat($result);
+            if ($result) {
+                $result = $this->getClient()->formatUrlStat($result);
 
-            static::$nextStat[$key] = $result;
+                static::$nextStat[$key] = $result;
+            }
+        } catch(\Exception $e) {
+            // TODO - refine that to handle specific exceptions
+            return false;
         }
 
         return $result;
@@ -335,7 +342,7 @@ class StreamWrapper
 
         $result = $this->getClient()->ls($params);
 
-        $this->objectIterator = $this->getClient()->getIterator($result);
+        $this->objectIterator = $this->getClient()->getIterator($result, $params);
 
         return true;
     }
@@ -382,7 +389,7 @@ class StreamWrapper
 
         $this->objectIterator->next();
 
-        static::$nextStat[$current[0]] = $current[1];
+        static::$nextStat[$current[1]] = $current[2];
 
         return $current[0];
     }
@@ -398,10 +405,10 @@ class StreamWrapper
      */
     public function rename($path_from, $path_to)
     {
-        $params = $this->getParams($path_from, "from") + $this->getParams($path_to, "to");
+        $paramsTo = $this->getParams($path_to, "to");
+        $paramsFrom = $this->getParams($path_from, "from");
 
-        $params['pathFrom'] = $params['fromfullpath'] . '/' . $params['fromitemname'];
-        $params['pathTo'] = $params['base_url'] . '/' . $params['tofullpath'] . '/' . $params['toitemname'];
+        $params = $paramsTo + $paramsFrom;
 
         $this->clearStatInfo($path_from);
         $this->clearStatInfo($path_to);
@@ -418,10 +425,16 @@ class StreamWrapper
      *
      * @return array Hash of custom params
      */
-    protected function getParams($path, $prefix = "")
+    protected function getParams($path, $mainPrefix = "")
     {
         $parts = explode('://', $path, 2);
         $this->protocol = $parts[0];
+
+        $default = stream_context_get_options(stream_context_get_default());
+        $default['core']['currentProtocol'] = $this->protocol;
+        stream_context_set_default($default);
+
+        $parts = AJXP_Utils::safeParseUrl($path);
 
         $params = [];
 
@@ -430,14 +443,23 @@ class StreamWrapper
         $it = new RecursiveArrayIterator($default[$this->protocol]);
 
         foreach ($it as $k => $v) {
-            $prefix = $k . "/";
+            $prefix = $mainPrefix . $k . "/";
 
-            $itchild = new RecursiveArrayIterator($default[$this->protocol][$k]);
+            $itChild = new RecursiveArrayIterator($default[$this->protocol][$k]);
 
-            foreach ($itchild as $kChild => $vChild) {
+            foreach ($itChild as $kChild => $vChild) {
                 $params[$prefix . $kChild] = $vChild;
             }
         }
+
+        // TODO - add call to parent client
+        $params["parentReference"] = [
+            "path" => "/drive/root:" . dirname($parts['path'])
+        ];
+
+        $params[$mainPrefix . 'path/itemname'] = basename($parts['path']);
+        $params[$mainPrefix . 'path/path']     = dirname($parts['path']);
+        $params[$mainPrefix . 'path/fullpath'] = rtrim(dirname($parts['path']), '/') . '/' . basename($parts['path']);
 
         return $params;
     }
