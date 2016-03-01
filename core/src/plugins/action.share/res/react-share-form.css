@@ -11,6 +11,9 @@ div#react_share_form [class^="icon-"],
 div#react_share_form [class*="icon-"] {
   font-family: FontAwesome;
 }
+div#react_share_form label.mui-switch-label {
+  white-space: nowrap;
+}
 div#react_share_form div.headerPanel {
   background-color: #4aceb0 !important;
 }
@@ -24,11 +27,13 @@ div#react_share_form .shared-users-rights-header {
   color: #ADADAD;
   padding-right: 50px;
   text-align: right;
+  margin-top: 10px;
 }
 div#react_share_form .shared-users-rights-header span {
   display: inline-block;
   font-size: 10px;
   margin: 0 6px;
+  width: 37px;
   text-transform: uppercase;
 }
 div#react_share_form .suggest-search.icon-search {
@@ -37,6 +42,23 @@ div#react_share_form .suggest-search.icon-search {
   position: absolute;
   right: 15px;
   top: 2px;
+}
+div#react_share_form div.share-form-users .react-autosuggest input#users-autosuggest {
+  font-size: 13px;
+  padding-bottom: 8px !important;
+  padding-left: 0 !important;
+  margin-top: 11px;
+  width: 340px;
+}
+div#react_share_form div.share-form-users .react-autosuggest input#users-autosuggest ::-webkit-input-placeholder,
+div#react_share_form div.share-form-users .react-autosuggest input#users-autosuggest ::-moz-placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+div#react_share_form div.share-form-users .react-autosuggest .react-autosuggest__suggestions {
+  width: 340px;
+}
+div#react_share_form div.share-form-users .suggest-search.icon-search {
+  top: 12px;
 }
 div#react_share_form .additional-actions-links {
   text-align: right;
@@ -254,7 +276,6 @@ div#react_share_form div.remote-users-add {
   display: -webkit-flex;
   display: flex;
   margin-top: -23px;
-  padding-left: 12px;
 }
 div#react_share_form div.remote-users-add div.host {
   width: 66%;
@@ -263,6 +284,7 @@ div#react_share_form div.remote-users-add div.host {
 div#react_share_form div.remote-users-add div.user {
   margin-top: 1px;
   width: 40%;
+  background-color: transparent;
 }
 div#react_share_form div.remote-users-add button.mui-icon-button {
   margin-top: 26px;
@@ -278,7 +300,7 @@ div#react_share_form a.revert-button {
   cursor: pointer;
 }
 div.react-autosuggest {
-  padding-left: 4px;
+  padding-left: 1px;
 }
 div.react-autosuggest li.react-autosuggest__suggestion .user-badge {
   display: block !important;

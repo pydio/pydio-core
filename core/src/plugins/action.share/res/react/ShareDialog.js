@@ -19,18 +19,27 @@
  */
 (function(global) {
 
-    var MessagesConsumerMixin = {
+    var ContextConsumerMixin = {
         contextTypes: {
             messages:React.PropTypes.object,
-            getMessage:React.PropTypes.func
+            getMessage:React.PropTypes.func,
+            isReadonly:React.PropTypes.func
         }
     };
 
-    var MessagesProviderMixin = {
+    var MainPanel = React.createClass({
+
+        propTypes: {
+            closeAjxpDialog: React.PropTypes.func.isRequired,
+            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
+            selection:React.PropTypes.instanceOf(PydioDataModel).isRequired,
+            readonly:React.PropTypes.bool
+        },
 
         childContextTypes: {
             messages:React.PropTypes.object,
-            getMessage:React.PropTypes.func
+            getMessage:React.PropTypes.func,
+            isReadonly:React.PropTypes.func
         },
 
         getChildContext: function() {
@@ -43,21 +52,11 @@
                     }catch(e){
                         return messageId;
                     }
-                }
+                },
+                isReadonly: function(){
+                    return this.props.readonly;
+                }.bind(this)
             };
-        }
-
-    };
-
-
-    var MainPanel = React.createClass({
-
-        mixins:[MessagesProviderMixin],
-
-        propTypes: {
-            closeAjxpDialog: React.PropTypes.func.isRequired,
-            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
-            selection:React.PropTypes.instanceOf(PydioDataModel).isRequired
         },
 
         refreshDialogPosition:function(){
@@ -189,7 +188,7 @@
     });
 
     var HeaderPanel = React.createClass({
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
         render: function(){
             return (
                 <div className="headerPanel">
@@ -203,7 +202,7 @@
 
     var ButtonsPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             onClick: React.PropTypes.func.isRequired
@@ -238,7 +237,7 @@
     /**************************/
     var UsersPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes:{
             shareModel:React.PropTypes.instanceOf(ReactModel.Share),
@@ -252,25 +251,6 @@
             if(!label) return;
             this.props.shareModel.saveSelectionAsTeam(label);
         },
-        valueSelected: function(id, label, type){
-            var newEntry = {
-                ID: id,
-                RIGHT:'r',
-                LABEL: label,
-                TYPE:type
-            };
-            this.props.shareModel.updateSharedUser('add', newEntry.ID, newEntry);
-        },
-        completerRenderSuggestion: function(userObject){
-            return (
-                <UserBadge
-                    label={userObject.getExtendedLabel() || userObject.getLabel()}
-                    avatar={userObject.getAvatar()}
-                    type={userObject.getGroup() ? 'group' : (userObject.getTemporary()?'temporary' : (userObject.getExternal()?'tmp_user':'user'))}
-                />
-            );
-        },
-
         sendInvitations:function(userObjects){
             var mailData = this.props.shareModel.prepareEmail("repository");
             this.props.showMailer(mailData.subject, mailData.message, userObjects);
@@ -278,26 +258,24 @@
 
         render: function(){
             var currentUsers = this.props.shareModel.getSharedUsers();
-            const excludes = currentUsers.map(function(u){return u.ID});
-            return (
-                <div style={{padding:'30px 20px 10px'}}>
-                    <UsersCompleter.Input
-                        fieldLabel={this.context.getMessage('34')}
-                        renderSuggestion={this.completerRenderSuggestion}
-                        onValueSelected={this.valueSelected}
-                        excludes={excludes}
+            if(ReactModel.Share.federatedSharingEnabled()){
+                var remoteUsersBlock = (
+                    <RemoteUsers
+                        shareModel={this.props.shareModel}
+                        onUserUpdate={this.onUserUpdate}
                     />
-                    <SharedUsersBox
+                );
+            }
+            return (
+                <div style={{padding:'0 16px 10px'}}>
+                    <SharedUsers
                         users={currentUsers}
                         userObjects={this.props.shareModel.getSharedUsersAsObjects()}
                         sendInvitations={this.props.showMailer ? this.sendInvitations : null}
                         onUserUpdate={this.onUserUpdate}
                         saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
                     />
-                    <RemoteUsers
-                        shareModel={this.props.shareModel}
-                        onUserUpdate={this.onUserUpdate}
-                    />
+                    {remoteUsersBlock}
                 </div>
             );
         }
@@ -343,7 +321,7 @@
             this.hideMenu();
         },
         renderMenu: function(){
-            if (!this.props.menus) {
+            if (!this.props.menus || !this.props.menus.length) {
                 return null;
             }
             var menuAnchor = <ReactMUI.IconButton iconClassName="icon-ellipsis-vertical" onClick={this.showMenu}/>;
@@ -399,9 +377,9 @@
         }
     });
 
-    var SharedUsersBox = React.createClass({
+    var SharedUsers = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             users:React.PropTypes.array.isRequired,
@@ -418,6 +396,25 @@
                 this.props.onUserUpdate('remove', entry.ID, entry);
             }.bind(this));
         },
+        valueSelected: function(id, label, type){
+            var newEntry = {
+                ID: id,
+                RIGHT:'r',
+                LABEL: label,
+                TYPE:type
+            };
+            this.props.onUserUpdate('add', newEntry.ID, newEntry);
+        },
+        completerRenderSuggestion: function(userObject){
+            return (
+                <UserBadge
+                    label={userObject.getExtendedLabel() || userObject.getLabel()}
+                    avatar={userObject.getAvatar()}
+                    type={userObject.getGroup() ? 'group' : (userObject.getTemporary()?'temporary' : (userObject.getExternal()?'tmp_user':'user'))}
+                />
+            );
+        },
+
         render: function(){
             // sort by group/user then by ID;
             const userEntries = this.props.users.sort(function(a,b) {
@@ -433,13 +430,13 @@
                 />
             }.bind(this));
             var actionLinks = [];
-            if(this.props.users.length){
+            if(this.props.users.length && !this.context.isReadonly()){
                 actionLinks.push(<a key="clear" onClick={this.clearAllUsers}>{this.context.getMessage('180')}</a>);
             }
             if(this.props.sendInvitations && this.props.users.length){
                 actionLinks.push(<a key="invite" onClick={this.sendInvitationToAllUsers}>{this.context.getMessage('45')}</a>);
             }
-            if(this.props.saveSelectionAsTeam && this.props.users.length > 1){
+            if(this.props.saveSelectionAsTeam && this.props.users.length > 1 && !this.context.isReadonly()){
                 actionLinks.push(<a key="team" onClick={this.props.saveSelectionAsTeam}>{this.context.getMessage('509', '')}</a>);
             }
             if(actionLinks.length){
@@ -455,13 +452,24 @@
                         </div>
                     </div>
                 );
-            }else{
-                rwHeader = (
-                    <div className="section-legend" style={{padding:10}}>{this.context.getMessage('182')}</div>
+            }
+            if(!this.context.isReadonly()){
+                const excludes = this.props.users.map(function(u){return u.ID});
+                var usersInput = (
+                    <UsersCompleter.Input
+                        className="share-form-users"
+                        fieldLabel={this.context.getMessage('34')}
+                        renderSuggestion={this.completerRenderSuggestion}
+                        onValueSelected={this.valueSelected}
+                        excludes={excludes}
+                    />
                 );
             }
             return (
-                <div style={{marginTop: 10}}>
+                <div>
+                    <h3>Local Users</h3>
+                    <div className="section-legend">{this.context.getMessage('182')}</div>
+                    {usersInput}
                     {rwHeader}
                     <div>{userEntries}</div>
                     {linkActions}
@@ -472,7 +480,7 @@
 
     var SharedUserEntry = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             userEntry:React.PropTypes.object.isRequired,
@@ -498,22 +506,29 @@
         render: function(){
             var menuItems = [];
             if(this.props.userEntry.TYPE != 'group'){
-                menuItems.push({
-                    text:this.context.getMessage('183'),
-                    callback:this.onToggleWatch,
-                    checked:this.props.userEntry.WATCH
-                });
+                if(!this.context.isReadonly()){
+                    // Toggle Notif
+                    menuItems.push({
+                        text:this.context.getMessage('183'),
+                        callback:this.onToggleWatch,
+                        checked:this.props.userEntry.WATCH
+                    });
+                }
                 if(this.props.sendInvitations){
+                    // Send invitation
                     menuItems.push({
                         text:this.context.getMessage('45'),
                         callback:this.onInvite
                     });
                 }
             }
-            menuItems.push({
-                text:this.context.getMessage('257', ''),
-                callback:this.onRemove
-            });
+            if(!this.context.isReadonly()){
+                // Remove Entry
+                menuItems.push({
+                    text:this.context.getMessage('257', ''),
+                    callback:this.onRemove
+                });
+            }
             return (
                 <UserBadge
                     label={this.props.userEntry.LABEL || this.props.userEntry.ID }
@@ -522,8 +537,8 @@
                     menus={menuItems}
                 >
                     <span className="user-badge-rights-container">
-                        <input type="checkbox" name="read" checked={this.props.userEntry.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
-                        <input type="checkbox" name="write" checked={this.props.userEntry.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="read" disabled={this.context.isReadonly()} checked={this.props.userEntry.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="write" disabled={this.context.isReadonly()} checked={this.props.userEntry.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
                     </span>
                 </UserBadge>
             );
@@ -532,7 +547,7 @@
 
     var RemoteUsers = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes:{
             shareModel: React.PropTypes.instanceOf(ReactModel.Share),
@@ -559,6 +574,19 @@
             this.setState({addDisabled:!(h && u)});
         },
 
+        renderForm: function(){
+            if(this.context.isReadonly()){
+                return null;
+            }
+            return (
+                <div className="remote-users-add reset-pydio-forms">
+                    <ReactMUI.TextField className="host" ref="host" floatingLabelText={this.context.getMessage('209')} onChange={this.monitorInput}/>
+                    <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText={this.context.getMessage('210')} onChange={this.monitorInput}/>
+                    <ReactMUI.IconButton tooltip={this.context.getMessage('45')} iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
+                </div>
+            );
+        },
+
         render: function(){
 
             var inv = this.props.shareModel.getOcsLinks().map(function(link){
@@ -575,11 +603,7 @@
                 <div>
                     <h3>{this.context.getMessage('207')}</h3>
                     <div className="section-legend">{this.context.getMessage('208')}</div>
-                    <div className="remote-users-add reset-pydio-forms">
-                        <ReactMUI.TextField className="host" ref="host" floatingLabelText={this.context.getMessage('209')} onChange={this.monitorInput}/>
-                        <ReactMUI.TextField className="user" ref="user" type="text" floatingLabelText={this.context.getMessage('210')} onChange={this.monitorInput}/>
-                        <ReactMUI.IconButton tooltip={this.context.getMessage('45')} iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
-                    </div>
+                    {this.renderForm()}
                     <div>{inv}</div>
                 </div>
             );
@@ -589,7 +613,7 @@
 
     var RemoteUserEntry = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes:{
             shareModel:React.PropTypes.instanceOf(ReactModel.Share),
@@ -642,10 +666,13 @@
         },
 
         render: function(){
-            var menuItems = [{
-                text:this.context.getMessage('257', ''),
-                callback:this.removeUser
-            }];
+            var menuItems = [];
+            if(!this.context.isReadonly()){
+                menuItems = [{
+                    text:this.context.getMessage('257', ''),
+                    callback:this.removeUser
+                }];
+            }
             return (
                 <UserBadge
                     label={this.buildLabel()}
@@ -654,8 +681,8 @@
                     menus={menuItems}
                 >
                     <span className="user-badge-rights-container">
-                        <input type="checkbox" name="read" checked={this.state.internalUser.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
-                        <input type="checkbox" name="write" checked={this.state.internalUser.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="read"  disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
+                        <input type="checkbox" name="write" disabled={this.context.isReadonly()} checked={this.state.internalUser.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
                     </span>
                 </UserBadge>
             );
@@ -668,7 +695,7 @@
      /**************************/
     var PublicLinkPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             linkData:React.PropTypes.object,
@@ -709,10 +736,14 @@
                     <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('190')}</div>
                 ];
             }
-
             return (
                 <div style={{padding:16}} className="reset-pydio-forms">
-                    <ReactMUI.Checkbox onCheck={this.toggleLink} checked={!!this.props.linkData} label={this.context.getMessage('189')}/>
+                    <ReactMUI.Checkbox
+                        disabled={this.context.isReadonly()}
+                        onCheck={this.toggleLink}
+                        checked={!!this.props.linkData}
+                        label={this.context.getMessage('189')}
+                    />
                     {publicLinkPanes}
                 </div>
             );
@@ -721,7 +752,7 @@
 
     var PublicLinkField = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             linkData:React.PropTypes.object.isRequired,
@@ -796,7 +827,7 @@
 
         render: function(){
             var publicLink = this.props.linkData['public_link'];
-            var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'];
+            var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly();
             if(this.state.editLink && editAllowed){
                 return (
                     <div className="public-link-container edit-link">
@@ -848,7 +879,7 @@
 
     var PublicLinkPermissions = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             linkData: React.PropTypes.object.isRequired,
@@ -881,6 +912,7 @@
                             return (
                                 <div style={{display:'inline-block',width:'30%'}}>
                                     <ReactMUI.Checkbox
+                                        disabled={this.context.isReadonly()}
                                         type="checkbox"
                                         name={p.NAME}
                                         label={p.LABEL}
@@ -899,7 +931,7 @@
 
     var PublicLinkSecureOptions = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes: {
             linkData: React.PropTypes.object.isRequired,
@@ -925,12 +957,17 @@
             this.props.shareModel.updatePassword(this.props.linkData.hash, newValue);
         },
 
-        render: function(){
+        renderPasswordContainer: function(){
             var linkId = this.props.linkData.hash;
             var passwordField;
             if(this.props.shareModel.hasHiddenPassword(linkId)){
                 var resetPassword = (
-                    <ReactMUI.FlatButton secondary={true} onClick={this.resetPassword} label={this.context.getMessage('174')}/>
+                    <ReactMUI.FlatButton
+                        disabled={this.context.isReadonly()}
+                        secondary={true}
+                        onClick={this.resetPassword}
+                        label={this.context.getMessage('174')}
+                    />
                 );
                 passwordField = (
                     <ReactMUI.TextField
@@ -940,7 +977,7 @@
                         onChange={this.updatePassword}
                     />
                 );
-            }else{
+            }else if(!this.context.isReadonly()){
                 passwordField = (
                     <PydioForm.ValidPassword
                         attributes={{label:this.context.getMessage('23')}}
@@ -949,10 +986,8 @@
                     />
                 );
             }
-            return (
-                <div>
-                    <h3>{this.context.getMessage('196')}</h3>
-                    <div className="section-legend">{this.context.getMessage('24')}</div>
+            if(passwordField){
+                return (
                     <div className="password-container">
                         <div style={{width:'50%', display:'inline-block'}}>
                             {passwordField}
@@ -961,18 +996,34 @@
                             {resetPassword}
                         </div>
                     </div>
+                );
+            }else{
+                return null;
+            }
+        },
+
+        render: function(){
+            var linkId = this.props.linkData.hash;
+            var passContainer = this.renderPasswordContainer();
+            return (
+                <div>
+                    <h3>{this.context.getMessage('196')}</h3>
+                    <div className="section-legend">{this.context.getMessage('24')}</div>
+                    {passContainer}
                     <div className="expires">
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
-                                   floatingLabelText={this.context.getMessage('21')}
-                                   value={this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days')}
-                                   onChange={this.updateDaysExpirationField}/>
+                                disabled={this.context.isReadonly()}
+                                floatingLabelText={this.context.getMessage('21')}
+                                value={this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days')}
+                                onChange={this.updateDaysExpirationField}/>
                             </div>
                         <div style={{width:'50%', display:'inline-block'}}>
                             <ReactMUI.TextField
-                               floatingLabelText={this.context.getMessage('22')}
-                               value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
-                               onChange={this.updateDLExpirationField}
+                                disabled={this.context.isReadonly()}
+                                floatingLabelText={this.context.getMessage('22')}
+                                value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
+                                onChange={this.updateDLExpirationField}
                             />
                         </div>
                     </div>
@@ -1009,7 +1060,7 @@
 
     var LabelDescriptionPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         updateLabel: function(event){
             this.props.shareModel.setGlobal("label", event.currentTarget.value);
@@ -1023,6 +1074,7 @@
             if(!this.props.shareModel.getNode().isLeaf()){
                 var label = (
                     <ReactMUI.TextField
+                        disabled={this.context.isReadonly()}
                         floatingLabelText={this.context.getMessage('35')}
                         name="label"
                         onChange={this.updateLabel}
@@ -1040,6 +1092,7 @@
                         {label}
                         {labelLegend}
                         <ReactMUI.TextField
+                            disabled={this.context.isReadonly()}
                             floatingLabelText="Description"
                             name="description"
                             onChange={this.updateDescription}
@@ -1054,7 +1107,7 @@
 
     var NotificationPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         dropDownChange:function(event, index, item){
             this.props.shareModel.setGlobal('watch', (index!=0));
@@ -1067,9 +1120,11 @@
                 /*,{payload:'watch_write', text:'Notify me when share is modified'}*/
             ];
             var selectedIndex = this.props.shareModel.getGlobal('watch') ? 1 : 0;
-            return (
-                <div>
-                    <h3>Notification</h3>
+            var element;
+            if(this.context.isReadonly()){
+                element = <ReactMUI.TextField disabled={true} value={menuItems[selectedIndex].text} style={{width:'100%'}}/>
+            }else{
+                element = (
                     <ReactMUI.DropDownMenu
                         autoWidth={false}
                         className="full-width"
@@ -1077,6 +1132,12 @@
                         selectedIndex={selectedIndex}
                         onChange={this.dropDownChange}
                     />
+                );
+            }
+            return (
+                <div className="reset-pydio-forms">
+                    <h3>Notification</h3>
+                    {element}
                     <div className="form-legend">{this.context.getMessage('188')}</div>
                 </div>
             );
@@ -1085,7 +1146,7 @@
 
     var PublicLinkTemplate = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         propTypes:{
             linkData:React.PropTypes.object
@@ -1105,9 +1166,11 @@
                 index ++;
                 return {payload:l.LAYOUT_ELEMENT, text:l.LAYOUT_LABEL};
             });
-            return (
-                <div>
-                    <h3>{this.context.getMessage('151')}</h3>
+            var element;
+            if(this.context.isReadonly()){
+                element = <ReactMUI.TextField disabled={true} value={menuItems[crtIndex].text} style={{width:'100%'}}/>
+            }else{
+                element = (
                     <ReactMUI.DropDownMenu
                         autoWidth={false}
                         className="full-width"
@@ -1115,6 +1178,12 @@
                         selectedIndex={crtIndex}
                         onChange={this.onDropDownChange}
                     />
+                );
+            }
+            return (
+                <div className="reset-pydio-forms">
+                    <h3>{this.context.getMessage('151')}</h3>
+                    {element}
                     <div className="form-legend">{this.context.getMessage('198')}</div>
                 </div>
             );
@@ -1123,7 +1192,7 @@
 
     var VisibilityPanel = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[ContextConsumerMixin],
 
         toggleVisibility: function(){
             this.props.shareModel.toggleVisibility();
@@ -1148,7 +1217,7 @@
                 <div>
                     <ReactMUI.Checkbox type="checkbox"
                            name="share_visibility"
-                           disabled={!currentIsOwner}
+                           disabled={!currentIsOwner || this.context.isReadonly()}
                            onCheck={this.toggleVisibility}
                            checked={this.props.shareModel.isPublic()}
                            label={this.context.getMessage('200')}
@@ -1156,7 +1225,7 @@
                     <div className="section-legend">{legend}</div>
                 </div>
             );
-            if(this.props.shareModel.isPublic() && currentIsOwner){
+            if(this.props.shareModel.isPublic() && currentIsOwner && !this.context.isReadonly()){
                 var showTransfer = (
                     <div className="ownership-form">
                         <h4>{this.context.getMessage('203')}</h4>

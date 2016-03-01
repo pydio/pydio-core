@@ -1584,6 +1584,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $crtParent = ConfService::getRepositoryById($repoObject->getParentId());
                     if(!empty($crtParent)){
+                        $parentPath = $crtParent->getOption("PATH", false, $meta["owner"]);
                         $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
                     }else {
                         $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();

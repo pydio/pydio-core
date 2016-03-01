@@ -25,6 +25,9 @@ div#react_share_form {
     font-family: FontAwesome;
   }
   font-size:13px;
+  label.mui-switch-label {
+    white-space: nowrap;
+  }
   div.headerPanel {
     background-color: @color0 !important;
   }
@@ -40,10 +43,12 @@ div#react_share_form {
     color: #ADADAD;
     padding-right: 50px;
     text-align: right;
+    margin-top: 10px;
     span {
       display: inline-block;
       font-size: 10px;
       margin: 0 6px;
+      width: 37px;
       text-transform: uppercase;
     }
   }
@@ -53,6 +58,26 @@ div#react_share_form {
     position: absolute;
     right: 15px;
     top: 2px;
+  }
+  div.share-form-users{
+    .react-autosuggest{
+      input#users-autosuggest{
+        font-size: 13px;
+        padding-bottom: 8px !important;
+        padding-left: 0 !important;
+        margin-top: 11px;
+        width: 340px;
+        ::-webkit-input-placeholder, ::-moz-placeholder{
+          color:rgba(0,0,0,0.3);
+        }
+      }
+      .react-autosuggest__suggestions {
+        width: 340px;
+      }
+    }
+    .suggest-search.icon-search{
+      top:12px;
+    }
   }
   .additional-actions-links{
     text-align: right;
@@ -278,7 +303,6 @@ div#react_share_form {
   div.remote-users-add{
     display: flex;
     margin-top: -23px;
-    padding-left: 12px;
     div.host{
       width: 66%;
       margin-right: 6px;
@@ -286,6 +310,7 @@ div#react_share_form {
     div.user{
       margin-top: 1px;
       width: 40%;
+      background-color: transparent;
     }
     button.mui-icon-button{
       margin-top: 26px;
@@ -304,7 +329,7 @@ div#react_share_form {
 }
 
 div.react-autosuggest {
-  padding-left: 4px;
+  padding-left: 1px;
   li.react-autosuggest__suggestion{
     .user-badge{
       display: block !important;
@@ -333,6 +358,7 @@ div.react-autosuggest {
     padding-left: 4px !important;
   }
 }
+
 .dialogContent div.reset-pydio-forms{
   input{
     border:0;

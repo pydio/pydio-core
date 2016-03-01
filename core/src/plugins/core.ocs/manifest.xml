@@ -9,6 +9,6 @@
     </client_settings>
     <server_settings>
         <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
-                      description="CONF_MESSAGE[Enable Federated Sharing]" default="true" mandatory="true"/>
+                      description="CONF_MESSAGE[Enable Federated Sharing]" default="true" mandatory="true" expose="true"/>
     </server_settings>
 </ajxp_plugin>

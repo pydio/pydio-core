@@ -28,7 +28,8 @@
             excludes:React.PropTypes.array.isRequired,
             usersOnly:React.PropTypes.bool,
             existingOnly:React.PropTypes.bool,
-            freeValueAllowed:React.PropTypes.bool
+            freeValueAllowed:React.PropTypes.bool,
+            className:React.PropTypes.string
         },
 
         getInitialState:function(){
@@ -102,7 +103,8 @@
             if(this.state.createUser){
 
                 return (
-                    <div className="react-autosuggest">
+                    <div className={this.props.className}>
+                    <div className={"react-autosuggest"}>
                         <input type="text" id="users-autosuggest" className="react-autosuggest__input" value={'Create User ' + this.state.createUser}/>
                         <div className="react-autosuggest__suggestions">
                             <UserCreationForm ref="creationForm" newUserName={this.state.createUser} />
@@ -111,7 +113,7 @@
                                 <ReactMUI.FlatButton label="Cancel" onClick={this.cancelCreationForm} />
                             </div>
                         </div>
-
+                    </div>
                     </div>
                 );
 
@@ -124,7 +126,7 @@
                     value: ''   // Initial value
                 };
                 return (
-                    <div style={{position:'relative'}}>
+                    <div style={{position:'relative'}} className={this.props.className}>
                         <span className="suggest-search icon-search"/>
                         <ReactAutoSuggest
                             ref="autosuggest"
