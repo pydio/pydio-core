@@ -115,7 +115,7 @@ class Server extends Dummy
         $token          = \AJXP_Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
         $remoteId       = \AJXP_Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
         $store = new SQLStore();
-        $remoteShare = $store->remoteShareById($remoteId);
+        $remoteShare = $store->remoteShareForOcsRemoteId($remoteId);
         if(empty($remoteShare)){
             throw new InvalidArgumentsException();
         }

@@ -127,6 +127,16 @@ class SQLStore implements IStore
         return $data;
     }
 
+    public function remoteShareForOcsRemoteId($ocsRemoteId){
+        $searchString = 's:11:"ocsRemoteId";s:'.strlen($ocsRemoteId).':"'.$ocsRemoteId.'"';
+        $l = $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, null,  "", OCS_SQLSTORE_FORMAT, "%$searchString%");
+        if(count($l)){
+            return array_shift(array_values($l));
+        }else{
+            return null;
+        }
+    }
+
     /**
      * Delete an existing remote share
      * @param RemoteShare $remoteShare
