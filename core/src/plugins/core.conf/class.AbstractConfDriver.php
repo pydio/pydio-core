@@ -1104,7 +1104,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 else $regexp = null;
                 $skipDisplayWithoutRegexp = ConfService::getCoreConf("USERS_LIST_REGEXP_MANDATORY", "conf");
                 if($skipDisplayWithoutRegexp && $regexp == null){
-                    print("<ul></ul>");
+                    $users = "";
+                    if (method_exists($this, "listUserTeams")) {
+                        $teams = $this->listUserTeams();
+                        foreach ($teams as $tId => $tData) {
+                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                        }
+                    }
+                    print("<ul>$users</ul>");
                     break;
                 }
                 $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
