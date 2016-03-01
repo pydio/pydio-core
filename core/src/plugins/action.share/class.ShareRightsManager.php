@@ -114,6 +114,9 @@ class ShareRightsManager
             throw new Exception("share_center.58");
         }
         $hiddenUserEntry["DISABLE_DOWNLOAD"] = $shareObject->disableDownload();
+        if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
+            $hiddenUserEntry["REMOTE"] = true;
+        }
         return $hiddenUserEntry;
     }
 
@@ -194,7 +197,7 @@ class ShareRightsManager
                         throw new Exception("You are not allowed to create users.");
                     }
                     if(!empty($this->options["SHARED_USERS_TMP_PREFIX"]) && strpos($u, $this->options["SHARED_USERS_TMP_PREFIX"])!==0 ){
-                        $u = $this->tmpUsersPrefix . $u;
+                        $u = $this->options["SHARED_USERS_TMP_PREFIX"] . $u;
                     }
                 }
                 $entry = array("ID" => $u, "TYPE" => "user");
@@ -406,7 +409,7 @@ class ShareRightsManager
             }
 
             // CREATE A MINISITE-LIKE ROLE FOR THIS REPOSITORY
-            if (isSet($userEntry["HIDDEN"])) {
+            if (isSet($userEntry["HIDDEN"]) && !isSet($userEntry["REMOTE"])) {
                 $minisiteRole = $this->createRoleForMinisite($childRepoId, $userEntry["DISABLE_DOWNLOAD"], $isUpdate);
                 if($minisiteRole != null){
                     $userObject->addRole($minisiteRole);
