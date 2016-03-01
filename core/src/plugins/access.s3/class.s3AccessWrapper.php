@@ -242,10 +242,13 @@ class s3AccessWrapper extends fsAccessWrapper
             if ($apiVersion === "") {
                 $apiVersion = "latest";
             }
-            $sdkVersion = $repoObject->getOption("SDK_VERSION");
-
+            //SDK_VERSION IS A GLOBAL PARAM
+            $sdkVersion = $repoObject->driverInstance->driverConf['SDK_VERSION'];
+            if ($sdkVersion !== "v2" && $sdkVersion !== "v3") {
+                $sdkVersion = "v2";
+            }
             if ($sdkVersion === "v3") {
-                require_once ("class.PydioS3Client.php");
+                require_once ("class.pydioS3Client.php");
                 $s3Client = new AccessS3\S3Client([
                     "version" => $apiVersion,
                     "region"  => $region,
@@ -298,23 +301,29 @@ class s3AccessWrapper extends fsAccessWrapper
                 ));
                 $toDelete[] = $currentFrom;
             }
-
-            try {
-
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute batch on ".count($batch)." objects");
-                $successful = $s3Client->execute($batch);
-
-                $failed = array();
-                $iterator->rewind();
-                $clear = new \Aws\S3\Model\ClearBucket($s3Client, $bucket);
-                $clear->setIterator($iterator);
-                $clear->clear();
-
-            } catch (\Guzzle\Service\Exception\CommandTransferException $e) {
-
-                $successful = $e->getSuccessfulCommands();
-                $failed = $e->getFailedCommands();
-
+            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute batch on ".count($batch)." objects");
+            if ($sdkVersion === "v3") {
+                foreach ($batch as $command) {
+                    $successful = $s3Client->execute($command);
+                }
+                //We must delete the "/" in $fromKeyname because we want to delete the folder
+                $clear = \Aws\S3\BatchDelete::fromIterator($s3Client, $bucket, $s3Client->getIterator('ListObjects', array(
+                    'Bucket'     => $bucket,
+                    'Prefix'     => $fromKeyname
+                )));
+                $clear->delete();
+            } else {
+                try {
+                    $successful = $s3Client->execute($batch);
+                    $clear = new \Aws\S3\Model\ClearBucket($s3Client, $bucket);
+                    $iterator->rewind();
+                    $clear->setIterator($iterator);
+                    $clear->clear();
+                    $failed = array();
+                } catch (\Guzzle\Service\Exception\CommandTransferException $e) {
+                    $successful = $e->getSuccessfulCommands();
+                    $failed = $e->getFailedCommands();
+                }
             }
             if(count($failed)){
                 foreach($failed as $c){
