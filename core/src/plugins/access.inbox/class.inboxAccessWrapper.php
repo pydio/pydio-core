@@ -48,14 +48,33 @@ class inboxAccessWrapper implements AjxpWrapper
             if(!$repo->hasOwner()){
                 continue;
             }
+            $repoId = $repo->getId();
+            $url = "pydio://".$repoId."/";
+
             if($repo->hasContentFilter()){
                 $cFilter = $repo->getContentFilter();
                 $filter = array_keys($cFilter->filters)[0];
-                self::$output[basename($filter)] = "pydio://".$repo->getId()."/".basename($filter);
+                $label = basename($filter);
+                if(strpos($repo->getId(), "ocs_remote_share") !== 0){
+                    $url .= $label;
+                }
             }else{
                 $label = $repo->getDisplay();
-                self::$output[$label] = "pydio://".$repo->getId()."/";
             }
+
+            if(strpos($repoId, "ocs_remote_share_") === 0){
+                // Check Status
+                $linkId = str_replace("ocs_remote_share_", "", $repoId);
+                $ocsStore = new \Pydio\OCS\Model\SQLStore();
+                $remoteShare = $ocsStore->remoteShareById($linkId);
+                $status = $remoteShare->getStatus();
+                if($status == 1){
+                    $label .= " (pending).".str_replace("ocs_remote_share_", "", $repoId).".invitation";
+                    $url = __FILE__;
+                }
+            }
+
+            self::$output[$label] = $url;
         }
         return self::$output;
     }
@@ -144,8 +163,11 @@ class inboxAccessWrapper implements AjxpWrapper
     public static function copyFileInStream($path, $stream)
     {
         $url = self::translateURL($path);
+        AJXP_MetaStreamWrapper::copyFileInStream($url, $stream);
+        /*
         $wrapperClass = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(parse_url($url, PHP_URL_HOST));
         call_user_func(array($wrapperClass, "copyFileInStream"), $url, $stream);
+        */
         if(self::$linkNode !== null){
             ConfService::loadDriverForRepository(self::$linkNode->getRepository());
         }
@@ -384,12 +406,16 @@ class inboxAccessWrapper implements AjxpWrapper
      */
     public function url_stat($path, $flags)
     {
-        $origRepo = parse_url($path, PHP_URL_HOST);
         $url = self::translateURL($path);
-        $targetRepo = parse_url($path, PHP_URL_PATH);
+        if(strpos($url, "invitation") === 0){
+            return stat(__FILE__);
+        }
+        if($url == null){
+            return false;
+        }
         $stat = stat($url);
-        if($targetRepo != $origRepo){
-            $stat["rdev"] = $stat[6] = $targetRepo;
+        if($stat === false){
+            return false;
         }
         if(self::$linkNode !== null){
             ConfService::loadDriverForRepository(self::$linkNode->getRepository());

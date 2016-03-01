@@ -53,6 +53,26 @@ class inboxAccessDriver extends fsAccessDriver
             if(!$leaf){
                 $meta["ajxp_mime"] = "shared_folder";
             }
+            if($ajxpNode->getExtension() == "invitation"){
+
+                $label = $ajxpNode->getLabel();
+                $parts = explode(".", $label);
+                array_pop($parts);
+                $shareId = array_pop($parts);
+                $ajxpNode->setLabel(implode(".", $parts));
+                $meta["ajxp_mime"] = "invitation";
+                $meta["remote_share_id"] = $shareId;
+
+            }else if(strpos($repoId, "ocs_remote_share_") === 0){
+
+                $shareId = str_replace("ocs_remote_share_", "", $repoId);
+                $label = $ajxpNode->getLabel();
+                $label.= " (accepted)";
+                $ajxpNode->setLabel($label);
+                $meta["remote_share_accepted"] = "true";
+                $meta["remote_share_id"] = $shareId;
+
+            }
             $ajxpNode->mergeMetadata($meta);
         }
     }

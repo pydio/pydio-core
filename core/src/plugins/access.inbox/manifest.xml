@@ -23,6 +23,42 @@
                     ]]></clientCallback>
                 </processing>
             </action>
+            <action name="accept_invitation">
+                <gui src="55" text="55" title="55" iconClass="icon-envelope">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="invitation"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+                        PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId});
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="reject_invitation">
+                <gui src="56" text="56" title="56" iconClass="icon-envelope">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="invitation"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId});
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="reject_remote_share">
+                <gui src="55" text="55" title="55" iconClass="icon-envelope">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId});
+                    ]]></clientCallback>
+                </processing>
+            </action>
             <action name="download" fileDefault="false">
                 <gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
                     <context selection="true" dir="" recycle="false"
