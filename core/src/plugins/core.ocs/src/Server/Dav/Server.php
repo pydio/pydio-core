@@ -26,14 +26,88 @@ require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.Shar
 
 use Sabre;
 
-class Server
+class Server extends Sabre\DAV\Server
 {
+    var $rootCollection;
+    var $uniqueBaseFile;
+
+    public function __construct()
+    {
+        $this->rootCollection = new \AJXP_Sabre_Collection("/", null, null);
+        parent::__construct($this->rootCollection);
+    }
+
     /**
+     * @return string
+     */
+    protected function pointToBaseFile(){
+        try{
+            $testBackend = new BasicAuthNoPass();
+            $userPass = $testBackend->getUserPass();
+            if(isSet($userPass[0])){
+                $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareData = $shareStore->loadShare($userPass[0]);
+                if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
+                    $repo = \ConfService::getRepositoryById($shareData["REPOSITORY"]);
+                    if(!empty($repo) && $repo->hasContentFilter()){
+                        return "/".$repo->getContentFilter()->getUniquePath();
+                    }
+                }
+            }
+        }catch (\Exception $e){}
+        return null;
+    }
+
+    public function calculateUri($uri) {
+        $uri = parent::calculateUri($uri);
+        if(!empty($this->uniqueBaseFile) && '/'.$uri !== $this->uniqueBaseFile){
+            $uri.= $this->uniqueBaseFile;
+        }
+        return $uri;
+    }
+
+    public function start($baseUri = "/"){
+
+        $this->uniqueBaseFile = $this->pointToBaseFile();
+        $this->setBaseUri($baseUri);
+
+        $authBackend = new AuthSharingBackend($this->rootCollection);
+        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, \ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
+        $this->addPlugin($authPlugin);
+
+        if (!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")) {
+            mkdir(AJXP_DATA_PATH."/plugins/server.sabredav", 0755);
+            $fp = fopen(AJXP_DATA_PATH."/plugins/server.sabredav/locks", "w");
+            fwrite($fp, "");
+            fclose($fp);
+        }
+
+        $lockBackend = new Sabre\DAV\Locks\Backend\File(AJXP_DATA_PATH."/plugins/server.sabredav/locks");
+        $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
+        $this->addPlugin($lockPlugin);
+
+        if (\ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
+            $browerPlugin = new \AJXP_Sabre_BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
+            $extPlugin = new Sabre\DAV\Browser\GuessContentType();
+            $this->addPlugin($browerPlugin);
+            $this->addPlugin($extPlugin);
+        }
+        try {
+            $this->exec();
+        } catch ( \Exception $e ) {
+            \AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
+        }
+    }
+
+    /**
+     * Not used for the moment
+     * This will expose folder as /dav/FolderName and file as /dav/FileName.txt
+     *
      * @param $baseUri
      * @return \AJXP_Sabre_Collection|SharingCollection
      * @throws \Exception
      */
-    protected function initCollectionForFileOrFolder(&$baseUri){
+    protected function initCollectionForFileOrFolderAsUniqueItem(&$baseUri){
         try{
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
@@ -60,38 +134,6 @@ class Server
         return $rootCollection;
     }
 
-    public function start($baseUri = "/"){
 
-        $rootCollection = $this->initCollectionForFileOrFolder($baseUri);
-        $server = new Sabre\DAV\Server($rootCollection);
-        $server->setBaseUri($baseUri);
-
-        $authBackend = new AuthSharingBackend($rootCollection);
-        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, \ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
-        $server->addPlugin($authPlugin);
-
-        if (!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")) {
-            mkdir(AJXP_DATA_PATH."/plugins/server.sabredav", 0755);
-            $fp = fopen(AJXP_DATA_PATH."/plugins/server.sabredav/locks", "w");
-            fwrite($fp, "");
-            fclose($fp);
-        }
-
-        $lockBackend = new Sabre\DAV\Locks\Backend\File(AJXP_DATA_PATH."/plugins/server.sabredav/locks");
-        $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
-        $server->addPlugin($lockPlugin);
-
-        if (\ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
-            $browerPlugin = new \AJXP_Sabre_BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
-            $extPlugin = new Sabre\DAV\Browser\GuessContentType();
-            $server->addPlugin($browerPlugin);
-            $server->addPlugin($extPlugin);
-        }
-        try {
-            $server->exec();
-        } catch ( \Exception $e ) {
-            \AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
-        }
-    }
 
 }

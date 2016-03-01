@@ -126,7 +126,7 @@ class RemoteShare
             "DRIVER"		=>	"webdav",
             "DRIVER_OPTIONS"=> array(
                 "HOST"			=>	$parts["scheme"]."://".$parts["host"],
-                "PATH"          =>  $parts["path"].($this->isDocumentIsLeaf()? "":"/".$this->getDocumentName()),
+                "PATH"          =>  $parts["path"],
                 "USER"		    =>	$this->getOcsToken(),
                 "PASS" 	        => 	($this->hasPassword()?$this->getPassword() : ""),
                 "DEFAULT_RIGHTS"=>  "",
