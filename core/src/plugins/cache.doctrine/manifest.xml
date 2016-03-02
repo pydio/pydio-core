@@ -24,5 +24,7 @@
         <param group_switch_name="driver" group_switch_label="redis" group_switch_value="redis" name="REDIS_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The port to access Redis server]" mandatory="true" default="6379" />
 
         <param group_switch_name="driver" group_switch_label="xcache" group_switch_value="xcache" name="driver" type="hidden" label="" description="" mandatory="false" default="xcache"/>
+
+        <param name="CACHE_PREFIX" type="string" label="CONF_MESSAGE[Cache Prefix]" description="CONF_MESSAGE[Cache Prefix]" mandatory="false" default="pydio-unique-id" />
     </server_settings>
 </ajxp_plugin>
