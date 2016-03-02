@@ -168,4 +168,14 @@ $mess=array(
 "Read Only" => "Read Only",
 "Read and Write" => "Read and Write",
 "Write Only (upload)" => "Write Only (upload)",
+"OAuth Commons" => "Paramètres Communs OAuth",
+"Client ID" => "Client ID",
+"Client SECRET" => "Client SECRET",
+"Scope" => "Scope",
+"Auth URL" => "URL d'autorisation",
+"Token URL" => "URL du 'Refresh Token'",
+"Redirect URL" => "URL de redirection",
+"API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "Point final de l'API endpoint - Ouvre la fenêtre permettant à l'utilisateur de s'authentifier et d'accepter les termes de l'application",
+"API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Rafraîchit ou valide le token reçu pendant l'authentification",
+"API setting - Redirect URL for the OAuth Application" => "API setting - Url de redirection de l'application OAuth"
 );

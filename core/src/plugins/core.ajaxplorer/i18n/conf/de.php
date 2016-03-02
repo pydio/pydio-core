@@ -176,4 +176,14 @@ $mess=array(
 "Read Only" => "Nur Lesen",
 "Read and Write" => "Lesen und Schreiben",
 "Write Only (upload)" => "Nur Schreiben (hochladen)",
+"OAuth Commons" => "OAuth Commons",
+"Client ID" => "Client ID",
+"Client SECRET" => "Client SECRET",
+"Scope" => "Scope",
+"Auth URL" => "Auth URL",
+"Token URL" => "Token URL",
+"Redirect URL" => "Redirect URL",
+"API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app",
+"API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Used to refresh or validate the token retrieved in the authentication part",
+"API setting - Redirect URL for the OAuth Application" => "API setting - Redirect URL for the OAuth Application"
 );
