@@ -1,0 +1,139 @@
+/***********************/
+/* TOOLTIPS            */
+/***********************/
+.tooltipped
+{
+  background-color: #ffffc0;
+}
+
+
+.simple_tooltip_observer {
+  cursor: help;
+}
+
+.simple_tooltip_observer_active{
+  /*text-decoration: underline;*/
+}
+
+.simple_tooltip_title{
+  padding-top: 2px;
+  padding-bottom: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.simple_tooltip
+{
+  position: absolute;
+  width: 150px;
+  z-index: 10000;
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+}
+
+.down_arrow_tip,
+.top_arrow_tip {
+  background: rgba(69, 77, 85, 0.86);
+  color: white;
+  border: 0;
+  border-radius: 2px;
+}
+.down_arrow_tip:after {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.down_arrow_tip:after {
+  border-color: rgba(69, 77, 85, 0);
+  border-top-color: rgba(69, 77, 85, 0.86);
+  border-width: 5px;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.top_arrow_tip{
+  width: 100px;
+}
+.top_arrow_tip:after {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.top_arrow_tip:after {
+  border-color: rgba(111, 123, 136, 0);
+  border-bottom-color:  rgb(111, 123, 136);
+  border-width: 5px;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.arrow_tip_arrow_left:after{
+  left: 8%;
+}
+
+.right_arrow_tip {
+  color: #ffffff;
+  border-radius: 4px;
+  background-color: rgba(69, 77, 85, 0.86);
+  border: 0;
+}
+.right_arrow_tip:after, .right_arrow_tip:before {
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.right_arrow_tip:after {
+  border-color: rgba(69, 77, 85, 0);
+  border-left-color: rgba(69, 77, 85, 0.86);
+  border-width: 5px;
+  top: 50%;
+  margin-top: -5px;
+}
+.right_arrow_tip:before {
+  border-color: rgba(69, 77, 85, 0);
+  border-left-color: rgba(69, 77, 85, 0.86);
+  border-width: 5px;
+  top: 50%;
+  margin-top: -5px;
+}
+
+.left_arrow_tip {
+  color: #ffffff;
+  border-radius: 4px;
+  background-color: rgba(69, 77, 85, 0.86);
+  border: 0;
+}
+.left_arrow_tip:after, .left_arrow_tip:before {
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.left_arrow_tip:before {
+  border-color: rgba(69, 77, 85, 0);
+  border-right-color: rgba(69, 77, 85, 0.86);
+  border-width: 5px;
+  top: 50%;
+  left:-10px;
+  margin-top: -5px;
+}

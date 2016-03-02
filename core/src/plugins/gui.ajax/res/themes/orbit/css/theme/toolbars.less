@@ -1,0 +1,193 @@
+
+.toolbarGroup{
+  display:inline-block;
+}
+
+
+#global_toolbar{
+  height: 47px;
+  padding: 0 15px 0 5px;
+  background: no-repeat 7px;
+  display: none;
+  #clickable_home{
+    position: absolute;
+    width: 150px;
+    height: 47px;
+    cursor: pointer;
+  }
+
+  #top_toolbar{
+    float:right;
+    margin-top:11px;
+
+    a
+    {
+      font-size:12px;
+      padding: 0 3px;
+      letter-spacing: 1px;
+      color: @white;
+      display: inline-block;
+
+      span.ajxp_icon_span,
+      span.ajxp_icon_arrow{
+        font-size: 1.0em;
+        display:inline-block;
+        padding: 0 4px;
+      }
+      img{
+        display:none;
+      }
+    }
+
+
+  }
+}
+
+
+
+
+#display_toolbar {
+  float: right;
+  display: inline-block;
+  min-width: 60px;
+  text-align: right;
+  a{
+    color: @white;
+    display: inline-block;
+    padding: 0 3px;
+    &:hover{
+      color: rgb(253, 252, 228);
+    }
+    &.disabled{
+      display:none;
+    }
+  }
+  span.actionbar_button_label {
+    display: none;
+  }
+  &.text_only{
+    padding-top: 8px;
+    a::after{
+      content:' |';
+    }
+    a:last-child::after{
+      display: none;
+    }
+    span.actionbar_button_label{
+      display: inline;
+    }
+    span.ajxp_icon_span{
+      display: none;
+    }
+  }
+  span#vertical_splitter_folding_action_button_label::before {
+    content: '| ';
+  }
+}
+
+#put_toolbar div.separator{
+  margin-right: 10px;
+}
+
+#default_toolbar{
+  a span.ajxp_icon_span {
+    margin-right: 1px;
+  }
+
+  span.icon-caret-down.ajxp_icon_arrow {
+    color: #797979;
+    margin-left: 3px;
+  }
+}
+
+#buttons_bar a,
+#buttons_bar_top a
+{
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 12px 2px 11px;
+  text-align: center;
+  overflow: visible;
+  outline: none;
+  border-radius: 14px;
+  margin: 3px 4px 0 1px;
+  background: #ffffff;
+  letter-spacing: 1px;
+  float: left;
+  color: #555;
+}
+
+div#buttons_bar_top {
+  padding-top: 1px;
+}
+
+#buttons_bar span.ajxp_icon_span {
+  display: none;
+}
+
+
+#workspace_toolbar{
+  padding: 0;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  height: 62px;
+  a#ls_button{
+    display: none;
+  }
+}
+
+
+a#up_dir_button {
+  height:22px;
+  span.ajxp_icon_span{
+    display: inline-block;
+  }
+  span#up_dir_button_label {
+    display: none;
+  }
+}
+
+.toolbars_separator
+{
+  border-bottom: 1px solid #fff;
+  border-top: 1px solid buttonshadow;
+}
+
+.toolbar_title{
+  font-size:15px;
+  font-weight:bold;
+  color: #ddd;
+}
+
+.actionbar_button_label u {
+  text-decoration: none;
+}
+
+div#navigation_toolbar {
+  padding: 0 6px;
+}
+
+
+#files_list_header
+{
+  font-size: 11px;
+  padding: 3px 16px 4px 8px;
+  height: 35px;
+  letter-spacing: 1px;
+  background-color: #ddd;
+  color: rgb(111, 123, 136);
+  border-right: 0;
+  overflow: hidden;
+}
+
+#files_list_header > #display_toolbar a:hover,
+#files_list_header > #display_toolbar a
+{
+  color: #333 !important;
+}
+
+
+#upload_button {
+  border-radius: 0 2px 2px 0;
+}
+

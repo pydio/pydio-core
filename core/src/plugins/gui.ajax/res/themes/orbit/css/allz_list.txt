@@ -1,6 +1,6 @@
 themes/orbit/css/xtree.css
 themes/orbit/css/screen.css
-themes/orbit/css/ajaxplorer.css
+themes/orbit/css/pydio.css
 themes/orbit/css/animate-custom.css
 themes/orbit/css/font-awesome.css
 themes/orbit/css/fontfaces.css

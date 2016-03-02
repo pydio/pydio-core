@@ -1,0 +1,292 @@
+#flashframe
+{
+  border: 0;
+  width: 450px;
+  height: 300px;
+  overflow:hidden;
+  margin-top: -9px;
+}
+
+/*
+UPLOAD MULTIFILE FORM
+*/
+div#upload_files_list, div#multiple_download_container
+{
+  overflow: auto;
+  height: 350px;
+  border: 4px dashed rgb(221, 221, 221);
+  text-align: left;
+  -moz-border-radius: 11px;
+  border-radius: 11px;
+}
+
+.droparea {
+  background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
+}
+
+.uploadFilesList.droparea{
+  background-position: center;
+}
+
+.dropareaHover{
+  background-color: #FAF3ED !important;
+}
+
+#content_pane.dropareaHover div.thumbnail_selectable_cell{
+  background-color: transparent !important;
+}
+
+#uploader_chooser{
+  width: 100%;
+}
+
+#uploader_chooser ul{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: block;
+  position: relative;
+  border-bottom: 1px solid #77b8e2;
+  background-color: #ffffff;
+}
+
+#uploader_chooser li {
+  display: inline-block;
+  padding: 12px 14px;
+  border-radius: 4px 4px 0 0;
+  margin: 8px 2px;
+  margin-bottom: 0;
+  border-bottom: 0;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#uploader_chooser li:hover {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #f5f5f5;
+}
+#uploader_chooser li.current:hover {
+}
+#uploader_chooser li.current {
+  font-weight: bold;
+  cursor: default;
+  border-bottom: 2px solid #77b8e2;
+}
+
+div#uploader_options_pane {
+  background-color: white;
+  border-top: 1px solid #CCCCCC;
+  font-size: 11px;
+  height: 59px;
+  overflow: hidden;
+  padding: 7px 10px;
+  text-align: left;
+  display: none;
+  margin-bottom: 11px;
+  border-bottom: 1px solid #CCCCCC;
+  box-shadow: inset 0 1px 6px rgba(0,0,0,0.3);
+  border-radius: 2px;
+  margin-top: 2px;
+}
+div#total_files_list{
+  display:none !important;
+}
+
+div#uploader_options_pane input {
+  width: 15px;
+  margin-right: 0;
+  margin-left: 0;
+  margin-top: 5px;
+}
+
+div#upload_files_list div, div#multiple_download_container div
+{
+  overflow: hidden;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 14px;
+  position: relative;
+  font-size: 13px;
+  background-image: url('../images/dl_bg.png');
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  border-bottom: 1px solid rgb(227, 229, 233);
+  color: #5C5C5C;
+}
+
+div#upload_files_list span.item_relative_path{
+  color: #ccc;
+  margin-left: 15px;
+  font-size: 0.8em;
+}
+
+
+#upload_files_list img
+{
+  margin-right: 6px;
+}
+
+#upload_files_list img.fakeUploadButton {
+  display: none;
+}
+
+#upload_files_list div a
+{
+  color: #ddd;
+  font-style: italic;
+}
+
+#upload_files_list span.statusText,
+#upload_files_list span.percentText
+{
+  font-size: 10px;
+  display: inline-block;
+  padding: 0 6px;
+  color: #cccccc;
+}
+
+#upload_files_list span.statusText.new, #upload_files_list span.statusText.loaded{
+  display:none;
+}
+
+#upload_files_list span.icon-remove-sign {
+  color: #ccc;
+  display: block;
+  float: right;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+#upload_files_list span.icon-remove-sign:hover{
+  color: #d00;
+}
+
+#multiple_download_container div a
+{
+  display: block;
+}
+#multiple_download_container div a:hover
+{
+  text-decoration:none;
+  color: #aaa;
+}
+#fileInputContainer {
+  position: relative;
+}
+#fileInputContainerDiv { /* to fit 1px border */
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  vertical-align: top;
+  height: 60px;
+  width: 167px;
+  cursor: pointer;
+}
+#fileInputContainer input {
+  moz-opacity: 0;
+  opacity: 0;
+  position: absolute;
+  font-size: 60px; /* causes it to fill the containing div */
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  height: 56px;
+  cursor: pointer !important;
+  filter:alpha(opacity=0);
+}
+#fileInputPos {
+  text-align: left;
+  height: 60px;
+  width: 180px;
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  z-index: 9999; /* this was needed to work in IE */
+;
+  cursor: pointer;
+}
+#uploaderTextActions{
+  position:absolute;
+  bottom: 6px;
+  right: 8px;
+  color: rgb(203, 204, 206);
+}
+
+#uploaderTextActions span{
+  cursor:pointer;
+}
+
+
+#uploaderTextActions span:hover{
+  color: #5C5C5C;
+}
+
+
+.fakeUploadButton {
+  width: 161px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 1.4em;
+  margin-bottom: 5px;
+  cursor: pointer;
+  color: #667;
+  font-weight: normal;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #ebedf0;
+  box-shadow: inset 1px 1px 0 white;
+}
+
+.fakeUploadButton.disabled{
+  -moz-opacity: 0.5;
+  opacity: 0.5;
+  filter:alpha(opacity=50);
+  cursor: default;
+}
+
+
+.fakeUploadButton img {
+  margin-bottom: 3px;
+}
+
+.fakeOptionButton {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  margin-bottom: 0;
+  margin-top: 5px;
+  background-position : center;
+  -moz-border-radius : 5px;
+  border-radius : 5px;
+}
+
+#uploadBrowseButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin:0;
+}
+
+#uploadBrowseButton span.icon-desktop {
+  font-size: 2em;
+  display: block;
+  float: left;
+  padding: 2px 7px;
+}
+
+#uploadSendButton {
+}
+
+#uploaderTextActions span.disabled{
+  display:none;
+}
+
+#uploadFilesListContainer
+{
+  vertical-align:top;
+  font-size: 11px;
+  letter-spacing: 1px;
+}

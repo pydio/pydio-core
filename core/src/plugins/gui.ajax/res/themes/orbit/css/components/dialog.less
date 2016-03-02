@@ -1,0 +1,269 @@
+/*
+DIALOG BOXES
+*/
+/*#upload_form, #createdir_form, #createfile_form, #rename_div*/
+#all_forms
+{
+  background-color: #eee;
+}
+#all_forms > div{display:none;}
+#all_forms form{display:inline;}
+
+#all_forms div.shadow_class
+{display:block;}
+
+div.shadow_class
+{
+  -moz-border-radius:5px;
+  border-radius:5px;
+}
+
+.dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #treeCopy
+{
+  background-color: #ffffff;
+}
+
+.dialogBox, .editBox
+{
+  display: none;
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  z-index: 1018;
+  font-size: 11px;
+  padding: 0;
+  border-radius: 0px;
+  min-width: 420px;
+}
+
+.editBox
+{
+  top:5%;
+  left:5%;
+  padding: 0;
+  margin: 0;
+}
+
+.dialogTitle
+{
+  cursor:move;
+  font-size: 15px !important;
+}
+
+.dialogTitle span.ajxp_icon_span,
+.dialogTitle span#modalCloseBtn
+{
+  display: inline-block;
+  font-size: 15px;
+  padding-right: 8px;
+  padding-top: 2px;
+}
+
+div.dialogTitle .ajxp_icon_span {
+  display: none;
+}
+
+.dialogTitle span#modalCloseBtn{
+  font-size: 14px;
+  margin-top: 0;
+  color: #FFFFFF;
+  padding: 7px 12px;
+}
+
+.dialogTitle span.string-only-title {
+  font-size: 16px;
+  display: inline-block;
+  padding-top: 3px;
+}
+
+.dialogContent
+{
+  background-color: #ffffff;
+  padding: 10px 10px;
+  -moz-border-radius: 0 0 5px 5px;
+  border-radius: 0 0 0px 0px;
+  /* background-image: url('../images/grid_tl.png'); */
+  border-top: 0;
+  color: #5C5C5C;
+}
+
+.dialogContent input,
+.dialogContent input[type="text"],
+.dialogContent input[type="password"],
+.dialogContent select,
+#search_txt
+{
+  margin-left: 0;
+  border: 1px solid #aaa;
+  background-repeat: no-repeat;
+  background-position: top left;
+  height: 24px;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+
+}
+
+.dialogContent select{
+  height: 30px !important;
+  font-size: 13px;
+  width: 97%;
+}
+
+.dialogContent select[multiple]{
+  height: 66px !important;
+}
+
+.dialogContent input:focus,
+.dialogContent input[type="text"]:focus,
+.dialogContent input[type="password"]:focus,
+.dialogContent select:focus
+{
+  /*    background: white;
+    border: 1px solid #77b8e2;
+    */
+}
+
+.dialogContent input:disabled,
+.dialogContent input[type="text"]:disabled,
+.dialogContent input[type="password"]:disabled,
+.dialogContent option:disabled,
+.dialogContent textarea:disabled
+{
+  background: #eee;
+}
+
+.dialogContent input[type="checkbox"],
+.dialogContent input[type="radio"]
+{
+  height: auto;
+  width: auto;
+  border-radius : 0;
+  border:none;
+  filter: none;
+  background: none;
+  margin-right: 0;
+}
+
+.dialogLegend
+{
+  padding: 5px;
+  line-height: 16px;
+  font-size: 13px;
+}
+
+.dialogButtons
+{
+  text-align: right;
+  clear:both;
+}
+
+.dialogButtons input,
+fieldSet input.dialogButton
+{
+  margin-left: 3px;
+  width: 32px;
+  height: 32px;
+  padding: 2px 0;
+  background-color: transparent;
+  border: 0;
+}
+
+.dialogButtons input:focus,
+fieldSet input.dialogButton:focus
+{
+  border: 0;
+  background-color: transparent;
+}
+
+.dialogButtons.inlineEdition input
+{
+  margin-left: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  box-shadow: none;
+}
+
+.dialogButtonsCheckbox{
+
+  float: left;
+  margin-top: 9px;
+
+}
+
+
+.dialogBox, div.dialogBox.css_boxshadow{
+  -moz-box-shadow: 5px 5px 60px #222;
+  -webkit-box-shadow: 5px 5px 60px #222;
+  box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+}
+
+div.dialogBox div.dialogBox.css_boxshadow{
+  border-radius: 4px !important;
+  border: 0;
+  width: 96%;
+  left: 10px;
+  min-width: 400px;
+  top: 19%;
+  background-color: white;
+}
+
+.no-flexbox div#mailer_message{
+  width: 380px !important;
+}
+
+div.dialogBox div.dialogBox.css_boxshadow > div{
+  background-color: transparent;
+}
+
+.dialogButtonsCheckbox label{
+  cursor: pointer;
+}
+
+.dialogContent form, .editContent form
+{
+  display: inline;
+  margin: 0;
+}
+
+div.dialogContentMainTitle{
+  color: rgb(117, 128, 139);
+  font-size: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgb(117, 128, 139);
+  padding-bottom: 0;
+}
+
+
+.dialogButton
+{
+  border-bottom: 1px solid buttonshadow;
+  border-right: 1px solid buttonshadow;
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+  padding: 1px 8px;
+  margin-top: 5px;
+}
+
+
+.dialogArrow
+{
+  font-weight: bold;
+  font-size: 16px;
+}
+
+div.dialogBox.form-diaporama_box div.dialogContent{
+  background-color: rgb(85,85,85);
+  border: 0;
+  background-image: none;
+}
+
+
+.dialogTitle{
+  border-radius: 0 0 0 0;
+  background-color: rgb(107, 107, 107);
+  color: #FFF;
+  padding: 11px 4px 13px 10px;
+}
+

@@ -1,0 +1,35 @@
+/********************************/
+/* SLIDER*/
+/*********************************/
+
+.slider-pane{
+  background-color: #ebedf0;
+  padding: 5px 2px;
+  position:absolute;
+  width:11px;
+  z-index:10000;
+  border-radius: 2px;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.75);
+}
+
+.slider-handle,
+.slider-pane div.selected
+{
+  background-image: url("../images/slider-handle-vert.png") !important;
+  background-position:top center;
+  background-repeat: no-repeat !important;
+  background-color: transparent !important;
+  height:15px;
+  width:10px;
+}
+
+.slider-tracker {
+  background-image : url("../images/slider-track-bottom.png");
+  background-position:bottom center;
+  background-repeat:no-repeat;
+}
+
+.slider-tracker-top {
+  background-position:top center;
+  background-repeat:no-repeat;
+}

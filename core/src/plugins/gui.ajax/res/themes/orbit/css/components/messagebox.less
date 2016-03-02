@@ -1,0 +1,49 @@
+/********************/
+/* MESSAGE BOX      */
+/********************/
+.messageBox
+{
+  position: absolute;
+  z-index: 1500;
+  cursor: pointer;
+  border-radius: 4px;
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  &.errorMessage
+  {
+    color: #960000 !important;
+    background-color: rgb(242, 193, 193);
+    & > div#message_content::before {
+      content: '\f071';
+    }
+  }
+
+  &.logMessage
+  {
+    color: #009600;
+    background-color: rgb(194, 236, 194);
+    & > div#message_content::before {
+      content: '\f058';
+    }
+  }
+
+  #message_content
+  {
+    font-size: 14px;
+    margin: 10px 7px;
+    overflow-y: auto;
+    max-height: 120px;
+    letter-spacing: 0;
+    &::before {
+      font-weight: normal;
+      font-style: normal;
+      font-family: @fontAwesome;
+      display: block;
+      padding: 0 6px;
+      margin-right: 5px;
+      font-size: 16px;
+      margin-top: 2px;
+      float: left;
+    }
+  }
+}
+

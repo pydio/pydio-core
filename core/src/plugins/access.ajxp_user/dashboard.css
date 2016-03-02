@@ -41,6 +41,58 @@
     display: inline;
 }
 
+
+div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
+    padding-top: 62px;
+}
+
+div#userdashboard_myparams_title{
+    position: absolute;
+    color: rgb(204, 204, 204);
+    font-weight: normal;
+    padding: 22px;
+    height: 17px;
+    font-size: 13px;
+    width: 196px;
+    left: 0;
+    background-color: #222;
+    letter-spacing: 1px;
+}
+
+div#userdashboard_myparams_title span#dash_title{
+    display: none;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace{
+    display: block;
+    cursor: pointer;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace:hover{
+    color:rgb(204, 204, 204);
+}
+
+div#userdashboard_main_tab div#team_pane,
+div#userdashboard_main_tab div#my-users-pane,
+div#userdashboard_main_tab div#account_pane,
+div#userdashboard_main_tab div#webdav_pane,
+div#userdashboard_main_tab div#shared_files_pane,
+div#userdashboard_main_tab div#shared_pane,
+div#userdashboard_main_tab div#shared_pane2,
+div#userdashboard_main_tab div#home_account_pane{
+    position: relative;
+}
+
+div#userdashboard_main_tab h3.dashboard_panel_title{
+    position: absolute;
+    top: 12px;
+    font-size: 29px;
+    margin: 0;
+    left: 19px;
+    color: #444;
+}
+
+
 #tutorials_pane{
     color: rgb(111,123,136);
     background-color: #f8f8f8;
@@ -90,6 +142,69 @@ div#team_edit_container {
 
 #team_edit_container ul li{
     list-style: none;
+}
+
+.wallet_pane{
+    /*
+       background-color:#EFEFEF;
+       border-left:1px solid;
+       */
+    margin-left:2px;
+    margin-right:2px;
+    padding:0 10px 0 0;
+}
+.wallet_pane div.driver_form{
+    width:215px;
+}
+.wallet_pane input.dialogButton{
+    float:right;
+    border: 1px solid #676965;
+}
+
+/****************************************/
+/* WEBDAV PREFERENCES                    */
+/****************************************/
+#webdav_main_access{
+    font-size: 20px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 3px;
+    background-color: white;
+    width: 97%;
+    margin-bottom: 5px;
+    color: rgb(111, 121, 131);
+}
+
+#perworkspace-urls-toggle{
+    cursor: pointer;
+}
+#perworkspace-urls-toggle span{
+    font-size: 13px;
+    margin: 0 7px;
+    text-decoration: none;
+}
+
+#webdav_repo_list{
+    height: auto !important;
+    background-color: white;
+}
+
+#webdav_repo_list div{
+    padding: 7px;
+}
+
+#webdav_repo_list span{
+    display: inline-block;
+    width: 24%;
+}
+
+#webdav_repo_list input {
+    width: 92% !important;
+    margin-top: 11px;
+}
+
+input#webdav_password{
+    height: 22px !important;
 }
 
 

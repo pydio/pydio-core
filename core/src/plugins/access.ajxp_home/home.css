@@ -147,6 +147,15 @@
     border-bottom: 0;
 }
 
+#home_account_pane{
+    line-height: 18px;
+}
+
+#webdav_password_form {
+    padding-left: 0 !important;
+}
+
+
 #home_account_pane #notifications_center {
     float: right;
     width: 29%;

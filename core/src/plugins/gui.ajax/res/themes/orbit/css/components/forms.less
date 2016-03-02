@@ -1,0 +1,449 @@
+
+input, textarea, select
+{
+  margin-top: 1px;
+  margin-left: 10px;
+  padding: 2px;
+  border: 1px solid #aaa;
+  font-size: 13px;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+
+textarea{
+  margin-top: 0;
+  margin-left: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+
+div.oneFieldForm{
+  margin-bottom: 13px;
+  background-color: #EEEEEE;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+div.oneFieldForm input.SF_input{
+  background: white !important;
+}
+
+
+.largeButton,
+.SF_input.SF_inlineButton
+{
+  display: inline-block;
+  font-size: 13px;
+  padding: 7px 6px !important;
+  text-align: center;
+  overflow: visible;
+  color: #fff;
+  outline: none;
+  margin-left: 12px;
+  background: rgba(107, 107, 107, 0.87);
+  letter-spacing: 1px;
+  float: left;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.largeButton img{
+  width:16px;
+  height:16px;
+  vertical-align: middle;
+  position: relative;
+  top: -2px;
+  margin-right: 5px;
+  margin-top: 3px;
+}
+
+.SF_disabled img
+{
+  filter:alpha(opacity=30);
+  opacity: 0.3;
+  -moz-opacity:0.3;
+  cursor:default;
+}
+
+
+
+/*********************/
+/* WIZARD STYLE FORM */
+/*********************/
+div.wizard-pane{
+  display: none !important;
+}
+
+div.wizard-pane.wizard-panel-active{
+  display: block !important;
+}
+
+div.wizard_panel_title{
+  font-size: 24px;
+  margin: 5px 0;
+}
+div.wizard_buttons{
+  text-align: center;
+  margin-top: 30px;
+}
+div.wizard_buttons div{
+  float: none !important;
+  width:70px;
+  display: inline-block !important;
+  margin-left: 10px !important;
+}
+
+.SF_input.SF_inlineButton.wizard_previous.disabled,
+.SF_input.SF_inlineButton.wizard_next.disabled
+{
+  display: none !important;
+}
+
+div.wizard_progress{
+  display: -webkit-flex !important;
+  display: flex !important;
+
+}
+
+.wizard_previous, .wizard_next{
+  background-color:#F47561 !important;
+}
+
+
+span.wizard_progress_element {
+  padding: 28px 0 14px;
+  background-color: #FFFFFF;
+  font-size: 11px;
+  flex: 1;
+  border-bottom: 3px solid #D8D7D7;
+  position: relative;
+  text-align: center;
+  color: #555555;
+}
+
+span.wizard_progress_element.wizard_progress_passed {
+  border-bottom: 3px solid #F47561;
+  color: #F47561;
+}
+
+span.progress_number {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: #ABAAAA;
+  text-align: center;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+  position: absolute;
+  bottom: -9px;
+  left: 43%;
+}
+
+.wizard_progress_passed span.progress_number {
+  background-color: #F47561;
+}
+
+
+label{
+  margin: 0 5px;
+  font-size: 13px;
+}
+
+.checkbox_left {
+  float: left;
+  clear: left;
+  margin: 0 4px 5px 0 !important;
+}
+
+label.checkbox_label_left{
+  float: left;
+  display: inline-block;
+}
+
+/*************************/
+/* SF like "Standard Form" DATA : try to make a "standard"...
+/*************************/
+div.SF_element{
+  padding-top: 5px;
+  clear:left;
+  width: 96%;
+  margin: 0 2%;
+}
+
+div.SF_element div.SF_element{
+  margin: 0;
+}
+
+div.dialogContent div.SF_element{
+}
+
+div.SF_disabled{
+  color: #ccc;
+  font-style:italic;
+}
+
+div.SF_label{
+  text-transform: uppercase;
+  width: 100% !important;
+  line-height: 22px !important;
+  letter-spacing: 1px;
+  margin-top: 3px;
+}
+
+input.SF_fieldCheckBox{
+  margin-top: 7px !important;
+}
+
+.no-flexbox div.SF_label{
+  padding-right:3px !important;
+}
+
+.SF_input{
+  padding: 1% !important;
+  margin-left: 0;
+  width: 97%;
+  max-width: 450px !important;
+}
+.SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
+  margin-left: 0 !important;
+  background-color: white;
+  width: 97% !important;
+  max-width: 450px !important;
+}
+
+div.SF_element.SF_largeLabel > input.SF_input.SF_number,
+input.SF_input.SF_number{
+  width: 30px !important;
+  text-align: right;
+}
+
+select.SF_input {
+  max-width: 450px !important;
+  width: 99% !important;
+  padding: 0 0 0 5px !important;
+  box-sizing: border-box;
+}
+
+.SF_box{
+  width: 20px !important;
+}
+
+.SF_fieldCheckBox{
+  float:left;
+  margin: 5px;
+}
+
+.SF_elementWithCheckbox > .SF_input{
+  width: 50% !important;
+  _width:46% !important; /*IE*/
+}
+
+.SF_inlineButton {
+  margin: 3px 0 !important;
+  padding: 4px !important;
+  background-image: url('../images/grid_tl.png');
+}
+
+.SF_inlineMonitoring {
+  padding: 7px 4px !important;
+}
+.SF_inlineMonitoring.SF_inlineMonitoringWorking:after{
+  content: " [reloading]";
+}
+
+.SF_inlineButton span[class^="icon-"]{
+  margin-right: 3px;
+}
+
+.SF_inlineButton.SF_inlineButtonWorking{
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
+  padding-top: 10px !important;
+  padding-bottom: 8px !important;
+}
+
+.SF_failed{
+  border: 1px solid #D8B0B0 !important;
+}
+
+.SF_replicableGroup{
+  background-color:#EEE;
+  clear: both;
+  position: relative;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  padding-bottom: 20px;
+  margin-top: 8px;
+}
+
+.SF_replication_Add,
+.SF_replication_Remove
+{
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-image: url('../images/0.gif');
+  background-repeat: no-repeat;
+  background-position: 5px 6px;
+  position:absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.SF_replication_Remove
+{
+  background-image: url('../images/1.gif');
+  top: 0;
+}
+
+.SF_rgClear{
+  clear:left;
+  height: 3px;
+}
+
+.SF_image_block{
+  max-width: 80px;
+  float: left;
+}
+
+.SF_image.small{
+  max-width: 80px;
+  max-height: 80px;
+}
+
+#user_profile_form img.SF_image.small {
+  border-radius: 40px;
+}
+
+.SF_image_link{
+  display: inline-block;
+  width: 80px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.accordion_toggle_failed {
+  background-color: #D8B0B0 !important;
+}
+
+.SF_horizontal_labelRow{
+  clear: both;
+}
+
+.SF_horizontal_labelRow div.SF_label{
+  float:left;
+  text-align: left;
+  padding: 0 5px 0 3px;
+  margin-right: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.SF_horizontal_fieldsRow{
+  clear: both;
+}
+.SF_horizontal_fieldsRow input{
+  float: left;
+  margin-right: 5px;
+  font-size: 13px;
+  padding: 3px 4px 3px 2px !important;
+}
+
+.SF_horizontal_fieldsRow input.SF_number{
+  text-align: left;
+}
+
+.SF_horizontal_actions {
+  float: left;
+  padding: 5px 2px;
+  font-size: 15px;
+}
+
+.SF_horizontal_pastilles{
+  padding: 1px 8px;
+  font-size: 11px;
+  float: none;
+}
+
+.SF_horizontal_actions span{
+  cursor: pointer;
+  margin-right: 0;
+}
+
+.SF_horizontal_pastilles span{
+  margin-right: 10px;
+}
+
+.SF_horizontal_pastilles span > span{
+  margin: 0;
+}
+
+.SF_horizontal_action_destructive{
+  color: #A00;
+}
+
+
+/**********************************************
+/* STANDARD FORM BUT IN A MORE "MATERIAL" WAY
+/*********************************************/
+
+.dialogContent div.SF_material div.SF_element{
+  width: auto;
+  margin: 0;
+}
+
+.dialogContent div.SF_material div.SF_label{
+  line-height: 14px !important;
+  letter-spacing: 0;
+  margin-top: 17px;
+  margin-left: 0;
+  font-size: 11px;
+  color: rgb(140, 140, 140);
+  text-transform: none;
+}
+
+.dialogContent div.SF_material input,
+.dialogContent div.SF_material textarea,
+.dialogContent div.SF_material select{
+  margin:1px 0 0 0;
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e2e2;
+  padding: 4px 1% 0 0 !important;
+}
+
+.dialogContent div.SF_material select.SF_input{
+  width: 98% !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  border: 0;
+}
+
+.dialogContent div.SF_material *.dialogLegend{
+  padding: 7px 0;
+  font-size: 12px;
+  line-height: inherit;
+}
+
+.dialogContent div.SF_material div.SF_element span.select-styler {
+  display: block;
+  border-top: 1px solid #E2E2E2;
+  width: 98%;
+}
+
+.dialogContent div.SF_material input.SF_failed{
+  border: 0 !important;
+  border-bottom: 1px solid #CF4747 !important;
+}
+
+.dialogContent div.SF_material div.SF_input.SF_inlineButton.disabled{
+  opacity: 0.5;
+}

@@ -1,0 +1,241 @@
+#topPane{
+  width:280px;
+  background-color: rgba(50,50,50,0.93);
+}
+
+.no-flexbox div#topPane{
+  float:left;
+}
+
+.no-flexbox div#cpane_container {
+  position: absolute;
+  left: 280px;
+}
+
+
+#tree_container{
+  overflow-x: hidden !important;
+}
+
+#browser
+{
+  clear:left;
+  /*background-color: #f5f5f5;*/
+  line-height: 18px;
+}
+
+.flexbox div#browser{
+  flex-direction:row;
+  -webkit-flex-direction:row;
+  align-items:stretch;
+  -webkit-align-items:stretch;
+}
+
+#content_pane{
+  background-color: #fff;
+}
+
+#content_pane div.panelHeader,
+#search_results div.panelHeader,
+div.class-FetchedResultPane > div.panelHeader
+{
+  display: none;
+}
+
+#topPane{
+  border: 0 !important;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed > div.thumbnail_selectable_cell{
+  display: none;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed div.thumbLabel{
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed div.thumbLabel:before{
+  content: "\f114";
+  font-size: 1.3em;
+  font-family: @fontAwesome;
+  padding: 13px 13px;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed.ajxpNodeLeaf div.thumbLabel:before{
+  content: "\f016";
+}
+
+
+#topPane h3,
+#search_meta div.advanced_search_section_title
+{
+  font-size: 16px;
+  padding: 16px 8px 15px 17px;
+  margin: 0;
+  letter-spacing: 1px;
+  display: block;
+  clear: left;
+  font-weight: lighter;
+}
+
+#topPane div.scrolling h3{
+  padding-right: 16px;
+}
+
+#topPane h3 small{
+  cursor: pointer;
+  display: none;
+  float: right;
+  color: #aaa;
+  background-color: #555;
+  border-radius: 5px;
+  text-transform: lowercase;
+  padding: 0 8px;
+  font-weight: normal;
+  font-size: 0.7em;
+  margin-left: 3px;
+}
+
+#topPane h3:hover small,
+#topPane h3 small.simple-toggler-show
+{
+  display: inline-block;
+}
+
+#topPane span.expand_label_hide,
+#topPane small.expand_button_hide span.expand_label_show
+{
+  display: none;
+}
+
+#topPane small.expand_button_hide span.expand_label_hide{
+  display: inline;
+}
+
+#search_meta div.advanced_search_section_title{
+  border-left: 0;
+}
+
+#search_meta div.advanced_search_section_title span.icon-circle{
+  display: none;
+}
+
+
+#repo_chooser{
+  background-color: #222;
+  float:left;
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: normal;
+  letter-spacing: 1px;
+  margin-top:0;
+  cursor: pointer;
+  padding: 21px 15px 21px 15px;
+  border-right: 2px solid #333;
+  height: 20px;
+}
+
+#repo_chooser:hover{
+  background-color: #fb725c;
+  color: white;
+}
+
+#repo_chooser.disabled{
+  display:none;
+}
+
+#repo_chooser span.icon-sitemap {
+  font-size: 1.0em;
+  padding-right: 5px;
+  padding-top: 5px;
+  display: inline-block;
+}
+
+#repo_chooser span.ws-label {
+  display: inline-block;
+  padding-top: 0;
+  line-height: 20px;
+}
+
+#repo_chooser span.icon-caret-down {
+  display: inline-block;
+  padding-left: 3px;
+}
+
+#sidebar_splitter div.panelHeader,
+#search_panel div.panelHeader{
+  color: #555;
+}
+
+
+div[ajxpClass="FilesList"].paginated div.scroller_track{
+  top: 30px;
+}
+
+div.fl-displayMode-list div.scroller_track {
+  top: 26px;
+}
+
+div.fl-displayMode-list.paginated div.scroller_track {
+  top: 56px;
+}
+
+
+
+#cpane_tabs > div.tabulatorContainer{
+  border-bottom: 0;
+  /*transition: height 0.5s ease;*/
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+  background-color: #f7f7f7;
+}
+
+#cpane_tabs[data-ajxptabscount="1"] > div.tabulatorContainer{
+  height: 0;
+}
+
+
+#action_instance_user_create_repository {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+
+#cpane_header{
+  padding-bottom: 4px;
+  height: 19px;
+}
+
+#content_pane div.thumbnail_selectable_cell.detailed div.thumbLabel,
+.table_rows_container span#ajxp_label
+{
+  font-family: @fontBold;
+}
+
+
+.colorcode-alert,
+span.overlay-class-span.icon-eye-open
+{
+  color: #F5C781;
+}
+
+.colorcode-shared,
+span.overlay-class-span.icon-share-sign
+{
+  color: #4Aceb0;
+}
+
+.colorcode-bookmark,
+span.overlay-class-span.icon-bookmark
+{
+  color: #77b8e2;
+}
+
+.colorcode-folder{
+  color: #fb725c;
+}
+

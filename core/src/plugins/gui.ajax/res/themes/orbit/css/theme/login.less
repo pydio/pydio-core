@@ -1,0 +1,189 @@
+/****************
+/* LOGIN BOX
+/****************/
+.captcha_container {
+  text-align:center;
+}
+.captcha_container img{
+  margin: 5px 0 0 2px;
+  border: 1px solid #ddd;
+}
+
+#login_form,
+#login_form_dynamic
+{
+  margin: 0 40px;
+  font-size: 15px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#login_form div.SF_label,
+#login_form_dynamic div.SF_label{
+  padding-left: 4px;
+}
+
+#login_form.no_placeholder div.SF_label,
+#login_form_dynamic.no_placeholder div.SF_label
+{
+  display: block;
+  text-align: left;
+  padding: 0 4px;
+}
+
+#login_form.no_placeholder div.SF_input,
+#login_form_dynamic.no_placeholder div.SF_input
+{
+  clear: left;
+}
+
+#login_form div.SF_input > input,
+#login_form_dynamic div.SF_input > input{
+  width: 280px !important;
+  padding: 7px !important;
+  font-size: 17px;
+  border: 0 !important;
+}
+
+.ajxp_login_error {
+  margin: 12px 27px 6px 12px;
+  font-size: 14px !important;
+  background-color: rgba(180, 57, 57, 0.4) !important;
+  color: white !important;
+  padding: 7px !important;
+}
+
+.ajxp_password_auth div.SF_element:first-of-type{
+  display: none !important;
+}
+
+div.dialogBox.form-switch_language_form,
+div.dialogBox.form-reset-password,
+div.dialogBox.form-reset-password-ask,
+div.dialogBox.form-login_form,
+div.dialogBox.form-login_form_dynamic
+{
+  /*
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    */
+  box-shadow: none;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(34,34,34,0.4);
+  border-radius: 0;
+
+}
+
+div.dialogBox.form-switch_language_form div.dialogContent,
+div.dialogBox.form-reset-password div.dialogContent,
+div.dialogBox.form-reset-password-ask div.dialogContent,
+div.dialogBox.form-login_form div.dialogContent,
+div.dialogBox.form-login_form_dynamic div.dialogContent
+{
+  height: 100%;
+  background-color: transparent;
+  color: white;
+  transition: padding-top 0.5s;
+  -webkit-transition: padding-top 0.5s;
+}
+
+div.dialogBox.form-switch_language_form div.dialogTitle,
+div.dialogBox.form-reset-password div.dialogTitle,
+div.dialogBox.form-reset-password-ask div.dialogTitle,
+div.dialogBox.form-login_form div.dialogTitle,
+div.dialogBox.form-login_form_dynamic div.dialogTitle
+{
+  display: block !important;
+  position: absolute;
+  top: 0;
+  height: 90% !important;
+  right: -113%;
+  background-color: transparent;
+}
+
+div.dialogBox.form-switch_language_form select#language_selector{
+  width: 280px !important
+}
+
+div.dialogBox.form-login_form div#progressCustomMessage,
+div.dialogBox.form-login_form_dynamic div#progressCustomMessage
+{
+  font-size: 30px !important;
+  text-align: center;
+}
+
+div.dialogBox.form-login_form a.icon-flag,
+div.dialogBox.form-login_form_dynamic a.icon-flag
+{
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:20px !important;
+  color: white !important;
+}
+
+div.dialogBox.form-login_form div.dialogLegend,
+div.dialogBox.form-login_form_dynamic div.dialogLegend
+{
+  text-align: center;
+  font-style: italic;
+  color: #ddd;
+}
+
+div.dialogBox.form-login_form a.forgot-password-link,
+div.dialogBox.form-login_form_dynamic a.forgot-password-link
+{
+  color: white !important;
+  margin-right: 45px;
+  margin-top: 6px;
+  text-decoration: underline;
+  font-size: 13px;
+  text-align: right;
+  display: block;
+  float: right;
+}
+
+div.dialogBox.form-switch_language_form div.dialogButtons,
+div.dialogBox.form-reset-password div.dialogButtons,
+div.dialogBox.form-reset-password-ask div.dialogButtons,
+div.dialogBox.form-login_form div.dialogButtons,
+div.dialogBox.form-login_form_dynamic div.dialogButtons
+{
+  margin-top: 50px;
+  text-align: center;
+}
+
+div.dialogBox.form-switch_language_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password-ask div.dialogButtons input.dialogButton,
+div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
+{
+  width: 70px;
+  height: 70px;
+}
+
+
+div.overlay.form-login_form,
+div.overlay.form-login_form_dynamic,
+div.overlay.form-switch_language_form,
+div.overlay.form-reset-password,
+div.overlay.form-reset-password-ask
+{
+  opacity: 0;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.ajxp_guest_enabled div.overlay.form-login_form,
+.ajxp_guest_enabled div.overlay.form-login_form_dynamic,
+.ajxp_guest_enabled div.overlay.form-switch_language_form,
+.ajxp_guest_enabled div.overlay.form-reset-password,
+.ajxp_guest_enabled div.overlay.form-reset-password-ask
+{
+  opacity: 1 !important;
+  background-color: inherit !important;
+}

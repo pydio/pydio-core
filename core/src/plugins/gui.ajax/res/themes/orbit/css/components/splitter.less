@@ -1,0 +1,52 @@
+#vertical_splitter{
+  overflow: hidden;
+}
+
+#vertical_splitter > div{
+  top:0;
+}
+
+#sidebar_splitter{
+  overflow: auto;
+  width: 200px;
+  background-color: #D2DFE9;
+  -webkit-box-shadow: rgb(153, 153, 153) 1px 1px 5px inset;
+  -moz-box-shadow: rgb(153, 153, 153) 1px 1px 5px inset;
+  box-shadow: rgb(153, 153, 153) 1px 1px 5px inset;
+}
+
+.splitterContentPane{
+  border: 1px solid #676965;
+}
+
+.vsplitbar
+{
+  width: 3px;
+  z-index: 1014;
+}
+.vsplitbar:hover
+{
+  background: #474E50 no-repeat center;
+}
+.vsplitbar.active
+{
+  background-color: #474E50;
+}
+.hsplitbar.folded, .vsplitbar.folded{
+  opacity: 0;
+  cursor: default !important;
+}
+
+.hsplitbar{
+  height: 4px;
+  /*background-color: #eee;*/
+  background-image: url(../images/hgrabber.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1014;
+}
+.hsplitbar.active
+{
+  background-color: #474E50;
+}
+
