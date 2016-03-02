@@ -11,10 +11,9 @@
   display:flex;
   flex-direction: column;
   -webkit-flex-direction: column;
-}
-
-.vertical_layout > *{
-  flex-shrink: 0;
+  & > *{
+    flex-shrink: 0;
+  }
 }
 
 .horizontal_layout{
@@ -35,4 +34,3 @@
 .fit_background_height{
   background-size: auto 100% !important;
 }
-

@@ -5,13 +5,20 @@ div.accordion_toggle{
   color: rgb(117, 128, 139);
   border-bottom: 1px solid rgb(117, 128, 139);
   cursor: pointer;
+  background: url('../../images/Tplus.png') no-repeat;
+  background-position-x: -6px;
+  background-position-y: -3px;
   padding-left: 15px;
   font-size: 16px;
   margin-bottom: 0;
   margin-top: 10px;
   padding-bottom: 2px;
   border-bottom: 0;
+  &_active{
+    background-image: url('../../images/Tminus.png');
+  }
 }
+
 div.accordion_content{
   overflow: hidden;
   padding: 5px;

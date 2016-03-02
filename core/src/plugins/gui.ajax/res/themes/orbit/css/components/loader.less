@@ -1,52 +1,48 @@
 #progressBox
 {
-  display: block;
   z-index: 2002;
-  top: 20%;
   -moz-border-radius : 5px;
   border-radius : 5px;
   width: 305px !important;
   padding: 3px;
   display: block;
   top: 30%;
-  z-index: 2002;
   left: 40%;
   position: absolute;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
   -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
   min-width: 305px;
-}
+  div.dialogTitle{
+    display: none;
+  }
+  .bounce-spinner {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    margin: 30px auto;
+  }
 
-#progressBox div.dialogTitle{
-  display: none;
-}
+  .double-bounce1, .double-bounce2 {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: @primary-1-color;
+    opacity: 0.6;
+    position: absolute;
+    top: 0;
+    left: 0;
 
-.bounce-spinner {
-  width: 50px;
-  height: 50px;
+    -webkit-animation: bounce 2.0s infinite ease-in-out;
+    animation: bounce 2.0s infinite ease-in-out;
+  }
 
-  position: relative;
-  margin: 30px auto;
-}
+  .double-bounce2 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+  }
 
-.double-bounce1, .double-bounce2 {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: @primary-1-color;
-  opacity: 0.6;
-  position: absolute;
-  top: 0;
-  left: 0;
 
-  -webkit-animation: bounce 2.0s infinite ease-in-out;
-  animation: bounce 2.0s infinite ease-in-out;
-}
-
-.double-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
 }
 
 @-webkit-keyframes bounce {
