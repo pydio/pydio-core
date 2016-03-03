@@ -134,8 +134,7 @@ class Client extends CoreClient
 
         $sabreDAVClient = $this->_getSabreDAVClient($params);
 
-        try {
-            $result = $sabreDAVClient->propFind(
+        $result = $sabreDAVClient->propFind(
                 $params['path/basepath'] . '/' . $params['path/fullpath'],
                 [
                     '{DAV:}getlastmodified',
@@ -143,11 +142,6 @@ class Client extends CoreClient
                     '{DAV:}resourcetype'
                 ]
             );
-        } catch (NotFound $e) {
-            return false;
-        } catch (\Exception $e) {
-            return false;
-        }
 
         return $result;
     }
@@ -174,19 +168,15 @@ class Client extends CoreClient
 
         $sabreDAVClient = $this->_getSabreDAVClient($params);
 
-        try {
-            $response = $sabreDAVClient->propFind(
-                $params['path/basepath'] . '/' . $params['path/fullpath'],
-                [
-                    '{DAV:}getlastmodified',
-                    '{DAV:}getcontentlength',
-                    '{DAV:}resourcetype'
-                ],
-                1
-            );
-        } catch (\Exception $e) {
-            return false;
-        }
+        $response = $sabreDAVClient->propFind(
+            $params['path/basepath'] . '/' . $params['path/fullpath'],
+            [
+                '{DAV:}getlastmodified',
+                '{DAV:}getcontentlength',
+                '{DAV:}resourcetype'
+            ],
+            1
+        );
 
         return $response;
     }

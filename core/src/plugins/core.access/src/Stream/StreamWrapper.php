@@ -22,6 +22,10 @@
 namespace Pydio\Access\Core\Stream;
 
 use AJXP_Utils;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+use Pydio\Access\Core\Stream\Exception\NotFoundException;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Pydio\Access\Core\Stream\ClientInterface;
@@ -165,9 +169,9 @@ class StreamWrapper
 
         try {
             $this->getClient()->put($params);
-            return true;
         } catch (\Exception $e) {
-            return $this->triggerError($e->getMessage());
+            $this->triggerError("Unable to write content : " . $e->getMessage());
+            return false;
         }
 
         return true;
@@ -233,9 +237,9 @@ class StreamWrapper
         try {
             $this->clearStatInfo($path);
             $this->getClient()->delete($params);
-            return true;
         } catch (\Exception $e) {
-            return $this->triggerError($e->getMessage());
+            $this->triggerError("Unable to delete item : " . $e->getMessage());
+            return false;
         }
     }
 
@@ -281,9 +285,16 @@ class StreamWrapper
 
                 static::$nextStat[$key] = $result;
             }
-        } catch(\Exception $e) {
-            // TODO - refine that to handle specific exceptions
-            return false;
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                static::$nextStat[$key] = false;
+
+                return false;
+            }
+        } catch (\Exception $e) {
+            static::$nextStat[$key] = false;
+
+            return $this->triggerError('Cannot access file ' . $e->getMessage(), $flags);
         }
 
         return $result;
@@ -304,7 +315,12 @@ class StreamWrapper
     {
         $params = $this->getParams($path);
 
-        $result = $this->getClient()->mkdir($params);
+        try {
+            $result = $this->getClient()->mkdir($params);
+        } catch (\Exception $e) {
+            $this->triggerError("Unable to create directory : " . $e->getMessage());
+            return false;
+        }
 
         return $result;
     }
@@ -322,7 +338,12 @@ class StreamWrapper
     {
         $params = $this->getParams($path);
 
-        $result = $this->getClient()->rmdir($params);
+        try {
+            $result = $this->getClient()->rmdir($params);
+        } catch (\Exception $e) {
+            $this->triggerError("Unable to remove directory : " . $e->getMessage());
+            return false;
+        }
 
         return $result;
     }
@@ -340,7 +361,11 @@ class StreamWrapper
     {
         $params = $this->getParams($path);
 
-        $result = $this->getClient()->ls($params);
+        try {
+            $result = $this->getClient()->ls($params);
+        } catch (\Exception $e) {
+            $this->triggerError("Unable to list directory : " . $e->getMessage());
+        }
 
         $this->objectIterator = $this->getClient()->getIterator($result, $params);
 
@@ -413,7 +438,12 @@ class StreamWrapper
         $this->clearStatInfo($path_from);
         $this->clearStatInfo($path_to);
 
-        $result = $this->getClient()->rename($params);
+        try {
+            $result = $this->getClient()->rename($params);
+        } catch (\Exception $e) {
+            $this->triggerError("Unable to rename item : " . $e->getMessage());
+            return false;
+        }
 
         return true;
     }
@@ -475,7 +505,12 @@ class StreamWrapper
     protected function openReadStream(array $params, array &$errors)
     {
         // Create the command and serialize the request
-        $response = $this->getClient()->open($params);
+        try {
+            $response = $this->getClient()->open($params);
+        } catch (\Exception $e) {
+            $this->triggerError("Unable to open stream : " . $e->getMessage());
+            return false;
+        }
 
         $this->body = $response->getBody();
 
@@ -533,7 +568,7 @@ class StreamWrapper
 
           if ($flags & STREAM_URL_STAT_LINK) {
             // This is triggered for things like is_link()
-            return $this->formatUrlStat(false);
+            return $this->getClient()->formatUrlStat([]);
           }
           return false;
         }
