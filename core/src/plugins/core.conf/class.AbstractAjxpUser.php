@@ -613,14 +613,6 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     }
 
     public function reloadRolesIfRequired(){
-        // Roles are always updated
-        $roles = array_keys($this->roles);
-        $replace = array();
-        foreach($roles as $k){
-            if(strpos($k, "ldapgroup_") !== 0) $replace[] = $k;
-        }
-        $roles = $replace;
-
         if($this->lastSessionSerialization && count($this->roles)
             && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
 
