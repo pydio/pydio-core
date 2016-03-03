@@ -1,3 +1,8 @@
+@tabs_react_like_selected_tab_color:#fb725c;
+
+@tabs_horizontal_container_bg:#30383A;
+@tabs_horizontal_selected_tab_color:#fb725c;
+
 div.tabbed_editor div.innerTitle{
   margin: 10px !important;
   padding: 8px !important;
@@ -13,7 +18,7 @@ span.toggleHeader{
   transition: border-color 0.3s ease;
   color: #555;
   font-size: 12px;
-  border-bottom: 3px solid #FB725C;
+  border-bottom: 3px solid @tabs_react_like_selected_tab_color;
 }
 
 .flat_tabulator span.toggleHeader{
@@ -92,7 +97,6 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
   color: #ffffff;
 }
 
-
 .tabrow {
   list-style: none;
   margin: 0;
@@ -124,7 +128,6 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
   color: #ffffff;
   background-color: transparent !important;
 }
-
 
 .innerTabulator  div.panelHeader
 {
@@ -222,7 +225,7 @@ div.flat_tabulator > div:not(.tabulatorContainer){
   float: left;
   width: 240px;
   padding: 0;
-  background-color: #30383A;
+  background-color: @tabs_horizontal_container_bg;
 }
 
 .flexbox div.horizontal_tabulator{
@@ -238,13 +241,13 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 }
 
 div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer {
-  background-color: #30383A;
+  background-color: @tabs_horizontal_container_bg;
 }
 
 .horizontal_tabulator span.toggleHeader{
   text-align: left;
   padding: 10px 0 12px 22px;
-  background-color: #fb725c !important;
+  background-color: @tabs_horizontal_selected_tab_color !important;
   color: #ffffff !important;
   border: 0;
   display: block;

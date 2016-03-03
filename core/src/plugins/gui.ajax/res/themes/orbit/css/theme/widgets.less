@@ -110,7 +110,6 @@
         color: #fff;
       }
     }
-
     div.no-results-found{
       padding: 0 24px;
       font-size: 12px;
@@ -164,8 +163,27 @@
         height: 0;
       }
 
-      #content_pane{
+      #content_pane.class-FilesList{
         background-color: #fff;
+
+          div.thumbnail_selectable_cell{
+            &.detailed div.thumbLabel{
+              font-family: @fontBold;
+            }
+            span.metadata_chunk.metadata_chunk_standard{
+              display: none;
+            }
+            span.metadata_chunk.metadata_chunk_standard.metadata_chunk_ajxp_modiftime{
+              display: none;
+            }
+            &:hover span.metadata_chunk.metadata_chunk_standard,
+            &.selected span.metadata_chunk.metadata_chunk_standard,
+            &.selected-focus span.metadata_chunk.metadata_chunk_standard          {
+              display: inline ;
+            }
+
+          }
+
         div.panelHeader{
           display: none;
         }
@@ -189,11 +207,6 @@
 #action_instance_user_create_repository {
   font-size: 14px;
   line-height: 21px;
-}
-
-#content_pane div.thumbnail_selectable_cell.detailed div.thumbLabel,
-.table_rows_container span#ajxp_label{
-  font-family: @fontBold;
 }
 
 .colorcode-alert,

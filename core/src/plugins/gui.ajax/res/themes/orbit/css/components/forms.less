@@ -1,16 +1,18 @@
 // Color variables (appears count calculates by raw css)
 @wizard_nav: #f47561; // Appears 5 times
-@color1: #ffffff; // Appears 4 times
-@color2: #e2e2e2; // Appears 4 times
-@color3: #aaaaaa; // Appears 3 times
-@color4: #eeeeee; // Appears 2 times
-@color5: #d8b0b0; // Appears 2 times
+
+@forms_button_background:rgba(107, 107, 107, 0.87);
+@forms_button_color:@white;
+@forms_input_border: 1px solid #aaaaaa;
+@forms_subform_background_color: #eeeeee; // Appears 2 times
+@forms_validation_error_color:#d8b0b0;
+
 
 input {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   border-radius: 2px;
-  border: 1px solid @color3;
+  border: @forms_input_border;
   font-size: 13px;
   margin-left: 10px;
   margin-top: 1px;
@@ -19,9 +21,9 @@ input {
 textarea {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-  background-color: @color1;
+  background-color: @white;
   border-radius: 2px;
-  border: 1px solid @color3;
+  border: @forms_input_border;
   font-size: 13px;
   margin-left: 10px;
   margin-top: 1px;
@@ -31,14 +33,14 @@ select {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   border-radius: 2px;
-  border: 1px solid @color3;
+  border: @forms_input_border;
   font-size: 13px;
   margin-left: 10px;
   margin-top: 1px;
   padding: 2px;
 }
 div.oneFieldForm {
-  background-color: @color4;
+  background-color: @forms_subform_background_color;
   border-radius: 4px;
   margin-bottom: 13px;
   margin-top: 10px;
@@ -48,9 +50,9 @@ div.oneFieldForm {
   }
 }
 .largeButton {
-  background: rgba(107, 107, 107, 0.87);
+  background: @forms_button_background;
   border-radius: 5px;
-  color: @color1;
+  color: @forms_button_color;
   cursor: pointer;
   display: inline-block;
   float: left;
@@ -72,9 +74,9 @@ div.oneFieldForm {
   }
 }
 .SF_input.SF_inlineButton {
-  background: rgba(107, 107, 107, 0.87);
+  background: @forms_button_background;
   border-radius: 5px;
-  color: @color1;
+  color: @forms_button_color;
   cursor: pointer;
   display: inline-block;
   float: left;
@@ -132,7 +134,7 @@ div.wizard_progress {
   background-color: @wizard_nav !important;
 }
 span.wizard_progress_element {
-  background-color: @color1;
+  background-color: @white;
   border-bottom: 3px solid #D8D7D7;
   color: #555555;
   flex: 1;
@@ -282,10 +284,10 @@ select.SF_input {
   padding-top: 10px !important;
 }
 .SF_failed {
-  border: 1px solid @color5 !important;
+  border: 1px solid @forms_validation_error_color !important;
 }
 .SF_replicableGroup {
-  background-color:@color4;
+  background-color: @forms_subform_background_color;
   border-radius: 5px;
   clear: both;
   margin-bottom: 5px;
@@ -336,7 +338,7 @@ select.SF_input {
   width: 80px;
 }
 .accordion_toggle_failed {
-  background-color: @color5 !important;
+  background-color: @forms_validation_error_color !important;
 }
 .SF_horizontal_labelRow {
   clear: both;
@@ -391,7 +393,7 @@ select.SF_input {
       margin: 0;
       width: auto;
       span.select-styler {
-        border-top: 1px solid @color2;
+        border-top: 1px solid #e2e2e2;
         display: block;
         width: 98%;
       }
