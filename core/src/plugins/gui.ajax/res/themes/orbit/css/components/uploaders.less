@@ -107,9 +107,9 @@ div#upload_files_list div, div#multiple_download_container div
   padding-left: 14px;
   position: relative;
   font-size: 13px;
-  background-image: url('../images/dl_bg.png');
+  background-image: url('@{imagePath}/dl_bg.png');
   background-repeat: no-repeat;
-  background-size: 0% 100%;
+  background-size: 0 100%;
   border-bottom: 1px solid rgb(227, 229, 233);
   color: #5C5C5C;
 }
@@ -184,8 +184,8 @@ div#upload_files_list span.item_relative_path{
   cursor: pointer;
 }
 #fileInputContainer input {
-  moz-opacity: 0;
   opacity: 0;
+  -moz-opacity: 0;
   position: absolute;
   font-size: 60px; /* causes it to fill the containing div */
   top: 0;

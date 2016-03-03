@@ -1,21 +1,25 @@
 /********************************/
 /* SLIDER*/
 /*********************************/
+@slider_background_color:#ebedf0;
+@slider_box_shadow:1px 1px 4px rgba(0,0,0,0.75);
 
 .slider-pane{
-  background-color: #ebedf0;
+
+  background-color: @slider_background_color;
   padding: 5px 2px;
   position:absolute;
   width:11px;
   z-index:10000;
   border-radius: 2px;
-  box-shadow: 1px 1px 4px rgba(0,0,0,0.75);
+  box-shadow: @slider_box_shadow;
+
 }
 
 .slider-handle,
 .slider-pane div.selected
 {
-  background-image: url("../images/slider-handle-vert.png") !important;
+  background-image: url('@{imagePath}slider-handle-vert.png') !important;
   background-position:top center;
   background-repeat: no-repeat !important;
   background-color: transparent !important;
@@ -24,7 +28,7 @@
 }
 
 .slider-tracker {
-  background-image : url("../images/slider-track-bottom.png");
+  background-image : url("@{imagePath}slider-track-bottom.png");
   background-position:bottom center;
   background-repeat:no-repeat;
 }

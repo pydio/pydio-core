@@ -1,59 +1,51 @@
+@userwidget_font_color: @white;
+@userwidget_font_size:12px;
 
 #logging_string {
-  color:#fff;
-  font-size:11px;
+  color:@userwidget_font_color;
   float: right;
   margin-top: 12px;
-}
+  div.inlineBarButtonLeft {
+    display:none;
+  }
+  i {
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: 1px;
+    img {
+      border-radius: 22px;
+      cursor: pointer;
+      float: right;
+      font-style: normal;
+      margin-left: 10px;
+      margin-top: -12px;
+    }
+  }
+  &.disabled {
+    display:none;
+  }
 
-#logging_string.disabled{
-  display:none;
+  .user_widget_label {
+    cursor: pointer;
+    float: left;
+    font-size: @userwidget_font_size;
+    letter-spacing: 1px;
+    padding: 3px 10px 7px 7px;
+  }
+  .user_widget_label.withImage {
+    padding:0;
+    position: relative;
+    i {
+      display: inline-block;
+      font-size: @userwidget_font_size;
+      font-weight: bold;
+      padding: 3px 0 0 8px;
+      img {
+      }
+    }
+  }
+  img.user_widget_mini {
+    height: 39px;
+    vertical-align: middle;
+  }
 }
-
-#logging_string div.inlineBarButtonLeft{
-  display:none;
-}
-
-#logging_string i
-{
-  font-style: normal;
-  font-weight: normal;
-  letter-spacing: 1px;
-}
-#logging_string i img
-{
-  font-style: normal;
-  cursor: pointer;
-  margin-top: -12px;
-  float: right;
-  margin-left: 10px;
-  border-radius: 22px;
-}
-.user_widget_label{
-  float: left;
-  padding: 3px 10px 7px 7px;
-  cursor: pointer;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-
-.user_widget_label.withImage{
-  position: relative;
-  padding:0;
-}
-
-.user_widget_label.withImage i{
-  font-weight: bold;
-  display: inline-block;
-  padding: 3px 0 0 8px;
-  font-size: 12px;
-}
-
-.user_widget_label.withImage i img{
-}
-
-img.user_widget_mini{
-  vertical-align: middle;
-  height: 39px;
-}
-

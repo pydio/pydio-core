@@ -1,449 +1,447 @@
+// Color variables (appears count calculates by raw css)
+@wizard_nav: #f47561; // Appears 5 times
+@color1: #ffffff; // Appears 4 times
+@color2: #e2e2e2; // Appears 4 times
+@color3: #aaaaaa; // Appears 3 times
+@color4: #eeeeee; // Appears 2 times
+@color5: #d8b0b0; // Appears 2 times
 
-input, textarea, select
-{
-  margin-top: 1px;
-  margin-left: 10px;
-  padding: 2px;
-  border: 1px solid #aaa;
-  font-size: 13px;
-  border-radius: 2px;
+input {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-}
-
-textarea{
-  margin-top: 0;
-  margin-left: 0;
-  padding: 0;
-  background-color: #fff;
-}
-
-
-div.oneFieldForm{
-  margin-bottom: 13px;
-  background-color: #EEEEEE;
-  padding: 3px 6px;
-  border-radius: 4px;
-  margin-top: 10px;
-}
-
-div.oneFieldForm input.SF_input{
-  background: white !important;
-}
-
-
-.largeButton,
-.SF_input.SF_inlineButton
-{
-  display: inline-block;
+  border-radius: 2px;
+  border: 1px solid @color3;
   font-size: 13px;
+  margin-left: 10px;
+  margin-top: 1px;
+  padding: 2px;
+}
+textarea {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  background-color: @color1;
+  border-radius: 2px;
+  border: 1px solid @color3;
+  font-size: 13px;
+  margin-left: 10px;
+  margin-top: 1px;
+  padding: 2px;
+}
+select {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  border: 1px solid @color3;
+  font-size: 13px;
+  margin-left: 10px;
+  margin-top: 1px;
+  padding: 2px;
+}
+div.oneFieldForm {
+  background-color: @color4;
+  border-radius: 4px;
+  margin-bottom: 13px;
+  margin-top: 10px;
+  padding: 3px 6px;
+  input.SF_input {
+    background: white !important;
+  }
+}
+.largeButton {
+  background: rgba(107, 107, 107, 0.87);
+  border-radius: 5px;
+  color: @color1;
+  cursor: pointer;
+  display: inline-block;
+  float: left;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-left: 12px;
+  outline: none;
+  overflow: visible;
   padding: 7px 6px !important;
   text-align: center;
-  overflow: visible;
-  color: #fff;
-  outline: none;
-  margin-left: 12px;
+  img {
+    height:16px;
+    margin-right: 5px;
+    margin-top: 3px;
+    position: relative;
+    top: -2px;
+    vertical-align: middle;
+    width:16px;
+  }
+}
+.SF_input.SF_inlineButton {
   background: rgba(107, 107, 107, 0.87);
-  letter-spacing: 1px;
-  float: left;
-  cursor: pointer;
   border-radius: 5px;
+  color: @color1;
+  cursor: pointer;
+  display: inline-block;
+  float: left;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-left: 12px;
+  outline: none;
+  overflow: visible;
+  padding: 7px 6px !important;
+  text-align: center;
 }
-
-.largeButton img{
-  width:16px;
-  height:16px;
-  vertical-align: middle;
-  position: relative;
-  top: -2px;
-  margin-right: 5px;
-  margin-top: 3px;
+.SF_disabled {
+  img {
+    -moz-opacity:0.3;
+    cursor:default;
+    filter:alpha(opacity=30);
+    opacity: 0.3;
+  }
 }
-
-.SF_disabled img
-{
-  filter:alpha(opacity=30);
-  opacity: 0.3;
-  -moz-opacity:0.3;
-  cursor:default;
-}
-
-
-
-/*********************/
-/* WIZARD STYLE FORM */
-/*********************/
-div.wizard-pane{
+div.wizard-pane {
   display: none !important;
 }
-
-div.wizard-pane.wizard-panel-active{
+div.wizard-pane.wizard-panel-active {
   display: block !important;
 }
-
-div.wizard_panel_title{
+div.wizard_panel_title {
   font-size: 24px;
   margin: 5px 0;
 }
-div.wizard_buttons{
-  text-align: center;
+div.wizard_buttons {
   margin-top: 30px;
+  text-align: center;
+  div {
+    display: inline-block !important;
+    float: none !important;
+    margin-left: 10px !important;
+    width:70px;
+  }
 }
-div.wizard_buttons div{
-  float: none !important;
-  width:70px;
-  display: inline-block !important;
-  margin-left: 10px !important;
+.SF_input.SF_inlineButton.wizard_previous.disabled {
+  display: none !important;
 }
-
-.SF_input.SF_inlineButton.wizard_previous.disabled,
-.SF_input.SF_inlineButton.wizard_next.disabled
-{
+.SF_input.SF_inlineButton.wizard_next.disabled {
   display: none !important;
 }
 
-div.wizard_progress{
+div.wizard_progress {
   display: -webkit-flex !important;
   display: flex !important;
-
 }
-
-.wizard_previous, .wizard_next{
-  background-color:#F47561 !important;
+.wizard_previous {
+  background-color: @wizard_nav !important;
 }
-
-
+.wizard_next {
+  background-color: @wizard_nav !important;
+}
 span.wizard_progress_element {
-  padding: 28px 0 14px;
-  background-color: #FFFFFF;
-  font-size: 11px;
-  flex: 1;
+  background-color: @color1;
   border-bottom: 3px solid #D8D7D7;
+  color: #555555;
+  flex: 1;
+  font-size: 11px;
+  padding: 28px 0 14px;
   position: relative;
   text-align: center;
-  color: #555555;
 }
-
 span.wizard_progress_element.wizard_progress_passed {
-  border-bottom: 3px solid #F47561;
-  color: #F47561;
+  border-bottom: 3px solid @wizard_nav;
+  color: @wizard_nav;
 }
-
 span.progress_number {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
   background-color: #ABAAAA;
-  text-align: center;
   border-radius: 50%;
-  color: white;
-  font-weight: bold;
-  font-size: 11px;
-  position: absolute;
   bottom: -9px;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  height: 16px;
   left: 43%;
+  position: absolute;
+  text-align: center;
+  width: 16px;
 }
-
-.wizard_progress_passed span.progress_number {
-  background-color: #F47561;
+.wizard_progress_passed {
+  span.progress_number {
+    background-color: @wizard_nav;
+  }
 }
-
-
-label{
-  margin: 0 5px;
+label {
   font-size: 13px;
+  margin: 0 5px;
 }
-
 .checkbox_left {
-  float: left;
   clear: left;
+  float: left;
   margin: 0 4px 5px 0 !important;
 }
-
-label.checkbox_label_left{
-  float: left;
+label.checkbox_label_left {
   display: inline-block;
+  float: left;
 }
-
-/*************************/
-/* SF like "Standard Form" DATA : try to make a "standard"...
-/*************************/
-div.SF_element{
-  padding-top: 5px;
+div.SF_element {
   clear:left;
-  width: 96%;
   margin: 0 2%;
+  padding-top: 5px;
+  width: 96%;
+  div.SF_element {
+    margin: 0;
+  }
 }
-
-div.SF_element div.SF_element{
-  margin: 0;
+div.dialogContent {
+  div.SF_element {
+  }
 }
-
-div.dialogContent div.SF_element{
-}
-
-div.SF_disabled{
-  color: #ccc;
+div.SF_disabled {
+  color: #cccccc;
   font-style:italic;
 }
-
-div.SF_label{
+div.SF_label {
+  letter-spacing: 1px;
+  line-height: 22px !important;
+  margin-top: 3px;
   text-transform: uppercase;
   width: 100% !important;
-  line-height: 22px !important;
-  letter-spacing: 1px;
-  margin-top: 3px;
 }
-
-input.SF_fieldCheckBox{
+input.SF_fieldCheckBox {
   margin-top: 7px !important;
 }
-
-.no-flexbox div.SF_label{
-  padding-right:3px !important;
+.no-flexbox {
+  div.SF_label {
+    padding-right:3px !important;
+  }
 }
-
-.SF_input{
-  padding: 1% !important;
+.SF_input {
   margin-left: 0;
+  max-width: 450px !important;
+  padding: 1% !important;
   width: 97%;
-  max-width: 450px !important;
 }
-.SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
-  margin-left: 0 !important;
-  background-color: white;
-  width: 97% !important;
-  max-width: 450px !important;
+.SF_element {
+  textarea {
+    background-color: white;
+    margin-left: 0 !important;
+    max-width: 450px !important;
+    width: 97% !important;
+  }
+  select {
+    background-color: white;
+    margin-left: 0 !important;
+    max-width: 450px !important;
+    width: 97% !important;
+  }
+  div.SF_image_block {
+    background-color: white;
+    margin-left: 0 !important;
+    max-width: 450px !important;
+    width: 97% !important;
+  }
 }
-
-div.SF_element.SF_largeLabel > input.SF_input.SF_number,
-input.SF_input.SF_number{
-  width: 30px !important;
+div.SF_element.SF_largeLabel>input.SF_input.SF_number {
   text-align: right;
+  width: 30px !important;
 }
-
+input.SF_input.SF_number {
+  text-align: right;
+  width: 30px !important;
+}
 select.SF_input {
-  max-width: 450px !important;
-  width: 99% !important;
-  padding: 0 0 0 5px !important;
   box-sizing: border-box;
+  max-width: 450px !important;
+  padding: 0 0 0 5px !important;
+  width: 99% !important;
 }
-
-.SF_box{
+.SF_box {
   width: 20px !important;
 }
-
-.SF_fieldCheckBox{
+.SF_fieldCheckBox {
   float:left;
   margin: 5px;
 }
-
-.SF_elementWithCheckbox > .SF_input{
+.SF_elementWithCheckbox>.SF_input {
+  _width:46% !important;
   width: 50% !important;
-  _width:46% !important; /*IE*/
 }
-
 .SF_inlineButton {
+  background-image: url('../../images/grid_tl.png');
   margin: 3px 0 !important;
   padding: 4px !important;
-  background-image: url('../images/grid_tl.png');
+  span[class^="icon-"] {
+    margin-right: 3px;
+  }
 }
-
 .SF_inlineMonitoring {
   padding: 7px 4px !important;
 }
-.SF_inlineMonitoring.SF_inlineMonitoringWorking:after{
-  content: " [reloading]";
+.SF_inlineMonitoring.SF_inlineMonitoringWorking {
+  &:after {
+    content: " [reloading]";
+  }
 }
-
-.SF_inlineButton span[class^="icon-"]{
-  margin-right: 3px;
-}
-
-.SF_inlineButton.SF_inlineButtonWorking{
+.SF_inlineButton.SF_inlineButtonWorking {
   box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
-  padding-top: 10px !important;
   padding-bottom: 8px !important;
+  padding-top: 10px !important;
 }
-
-.SF_failed{
-  border: 1px solid #D8B0B0 !important;
+.SF_failed {
+  border: 1px solid @color5 !important;
 }
-
-.SF_replicableGroup{
-  background-color:#EEE;
-  clear: both;
-  position: relative;
-  margin-bottom: 5px;
+.SF_replicableGroup {
+  background-color:@color4;
   border-radius: 5px;
-  padding-bottom: 20px;
+  clear: both;
+  margin-bottom: 5px;
   margin-top: 8px;
+  padding-bottom: 20px;
+  position: relative;
 }
-
-.SF_replication_Add,
-.SF_replication_Remove
-{
-  display: block;
-  width: 20px;
-  height: 20px;
-  background-image: url('../images/0.gif');
-  background-repeat: no-repeat;
-  background-position: 5px 6px;
-  position:absolute;
+.SF_replication_Add {
+  background: url('../../images/0.gif') no-repeat 5px 6px;
   bottom: 0;
+  display: block;
+  height: 20px;
   left: 0;
+  position:absolute;
+  width: 20px;
 }
-
-.SF_replication_Remove
-{
-  background-image: url('../images/1.gif');
+.SF_replication_Remove {
+  background: url('../../images/1.gif') no-repeat 5px 6px;
+  bottom: 0;
+  display: block;
+  height: 20px;
+  left: 0;
+  position:absolute;
   top: 0;
+  width: 20px;
 }
-
-.SF_rgClear{
+.SF_rgClear {
   clear:left;
   height: 3px;
 }
-
-.SF_image_block{
-  max-width: 80px;
+.SF_image_block {
   float: left;
-}
-
-.SF_image.small{
   max-width: 80px;
+}
+.SF_image.small {
   max-height: 80px;
+  max-width: 80px;
 }
-
-#user_profile_form img.SF_image.small {
-  border-radius: 40px;
+#user_profile_form {
+  img.SF_image.small {
+    border-radius: 40px;
+  }
 }
-
-.SF_image_link{
-  display: inline-block;
-  width: 80px;
+.SF_image_link {
   cursor: pointer;
+  display: inline-block;
   text-align: center;
+  width: 80px;
 }
-
 .accordion_toggle_failed {
-  background-color: #D8B0B0 !important;
+  background-color: @color5 !important;
 }
-
-.SF_horizontal_labelRow{
+.SF_horizontal_labelRow {
   clear: both;
+  div.SF_label {
+    float:left;
+    margin-right: 5px;
+    overflow: hidden;
+    padding: 0 5px 0 3px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
-
-.SF_horizontal_labelRow div.SF_label{
-  float:left;
-  text-align: left;
-  padding: 0 5px 0 3px;
-  margin-right: 5px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.SF_horizontal_fieldsRow{
+.SF_horizontal_fieldsRow {
   clear: both;
+  input {
+    float: left;
+    font-size: 13px;
+    margin-right: 5px;
+    padding: 3px 4px 3px 2px !important;
+  }
+  input.SF_number {
+    text-align: left;
+  }
 }
-.SF_horizontal_fieldsRow input{
-  float: left;
-  margin-right: 5px;
-  font-size: 13px;
-  padding: 3px 4px 3px 2px !important;
-}
-
-.SF_horizontal_fieldsRow input.SF_number{
-  text-align: left;
-}
-
 .SF_horizontal_actions {
   float: left;
-  padding: 5px 2px;
   font-size: 15px;
+  padding: 5px 2px;
+  span {
+    cursor: pointer;
+    margin-right: 0;
+  }
 }
-
-.SF_horizontal_pastilles{
-  padding: 1px 8px;
-  font-size: 11px;
+.SF_horizontal_pastilles {
   float: none;
-}
-
-.SF_horizontal_actions span{
-  cursor: pointer;
-  margin-right: 0;
-}
-
-.SF_horizontal_pastilles span{
-  margin-right: 10px;
-}
-
-.SF_horizontal_pastilles span > span{
-  margin: 0;
-}
-
-.SF_horizontal_action_destructive{
-  color: #A00;
-}
-
-
-/**********************************************
-/* STANDARD FORM BUT IN A MORE "MATERIAL" WAY
-/*********************************************/
-
-.dialogContent div.SF_material div.SF_element{
-  width: auto;
-  margin: 0;
-}
-
-.dialogContent div.SF_material div.SF_label{
-  line-height: 14px !important;
-  letter-spacing: 0;
-  margin-top: 17px;
-  margin-left: 0;
   font-size: 11px;
-  color: rgb(140, 140, 140);
-  text-transform: none;
+  padding: 1px 8px;
+  span {
+    margin-right: 10px;
+  }
+  span>span {
+    margin: 0;
+  }
 }
-
-.dialogContent div.SF_material input,
-.dialogContent div.SF_material textarea,
-.dialogContent div.SF_material select{
-  margin:1px 0 0 0;
-  border: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  font-size: 14px;
-  border-bottom: 1px solid #e2e2e2;
-  padding: 4px 1% 0 0 !important;
+.SF_horizontal_action_destructive {
+  color: #aa0000;
 }
-
-.dialogContent div.SF_material select.SF_input{
-  width: 98% !important;
-  padding: 0 !important;
-  box-sizing: border-box;
-  border: 0;
-}
-
-.dialogContent div.SF_material *.dialogLegend{
-  padding: 7px 0;
-  font-size: 12px;
-  line-height: inherit;
-}
-
-.dialogContent div.SF_material div.SF_element span.select-styler {
-  display: block;
-  border-top: 1px solid #E2E2E2;
-  width: 98%;
-}
-
-.dialogContent div.SF_material input.SF_failed{
-  border: 0 !important;
-  border-bottom: 1px solid #CF4747 !important;
-}
-
-.dialogContent div.SF_material div.SF_input.SF_inlineButton.disabled{
-  opacity: 0.5;
+.dialogContent {
+  div.SF_material {
+    div.SF_element {
+      margin: 0;
+      width: auto;
+      span.select-styler {
+        border-top: 1px solid @color2;
+        display: block;
+        width: 98%;
+      }
+    }
+    div.SF_label {
+      color: rgb(140, 140, 140);
+      font-size: 11px;
+      letter-spacing: 0;
+      line-height: 14px !important;
+      margin-left: 0;
+      margin-top: 17px;
+      text-transform: none;
+    }
+    input {
+      border-radius: 0;
+      border: 0;
+      font-size: 14px;
+      margin:1px 0 0 0;
+      padding: 4px 1% 0 0 !important;
+    }
+    textarea {
+      border-radius: 0;
+      border: 0;
+      font-size: 14px;
+      margin:1px 0 0 0;
+      padding: 4px 1% 0 0 !important;
+    }
+    select {
+      border-radius: 0;
+      border: 0;
+      font-size: 14px;
+      margin:1px 0 0 0;
+      padding: 4px 1% 0 0 !important;
+    }
+    select.SF_input {
+      border: 0;
+      box-sizing: border-box;
+      padding: 0 !important;
+      width: 98% !important;
+    }
+    *.dialogLegend {
+      font-size: 12px;
+      line-height: inherit;
+      padding: 7px 0;
+    }
+    input.SF_failed {
+      border: 0 !important;
+    }
+    div.SF_input.SF_inlineButton.disabled {
+      opacity: 0.5;
+    }
+  }
 }

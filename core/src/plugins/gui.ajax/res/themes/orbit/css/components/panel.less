@@ -1,22 +1,18 @@
-
 .panelHeader{
   border: none;
   vertical-align: middle;
   background-color: transparent;
-  letter-spacing: 1px; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
-}
-
-.panelHeader.panelHeaderWithIcon{
-  position: relative;
-}
-
-.panelHeader img
-{
-  display: none;
-}
-
-.panelHeader img.panelHeaderCloseIcon{
-  left: auto;
-  right: 6px;
-  cursor: pointer;
+  letter-spacing: 1px;
+  &.panelHeaderWithIcon{
+    position: relative;
+  }
+  img
+  {
+    display: none;
+    &.panelHeaderCloseIcon{
+      left: auto;
+      right: 6px;
+      cursor: pointer;
+    }
+  }
 }

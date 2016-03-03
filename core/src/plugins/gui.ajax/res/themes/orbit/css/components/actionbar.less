@@ -1,13 +1,10 @@
 // Color variables (appears count calculates by raw css)
-@color0: #cccccc; // Appears 2 times
-
-// Width variables (appears count calculates by raw css)
-@width5: 0; // Appears 4 times
+@actionbar_color0: #cccccc; // Appears 2 times
 
 // Height variables (appears count calculates by raw css)
-@height0: 29px; // Appears 2 times
-@height1: 22px; // Appears 4 times
-@height3: 100%; // Appears 2 times
+@actionbar_height0: 29px; // Appears 2 times
+@actionbar_height1: 22px; // Appears 4 times
+@actionbar_height3: 100%; // Appears 2 times
 
 .action_bar {
   line-height: 15px;
@@ -51,17 +48,7 @@
       margin: 2px 5px 2px 0;
     }
     &.separator {
-      border-left: 1px solid @color0;
-      border-right: 1px solid white;
-      display: block;
-      float: left;
-      font-size: 10px;
-      height: @height3;
-      margin-left: 2px;
-      margin-right: 2px;
-      padding-top: 0;
-      text-align: center;
-      width: @width5;
+      display: none;
     }
     &.disabled {
       -moz-opacity: 1;
@@ -166,7 +153,7 @@
     }
     img.actionbar_button_icon {
       display: none;
-      height: @height1;
+      height: @actionbar_height1;
       width: 22px;
     }
   }
@@ -190,7 +177,7 @@
       display: block !important;
       float: left;
       font-size: 10px;
-      height: @height0;
+      height: @actionbar_height0;
       margin: 2px 5px 4px 2px;
       padding-top: 0;
       text-align: center;
@@ -201,7 +188,7 @@
       display: block !important;
       float: left;
       font-size: 10px;
-      height: @height0;
+      height: @actionbar_height0;
       margin: 2px 5px 4px 2px;
       padding-top: 0;
       text-align: center;
@@ -242,22 +229,6 @@ div.editor_header {
     width: 100%;
   }
 }
-
-div.separator {
-  border-left: 1px solid @color0;
-  border-right: 1px solid white;
-  display: block;
-  float: left;
-  font-size: 10px;
-  height: @height3;
-  margin-left: 2px;
-  margin-right: 2px;
-  padding-top: 0;
-  text-align: center;
-  width: 0;
-}
-
-
 
 div.FL-inlineToolbar {
   text-align: left;
@@ -318,7 +289,7 @@ div.detailed {
   cursor:pointer;
   display:inline;
   float:left;
-  height: @height1;
+  height: @actionbar_height1;
   padding:0 1px;
   img {
     border: 0;
@@ -330,7 +301,7 @@ div.detailed {
     cursor:pointer;
     display:inline;
     float:left;
-    height: @height1;
+    height: @actionbar_height1;
     padding:0 1px;
     img {
       border: 0;
@@ -343,7 +314,7 @@ div.detailed {
     cursor:pointer;
     display:inline;
     float:left;
-    height: @height1;
+    height: @actionbar_height1;
     padding:0 1px;
     img {
       border: 0;

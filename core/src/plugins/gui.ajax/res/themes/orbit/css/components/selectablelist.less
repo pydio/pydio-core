@@ -10,12 +10,20 @@ table.sort-table tr:nth-child(even)
   float: left;
   text-align: center;
   margin: 4px;
-  background-color: rgb(250, 250, 250);
   -moz-border-radius : 2px;
   border-radius: 2px;
   padding: 4px 6px;
   color: #666;
 }
+
+/* GROUPS HEADER - TO BE CONTEXTUALIZED */
+tr h3 {
+  padding: 5px 10px 10px;
+  font-size: 1.8em;
+  margin: 10px 0 -7px;
+  border-bottom: 1px solid #999;
+}
+
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell{
   margin: 1px;
@@ -50,7 +58,6 @@ table.sort-table tr:nth-child(even)
 .thumbnail_selectable_cell.detailed {;
   margin: 0 0 !important;
   margin-bottom: 2px;
-  background-color: #ffffff;
   width: 100%;
   display: block;;
   height: auto;
@@ -195,6 +202,10 @@ div.class-FetchedResultPane div.overlay_icon_div {
   font-size: 13px;
 }
 
+div.class-FetchedResultPane > div.panelHeader{
+  display: none;
+}
+
 span.overlay-class-span{
   color: rgb(111,123,136);
   margin-left: 5px;
@@ -231,6 +242,49 @@ span.overlay-class-span{
   border: 1px solid #CCCCCC;
   margin-right: 2px;
   margin-left: 5px;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+  padding: 2px 12px;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell img{
+  width: 16px !important;
+  height: 16px !important;
+  margin-top: 4px !important;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell{
+  margin: 0;
+  padding: 1px 7px 6px 6px;
+  height: 22px !important;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+  display: none;
+}
+
+div.class-FetchedResultPane.display_metadata div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+  display: inherit;
+}
+
+
+div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus{
+  background-color: #fb725c !important;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
+  font-size: 13px;
+  padding-top: 4px;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_label{
+  padding-top: 0;
+}
+
+#no-results-found {
+  text-align: center;
+  margin-top: 10%;
 }
 
 
@@ -337,9 +391,22 @@ div.fl-showFilterPane div.sort-table-filter {
   display: block !important;
 }
 
+div[ajxpClass="FilesList"].paginated div.scroller_track{
+  top: 30px;
+}
+
 div.fl-displayMode-list.fl-showFilterPane div.scroller_track {
   top: 50px !important;
 }
+
+div.fl-displayMode-list div.scroller_track {
+  top: 26px;
+}
+
+div.fl-displayMode-list.paginated div.scroller_track {
+  top: 56px;
+}
+
 
 
 .sort-table {
@@ -379,14 +446,14 @@ div.fl-displayMode-list.fl-showFilterPane div.scroller_track {
 
 .sort-table thead td.descending {
   background-color: #daddd7;
-  background-image: url("../images/arrow_up_margin.png");
+  background-image: url("@{imagePath}arrow_up_margin.png");
   background-repeat : no-repeat;
   background-position : right center;
 }
 
 .sort-table thead td.ascending {
   background-color: #daddd7;
-  background-image: url("../images/arrow_down_margin.png");
+  background-image: url("@{imagePath}arrow_down_margin.png");
   background-repeat : no-repeat;
   background-position : right center;
 }

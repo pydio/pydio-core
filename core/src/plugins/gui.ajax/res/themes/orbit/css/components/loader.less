@@ -1,3 +1,5 @@
+@loader_box_shadow:2px 2px 4px rgba(0, 0, 0, 0.23);
+
 #progressBox
 {
   z-index: 2002;
@@ -9,10 +11,10 @@
   top: 30%;
   left: 40%;
   position: absolute;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
-  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
-  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
   min-width: 305px;
+  box-shadow: @loader_box_shadow;
+  -webkit-box-shadow: @loader_box_shadow;
+  -moz-box-shadow: @loader_box_shadow;
   div.dialogTitle{
     display: none;
   }

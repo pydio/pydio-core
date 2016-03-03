@@ -1,20 +1,20 @@
+@dnd_dropzone_color:#c3d9ff;
+@dnd_draggable_border:1px solid #c3d9ff;
+@dnd_draggable_bg_color:#ffffff;
+
 .droppableZone,
 .thumbnail_selectable_cell.detailed.droppableZone
 {
-  background-color: #c3d9ff !important;
-}
-
-#topPane div.droppableZone{
-  background-color: rgba(255,255,255,0.2) !important;
+  background-color: @dnd_dropzone_color !important;
 }
 
 div.multiple_selection_draggable
 {
   display: block;
   color: #000;
-  background-color: #fff;
+  background-color: @dnd_draggable_bg_color;
   padding: 5px;
-  border: 1px solid #c3d9ff;
+  border: @dnd_draggable_border;
   font-size: 12px;
   cursor:default;
   overflow:hidden;
@@ -23,6 +23,5 @@ div.multiple_selection_draggable
 
 div.selection_ctrl_key
 {
-  background: url('../../images/0.gif') no-repeat bottom right;
+  background: url('@{imagePath}0.gif') no-repeat bottom right;
 }
-

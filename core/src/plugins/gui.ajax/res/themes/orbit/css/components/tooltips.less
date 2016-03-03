@@ -1,41 +1,37 @@
-/***********************/
-/* TOOLTIPS            */
-/***********************/
+@tooltip_background_color:rgba(69, 77, 85, 0.86);
+@tooltip_border_color:rgba(0,0,0,0);
+@tooltip_font_color:@white;
+@tooltip_font_size:13px;
+@tooltip_title_font_size:1.1em;
+
 .tooltipped
 {
   background-color: #ffffc0;
-}
-
-
-.simple_tooltip_observer {
-  cursor: help;
-}
-
-.simple_tooltip_observer_active{
-  /*text-decoration: underline;*/
-}
-
-.simple_tooltip_title{
-  padding-top: 2px;
-  padding-bottom: 1px;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1.1em;
 }
 .simple_tooltip
 {
   position: absolute;
   width: 150px;
   z-index: 10000;
-  font-size: 13px;
-  letter-spacing: 1px;
+  font-size: @tooltip_font_size;
   padding: 5px 10px;
+  &_observer {
+    cursor: help;
+  }
+  &_title{
+    padding-top: 2px;
+    padding-bottom: 1px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: @tooltip_title_font_size;
+  }
 }
+
 
 .down_arrow_tip,
 .top_arrow_tip {
-  background: rgba(69, 77, 85, 0.86);
-  color: white;
+  background: @tooltip_background_color;
+  color: @tooltip_font_color;
   border: 0;
   border-radius: 2px;
 }
@@ -47,11 +43,8 @@
   width: 0;
   position: absolute;
   pointer-events: none;
-}
-
-.down_arrow_tip:after {
-  border-color: rgba(69, 77, 85, 0);
-  border-top-color: rgba(69, 77, 85, 0.86);
+  border-color: @tooltip_border_color;
+  border-top-color: @tooltip_background_color;
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -72,7 +65,7 @@
 
 .top_arrow_tip:after {
   border-color: rgba(111, 123, 136, 0);
-  border-bottom-color:  rgb(111, 123, 136);
+  border-bottom-color: @tooltip_background_color;
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -83,9 +76,9 @@
 }
 
 .right_arrow_tip {
-  color: #ffffff;
+  color: @tooltip_font_color;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: @tooltip_background_color;
   border: 0;
 }
 .right_arrow_tip:after, .right_arrow_tip:before {
@@ -99,24 +92,24 @@
 }
 
 .right_arrow_tip:after {
-  border-color: rgba(69, 77, 85, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-color: @tooltip_border_color;
+  border-left-color: @tooltip_background_color;
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
 }
 .right_arrow_tip:before {
-  border-color: rgba(69, 77, 85, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-color: @tooltip_border_color;
+  border-left-color: @tooltip_background_color;
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
 }
 
 .left_arrow_tip {
-  color: #ffffff;
+  color: @tooltip_font_color;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: @tooltip_background_color;
   border: 0;
 }
 .left_arrow_tip:after, .left_arrow_tip:before {
@@ -130,8 +123,8 @@
 }
 
 .left_arrow_tip:before {
-  border-color: rgba(69, 77, 85, 0);
-  border-right-color: rgba(69, 77, 85, 0.86);
+  border-color: @tooltip_border_color;
+  border-right-color: @tooltip_background_color;
   border-width: 5px;
   top: 50%;
   left:-10px;

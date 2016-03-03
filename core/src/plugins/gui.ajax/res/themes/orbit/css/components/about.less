@@ -1,20 +1,25 @@
 /*******************************/
 /* CREDIT SPLASH SCREEN
 /******************************/
+@title_font_size:13px;
+@subtitle_font_size:25px;
+@subtitle_font_color: #5E7C90;
+@links_font_color:#39C0BE;
+
 #docDiv
 {
   div.title{
-    font-size:13px;
+    font-size:@title_font_size;
     font-weight: bold;
   }
   div.subtitle
   {
-    color: #5E7C90;
-    font-size:25px;
+    color: @subtitle_font_color;
+    font-size:@subtitle_font_size;
   }
   a
   {
-    color: #39C0BE !important;
+    color: @links_font_color !important;
     text-decoration: underline;
   }
 }

@@ -1,3 +1,7 @@
+@activity_box_shadow:1px 1px 46px rgba(0, 0, 0, 0.67);
+@timer_font_color: #0077b3;
+@click_link_font_color:#676965;
+
 #activity_monitor_warning {
   box-shadow: none;
   cursor: pointer;
@@ -8,18 +12,20 @@
   text-align:center;
   top:30%;
   width:20%;
+
   div.dialogContent {
     border-radius: 10px;
-    box-shadow: 1px 1px 46px rgba(0, 0, 0, 0.67);
+    box-shadow: @activity_box_shadow;
   }
   span.click_anywhere {
-    color: #676965;
+    color: @click_link_font_color;
     display:block;
     font-size: 12px;
     font-weight:normal;
     padding-top:15px;
   }
+
   span.warning_timer {
-    color: #0077b3;
+    color: @timer_font_color;
   }
 }

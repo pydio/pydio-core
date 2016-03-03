@@ -1,17 +1,22 @@
 /********************/
 /* MESSAGE BOX      */
 /********************/
+@messagebox_box_shadow: 1px 1px 1px rgba(0,0,0,0.5);
+@messagebox_error_tint:#960000;
+@messagebox_success_tint:#009600;
+@messagebox_font_size:16px;
+
 .messageBox
 {
   position: absolute;
   z-index: 1500;
   cursor: pointer;
   border-radius: 4px;
-  box-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  box-shadow: @messagebox_box_shadow;
   &.errorMessage
   {
-    color: #960000 !important;
-    background-color: rgb(242, 193, 193);
+    color: @messagebox_error_tint;
+    background-color: desaturate(lighten(@messagebox_error_tint, 50%), 50%);
     & > div#message_content::before {
       content: '\f071';
     }
@@ -19,8 +24,8 @@
 
   &.logMessage
   {
-    color: #009600;
-    background-color: rgb(194, 236, 194);
+    color: @messagebox_success_tint;
+    background-color: desaturate(lighten(@messagebox_success_tint, 50%), 50%);
     & > div#message_content::before {
       content: '\f058';
     }
@@ -40,7 +45,7 @@
       display: block;
       padding: 0 6px;
       margin-right: 5px;
-      font-size: 16px;
+      font-size: @messagebox_font_size;
       margin-top: 2px;
       float: left;
     }

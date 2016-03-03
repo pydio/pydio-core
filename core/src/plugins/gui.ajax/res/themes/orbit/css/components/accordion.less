@@ -1,21 +1,21 @@
-/*********************/
-/* ACCORDION CONTENT */
-/*********************/
+@main_tint:rgb(117, 128, 139);
+@font_size:16px;
+
 div.accordion_toggle{
-  color: rgb(117, 128, 139);
-  border-bottom: 1px solid rgb(117, 128, 139);
+  color: @main_tint ;
+  border-bottom: 1px solid @main_tint;
   cursor: pointer;
-  background: url('../../images/Tplus.png') no-repeat;
+  background: url('@{imagePath}Tplus.png') no-repeat;
   background-position-x: -6px;
   background-position-y: -3px;
   padding-left: 15px;
-  font-size: 16px;
+  font-size: @font_size;
   margin-bottom: 0;
   margin-top: 10px;
   padding-bottom: 2px;
   border-bottom: 0;
   &_active{
-    background-image: url('../../images/Tminus.png');
+    background-image: url('@{imagePath}Tminus.png');
   }
 }
 
@@ -24,7 +24,7 @@ div.accordion_content{
   padding: 5px;
   div.dialogLegend{
     text-align: justify;
-    color: rgb(117, 128, 139);
+    color: @main_tint;
   }
 }
 
