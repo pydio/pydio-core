@@ -503,7 +503,7 @@ Class.create("InfoPanel", AjxpPane, {
             }
             this.insertedTemplates.push(registeredTemplates[i]);
 			if(tModifier){
-                const cContainer = this.contentContainer;
+                var cContainer = this.contentContainer;
                 var className = tModifier.split('.',1).shift();
                 ResourcesManager.loadClassesAndApply([className], function(){
                     if(!cContainer) return;

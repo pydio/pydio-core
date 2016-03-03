@@ -330,26 +330,6 @@ div.react-autosuggest input#users-autosuggest {
   padding-bottom: 9px !important;
   padding-left: 4px !important;
 }
-.dialogContent div.reset-pydio-forms input {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  border-radius: 0;
-  height: inherit;
-  font-size: inherit;
-  background-color: transparent;
-}
-.dialogContent div.reset-pydio-forms input:disabled {
-  background-color: transparent !important;
-}
-.dialogContent div.reset-pydio-forms .mui-text-field.mui-has-floating-labels .mui-text-field-input {
-  padding-top: 24px !important;
-}
-.dialogContent div.reset-pydio-forms input[type="checkbox"],
-.dialogContent div.reset-pydio-forms .dialogContent input[type="radio"] {
-  height: 100%;
-  width: 100%;
-}
 div#ajxp_shared_info_panel .infoPanelLabel {
   color: black;
 }

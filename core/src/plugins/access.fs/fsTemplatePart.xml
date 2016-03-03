@@ -40,7 +40,7 @@
                                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "change_main"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
                             </div>
-                            <div id="vertical_splitter" ajxpClass="Splitter" class="forceComputeFit" ajxpOptions='{"direction": "vertical", "initB":290, "minB":290,"fit":"height","fitParent":"browser", "minSize":280, "invisibleBar": true, "foldingButton":"B", "foldingButtonText":341, "foldingMinSize":0}'>
+                            <div id="vertical_splitter" ajxpClass="Splitter" class="forceComputeFit" ajxpOptions='{"direction": "vertical", "initB":250, "minB":250,"fit":"height","fitParent":"browser", "minSize":250, "invisibleBar": true, "foldingButton":"B", "foldingButtonText":341, "foldingMinSize":0}'>
                                 <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                                 <div id="info_panel" ajxpClass="InfoPanel" style="top:0;" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
                             </div>
@@ -48,15 +48,6 @@
                     </div>
                 </div>
             </div>
-            <style>
-            .breadcrumbs-one li:nth-child(1) span:before{
-                border-left-color: #f5f5f5;
-            }
-            #global_toolbar{
-                display: block;
-                background-color: #345E79;
-            }
-            </style>
         ]]></template_part>
     </client_configs>
 </registry_contributions>

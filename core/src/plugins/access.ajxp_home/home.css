@@ -31,10 +31,6 @@
     float: left;
 }
 
-#global_toolbar{
-    z-index: 2;
-}
-
 #home_center_panel {
     z-index: 1;
 }

@@ -5,11 +5,13 @@ js/core/util/LangUtils.js
 js/core/util/XMLUtils.js
 js/core/util/PathUtils.js
 js/core/util/HasherUtils.js
+js/core/util/PassUtils.js
 js/core/util/CookiesManager.js
 js/core/model/Router.js
 js/core/model/AjxpNode.js
 js/core/model/User.js
 js/core/http/ResourcesManager.js
+js/core/http/PydioUsersApi.js
 js/core/model/RemoteNodeProvider.js
 js/core/model/EmptyNodeProvider.js
 js/core/model/Repository.js

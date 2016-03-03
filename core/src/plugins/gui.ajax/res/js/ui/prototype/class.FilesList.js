@@ -55,6 +55,8 @@ Class.create("FilesList", SelectableElements, {
         this._parsingCache = new $H();
         this._filters = $H();
 
+        this.htmlElement.addClassName('class-FilesList');
+
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
 			this._displayMode = initDefaultDispOrOptions;

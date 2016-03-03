@@ -167,12 +167,6 @@
                 <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
                 <div class="infoPanelActions" style="color: white; position:absolute; top: -5px; right: 5px; font-size: 1.3em;"><a class="icon-remove-sign"></a></div>
             </div>
-            <style>
-            #global_toolbar{
-                background-color: #345E79;
-                display: block;
-            }
-            </style>
         ]]></template_part>
 
             <template_part ajxpClass="FilesList" ajxpId="content_pane" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' theme="orbit"><![CDATA[

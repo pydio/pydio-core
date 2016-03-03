@@ -9,7 +9,7 @@
 @filelist_detailed_font_small:11px;
 @filelist_fetched_font_big:13px;
 
-@filelist_tablerow_font_big:13px;
+@filelist_tablerow_font_big:12px;
 @filelist_tablerow_font_small:10px;
 
 @filelist_thumbnail_background:#f9f9f9;
@@ -270,17 +270,18 @@
     }
   }
 
+  > div.panelHeader{
+    display: none;
+  }
+
   &.class-FetchedResultPane{
-    
+
     div.overlay_icon_div {
       top: 16px!important;
       font-size: 13px;
     }
-  
-    > div.panelHeader{
-      display: none;
-    }
-  
+
+
     div.thumbnail_selectable_cell.detailed{
       padding: 2px 12px;
     }

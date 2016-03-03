@@ -1,15 +1,15 @@
-@main_tint:rgb(117, 128, 139);
-@font_size:16px;
+@accordion_main_tint:rgb(117, 128, 139);
+@accordion_font_size:16px;
 
 div.accordion_toggle{
-  color: @main_tint ;
-  border-bottom: 1px solid @main_tint;
+  color: @accordion_main_tint;
+  border-bottom: 1px solid @accordion_main_tint;
   cursor: pointer;
   background: url('@{imagePath}Tplus.png') no-repeat;
   background-position-x: -6px;
   background-position-y: -3px;
   padding-left: 15px;
-  font-size: @font_size;
+  font-size: @accordion_font_size;
   margin-bottom: 0;
   margin-top: 10px;
   padding-bottom: 2px;
@@ -24,7 +24,7 @@ div.accordion_content{
   padding: 5px;
   div.dialogLegend{
     text-align: justify;
-    color: @main_tint;
+    color: @accordion_main_tint;
   }
 }
 

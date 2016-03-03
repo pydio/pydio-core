@@ -1,4 +1,5 @@
-@toppane-width:250px;
+@toppane-width:@leftColumnWidth;
+
 
 #repo_chooser{
   background-color: #222;
@@ -48,7 +49,7 @@
 
   #topPane{
     width:@toppane-width;
-    background-color: rgba(50,50,50,0.93);
+    background-color: @leftColumnBackgroundColor;
     .no-flexbox &{
       float:left;
     }
@@ -199,9 +200,17 @@
 .menu.desktop a#action_instance_share-folder-minisite-public.enabled:hover,
 .menu.desktop a#action_instance_share-edit-shared.enabled:hover
 {
-  background-color: #4aCEB0;
+  background-color: @colorCodeShared;
 }
 
+span#alerts_number {
+  display: inline-block;
+  font-size: 13px;
+  background-color: @colorCodeAlert;
+  color: black;
+  border-radius: 20px;
+  padding: 0 6px;
+}
 
 
 #action_instance_user_create_repository {
@@ -212,22 +221,22 @@
 .colorcode-alert,
 span.overlay-class-span.icon-eye-open
 {
-  color: #F5C781;
+  color: @colorCodeAlert;
 }
 
 .colorcode-shared,
 span.overlay-class-span.icon-share-sign
 {
-  color: #4Aceb0;
+  color: @colorCodeShared;
 }
 
 .colorcode-bookmark,
 span.overlay-class-span.icon-bookmark
 {
-  color: #77b8e2;
+  color: @colorCodeBookmark;
 }
 
 .colorcode-folder{
-  color: #fb725c;
+  color: @colorCodeFolder;
 }
 

@@ -387,63 +387,90 @@ select.SF_input {
 .SF_horizontal_action_destructive {
   color: #aa0000;
 }
-.dialogContent {
-  div.SF_material {
-    div.SF_element {
-      margin: 0;
-      width: auto;
-      span.select-styler {
-        border-top: 1px solid #e2e2e2;
-        display: block;
-        width: 98%;
+.dialogBox{
+  .dialogContent {
+    div.SF_material {
+      div.SF_element {
+        margin: 0;
+        width: auto;
+        span.select-styler {
+          border-top: 1px solid #e2e2e2;
+          display: block;
+          width: 98%;
+        }
+      }
+      div.SF_label {
+        color: rgb(140, 140, 140);
+        font-size: 11px;
+        letter-spacing: 0;
+        line-height: 14px !important;
+        margin-left: 0;
+        margin-top: 17px;
+        text-transform: none;
+      }
+      input {
+        border-radius: 0;
+        border: 0;
+        font-size: 14px;
+        margin:1px 0 0 0;
+        padding: 4px 1% 0 0 !important;
+      }
+      textarea {
+        border-radius: 0;
+        border: 0;
+        font-size: 14px;
+        margin:1px 0 0 0;
+        padding: 4px 1% 0 0 !important;
+      }
+      select {
+        border-radius: 0;
+        border: 0;
+        font-size: 14px;
+        margin:1px 0 0 0;
+        padding: 4px 1% 0 0 !important;
+      }
+      select.SF_input {
+        border: 0;
+        box-sizing: border-box;
+        padding: 0 !important;
+        width: 98% !important;
+      }
+      *.dialogLegend {
+        font-size: 12px;
+        line-height: inherit;
+        padding: 7px 0;
+      }
+      input.SF_failed {
+        border: 0 !important;
+      }
+      div.SF_input.SF_inlineButton.disabled {
+        opacity: 0.5;
       }
     }
-    div.SF_label {
-      color: rgb(140, 140, 140);
-      font-size: 11px;
-      letter-spacing: 0;
-      line-height: 14px !important;
-      margin-left: 0;
-      margin-top: 17px;
-      text-transform: none;
+
+    div.reset-pydio-forms{
+      input{
+        border:0;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        height: inherit;
+        font-size: inherit;
+        background-color: transparent;
+        &:disabled{
+          background-color: transparent !important;
+        }
+      }
+      .mui-text-field.mui-has-floating-labels .mui-text-field-input{
+        padding-top: 24px !important;
+      }
+      input[type="checkbox"], .dialogContent input[type="radio"]{
+        height: 100%;
+        width: 100%;
+      }
     }
-    input {
-      border-radius: 0;
-      border: 0;
-      font-size: 14px;
-      margin:1px 0 0 0;
-      padding: 4px 1% 0 0 !important;
-    }
-    textarea {
-      border-radius: 0;
-      border: 0;
-      font-size: 14px;
-      margin:1px 0 0 0;
-      padding: 4px 1% 0 0 !important;
-    }
-    select {
-      border-radius: 0;
-      border: 0;
-      font-size: 14px;
-      margin:1px 0 0 0;
-      padding: 4px 1% 0 0 !important;
-    }
-    select.SF_input {
-      border: 0;
-      box-sizing: border-box;
-      padding: 0 !important;
-      width: 98% !important;
-    }
-    *.dialogLegend {
-      font-size: 12px;
-      line-height: inherit;
-      padding: 7px 0;
-    }
-    input.SF_failed {
-      border: 0 !important;
-    }
-    div.SF_input.SF_inlineButton.disabled {
-      opacity: 0.5;
-    }
+
   }
+
 }
+

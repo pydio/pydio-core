@@ -2,18 +2,30 @@
 .toolbarGroup{
   display:inline-block;
 }
+.actionbar_button_label u {
+  text-decoration: none;
+}
 
+.action_bar{
+  a{
+  }
+}
 
 #global_toolbar{
   height: 47px;
   padding: 0 15px 0 5px;
-  background: no-repeat 7px;
-  display: none;
+  background: @topBarBackgroundColor no-repeat 7px 7px;
+  box-shadow: @topBarBoxShadow;
+  z-index: 1021;
+  display: block;
   #clickable_home{
     position: absolute;
     width: 150px;
     height: 47px;
     cursor: pointer;
+  }
+  .custom_top_title{
+    color: white;
   }
 
   #top_toolbar{
@@ -38,13 +50,19 @@
         display:none;
       }
     }
-
-
   }
+  #ajxp_desktop.ajxp_ws-welcome &{
+    position: absolute;
+    display: block;
+    width:99%;
+    background: transparent;
+    box-shadow: none;
+    #clickable_home, div.custom_top_title, img.custom_logo_image.linked {
+      display:none;
+    }
+  }
+
 }
-
-
-
 
 #display_toolbar {
   float: right;
@@ -54,7 +72,7 @@
   a{
     color: @white;
     display: inline-block;
-    padding: 0 3px;
+    padding: 0 6px;
     &:hover{
       color: rgb(253, 252, 228);
     }
@@ -68,7 +86,7 @@
   &.text_only{
     padding-top: 8px;
     a::after{
-      content:' |';
+      /*content:' |';*/
     }
     a:last-child::after{
       display: none;
@@ -81,7 +99,12 @@
     }
   }
   span#vertical_splitter_folding_action_button_label::before {
-    content: '| ';
+    /*content: '| ';*/
+  }
+  span.icon-caret-down.ajxp_icon_arrow {
+    display: none;
+    margin-left: 3px;
+    color: #888;
   }
 }
 
@@ -100,31 +123,53 @@
   }
 }
 
-#buttons_bar a,
-#buttons_bar_top a
-{
-  display: inline-block;
-  font-size: 11px;
-  padding: 1px 12px 2px 11px;
-  text-align: center;
-  overflow: visible;
-  outline: none;
-  border-radius: 14px;
-  margin: 3px 4px 0 1px;
-  background: #ffffff;
-  letter-spacing: 1px;
-  float: left;
-  color: #555;
-}
+#buttons_bar{
 
-div#buttons_bar_top {
-  padding-top: 1px;
-}
+  padding-left: 0;
+  overflow:hidden;
+  padding-top: 3px;
 
-#buttons_bar span.ajxp_icon_span {
-  display: none;
-}
+  a,&_top a
+  {
+    display: inline-block;
+    font-size: 11px;
+    padding: 1px 12px 2px 11px;
+    text-align: center;
+    overflow: visible;
+    outline: none;
+    border-radius: 14px;
+    margin: 3px 4px 0 1px;
+    background: #ffffff;
+    letter-spacing: 1px;
+    float: left;
+    color: #555;
+  }
 
+  &_top {
+    padding-left: 0;
+    overflow:hidden;
+    padding-top: 1px;
+  }
+
+  span.ajxp_icon_span {
+    display: none;
+  }
+
+  #navigation_toolbar {
+    padding: 0 6px;
+  }
+
+  a#up_dir_button {
+    height:22px;
+    span.ajxp_icon_span{
+      display: inline-block;
+    }
+    span#up_dir_button_label {
+      display: none;
+    }
+  }
+
+}
 
 #workspace_toolbar{
   padding: 0;
@@ -136,40 +181,7 @@ div#buttons_bar_top {
   }
 }
 
-
-a#up_dir_button {
-  height:22px;
-  span.ajxp_icon_span{
-    display: inline-block;
-  }
-  span#up_dir_button_label {
-    display: none;
-  }
-}
-
-.toolbars_separator
-{
-  border-bottom: 1px solid #fff;
-  border-top: 1px solid buttonshadow;
-}
-
-.toolbar_title{
-  font-size:15px;
-  font-weight:bold;
-  color: #ddd;
-}
-
-.actionbar_button_label u {
-  text-decoration: none;
-}
-
-div#navigation_toolbar {
-  padding: 0 6px;
-}
-
-
-#files_list_header
-{
+#files_list_header{
   font-size: 11px;
   padding: 3px 16px 4px 8px;
   height: 35px;
@@ -178,16 +190,37 @@ div#navigation_toolbar {
   color: rgb(111, 123, 136);
   border-right: 0;
   overflow: hidden;
+  > #display_toolbar{
+    a, a:hover{
+      color: #333 !important;
+    }
+  }
 }
 
-#files_list_header > #display_toolbar a:hover,
-#files_list_header > #display_toolbar a
-{
-  color: #333 !important;
+#topPane{
+
+  div.FL-inlineToolbar{
+    position: absolute;
+    top: 6px;
+    right: 40px;
+    margin: 0;
+    display: none;
+  }
+
+  div.thumbnail_selectable_cell:hover div.FL-inlineToolbar {
+    display: block;
+  }
+
+  div.FL-inlineToolbar div.toolbarGroup{
+    min-width: 0;
+  }
+
+  div.FL-inlineToolbar span.ajxp_icon_span{
+    color:#eee;
+  }
+
+  div.FL-inlineToolbar span.actionbar_button_label{
+    display: none !important;
+  }
+
 }
-
-
-#upload_button {
-  border-radius: 0 2px 2px 0;
-}
-

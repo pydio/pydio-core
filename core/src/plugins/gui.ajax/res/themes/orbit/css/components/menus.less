@@ -45,7 +45,7 @@ div.menu {
       outline: none;
       font-size: @menu_font_size_standard;
     }
-    .menuTitle{
+    &.menuTitle{
       display: none;
     }
     &.separator {
@@ -140,6 +140,11 @@ div.menu {
       }
       &.menuAnchorSelected a {
         .invertSelection();
+        u{
+          .kbd();
+          padding: 2px;
+          color:@menu_desktop_items_color;
+        }
       }
       a {
         color: @menu_desktop_items_color;
@@ -168,7 +173,7 @@ div.menu {
           filter: alpha(opacity=25);
           zoom: 1;
         }
-        &.enabled:hover {
+        &.enabled:hover{
           .invertSelection();
           u{
             .kbd();
@@ -186,7 +191,6 @@ div.menu {
       width:expression("150px");
       min-width: 15em;
       li {
-        height: auto;
         &.separator{
           border-bottom: 1px solid @menu_desktop_separator_color;
         }
@@ -253,6 +257,7 @@ div.menu {
 
     &.workspacesMenu {
       border-radius: 0;
+      left: 0 !important;
 
       span.ajxp_icon_span{
         display: none;

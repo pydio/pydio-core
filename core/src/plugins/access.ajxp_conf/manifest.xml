@@ -116,12 +116,6 @@
                         if($("leftTabulator")) $("leftTabulator").ajxpPaneObject.resize();
                     }, 2000);
                 </script>
-                <style>
-                    #global_toolbar{
-                        display: block;
-                        background-color: #345E79;
-                    }
-                </style>
 			]]></template_part>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
