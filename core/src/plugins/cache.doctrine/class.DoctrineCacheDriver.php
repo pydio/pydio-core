@@ -21,6 +21,8 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+require __DIR__ . "/doctrine/vendor/autoload.php";
+
 define('APC_EXTENSION_LOADED', extension_loaded('apc'));
 define('MEMCACHE_EXTENSION_LOADED', extension_loaded('memcache'));
 define('MEMCACHED_EXTENSION_LOADED', extension_loaded('memcached'));
@@ -37,20 +39,10 @@ use \Doctrine\Common\Cache;
 class doctrineCacheDriver extends AbstractCacheDriver
 {
 
+    /*
+     * @var CacheProvider
+     */
     private $cacheDriver;
-
-    /**
-     * Close file handle on objects destructor.
-     */
-    public function __destruct()
-    {
-    }
-
-    /**
-     * If the plugin is cloned, make sure to renew the $fileHandle
-     */
-    public function __clone() {
-    }
 
     /**
      * Initialise the cache driver based on config
@@ -64,16 +56,19 @@ class doctrineCacheDriver extends AbstractCacheDriver
         parent::init($options);
 
         $this->cacheDriver = null;
-        $this->options = $this->getFilteredOption("DRIVER");
-        if(!is_array($this->options)){
+
+        $driverOptions = $this->getFilteredOption("DRIVER");
+        $cachePrefix = $this->getFilteredOption("CACHE_PREFIX");
+
+        if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
             return;
         }
 
-        switch ($this->options['driver']) {
+        switch ($driverOptions['driver']) {
             case "apc":
                 if (!APC_EXTENSION_LOADED) {
-                   AJXP_Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
-                   return;
+                    AJXP_Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
+                    return;
                 }
                 $this->_apc_init();
                 break;
@@ -107,6 +102,11 @@ class doctrineCacheDriver extends AbstractCacheDriver
                 break;
             default:
                 break;
+        }
+
+        // Setting Prefix
+        if (!empty($cachePrefix) && ! empty($this->cacheDriver)) {
+            $this->cacheDriver->setNamespace($cachePrefix . '_');
         }
     }
 
@@ -151,6 +151,5 @@ class doctrineCacheDriver extends AbstractCacheDriver
     public function getCacheDriver() {
         return $this->cacheDriver;
     }
-
 
 }

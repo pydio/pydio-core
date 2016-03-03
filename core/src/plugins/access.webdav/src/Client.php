@@ -16,8 +16,8 @@
 
 namespace Pydio\Access\WebDAV;
 
-require_once(__DIR__ . '/../../../core/classes/guzzle/vendor/autoload.php');
-require_once(__DIR__ . '/../../../core/classes/sabredav/lib/Sabre/autoload.php');
+require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
+require_once(AJXP_BIN_FOLDER . '/sabredav/lib/Sabre/autoload.php');
 
 
 use Pydio\Access\Core\Stream\Client as CoreClient;
@@ -68,7 +68,7 @@ class Client extends CoreClient
     }
 
     /**
-     * Register the Sabre DAV stream wrapper and associates it with this client object
+     * Register the stream wrapper and associates it with this client object
      *
      * @return $this
      */
@@ -100,6 +100,11 @@ class Client extends CoreClient
             $stat['mode'] = $stat[2] = 0100777; // mode for a standard file
         }
 
+        if (isset($arr["{DAV:}getcontentlength"])) {
+            $stat['size'] = $stat[7] = $arr["{DAV:}getcontentlength"];
+        }
+
+
         return $stat + static::$STAT_TEMPLATE;
     }
 
@@ -129,20 +134,14 @@ class Client extends CoreClient
 
         $sabreDAVClient = $this->_getSabreDAVClient($params);
 
-        try {
-            $result = $sabreDAVClient->propFind(
-                join('/', array_filter([$params['path/fullpath'], $params['path/itemname']])),
+        $result = $sabreDAVClient->propFind(
+                $params['path/basepath'] . '/' . $params['path/fullpath'],
                 [
                     '{DAV:}getlastmodified',
                     '{DAV:}getcontentlength',
                     '{DAV:}resourcetype'
                 ]
             );
-        } catch (NotFound $e) {
-            return false;
-        } catch (\Exception $e) {
-            return false;
-        }
 
         return $result;
     }
@@ -169,19 +168,15 @@ class Client extends CoreClient
 
         $sabreDAVClient = $this->_getSabreDAVClient($params);
 
-        try {
-            $response = $sabreDAVClient->propFind(
-                join('/', [$params['path/fullpath'], $params['path/itemname']]),
-                [
-                    '{DAV:}getlastmodified',
-                    '{DAV:}getcontentlength',
-                    '{DAV:}resourcetype'
-                ],
-                1
-            );
-        } catch (\Exception $e) {
-            return false;
-        }
+        $response = $sabreDAVClient->propFind(
+            $params['path/basepath'] . '/' . $params['path/fullpath'],
+            [
+                '{DAV:}getlastmodified',
+                '{DAV:}getcontentlength',
+                '{DAV:}resourcetype'
+            ],
+            1
+        );
 
         return $response;
     }
@@ -193,7 +188,7 @@ class Client extends CoreClient
      *
      * @return DirIterator
      */
-    public function getIterator($response) {
+    public function getIterator($response, $params) {
         $this->files = array();
 
         $keys = array_keys($response);
@@ -205,6 +200,7 @@ class Client extends CoreClient
             $formattedStat = $this->_formatUrlStat($response[$key]);
             $this->files[] = [
                 urldecode(basename($key)),
+                md5($params['path/keybase'] . urldecode(basename($key))),
                 $formattedStat
             ];
         }

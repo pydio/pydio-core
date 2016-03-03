@@ -4,7 +4,7 @@
     "operations" : {
         "Open" : {
             "httpMethod" : "GET",
-            "uri" : "{path/fullpath}/{path/itemname}",
+            "uri" : "{path/basepath}/{path/fullpath}",
             "summary" : "Open the object as a stream for the StreamWrapper to access",
             "responseClass" : "OpenOutput",
             "parameters" : {
@@ -13,29 +13,7 @@
                     "type" : "string",
                     "location" : "uri"
                 },
-                "path/itemname": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                }
-            }
-        },
-        "Stat" : {
-            "httpMethod" : "PROPFIND",
-            "uri" : "{path/fullpath}/{path/itemname}",
-            "summary" : "Returns the stat of a specific object",
-            "responseClass" : "StatOutput",
-            "parameters" : {
-                "DAV:prop" : {
-                    "required" : true,
-                    "location" : "xml"
-                },
-                "path/fullpath" : {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/itemname": {
+                "path/basepath": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -44,7 +22,7 @@
         },
         "Mkdir" : {
             "httpMethod" : "MKCOL",
-            "uri" : "{path/fullpath}/{path/itemname}",
+            "uri" : "{path/basepath}/{path/fullpath}",
             "responseClass" : "MkdirOutput",
             "parameters" : {
                 "path/fullpath" : {
@@ -61,7 +39,7 @@
         },
         "Rmdir" : {
             "httpMethod" : "DELETE",
-            "uri" : "{path/fullpath}/{path/itemname}",
+            "uri" : "{path/basepath}/{path/fullpath}",
             "responseClass" : "RmdirOutput",
             "parameters" : {
                 "path/fullpath":  {
@@ -69,7 +47,7 @@
                     "type" : "string",
                     "location" : "uri"
                 },
-                "path/itemname": {
+                "path/basepath": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -78,15 +56,20 @@
         },
         "Rename" : {
             "httpMethod" : "MOVE",
-            "uri" : "{pathFrom}",
+            "uri" : "{frompath/basepath}/{frompath/fullpath}",
             "responseClass" : "MoveOutput",
             "parameters" : {
-                "pathFrom" : {
+                "frompath/fullpath":  {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
                 },
-                "pathTo" : {
+                "frompath/basepath": {
+                    "required" : true,
+                    "type" : "string",
+                    "location" : "uri"
+                },
+                "topath/fullpath" : {
                     "required" : true,
                     "type" : "string",
                     "location" : "header",
@@ -96,7 +79,7 @@
         },
         "Put" : {
             "httpMethod" : "PUT",
-            "uri": "{path/fullpath}/{path/itemname}",
+            "uri" : "{path/basepath}/{path/fullpath}",
             "responseClass" : "PutOutput",
             "parameters" : {
                 "path/fullpath":  {
@@ -104,7 +87,7 @@
                     "type" : "string",
                     "location" : "uri"
                 },
-                "path/itemname": {
+                "path/basepath": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
@@ -116,7 +99,7 @@
         },
         "Delete" : {
             "httpMethod": "DELETE",
-            "uri": "{path/fullpath}/{path/itemname}",
+            "uri" : "{path/basepath}/{path/fullpath}",
             "responseClass": "DeleteOutput",
             "parameters": {
                 "path/fullpath":  {
@@ -124,7 +107,7 @@
                     "type" : "string",
                     "location" : "uri"
                 },
-                "path/itemname": {
+                "path/basepath": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"

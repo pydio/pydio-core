@@ -21,6 +21,7 @@
 
 namespace Pydio\Access\Core\Stream;
 
+use Pydio\Access\Core\Stream\Listener\PathListener;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 
 /**
@@ -106,7 +107,7 @@ class Client extends GuzzleClient implements ClientInterface
      *
      * @return DirIterator
      */
-    public function getIterator($arr) {
+    public function getIterator($arr, $params) {
         return new Iterator\DirIterator($arr);
     }
 

@@ -20,8 +20,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require __DIR__ . "/doctrine/vendor/autoload.php";
-
 use Doctrine\Common\Cache;
 
 /**
