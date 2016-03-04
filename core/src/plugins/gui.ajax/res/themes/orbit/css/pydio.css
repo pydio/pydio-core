@@ -4479,9 +4479,6 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 #ajxp_desktop.ajxp_ws-welcome #global_toolbar img.custom_logo_image.linked {
   display: none;
 }
-#ajxp_desktop.ajxp_ws-settings #global_toolbar {
-  display: none;
-}
 #files_list_header {
   font-size: 11px;
   padding: 3px 12px 4px 8px;

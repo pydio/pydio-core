@@ -243,6 +243,14 @@
 }
 
 .settings_main_pane div.tabulatorContainer div#display_toolbar{
+    display: inline-block;
+    min-width: 0;
+    padding-top: 6px;
+    padding-right: 6px;
+}
+
+
+.settings_main_pane div.tabulatorContainer div#display_toolbar{
     padding-top: 6px;
 }
 
