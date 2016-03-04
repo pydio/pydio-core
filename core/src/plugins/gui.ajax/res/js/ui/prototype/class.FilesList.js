@@ -476,7 +476,7 @@ Class.create("FilesList", SelectableElements, {
 		var options1 = {
 			name:oThisId+'-multi_display',
 			src:'view_icon.png',
-            icon_class:'icon-th-large',
+            icon_class:'icon-columns',
 			text_id:150,
 			title_id:151,
 			text:MessageHash[150],
@@ -573,7 +573,7 @@ Class.create("FilesList", SelectableElements, {
         var options3 = {
 			name:oThisId+'-thumbs_sortby',
 			src:'view_icon.png',
-            icon_class:'icon-sort',
+            icon_class:'icon-sort-by-alphabet',
 			text_id:450,
 			title_id:451,
 			text:MessageHash[450],

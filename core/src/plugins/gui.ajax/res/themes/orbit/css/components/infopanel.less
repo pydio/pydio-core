@@ -2,12 +2,12 @@
 @infopanel_background_color:#f3f3f3;
 @infopanel_main_text_color:#555;
 @infopanel_labels_color:#333;
+@infopanel_section_title_color:#333;
 @infopanel_values_color:#555;
 @infopanel_quick_button_border:1px dotted #999;
 
 @infopanel_fetchedpane_text_color: #222;
 @infopanel_fetchedpane_legend_color: #666;
-@infopanel_share_button_tint:#4aCEB0;
 
 @infopanel_toolbar_buttons_radius:0;
 
@@ -15,6 +15,7 @@
   font-family: @infopanel_font_family;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
+  box-shadow: @reactBoxShadowDepthHalf;
 
   div#display_toolbar {
     float: left;
@@ -26,29 +27,6 @@
       border: none;
       margin-right: 0;
     }
-  }
-
-  .toolbarGroup{
-    display: flex;
-    a{
-      span.ajxp_icon_span{
-        display: none;
-      }
-      flex-grow: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-transform: uppercase;
-      text-overflow: ellipsis;
-      display: inline-block;
-      padding: 4px 10px;
-      margin-right: 1px;
-      margin-bottom: 6px;
-      font-size: 13px;
-      background-color: rgba(107, 107, 107, 0.87);
-      color: #fff;
-      font-weight: 500;
-    }
-
   }
 
   a {
@@ -77,6 +55,7 @@
     img {
       margin-top: 0 !important;
       margin-bottom: 0 !important;
+      background-color: white;
       box-shadow: 2px 2px 3px rgba(0,0,0,0.25);
     }
     div.infoPanelBasenameTitle{
@@ -175,7 +154,8 @@
 
 
   #ajxp_workspace_info_panel_content{
-    line-height: 1.5em;
+    font-size: 13px;
+    margin-bottom: 15px;
   }
   .infopanel_loading{
     opacity: 0;
@@ -200,15 +180,14 @@
     div.panelHeader{
       font-size: 13px;
       padding: 8px 0 16px 0;
-      color: #555;
+      color: @infopanel_section_title_color;
       font-weight: 500;
       span.user_meta_change {
         color: #222;
         text-transform: uppercase;
-        font-size: 11px;
-        background-color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
         padding:4px 10px 3px;
-        margin-top: -3px;
+        margin-top: -5px;
         display: inline-block !important;
         float: right;
         cursor: pointer;
@@ -235,26 +214,9 @@
       margin-right: 5px;
     }
 
-    div.toolbarGroup a:first-child {
-      border-radius: @infopanel_toolbar_buttons_radius 0 0 @infopanel_toolbar_buttons_radius;
-    }
-
-    div.toolbarGroup a:last-child{
-      border-radius: 0 @infopanel_toolbar_buttons_radius @infopanel_toolbar_buttons_radius 0;
-    }
-
-    div.toolbarGroup a:last-child:first-child{
-      border-radius: @infopanel_toolbar_buttons_radius;
-    }
-
     a#open_with_button span.ajxp_icon_span,
     span#open_with_button_label{
       display: none;
-    }
-
-    div#info_panel_share_toolbar a{
-      background-color: @infopanel_share_button_tint;
-      border-radius: @infopanel_toolbar_buttons_radius;
     }
 
     &.scrolling td.infoPanelValue{
@@ -370,6 +332,9 @@
     padding: 6px 16px;
     &#info_panel_primary{
       padding-top: 12px;
+      &.empty{
+        display: none;
+      }
     }
   }
 
@@ -390,17 +355,21 @@
     font-weight: bold;
   }
 
-
-  .ipanel_no_selection_select, #no-results-found {
-    color: rgb(180, 184, 190);
-    text-shadow: 1px 1px 0 #ffffff;
+  .ipanel_no_selection_select{
+    padding: 30px;
+    color: rgb(150, 154, 160);
+    span.icon-info-sign {
+      opacity: 0.4;
+      display: block;
+      text-align: center;
+      font-size: 120px;
+      padding: 50px 0 20px;
+    }
   }
 
-  .ipanel_no_selection_select span.icon-info-sign {
-    display: block;
-    text-align: center;
-    font-size: 150px;
-    padding: 50px 0 20px;
+  #no-results-found {
+    color: rgb(180, 184, 190);
+    text-shadow: 1px 1px 0 #ffffff;
   }
 
   .ipanel_no_selection_select span.label {

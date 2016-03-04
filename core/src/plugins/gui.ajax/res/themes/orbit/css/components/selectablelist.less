@@ -19,7 +19,7 @@
 @filelist_paginator_background:#FFFCE8;
 
 @filelist_resizer_label_selected_bg:rgb(231, 231, 231);
-@filelist_resizer_label_color:rgb(86, 101, 117);
+@filelist_resizer_label_color:rgba(0, 0, 0, 0.87);
 @filelist_resizer_label_size:11px;
 
 
@@ -29,8 +29,12 @@
 
   .sort-table {
     font-size: @filelist_tablerow_font_small;
+    color:rgba(0,0,0,0.53);
     td {
-      padding: 7px 0;
+      padding: 8px 0;
+      border: 0;
+    }
+    tr{
     }
     tr:nth-child(even){
       background-color: @filelist_even_row_color;
@@ -58,7 +62,6 @@
     height: 18px;
     line-height: 17px;
     white-space : nowrap;
-    color: #555;
     text-overflow: ellipsis;
     .full{
       height: auto;
@@ -129,7 +132,8 @@
       height: auto;
       position: relative;
       border-radius: 0;
-      padding: 6px 4px;
+      padding: 7px 4px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
       div.thumbnail_selectable_cell{
         margin-right: 11px;
         background-color: transparent;
@@ -145,11 +149,19 @@
       }
       div.thumbnail_cell_metadata{
         text-align: left;
-        padding-top: 0;
+        padding-top: 1px;
         font-size: @filelist_detailed_font_small;
         white-space: nowrap;
         margin-top: 1px;
-        opacity: 0.7;
+        opacity: 0.5;
+      }
+      &.selected-focus{
+        div.thumbLabel{
+          font-weight: 500;
+        }
+        div.thumbnail_cell_metadata{
+          opacity: 0.8;
+        }
       }
 
       &:hover{
@@ -190,15 +202,6 @@
         color: @filelist_default_text_color;
         letter-spacing: 1px;
       }
-      td
-      {
-        border: 0;
-      }
-      tr:nth-child(even)>td
-      {
-        border-top: 0;
-        border-bottom: 0;
-      }
       span#ajxp_label {
         font-weight: normal;
         background-size: 16px;
@@ -219,31 +222,37 @@
   &.fl-displayMode-thumb {
 
     div.thumbnail_selectable_cell{
-      margin: 1px;
+      margin: 5px;
       background-color: @filelist_thumbnail_background;
       border-radius: 2px;
       padding: 0 0 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.43);
       div.thumbLabel{
         margin-top: -29px;
         opacity: 1;
         background-color: @filelist_thumbnail_label_background;
         padding: 8px 3px;
         color: @filelist_thumbnail_label_color;
-        text-shadow: 1px 1px 0 white;
+        border-radius: 0 0 2px 2px;
       }
 
       &.fl-displayMode-thumbsize-medium div.thumbLabel{
         padding:1px;
         margin-top: -15px;
-        font-size: 0.8em;
+        font-size: 0.7em;
       }
 
       &.fl-displayMode-thumbsize-small div.thumbLabel{
         display: none;
       }
 
-      &.selected-focus div.thumbLabel{
-        opacity: 1;
+      &.selected-focus {
+        background-color: @filelist_thumbnail_background !important;
+        div.thumbLabel{
+          opacity: 1;
+          background-color: @filelist_selection_background;
+          color:@filelist_selection_color;
+        }
       }
     }
 
@@ -284,6 +293,7 @@
 
     div.thumbnail_selectable_cell.detailed{
       padding: 2px 12px;
+      border-bottom: 0;
     }
   
     div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell img{
@@ -330,7 +340,7 @@
 
   div.header_resizer{
     overflow:hidden;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.35);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
     opacity: 0.85;
     max-height: 26px;
     .column_resize_grabber {

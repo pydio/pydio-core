@@ -1,10 +1,12 @@
 @leftpanel_width:250px;
 @leftpanel_top_position:60px;
 @leftpanel_background_color:@white;
-@leftpanel_text_color:#eeeeee;
+@leftpanel_text_color:rgba(255,255,255,0.92);
 @leftpanel_zindex:1001;
 @leftpanel_box_shadow:@reactBoxShadowDepth1;
 @leftpanel_closed_width:45px;
+
+@bezier_transition:all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 
 .left-panel{
   background-color: @leftpanel_background_color;
@@ -20,21 +22,18 @@
   color:@leftpanel_text_color;
   overflow-y: scroll;
   box-sizing: border-box;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: @bezier_transition;
   box-shadow: @leftpanel_box_shadow;
   *{
     box-sizing: border-box;
   }
 
   .section-title{
-    padding: 16px 10px ;
+    padding: 16px 16px ;
     font-weight: 500;
     border-top:1px solid fade(@leftpanel_text_color, 30);
     margin-top: 10px;
-    &:first-of-type{
-      border-top:0;
-      margin-top: 0;
-    }
+    transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -50,7 +49,7 @@
   }
 
   .nav-list-entry{
-    padding: 6px 16px 6px 12px;
+    padding: 6px 1px 6px 16px;
     display: flex;
     line-height: 24px;
     cursor: pointer;
@@ -79,7 +78,7 @@
         .nav-list-entry-icon();
         font-size: 0.9em;
         font-weight: 500;
-        background-color: darken(@leftpanel_text_color, 20);
+        background-color: @leftpanel_text_color;
         color: @leftpanel_background_color;
         border-radius: 50%;
       }
@@ -107,13 +106,25 @@
     .mui-toolbar{
       position: absolute;
       top:16px;
-      right: 20px;
+      right: 60px;
+      color:darken(@leftpanel_text_color, 30);
     }
     .toggle-button{
       cursor: pointer;
       float: right;
+      color:darken(@leftpanel_text_color, 30);
+      &:hover{
+        color:@leftpanel_text_color;
+      }
+    }
+    .section-title{
+      border-top:0;
+      margin-top: 0;
     }
     &.closed{
+      .section-title{
+        padding-bottom: 6px;
+      }
       .material-list{
         display: none;
       }

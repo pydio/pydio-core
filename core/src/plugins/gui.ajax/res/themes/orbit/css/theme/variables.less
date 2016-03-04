@@ -2,18 +2,19 @@
 /* MASTER VARIABLES
 /**********************/
 @reactBoxShadowDepth1:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+@reactBoxShadowDepthHalf:0 2px 3px rgba(0,0,0,.16),0 2px 3px rgba(0,0,0,.43);
 
 @leftColumnWidth: 250px;
 @leftColumnBackgroundColor:#333;
 @leftColumnTextColor:#ddd;
 @rightColumnBackgroundColor: #f8f8f8;
 @topBarBackgroundColor:@teal-500;
-@topBarBoxShadow:@reactBoxShadowDepth1;
+@topBarBoxShadow:@reactBoxShadowDepthHalf;
 
 @globalToolbarHeight:47px;
 @workspacesToolbarHeight:62px;
 
-@leftNavigationPanelBackgroundColor: rgb(68, 68, 68);
+@leftNavigationPanelBackgroundColor: rgb(53, 53, 53);
 @leftNavigationPanelClosedWidth:-5px;
 
 @selectionMainTint: #fb725c;
@@ -21,7 +22,7 @@
 @colorCodeAlert:#F5C781;
 @colorCodeShared: #4aceb0;
 @colorCodeBookmark:#77b8e2;
-@colorCodeFolder:#fb725c;
+@colorCodeFolder:#FF796B;
 
 
 /**********************
@@ -47,6 +48,7 @@
 @bgtask_font_color: @white;
 
 /* breadcrumb */
+@breadcrumb_font_family:@fontReact;
 @breadcrumb_background: #f5f5f5; // Appears 3 times
 @breadcrumb_hover_background: #ffffff; // Appears 2 times
 @breadcrumb_angle_color: #cccccc; // Appears 2 times
@@ -95,7 +97,7 @@
 @searchform_icon_font_closed:1em;
 @searchform_icon_font_active:1.6em;
 
-@searchform_icon_color:#555;
+@searchform_icon_color:rgba(0,0,0,0.33);
 @searchform_input_color:rgb(138, 149, 160);
 
 @searchresult_mainbackground: #efefef;
@@ -107,28 +109,28 @@
 @searchmeta_panel_width:@leftColumnWidth;
 
 /* selectable list */
-@filelist_even_row_color:#f9f9f9;
-@filelist_default_text_color:#666666;
+@filelist_even_row_color:rgba(0, 0, 0, 0.02);
+@filelist_default_text_color:rgba(0,0,0,0.87);
 @filelist_selection_background:@selectionMainTint;
 @filelist_selection_color:@white;
 @filelist_detailed_hover_background:#f7f7f7;
 @filelist_tablerow_hover_background:rgb(253, 252, 228);
 
 @filelist_detailed_font_big:15px;
-@filelist_detailed_font_small:11px;
+@filelist_detailed_font_small:13px;
 @filelist_fetched_font_big:13px;
 
-@filelist_tablerow_font_big:12px;
-@filelist_tablerow_font_small:10px;
+@filelist_tablerow_font_big:13px;
+@filelist_tablerow_font_small:11px;
 
 @filelist_thumbnail_background:#f9f9f9;
-@filelist_thumbnail_label_background:rgba(237, 237, 237, 0.82);
+@filelist_thumbnail_label_background:@white;
 @filelist_thumbnail_label_color:#666;
 
 @filelist_paginator_background:#FFFCE8;
 
-@filelist_resizer_label_selected_bg:rgb(231, 231, 231);
-@filelist_resizer_label_color:rgb(86, 101, 117);
+@filelist_resizer_label_selected_bg:rgba(0, 0, 0, 0.05);
+@filelist_resizer_label_color:rgba(0, 0, 0, 0.87);
 @filelist_resizer_label_size:11px;
 
 /* slider */
@@ -168,21 +170,21 @@
 @userwidget_font_size:12px;
 
 /* menus */
-@menu_box_shadow:1px 1px 4px rgba(100, 100, 100, 0.7);
-@menu_border_radius: 2px;
+@menu_box_shadow:0px 1px 6px rgba(0, 0, 0, 0.16), 0px 1px 6px rgba(0, 0, 0, 0.23);
+@menu_border_radius: 1px;
 
 @menu_desktop_background_color:@white;
-@menu_desktop_items_color:#222222;
+@menu_desktop_items_color:rgba(0,0,0,0.87);
 @menu_desktop_separator_color:#eeeeee;
-@menu_desktop_hover_background_color:rgba(107, 107, 107, 0.87);
-@menu_desktop_hover_color:@white;
+@menu_desktop_hover_background_color:rgba(0, 0, 0, 0.07);
+@menu_desktop_hover_color:rgba(0,0,0,0.87);
 
 @menu_dark_background_color:#222222;
 @menu_dark_items_color:@white;
 @menu_dark_hover_background_color:@selectionMainTint;
 @menu_dark_hover_color:@white;
 
-@menu_font_size_standard:12px;
+@menu_font_size_standard:13px;
 @menu_font_size_bigger:20px;
 @menu_font_size_smaller:11px;
 
@@ -195,6 +197,7 @@
 @infopanel_labels_color:#aaa;
 @infopanel_values_color:#222;
 @infopanel_quick_button_border:1px dotted #999;
+@infopanel_section_title_color:#333;
 
 @infopanel_fetchedpane_text_color: #222;
 @infopanel_fetchedpane_legend_color: #666;

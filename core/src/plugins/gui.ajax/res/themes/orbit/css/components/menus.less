@@ -1,5 +1,5 @@
 @menu_box_shadow:1px 1px 4px rgba(100, 100, 100, 0.7);
-@menu_border_radius: 2px;
+@menu_border_radius: 1px;
 
 @menu_desktop_background_color:@white;
 @menu_desktop_items_color:#222222;
@@ -22,13 +22,16 @@
 /* CONTEXT MENU STYLES  */
 /************************/
 div.menu {
+  font-family: @fontReact;
+  -webkit-font-smoothing: antialiased;
+
+
   position: absolute;
   top: 0;
   left: 0;
   -moz-border-radius:@menu_border_radius;
   border-radius: @menu_border_radius;
   box-shadow : @menu_box_shadow;
-  opacity: 0.97;
 
   ul, li {
     margin: 0;
@@ -59,7 +62,7 @@ div.menu {
 
   .menuActions {
     position: absolute;
-    right: 0;
+    right: 16px;
     top: 1px;
     text-align: right;
     padding-right: 3px !important;
@@ -99,24 +102,23 @@ div.menu {
     }
 
     &.icon-caret-right {
-      padding-top: 4px;
-      color: #666;
+      padding-top: 10px;
+      color:rgba(0,0,0,0.53);
     }
 
   }
 
 
   &.desktop {
-    width: 15em;
+    width: 14em;
     padding: 0 0 1px;
-    letter-spacing: 1px;
     background-color: @menu_desktop_background_color;
 
     span.ajxp_icon_span{
-      font-size: 1.1em;
-      padding-right: 10px;
+      font-size: 15px;
+      padding-right: 16px;
       color: @menu_desktop_items_color;
-      opacity: 0.3;
+      opacity: 0.7;
     }
 
     .invertSelection{
@@ -135,23 +137,30 @@ div.menu {
         padding: 0;
         height: 0;
         border-bottom: 1px solid @menu_desktop_separator_color;
-        margin: 0 10px;
+        margin: 0;
         line-height: 1px !important;
+      }
+      &.menuAnchorSelected, a:hover{
+        .menuActions.icon-caret-right{
+          color:@menu_desktop_hover_color !important;
+        }
       }
       &.menuAnchorSelected a {
         .invertSelection();
         u{
           .kbd();
-          padding: 2px;
+          font-size: 1em;
+          padding: 0 1px;
+          line-height: 22px;
           color:@menu_desktop_items_color;
         }
       }
       a {
         color: @menu_desktop_items_color;
-        padding: 9px 12px 10px;
+        padding: 12px 16px;
         margin: 0;
         font-size: @menu_font_size_standard;
-        line-height: 1.7em;
+        line-height: 22px;
         u {
           text-decoration: none;
           display: inline-block;
@@ -163,7 +172,7 @@ div.menu {
           margin-top: -5px;
         }
         &.menu_item_default{
-          font-family: @fontBold;
+          font-weight: 500 !important;
           span.ajxp_icon_span{
             opacity: 0.8;
           }
@@ -177,7 +186,9 @@ div.menu {
           .invertSelection();
           u{
             .kbd();
-            padding: 2px;
+            font-size: 1em;
+            padding: 0 1px;
+            line-height: 22px;
             color:@menu_desktop_items_color;
           }
         }
@@ -190,22 +201,6 @@ div.menu {
       /* IE */
       width:expression("150px");
       min-width: 15em;
-      li {
-        &.separator{
-          border-bottom: 1px solid @menu_desktop_separator_color;
-        }
-        a {
-          color: @menu_desktop_items_color;
-          padding: 10px 20px 8px 8px;
-          margin: 0;
-          font-size: @menu_font_size_standard;
-          img{
-            margin-right: 6px;
-            width: 16px;
-            height:16px;
-          }
-        }
-      }
     }
 
     &.textual{

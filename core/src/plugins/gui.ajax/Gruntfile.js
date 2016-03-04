@@ -183,6 +183,24 @@ module.exports = function(grunt) {
                     spawn: false
                 }
             }
+        },
+        cssmin: {
+            options: {
+                shorthandCompacting: false,
+                roundingPrecision: -1
+            },
+            target: {
+                files: {
+                    'res/themes/orbit/css/allz.css': [
+                        'res/themes/orbit/css/pydio.css',
+                        'res/themes/orbit/css/animate-custom.css',
+                        'res/themes/orbit/css/font-awesome.css',
+                        'res/themes/orbit/css/fontfaces.css',
+                        'res/themes/orbit/css/chosen.css',
+                        'res/themes/orbit/css/media.css#NO_MINI'
+                    ]
+                }
+            }
         }
     });
     grunt.loadNpmTasks('grunt-env');
@@ -191,6 +209,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-run');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.registerTask('default', [
         'babel:dist',
         'uglify:js',
@@ -200,7 +219,8 @@ module.exports = function(grunt) {
         'browserify',
         'env:dev',
         'uglify:nodejs',
-        'babel:pydio'
+        'babel:pydio',
+        'cssmin'
     ]);
     grunt.registerTask('build-core', [
         'babel:dist',

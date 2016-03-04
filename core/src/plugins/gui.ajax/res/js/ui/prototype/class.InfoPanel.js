@@ -516,7 +516,15 @@ Class.create("InfoPanel", AjxpPane, {
                 });
 			}
 		}
-        if(this.contentContainer.down('#info_panel_primary') && this.contentContainer.down('div.infoPanelAllMetadata')){
+        var primaryPanel = this.contentContainer.down('#info_panel_primary');
+        if(primaryPanel){
+            if(!primaryPanel.innerHTML.strip()){
+                primaryPanel.addClassName("empty");
+            }else{
+                primaryPanel.removeClassName("empty");
+            }
+        }
+        if(primaryPanel && this.contentContainer.down('div.infoPanelAllMetadata')){
             this.contentContainer.select('[data-infoPanelPosition]').each(function(ip){
                 if(ip.readAttribute('data-infoPanelPosition') == 'first'){
                     this.contentContainer.down('#info_panel_primary').insert({after:ip});

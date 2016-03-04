@@ -136,10 +136,6 @@
                     background-color: #30383A;
                     padding-top: 10px;
                 }
-                #global_toolbar{
-                    display: block;
-                    background-color: #345E79;
-                }
                 </style>
                 <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>

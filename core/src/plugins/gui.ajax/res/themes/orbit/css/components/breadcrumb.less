@@ -1,3 +1,5 @@
+@breadcrumb_font_family:@fontStandard;
+@breadcrumb_text_color:rgba(0,0,0,0.63);
 @breadcrumb_background: #f5f5f5; // Appears 3 times
 @breadcrumb_hover_background: #ffffff; // Appears 2 times
 @breadcrumb_angle_color: #cccccc; // Appears 2 times
@@ -9,8 +11,10 @@
 
 
 #breadcrumb {
+  font-family: @breadcrumb_font_family;
+  -webkit-font-smoothing: antialiased;
   border-radius: 0 40px 40px 0;
-  color: rgb(111, 121, 131);
+  color: @breadcrumb_text_color;
   display: block;
   float: left;
   margin-top: 0;
@@ -27,6 +31,10 @@
     margin: 0;
     padding: 0;
   }
+  em {
+    font-style: normal;
+    font-weight: 100;
+  }
   li {
     float: left;
     &:first-child {
@@ -34,8 +42,12 @@
         background-color: @breadcrumb_first_bread;
         border-radius: 0;
         color: white;
+        font-weight: 500;
         padding-left: 1em;
         width: @breadcrumb_width1;
+        em{
+          font-weight: 500;
+        }
         &::after {
           border-left-color: @breadcrumb_first_bread;
         }
@@ -51,10 +63,10 @@
   }
   span {
     background-color: @breadcrumb_background;
-    color: #666666;
+    color: @breadcrumb_text_color;
     float: left;
     height: 22px;
-    padding: 20px 15px 20px 35px;
+    padding: 22px 15px 20px 35px;
     position: relative;
     text-decoration: none;
     &:hover {
@@ -99,15 +111,11 @@
       content: normal;
     }
   }
-  em {
-    font-style: normal;
-    font-weight: lighter;
-  }
   i.ajxp-goto {
     color: @breadcrumb_angle_color;
     cursor: pointer;
     display: inline-block;
-    padding: 20px 25px;
+    padding: 22px 25px;
     &:hover {
       color: @breadcrumb_refresh_hover;
     }
