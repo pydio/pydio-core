@@ -31,6 +31,7 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-browserify": "~4.0.1",
     "grunt-env": "~0.4.4",
-    "grunt-run":"~0.5.2"
+    "grunt-run":"~0.5.2",
+    "grunt-cssmin":"~0.14.0"
   }
 }
