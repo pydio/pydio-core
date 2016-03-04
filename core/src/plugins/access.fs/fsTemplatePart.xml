@@ -3,7 +3,7 @@
     <client_configs>
         <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fitMinOffsetTop":"$(\"global_toolbar\").getHeight();"}' theme="orbit"><![CDATA[
             <div id="workspace_toolbar" ajxpClass="AjxpPane" class="skipSibling">
-                <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":0, "menuOffsetLeft":116, "menuFitHeight":true, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
+                <span id="left_navigator" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"LeftNavigation","componentName":"Panel"}'></span>
                 <div id="breadcrumb" class="breadcrumbs-one" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true, "resize_events":["actions_refreshed"]}'></div>
                 <div style="float:right;margin-top:14px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
                     <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -15,12 +15,6 @@
                 <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>
                     <div id="navigation_pane" style="position:relative;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content"}' >
                         <div id="navigation_scroller" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content", "replaceScroller":true, "resize_events":["tree_change"]}'>
-                            <div id="navigation_bookmarks" ajxp_position="1">
-                                <h3 class="colorcode-bookmark" ajxp_message_id="147">AJXP_MESSAGE[147]
-                                    <small id="bookmarks_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>AJXP_MESSAGE[513]</small>
-                                </h3>
-                                <div style="display:none;" id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content", "silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true, "containerDroppableAction":"bookmark", "emptyChildrenMessage":515,"clearSelectionOnBlur":true}'></div>
-                            </div>
                             <div id="navigation_folders" ajxp_position="3">
                                 <h3 class="colorcode-folder" ajxp_message_id="130">AJXP_MESSAGE[130]
                                     <small id="folders_pane_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"folder_pane", "detection_id":"tree_container"}'>AJXP_MESSAGE[514]</small>

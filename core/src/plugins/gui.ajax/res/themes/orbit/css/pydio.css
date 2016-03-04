@@ -14,7 +14,7 @@
 *:focus {
   outline: none;
 }
-* {
+body {
   font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 /*
@@ -49,6 +49,7 @@ html {
 input,
 textarea,
 .selectable {
+  font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   -moz-user-select: text;
   -khtml-user-select: auto;
   -webkit-user-select: auto;
@@ -284,8 +285,7 @@ div.dialogBox div#element_overlay {
   outline: 0;
   cursor: default;
   text-decoration: none;
-  color: #ccc !important;
-  font-weight: lighter !important;
+  color: #dddddd;
 }
 .webfx-tree-item a span,
 .webfx-tree-item a:active span,
@@ -307,6 +307,7 @@ div.dialogBox div#element_overlay {
   color: white;
 }
 .webfx-tree-item img {
+  width: 24px;
   vertical-align: middle;
   border: 0;
   float: left;
@@ -414,7 +415,10 @@ div#tree_container {
   /* default: FOLDER */
 }
 div#tree_container > div:first-child {
-  padding-left: 23px;
+  padding-left: 16px;
+}
+div#tree_container > div.first_container {
+  margin-left: -11px;
 }
 div#tree_container > div:first-child > a > span,
 div#tree_container div[data-node-icon] > a > span {
@@ -424,8 +428,8 @@ div#tree_container div[data-node-icon] > a > span {
 div#tree_container > div:first-child > a > span:before,
 div#tree_container div[data-node-icon] > a > span:before {
   content: "\f015";
-  font-size: 1.3em;
-  padding-right: 13px;
+  font-size: 1.2em;
+  padding-right: 18px;
   font-family: FontAwesome;
   font-weight: normal;
   font-style: normal;
@@ -433,7 +437,7 @@ div#tree_container div[data-node-icon] > a > span:before {
   -webkit-font-smoothing: antialiased;
 }
 div#tree_container div[data-node-icon] > a > span:before {
-  content: "\f114";
+  content: "\f07b";
 }
 div#tree_container div[data-node-icon="zip.png"] > a > span:before {
   content: "\f187";
@@ -2325,7 +2329,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   border: none;
   vertical-align: middle;
   background-color: transparent;
-  letter-spacing: 1px;
 }
 .panelHeader.panelHeaderWithIcon {
   position: relative;
@@ -3647,7 +3650,9 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   font-size: 1.4em;
 }
 #info_panel {
-  font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
 }
 #info_panel div#display_toolbar {
   float: left;
@@ -3660,17 +3665,30 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   border: none;
   margin-right: 0;
 }
-#info_panel a {
+#info_panel .toolbarGroup {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+#info_panel .toolbarGroup a {
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+          flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
   display: inline-block;
   padding: 4px 10px;
   margin-right: 1px;
   margin-bottom: 6px;
   font-size: 13px;
-  letter-spacing: 1px;
   background-color: rgba(107, 107, 107, 0.87);
   color: #fff;
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  -webkit-font-smoothing: auto;
+  font-weight: 500;
+}
+#info_panel .toolbarGroup a span.ajxp_icon_span {
+  display: none;
 }
 #info_panel a.sm2_link {
   visibility: hidden;
@@ -3685,75 +3703,71 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   text-align: center;
   padding-bottom: 10px;
 }
-#info_panel div.infoPanelImagePreview img {
+#info_panel .infoPanelImagePreview {
+  text-align: center;
+  position: relative;
+  margin: 10px 16px;
+  border-radius: 5px;
+}
+#info_panel .infoPanelImagePreview img {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
 }
-#info_panel div.infoPanelBasenameTitle {
-  color: #555555;
-  margin: 9px 15px;
+#info_panel .infoPanelImagePreview div.infoPanelBasenameTitle {
+  color: #fb725c;
+  font-weight: 500;
+  font-size: 13px;
+  margin-bottom: 20px;
   line-height: 1.5em;
   text-align: left;
-  margin-top: 0;
   word-break: break-all;
 }
 #info_panel .infoPanelTable,
 #info_panel div.infoPanelRow {
-  font-size: 12px;
+  font-size: 13px;
   width: 100%;
 }
 #info_panel td.infoPanelLabel,
 #info_panel div.infoPanelLabel {
   width: 50%;
-  color: #333333;
-  text-transform: uppercase;
+  color: #aaaaaa;
   font-size: 0.9em;
+  font-weight: 500;
 }
 #info_panel td.infoPanelValue,
 #info_panel div.infoPanelValue {
-  padding: 0 0 15px;
-  font-size: 1.5em;
-  color: #555555;
+  padding: 0 0 10px;
+  font-size: 1em;
+  color: #222222;
   line-height: 1.3em;
   vertical-align: top;
-}
-#info_panel span.user_meta_change {
-  display: inline-block !important;
-  text-transform: lowercase;
-  font-size: 11px !important;
-  margin: 3px 0;
-  border-bottom: 1px dotted #999999;
-  float: right;
-  cursor: pointer;
-}
-#info_panel span[data-ajxpAction] {
-  float: right;
-  padding: 0;
-  cursor: pointer;
-  font-size: 17px;
-  display: none;
 }
 #info_panel div.folded_icons {
   display: none;
 }
+#info_panel div.class-FetchedResultPane {
+  font-size: 13px;
+}
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
-  padding: 3px 1px;
+  padding: 0;
   cursor: default;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
   display: none;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  font-size: 1.3em;
+  font-size: 1.1em;
   color: #222222;
   white-space: normal;
   line-height: 1.5em;
-  padding-bottom: 4px;
+  padding-top: 0;
+  padding-bottom: 8px;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
   color: #666666;
   display: block;
-  font-size: 11px;
+  font-size: 0.8em;
   line-height: 15px;
 }
 #info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
@@ -3794,9 +3808,33 @@ div.menu.rootDirChooser span.ajxp_icon_span {
 }
 #info_panel .panelContent {
   overflow: hidden;
-  background-color: #f3f3f3;
+  background-color: #f8f8f8;
   padding-bottom: 15px;
   -webkit-font-smoothing: antialiased;
+}
+#info_panel .panelContent div.panelHeader {
+  font-size: 13px;
+  padding: 8px 0 16px 0;
+  color: #555;
+  font-weight: 500;
+}
+#info_panel .panelContent div.panelHeader span.user_meta_change {
+  color: #222;
+  text-transform: uppercase;
+  font-size: 11px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 4px 10px 3px;
+  margin-top: -3px;
+  display: inline-block !important;
+  float: right;
+  cursor: pointer;
+  font-weight: 300;
+}
+#info_panel .panelContent div.panelHeader span.user_meta_change:hover {
+  background-color: white;
+}
+#info_panel .panelContent div.panelHeader span[data-ajxpAction] {
+  display: none;
 }
 #info_panel .panelContent i {
   font-size: 13px;
@@ -3809,13 +3847,13 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   margin-right: 5px;
 }
 #info_panel .panelContent div.toolbarGroup a:first-child {
-  border-radius: 30px 0 0 30px;
+  border-radius: 0 0 0 0;
 }
 #info_panel .panelContent div.toolbarGroup a:last-child {
-  border-radius: 0 30px 30px 0;
+  border-radius: 0 0 0 0;
 }
 #info_panel .panelContent div.toolbarGroup a:last-child:first-child {
-  border-radius: 30px;
+  border-radius: 0;
 }
 #info_panel .panelContent a#open_with_button span.ajxp_icon_span,
 #info_panel .panelContent span#open_with_button_label {
@@ -3823,7 +3861,7 @@ div.menu.rootDirChooser span.ajxp_icon_span {
 }
 #info_panel .panelContent div#info_panel_share_toolbar a {
   background-color: #4aceb0;
-  border-radius: 30px;
+  border-radius: 0;
 }
 #info_panel .panelContent.scrolling td.infoPanelValue {
   padding-right: 18px;
@@ -3863,21 +3901,15 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   color: #646464;
   white-space: nowrap;
 }
-#info_panel .panelContent div.panelHeader {
-  font-size: 1.3em;
-  padding: 24px 0 8px 0;
-  text-transform: uppercase;
-  color: #222;
-}
-#info_panel .panelContent div.panelHeader a[data-ajxpAction] {
-  float: right;
-  cursor: pointer;
-  text-transform: none;
-  margin-top: -3px;
-  border-radius: 30px;
-}
 #info_panel .panelContent div.toolbar_placeholder {
+  margin-top: 25px;
   display: inline-block;
+}
+#info_panel .panelContent div.one_has_many {
+  margin-top: 10px;
+}
+#info_panel .panelContent div.one_has_many div.toolbar_placeholder {
+  margin-top: 0;
 }
 #info_panel .panelContent div.toolbarGroup {
   text-align: center;
@@ -3887,21 +3919,6 @@ div.menu.rootDirChooser span.ajxp_icon_span {
 }
 #info_panel div.infoPanelLabel {
   width: 100%;
-}
-#info_panel div.one_has_many > div.toolbar_placeholder.has_many > div.toolbarGroup {
-  min-width: 250px;
-}
-#info_panel div.one_has_many > div.toolbar_placeholder.one_or_less > div.toolbarGroup a {
-  width: 211px;
-}
-#info_panel .infoPanelImagePreview {
-  text-align: center;
-  padding: 10px 6px;
-  position: relative;
-  background-color: white;
-  margin: 10px 14px;
-  border-radius: 5px;
-  box-shadow: 0 0 7px rgba(0, 0, 0, 0.25);
 }
 #info_panel div.dimension_card_width {
   text-align: center;
@@ -3924,7 +3941,11 @@ div.menu.rootDirChooser span.ajxp_icon_span {
   border: 1px solid #AAA;
 }
 #info_panel div.infoPanelAllMetadata > div {
-  margin: 6px 20px;
+  border-top: 1px solid #ddd;
+  padding: 6px 16px;
+}
+#info_panel div.infoPanelAllMetadata > div#info_panel_primary {
+  padding-top: 12px;
 }
 #info_panel div.triple div.infoPanelAllMetadata > div {
   float: left;
@@ -3960,11 +3981,152 @@ div.menu.rootDirChooser span.ajxp_icon_span {
 #info_panel .ipanel_no_selection_data {
   display: none;
 }
-#info_panel div.infoPanelBasenameTitle {
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-}
 #info_panel .infoPanelTable tr:last-child td {
   border-bottom: 0;
+}
+.left-panel {
+  background-color: #444444;
+  position: absolute;
+  top: 109px;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  z-index: 1001;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 13px;
+  color: #eeeeee;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+.left-panel * {
+  box-sizing: border-box;
+}
+.left-panel .section-title {
+  padding: 16px 10px ;
+  font-weight: 500;
+  border-top: 1px solid rgba(238, 238, 238, 0.3);
+  margin-top: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.left-panel .section-title:first-of-type {
+  border-top: 0;
+  margin-top: 0;
+}
+.left-panel .navigation-title {
+  display: none;
+  height: 62px;
+  border-bottom: 1px solid ghostwhite;
+  padding-left: 16px;
+  font-size: 2em;
+  line-height: 62px;
+}
+.left-panel .nav-list-entry {
+  padding: 6px 16px 6px 12px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  line-height: 24px;
+  cursor: pointer;
+}
+.left-panel .nav-list-entry:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.left-panel .nav-list-entry-icon {
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  text-align: center;
+}
+.left-panel .nav-list-entry-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.left-panel .workspaces .workspace-entry {
+  padding: 6px 16px 6px 12px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  line-height: 24px;
+  cursor: pointer;
+}
+.left-panel .workspaces .workspace-entry:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.left-panel .workspaces .workspace-entry .workspace-badge {
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  text-align: center;
+  font-size: 0.9em;
+  font-weight: 500;
+  background-color: #bbbbbb;
+  color: #444444;
+  border-radius: 50%;
+}
+.left-panel .workspaces .workspace-entry .workspace-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.left-panel .workspaces .workspace-entry.workspace-current {
+  opacity: 0.4;
+}
+.left-panel .simple-provider {
+  position: relative;
+}
+.left-panel .simple-provider .material-list-entry {
+  padding: 6px 16px 6px 12px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  line-height: 24px;
+  cursor: pointer;
+}
+.left-panel .simple-provider .material-list-entry:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.left-panel .simple-provider .material-list-entry .material-list-icon {
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  text-align: center;
+  font-size: 1.2em;
+}
+.left-panel .simple-provider .material-list-entry .material-list-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.left-panel .simple-provider .mui-toolbar {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+}
+.left-panel .simple-provider .toggle-button {
+  cursor: pointer;
+  float: right;
+}
+.left-panel .simple-provider.closed .material-list {
+  display: none;
+}
+.left-panel.hidden {
+  left: -255px;
 }
 /**********************/
 /* MASTER VARIABLES
@@ -3994,6 +4156,7 @@ div.menu.rootDirChooser span.ajxp_icon_span {
 /* user widget */
 /* menus */
 /* InfoPanel */
+/* Left PAnel */
 /****************
 /* LOGIN BOX
 /****************/
@@ -4199,8 +4362,8 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 #global_toolbar {
   height: 47px;
   padding: 0 15px 0 5px;
-  background: #345e79 no-repeat 7px 7px;
-  box-shadow: none;
+  background: #009688 no-repeat 7px 7px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   z-index: 1021;
   display: block;
 }
@@ -4392,6 +4555,7 @@ div.dialogBox.form-diaporama_box div.dialogContent {
   padding: 21px 15px 21px 15px;
   border-right: 2px solid #333;
   height: 20px;
+  width: 15px;
 }
 #repo_chooser:hover {
   background-color: #fb725c;
@@ -4399,6 +4563,9 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 }
 #repo_chooser.disabled {
   display: none;
+}
+#repo_chooser.open {
+  background-color: #fb725c;
 }
 #repo_chooser span.icon-sitemap {
   font-size: 1.0em;
@@ -4430,22 +4597,24 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 }
 #browser #topPane {
   width: 250px;
-  background-color: #323232;
+  background-color: #333333;
 }
 .no-flexbox #browser #topPane {
   float: left;
 }
 #browser #topPane #tree_container {
   overflow-x: hidden !important;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /*margin-left: -10px;*/
 }
 #browser #topPane h3 {
-  font-size: 16px;
-  padding: 16px 8px 15px 17px;
+  font-size: 13px;
+  padding: 13px 8px 11px 17px;
   margin: 0;
-  letter-spacing: 1px;
   display: block;
   clear: left;
-  font-weight: lighter;
+  font-weight: 500;
 }
 #browser #topPane h3 small {
   cursor: pointer;
@@ -4457,7 +4626,7 @@ div.dialogBox.form-diaporama_box div.dialogContent {
   text-transform: lowercase;
   padding: 0 8px;
   font-weight: normal;
-  font-size: 0.7em;
+  font-size: 10px;
   margin-left: 3px;
 }
 #browser #topPane h3:hover small,

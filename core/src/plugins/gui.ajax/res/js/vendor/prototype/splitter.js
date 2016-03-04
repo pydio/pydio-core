@@ -142,7 +142,8 @@ Class.create("Splitter", AjxpPane, {
 		this.resizeGroup(null, startB || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
         this.userLoggedObs = function(){
-            var sizePref = this.getUserPreference("size");
+            //var sizePref = this.getUserPreference("size");
+            var sizePref = null;
             var folded = this.getUserPreference("folded");
 			if(sizePref){
                 if(folded) this.moveSplitter(parseInt(sizePref));
@@ -564,7 +565,7 @@ Class.create("Splitter", AjxpPane, {
 		if($(this.paneB).ajxpPaneObject){
 			$(this.paneB).ajxpPaneObject.resize();
 		}
-        this.setUserPreference("size", this.getCurrentSize());
+        //this.setUserPreference("size", this.getCurrentSize());
 	},
 	/**
 	 * Move the splitter object

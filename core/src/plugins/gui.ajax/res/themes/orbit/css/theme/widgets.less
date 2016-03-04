@@ -13,12 +13,16 @@
   padding: 21px 15px 21px 15px;
   border-right: 2px solid #333;
   height: 20px;
+  width: 15px;
   &:hover{
-    background-color: #fb725c;
+    background-color: @selectionMainTint;
     color: white;
   }
   &.disabled{
     display:none;
+  }
+  &.open{
+    background-color: @selectionMainTint;
   }
   span.icon-sitemap {
     font-size: 1.0em;
@@ -56,16 +60,18 @@
 
     #tree_container{
       overflow-x: hidden !important;
+      font-family: @fontReact;
+      -webkit-font-smoothing: antialiased;
+      /*margin-left: -10px;*/
     }
 
     h3{
-      font-size: 16px;
-      padding: 16px 8px 15px 17px;
+      font-size: 13px;
+      padding: 13px 8px 11px 17px;
       margin: 0;
-      letter-spacing: 1px;
       display: block;
       clear: left;
-      font-weight: lighter;
+      font-weight: 500;
       small{
         cursor: pointer;
         display: none;
@@ -76,7 +82,7 @@
         text-transform: lowercase;
         padding: 0 8px;
         font-weight: normal;
-        font-size: 0.7em;
+        font-size: 10px;
         margin-left: 3px;
       }
       &:hover small,

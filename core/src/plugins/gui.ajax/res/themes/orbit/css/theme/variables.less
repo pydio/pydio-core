@@ -4,10 +4,17 @@
 @reactBoxShadowDepth1:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
 
 @leftColumnWidth: 250px;
-@leftColumnBackgroundColor:rgba(50,50,50,1);
-@rightColumnBackgroundColor:#f3f3f3;
-@topBarBackgroundColor:#345E79;
-@topBarBoxShadow:none;
+@leftColumnBackgroundColor:#333;
+@leftColumnTextColor:#ddd;
+@rightColumnBackgroundColor: #f8f8f8;
+@topBarBackgroundColor:@teal-500;
+@topBarBoxShadow:@reactBoxShadowDepth1;
+
+@globalToolbarHeight:47px;
+@workspacesToolbarHeight:62px;
+
+@leftNavigationPanelBackgroundColor: rgb(68, 68, 68);
+@leftNavigationPanelClosedWidth:-5px;
 
 @selectionMainTint: #fb725c;
 
@@ -148,7 +155,8 @@
 @tree_item_selected_bg:#666;
 @tree_item_selected_focused_bg:@selectionMainTint;
 @tree_admin_panel_item_selected_bg:rgb(78, 167, 165);
-@tree_icon_folder:"\f114";
+@tree_labels_color:@leftColumnTextColor;
+@tree_icon_folder:"\f07b";
 @tree_icon_archive:"\f187";
 @tree_icon_recycle:"\f014";
 
@@ -182,11 +190,19 @@
 
 /* InfoPanel */
 @infopanel_background_color:@rightColumnBackgroundColor;
+@infopanel_font_family:@fontReact;
 @infopanel_main_text_color:#555;
-@infopanel_labels_color:#333;
-@infopanel_values_color:#555;
+@infopanel_labels_color:#aaa;
+@infopanel_values_color:#222;
 @infopanel_quick_button_border:1px dotted #999;
 
 @infopanel_fetchedpane_text_color: #222;
 @infopanel_fetchedpane_legend_color: #666;
 @infopanel_share_button_tint:@colorCodeShared;
+
+/* Left PAnel */
+@leftpanel_top_position:@globalToolbarHeight + @workspacesToolbarHeight;
+@leftpanel_background_color:@leftNavigationPanelBackgroundColor;
+@leftpanel_width:@leftColumnWidth;
+@leftpanel_closed_width:@leftNavigationPanelClosedWidth;
+@leftpanel_zindex:1001;

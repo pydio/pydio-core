@@ -1,5 +1,6 @@
 @tree_item_selected_bg:#666;
 @tree_item_selected_focused_bg:#fb725c;
+@tree_labels_color:#eeeeee;
 
 @tree_admin_panel_item_selected_bg:rgb(78, 167, 165);
 
@@ -28,8 +29,7 @@
     outline:0;
     cursor: default;
     text-decoration: none;
-    color: #ccc !important;
-    font-weight: lighter !important;
+    color: @tree_labels_color;
     span {
       display: inline-block;
       line-height: 19px;
@@ -46,6 +46,7 @@
   }
 
   img {
+    width:24px;
     vertical-align: middle;
     border: 0;
     float:left;
@@ -182,7 +183,11 @@
 div#tree_container{
 
   > div:first-child {
-    padding-left: 23px;
+    padding-left: 16px;
+  }
+
+  > div.first_container{
+    margin-left: -11px;
   }
 
   > div:first-child > a > span,
@@ -194,8 +199,8 @@ div#tree_container{
   > div:first-child > a > span:before,
   div[data-node-icon] > a > span:before {
     content: "\f015";
-    font-size: 1.3em;
-    padding-right: 13px;
+    font-size: 1.2em;
+    padding-right: 18px;
     font-family: @fontAwesome;
     font-weight: normal;
     font-style: normal;

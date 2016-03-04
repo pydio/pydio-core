@@ -65,11 +65,12 @@ class Repository {
 		this.label = label;
 	}
 
-    getHtmlBadge(){
+    getHtmlBadge(noClass=false){
         if(!this.label) return '';
         if(!this.badge){
+            var className = noClass ? '' : 'letter_badge';
             var letters = this.label.split(" ").map(function(word){return word.substr(0,1)}).slice(0,3).join("");
-            this.badge = "<span class='letter_badge'>"+ letters +"</span>";
+            this.badge = "<span class='"+className+"'>"+ letters +"</span>";
         }
         return this.badge;
     }

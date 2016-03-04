@@ -9,8 +9,12 @@
 @infopanel_fetchedpane_legend_color: #666;
 @infopanel_share_button_tint:#4aCEB0;
 
+@infopanel_toolbar_buttons_radius:0;
+
 #info_panel{
   font-family: @infopanel_font_family;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
 
   div#display_toolbar {
     float: left;
@@ -24,17 +28,30 @@
     }
   }
 
+  .toolbarGroup{
+    display: flex;
+    a{
+      span.ajxp_icon_span{
+        display: none;
+      }
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-transform: uppercase;
+      text-overflow: ellipsis;
+      display: inline-block;
+      padding: 4px 10px;
+      margin-right: 1px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      background-color: rgba(107, 107, 107, 0.87);
+      color: #fff;
+      font-weight: 500;
+    }
+
+  }
+
   a {
-    display: inline-block;
-    padding: 4px 10px;
-    margin-right: 1px;
-    margin-bottom: 6px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    background-color: rgba(107, 107, 107, 0.87);
-    color: #fff;
-    font-family: @fontBold;
-    -webkit-font-smoothing:auto;
     &.sm2_link{
       visibility: hidden;
     }
@@ -51,24 +68,34 @@
     padding-bottom: 10px;
   }
 
-  div.infoPanelImagePreview img {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+  .infoPanelImagePreview
+  {
+    text-align:center;
+    position: relative;
+    margin: 10px 16px;
+    border-radius: 5px;
+    img {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      box-shadow: 2px 2px 3px rgba(0,0,0,0.25);
+    }
+    div.infoPanelBasenameTitle{
+      color: @colorCodeFolder;
+      font-weight: 500;
+      font-size: 13px;
+      margin-bottom: 20px;
+      line-height: 1.5em;
+      text-align: left;
+      word-break:break-all;
+    }
   }
 
-  div.infoPanelBasenameTitle{
-    color: @infopanel_main_text_color;
-    margin: 9px 15px;
-    line-height: 1.5em;
-    text-align: left;
-    margin-top: 0;
-    word-break:break-all;
-  }
+
 
   .infoPanelTable,
   div.infoPanelRow
   {
-    font-size: 12px;
+    font-size: 13px;
     width: 100%;
   }
 
@@ -77,37 +104,18 @@
   {
     width: 50%;
     color: @infopanel_labels_color;
-    text-transform: uppercase;
     font-size: 0.9em;
+    font-weight: 500;
   }
 
   td.infoPanelValue,
   div.infoPanelValue
   {
-    padding: 0 0 15px;
-    font-size: 1.5em;
+    padding: 0 0 10px;
+    font-size: 1em;
     color: @infopanel_values_color;
     line-height: 1.3em;
     vertical-align: top;
-  }
-
-  span.user_meta_change {
-    display: inline-block !important;
-    text-transform: lowercase;
-    font-size: 11px !important;
-    margin: 3px 0;
-    border-bottom: @infopanel_quick_button_border;
-    float: right;
-    cursor: pointer;
-  }
-  
-  
-  span[data-ajxpAction]{
-    float: right;
-    padding: 0;
-    cursor: pointer;
-    font-size: 17px;
-    display: none;
   }
 
   div.folded_icons{
@@ -116,22 +124,24 @@
 
   div.class-FetchedResultPane{
 
+    font-size: 13px;
     div.thumbnail_selectable_cell.detailed{
-      padding: 3px 1px;
+      padding: 0;
       cursor: default;
       div.thumbnail_selectable_cell{
         display: none;
       }
       div.thumbLabel{
-        font-size: 1.3em;
+        font-size: 1.1em;
         color: @infopanel_fetchedpane_text_color;
         white-space: normal;
         line-height: 1.5em;
-        padding-bottom: 4px;
+        padding-top: 0;
+        padding-bottom: 8px;
         small {
           color: @infopanel_fetchedpane_legend_color;
           display: block;
-          font-size: 11px;
+          font-size: 0.8em;
           line-height: 15px;
         }
       }
@@ -187,6 +197,32 @@
     padding-bottom: 15px;
     -webkit-font-smoothing: antialiased;
 
+    div.panelHeader{
+      font-size: 13px;
+      padding: 8px 0 16px 0;
+      color: #555;
+      font-weight: 500;
+      span.user_meta_change {
+        color: #222;
+        text-transform: uppercase;
+        font-size: 11px;
+        background-color: rgba(255, 255, 255, 0.5);
+        padding:4px 10px 3px;
+        margin-top: -3px;
+        display: inline-block !important;
+        float: right;
+        cursor: pointer;
+        font-weight:300;
+        &:hover{
+            background-color: white;
+        }
+      }
+      span[data-ajxpAction]{
+        display: none;
+      }
+    }
+
+
     i {
       font-size: 13px;
       font-style: normal;
@@ -200,15 +236,15 @@
     }
 
     div.toolbarGroup a:first-child {
-      border-radius: 30px 0 0 30px;
+      border-radius: @infopanel_toolbar_buttons_radius 0 0 @infopanel_toolbar_buttons_radius;
     }
 
     div.toolbarGroup a:last-child{
-      border-radius: 0 30px 30px 0;
+      border-radius: 0 @infopanel_toolbar_buttons_radius @infopanel_toolbar_buttons_radius 0;
     }
 
     div.toolbarGroup a:last-child:first-child{
-      border-radius: 30px;
+      border-radius: @infopanel_toolbar_buttons_radius;
     }
 
     a#open_with_button span.ajxp_icon_span,
@@ -218,7 +254,7 @@
 
     div#info_panel_share_toolbar a{
       background-color: @infopanel_share_button_tint;
-      border-radius: 30px;
+      border-radius: @infopanel_toolbar_buttons_radius;
     }
 
     &.scrolling td.infoPanelValue{
@@ -267,23 +303,15 @@
       white-space: nowrap;
     }
 
-    div.panelHeader{
-      font-size: 1.3em;
-      padding: 24px 0 8px 0;
-      text-transform: uppercase;
-      color: #222;
-    }
-
-    div.panelHeader a[data-ajxpAction]{
-      float:right;
-      cursor:pointer;
-      text-transform:none;
-      margin-top:-3px;
-      border-radius: 30px;
-    }
-
     div.toolbar_placeholder{
+      margin-top: 25px;
       display: inline-block;
+    }
+    div.one_has_many{
+      margin-top: 10px;
+      div.toolbar_placeholder{
+        margin-top: 0;
+      }
     }
 
     div.toolbarGroup{
@@ -305,22 +333,10 @@
   }
 
   div.one_has_many > div.toolbar_placeholder.has_many > div.toolbarGroup {
-    min-width: 250px;
   }
 
   div.one_has_many > div.toolbar_placeholder.one_or_less > div.toolbarGroup a {
-    width: 211px;
-  }
 
-  .infoPanelImagePreview
-  {
-    text-align:center;
-    padding: 10px 6px;
-    position: relative;
-    background-color: white;
-    margin: 10px 14px;
-    border-radius: 5px;
-    box-shadow: 0 0 7px rgba(0,0,0,0.25);
   }
 
   div.dimension_card_width{
@@ -350,7 +366,11 @@
   }
 
   div.infoPanelAllMetadata > div {
-    margin: 6px 20px;
+    border-top: 1px solid #ddd;
+    padding: 6px 16px;
+    &#info_panel_primary{
+      padding-top: 12px;
+    }
   }
 
   div.triple div.infoPanelAllMetadata > div{
@@ -392,11 +412,6 @@
   .ipanel_no_selection_data {
     display: none;
   }
-
-  div.infoPanelBasenameTitle{
-    font-family: @fontBold;
-  }
-
 
   .infoPanelTable tr:last-child td
   {

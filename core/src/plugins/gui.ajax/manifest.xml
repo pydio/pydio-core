@@ -8,6 +8,7 @@
             <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
             <js className="ReactPydio" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactPydioComponents.js"/>
             <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
+            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,ReactPydio"/>
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>

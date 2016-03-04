@@ -1,6 +1,11 @@
 (function(global){
 
-    var MessagesConsumerMixin = AdminComponents.MessagesConsumerMixin;
+    var MessagesConsumerMixin = {
+        contextTypes: {
+            messages:React.PropTypes.object,
+            getMessage:React.PropTypes.func
+        }
+    };
 
     /******************************/
     /* REACT DND GENERIC COMPONENTS
@@ -1965,11 +1970,22 @@
             autoRefresh:React.PropTypes.number,
             actionBarGroups:React.PropTypes.array,
             heightAutoWithMax:React.PropTypes.number,
-            elementHeight:React.PropTypes.number.isRequired
+            elementHeight:React.PropTypes.number.isRequired,
+            nodeClicked:React.PropTypes.func,
+            reloadOnServerMessage:React.PropTypes.string
         },
 
         reload: function(){
-            this.refs.list.reload();
+            if(this.refs.list && this.isMounted()){
+                this.refs.list.reload();
+            }
+        },
+
+        componentWillUnmount:function(){
+            if(this._smObs){
+                this.props.pydio.stopObserving("server_message", this._smObs);
+                this.props.pydio.stopObserving("server_message:" + this.props.reloadOnServerMessage, this.reload);
+            }
         },
 
         getInitialState:function(){
@@ -1979,6 +1995,26 @@
             rNodeProvider.initProvider(this.props.nodeProviderProperties);
             var rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
             dataModel.setRootNode(rootNode);
+            if(this.props.nodeClicked){
+                // leaf
+                this.openEditor = function(node){
+                    this.props.nodeClicked(node);
+                    return false;
+                }.bind(this);
+                // dir
+                dataModel.observe("selection_changed", function(event){
+                    var selectedNodes = event.memo.getSelectedNodes();
+                    if(selectedNodes.length) {
+                        this.props.nodeClicked(selectedNodes[0]);
+                        event.memo.setSelectedNodes([]);
+                    }
+                }.bind(this));
+            }
+            if(this.props.reloadOnServerMessage && this.props.pydio){
+                this._smObs = function(event){ if(XMLUtils.XPathSelectSingleNode(event, this.props.reloadOnServerMessage)) this.reload(); }.bind(this);
+                this.props.pydio.observe("server_message", this._smObs);
+                this.props.pydio.observe("server_message:" + this.props.reloadOnServerMessage, this.reload);
+            }
             return {node:rootNode, dataModel:dataModel};
         },
 
@@ -1991,6 +2027,7 @@
                 <div className={this.props.heightAutoWithMax?"":"layout-fill vertical-layout"}>
                     <ReactPydio.SimpleList
                         {...this.props}
+                        openEditor={this.openEditor}
                         ref="list"
                         style={{height:'100%'}}
                         node={this.state.node}
@@ -2183,6 +2220,9 @@
     });
 
     var ReactPydio = global.ReactPydio || {};
+
+    ReactPydio.MessagesConsumerMixin = MessagesConsumerMixin;
+
     ReactPydio.SortableList = SortableList;
     ReactPydio.SimpleList = SimpleFlatList;
     ReactPydio.NodeListCustomProvider = NodeListCustomProvider;
