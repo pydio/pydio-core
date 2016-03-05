@@ -28,7 +28,7 @@
 
         parseComponentConfigs:function(){
             var reg = this.props.pydio.Registry.getXML();
-            var contentNodes = XMLUtils.XPathSelectNodes(reg, '//component_config[@className="AjxpReactComponent::left_navigator"]/additional_content');
+            var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::left_navigator"]/additional_content');
             return contentNodes.map(function(node){
                 return {
                     id:node.getAttribute('id'),
@@ -37,6 +37,11 @@
                     options: JSON.parse(node.getAttribute('options'))
                 };
             });
+        },
+
+        createRepositoryEnabled:function(){
+            var reg = this.props.pydio.Registry.getXML();
+            return XMLUtils.XPathSelectSingleNode(reg, 'actions/action[@name="user_create_repository"]') !== null;
         },
 
         getInitialState:function(){
@@ -103,6 +108,20 @@
                 }
             }.bind(this));
 
+            if(this.createRepositoryEnabled()){
+                var createClick = function(){
+                    this.props.pydio.Controller.fireAction('user_create_repository');
+                }.bind(this);
+                var createAction = (
+                    <div className="workspaces">
+                        <div className="workspace-entry" onClick={createClick} title={messages[418]}>
+                            <span className="workspace-badge">+</span>
+                            <span className="workspace-label">{messages[417]}</span>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
                 <span>
                     <div  id="repo_chooser" onClick={this.openNavigation} onMouseOver={this.openNavigation} className={this.state.statusOpen?"open":""}>
@@ -120,6 +139,7 @@
                                 {sharedEntries}
                             </div>
                         </div>
+                        {createAction}
                     </div>
                 </span>
             )

@@ -194,8 +194,6 @@ module.exports = function(grunt) {
                     'res/themes/orbit/css/allz.css': [
                         'res/themes/orbit/css/pydio.css',
                         'res/themes/orbit/css/animate-custom.css',
-                        'res/themes/orbit/css/font-awesome.css',
-                        'res/themes/orbit/css/fontfaces.css',
                         'res/themes/orbit/css/chosen.css',
                         'res/themes/orbit/css/media.css#NO_MINI'
                     ]
