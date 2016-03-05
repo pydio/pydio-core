@@ -227,7 +227,7 @@
                 </processing>
             </action>
             <action name="current-cart-share">
-                <gui src="" iconClass="icon-share" text="action.cart.10" title="action.cart.11">
+                <gui src="" iconClass="mdi mdi-share-variant" text="action.cart.10" title="action.cart.11">
                     <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
                 </gui>
                 <processing>

@@ -73,7 +73,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                     "files" => array(
                         "LABEL" => $mess["user_dash.34"],
                         "ICON" => "user_shared.png",
-                        "ICON-CLASS" => "icon-share",
+                        "ICON-CLASS" => "mdi mdi-share-variant",
                         "DESCRIPTION" => $mess["user_dash.35"]
                     ),
                     "settings" => array(

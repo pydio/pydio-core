@@ -847,7 +847,7 @@ class ShareCenter extends AJXP_Plugin
             $merge = array(
                 "ajxp_shared"      => "true",
                 "overlay_icon"     => "shared.png",
-                "overlay_class"    => "icon-share-sign"
+                "overlay_class"    => "mdi mdi-share-variant"
             );
             // Backward compat, until we rework client-side
             $sKeys = array_keys($shares);
