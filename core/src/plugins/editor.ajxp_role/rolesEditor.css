@@ -409,7 +409,9 @@ div.documentation{
 }
 
 #shares-toolbar{
-    padding: 10px 0 0 24px;
+    padding: 18px 0 0 24px;
+    position: absolute;
+    right: 0;
 }
 
 .innerContainer{

@@ -35,7 +35,7 @@ Class.create("UserProfileEditor", AjxpPane, {
             this._formManager.createParametersInputs(oFormObject.down('#user_profile_form'), definitions, true, ajaxplorer.user.preferences, false, true);
             this._formManager.disableShortcutsOnForm(oFormObject.down('#user_profile_form'));
 
-            var saveButton = new Element('a', {}).update('<span class="icon-save"></span> <span>'+MessageHash[53]+'</span>');
+            var saveButton = new Element('a', {}).update('<span class="ajxp_icon_span icon-save"></span> <span class="actionbar_button_label">'+MessageHash[53]+'</span>');
             oFormObject.down('.toolbarGroup').insert({top: saveButton});
 
 
@@ -67,7 +67,7 @@ Class.create("UserProfileEditor", AjxpPane, {
 
         if(pydio.getController().getActionByName('pass_change')){
 
-            var chPassButton = new Element('a', {className:''}).update('<span class="icon-key"></span> <span>'+MessageHash[194]+'</span>');
+            var chPassButton = new Element('a', {className:''}).update('<span class="ajxp_icon_span icon-key"></span> <span class="actionbar_button_label">'+MessageHash[194]+'</span>');
             oFormObject.down('.toolbarGroup').insert(chPassButton);
             chPassButton.observe("click", function(){
                 pydio.getController().getActionByName('pass_change').apply();

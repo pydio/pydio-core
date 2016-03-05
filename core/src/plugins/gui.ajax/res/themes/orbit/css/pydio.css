@@ -457,23 +457,12 @@ div.selected-webfx-tree-item-inactive {
 }
 div.selected-webfx-tree-item,
 .selected-focus {
-  background: #fb725c !important;
+  background: #ff764b !important;
 }
 .settings_main_pane div.selected-webfx-tree-item,
 .settings_main_pane div.selected-focus,
 .settings_main_pane tr.selected-focus {
   background-color: #4ea7a5;
-}
-div#copymove_form > div {
-  width: 390px !important;
-  height: auto !important;
-}
-select#external_repository {
-  width: 390px !important;
-  height: 26px !important;
-}
-div#copymove_form div#treeCopy {
-  height: 254px !important;
 }
 div.treeCopyContainer div.webfx-tree-item a {
   color: #555 !important;
@@ -482,11 +471,6 @@ div.treeCopyContainer div.selected-webfx-tree-item a,
 div.treeCopyContainer div.webfx-tree-item:hover a,
 div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   color: white !important;
-}
-div#copymove_form > input {
-  background-color: #fff;
-  padding: 5px;
-  width: 380px !important;
 }
 .webfx-tree-item div.overlay_icon_div {
   display: none;
@@ -692,7 +676,7 @@ div#copymove_form > input {
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel {
   opacity: 1;
-  background-color: #fb725c;
+  background-color: #ff764b;
   color: #ffffff;
 }
 .class-FilesList .list_selectable_span img {
@@ -1303,7 +1287,7 @@ DIALOG BOXES
 */
 /*#upload_form, #createdir_form, #createfile_form, #rename_div*/
 #all_forms {
-  background-color: #eee;
+  background-color: #ffffff;
 }
 #all_forms > div {
   display: none;
@@ -1318,7 +1302,8 @@ div.shadow_class {
   border-radius: 5px;
 }
 .dialogBox {
-  border-radius: 0;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   display: none;
   font-size: 11px;
@@ -1333,142 +1318,157 @@ div.shadow_class {
   /***/
 }
 .dialogBox .dialogTitle {
-  background-color: #6b6b6b;
-  border-radius: 0 0 0 0;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 24px 24px 10px 24px;
+  font-weight: 500;
   cursor: move;
-  font-size: 15px !important;
-  padding: 11px 4px 13px 10px;
 }
 .dialogBox .dialogTitle span.ajxp_icon_span {
-  display: inline-block;
+  display: none;
   font-size: 15px;
   padding-right: 8px;
   padding-top: 2px;
 }
 .dialogBox .dialogTitle span#modalCloseBtn {
-  color: #ffffff;
-  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  display: none;
   font-size: 15px;
   margin-top: 0;
   padding: 7px 12px;
 }
 .dialogBox .dialogTitle span.string-only-title {
   display: inline-block;
+  font-size: 21px;
+}
+.dialogBox .dialogContent {
+  background-color: #ffffff;
   font-size: 16px;
-  padding-top: 3px;
+  color: rgba(0, 0, 0, 0.53);
+  padding: 10px 24px 24px 24px;
+  line-height: 22px;
+  padding-bottom: 76px;
+  border-top: 0;
 }
-.dialogBox .dialogTitle .ajxp_icon_span {
-  display: none;
-}
-.dialogBox .dialogLegend {
+.dialogBox .dialogContent .dialogLegend {
   font-size: 13px;
   line-height: 16px;
-  padding: 5px;
 }
-.dialogBox .dialogButtons {
-  clear: both;
-  text-align: right;
-}
-.dialogBox .dialogButtons .dialogButton {
-  background-color: transparent;
-  border: 0;
-  height: 32px;
-  margin-left: 3px;
-  padding: 2px 0;
-  width: 32px;
-}
-.dialogBox .dialogButtons .dialogButton:focus {
-  background-color: transparent;
-  border: 0;
-}
-.dialogBox .dialogButtons fieldSet input.dialogButton {
-  background-color: transparent;
-  border: 0;
-  height: 32px;
-  margin-left: 3px;
-  padding: 2px 0;
-  width: 32px;
-}
-.dialogBox .dialogButtons fieldSet input.dialogButton:focus {
-  background-color: transparent;
-  border: 0;
-}
-.dialogBox .dialogButtons .dialogButtonsCheckbox {
-  float: left;
-  margin-top: 9px;
-}
-.dialogBox .dialogButtons .dialogButtonsCheckbox label {
-  cursor: pointer;
-}
-.dialogBox .dialogButtons.inlineEdition input {
-  box-shadow: none;
-  height: 22px;
-  margin-left: 6px;
-  padding: 0;
-  width: 22px;
-}
-.dialogBox div.dialogContentMainTitle {
+.dialogBox .dialogContent .dialogContentMainTitle {
   border-bottom: 1px solid #75808b;
   color: #75808b;
   font-size: 20px;
   margin-bottom: 10px;
   padding-bottom: 0;
 }
-.dialogBox .dialogArrow {
-  font-size: 16px;
-  font-weight: bold;
+.dialogBox .dialogContent .dialogButtons {
+  position: absolute;
+  box-sizing: border-box;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  padding: 8px;
+  text-align: right;
 }
-.dialogBox .dialogContent {
-  background-color: #ffffff;
-  border-radius: 0;
-  border-top: 0;
-  color: #5C5C5C;
-  padding: 10px 10px;
+.dialogBox .dialogContent .dialogButtons .dialogButton {
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #009688;
+  text-transform: uppercase;
+  background-color: transparent;
+  border: 0;
+  border-radius: 2px;
+  height: 32px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  cursor: pointer;
+}
+.dialogBox .dialogContent .dialogButtons .dialogButton:focus {
+  background-color: #d8fffb;
+}
+.dialogBox .dialogContent .dialogButtons .dialogButton:hover {
+  background-color: #bffff9;
+}
+.dialogBox .dialogContent .dialogButtons fieldSet input.dialogButton {
+  background-color: transparent;
+  border: 0;
+  height: 32px;
+  margin-left: 3px;
+  padding: 2px 0;
+  width: 32px;
+}
+.dialogBox .dialogContent .dialogButtons fieldSet input.dialogButton:focus {
+  background-color: transparent;
+  border: 0;
+}
+.dialogBox .dialogContent .dialogButtons .dialogButtonsCheckbox {
+  float: left;
+  margin-top: 9px;
+}
+.dialogBox .dialogContent .dialogButtons .dialogButtonsCheckbox label {
+  cursor: pointer;
+}
+.dialogBox .dialogContent .dialogButtons.inlineEdition input {
+  box-shadow: none;
+  height: 22px;
+  margin-left: 6px;
+  padding: 0;
 }
 .dialogBox .dialogContent form {
   display: inline;
   margin: 0;
 }
-.dialogBox .dialogContent input[type="text"] {
-  border-radius: 2px;
-  background: #ffffff;
-  border: 1px solid #aaaaaa;
-  height: 24px;
-  margin-left: 0;
+.dialogBox .dialogContent .SF_label {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 12px;
+  margin-bottom: -3px;
 }
-.dialogBox .dialogContent input[type="text"]:disabled {
-  background: #eeeeee;
-}
+.dialogBox .dialogContent input[type="text"],
 .dialogBox .dialogContent input[type="password"] {
-  border-radius: 2px;
-  background-color: #ffffff;
-  border: 1px solid #aaaaaa;
-  height: 24px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 30px;
+  border-radius: 0;
+  border: solid #aaaaaa;
+  border-width: 0 0 1px 0;
   margin-left: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+  padding: 0 !important;
 }
+.dialogBox .dialogContent input[type="text"]:focus,
+.dialogBox .dialogContent input[type="password"]:focus {
+  border-color: #009688;
+}
+.dialogBox .dialogContent input[type="text"]:disabled,
 .dialogBox .dialogContent input[type="password"]:disabled {
   background: #eeeeee;
 }
+.dialogBox .dialogContent input[type="checkbox"],
+.dialogBox .dialogContent input[type="radio"] {
+  background: none;
+  border-radius: 0;
+  border: none;
+  -webkit-filter: none;
+          filter: none;
+  height: auto;
+  margin-right: 0;
+  width: auto;
+}
 .dialogBox .dialogContent select {
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
+  border-radius: 0;
   background-color: #ffffff;
-  border-radius: 2px;
-  border: 1px solid #aaaaaa;
+  border: 0 0 1px 0 solid #aaaaaa;
   font-size: 13px;
-  height: 24px;
+  height: 30px;
   margin-left: 0;
-  width: 97%;
-}
-.dialogBox .dialogContent input {
-  border-radius: 2px;
-  border: 1px solid #aaaaaa;
-  height: 24px;
-  margin-left: 0;
-}
-.dialogBox .dialogContent input:disabled {
-  background: #eeeeee;
+  box-sizing: border-box;
+  width: 100%;
 }
 .dialogBox .dialogContent select[multiple] {
   height: 66px !important;
@@ -1479,25 +1479,9 @@ div.shadow_class {
 .dialogBox .dialogContent textarea:disabled {
   background: #eeeeee;
 }
-.dialogBox .dialogContent input[type="checkbox"] {
-  background: none;
-  border-radius: 0;
-  border: none;
-  -webkit-filter: none;
-          filter: none;
-  height: auto;
-  margin-right: 0;
-  width: auto;
-}
-.dialogBox .dialogContent input[type="radio"] {
-  background: none;
-  border-radius: 0;
-  border: none;
-  -webkit-filter: none;
-          filter: none;
-  height: auto;
-  margin-right: 0;
-  width: auto;
+.dialogBox .dialogArrow {
+  font-size: 16px;
+  font-weight: bold;
 }
 .dialogBox div.dialogBox.css_boxshadow {
   background-color: white;
@@ -1752,7 +1736,7 @@ div#upload_files_list,
 div#multiple_download_container {
   overflow: auto;
   height: 350px;
-  border: 4px dashed #dddddd;
+  border: 3px dashed #dddddd;
   text-align: left;
   border-radius: 11px;
 }
@@ -1777,42 +1761,37 @@ div#multiple_download_container {
   list-style: none;
   display: block;
   position: relative;
-  border-bottom: 1px solid #77b8e2;
+  border-bottom: 1px solid #ff5722;
   background-color: #ffffff;
 }
-#uploader_chooser li {
+#uploader_chooser ul li {
   display: inline-block;
   padding: 12px 14px;
-  border-radius: 4px 4px 0 0;
-  margin: 8px 2px;
-  margin-bottom: 0;
+  margin: 0;
   border-bottom: 0;
   cursor: pointer;
   font-size: 13px;
 }
-#uploader_chooser li:hover {
+#uploader_chooser ul li:hover {
   background-color: #f5f5f5;
   border-bottom: 2px solid #f5f5f5;
 }
-#uploader_chooser li.current {
-  font-weight: bold;
+#uploader_chooser ul li.current {
+  font-weight: 500;
   cursor: default;
-  border-bottom: 2px solid #77b8e2;
+  border-bottom: 3px solid #ff5722;
 }
 div#uploader_options_pane {
   background-color: white;
-  border-top: 1px solid #CCCCCC;
   font-size: 11px;
   height: 59px;
   overflow: hidden;
-  padding: 7px 10px;
-  text-align: left;
+  padding: 0 10px 7px;
+  text-align: right;
   display: none;
   margin-bottom: 11px;
-  border-bottom: 1px solid #CCCCCC;
-  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.3);
-  border-radius: 2px;
-  margin-top: 2px;
+  margin-right: 2px;
+  border-right: 2px solid #ff5722;
 }
 div#total_files_list {
   display: none !important;
@@ -1823,75 +1802,114 @@ div#uploader_options_pane input {
   margin-left: 0;
   margin-top: 5px;
 }
-div#upload_files_list div,
-div#multiple_download_container div {
+.dotted_container_item_mixin {
   overflow: hidden;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 14px;
+  height: 20px;
   position: relative;
   font-size: 13px;
-  background-image: url('../images//dl_bg.png');
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='#ffc4b1' fill-opacity='1'/></svg>");
   background-repeat: no-repeat;
   background-size: 0 100%;
   border-bottom: 1px solid #e3e5e9;
   color: #5C5C5C;
+}
+.dotted_container_item_mixin rect {
+  fill: #ffffff;
+}
+div#upload_files_list div {
+  overflow: hidden;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 14px;
+  height: 20px;
+  position: relative;
+  font-size: 13px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='#ffc4b1' fill-opacity='1'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 0 100%;
+  border-bottom: 1px solid #e3e5e9;
+  color: #5C5C5C;
+}
+div#upload_files_list div rect {
+  fill: #ffffff;
 }
 div#upload_files_list span.item_relative_path {
   color: #ccc;
   margin-left: 15px;
   font-size: 0.8em;
 }
-#upload_files_list img {
+div#upload_files_list img {
   margin-right: 6px;
 }
-#upload_files_list img.fakeUploadButton {
+div#upload_files_list img.fakeUploadButton {
   display: none;
 }
-#upload_files_list div a {
+div#upload_files_list div a {
   color: #ddd;
   font-style: italic;
 }
-#upload_files_list span.statusText,
-#upload_files_list span.percentText {
+div#upload_files_list span.statusText,
+div#upload_files_list span.percentText {
   font-size: 10px;
   display: inline-block;
   padding: 0 6px;
   color: #cccccc;
 }
-#upload_files_list span.statusText.new,
-#upload_files_list span.statusText.loaded {
+div#upload_files_list span.statusText.new,
+div#upload_files_list #upload_files_list span.statusText.loaded {
   display: none;
 }
-#upload_files_list span.icon-remove-sign {
+div#upload_files_list span.icon-remove-sign {
   color: #ccc;
   display: block;
-  float: right;
-  margin-right: 10px;
+  position: absolute;
+  padding: 12px;
+  right: 5px;
+  top: 2px;
   cursor: pointer;
 }
-#upload_files_list span.icon-remove-sign:hover {
+div#upload_files_list span.icon-remove-sign:hover {
   color: #d00;
 }
-#multiple_download_container div a {
+div#multiple_download_container div {
+  overflow: hidden;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 14px;
+  height: 20px;
+  position: relative;
+  font-size: 13px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='#ffc4b1' fill-opacity='1'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 0 100%;
+  border-bottom: 1px solid #e3e5e9;
+  color: #5C5C5C;
+}
+div#multiple_download_container div rect {
+  fill: #ffffff;
+}
+div#multiple_download_container div div a {
   display: block;
 }
-#multiple_download_container div a:hover {
+div#multiple_download_container div div a:hover {
   text-decoration: none;
   color: #aaa;
 }
 #fileInputContainer {
   position: relative;
 }
-#fileInputContainerDiv {
+#fileInputContainer #fileInputContainerDiv {
   /* to fit 1px border */
   margin: 0;
   padding: 0;
   position: relative;
   overflow: hidden;
   vertical-align: top;
-  height: 60px;
-  width: 167px;
+  height: 47px;
+  width: 292px;
   cursor: pointer;
 }
 #fileInputContainer input {
@@ -1907,7 +1925,7 @@ div#upload_files_list span.item_relative_path {
   cursor: pointer !important;
   filter: alpha(opacity=0);
 }
-#fileInputPos {
+#fileInputContainer #fileInputPos {
   text-align: left;
   height: 60px;
   width: 180px;
@@ -1917,6 +1935,41 @@ div#upload_files_list span.item_relative_path {
   z-index: 9999;
   /* this was needed to work in IE */
   cursor: pointer;
+}
+#fileInputContainer .fakeUploadButton {
+  width: 270px;
+  padding: 6px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: normal;
+  background-color: #c9fffa;
+  color: #009688;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
+  position: absolute;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  top: 0;
+  left: 0;
+  margin: 0;
+}
+#fileInputContainer .fakeUploadButton span.icon-desktop {
+  font-size: 20px;
+  display: block;
+  float: left;
+  padding: 2px 10px 0 6px;
+}
+#fileInputContainer .fakeUploadButton .disabled {
+  -moz-opacity: 0.5;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+  cursor: default;
+}
+#fileInputContainer .fakeUploadButton img {
+  margin-bottom: 3px;
 }
 #uploaderTextActions {
   position: absolute;
@@ -1930,31 +1983,6 @@ div#upload_files_list span.item_relative_path {
 #uploaderTextActions span:hover {
   color: #5C5C5C;
 }
-.fakeUploadButton {
-  width: 161px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border: 1px solid #ccc;
-  text-align: left;
-  vertical-align: middle;
-  font-size: 1.4em;
-  margin-bottom: 5px;
-  cursor: pointer;
-  color: #667;
-  font-weight: normal;
-  border-radius: 3px;
-  background-color: #ebedf0;
-  box-shadow: inset 1px 1px 0 white;
-}
-.fakeUploadButton.disabled {
-  -moz-opacity: 0.5;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-  cursor: default;
-}
-.fakeUploadButton img {
-  margin-bottom: 3px;
-}
 .fakeOptionButton {
   padding-top: 3px;
   padding-bottom: 3px;
@@ -1962,18 +1990,6 @@ div#upload_files_list span.item_relative_path {
   margin-top: 5px;
   background-position: center;
   border-radius: 5px;
-}
-#uploadBrowseButton {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0;
-}
-#uploadBrowseButton span.icon-desktop {
-  font-size: 2em;
-  display: block;
-  float: left;
-  padding: 2px 7px;
 }
 #uploaderTextActions span.disabled {
   display: none;
@@ -2358,7 +2374,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 }
 #logging_string i {
   font-style: normal;
-  font-weight: normal;
   letter-spacing: 1px;
 }
 #logging_string i img {
@@ -2386,7 +2401,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 #logging_string .user_widget_label.withImage i {
   display: inline-block;
   font-size: 12px;
-  font-weight: bold;
   padding: 3px 0 0 8px;
 }
 #logging_string img.user_widget_mini {
@@ -2864,7 +2878,7 @@ span.toggleHeader {
           transition: border-color 0.3s ease;
   color: #555;
   font-size: 12px;
-  border-bottom: 3px solid #fb725c;
+  border-bottom: 3px solid #ff5722;
 }
 .flat_tabulator span.toggleHeader {
   border-bottom-color: #3d8180;
@@ -2989,7 +3003,7 @@ div.innerTabulator > div.tabulatorContainer > #display_toolbar a {
 DASHBOARD TABULATOR
 */
 .flat_tabulator div.panelHeader.tabulatorContainer {
-  padding: 0 0 0 0;
+  padding: 2px 0 0 0;
   background-color: #fff;
   border-bottom: 0;
 }
@@ -3034,7 +3048,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 .horizontal_tabulator span.toggleHeader {
   text-align: left;
   padding: 10px 0 12px 22px;
-  background-color: #fb725c !important;
+  background-color: #ff5722 !important;
   color: #ffffff !important;
   border: 0;
   display: block;
@@ -3163,7 +3177,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   padding: 22px 25px;
 }
 .breadcrumbs-one i.ajxp-goto:hover {
-  color: #fb725c;
+  color: #ff764b;
 }
 .breadcrumbs-one span.reduced {
   height: 20px;
@@ -3592,7 +3606,7 @@ div.menu.rootDirChooser {
   width: 250px !important;
   /* IE */
   width: expression("250px");
-  background-color: #222222;
+  background-color: #333333;
   box-shadow: none !important;
   -webkit-font-smoothing: antialiased;
 }
@@ -3607,10 +3621,9 @@ div.menu.rootDirChooser li.menuTitle {
 }
 div.menu.rootDirChooser li.separator {
   border-top: 1px solid rgba(255, 255, 255, 0.75);
-  margin: 0 auto;
+  margin: 2px 0;
   line-height: 1px !important;
   height: 0 !important;
-  width: 98%;
 }
 div.menu.rootDirChooser li.separator.menuTitle {
   height: auto !important;
@@ -3621,13 +3634,19 @@ div.menu.rootDirChooser li.separator.menuTitle {
 }
 div.menu.rootDirChooser a {
   display: block;
-  padding: 6px 5px 5px 6px;
+  padding: 8px 5px 8px 6px;
   color: #fff;
   letter-spacing: 1px;
 }
 div.menu.rootDirChooser a img {
   margin-right: 5px;
   border: 0;
+}
+div.menu.rootDirChooser a span.ajxp_icon_span {
+  display: inline-block;
+  padding: 0 16px 30px 10px;
+  margin-top: -1px;
+  font-size: 1.4em;
 }
 div.menu.rootDirChooser a.disabled img {
   filter: alpha(opacity=30);
@@ -3636,7 +3655,7 @@ div.menu.rootDirChooser a.disabled img {
 }
 div.menu.rootDirChooser a:hover,
 div.menu.rootDirChooser a.hovered {
-  background-color: #fb725c;
+  background-color: #ff764b;
   color: #ffffff;
 }
 div.menu.rootDirChooser span.rootDirTitle {
@@ -3651,16 +3670,10 @@ div.menu.rootDirChooser span.rootDirTitle {
   text-align: left;
   font-style: italic;
 }
-div.menu.rootDirChooser span.ajxp_icon_span {
-  display: inline-block;
-  padding-right: 5px;
-  font-size: 1.4em;
-}
 #info_panel {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
 }
 #info_panel div#display_toolbar {
   float: left;
@@ -4302,21 +4315,12 @@ div.overlay.form-reset-password-ask {
 /************************/
 /* ORBIT RESIZE DIALOGS */
 /************************/
-span#delete_message {
-  font-size: 16px;
-  display: block;
-  padding: 30px 10px;
-}
 div#properties_box {
   margin: 20px auto;
   width: 250px;
 }
 input#ajxp_link_container {
   width: 340px !important;
-}
-div#mkfile_form input,
-div#mkdir_form input {
-  width: 390px;
 }
 textarea#myCode {
   border: 1px solid #5C5C5C;
@@ -4340,6 +4344,60 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 }
 .no-flexbox div#mailer_message {
   width: 380px !important;
+}
+div#copymove_form {
+  box-sizing: border-box;
+}
+div#copymove_form > div {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: auto !important;
+}
+div#copymove_form select#external_repository {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 30px !important;
+}
+div#copymove_form div#treeCopy {
+  height: 254px !important;
+}
+div#copymove_form > input {
+  box-sizing: border-box;
+  width: 100% !important;
+  background-color: #fff;
+  padding: 5px;
+}
+div#external_download > div {
+  padding: 10px 24px 52px !important;
+}
+div#external_download > div .dialoglegend {
+  font-size: 14px;
+  display: block;
+  padding-bottom: 20px;
+}
+div#external_download > div input {
+  width: 380px !important;
+}
+div.dialogBox.form-originalUploadForm #modalCloseBtn,
+div.dialogBox.form-jumploader_form #modalCloseBtn,
+div.dialogBox.form-external_download #modalCloseBtn,
+div.dialogBox.form-plupload_form #modalCloseBtn {
+  display: block;
+  color: rgba(0, 0, 0, 0.53);
+}
+div.dialogBox.form-user_create_repository_form div#user_tpl_container {
+  border: 0 !important;
+  font-size: 13px;
+  background-color: white !important;
+  padding-bottom: 52px;
+}
+div.dialogBox.form-user_create_repository_form div#user_tpl_container div.panelHeader {
+  padding-left: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+div.dialogBox.form-user_create_repository_form div.dialogButtons {
+  background-color: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 .toolbars_buttons_mixin {
   box-sizing: border-box;
@@ -4451,7 +4509,9 @@ div.dialogBox.form-diaporama_box div.dialogContent {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
-  padding: 0 3px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 0 18px;
   color: #ffffff;
   display: inline-block;
 }
@@ -4717,14 +4777,14 @@ div.dialogBox.form-diaporama_box div.dialogContent {
   width: 15px;
 }
 #repo_chooser:hover {
-  background-color: #fb725c;
+  background-color: #ff764b;
   color: white;
 }
 #repo_chooser.disabled {
   display: none;
 }
 #repo_chooser.open {
-  background-color: #fb725c;
+  background-color: #ff764b;
 }
 #repo_chooser span.icon-sitemap {
   font-size: 1.0em;

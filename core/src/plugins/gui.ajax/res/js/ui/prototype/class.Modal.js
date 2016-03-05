@@ -136,8 +136,12 @@ Class.create("Modal", {
 		}
 		this.dialogContent.appendChild(newForm);
 		var boxPadding = $(sFormId).getAttribute("box_padding");
-		if(!boxPadding) boxPadding = 10;
-		this.dialogContent.setStyle({padding:boxPadding+'px'});
+		if(!boxPadding) {
+            boxPadding = null;
+        }else{
+            boxPadding += 'px';
+        }
+		this.dialogContent.setStyle({padding:boxPadding});
 
 		if(this.dialogTitle.select('#modalCloseBtn')[0]){
             if(fOnCancel){
@@ -553,24 +557,24 @@ Class.create("Modal", {
             contDiv.setStyle({direction:'rtl'});
         }
 		var okButton = new Element('input', {
-			type:'image',
+			type:'submit',
 			name:(bOkButtonOnly ? (bOkButtonOnly =='close' ? 'close' :'ok') :'ok'),
-			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
+			//src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
-			title:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
+			value:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
 		okButton.addClassName('dialogButton');
 		okButton.addClassName('dialogFocus');
         contDiv.insert(okButton);
 		if(!bOkButtonOnly)
 		{
 			var caButton = new Element('input', {
-				type:"image",
+				type:"button",
 				name:"can",
 				height:22,
 				width:22,
-				src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
-				title:MessageHash[49],
+				//src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
+				value:MessageHash[49],
 				className:"dialogButton"
 			});
 			if(fOnCancel){

@@ -1,4 +1,8 @@
 @uploaders_react_like_tab_tint:#77b8e2;
+@uploader_dialog_header_tint:@white;
+@uploader_dialog_header_color:rgba(0,0,0,0.87);
+@uploader_dialog_chooser_secondary:#fb725c;
+@uploader_dialog_progress_color: lighten(@uploader_dialog_chooser_secondary, 28);
 
 #flashframe
 {
@@ -16,7 +20,7 @@ div#upload_files_list, div#multiple_download_container
 {
   overflow: auto;
   height: 350px;
-  border: 4px dashed rgb(221, 221, 221);
+  border: 3px dashed rgb(221, 221, 221);
   text-align: left;
   -moz-border-radius: 11px;
   border-radius: 11px;
@@ -40,55 +44,48 @@ div#upload_files_list, div#multiple_download_container
 
 #uploader_chooser{
   width: 100%;
-}
 
-#uploader_chooser ul{
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: block;
-  position: relative;
-  border-bottom: 1px solid @uploaders_react_like_tab_tint;
-  background-color: #ffffff;
-}
+  ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: block;
+    position: relative;
+    border-bottom: 1px solid @uploaders_react_like_tab_tint;
+    background-color: @uploader_dialog_header_tint;
+    li {
+      display: inline-block;
+      padding: 12px 14px;
+      margin: 0;
+      border-bottom: 0;
+      cursor: pointer;
+      font-size: 13px;
+      &:hover {
+        background-color: #f5f5f5;
+        border-bottom: 2px solid #f5f5f5;
+      }
+      &.current {
+        font-weight: 500;
+        cursor: default;
+        border-bottom: 3px solid @uploaders_react_like_tab_tint;
+      }
+    }
 
-#uploader_chooser li {
-  display: inline-block;
-  padding: 12px 14px;
-  border-radius: 4px 4px 0 0;
-  margin: 8px 2px;
-  margin-bottom: 0;
-  border-bottom: 0;
-  cursor: pointer;
-  font-size: 13px;
-}
+  }
 
-#uploader_chooser li:hover {
-  background-color: #f5f5f5;
-  border-bottom: 2px solid #f5f5f5;
-}
-#uploader_chooser li.current:hover {
-}
-#uploader_chooser li.current {
-  font-weight: bold;
-  cursor: default;
-  border-bottom: 2px solid @uploaders_react_like_tab_tint;
 }
 
 div#uploader_options_pane {
   background-color: white;
-  border-top: 1px solid #CCCCCC;
   font-size: 11px;
   height: 59px;
   overflow: hidden;
-  padding: 7px 10px;
-  text-align: left;
+  padding: 0 10px 7px;
+  text-align: right;
   display: none;
   margin-bottom: 11px;
-  border-bottom: 1px solid #CCCCCC;
-  box-shadow: inset 0 1px 6px rgba(0,0,0,0.3);
-  border-radius: 2px;
-  margin-top: 2px;
+  margin-right: 2px;
+  border-right: 2px solid @uploaders_react_like_tab_tint;
 }
 div#total_files_list{
   display:none !important;
@@ -101,112 +98,164 @@ div#uploader_options_pane input {
   margin-top: 5px;
 }
 
-div#upload_files_list div, div#multiple_download_container div
-{
+.dotted_container_item_mixin{
   overflow: hidden;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 14px;
+  height: 20px;
   position: relative;
   font-size: 13px;
-  background-image: url('@{imagePath}/dl_bg.png');
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");
   background-repeat: no-repeat;
   background-size: 0 100%;
   border-bottom: 1px solid rgb(227, 229, 233);
   color: #5C5C5C;
+  rect{
+    fill:@uploader_dialog_header_tint;
+  }
 }
 
-div#upload_files_list span.item_relative_path{
-  color: #ccc;
-  margin-left: 15px;
-  font-size: 0.8em;
+div#upload_files_list{
+
+  div {
+    .dotted_container_item_mixin();
+  }
+
+  span.item_relative_path{
+    color: #ccc;
+    margin-left: 15px;
+    font-size: 0.8em;
+  }
+  img {
+    margin-right: 6px;
+  }
+
+  img.fakeUploadButton {
+    display: none;
+  }
+
+  div a {
+    color: #ddd;
+    font-style: italic;
+  }
+
+  span.statusText,
+  span.percentText {
+    font-size: 10px;
+    display: inline-block;
+    padding: 0 6px;
+    color: #cccccc;
+  }
+
+  span.statusText.new, #upload_files_list span.statusText.loaded{
+    display:none;
+  }
+
+  span.icon-remove-sign {
+    color: #ccc;
+    display: block;
+    position: absolute;
+    padding: 12px;
+    right: 5px;
+    top:2px;
+    cursor: pointer;
+  }
+
+  span.icon-remove-sign:hover{
+    color: #d00;
+  }
 }
 
-
-#upload_files_list img
-{
-  margin-right: 6px;
+div#multiple_download_container div{
+  .dotted_container_item_mixin();
+  div a {
+    display: block;
+    &:hover {
+      text-decoration:none;
+      color: #aaa;
+    }
+  }
 }
 
-#upload_files_list img.fakeUploadButton {
-  display: none;
-}
-
-#upload_files_list div a
-{
-  color: #ddd;
-  font-style: italic;
-}
-
-#upload_files_list span.statusText,
-#upload_files_list span.percentText
-{
-  font-size: 10px;
-  display: inline-block;
-  padding: 0 6px;
-  color: #cccccc;
-}
-
-#upload_files_list span.statusText.new, #upload_files_list span.statusText.loaded{
-  display:none;
-}
-
-#upload_files_list span.icon-remove-sign {
-  color: #ccc;
-  display: block;
-  float: right;
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-#upload_files_list span.icon-remove-sign:hover{
-  color: #d00;
-}
-
-#multiple_download_container div a
-{
-  display: block;
-}
-#multiple_download_container div a:hover
-{
-  text-decoration:none;
-  color: #aaa;
-}
 #fileInputContainer {
+  @upload_button_width:270px;
+
   position: relative;
-}
-#fileInputContainerDiv { /* to fit 1px border */
-  margin: 0;
-  padding: 0;
-  position: relative;
-  overflow: hidden;
-  vertical-align: top;
-  height: 60px;
-  width: 167px;
-  cursor: pointer;
-}
-#fileInputContainer input {
-  opacity: 0;
-  -moz-opacity: 0;
-  position: absolute;
-  font-size: 60px; /* causes it to fill the containing div */
-  top: 0;
-  left: 0;
-  z-index: 10000;
-  height: 56px;
-  cursor: pointer !important;
-  filter:alpha(opacity=0);
-}
-#fileInputPos {
-  text-align: left;
-  height: 60px;
-  width: 180px;
-  position: absolute;
-  top: 0;
-  overflow: hidden;
-  z-index: 9999; /* this was needed to work in IE */
-;
-  cursor: pointer;
+  #fileInputContainerDiv { /* to fit 1px border */
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    vertical-align: top;
+    height: 47px;
+    width: @upload_button_width + 22px;
+    cursor: pointer;
+  }
+  input {
+    opacity: 0;
+    -moz-opacity: 0;
+    position: absolute;
+    font-size: 60px; /* causes it to fill the containing div */
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    height: 56px;
+    cursor: pointer !important;
+    filter:alpha(opacity=0);
+  }
+  #fileInputPos {
+    text-align: left;
+    height: 60px;
+    width: 180px;
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+    z-index: 9999; /* this was needed to work in IE */
+  ;
+    cursor: pointer;
+  }
+
+  .fakeUploadButton {
+    width: @upload_button_width;
+    padding: 6px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: normal;
+    background-color: lighten(@applicationPrimaryColor, 60);
+    color:@applicationPrimaryColor;
+    box-shadow: @reactBoxShadowDepthHalf;
+    position: absolute;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    top: 0;
+    left: 0;
+    margin:0;
+    span.icon-desktop {
+      font-size: 20px;
+      display: block;
+      float: left;
+      padding: 2px 10px 0 6px;
+    }
+
+    .disabled{
+      -moz-opacity: 0.5;
+      opacity: 0.5;
+      filter:alpha(opacity=50);
+      cursor: default;
+    }
+
+    img {
+      margin-bottom: 3px;
+    }
+
+
+  }
+
 }
 #uploaderTextActions{
   position:absolute;
@@ -225,35 +274,8 @@ div#upload_files_list span.item_relative_path{
 }
 
 
-.fakeUploadButton {
-  width: 161px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border: 1px solid #ccc;
-  text-align: left;
-  vertical-align: middle;
-  font-size: 1.4em;
-  margin-bottom: 5px;
-  cursor: pointer;
-  color: #667;
-  font-weight: normal;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  background-color: #ebedf0;
-  box-shadow: inset 1px 1px 0 white;
-}
-
-.fakeUploadButton.disabled{
-  -moz-opacity: 0.5;
-  opacity: 0.5;
-  filter:alpha(opacity=50);
-  cursor: default;
-}
 
 
-.fakeUploadButton img {
-  margin-bottom: 3px;
-}
 
 .fakeOptionButton {
   padding-top: 3px;
@@ -265,22 +287,7 @@ div#upload_files_list span.item_relative_path{
   border-radius : 5px;
 }
 
-#uploadBrowseButton {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin:0;
-}
 
-#uploadBrowseButton span.icon-desktop {
-  font-size: 2em;
-  display: block;
-  float: left;
-  padding: 2px 7px;
-}
-
-#uploadSendButton {
-}
 
 #uploaderTextActions span.disabled{
   display:none;

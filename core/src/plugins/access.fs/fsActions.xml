@@ -75,13 +75,9 @@
                     ]]></clientCallback>
                 <clientForm id="mkdir_form"><![CDATA[
                 <div id="mkdir_form" action="mkdir" box_width="200">
-                <!--
-                <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
-                -->
-                    <paper-input-decorator label="AJXP_MESSAGE[173]" floatingLabel>
-                        <input type="text" name="dirname" size="30" class="dialogFocus" is="core-input">
-                    </paper-input-decorator>
-                <div class="dialogLegend" style="padding-top:20px;" id="alt_mkfile"><span class="icon-chevron-right"></span> AJXP_MESSAGE[518]</div>
+                    <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
+                    <input type="text" name="dirname" size="30" class="dialogFocus" is="core-input">
+                    <div class="dialogLegend" style="padding-top:20px;" id="alt_mkfile"><span class="icon-chevron-right"></span> AJXP_MESSAGE[518]</div>
                 </div>
                 ]]></clientForm>
                 <serverCallback methodName="switchAction" sdkMethodName="mkdir" restParams="/file+" checkParams="false" developerComment="Creates a directory with name {dirname} at the given location.">
@@ -906,7 +902,7 @@
 						legendDiv.next("br").remove();
 						legendDiv.update(MessageHash[399]+'<br>'+MessageHash[401]+'<a href="'+MessageHash[402]+'" target="_blank">'+MessageHash[402]+'</a>');
 						dObject.insert({before:'\
-							<div class="dialogButtons" id="chunk_dl_form" style="height:36px;"> \
+							<div id="chunk_dl_form" style="height:36px;"> \
 								<span style="display:inline-block;float:left;margin-top: 11px;margin-left: 4px;margin-right: 4px;">'+MessageHash[400]+'</span> <input type="text" style="float:left;margin-top:5px; text-align:right; width:30px;height:24px;" name="chunk_count" id="chunk_count" value="4"> \
 								<input type="image" style="float:left;" id="dl_form_submit" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" class="dialogButton dialogFocus">\
 							</div> \

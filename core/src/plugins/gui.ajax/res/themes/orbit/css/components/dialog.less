@@ -1,15 +1,29 @@
 // Color variables (appears count calculates by raw css)
 @dialog_content_background: #ffffff; // Appears 10 times
 @dialog_box_shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+
+@dialog_box_default_font:@fontReact;
+@dialog_box_title_font_size:21px;
+@dialog_box_title_font_color:rgba(0,0,0,0.87);
+@dialog_box_title_background_color:@white;
+@dialog_box_title_font_weight:500;
+@dialog_box_title_padding:24px 24px 10px 24px;
+@dialog_box_title_close_button_display:none;
+
+@dialog_box_content_padding: 10px 24px 24px 24px;
+@dialog_box_content_font_size:16px;
+@dialog_box_content_line_height:22px;
+@dialog_box_content_font_weight:300;
+@dialog_box_content_font_color:rgba(0,0,0,0.53);
+
+@dialog_box_button_color:@teal-500;
+
 @dialog_content_titles_tint: rgb(117, 128, 139);
-
 @dialog_field_disabled_background: #eeeeee; // Appears 5 times
-@dialog_fields_border: 1px solid #aaaaaa; // Appears 5 times
+@dialog_fields_border_radius: 0; // Appears 5 times
+@dialog_fields_border_width: 0 0 1px 0; // Appears 5 times
+@dialog_fields_border_color: #aaaaaa; // Appears 5 times
 @dialog_fields_height: 24px; // Appears 5 times
-
-
-
-// Height variables (appears count calculates by raw css)
 
 
 /*
@@ -18,7 +32,7 @@ DIALOG BOXES
 /*#upload_form, #createdir_form, #createfile_form, #rename_div*/
 #all_forms
 {
-  background-color: #eee;
+  background-color: @dialog_content_background;
 }
 #all_forms > div{display:none;}
 #all_forms form{display:inline;}
@@ -33,7 +47,10 @@ div.shadow_class
 }
 
 .dialogBox {
-  border-radius: 0;
+
+  font-family: @dialog_box_default_font;
+  -webkit-font-smoothing: antialiased;
+
   box-shadow:@dialog_box_shadow;
   display: none;
   font-size: 11px;
@@ -45,168 +62,171 @@ div.shadow_class
   z-index: 1048;
 
   .dialogTitle {
-    background-color: rgb(107, 107, 107);
-    border-radius: 0 0 0 0;
-    color: @dialog_content_background;
+    background-color: @dialog_box_title_background_color;
+    color: @dialog_box_title_font_color;
+    padding: @dialog_box_title_padding;
+    font-weight: @dialog_box_title_font_weight;
     cursor:move;
-    font-size: 15px !important;
-    padding: 11px 4px 13px 10px;
     span.ajxp_icon_span {
-      display: inline-block;
+      display: @dialog_box_title_close_button_display;
       font-size: 15px;
       padding-right: 8px;
       padding-top: 2px;
     }
     span#modalCloseBtn {
-      color: @dialog_content_background;
-      display: inline-block;
+      color: @dialog_box_title_font_color;
+      display: @dialog_box_title_close_button_display;
       font-size: 15px;
       margin-top: 0;
       padding: 7px 12px;
     }
     span.string-only-title {
       display: inline-block;
-      font-size: 16px;
-      padding-top: 3px;
+      font-size: @dialog_box_title_font_size;
     }
-    .ajxp_icon_span {
-      display: none;
-    }
-  }
-  .dialogLegend {
-    font-size: 13px;
-    line-height: 16px;
-    padding: 5px;
-  }
-  .dialogButtons {
-    clear:both;
-    text-align: right;
-
-    .dialogButton {
-      background-color: transparent;
-      border: 0;
-      height: 32px;
-      margin-left: 3px;
-      padding: 2px 0;
-      width: 32px;
-      &:focus {
-        background-color: transparent;
-        border: 0;
-      }
-    }
-
-    fieldSet {
-      input.dialogButton {
-        background-color: transparent;
-        border: 0;
-        height: 32px;
-        margin-left: 3px;
-        padding: 2px 0;
-        width: 32px;
-        &:focus {
-          background-color: transparent;
-          border: 0;
-        }
-      }
-    }
-
-    .dialogButtonsCheckbox {
-      float: left;
-      margin-top: 9px;
-      label {
-        cursor: pointer;
-      }
-    }
-
-    &.inlineEdition {
-      input {
-        box-shadow: none;
-        height: 22px;
-        margin-left: 6px;
-        padding: 0;
-        width: 22px;
-      }
-    }
-
-  }
-
-
-  div.dialogContentMainTitle {
-    border-bottom: 1px solid @dialog_content_titles_tint;
-    color: @dialog_content_titles_tint;
-    font-size: 20px;
-    margin-bottom: 10px;
-    padding-bottom: 0;
-  }
-  .dialogArrow {
-    font-size: 16px;
-    font-weight: bold;
   }
 
   .dialogContent {
+
     background-color: @dialog_content_background;
-    border-radius: 0;
+    font-size: @dialog_box_content_font_size;
+    color: @dialog_box_content_font_color;
+    padding: @dialog_box_content_padding;
+    line-height: @dialog_box_content_line_height;
+    padding-bottom: 52px  + 24px;
+
     border-top: 0;
-    color: #5C5C5C;
-    padding: 10px 10px;
+
+    .dialogLegend {
+      font-size: 13px;
+      line-height: 16px;
+    }
+
+    .dialogContentMainTitle {
+      border-bottom: 1px solid @dialog_content_titles_tint;
+      color: @dialog_content_titles_tint;
+      font-size: 20px;
+      margin-bottom: 10px;
+      padding-bottom: 0;
+    }
+
+    .dialogButtons {
+      position:absolute;
+      box-sizing: border-box;
+      bottom: 0;
+      left:0;
+      right:0;
+      height: 52px;
+      padding: 8px;
+      text-align: right;
+
+      .dialogButton {
+        font-family:@fontReact;
+        font-weight: 500;
+        font-size: 15px;
+        color:@dialog_box_button_color;
+        text-transform: uppercase;
+        background-color: transparent;
+        border: 0;
+        border-radius: 2px;
+        height: 32px;
+        margin-left: 8px;
+        padding: 2px 8px;
+        transition: @bezier_transition;
+        cursor: pointer;
+        &:focus {
+          background-color: lighten(@dialog_box_button_color, 63);
+        }
+        &:hover{
+          background-color: lighten(@dialog_box_button_color, 58);
+        }
+      }
+
+      fieldSet {
+        input.dialogButton {
+          background-color: transparent;
+          border: 0;
+          height: 32px;
+          margin-left: 3px;
+          padding: 2px 0;
+          width: 32px;
+          &:focus {
+            background-color: transparent;
+            border: 0;
+          }
+        }
+      }
+
+      .dialogButtonsCheckbox {
+        float: left;
+        margin-top: 9px;
+        label {
+          cursor: pointer;
+        }
+      }
+
+      &.inlineEdition {
+        input {
+          box-shadow: none;
+          height: 22px;
+          margin-left: 6px;
+          padding: 0;
+        }
+      }
+
+    }
+
+
 
     form {
       display: inline;
       margin: 0;
     }
+    .SF_label{
+      text-transform: none;
+      letter-spacing: normal;
+      font-size: 12px;
+      margin-bottom: -3px;
+    }
 
-    input[type="text"] {
-      -moz-border-radius: 2px;
-      -webkit-border-radius: 2px;
-      border-radius: 2px;
-      background: @dialog_content_background;
-      border: @dialog_fields_border;
+    input[type="text"], input[type="password"] {
+      box-sizing: border-box;
+      width: 100%;
       height: @dialog_fields_height;
+      border-radius: @dialog_fields_border_radius;
+      border: solid @dialog_fields_border_color;
+      border-width: @dialog_fields_border_width;
       margin-left: 0;
+      margin-bottom: 8px;
+      font-size: 16px;
+      padding: 0 !important;
       &:focus {
+        border-color: @dialog_box_button_color;
       }
       &:disabled {
         background: @dialog_field_disabled_background;
       }
     }
-    input[type="password"] {
-      -moz-border-radius: 2px;
-      -webkit-border-radius: 2px;
-      border-radius: 2px;
-      background-color: @dialog_content_background;
-      border: @dialog_fields_border;
-      height: @dialog_fields_height;
-      margin-left: 0;
-      &:focus {
-      }
-      &:disabled {
-        background: @dialog_field_disabled_background;
-      }
+    input[type="checkbox"], input[type="radio"] {
+      background: none;
+      border-radius : 0;
+      border:none;
+      filter: none;
+      height: auto;
+      margin-right: 0;
+      width: auto;
     }
+
     select {
-      -moz-border-radius: 2px;
-      -webkit-border-radius: 2px;
+      border-radius: @dialog_fields_border_radius;
       background-color: @dialog_content_background;
-      border-radius: 2px;
       border: @dialog_fields_border;
       font-size: 13px;
       height: @dialog_fields_height;
       margin-left: 0;
-      width: 97%;
+      box-sizing: border-box;
+      width: 100%;
       &:focus {
-      }
-    }
-    input {
-      -moz-border-radius: 2px;
-      -webkit-border-radius: 2px;
-      border-radius: 2px;
-      border: @dialog_fields_border;
-      height: @dialog_fields_height;
-      margin-left: 0;
-      &:focus {
-      }
-      &:disabled {
-        background: @dialog_field_disabled_background;
       }
     }
     select[multiple] {
@@ -222,25 +242,15 @@ div.shadow_class
         background: @dialog_field_disabled_background;
       }
     }
-    input[type="checkbox"] {
-      background: none;
-      border-radius : 0;
-      border:none;
-      filter: none;
-      height: auto;
-      margin-right: 0;
-      width: auto;
-    }
-    input[type="radio"] {
-      background: none;
-      border-radius : 0;
-      border:none;
-      filter: none;
-      height: auto;
-      margin-right: 0;
-      width: auto;
-    }
   }
+
+
+
+  .dialogArrow {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
 
   /***
   Dialog inside dialog

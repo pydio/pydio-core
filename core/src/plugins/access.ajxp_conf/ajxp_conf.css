@@ -2,6 +2,10 @@
     width: 100%;
 }
 
+.settings_main_pane #share_react_button{
+    display: none;
+}
+
 .settings_main_pane #search_form{
     text-align: center;
     padding: 19px 0 10px 0;
@@ -111,9 +115,40 @@
     margin-right: 0;
 }
 
+.settings_search_container span.close_results{
+    float: right;
+    cursor: pointer;
+}
+
 .settings_search_container #search_form{
     padding-top: 0;
     padding-bottom: 0;
+}
+
+.settings_search_container #search_form #search_txt{
+    color: #eee;
+}
+
+.settings_main_pane #search_results_cont{
+    box-shadow: 3px 3px 20px rgba(0,0,0,0.3);
+    text-shadow: none;
+    margin-top: 5px;
+    width: 95%;
+}
+
+.settings_search_container #search_results_cont,
+.settings_search_container .panelHeader
+{
+    background-color: #eee;
+    z-index: 2;
+}
+.settings_search_container .panelHeader{
+    padding: 5px;
+}
+
+
+.settings_search_container #search_results_cont #search_meta{
+    display: none;
 }
 
 .settings_search_container #search_form a{
@@ -122,6 +157,15 @@
     right: 14px;
     text-shadow: none;
 }
+.settings_search_container #search_form a img{
+    display: none;
+}
+
+.settings_search_container #search_form a.disabled{
+    display: none;
+}
+
+
 
 .settings_search_container #search_form input{
     height: 21px;
@@ -170,6 +214,10 @@
     top: 2px;
 }
 
+.settings_main_pane div#tree_container > div.first_container{
+    margin-left: 0;
+}
+
 .flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item{
     margin-bottom: 4px;
 }
@@ -186,10 +234,15 @@
     padding: 3px 0;
 }
 
+#leftTabulator div.tabulatorContainer #display_toolbar{
+    display: none;
+}
+
 #leftTabulator span.toggleHeader {
     background-color: transparent;
     padding: 6px 7px 7px 11px;
     font-size: 14px;
+    display: inline-block;
 }
 
 #leftTabulator span.toggleHeader span[class^="icon-"],
@@ -233,11 +286,6 @@
     border-bottom: 1px solid white;
 }
 
-#leftTabulator div.panelHeader{
-    background-color: #30383A;
-    border-bottom: 0;
-}
-
 .settings_main_pane div.folded .toggleHeader {
     display: none;
 }
@@ -279,7 +327,7 @@
 }
 
 .ajxp_theme_orbit div.settings_main_pane #breadcrumb_container{
-    padding: 9px 11px 6px;
+    padding: 13px 11px 9px;
 }
 
 .ajxp_theme_orbit div.settings_main_pane .buttons_bar_container {
@@ -354,13 +402,6 @@
     padding-bottom: 8px;
     margin: 7px 4px 0px;
     padding-left: 6px;
-}
-
-.settings_main_pane #search_results_cont{
-    box-shadow: 3px 3px 20px rgba(0,0,0,0.3);
-    text-shadow: none;
-    margin-top: 5px;
-    width: 95%;
 }
 
 .settings_main_pane div#search_results div.thumbnail_selectable_cell.detailed{

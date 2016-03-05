@@ -125,10 +125,6 @@
                     padding:14px;
                     text-align: right;
                 }
-                #buttons_bar a {
-                    padding-bottom: 0;
-                    height: 26px;
-                }
                 .action_bar span.actionbar_button_label{
                     font-size: 11px;
                 }
@@ -143,7 +139,7 @@
                 </div>
                 <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
                     <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
-                        <div class="action_bar">
+                        <div class="action_bar" id="buttons_bar">
                             <div class="toolbarGroup"></div>
                         </div>
                         <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.43]</h3>

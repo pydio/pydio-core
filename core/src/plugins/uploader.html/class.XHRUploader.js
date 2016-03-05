@@ -209,12 +209,11 @@ Class.create("XHRUploader", {
             var optionPane = this.mainForm.down('#uploader_options_pane');
             var closeSpan = optionsButton.down('span');
             if(optionPane.visible()) {
-                optionPane.hidePane();
-                closeSpan.hide();
-            }
-            else {
-                optionPane.showPane();
-                closeSpan.show();
+                optionPane.setStyle({display:'none'});
+                closeSpan.setStyle({display:'none'});
+            } else {
+                optionPane.setStyle({display:'block'});
+                closeSpan.setStyle({display:'inline-block'});
             }
         }.bind(this));
         if(closeButton){

@@ -1,12 +1,6 @@
 /************************/
 /* ORBIT RESIZE DIALOGS */
 /************************/
-span#delete_message{
-  font-size: 16px;
-  display: block;
-  padding: 30px 10px;
-}
-
 div#properties_box{
   margin: 20px auto;
   width: 250px;
@@ -14,11 +8,6 @@ div#properties_box{
 
 input#ajxp_link_container{
   width: 340px !important;
-}
-
-div#mkfile_form input,
-div#mkdir_form input{
-  width: 390px;
 }
 
 textarea#myCode
@@ -52,5 +41,71 @@ div.dialogBox.form-diaporama_box {
 .no-flexbox {
   div#mailer_message {
     width: 380px !important;
+  }
+}
+
+div#copymove_form{
+  box-sizing: border-box;
+  > div
+  {
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto !important;
+  }
+  select#external_repository{
+    box-sizing: border-box;
+    width: 100% !important;
+    height: 30px !important;
+  }
+  div#treeCopy{
+    height: 254px !important;
+  }
+  > input{
+    box-sizing: border-box;
+    width: 100% !important;
+    background-color: #fff;
+    padding: 5px;
+  }
+}
+
+div#external_download{
+  > div{
+    padding: 10px 24px 52px !important;
+    .dialoglegend{
+      font-size: 14px;
+      display: block;
+      padding-bottom: 20px;
+    }
+    input{
+      width:380px !important;
+    }
+  }
+}
+
+div.dialogBox.form-originalUploadForm,
+div.dialogBox.form-jumploader_form,
+div.dialogBox.form-external_download,
+div.dialogBox.form-plupload_form
+{
+  #modalCloseBtn{
+    display: block;
+    color: rgba(0,0,0,0.53);
+  }
+}
+
+div.dialogBox.form-user_create_repository_form{
+  div#user_tpl_container{
+    border:0 !important;
+    div.panelHeader{
+      padding-left: 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    font-size: 13px;
+    background-color: white !important;
+    padding-bottom: 52px;
+  }
+  div.dialogButtons{
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0,0,0,0.05);
   }
 }

@@ -14,9 +14,6 @@
                 .scheduler-list .mui-toolbar-group.mui-left {
                     width: 88% !important;
                 }
-                .dialogButtons input.dialogButton{
-                    padding: 0 !important;
-                }
             </style>
             ]]></template>
         </client_configs>

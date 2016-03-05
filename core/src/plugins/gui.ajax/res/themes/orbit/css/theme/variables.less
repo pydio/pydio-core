@@ -1,6 +1,9 @@
 /**********************/
 /* MASTER VARIABLES
 /**********************/
+@applicationPrimaryColor:@teal-500;
+@applicationSecondaryColor:#ff5722;
+
 @reactBoxShadowDepth1:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
 @reactBoxShadowDepthHalf:0 2px 3px rgba(0,0,0,.16),0 2px 3px rgba(0,0,0,.43);
 
@@ -8,7 +11,7 @@
 @leftColumnBackgroundColor:#333;
 @leftColumnTextColor:#ddd;
 @rightColumnBackgroundColor: #f8f8f8;
-@topBarBackgroundColor:@teal-500;
+@topBarBackgroundColor:@applicationPrimaryColor;
 @topBarBoxShadow:@reactBoxShadowDepthHalf;
 
 @globalToolbarHeight:47px;
@@ -17,7 +20,7 @@
 @leftNavigationPanelBackgroundColor: rgb(53, 53, 53);
 @leftNavigationPanelClosedWidth:-5px;
 
-@selectionMainTint: #fb725c;
+@selectionMainTint: lighten(@applicationSecondaryColor, 8);
 
 @colorCodeAlert:#F5C781;
 @colorCodeShared: #4aceb0;
@@ -66,8 +69,25 @@
 @dialog_box_shadow:@reactBoxShadowDepth1;
 @dialog_content_titles_tint: rgb(117, 128, 139);
 @dialog_field_disabled_background: #eeeeee; // Appears 5 times
-@dialog_fields_border: 1px solid #aaaaaa; // Appears 5 times
-@dialog_fields_height: 24px; // Appears 5 times
+@dialog_fields_border: 0 0 1px 0 solid #aaaaaa ; // Appears 5 times
+@dialog_fields_height: 30px; // Appears 5 times
+
+@dialog_box_default_font:@fontReact;
+@dialog_box_title_font_size:21px;
+@dialog_box_title_font_color:rgba(0,0,0,0.87);
+@dialog_box_title_background_color:@white;
+@dialog_box_title_font_weight:500;
+@dialog_box_title_padding:24px 24px 10px 24px;
+@dialog_box_title_close_button_display:none;
+
+@dialog_box_content_padding: 10px 24px 24px 24px;
+@dialog_box_content_font_size:16px;
+@dialog_box_content_line_height:22px;
+@dialog_box_content_font_weight:300;
+@dialog_box_content_font_color:rgba(0,0,0,0.53);
+
+@dialog_box_button_color:@applicationPrimaryColor;
+
 
 /* dnd */
 @dnd_dropzone_color:#c3d9ff;
@@ -141,10 +161,10 @@
 @splitter_activebar_color: #474E50;
 
 /* tabs */
-@tabs_react_like_selected_tab_color:@selectionMainTint;
+@tabs_react_like_selected_tab_color:@applicationSecondaryColor;
 @tabs_rows_container_bg:rgb(78,167,165);
 @tabs_horizontal_container_bg:#30383A;
-@tabs_horizontal_selected_tab_color:@selectionMainTint;
+@tabs_horizontal_selected_tab_color:@applicationSecondaryColor;
 
 /* tooltips */
 @tooltip_background_color:rgba(69, 77, 85, 0.86);
@@ -163,7 +183,11 @@
 @tree_icon_recycle:"\f014";
 
 /* uploaders */
-@uploaders_react_like_tab_tint:#77b8e2;
+@uploaders_react_like_tab_tint:@applicationSecondaryColor;
+@uploader_dialog_header_tint:@white;
+@uploader_dialog_header_color:rgba(0,0,0,0.87);
+@uploader_dialog_chooser_secondary:@applicationSecondaryColor;
+@uploader_dialog_progress_color: lighten(@uploader_dialog_chooser_secondary, 28);
 
 /* user widget */
 @userwidget_font_color: @white;
@@ -179,7 +203,7 @@
 @menu_desktop_hover_background_color:rgba(0, 0, 0, 0.07);
 @menu_desktop_hover_color:rgba(0,0,0,0.87);
 
-@menu_dark_background_color:#222222;
+@menu_dark_background_color:#333333;
 @menu_dark_items_color:@white;
 @menu_dark_hover_background_color:@selectionMainTint;
 @menu_dark_hover_color:@white;

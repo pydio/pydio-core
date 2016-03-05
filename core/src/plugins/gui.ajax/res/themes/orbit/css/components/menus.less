@@ -331,10 +331,9 @@ div.menu {
       }
       &.separator {
         border-top: 1px solid fade(@menu_dark_items_color, 75%);
-        margin: 0 auto;
+        margin: 2px 0;
         line-height: 1px !important;
         height: 0 !important;
-        width: 98%;
         &.menuTitle{
           height: auto !important;
           line-height: 14px !important;
@@ -346,12 +345,18 @@ div.menu {
     }
     a {
       display: block;
-      padding: 6px 5px 5px 6px;
+      padding: 8px 5px 8px 6px;
       color: #fff;
       letter-spacing: 1px;
       img {
         margin-right:5px;
         border: 0;
+      }
+      span.ajxp_icon_span{
+        display:inline-block;
+        padding: 0 16px 30px 10px;
+        margin-top: -1px;
+        font-size: 1.4em;
       }
       &.disabled img{
         filter: alpha(opacity=30);
@@ -375,11 +380,6 @@ div.menu {
       border-bottom: 0 solid #ddd;
       text-align: left;
       font-style: italic;
-    }
-    span.ajxp_icon_span{
-      display:inline-block;
-      padding-right: 5px;
-      font-size: 1.4em;
     }
   }
 
