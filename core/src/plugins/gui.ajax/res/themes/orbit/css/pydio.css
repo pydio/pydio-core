@@ -7,6 +7,10 @@
 .react-mui-context [class*=" icon-"] {
   font-family: FontAwesome;
 }
+.react-mui-context [class^="mdi-"],
+.react-mui-context [class*=" mdi-"] {
+  font-family: "Material Design Icons";
+}
 .react-mui-context .mui-tabs-container .mui-tab-item-container {
   background-color: #424242 !important;
 }
@@ -4595,6 +4599,7 @@ div.dialogButtons.inlineEdition input {
   display: block;
   width: 99%;
   background: transparent;
+  background-image: none !important;
   box-shadow: none;
 }
 #ajxp_desktop.ajxp_ws-welcome #global_toolbar #clickable_home,
