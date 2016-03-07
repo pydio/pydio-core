@@ -46,10 +46,15 @@
 
         getInitialState:function(){
             return {
-                statusOpen:false,
+                statusOpen:true,
                 additionalContents:this.parseComponentConfigs(),
                 workspaces: this.props.pydio.user.getRepositoriesList()
             };
+        },
+
+        componentDidMount:function(){
+            if(this._timer) global.clearTimeout(this._timer);
+            this._timer = global.setTimeout(this.closeNavigation, 3000);
         },
 
         openNavigation:function(){
