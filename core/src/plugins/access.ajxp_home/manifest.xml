@@ -3,8 +3,7 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/i18n" />
-            <js className="WelcomeComponents" file="plugins/access.ajxp_home/build/WelcomeComponents.js" depends="React"/>
-            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js"/>
+            <js className="WelcomeComponents" file="plugins/access.ajxp_home/build/WelcomeComponents.js" depends="React,ReactPydio,LeftNavigation"/>
             <css file="plugins/access.ajxp_home/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>

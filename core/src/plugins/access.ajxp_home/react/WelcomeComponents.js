@@ -175,65 +175,6 @@
 
     });
 
-    var HomeWorkspacesList = React.createClass({
-
-        render: function(){
-            var workspacesNodes = [];
-            var sharedNodes = [];
-            this.props.workspaces.forEach(function(v){
-                if (v.getAccessType().startsWith('ajxp_')) return;
-                var node = <HomeWorkspaceItem ws={v}
-                    key={v.getId()}
-                    onHoverLink={this.props.onHoverLink}
-                    onOutLink={this.props.onOutLink}
-                    onOpenLink={this.props.onOpenLink}
-                    openOnDoubleClick={this.props.openOnDoubleClick}
-                />;
-                if (v.owner !== ''){
-                    sharedNodes.push(node);
-                }else{
-                    workspacesNodes.push(node);
-                }
-            }.bind(this));
-            var titleNode = workspacesNodes.length? <li className="ws_selector_title"><h3>{MessageHash[468]}</h3></li> : '';
-            var titleSharedNode = sharedNodes.length? <li className="ws_selector_title"><h3>{MessageHash[469]}</h3></li> : '';
-            return (
-                <ul id="workspaces_list">
-                    {titleNode}
-                    {workspacesNodes}
-                    {titleSharedNode}
-                    {sharedNodes}
-                </ul>
-            );
-        }
-    });
-
-    var HomeWorkspaceItem = React.createClass({
-        onHoverLink: function(event) {
-            this.props.onHoverLink(event, this.props.ws);
-        },
-        onClickLink: function(event) {
-            if(!this.props.openOnDoubleClick){
-                this.props.onOpenLink(event, this.props.ws);
-            }
-        },
-        onDoubleClickLink: function(event) {
-            if(this.props.openOnDoubleClick){
-                this.props.onOpenLink(event, this.props.ws);
-            }
-        },
-        render: function(){
-            var letters = this.props.ws.getLabel().split(" ",3).map(function(word){return word.substr(0,1)}).join("");
-            return (
-                <li onMouseOver={this.onHoverLink} onMouseOut={this.props.onOutLink} onTouchTap={this.onClickLink} onClick={this.onClickLink} onDoubleClick={this.onDoubleClickLink}>
-                    <span className="letter_badge">{letters}</span>
-                    <h3>{this.props.ws.getLabel()}</h3>
-                    <h4>{this.props.ws.getDescription()}</h4>
-                </li>
-            )
-        }
-    });
-
     var HomeWorkspaceLegend = React.createClass({
 
         getInitialState: function() {
@@ -386,14 +327,13 @@
                             enableGettingStarted={enableGettingStarted}
                         />
                         <div id="workspaces_center" className="vertical_layout vertical_fit">
-                            <HomeWorkspacesList className="vertical_layout vertical_fit"
-                                workspaces={this.props.pydio.user.repositories}
-                                active={this.props.pydio.user.active}
-                                openOnDoubleClick={!simpleClickOpen}
+                            <LeftNavigation.UserWorkspacesList
+                                pydio={this.props.pydio}
+                                workspaces={this.props.pydio.user.getRepositoriesList()}
                                 onHoverLink={this.onHoverLink}
                                 onOutLink={this.onOutLink}
-                                onOpenLink={this.onOpenLink}
                             />
+
                         </div>
                     </div>
                     <HomeWorkspaceLegendPanel ref="legend"

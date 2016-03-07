@@ -44,20 +44,31 @@
       transition:margin 0.5s ease;
       overflow-y: auto;
 
-      #workspaces_list{
+      .section-title{
+        font-size: 13px;
+        font-weight: 500;
+        padding: 16px 24px 6px 24px ;
+        line-height: 13px;
+      }
 
-        list-style: none;
-        padding-left: 0;
-        margin-top: 0;
+      .workspaces{
 
-        li {
+
+        .workspace-entry {
           cursor: pointer;
           padding: 10px 10px 10px 0;
           clear: left;
           font-weight: normal;
           transition: @bezier_transition;
 
-          span.letter_badge {
+          .workspace-badge {
+            display: inline-block;
+            float: left;
+            background-color: #111;
+            border-radius: 34px;
+            color: white;
+            text-align: center;
+            padding: 7px 0;
             font-family: Roboto, sans-serif;
             margin: 5px 24px 12px;
             box-sizing: border-box;
@@ -69,7 +80,7 @@
             background-color: rgba(255,255,255, 0.4);
           }
 
-          h3{
+          .workspace-label{
             padding: 0;
             font-weight: 500;
             font-size: 18px;
@@ -80,8 +91,8 @@
             text-overflow: ellipsis;
           }
 
-
-          h4{
+          .workspace-description{
+            display: block;
             margin: 0;
             padding: 0;
             font-weight: normal;
@@ -93,7 +104,6 @@
           }
 
           &.ws_selector_title{
-            cursor: default;
             h3{
               font-size: 13px;
               font-weight: 500;

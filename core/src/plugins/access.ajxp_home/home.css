@@ -39,12 +39,13 @@
           transition: margin 0.5s ease;
   overflow-y: auto;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 0;
+#home_account_pane #home_left_bar #workspaces_center .section-title {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 16px 24px 6px 24px ;
+  line-height: 13px;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry {
   cursor: pointer;
   padding: 10px 10px 10px 0;
   clear: left;
@@ -52,7 +53,14 @@
   -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
           transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li span.letter_badge {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-badge {
+  display: inline-block;
+  float: left;
+  background-color: #111;
+  border-radius: 34px;
+  color: white;
+  text-align: center;
+  padding: 7px 0;
   font-family: Roboto, sans-serif;
   margin: 5px 24px 12px;
   box-sizing: border-box;
@@ -63,7 +71,7 @@
   font-weight: 500;
   background-color: rgba(255, 255, 255, 0.4);
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li h3 {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label {
   padding: 0;
   font-weight: 500;
   font-size: 18px;
@@ -73,7 +81,8 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li h4 {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-description {
+  display: block;
   margin: 0;
   padding: 0;
   font-weight: normal;
@@ -83,34 +92,31 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title {
-  cursor: default;
-}
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title h3 {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.ws_selector_title h3 {
   font-size: 13px;
   font-weight: 500;
   padding: 16px 24px 6px 24px ;
   line-height: 13px;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title:hover {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.ws_selector_title:hover {
   background-color: transparent;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li:hover {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.selected {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.selected {
   background-color: rgba(227, 93, 82, 0.7) !important;
   color: white;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list li:last-of-type {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry:last-of-type {
   border-bottom: 0;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button {
+#home_account_pane #home_left_bar #workspaces_center .workspaces #workspaces_button {
   padding: 38px 30px;
   width: 340px;
   text-align: center;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button input[type="button"] {
+#home_account_pane #home_left_bar #workspaces_center .workspaces #workspaces_button input[type="button"] {
   float: right;
   padding: 7px 30px;
   color: white;
@@ -120,7 +126,7 @@
   background-color: #e35d52;
   display: none;
 }
-#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button input[type="button"].disabled {
+#home_account_pane #home_left_bar #workspaces_center .workspaces #workspaces_button input[type="button"].disabled {
   /* opacity: 0.5; */
   cursor: default;
 }
