@@ -381,6 +381,7 @@ Class.create("Splitter", AjxpPane, {
         if(!pane) pane = this.foldedPane;
         if(!this.paneA) return;
         var state = this.splitbar.hasClassName("folded");
+        document.fire("ajaxplorer:"+this.htmlElement.id+"-fold-status", {"folded":state});
         if(!this.getFoldingAction()) return;
         if(this.options.foldingAlternateClose){
             this.getFoldingAction()[(state?"enable":"disable")]();

@@ -50,7 +50,6 @@ and (max-width : 720px) {
     div.toolbarGroup span.ajxp_icon_span
     {
         display: inline-block !important;
-        padding: 5px 1px 4px;
     }
 
     div.toolbarGroup a{
@@ -144,15 +143,6 @@ and (max-width : 420px){
     }
     #workspace_toolbar{
         padding-top:0;
-    }
-
-    #buttons_bar, #buttons_bar_top{
-
-    }
-
-    #buttons_bar a, #buttons_bar_top a{
-        padding: 1px 8px;
-        border-radius: 19px;
     }
 
     .tabulatorContainer.panelHeader.icons_only {

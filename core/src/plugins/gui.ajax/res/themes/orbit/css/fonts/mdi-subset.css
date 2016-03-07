@@ -8,10 +8,22 @@
     transform: translate(0, 0);
 }
 
+.mdi-download:before {
+    content: "\f2cf";
+}
+
+.mdi-folder-plus:before {
+    content: "\f34c";
+}
+
 .mdi-share:before {
     content: "\f585";
 }
 
 .mdi-share-variant:before {
     content: "\f586";
+}
+
+.mdi-upload:before {
+    content: "\f63f";
 }

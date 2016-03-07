@@ -234,10 +234,14 @@ span.overlay-class-span.icon-share-sign,
 span.overlay-class-span.mdi.mdi-share-variant
 {
   color: @colorCodeShared;
+  .selected &{
+    color: @white;
+  }
 }
 
 .colorcode-bookmark,
-span.overlay-class-span.icon-bookmark
+span.overlay-class-span.icon-bookmark,
+span.overlay-class-span.icon-bookmark-empty
 {
   color: @colorCodeBookmark;
 }

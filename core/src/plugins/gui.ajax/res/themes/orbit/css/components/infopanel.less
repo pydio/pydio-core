@@ -54,21 +54,20 @@
     img {
       margin-top: 0 !important;
       margin-bottom: 0 !important;
-      background-color: white;
-      box-shadow: 2px 2px 3px rgba(0,0,0,0.25);
+      &.thumbnail_iconlike_shadow{
+        box-shadow: @reactBoxShadowDepth1;
+      }
     }
     div.infoPanelBasenameTitle{
       color: @colorCodeFolder;
       font-weight: 500;
-      font-size: 13px;
+      font-size: 16px;
       margin-bottom: 20px;
       line-height: 1.5em;
       text-align: left;
       word-break:break-all;
     }
   }
-
-
 
   .infoPanelTable,
   div.infoPanelRow
@@ -94,6 +93,11 @@
     color: @infopanel_values_color;
     line-height: 1.3em;
     vertical-align: top;
+    &[data-metatype="css_label"]{
+      padding: 5px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
   }
 
   div.folded_icons{
@@ -230,7 +234,8 @@
     }
 
     div.info_panel_primary_multiple{
-      margin: 6px 2px 6px 3px !important;
+      margin-top: 0 !important;
+      border-top: 0;
     }
 
     .info_panel_multiple_tile {
@@ -240,10 +245,10 @@
       padding: 7px 2%;
       background-color: white;
       margin: 0 1% 6px;
-      border-radius: 4px;
       position: relative;
       text-align: center;
-      box-shadow: 0 0 2px rgba(211, 211, 211, 0.6);
+      border-radius: 0;
+      box-shadow: @reactBoxShadowDepthMini;
     }
 
     .info_panel_multiple_tile div.tile_preview img {
@@ -344,14 +349,13 @@
   }
 
   div.infoPanelAllMetadata span.meta_user_tag_block {
-    font-size: 0.7em;
     display: inline-block;
     background-color: rgba(52, 94, 121, 0.78);
     color: white;
-    padding: 0 7px;
+    padding: 2px 5px;
     border-radius: 4px;
     margin-right: 5px;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .ipanel_no_selection_select{

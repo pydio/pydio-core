@@ -577,7 +577,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 11px;
 }
 .class-FilesList .overlay_icon_div span.overlay-class-span {
-  margin-left: 7px;
+  margin-left: 10px;
 }
 .class-FilesList .selected span.overlay-class-span {
   color: #ffffff;
@@ -607,7 +607,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   overflow: hidden;
 }
 .class-FilesList .thumbnail_selectable_cell > div > div.overlay_icon_div {
-  top: 24px !important;
+  top: 27px !important;
   right: 21px !important;
   font-size: 16px;
   -webkit-transition: top 0.6s ease;
@@ -710,11 +710,17 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   margin-top: -15px;
   font-size: 0.7em;
 }
+.class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-large div.thumbLabel {
+  font-size: 0.9em;
+}
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel {
   display: none;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus {
   background-color: #f9f9f9 !important;
+}
+.class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus.fl-displayMode-thumbsize-small {
+  background-color: #ff764b !important;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel {
   opacity: 1;
@@ -1569,29 +1575,34 @@ div.shadow_class {
   position: absolute;
   z-index: 1500;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 2px;
+  background-color: #454545;
+  color: #ffffff;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 .messageBox.errorMessage {
-  color: #960000;
-  background-color: #e5b0b0;
+  /*background-color: desaturate(lighten(@messagebox_error_tint, 50%), 50%);*/
 }
 .messageBox.errorMessage > div#message_content::before {
+  color: #ff8585;
   content: '\f071';
 }
 .messageBox.logMessage {
-  color: #009600;
-  background-color: #b0e5b0;
+  /*background-color: desaturate(lighten(@messagebox_success_tint, 50%), 50%);*/
 }
 .messageBox.logMessage > div#message_content::before {
+  color: #54da7c;
   content: '\f058';
 }
 .messageBox #message_content {
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
   font-size: 14px;
-  margin: 10px 7px;
+  margin: 24px 18px;
   overflow-y: auto;
   max-height: 120px;
   letter-spacing: 0;
+  line-height: 18px;
 }
 .messageBox #message_content::before {
   font-weight: normal;
@@ -1600,7 +1611,7 @@ div.shadow_class {
   display: block;
   padding: 0 6px;
   margin-right: 5px;
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 2px;
   float: left;
 }
@@ -2102,7 +2113,6 @@ div#multiple_download_container div div a:hover {
   display: inline-block;
   float: left;
   font-size: 11px;
-  letter-spacing: 1px;
   margin: 5px 2px 0 1px;
   outline: none;
   overflow: visible;
@@ -3750,13 +3760,14 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel .infoPanelImagePreview img {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  background-color: white;
-  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+}
+#info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 #info_panel .infoPanelImagePreview div.infoPanelBasenameTitle {
   color: #ff796b;
   font-weight: 500;
-  font-size: 13px;
+  font-size: 16px;
   margin-bottom: 20px;
   line-height: 1.5em;
   text-align: left;
@@ -3781,6 +3792,12 @@ div.menu.rootDirChooser span.rootDirTitle {
   color: #222222;
   line-height: 1.3em;
   vertical-align: top;
+}
+#info_panel td.infoPanelValue[data-metatype="css_label"],
+#info_panel div.infoPanelValue[data-metatype="css_label"] {
+  padding: 5px;
+  border-radius: 2px;
+  margin-bottom: 10px;
 }
 #info_panel div.folded_icons {
   display: none;
@@ -3897,7 +3914,8 @@ div.menu.rootDirChooser span.rootDirTitle {
   padding: 1px;
 }
 #info_panel .panelContent div.info_panel_primary_multiple {
-  margin: 6px 2px 6px 3px !important;
+  margin-top: 0 !important;
+  border-top: 0;
 }
 #info_panel .panelContent .info_panel_multiple_tile {
   width: 27%;
@@ -3906,10 +3924,10 @@ div.menu.rootDirChooser span.rootDirTitle {
   padding: 7px 2%;
   background-color: white;
   margin: 0 1% 6px;
-  border-radius: 4px;
   position: relative;
   text-align: center;
-  box-shadow: 0 0 2px rgba(211, 211, 211, 0.6);
+  border-radius: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
 }
 #info_panel .panelContent .info_panel_multiple_tile div.tile_preview img {
   max-width: 90%;
@@ -3982,14 +4000,13 @@ div.menu.rootDirChooser span.rootDirTitle {
   width: 46%;
 }
 #info_panel div.infoPanelAllMetadata span.meta_user_tag_block {
-  font-size: 0.7em;
   display: inline-block;
   background-color: rgba(52, 94, 121, 0.78);
   color: white;
-  padding: 0 7px;
+  padding: 2px 5px;
   border-radius: 4px;
   margin-right: 5px;
-  font-weight: bold;
+  font-weight: 500;
 }
 #info_panel .ipanel_no_selection_select {
   padding: 30px;
@@ -4441,14 +4458,22 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   background-color: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
+div.dialogButtons.inlineEdition input {
+  text-align: center;
+  cursor: pointer;
+  width: auto !important;
+  min-width: 44px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+}
 .toolbars_buttons_mixin {
   box-sizing: border-box;
   height: 30px;
   font-family: Roboto, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: 3px;
   background: transparent;
@@ -4468,8 +4493,8 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   font-family: Roboto, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: 3px;
   background: transparent;
@@ -4585,7 +4610,7 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   font-size: 11px;
   padding: 3px 12px 4px 8px;
   height: 35px;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   background-color: #e8e8e8;
   color: #6f7b88;
   border-right: 0;
@@ -4604,8 +4629,8 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   font-family: Roboto, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: 3px;
   background: transparent;
@@ -4645,6 +4670,59 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
 #files_list_header #display_toolbar a span.icon-caret-left:before {
   content: "\f129";
 }
+#files_list_header #info_panel_toolbar,
+#files_list_header #info_panel_share_toolbar {
+  display: none;
+}
+#files_list_header #info_panel_toolbar a,
+#files_list_header #info_panel_share_toolbar a {
+  color: #009688;
+}
+#files_list_header #info_panel_toolbar a:hover,
+#files_list_header #info_panel_share_toolbar a:hover {
+  background-color: #c9fffa;
+}
+#files_list_header #info_panel_toolbar a.disabled,
+#files_list_header #info_panel_share_toolbar a.disabled,
+#files_list_header #info_panel_toolbar #open_with_unique_button,
+#files_list_header #info_panel_share_toolbar #open_with_unique_button {
+  display: none;
+}
+#files_list_pane.infoPanelFolded #info_panel_toolbar,
+#files_list_pane.infoPanelFolded #info_panel_share_toolbar {
+  display: inline-block;
+}
+#files_list_pane.infoPanelFolded #info_panel_toolbar span.ajxp_icon_span,
+#files_list_pane.infoPanelFolded #info_panel_share_toolbar span.ajxp_icon_span {
+  /*display: inline-block;*/
+}
+#files_list_pane.infoPanelFolded #info_panel_share_toolbar {
+  border-right: 1px solid #d1d1d1;
+}
+@media only screen and (max-width: 1000px) {
+  #files_list_pane.infoPanelFolded div.toolbarGroup a {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+@media only screen and (max-width: 860px) {
+  #files_list_pane.infoPanelFolded div.toolbarGroup a {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  #files_list_pane.infoPanelFolded div.toolbarGroup a span.actionbar_button_label {
+    display: none;
+  }
+  #files_list_pane.infoPanelFolded div.toolbarGroup a span.ajxp_icon_span {
+    display: inline-block;
+  }
+}
+@media only screen and (max-width: 700px) {
+  #files_list_pane.infoPanelFolded div.toolbarGroup a {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
 #info_panel .toolbarGroup {
   margin-bottom: 10px;
 }
@@ -4654,8 +4732,8 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   font-family: Roboto, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: 3px;
   background: transparent;
@@ -4676,11 +4754,13 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   text-transform: none;
   letter-spacing: 0;
   font-size: 12px;
+  font-weight: 500;
+  padding-top: 3px;
 }
 #info_panel .toolbarGroup a span.ajxp_icon_span {
   display: block;
-  color: #555;
-  font-size: 1.3em;
+  color: inherit;
+  font-size: 18px;
 }
 #info_panel .toolbarGroup a:hover {
   background-color: transparent;
@@ -4718,8 +4798,8 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
   font-family: Roboto, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: 3px;
   background: transparent;
@@ -4759,11 +4839,14 @@ div.dialogBox.form-user_create_repository_form div.dialogButtons {
 }
 #search_engine_cont #put_toolbar a {
   background-color: transparent;
-  font-size: 9px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
   height: 50px;
   margin-right: 6px;
   border-radius: 0;
   border-left: 1px solid #ddd;
+  text-transform: none;
 }
 #search_engine_cont #put_toolbar a span.ajxp_icon_span {
   font-size: 18px;
@@ -5000,8 +5083,14 @@ span.overlay-class-span.icon-share-sign,
 span.overlay-class-span.mdi.mdi-share-variant {
   color: #4aceb0;
 }
+.selected .colorcode-shared,
+.selected span.overlay-class-span.icon-share-sign,
+.selected span.overlay-class-span.mdi.mdi-share-variant {
+  color: #ffffff;
+}
 .colorcode-bookmark,
-span.overlay-class-span.icon-bookmark {
+span.overlay-class-span.icon-bookmark,
+span.overlay-class-span.icon-bookmark-empty {
   color: #77b8e2;
 }
 .colorcode-folder {

@@ -9,6 +9,10 @@
     margin-right: 10px;
 }
 
+.ajxp_theme_orbit .scrolling #comments_container{
+    margin-right: 0;
+}
+
 #comments_form{
     padding: 5px 0;
     position: relative;
@@ -27,6 +31,11 @@
 div.double #comments_form textarea, div.triple #comments_form textarea{
     border-width: 1px 1px;
     width: 96%;
+}
+
+.ajxp_theme_orbit #comments_form textarea{
+    width: 94%;
+    margin-left: 0;
 }
 
 #comments_submit{

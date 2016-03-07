@@ -47,7 +47,7 @@
 			</processing>
 		</action>
         <action name="mkdir">
-            <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus" accessKey="folder_access_key" hasAccessKey="true">
+            <gui text="154" title="155" src="folder_new.png" iconClass="mdi mdi-folder-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="put,minisite" inZip="false"/>
             </gui>
@@ -119,7 +119,7 @@
             </processing>
         </action>
 		<action name="upload">
-			<gui text="27" title="27" src="yast_backup.png" iconClass="icon-upload-alt" accessKey="upload_access_key" hasAccessKey="true">
+			<gui text="27" title="27" src="yast_backup.png" iconClass="mdi mdi-upload" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put,minisite,orbit_create" inZip="false">
@@ -203,7 +203,7 @@
 				</processing>
 		</action>
 		<action name="download" fileDefault="false">
-			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
+			<gui text="88" title="88" src="download_manager.png" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get,inline,info_panel">

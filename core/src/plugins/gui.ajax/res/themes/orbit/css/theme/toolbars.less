@@ -6,8 +6,8 @@
   font-family: @fontReact;
   font-size: 12px;
   text-transform: uppercase;
+  font-weight: 500;
   color: #555;
-  font-weight: normal;
   -webkit-font-smoothing: auto;
   border-radius: @toolbars_buttons_border_radius;
   background: @toolbars_buttons_background_color;
@@ -125,7 +125,7 @@
   font-size: 11px;
   padding: 3px 12px 4px 8px;
   height: 35px;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   background-color: #e8e8e8;
   color: rgb(111, 123, 136);
   border-right: 0;
@@ -151,6 +151,60 @@
     }
   }
 
+  #info_panel_toolbar, #info_panel_share_toolbar{
+    display: none;
+    a{
+      color:@applicationPrimaryColor;
+      &:hover{
+        background-color: lighten(@applicationPrimaryColor, 60);
+      }
+    }
+    a.disabled, #open_with_unique_button{
+      display: none;
+    }
+  }
+
+}
+
+#files_list_pane.infoPanelFolded{
+
+  #info_panel_toolbar, #info_panel_share_toolbar{
+    display: inline-block;
+    span.ajxp_icon_span{
+      /*display: inline-block;*/
+    }
+  }
+  #info_panel_share_toolbar{
+    border-right: 1px solid #d1d1d1;
+  }
+  @media only screen
+  and (max-width : 1000px){
+    div.toolbarGroup a{
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+  }
+  @media only screen
+  and (max-width : 860px){
+    div.toolbarGroup a{
+      padding-left: 8px;
+      padding-right: 8px;
+      span.actionbar_button_label{
+        display: none;
+      }
+      span.ajxp_icon_span{
+        display: inline-block;
+      }
+    }
+  }
+  @media only screen
+  and (max-width : 700px){
+    div.toolbarGroup a{
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+  }
+
 }
 
 #info_panel{
@@ -165,11 +219,13 @@
         text-transform: none;
         letter-spacing: 0;
         font-size: 12px;
+        font-weight: 500;
+        padding-top: 3px;
       }
       span.ajxp_icon_span{
         display: block;
-        color: #555;
-        font-size: 1.3em;
+        color: inherit;
+        font-size: 18px;
       }
       &:hover{
         background-color: transparent;
@@ -249,11 +305,14 @@
   #put_toolbar{
     a{
       background-color: transparent;
-      font-size: 9px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0;
       height:@workspacesToolbarHeight - 12px;
       margin-right: 6px;
       border-radius: 0;
       border-left: 1px solid #ddd;
+      text-transform: none;
       span.ajxp_icon_span{
         font-size: 18px;
         display: block;

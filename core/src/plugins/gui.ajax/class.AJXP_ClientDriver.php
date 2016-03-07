@@ -326,7 +326,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             $ajxpNode->mergeMetadata(array(
                      "ajxp_bookmarked" => "true",
                      "overlay_icon"  => "bookmark.png",
-                     "overlay_class" => "icon-bookmark"
+                     "overlay_class" => "icon-bookmark-empty"
                 ), true);
             return;
         }
@@ -338,7 +338,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 $ajxpNode->mergeMetadata(array(
                          "ajxp_bookmarked" => "true",
                          "overlay_icon"  => "bookmark.png",
-                        "overlay_class" => "icon-bookmark"
+                        "overlay_class" => "icon-bookmark-empty"
                     ), true);
                 $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }
