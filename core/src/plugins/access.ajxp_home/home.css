@@ -1,537 +1,505 @@
-#team_pane, #parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
-    /* background-color: #f8f8f8; */
+#home_account_pane {
+  -webkit-transition: opacity 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+          transition: opacity 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  opacity: 1 !important;
+  color: #fff;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 18px;
 }
-
-#workspaces_center{
-    width: 100%;
-    margin-top: 0;
-    transition:margin 0.5s ease;
-    overflow-y: auto;
+#home_account_pane #home_left_bar {
+  width: 380px;
+  background-color: rgba(34, 34, 34, 0.5);
 }
-
-#list_cont{
-    overflow-y: auto;
+#home_account_pane #home_left_bar #welcome {
+  text-align: left;
+  padding: 24px;
+  border-bottom: 1px solid #ddd;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 20px;
 }
-
-#workspaces_list{
-    list-style: none;
-    padding-left: 0;
+#home_account_pane #home_left_bar #welcome p {
+  margin: 0;
+  margin-top: 10px;
 }
-
-#workspaces_list span.letter_badge {
-    margin: 12px 13px 16px 50px;
+#home_account_pane #home_left_bar #welcome small {
+  font-size: 13px;
 }
-
-#home_left_bar{
-    width: 420px;
-    background-color: rgba(34, 34, 34, 0.5);
+#home_account_pane #home_left_bar #welcome #get_started_link,
+#home_account_pane #home_left_bar #welcome #disconnect_link span {
+  cursor: pointer;
+  color: white;
+  text-decoration: underline;
 }
-
-.no-flexbox #home_left_bar{
-    float: left;
+#home_account_pane #home_left_bar #workspaces_center {
+  width: 100%;
+  margin-top: 0;
+  -webkit-transition: margin 0.5s ease;
+          transition: margin 0.5s ease;
+  overflow-y: auto;
 }
-
-#home_center_panel {
-    z-index: 1;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0;
 }
-
-.no-flexbox #home_center_panel{
-    position: absolute;
-    left: 420px;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li {
+  cursor: pointer;
+  padding: 10px 10px 10px 0;
+  clear: left;
+  font-weight: normal;
+  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-
-.flexbox #home_center_panel{
-    flex: 1;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li span.letter_badge {
+  font-family: Roboto, sans-serif;
+  margin: 5px 24px 12px;
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.4);
 }
-
-.repoInfoBadge {
-    display: inline-block;
-    font-size: 25px;
-    min-width: 210px;
-    max-width: 300px;
-    line-height: 30px;
-    border: 1px solid rgba(255,255,255,0.7);
-    border-radius: 8px;
-    margin: 10px 16px;
-    min-height: 106px;
-    font-family: "Open sans Regular", Arial, sans-serif;
-    vertical-align: top;
-    padding: 13px 8px;
-    text-align: left;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li h3 {
+  padding: 0;
+  font-weight: 500;
+  font-size: 18px;
+  margin: 0;
+  line-height: 26px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-
-.repoInfoTitle {
-    text-transform: uppercase;
-    font-family: "Open sans Light", Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    margin-bottom: 9px;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li h4 {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+  font-size: 13px;
+  opacity: 0.7;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-
-.repoInfoBadge span[class^="icon-"] {
-    display: block;
-    font-size: 50px;
-    float: left;
-    margin: 6px 16px 0 14px;
-    opacity: 0.9;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title {
+  cursor: default;
 }
-
-#home_account_pane #close-icon{
-    position: absolute;
-    margin-left: 2px;
-    margin-top: 1px;
-    cursor: pointer;
-    transition:margin 0.5s ease;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title h3 {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 16px 24px 6px 24px ;
+  line-height: 13px;
 }
-
-#workspaces_list h3{
-    padding: 16px 12px 14px 10px;
-    font-weight: normal;
-    font-size: 19px;
-    letter-spacing: 1px;
-    margin: 0;
-    line-height: 21px;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.ws_selector_title:hover {
+  background-color: transparent;
 }
-
-#workspaces_list h4{
-    margin: 0;
-    padding: 0 10px 11px;
-    font-weight: normal;
-    font-size: 12px;
-    opacity: 0.4;
-    letter-spacing: 1px;
-    margin-left:60px;
-    display: none;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
-
-#workspaces_list li {
-    cursor: pointer;
-    padding: 1px 9px 5px;
-    clear: left;
-    font-weight: normal;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li.selected {
+  background-color: rgba(227, 93, 82, 0.7) !important;
+  color: white;
 }
-
-#workspaces_list li.ws_selector_title{
-    cursor: default;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list li:last-of-type {
+  border-bottom: 0;
 }
-
-#workspaces_list li:hover {
-    background-color: rgba(255,255,255,0.3);
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button {
+  padding: 38px 30px;
+  width: 340px;
+  text-align: center;
 }
-
-#workspaces_list li.ws_selector_title:hover {
-    background-color: transparent;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button input[type="button"] {
+  float: right;
+  padding: 7px 30px;
+  color: white;
+  border: 0;
+  cursor: pointer;
+  margin-top: 0;
+  background-color: #e35d52;
+  display: none;
 }
-
-#workspaces_list li.ws_selector_title h3{
-    font-size: 23px;
-    padding: 20px 43px;
-    text-transform: uppercase;
+#home_account_pane #home_left_bar #workspaces_center #workspaces_list #workspaces_button input[type="button"].disabled {
+  /* opacity: 0.5; */
+  cursor: default;
 }
-
-#workspaces_list li.selected{
-    background-color: rgba(227, 93, 82, 0.7) !important;
-    color: white;
+.no-flexbox #home_account_pane #home_left_bar {
+  float: left;
 }
-
-#workspaces_list li:last-of-type {
-    border-bottom: 0;
+#home_account_pane #home_center_panel {
+  z-index: 1;
+  height: 100%;
 }
-
-#home_account_pane{
-    line-height: 18px;
+.flexbox #home_account_pane #home_center_panel {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
 }
-
-#webdav_password_form {
-    padding-left: 0 !important;
+.no-flexbox #home_account_pane #home_center_panel {
+  position: absolute;
+  left: 420px;
 }
-
-
+#home_account_pane #home_center_panel div#logo_div {
+  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  margin-top: 28%;
+  position: relative;
+}
+#home_account_pane #home_center_panel.legend_visible div#logo_div {
+  margin-top: 5%;
+}
+#home_account_pane #home_center_panel #logo_div {
+  text-align: center;
+  padding-top: 20px;
+  margin: 0 20px;
+}
+#home_account_pane #home_center_panel.legend_visible div#ws_legend {
+  top: 2%;
+  position: relative;
+}
+#home_account_pane a {
+  cursor: pointer;
+  text-decoration: underline;
+}
+#home_account_pane a:hover {
+  color: #fff;
+}
 #home_account_pane #notifications_center {
-    float: right;
-    width: 29%;
-    height: 96%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background-color: #ebedf0;
-    color: rgb(111,123,136);
-    margin-top: 2px;
-    transition: width 1s ease;
-    border-radius: 6px 0 0 0;
+  float: right;
+  width: 29%;
+  height: 96%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #ebedf0;
+  color: #6f7b88;
+  margin-top: 2px;
+  -webkit-transition: width 1s ease;
+          transition: width 1s ease;
+  border-radius: 6px 0 0 0;
 }
-
-#home_account_pane .notif_event_container{
-    width: 56%;
+#home_account_pane #notifications_center .notif_event_container {
+  width: 56%;
 }
-
-#home_account_pane .notif_event_container > div {
-    padding:0;
-    line-height: 15px;
-    color: rgba(92, 92, 92, 0.55);
+#home_account_pane #notifications_center .notif_event_container > div {
+  padding: 0;
+  line-height: 15px;
+  color: rgba(92, 92, 92, 0.55);
 }
-
-#home_account_pane .notif_event_container > div.notif_event_label {
-    color: rgb(111,123,136);
-    line-height: 25px;
-    overflow: hidden;
+#home_account_pane #notifications_center .notif_event_container > div.notif_event_label {
+  color: #6f7b88;
+  line-height: 25px;
+  overflow: hidden;
 }
-
-#home_account_pane .imagePreviewOverlay{
-    display: none !important;
+#home_account_pane #notifications_center .imagePreviewOverlay {
+  display: none !important;
 }
-
 #home_account_pane #notifications_center img {
-    float: left;
-    height: 64px;
-    width: 64px;
-    margin: 0 20px;
+  float: left;
+  height: 64px;
+  width: 64px;
+  margin: 0 20px;
 }
-
 #home_account_pane #notifications_center div[data-is_loaded] {
-    display: block !important;
-    float: left;
-    width: 104px !important;
-    text-align: center;
+  display: block !important;
+  float: left;
+  width: 104px !important;
+  text-align: center;
 }
-
 #home_account_pane #notifications_center div[data-is_loaded] img {
-    float: none!important;
+  float: none!important;
 }
-
-#home_account_pane{
-    color: #fff;
-    -webkit-font-smoothing: antialiased;
+#home_account_pane h1 {
+  margin-top: 0;
+  padding-top: 44px;
+  font-size: 21px;
+  text-align: center;
+  font-weight: normal;
 }
-
-#home_account_pane h1{
-    margin-top: 0;
-    padding-top: 44px;
-    font-size: 21px;
-    text-align: center;
-    font-weight: normal;
+#home_account_pane #ws_legend {
+  text-align: center;
+  font-size: 2.5em;
+  color: white;
+  margin: 20px;
+  line-height: 55px;
+  -webkit-transition: opacity ease 0.4s;
+          transition: opacity ease 0.4s;
 }
-
-#home_account_pane div#ws_legend{
-    text-align: center;
-    font-size: 2.5em;
-    color: white;
-    margin: 8% 20px;
-    line-height: 55px;
-    transition: opacity ease 0.4s;
+#home_account_pane #ws_legend .repoInfoBadge {
+  display: inline-block;
+  font-size: 23px;
+  min-width: 210px;
+  max-width: 230px;
+  line-height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.53);
+  background-color: rgba(0, 0, 0, 0.16);
+  border-radius: 6px;
+  margin: 16px;
+  min-height: 106px;
+  vertical-align: top;
+  padding: 13px 8px;
+  text-align: left;
 }
-
-#home_account_pane div#ws_legend.empty_ws_legend{
-    opacity: 0;
+#home_account_pane #ws_legend .repoInfoTitle {
+  text-transform: uppercase;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 9px;
 }
-
-
-#logo_div{
-    text-align: center;
-    padding-top: 20px;
-    margin: 0 20px;
+#home_account_pane #ws_legend .repoInfoBadge span[class^="icon-"] {
+  display: block;
+  font-size: 45px;
+  float: left;
+  margin: 6px 16px 0 14px;
+  opacity: 0.9;
 }
-
-#home_center_panel > div{
-    transition: top 0.4s ease;
-    top:28%;
-    position: relative;
+#home_account_pane #ws_legend > small {
+  font-size: 0.6em;
+  line-height: 1em;
+  display: none;
 }
-
-div#home_center_panel.legend_visible > div{
-    top: 5%;
+#home_account_pane #ws_legend > small.show_description {
+  line-height: 1.9em;
+  display: block;
 }
-
-div.legend_visible div#ws_legend{
-    top: 2%;
-    position: relative;
+#home_account_pane #ws_legend a {
+  font-size: 0.5em;
 }
-
-#home_account_pane div#ws_legend > small {
-    display: block;
-    font-size: 0.6em;
-    line-height: 1em;
-    visibility: hidden;
+#home_account_pane #ws_legend.empty_ws_legend {
+  opacity: 0;
 }
-
-#home_account_pane div#ws_legend > small.show_description {
-    line-height: 1.9em;
-    visibility: visible;
+#home_account_pane #list_cont {
+  overflow-y: auto;
 }
-
-#home_account_pane div#ws_legend a{
-    font-size: 0.5em;
-}
-
-#home_account_pane #welcome{
-    text-align: left;
-    padding: 32px 0;
-    margin: 0 30px;
-    border-bottom: 1px solid #ddd;
-    font-size: 1.3em;
-    font-weight: normal;
-}
-#home_account_pane a{
-    cursor: pointer;
-    text-decoration: underline;
-}
-#home_account_pane a:hover{
-    color: #fff;
-}
-
-#home_account_pane #welcome small{
-    padding-top: 30px;
-    display: block;
-    font-size: 0.8em;
-    line-height: 1.4em;
-}
-
-#workspaces_button {
-    padding: 38px 30px;
-    width: 340px;
-    text-align: center;
-}
-
-#workspaces_button input[type="button"] {
-    float: right;
-    padding: 7px 30px;
-    color: white;
-    border: 0;
-    cursor: pointer;
-    margin-top: 0;
-    background-color: #e35d52;
-    display: none;
-}
-
-#workspaces_button input[type="button"].disabled{
-    /* opacity: 0.5; */
-    cursor: default;
-}
-
-#get_started_link,
-#disconnect_link span{
-    cursor: pointer;
-    color: white;
-}
-
-#userdashboard_main_tab #content_pane.droparea{
-    background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
-    background-position: 50%;
-    border: 5px dashed #5c5c5c !important;
-    border-radius: 5px !important;
-    margin: 5px !important;
-}
-
-#userdashboard_main_tab #content_pane.dropareaHover{
-    border-color: #e35d52 !important;
-}
-
 #videos_pane {
-    color: rgb(64, 68, 71);
-    background-color: rgba(255, 255, 255, 1);
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #ffffff;
+  position: absolute;
+  border-radius: 3px;
+  top: 2%;
+  right: 5px;
+  width: 60%;
+  height: 96%;
+  overflow: auto;
+  opacity: 1;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  max-width: 930px;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
+  z-index: 20000;
+  overflow-y: scroll;
+}
+#videos_pane h2 {
+  color: rgba(0, 0, 0, 0.77);
+  font-weight: 500;
+}
+#videos_pane div.icon-remove-sign {
+  float: left;
+  font-size: 1em;
+  margin-left: 11px;
+  margin-top: 11px;
+  cursor: pointer;
+}
+#videos_pane div.tutorial_title {
+  clear: left;
+  font-size: 25px;
+  text-align: center;
+  margin: 40px 0 30px;
+}
+#videos_pane div#dl_pydio_cont {
+  width: 750px;
+  margin: 0 auto;
+}
+#videos_pane div#dl_pydio_for {
+  float: left;
+  margin: 44px 18px;
+  font-size: 21px;
+}
+#videos_pane div#dl_pydio_android {
+  width: 81px;
+  float: left;
+}
+#videos_pane div#dl_pydio_android a.icon-mobile-phone {
+  font-size: 96px;
+}
+#videos_pane div#dl_pydio_android a.icon-android {
+  font-size: 30px;
+  position: relative;
+  top: -26px;
+  left: -32px;
+  color: #56be56;
+}
+#videos_pane div#dl_pydio_android div {
+  font-size: 11px;
+  top: -15px;
+  position: relative;
+  left: -13px;
+}
+#videos_pane div#dl_pydio_ios {
+  width: 91px;
+  float: left;
+}
+#videos_pane div#dl_pydio_ios a.icon-tablet {
+  font-size: 96px;
+}
+#videos_pane div#dl_pydio_ios a.icon-apple {
+  font-size: 26px;
+  position: relative;
+  top: -33px;
+  left: -40px;
+  color: white;
+  text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
+}
+#videos_pane div#dl_pydio_ios div {
+  font-size: 11px;
+  top: -15px;
+  position: relative;
+  left: 2px;
+}
+#videos_pane div#dl_pydio_mac {
+  width: 110px;
+  float: left;
+  padding-top: 14px;
+}
+#videos_pane div#dl_pydio_mac a.icon-desktop {
+  font-size: 74px;
+}
+#videos_pane div#dl_pydio_mac a.icon-apple {
+  font-size: 26px;
+  position: relative;
+  top: -30px;
+  left: -51px;
+  color: #949494;
+}
+#videos_pane div#dl_pydio_mac div {
+  font-size: 11px;
+  top: -6px;
+  position: relative;
+  left: 6px;
+}
+#videos_pane div#dl_pydio_win {
+  width: 100px;
+  float: left;
+  padding-top: 8px;
+}
+#videos_pane div#dl_pydio_win a.icon-laptop {
+  font-size: 87px;
+}
+#videos_pane div#dl_pydio_win a.icon-windows {
+  font-size: 26px;
+  position: relative;
+  top: -66px;
+  left: 34px;
+  color: #387aad;
+}
+#videos_pane div#dl_pydio_win div {
+  font-size: 11px;
+  top: -40px;
+  position: relative;
+  left: 12px;
+}
+#videos_pane div.tutorial_more_videos_cont {
+  clear: left;
+  text-align: center;
+}
+#videos_pane a.tutorial_more_videos_button {
+  text-align: center;
+  font-size: 25px;
+  background-color: #e35d52;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  display: inline-block;
+  margin: 40px 0;
+}
+#videos_pane #tutorials_pane h2 {
+  font-weight: normal;
+  font-size: 25px;
+}
+#videos_pane #tutorial_dl_apps_pane {
+  height: 107px;
+  background-color: #ebedf0;
+  border-top: 1px solid #6f7b88;
+  border-bottom: 1px solid #6f7b88;
+}
+#videos_pane .tutorial_legend {
+  clear: left;
+  float: left;
+  width: 40%;
+  margin-left: 5%;
+  font-size: 14px;
+  margin-top: 20px;
+}
+#videos_pane .tutorial_video {
+  width: 49%;
+  height: 300px;
+  margin-top: 20px;
+  margin-right: 5%;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background-color: #eee;
+}
+#videos_pane div.tutorial_load_button {
+  background-color: #666;
+  display: inline-block;
+  color: white;
+  padding: 3px 11px;
+  border-radius: 6px;
+  margin-right: 15px;
+  float: right;
+  cursor: pointer;
+}
+@media only screen and (max-width: 980px) {
+  #notifications_center div.notif_event_container {
+    width: 100px;
+  }
+}
+@media only screen and (max-width: 800px) {
+  #logo_div img {
+    width: 210px;
+  }
+  .tutorial_legend {
+    clear: left;
+    width: 97%;
+  }
+  .tutorial_video {
+    width: 94%;
+    height: 300px;
+    margin-right: 3%;
+    margin-left: 3%;
+  }
+  #dl_pydio_cont {
+    width: 400px !important;
+  }
+  #dl_pydio_for {
+    display: none;
+  }
+  #home_left_bar {
+    width: 380px;
+  }
+  #welcome {
+    font-size: 1em;
+    padding-top: 30px;
+    padding-bottom: 10px;
+    border-bottom-color: #555;
+  }
+  #home_account_pane #welcome small {
+    padding-top: 10px;
+  }
+  #workspaces_list li.ws_selector_title h3 {
+    padding: 0 30px;
+  }
+}
+@media only screen and (max-width: 400px) {
+  #home_left_bar {
+    width: 100%;
     position: absolute;
     top: 0;
-    right: 0;
-    width: 70%;
-    height: 100%;
-    border-radius: 0;
-    overflow: auto;
-    opacity: 1;
-    box-shadow: -5px -8px 9px rgba(0, 0, 0, 0.36);
-    /*display: none;*/
-    max-width: 930px;
-    -webkit-font-smoothing: antialiased;
-    z-index:20000;
-    overflow-y: scroll;
-}
-
-#videos_pane div.icon-remove-sign{
-    float: left;font-size: 1.5em;margin-left: 16px;margin-top: 16px;cursor: pointer;
-}
-#videos_pane div.tutorial_title{
-    clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;
-}
-#videos_pane div#dl_pydio_cont{
-    width: 750px; margin: 0 auto;
-}
-#videos_pane div#dl_pydio_for{
-    float: left;margin: 44px 18px;font-size: 21px;
-}
-
-div#dl_pydio_android{
-    width: 81px; float:left;
-}
-div#dl_pydio_android a.icon-mobile-phone{
-    font-size: 96px;
-}
-div#dl_pydio_android a.icon-android{
-    font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);
-}
-div#dl_pydio_android div{
-    font-size: 11px;top: -15px;position: relative;left: -13px;
-}
-
-div#dl_pydio_ios{
-    width: 91px; float:left;
-}
-div#dl_pydio_ios a.icon-tablet{
-    font-size: 96px;
-}
-div#dl_pydio_ios a.icon-apple{
-    font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);
-}
-div#dl_pydio_ios div{
-    font-size: 11px;top: -15px;position: relative;left: 2px;
-}
-
-div#dl_pydio_mac{
-    width: 110px; float:left;padding-top: 14px;
-}
-div#dl_pydio_mac a.icon-desktop{
-    font-size: 74px;
-}
-div#dl_pydio_mac a.icon-apple{
-    font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);
-}
-div#dl_pydio_mac div{
-    font-size: 11px;top: -6px;position: relative;left: 6px;
-}
-
-div#dl_pydio_win{
-    width: 100px; float:left;padding-top: 8px;
-}
-div#dl_pydio_win a.icon-laptop{
-    font-size: 87px;
-}
-div#dl_pydio_win a.icon-windows{
-    font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);
-}
-div#dl_pydio_win div{
-    font-size: 11px;top: -40px;position: relative;left: 12px;
-}
-
-div.tutorial_more_videos_cont{
-    clear:left; text-align:center;
-}
-a.tutorial_more_videos_button{
-    text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;
-}
-
-
-
-#tutorials_pane h2{
-    font-weight: normal;
-    font-size: 25px;
-}
-
-#tutorial_dl_apps_pane{
-    height: 107px;
-    background-color: #ebedf0;
-    border-top: 1px solid rgb(111,123,136);
-    border-bottom: 1px solid rgb(111,123,136);
-}
-
-.tutorial_legend{
-    clear: left;
-    float: left;
-    width: 40%;
-    margin-left: 5%;
-    font-size: 14px;
-    margin-top: 20px;
-}
-
-.tutorial_video{
-    width: 49%;
-    height: 300px;
-    margin-top: 20px;
-    margin-right: 5%;
-    margin-bottom: 20px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    background-color: #eee;
-}
-
-div.tutorial_load_button {
-    background-color: #666;
-    display: inline-block;
-    color: white;
-    padding: 3px 11px;
-    border-radius: 6px;
-    margin-right: 15px;
-    float: right;
-    cursor: pointer;
-}
-
-
-
-@media only screen
-and (max-width : 980px){
-    #notifications_center div.notif_event_container{
-        width: 100px;
-    }
-}
-
-@media only screen
-and (max-width : 800px){
-
-    #logo_div img{
-        width: 210px;
-    }
-
-    .tutorial_legend{
-        clear: left;
-        width: 97%;
-    }
-
-    .tutorial_video{
-        width: 94%;
-        height: 300px;
-        margin-right: 3%;
-        margin-left: 3%;
-    }
-    #dl_pydio_cont{
-        width: 400px !important;
-    }
-    #dl_pydio_for{
-        display: none;
-    }
-
-    #home_left_bar{
-        width: 380px;
-    }
-
-    #home_account_pane #welcome{
-        font-size: 1em;
-        padding-top: 30px;
-        padding-bottom: 10px;
-        border-bottom-color: #555;
-    }
-
-    #home_account_pane #welcome small{
-        padding-top: 10px;
-    }
-
-    #workspaces_list li.ws_selector_title h3{
-        padding: 0 30px;
-    }
-
-
-
-}
-
-@media only screen
-and (max-width : 400px){
-    #home_left_bar{
-        width: 100%;
-        position: absolute;
-        top:0;
-    }
-    #workspaces_button {
-        padding: 38px 0;
-        width: 100%;
-    }
+  }
+  #workspaces_button {
+    padding: 38px 0;
+    width: 100%;
+  }
 }

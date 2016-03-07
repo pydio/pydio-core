@@ -109,7 +109,7 @@
                 </div>
             ]]></template_part>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
-                <div id="home_account_pane" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
+                <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
 			]]></template_part>
         </client_configs>
         <actions>
@@ -138,7 +138,7 @@
                     <clientForm id="videos_pane"><![CDATA[
                         <div id="videos_pane" style="display:none;" class="skipSibling" ajxpClass="AjxpPane" ajxpOptions='{}' style="overflow-y: scroll;">
                             <div style="float: left;font-size: 1.5em;margin-left: 16px;margin-top: 16px;cursor: pointer;" onclick="$('videos_pane').hide();" class="icon-remove-sign"></div>
-                            <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_home.56]</div>
+                            <h2>AJXP_MESSAGE[user_home.56]</h3>
                             <div id="tutorial_dl_apps_pane">
                                 <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">
                                     <div style="float: left;margin: 44px 18px;font-size: 21px;" id="dl_pydio_for">AJXP_MESSAGE[user_home.57]</div>

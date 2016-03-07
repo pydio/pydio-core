@@ -153,17 +153,22 @@
 
             var gettingStartedBlock = '';
             if(this.props.enableGettingStarted){
+                var dgs = function(){
+                    return {__html:MessageHash["user_home.55"]};
+                };
                 gettingStartedBlock = (
-                    <small><span onClick={this.showGettingStarted}>{MessageHash["user_home.55"].replace('<a>', '').replace('</a>','')}</span></small>
-                )
+                    <small> <span onClick={this.showGettingStarted} dangerouslySetInnerHTML={dgs()}/></small>
+                );
             }
 
 
             return (
                 <div id="welcome">
                     {MessageHash['user_home.40'].replace('%s', userLabel)}
-                    {loginLink}
-                    {gettingStartedBlock}
+                    <p>
+                        {loginLink}
+                        {gettingStartedBlock}
+                    </p>
                 </div>
             )
         }
@@ -218,7 +223,7 @@
             }
         },
         render: function(){
-            var letters = this.props.ws.getLabel().split(" ").map(function(word){return word.substr(0,1)}).join("");
+            var letters = this.props.ws.getLabel().split(" ",3).map(function(word){return word.substr(0,1)}).join("");
             return (
                 <li onMouseOver={this.onHoverLink} onMouseOut={this.props.onOutLink} onTouchTap={this.onClickLink} onClick={this.onClickLink} onDoubleClick={this.onDoubleClickLink}>
                     <span className="letter_badge">{letters}</span>
