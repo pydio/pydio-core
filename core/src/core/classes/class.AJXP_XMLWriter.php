@@ -641,6 +641,9 @@ class AJXP_XMLWriter
             if ($repoObject->getUniqueUser()) {
                 $streamString .= " user_editable_repository=\"true\" ";
             }
+            if ($repoObject->hasContentFilter()){
+                $streamString .= " hasContentFilter=\"true\"";
+            }
             $slugString = "";
             $slug = $repoObject->getSlug();
             if (!empty($slug)) {

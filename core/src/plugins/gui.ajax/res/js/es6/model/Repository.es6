@@ -38,6 +38,7 @@ class Repository {
         this.slug = '';
         this.owner = '';
         this.description = '';
+        this._hasContentFilter = false;
         if(window.ajxpResourcesFolder){
     		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
         }
@@ -146,6 +147,13 @@ class Repository {
     getOverlay(){
         return (this.getOwner() ? resolveImageSource("shared.png", "/images/overlays/ICON_SIZE", 8):"");
     }
+
+    /**
+     * @returns {boolean}
+     */
+    hasContentFilter(){
+        return this._hasContentFilter;
+    }
 	
 	/**
 	 * Parses XML Node
@@ -154,6 +162,9 @@ class Repository {
 	loadFromXml(repoNode){
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
+		}
+		if(repoNode.getAttribute('hasContentFilter') && repoNode.getAttribute('hasContentFilter') == "true"){
+			this._hasContentFilter = true;
 		}
 		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
 			this.userEditable = true;
