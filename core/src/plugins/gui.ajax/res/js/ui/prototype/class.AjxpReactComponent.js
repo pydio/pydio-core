@@ -35,7 +35,8 @@ Class.create('AjxpReactComponent', AjxpPane, {
         ResourcesManager.loadClassesAndApply(namespacesToLoad, function(){
             this.reactComponent = React.render(
                 React.createElement(window[options.componentNamespace][options.componentName], {
-                    pydio:pydio
+                    pydio:pydio,
+                    pydioId:htmlElement.id
                 }),
                 $(htmlElement)
             );

@@ -4129,6 +4129,9 @@ div.menu.rootDirChooser span.rootDirTitle {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.left-panel .workspaces .workspace-entry .workspace-description {
+  display: none;
+}
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 0.4;
 }

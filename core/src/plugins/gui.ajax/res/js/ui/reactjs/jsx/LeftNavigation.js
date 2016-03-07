@@ -4,7 +4,8 @@
     var LeftPanel = React.createClass({
 
         propTypes:{
-            pydio:React.PropTypes.instanceOf(Pydio).isRequired
+            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
+            pydioId:React.PropTypes.string.isRequired
         },
 
         childContextTypes: {
@@ -28,7 +29,7 @@
 
         parseComponentConfigs:function(){
             var reg = this.props.pydio.Registry.getXML();
-            var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::left_navigator"]/additional_content');
+            var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::'+this.props.pydioId+'"]/additional_content');
             return contentNodes.map(function(node){
                 return {
                     id:node.getAttribute('id'),
@@ -37,11 +38,6 @@
                     options: JSON.parse(node.getAttribute('options'))
                 };
             });
-        },
-
-        createRepositoryEnabled:function(){
-            var reg = this.props.pydio.Registry.getXML();
-            return XMLUtils.XPathSelectSingleNode(reg, 'actions/action[@name="user_create_repository"]') !== null;
         },
 
         getInitialState:function(){
@@ -82,23 +78,7 @@
         },
 
         render:function(){
-            var entries = [], sharedEntries = [];
-            this.state.workspaces.forEach(function(object, key){
-                var entry = (
-                    <WorkspaceEntry
-                        {...this.props}
-                        key={key}
-                        workspace={object}
-                    />
-                );
-                if(object.getOwner()){
-                    sharedEntries.push(entry);
-                }else{
-                    entries.push(entry);
-                }
-            }.bind(this));
 
-            var messages = this.props.pydio.MessageHash;
             const additional = this.state.additionalContents.map(function(paneData){
                 if(paneData.type == 'ListProvider'){
                     return (
@@ -113,20 +93,6 @@
                 }
             }.bind(this));
 
-            if(this.createRepositoryEnabled()){
-                var createClick = function(){
-                    this.props.pydio.Controller.fireAction('user_create_repository');
-                }.bind(this);
-                var createAction = (
-                    <div className="workspaces">
-                        <div className="workspace-entry" onClick={createClick} title={messages[418]}>
-                            <span className="workspace-badge">+</span>
-                            <span className="workspace-label">{messages[417]}</span>
-                        </div>
-                    </div>
-                );
-            }
-
             return (
                 <span>
                     <div  id="repo_chooser" onClick={this.openNavigation} onMouseOver={this.openNavigation} className={this.state.statusOpen?"open":""}>
@@ -134,20 +100,13 @@
                     </div>
                     <div className={"left-panel" + (this.state.statusOpen?'':' hidden')} onMouseOver={this.closeMouseover} onMouseOut={this.closeMouseout}>
                         {additional}
-                        <div>
-                            <div className="section-title" onClick={this.closeNavigation}>{messages[468]}</div>
-                            <div className="workspaces">
-                                {entries}
-                            </div>
-                            <div className="section-title">{messages[469]}</div>
-                            <div className="workspaces">
-                                {sharedEntries}
-                            </div>
-                        </div>
-                        {createAction}
+                        <UserWorkspacesList
+                            pydio={this.props.pydio}
+                            workspaces={this.state.workspaces}
+                        />
                     </div>
                 </span>
-            )
+            );
         }
     });
 
@@ -207,13 +166,92 @@
 
     });
 
+    var UserWorkspacesList = React.createClass({
+
+        propTypes:{
+            pydio:React.PropTypes.instanceOf(Pydio),
+            workspaces:React.PropTypes.instanceOf(Map),
+            onHoverLink:React.PropTypes.func,
+            onOutLink:React.PropTypes.func
+        },
+
+        createRepositoryEnabled:function(){
+            var reg = this.props.pydio.Registry.getXML();
+            return XMLUtils.XPathSelectSingleNode(reg, 'actions/action[@name="user_create_repository"]') !== null;
+        },
+
+        render: function(){
+            var entries = [], sharedEntries = [], inboxEntry;
+            this.props.workspaces.forEach(function(object, key){
+                if(object.getId().indexOf('ajxp_') === 0){
+                    return;
+                }
+                if(object.hasContentFilter()){
+                    return;
+                }
+                var entry = (
+                    <WorkspaceEntry
+                        {...this.props}
+                        key={key}
+                        workspace={object}
+                    />
+                );
+                if(object.getAccessType() == "inbox"){
+                    inboxEntry = entry;
+                }else if(object.getOwner()){
+                    sharedEntries.push(entry);
+                }else{
+                    entries.push(entry);
+                }
+            }.bind(this));
+            if(inboxEntry){
+                sharedEntries.unshift(inboxEntry);
+            }
+
+            var messages = this.props.pydio.MessageHash;
+
+            if(this.createRepositoryEnabled()){
+                var createClick = function(){
+                    this.props.pydio.Controller.fireAction('user_create_repository');
+                }.bind(this);
+                var createAction = (
+                    <div className="workspaces">
+                        <div className="workspace-entry" onClick={createClick} title={messages[418]}>
+                            <span className="workspace-badge">+</span>
+                            <span className="workspace-label">{messages[417]}</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div>
+                    <div className="section-title">{messages[468]}</div>
+                    <div className="workspaces">
+                        {entries}
+                    </div>
+                    <div className="section-title">{messages[469]}</div>
+                    <div className="workspaces">
+                        {sharedEntries}
+                    </div>
+                    <div className="section-title"></div>
+                    {createAction}
+                </div>
+            );
+
+        }
+
+    });
+
     var WorkspaceEntry = React.createClass({
 
         mixins:[ReactPydio.MessagesConsumerMixin],
 
         propTypes:{
             pydio:React.PropTypes.instanceOf(Pydio).isRequired,
-            workspace:React.PropTypes.instanceOf(Repository).isRequired
+            workspace:React.PropTypes.instanceOf(Repository).isRequired,
+            onHoverLink:React.PropTypes.func,
+            onOutLink:React.PropTypes.func
         },
         getLetterBadge:function(){
             return {__html:this.props.workspace.getHtmlBadge(true)};
@@ -227,10 +265,25 @@
             if(current == this.props.workspace.getId()){
                 currentClass +=" workspace-current";
             }
+            if(this.props.onHoverLink){
+                var onHover = function(event){
+                    this.props.onHoverLink(event, this.props.workspace)
+                }.bind(this);
+            }
+            if(this.props.onOutLink){
+                var onOut = function(event){this.props.onOutLink(event, this.props.ws)}.bind(this);
+            }
             return (
-                <div className={currentClass} onClick={this.onClick} title={this.props.workspace.getDescription()}>
+                <div
+                    className={currentClass}
+                    onClick={this.onClick}
+                    title={this.props.workspace.getDescription()}
+                    onMouseOver={onHover}
+                    onMouseOut={onOut}
+                >
                     <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>
                     <span className="workspace-label">{this.props.workspace.getLabel()}</span>
+                    <span className="workspace-description">{this.props.workspace.getDescription()}</span>
                 </div>
             );
         }
@@ -243,6 +296,7 @@
     }else{
         ns.Panel = LeftPanel;
     }
+    ns.UserWorkspacesList = UserWorkspacesList;
     global.LeftNavigation=ns;
 
 })(window);
