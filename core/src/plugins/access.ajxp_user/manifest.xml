@@ -104,11 +104,6 @@
                 .largeButton, .SF_input.SF_inlineButton{
                     background-color: #fb725c;
                 }
-                .action_bar{
-                    background-color: #EAEAEA;
-                    padding: 14px;
-                    min-height: 33px;
-                }
                 #account_pane .action_bar{
                     text-align: right;
                 }
@@ -121,8 +116,11 @@
                 div.class-FetchedResultPane{
                     background-color: #f8f8f8;
                 }
-                #buttons_bar{
-                    padding:14px;
+                .action_bar, #buttons_bar{
+                    background-color: #ffffff;
+                    height: 32px;
+                    border-bottom: 1px solid rgba(0,0,0,0.16);
+                    padding:18px 14px 12px;
                     text-align: right;
                 }
                 .action_bar span.actionbar_button_label{

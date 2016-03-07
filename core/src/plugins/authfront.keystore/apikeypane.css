@@ -2,6 +2,10 @@
 
 }
 
+#apikeys_pane h2{
+    font-weight: 500;
+}
+
 #apikeys_pane #token_results{
     position: absolute;
     bottom: 5%;

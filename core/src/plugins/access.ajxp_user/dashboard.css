@@ -1,11 +1,20 @@
 #team_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane{
-    background-color: #f8f8f8;
+    background-color: #ffffff;
 }
 
 #get_started_link,
 #disconnect_link span{
     font-weight: bold;
     cursor: pointer;
+}
+
+#userdashboard_main_tab{
+    font-family: Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+#userdashboard_main_tab h3{
+    font-weight: 500;
 }
 
 #userdashboard_main_tab #content_pane.droparea{
@@ -20,12 +29,16 @@
     border:0;
 }
 
+#userdashboard_main_tab div.class-FetchedResultPane{
+    background-color: #ffffff;
+}
+
 #userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
     padding: 6px 4px;
 }
 
 #userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd){
-    background-color: #f1f1f1 !important;
+    background-color: #f8f8f8 !important;
 }
 
 #userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd).selected{
@@ -44,18 +57,19 @@
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
     padding-top: 62px;
+    background-color: #444;
 }
 
 div#userdashboard_myparams_title{
     position: absolute;
-    color: rgb(204, 204, 204);
+    color: #ffffff;
     font-weight: normal;
     padding: 22px;
     height: 17px;
     font-size: 13px;
     width: 196px;
     left: 0;
-    background-color: #222;
+    background-color: #444;
     letter-spacing: 1px;
 }
 
@@ -85,47 +99,14 @@ div#userdashboard_main_tab div#home_account_pane{
 
 div#userdashboard_main_tab h3.dashboard_panel_title{
     position: absolute;
-    top: 12px;
-    font-size: 29px;
+    top: 18px;
+    left: 16px;
+    font-size: 24px;
+    font-weight: 500;
     margin: 0;
-    left: 19px;
     color: #444;
 }
 
-
-#tutorials_pane{
-    color: rgb(111,123,136);
-    background-color: #f8f8f8;
-}
-
-#tutorials_pane h2{
-    font-weight: normal;
-    font-size: 25px;
-}
-
-#tutorial_dl_apps_pane{
-    height: 107px;
-    background-color: #ebedf0;
-    border-top: 1px solid rgb(111,123,136);
-    border-bottom: 1px solid rgb(111,123,136);
-}
-
-.tutorial_legend{
-    clear: left;
-    float: left;
-    width: 30%;
-    margin-left: 5%;
-    font-size: 14px;
-    margin-top: 20px;
-}
-
-.tutorial_video{
-    width: 60%;
-    height: 350px;
-    margin-top: 20px;
-    margin-right: 5%;
-    margin-bottom: 20px;
-}
 
 div#team_edit_container {
     max-height: 200px;
