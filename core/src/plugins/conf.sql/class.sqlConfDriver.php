@@ -57,7 +57,9 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         parent::init($options);
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
-            dibi::connect($this->sqlDriver);
+            if(!dibi::isConnected()) {
+                dibi::connect($this->sqlDriver);
+            }
             if(AJXP_SERVER_DEBUG && AJXP_VERSION_DB != "##DB_VERSION##"){
                 $res = dibi::query("select MAX(db_build) from [ajxp_version]");
                 if(!empty($res)){

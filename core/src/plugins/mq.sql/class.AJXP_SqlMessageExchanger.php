@@ -216,7 +216,9 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      */
     public function consumeWorkerChannel($channelName, $filter = null)
     {
-        dibi::connect($this->sqlDriver);
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
         $castType = "UNSIGNED";
         if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
         $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY CAST([object_id] AS ".$castType.") ASC", "queues.$channelName");
@@ -241,7 +243,9 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      */
     public function publishWorkerMessage($channel, $message)
     {
-        dibi::connect($this->sqlDriver);
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
         $castType = "UNSIGNED";
         if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
         $r = dibi::query("SELECT MAX( CAST( [object_id] AS ".$castType." ) ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$channel");

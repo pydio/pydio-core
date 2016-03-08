@@ -35,7 +35,9 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         parent::init($options);
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
-            dibi::connect($this->sqlDriver);
+            if(!dibi::isConnected()) {
+                dibi::connect($this->sqlDriver);
+            }
         } catch (DibiException $e) {
             echo get_class($e), ': ', $e->getMessage(), "\n";
             exit(1);
