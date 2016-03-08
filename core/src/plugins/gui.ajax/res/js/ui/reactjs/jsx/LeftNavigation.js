@@ -265,6 +265,7 @@
             if(current == this.props.workspace.getId()){
                 currentClass +=" workspace-current";
             }
+            currentClass += " workspace-access-" + this.props.workspace.getAccessType();
             if(this.props.onHoverLink){
                 var onHover = function(event){
                     this.props.onHoverLink(event, this.props.workspace)
@@ -272,6 +273,12 @@
             }
             if(this.props.onOutLink){
                 var onOut = function(event){this.props.onOutLink(event, this.props.ws)}.bind(this);
+            }
+            var badge;
+            if(this.props.workspace.getAccessType() == "inbox"){
+                badge = <span className="workspace-badge"><span className="access-icon"/></span>;
+            }else{
+                badge = <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>;
             }
             return (
                 <div
@@ -281,7 +288,7 @@
                     onMouseOver={onHover}
                     onMouseOut={onOut}
                 >
-                    <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>
+                    {badge}
                     <span className="workspace-label">{this.props.workspace.getLabel()}</span>
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
                 </div>

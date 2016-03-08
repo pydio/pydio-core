@@ -1,13 +1,3 @@
-#team_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane{
-    background-color: #ffffff;
-}
-
-#get_started_link,
-#disconnect_link span{
-    font-weight: bold;
-    cursor: pointer;
-}
-
 #userdashboard_main_tab{
     font-family: Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -29,19 +19,24 @@
     border:0;
 }
 
+#userdashboard_main_tab div.header_resizer div.header_label {
+    padding-top: 7px;
+}
+
 #userdashboard_main_tab div.class-FetchedResultPane{
     background-color: #ffffff;
 }
-
 #userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
-    padding: 6px 4px;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
 }
 
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd){
-    background-color: #f8f8f8 !important;
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    padding-top: 7px;
+    font-size: 14px;
 }
 
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd).selected{
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus{
     background-color: #fb725c !important;
 }
 
@@ -58,6 +53,11 @@
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
     padding-top: 62px;
     background-color: #444;
+}
+
+div#userdashboard_main_tab.horizontal_tabulator div.tabbed_editor{
+    background-color: #ffffff;
+    box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
 }
 
 div#userdashboard_myparams_title{

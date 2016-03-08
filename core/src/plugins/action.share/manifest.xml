@@ -357,7 +357,7 @@
                 <additional_tab id="shared_pane2"
                                 tabInfo='{"id":"my-shared2","iconClass":"icon-share","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="shared_pane2" ajxpClass="AjxpPane">
+                    <div id="shared_pane2" ajxpClass="AjxpPane" class="tabbed_editor">
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <h3 class="dashboard_panel_title">AJXP_MESSAGE[share_center.98]</h3>
                         <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"displayMode":"list", "fixedDisplayMode":"list", "groupByData":"1", "fit":"height","selectionChangeCallback":false,"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"sharelist-load","user_context":"current"}}'></div>

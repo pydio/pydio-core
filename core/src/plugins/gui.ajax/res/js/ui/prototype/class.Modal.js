@@ -613,6 +613,12 @@ Class.create("Modal", {
 	simpleTooltip : function(element, title, position, className, hookTo, updateOnShow){
         if(!position) position = 'bottom right';
         if(!hookTo) hookTo = 'pointer';
+        if(!this.REMOVE_TOOLTIP_OBSERVER){
+            this.REMOVE_TOOLTIP_OBSERVER = function(){
+                if(this.tooltip) this.tooltip.hide();
+            }.bind(this);
+            document.observe("ajaxplorer:registry_loaded", this.REMOVE_TOOLTIP_OBSERVER);
+        }
 		element.observe("mouseover", function(event){
 			if(!this.tooltip){
 				this.tooltip = new Element("div", {className:"simple_tooltip"});
