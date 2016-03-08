@@ -114,7 +114,7 @@ class PydioDataModel extends Observable{
                         var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
-                        });
+                        }, {page_position:'true'});
                         if(newPage && newPage != currentPage){
                             ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
                             this.requireContextChange(ajxpNode, true, true);
@@ -169,8 +169,8 @@ class PydioDataModel extends Observable{
         this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath, onComplete);
     }
 
-    loadPathInfoSync (path, callback){
-        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false);
+    loadPathInfoSync (path, callback, additionalParameters = {}){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false, additionalParameters);
     }
 
     loadPathInfoAsync (path, callback){

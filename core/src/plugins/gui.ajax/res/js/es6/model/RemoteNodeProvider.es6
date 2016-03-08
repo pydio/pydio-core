@@ -96,14 +96,19 @@ class RemoteNodeProvider{
      * @param node AjxpNode
      * @param nodeCallback Function On node loaded
      * @param aSync bool
+     * @param additionalParameters object
      */
-    loadLeafNodeSync (node, nodeCallback, aSync=false){
+    loadLeafNodeSync (node, nodeCallback, aSync=false, additionalParameters={}){
         var params = {
             get_action:'ls',
             options:'al',
             dir: PathUtils.getDirname(node.getPath()),
             file: PathUtils.getBasename(node.getPath())
         };
+        for(var k in additionalParameters){
+            if(!additionalParameters.hasOwnProperty(k)) continue;
+            params[k] = additionalParameters[k];
+        }
         if(this.properties){
             this.properties.forEach(function(value, key){
                 params[key] = value;
