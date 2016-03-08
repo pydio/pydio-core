@@ -18,15 +18,13 @@ div.form-react_share_form {
 }
 
 div#react_share_form {
-  * {
-    font-family: Roboto;
-  }
-  [class^="icon-"],[class*="icon-"]{
-    font-family: FontAwesome;
-  }
+  font-family: Roboto, sans-serif;
   font-size:13px;
   label.mui-switch-label {
     white-space: nowrap;
+  }
+  .mui-checkbox .mui-checkbox-icon{
+    margin-right: 6px;
   }
   div.headerPanel {
     background-color: @color0 !important;
@@ -62,11 +60,12 @@ div#react_share_form {
   div.share-form-users{
     .react-autosuggest{
       input#users-autosuggest{
-        font-size: 13px;
+        font-size: 16px;
         padding-bottom: 8px !important;
         padding-left: 0 !important;
         margin-top: 11px;
         width: 340px;
+        border-bottom: 1px solid #E0E0E0;
         ::-webkit-input-placeholder, ::-moz-placeholder{
           color:rgba(0,0,0,0.3);
         }
@@ -185,7 +184,48 @@ div#react_share_form {
   {
     margin-top: -10px;
     .mui-text-field{
-      width: 96%;
+      width: 154px;
+    }
+    label{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 154px;
+    }
+    .calLabelHasValue{
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(0.75) translate3d(35px, 27px, 0);
+      transform-origin: left top;
+      color: rgba(0, 0, 0, 0.5);
+      font-size: 16px;
+    }
+    .mui-date-picker{
+      display: inline-block;
+      margin-top: 22px;
+    }
+    .ajxp_icon_span{
+      float: left;
+      font-size: 20px;
+      color: rgba(0, 0, 0, 0.23);
+      margin-top: 37px;
+      margin-right: 9px;
+      margin-left: 3px;
+      &.icon-calendar{
+        font-size: 18px;
+      }
+      &.mdi-download{
+        margin-top: 40px;
+      }
+    }
+    span.dlCounterString {
+      position: absolute;
+      right: 17px;
+      bottom: 11px;
+      color: rgb(47, 140, 119);
+      font-size: 13px;
+      font-weight: 500;
     }
   }
   .label-desc-edit{
@@ -305,7 +345,7 @@ div#react_share_form {
   }
   div.remote-users-add{
     display: flex;
-    margin-top: -23px;
+    margin-top: -20px;
     div.host{
       width: 66%;
       margin-right: 6px;

@@ -155,7 +155,7 @@
             return (
                 <div className={className + (this.state.open?" open": " closed")}>
                     <div className={titleClassName}>
-                        <span className="toggle-button" onClick={this.toggleOpen}>{this.state.open?'Hide':'Show'}</span>
+                        <span className="toggle-button" onClick={this.toggleOpen}>{this.state.open?messages[514]:messages[513]}</span>
                         {title}
                     </div>
                     {component}

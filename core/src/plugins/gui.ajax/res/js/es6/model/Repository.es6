@@ -39,6 +39,7 @@ class Repository {
         this.owner = '';
         this.description = '';
         this._hasContentFilter = false;
+        this._hasUserScope = false;
         if(window.ajxpResourcesFolder){
     		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
         }
@@ -154,6 +155,13 @@ class Repository {
     hasContentFilter(){
         return this._hasContentFilter;
     }
+
+    /**
+     * @returns {boolean}
+     */
+    hasUserScope(){
+        return this._hasUserScope;
+    }
 	
 	/**
 	 * Parses XML Node
@@ -165,6 +173,9 @@ class Repository {
 		}
 		if(repoNode.getAttribute('hasContentFilter') && repoNode.getAttribute('hasContentFilter') == "true"){
 			this._hasContentFilter = true;
+		}
+		if(repoNode.getAttribute('userScope') && repoNode.getAttribute('userScope') == "true"){
+			this._hasUserScope = true;
 		}
 		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
 			this.userEditable = true;

@@ -24,12 +24,23 @@
             return this._node;
         }
 
+        hasActiveShares(){
+            if(this.hasPublicLink()) return true;
+            var total = this.getSharedUsers().length + this.getOcsLinks().length;
+            return total > 0;
+        }
+
         getSelectionLabel(){
             return this._node.getLabel();
         }
 
         getStatus(){
             return this._status;
+        }
+
+        currentRepoIsUserScope(){
+            var repo = this._pydio.user.getRepositoriesList().get(this._pydio.user.getActiveRepository());
+            return repo.hasUserScope();
         }
 
         hasPublicLink(){
@@ -245,6 +256,9 @@
         getShareOwner(){
             return this._data['share_owner'];
         }
+        currentIsOwner(){
+            return (this._pydio.user.id == this.getShareOwner());
+        }
         setNewShareOwner(owner){
             this._pendingData['new_owner'] = owner;
             this.save();
@@ -364,6 +378,13 @@
             return current;
         }
 
+        getDownloadCounter(linkId){
+            if(this._data['links'] && this._data['links'][linkId] && this._data['links'][linkId]['download_counter']){
+                return this._data['links'][linkId]['download_counter'];
+            }
+            return 0;
+        }
+
         setExpirationFor(linkId, name, value){
             this._initPendingData();
             var expiration = this.findPendingKeyForLink(linkId, "expiration") || {};
@@ -373,8 +394,16 @@
         }
 
         _expirationsToParameters(linkId, params){
-            if(this.getExpirationFor(linkId, 'days')) params['expiration'] = this.getExpirationFor(linkId, 'days');
-            if(this.getExpirationFor(linkId, 'downloads')) params['downloadlimit'] = this.getExpirationFor(linkId, 'downloads');
+            if(this.getExpirationFor(linkId, 'days')) {
+                params['expiration'] = this.getExpirationFor(linkId, 'days');
+            }else{
+                params['expiration'] = '';
+            }
+            if(this.getExpirationFor(linkId, 'downloads')) {
+                params['downloadlimit'] = this.getExpirationFor(linkId, 'downloads');
+            }else{
+                params['downloadlimit'] = '';
+            }
         }
 
 
@@ -560,10 +589,17 @@
             }
         }
 
-        stopSharing(){
+        stopSharing(callbackFunc = null){
             var params = {get_action:'unshare'};
             ShareModel.prepareShareActionParameters(this.getNode(), params);
-            PydioApi.getClient().request(params, this.load.bind(this), null);
+            PydioApi.getClient().request(params, function(response){
+                this._pydio.fireNodeRefresh(this._node);
+                if(callbackFunc){
+                    callbackFunc(response);
+                }else{
+                    this.load();
+                }
+            }.bind(this), null);
         }
 
         submitToServer(){
@@ -617,6 +653,7 @@
                 this._permissionsToParameters('ajxp_create_public_link', params);
                 this._expirationsToParameters('ajxp_create_public_link', params);
                 this._passwordAsParameter('ajxp_create_public_link', params);
+                this._templateToParameter('ajxp_create_public_link', params);
             }
 
 
@@ -633,6 +670,7 @@
                     this._data = _data;
                     this._pendingData = {};
                     this._setStatus('saved');
+                    this._pydio.fireNodeRefresh(this._node);
                 }else{
                     // There must have been an error, revert
                 }

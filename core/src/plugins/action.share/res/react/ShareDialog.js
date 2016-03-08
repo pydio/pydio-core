@@ -71,9 +71,6 @@
                 }, function(){
                     this.refreshDialogPosition();
                 }.bind(this));
-                if(eventData.status == "saved"){
-                    this.props.pydio.fireNodeRefresh(this.props.selection.getUniqueNode());
-                }
             }
         },
 
@@ -213,6 +210,9 @@
         triggerModelRevert:function(){
             this.props.shareModel.revertChanges();
         },
+        disableAllShare:function(){
+            this.props.shareModel.stopSharing(this.props.onClick.bind(this));
+        },
         render: function(){
             if(this.props.shareModel.getStatus() == 'modified'){
                 return (
@@ -223,8 +223,13 @@
                     </div>
                 );
             }else{
+                var unshareButton;
+                if(this.props.shareModel.hasActiveShares()){
+                    unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
+                }
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
+                        {unshareButton}
                         <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
                     </div>
                 );
@@ -744,10 +749,15 @@
                     <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('190')}</div>
                 ];
             }
+            var checked = !!this.props.linkData;
+            var disableForNotOwner = false;
+            if(checked && !this.props.shareModel.currentIsOwner()){
+                disableForNotOwner = true;
+            }
             return (
                 <div style={{padding:16}} className="reset-pydio-forms">
                     <ReactMUI.Checkbox
-                        disabled={this.context.isReadonly()}
+                        disabled={this.context.isReadonly() || disableForNotOwner}
                         onCheck={this.toggleLink}
                         checked={!!this.props.linkData}
                         label={this.context.getMessage('189')}
@@ -835,7 +845,7 @@
 
         render: function(){
             var publicLink = this.props.linkData['public_link'];
-            var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly();
+            var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly() && this.props.shareModel.currentIsOwner();
             if(this.state.editLink && editAllowed){
                 return (
                     <div className="public-link-container edit-link">
@@ -951,9 +961,20 @@
             this.props.shareModel.setExpirationFor(this.props.linkData.hash, "downloads", newValue);
         },
 
-        updateDaysExpirationField: function(event){
-            var newValue = event.currentTarget.getValue();
+        updateDaysExpirationField: function(event, newValue){
+            if(!newValue){
+                newValue = event.currentTarget.getValue();
+            }
             this.props.shareModel.setExpirationFor(this.props.linkData.hash, "days", newValue);
+        },
+
+        onDateChange: function(event, value){
+            var today = new Date();
+            var date1 = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+            var date2 = Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+            var ms = Math.abs(date1-date2);
+            var integerVal = Math.floor(ms/1000/60/60/24); //floor should be unnecessary, but just in case
+            this.updateDaysExpirationField(event, integerVal);
         },
 
         resetPassword: function(){
@@ -998,6 +1019,7 @@
                 return (
                     <div className="password-container">
                         <div style={{width:'50%', display:'inline-block'}}>
+                            <span className="ajxp_icon_span icon-lock"/>
                             {passwordField}
                         </div>
                         <div style={{width:'50%', display:'inline-block'}}>
@@ -1013,26 +1035,60 @@
         render: function(){
             var linkId = this.props.linkData.hash;
             var passContainer = this.renderPasswordContainer();
+            var dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
+            var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
+            var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
+            var expDate = null;
+            if(expirationDateValue){
+                var today = new Date();
+                expDate = new Date();
+                expDate.setDate(today.getDate() + parseInt(expirationDateValue));
+                var clearValue = function(){
+                    this.props.shareModel.setExpirationFor(linkId, "days", "");
+                    this.refs['expirationDate'].getDOMNode().querySelector(".mui-text-field-input").value = "";
+                }.bind(this);
+                calIcon = <span className="ajxp_icon_span icon-remove-sign" onClick={clearValue}/>;
+                var calLabel = <span className="calLabelHasValue">{this.context.getMessage('21')}</span>
+            }
+            if(dlLimitValue){
+                var dlCounter = this.props.shareModel.getDownloadCounter(linkId);
+                var dlCounterString = '';
+                if(dlCounter){
+                    dlCounterString = <span className="dlCounterString">{'Already ' +dlCounter+ '/'+ dlLimitValue}</span>;
+                }
+            }
             return (
                 <div>
-                    <h3>{this.context.getMessage('196')}</h3>
+                    <h3 style={{paddingTop:0}}>{this.context.getMessage('196')}</h3>
                     <div className="section-legend">{this.context.getMessage('24')}</div>
                     {passContainer}
                     <div className="expires">
-                        <div style={{width:'50%', display:'inline-block'}}>
-                            <ReactMUI.TextField
+                        <div style={{width:'50%', display:'inline-block', position:'relative'}}>
+                            {calIcon}
+                            {calLabel}
+                            <ReactMUI.DatePicker
+                                ref="expirationDate"
                                 disabled={this.context.isReadonly()}
-                                floatingLabelText={this.context.getMessage('21')}
-                                value={this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days')}
-                                onChange={this.updateDaysExpirationField}/>
-                            </div>
-                        <div style={{width:'50%', display:'inline-block'}}>
+                                onChange={this.onDateChange}
+                                key="start"
+                                hintText={this.context.getMessage('21')}
+                                autoOk={true}
+                                minDate={new Date()}
+                                defaultDate={expDate}
+                                showYearSelector={true}
+                                onShow={null}
+                                onDismiss={null}
+                            />
+                        </div>
+                        <div style={{width:'50%', display:'inline-block', position:'relative'}}>
+                            <span className="ajxp_icon_span mdi mdi-download"/>
                             <ReactMUI.TextField
                                 disabled={this.context.isReadonly()}
                                 floatingLabelText={this.context.getMessage('22')}
                                 value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                                 onChange={this.updateDLExpirationField}
                             />
+                            {dlCounterString}
                         </div>
                     </div>
                 </div>
@@ -1054,13 +1110,15 @@
             if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1 && this.props.shareModel.hasPublicLink()){
                 var layoutPane = <PublicLinkTemplate {...this.props} linkData={this.props.shareModel.getPublicLinks()[0]} layoutData={layoutData}/>;
             }
-
+            if(!this.props.shareModel.currentRepoIsUserScope()){
+                var visibilityPanel = <VisibilityPanel  {...this.props}/>;
+            }
             return (
                 <div style={{padding:16}}>
                     <LabelDescriptionPanel {...this.props}/>
                     <NotificationPanel {...this.props}/>
                     {layoutPane}
-                    <VisibilityPanel  {...this.props}/>
+                    {visibilityPanel}
                 </div>
             );
         }
@@ -1209,7 +1267,7 @@
             this.props.shareModel.setNewShareOwner(this.refs['newOwner'].getValue());
         },
         render: function(){
-            var currentIsOwner = global.pydio.user.id == this.props.shareModel.getShareOwner();
+            var currentIsOwner = this.props.shareModel.currentIsOwner();
 
             var legend;
             if(this.props.shareModel.isPublic()){

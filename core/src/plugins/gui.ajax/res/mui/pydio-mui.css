@@ -2826,6 +2826,7 @@
 }
 .react-mui-context label {
   margin: 0;
+  font-size: inherit;
 }
 .react-mui-context .mui-error-as-hint hr.mui-text-field-focus-underline {
   border-color: #009688 !important;
