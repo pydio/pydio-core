@@ -163,12 +163,22 @@ class MinisiteRenderer
         } else {
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         }
+
+        $serverBaseUrl = AJXP_Utils::detectServerURL(true);
+
         // Update Host dynamically if it differ from registered one.
         $registeredHost = parse_url($tPath, PHP_URL_HOST);
-        $currentHost = parse_url(AJXP_Utils::detectServerURL("SERVER_URL"), PHP_URL_HOST);
+        $currentHost = parse_url($serverBaseUrl, PHP_URL_HOST);
         if($registeredHost != $currentHost){
             $tPath = str_replace($registeredHost, $currentHost, $tPath);
         }
+        // Update scheme dynamically if it differ from registered one.
+        $registeredScheme = parse_url($tPath, PHP_URL_SCHEME);
+        $currentScheme = parse_url($serverBaseUrl, PHP_URL_SCHEME);
+        if($registeredScheme != $currentScheme){
+            $tPath = str_replace($registeredScheme."://", $currentScheme."://", $tPath);
+        }
+
         $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
         HTMLWriter::internetExplorerMainDocumentHeader();
         HTMLWriter::charsetHeader();
