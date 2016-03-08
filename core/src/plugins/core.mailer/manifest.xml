@@ -10,18 +10,22 @@
         <global_param name="SUBJECT_APPEND" label="CONF_MESSAGE[Subject Append]" description="CONF_MESSAGE[String automatically added at the end of the mail subject]" type="string" mandatory="false" default=""/>
         <global_param name="BODY_LAYOUT" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="false" default="AJXP_MAIL_BODY"/>
         <global_param name="LAYOUT_FOLDER" label="CONF_MESSAGE[Layout Folder]" description="CONF_MESSAGE[Extract the main layout from a localized file. Will prevail on the previous parameter, make sure to have an AJXP_MAIL_BODY in the layout file.]" type="string" mandatory="false" default="plugins/core.mailer/layout"/>
+        <param name="NOTIFICATIONS_EMAIL_GET" type="select" choices="true|Yes,false|No" scope="user" description="Receive Notifcations by email" label="Active notifications by email" expose="true" mandatory="true" default="true" />
+        <param name="NOTIFICATIONS_EMAIL_FREQUENCY" scope="user" type="select" choices="M|Every X min,H|Every X hour,D1|Every day at ,D2|Twice a day (every day at and),W1|One a Week" label="Emails frequency" description="Emails frenquency" expose="true" mandatory="true" default="M" />
+        <param name="NOTIFICATIONS_EMAIL_FREQUENCY_USER" scope="user" type="string" description="Choose your mail frequency (like 9:00 or 9:00,14:00 or Wednesday)" label="Detail your frequency here" expose="true" mandatory="true" default="5" />
+        <param name="NOTIFICATIONS_EMAIL" scope="user" description="You can add many email separated by commas" label="Send email to..." type="string" expose="true" editable="true"/>
+        <param name="NOTIFICATIONS_EMAIL_SEND_HTML" scope="user" type="select" choices="true|Yes,false|No" description="Send as HTML" label="Get the email in HTML" expose="true" mandatory="true" default="true" />
     </server_settings>
     <client_settings>
         <resources>
             <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
             <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js"/>
-            <js file="plugins/core.mailer/js/build/PydioMailer.js" className="PydioMailer" depends="React,UsersCompleter"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="send_mail">
-                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="hidden" write="false"/>
                 <processing>
                     <serverCallback methodName="sendMailAction" restParams="/" developerComment="Trigger an email to a user or external email, sent by currently logged user">
                         <input_param name="from" type="string" description="From email"/>
@@ -30,6 +34,12 @@
                         <input_param name="message" type="string" description="Body of the message"/>
                         <input_param name="link" type="string" description="URL of an image to be used in the message body."/>
                     </serverCallback>
+                </processing>
+            </action>
+            <action name="consume_mail_queue">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <processing>
+                    <serverCallback methodName="mailConsumeQueue" restParams="/"/>
                 </processing>
             </action>
         </actions>
