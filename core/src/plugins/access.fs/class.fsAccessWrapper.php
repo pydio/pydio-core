@@ -492,21 +492,20 @@ class fsAccessWrapper implements AjxpWrapper
         if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) {
             $cmd = "stat -L -c%s ".escapeshellarg($file);
             $val = trim(`$cmd`);
-            if (strlen($val) == 0 || floatval($val) == 0) {
+            if (!is_numeric($val) || $val == -1) {
                 // No stat on system
                 $cmd = "ls -1s --block-size=1 ".escapeshellarg($file);
                 $val = trim(`$cmd`);
-            }
-            if (strlen($val) == 0 || floatval($val) == 0) {
-                // No block-size on system (probably busybox), try long output
-                $cmd = "ls -l ".escapeshellarg($file)."";
-
-                $arr = explode("/[\s]+/", `$cmd`);
-                $val = trim($arr[4]);
-            }
-            if (strlen($val) == 0 || floatval($val) == 0) {
-                // Still not working, get a value at least, not 0...
-                $val = sprintf("%u", filesize($file));
+                if (strlen($val) == 0 || floatval($val) == 0) {
+                    // No block-size on system (probably busybox), try long output
+                    $cmd = "ls -l ".escapeshellarg($file)."";
+                    $arr = explode("/[\s]+/", `$cmd`);
+                    $val = trim($arr[4]);
+                    if (strlen($val) == 0 || floatval($val) == 0) {
+                        // Still not working, get a value at least, not 0...
+                        $val = sprintf("%u", filesize($file));
+                    }
+                }
             }
             return floatval($val);
         } else if (class_exists("COM")) {
@@ -517,5 +516,4 @@ class fsAccessWrapper implements AjxpWrapper
             return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
         } else return sprintf("%u", filesize($file));
     }
-
 }

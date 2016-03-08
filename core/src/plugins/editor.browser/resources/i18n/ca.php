@@ -18,14 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-  //	Spanish translation: Salva Gómez <salva.gomez at gmail.com> 2016
+  //	Catalan translation: Salva Gómez <salva.gomez at gmail.com> 2015
 $mess=array(
-"1" => "Nueva ventana",
-"2" => "Navegador en nueva ventana",
-"3" => "Abriendo el fichero en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
-    "4" => "Nuevo marcador URL",
-    "5" => "De manera alternativa, puede <a>crear un nuevo marcador a una URL</a>",
-    "6" => "Introduzca una URL empezando por http/https",
+"1" => "Nova finestra",
+"2" => "Navegador a nova finestra",
+"3" => "Obrint l'arxiu a una finestra externa. Esperi per favor, aquesta finestra s'hi tancarà automàticament.",
+    "4" => "Nou marcador URL",
+    "5" => "De manera alternativa, pot <a>crear un nou marcador a una URL</a>",
+    "6" => "Introdueixi una URL començant per http/https",
     "7" => "Marcador URL",
-    "8" => "Introduzca una etiqueta para este marcador"
+    "8" => "Introdueixi una etiqueta per aquest marcador"
 );

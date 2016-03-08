@@ -18,10 +18,11 @@
     *
     * The latest code can be found at <http://pyd.io/>.
     */
+	//      spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2016
 $mess=array(
-    "workspace.normal" => "Workspace AJXP_REPOSITORY_LABEL",
-    "workspace.shared" => "Shared Folder AJXP_REPOSITORY_LABEL",
-    "minisite.file" => "Public File AJXP_REPOSITORY_LABEL",
-    "minisite.folder" => "Public Folder AJXP_REPOSITORY_LABEL",
-    "public_user" => "a public user (connection from '%s')",
+    "workspace.normal" => "Repositorio AJXP_REPOSITORY_LABEL",
+    "workspace.shared" => "Carpeta compartida AJXP_REPOSITORY_LABEL",
+    "minisite.file" => "Fichero público AJXP_REPOSITORY_LABEL",
+    "minisite.folder" => "Carpeta pública AJXP_REPOSITORY_LABEL",
+    "public_user" => "Usuario público (conexión desde '%s')",
 );
