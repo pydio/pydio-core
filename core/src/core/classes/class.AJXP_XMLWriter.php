@@ -633,7 +633,8 @@ class AJXP_XMLWriter
 
         $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
         foreach ($accessible as $repoId => $repoObject) {
-            $rightString = "";
+            $statusString = " repository_type=\"".$repoObject->getRepositoryType()."\" access_status=\"".$repoObject->getAccessStatus()."\" ";
+
             $streamString = "";
             if (in_array($repoObject->accessType, $streams)) {
                 $streamString = "allowCrossRepositoryCopy=\"true\"";
@@ -695,7 +696,7 @@ class AJXP_XMLWriter
                     $roleString.= ' hasMask="true" ';
                 }
             }
-            $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+            $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
         }
 
         $st .= "</repositories>";

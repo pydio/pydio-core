@@ -40,6 +40,8 @@ class Repository {
         this.description = '';
         this._hasContentFilter = false;
         this._hasUserScope = false;
+        this._repositoryType = 'local';
+        this._accessStatus = 'accessed';
         if(window.ajxpResourcesFolder){
     		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
         }
@@ -162,7 +164,21 @@ class Repository {
     hasUserScope(){
         return this._hasUserScope;
     }
-	
+
+    /**
+     * @returns {string}
+     */
+    getRepositoryType(){
+        return this._repositoryType;
+    }
+
+    /**
+     * @returns {string}
+     */
+    getAccessStatus(){
+        return this._accessStatus;
+    }
+
 	/**
 	 * Parses XML Node
 	 * @param repoNode XMLNode
@@ -176,6 +192,12 @@ class Repository {
 		}
 		if(repoNode.getAttribute('userScope') && repoNode.getAttribute('userScope') == "true"){
 			this._hasUserScope = true;
+		}
+		if(repoNode.getAttribute('repository_type')){
+			this._repositoryType = repoNode.getAttribute('repository_type');
+		}
+		if(repoNode.getAttribute('access_status')){
+			this._hasUserScope = repoNode.getAttribute('access_status');
 		}
 		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
 			this.userEditable = true;

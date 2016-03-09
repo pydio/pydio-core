@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
+
+define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
+define('AJXP_REPOSITORY_STATUS_ACCESSED', 'accessed');
+define('AJXP_REPOSITORY_STATUS_NEW', 'new');
 /**
  * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
  * different source, like the application configurations, a mailbox, etc.
@@ -81,6 +85,16 @@ class Repository implements AjxpGroupPathProvider
     public $isTemplate = false;
 
     /**
+     * @var string local or remote
+     */
+    protected $repositoryType = AJXP_REPOSITORY_TYPE_LOCAL;
+
+    /**
+     * @var string status
+     */
+    protected $accessStatus = AJXP_REPOSITORY_STATUS_ACCESSED;
+
+    /**
      * @var string
      */
     private $owner;
@@ -122,11 +136,28 @@ class Repository implements AjxpGroupPathProvider
     protected $contentFilter;
 
     /**
+     * @var array Store filters as array variable to avoid serialization problems
+     */
+    private $contentFilterData;
+
+    /**
      * @param \ContentFilter $contentFilter
      */
     public function setContentFilter($contentFilter)
     {
         $this->contentFilter = $contentFilter;
+        $this->contentFilterData  = $contentFilter->filters;
+    }
+
+    /**
+     * Fix unserialization issues by reloading object from data array
+     */
+    private function checkCFilterData(){
+        if(!is_object($this->contentFilter) && is_array($this->contentFilterData)){
+            $cf = new ContentFilter(array());
+            $cf->fromFilterArray($this->contentFilterData);
+            $this->contentFilter = $cf;
+        }
     }
 
     /**
@@ -134,6 +165,7 @@ class Repository implements AjxpGroupPathProvider
      * @return bool
      */
     public function hasContentFilter(){
+        $this->checkCFilterData();
         return isSet($this->contentFilter);
     }
 
@@ -142,6 +174,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function getContentFilter()
     {
+        $this->checkCFilterData();
         return $this->contentFilter;
     }
 
@@ -149,7 +182,6 @@ class Repository implements AjxpGroupPathProvider
      * @param string $id
      * @param string $display
      * @param string $driver
-     * @return void
      */
     public function __construct($id, $display, $driver)
     {
@@ -577,6 +609,38 @@ class Repository implements AjxpGroupPathProvider
     public function setDescription( $descriptionText )
     {
         $this->options["USER_DESCRIPTION"] = $descriptionText;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessStatus()
+    {
+        return $this->accessStatus;
+    }
+
+    /**
+     * @param string $accessStatus
+     */
+    public function setAccessStatus($accessStatus)
+    {
+        $this->accessStatus = $accessStatus;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRepositoryType()
+    {
+        return $this->repositoryType;
+    }
+
+    /**
+     * @param string $repositoryType
+     */
+    public function setRepositoryType($repositoryType)
+    {
+        $this->repositoryType = $repositoryType;
     }
 
     /**
