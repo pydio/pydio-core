@@ -677,6 +677,19 @@
             }.bind(this), null);
         }
 
+
+        resetDownloadCounter(linkId, callback = function(){}){
+            var params = {
+                "get_action":"reset_counter",
+                "element_id" : linkId
+            };
+            ShareModel.prepareShareActionParameters(this.getNode(), params);
+            PydioApi.getClient().request(params, function(){
+                this.load();
+                callback();
+            }.bind(this));
+        }
+
         static prepareShareActionParameters(uniqueNode, params){
             var meta = uniqueNode.getMetadata();
             if(meta.get('shared_element_hash')){

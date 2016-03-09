@@ -1052,10 +1052,15 @@
             }
             if(dlLimitValue){
                 var dlCounter = this.props.shareModel.getDownloadCounter(linkId);
-                var dlCounterString = '';
-                if(dlCounter){
-                    dlCounterString = <span className="dlCounterString">{'Already ' +dlCounter+ '/'+ dlLimitValue}</span>;
+                var resetDl = function(){
+                    if(window.confirm(this.context.getMessage('106'))){
+                        this.props.shareModel.resetDownloadCounter(linkId, function(){});
+                    }
+                }.bind(this);
+                if(dlCounter) {
+                    var resetLink = <a style={{cursor:'pointer'}} onClick={resetDl} title={this.context.getMessage('17')}>({this.context.getMessage('16')})</a>;
                 }
+                var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
             }
             return (
                 <div>
