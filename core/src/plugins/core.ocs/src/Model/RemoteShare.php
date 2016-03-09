@@ -120,7 +120,7 @@ class RemoteShare
         // Create REPO
         $parts = parse_url($this->getOcsDavUrl());
         $data = array(
-            "DISPLAY"		=>	$this->getDocumentName(). " [remote]",
+            "DISPLAY"		=>	$this->getDocumentName(),
             "DESCRIPTION"   =>  "Shared by ".$this->getSender(),
             "AJXP_SLUG"		=>  "remote-".$this->getOcsToken(),
             "DRIVER"		=>	"webdav",
@@ -134,6 +134,7 @@ class RemoteShare
             )
         );
         $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
+        $repo->setRepositoryType("remote");
         $repo->setWriteable(false);
         $repo->setOwnerData(null, $this->getSender()." [remote]");
         if($this->isDocumentIsLeaf()){

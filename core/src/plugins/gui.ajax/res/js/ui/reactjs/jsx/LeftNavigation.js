@@ -59,6 +59,7 @@
                     });
                 }
             }.bind(this);
+
             this.props.pydio.observe('repository_list_refreshed', this._reloadObserver);
         },
 
@@ -67,7 +68,6 @@
                 this.props.pydio.stopObserving('repository_list_refreshed', this._reloadObserver);
             }
         },
-
 
         openNavigation:function(){
             if(!this.state.statusOpen){
@@ -198,6 +198,7 @@
 
         render: function(){
             var entries = [], sharedEntries = [], inboxEntry;
+
             this.props.workspaces.forEach(function(object, key){
                 if(object.getId().indexOf('ajxp_') === 0){
                     return;
@@ -212,14 +213,15 @@
                         workspace={object}
                     />
                 );
-                if(object.getAccessType() == "inbox"){
+                if (object.getAccessType() == "inbox") {
                     inboxEntry = entry;
-                }else if(object.getOwner()){
+                } else if(object.getOwner()) {
                     sharedEntries.push(entry);
-                }else{
+                } else {
                     entries.push(entry);
                 }
             }.bind(this));
+
             if(inboxEntry){
                 sharedEntries.unshift(inboxEntry);
             }
@@ -269,12 +271,41 @@
             onHoverLink:React.PropTypes.func,
             onOutLink:React.PropTypes.func
         },
+
+        getInitialState:function(){
+            return {openAlert:false};
+        },
+
         getLetterBadge:function(){
             return {__html:this.props.workspace.getHtmlBadge(true)};
         },
+
+        handleAccept: function () {
+            PydioApi.getClient().request({
+                'get_action': 'accept_invitation',
+                'remote_share_id': this.props.workspace.getShareId()
+            }, this.handleCloseAlert.bind(this), this.handleCloseAlert.bind(this));
+        },
+
+        handleDecline: function () {
+            PydioApi.getClient().request({
+                'get_action': 'reject_invitation',
+                'remote_share_id': this.props.workspace.getShareId()
+            }, this.handleCloseAlert.bind(this), this.handleCloseAlert.bind(this));
+        },
+
+        handleOpenAlert: function () {
+            this.refs.dialog.show();
+        },
+
+        handleCloseAlert: function() {
+            this.refs.dialog.dismiss();
+        },
+
         onClick:function(){
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
         },
+
         render:function(){
             var current = this.props.pydio.user.getActiveRepository();
             var currentClass="workspace-entry";
@@ -290,16 +321,50 @@
             if(this.props.onOutLink){
                 var onOut = function(event){this.props.onOutLink(event, this.props.ws)}.bind(this);
             }
+            var onClick = this.onClick.bind(this);
+
+            // Icons
             var badge;
             if(this.props.workspace.getAccessType() == "inbox"){
                 badge = <span className="workspace-badge"><span className="access-icon"/></span>;
             }else{
                 badge = <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>;
             }
+            var remote, remoteDialog;
+            if (this.props.workspace.getRepositoryType() == "remote"){
+                var actions = [
+                    { text: 'Decline', ref: 'decline', onClick: this.handleDecline.bind(this)},
+                    { text: 'Accept', ref: 'accept', onClick: this.handleAccept.bind(this)}
+                ];
+
+                onClick = this.handleOpenAlert.bind(this);
+
+                remote = <span className="icon-cloud"></span>;
+
+                remoteDialog = <div className='react-mui-context'>
+                    <ReactMUI.Dialog
+                        title="Remote File Dialog"
+                        ref="dialog"
+                        actions={actions}
+                        modal={false}
+                        dismissOnClickAway={true}
+                    >
+                        This item has been share with you from a remote location.
+
+                        Do you want to accept it ?
+                    </ReactMUI.Dialog>
+                </div>
+            }
+
+            var newWorkspace;
+            /*if (this.props.workspace.getFirstAccess() === ""){
+                newWorkspace = <span className="workspace-new"><span className="new-icon"/></span>;
+            }*/
+
             return (
                 <div
                     className={currentClass}
-                    onClick={this.onClick}
+                    onClick={onClick}
                     title={this.props.workspace.getDescription()}
                     onMouseOver={onHover}
                     onMouseOut={onOut}
@@ -307,6 +372,9 @@
                     {badge}
                     <span className="workspace-label">{this.props.workspace.getLabel()}</span>
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
+                    {remote}
+                    {remoteDialog}
+                    {newWorkspace}
                 </div>
             );
         }

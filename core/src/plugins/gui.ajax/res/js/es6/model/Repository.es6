@@ -55,6 +55,14 @@ class Repository {
 	getId(){
 		return this.id;
 	}
+
+	/**
+	 * @returns String
+	 */
+	getShareId(){
+		return this.id.replace(/ocs_remote_share_/, '');
+
+	}
 	
 	/**
 	 * @returns String
