@@ -21,8 +21,6 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
-define('AJXP_REPOSITORY_STATUS_ACCESSED', 'accessed');
-define('AJXP_REPOSITORY_STATUS_NEW', 'new');
 /**
  * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
  * different source, like the application configurations, a mailbox, etc.
@@ -92,7 +90,7 @@ class Repository implements AjxpGroupPathProvider
     /**
      * @var string status
      */
-    protected $accessStatus = AJXP_REPOSITORY_STATUS_ACCESSED;
+    protected $accessStatus;
 
     /**
      * @var string

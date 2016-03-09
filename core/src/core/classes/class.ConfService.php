@@ -570,6 +570,8 @@ class ConfService
             if($sessionNotCorrupted){
                 $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
                 return $_SESSION["REPOSITORIES"];
+            }else if(isSet($this->configs["REPOSITORIES"])){
+                unset($this->configs["REPOSITORIES"]);
             }
         }
         if (isSet($this->configs["REPOSITORIES"])) {
@@ -722,7 +724,7 @@ class ConfService
     public function getCurrentRepositoryIdInst()
     {
         $ctxId = $this->getContextRepositoryId();
-        if(!empty($ctxId) || $ctxId === 0){
+        if(!empty($ctxId) || $ctxId."" === "0"){
             $object = self::getRepositoryById($ctxId);
             if($object != null && self::repositoryIsAccessible($ctxId, $object)){
                 return $ctxId;

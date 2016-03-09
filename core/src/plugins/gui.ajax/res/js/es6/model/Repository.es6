@@ -41,7 +41,8 @@ class Repository {
         this._hasContentFilter = false;
         this._hasUserScope = false;
         this._repositoryType = 'local';
-        this._accessStatus = 'accessed';
+        this._accessStatus = null;
+        this._lastConnection = null;
         if(window.ajxpResourcesFolder){
     		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
         }
@@ -187,6 +188,10 @@ class Repository {
         return this._accessStatus;
     }
 
+    getLastConnection(){
+        return this._lastConnection;
+    }
+
 	/**
 	 * Parses XML Node
 	 * @param repoNode XMLNode
@@ -205,8 +210,12 @@ class Repository {
 			this._repositoryType = repoNode.getAttribute('repository_type');
 		}
 		if(repoNode.getAttribute('access_status')){
-			this._hasUserScope = repoNode.getAttribute('access_status');
+			this._accessStatus = repoNode.getAttribute('access_status');
 		}
+        if(repoNode.getAttribute('last_connection')){
+            this._lastConnection = repoNode.getAttribute('last_connection');
+        }
+
 		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
 			this.userEditable = true;
 		}

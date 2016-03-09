@@ -357,10 +357,9 @@
             }
 
             var newWorkspace;
-            /*if (this.props.workspace.getFirstAccess() === ""){
-                newWorkspace = <span className="workspace-new"><span className="new-icon"/></span>;
-            }*/
-
+            if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()){
+                newWorkspace = <span className="workspace-new"> - NEW!</span>;
+            }
             return (
                 <div
                     className={currentClass}

@@ -633,7 +633,15 @@ class AJXP_XMLWriter
 
         $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
         foreach ($accessible as $repoId => $repoObject) {
-            $statusString = " repository_type=\"".$repoObject->getRepositoryType()."\" access_status=\"".$repoObject->getAccessStatus()."\" ";
+
+            $statusString = " repository_type=\"".$repoObject->getRepositoryType()."\"";
+            $accessStatus = $repoObject->getAccessStatus();
+            if(!empty($accessStatus)){
+                $statusString .= " access_status=\"$accessStatus\" ";
+            }else if(AuthService::usersEnabled()){
+                $lastConnected = AuthService::getLoggedUser()->getArrayPref("repository_last_connected", $repoId);
+                if(!empty($lastConnected)) $statusString .= " last_connection=\"$lastConnected\" ";
+            }
 
             $streamString = "";
             if (in_array($repoObject->accessType, $streams)) {

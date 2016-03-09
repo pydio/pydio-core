@@ -365,6 +365,9 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     {
         if(!isSet($this->prefs[$prefName])) $this->prefs[$prefName] = array();
         $this->prefs[$prefName][$prefPath] = $prefValue;
+        if($prefName == "history" && $prefPath == "last_repository"){
+            $this->setArrayPref("repository_last_connected", $prefValue, time());
+        }
     }
 
     public function getArrayPref($prefName, $prefPath)
