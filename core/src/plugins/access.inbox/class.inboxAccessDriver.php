@@ -21,19 +21,131 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Pydio\Access\Core\Stream\Iterator\DirIterator;
 
 class inboxAccessDriver extends fsAccessDriver
 {
+    private static $output;
+
     public function initRepository()
     {
         $this->detectStreamWrapper(true);
         $this->urlBase = "pydio://".$this->repository->getId();
     }
 
+    /**
+     *
+     * Main callback for all share- actions.
+     * @param string $action
+     * @param array $httpVars
+     * @param array $fileVars
+     * @return null
+     * @throws Exception
+     */
+    public function switchAction($action, $httpVars, $fileVars) {
+
+        switch ($action) {
+            //------------------------------------
+            // SHARING FILE OR FOLDER
+            //------------------------------------
+            case "load_shares":
+
+                $nodes = static::getNodes();
+
+                header("Content-type:application/json");
+
+                $data = [];
+                $data["shares"] = [];
+
+                foreach ($nodes as $key => $node) {
+
+                    $n = new AJXP_Node($node['url']);
+
+                    $remoteShare = $node['remote_share'];
+
+                    $repositoryId = $n->getRepositoryId();
+                    $n->getRepository()->driverInstance = null;
+
+                    ConfService::loadDriverForRepository($n->getRepository());
+
+                    $repository = $n->getRepository();
+
+                    $currentData = [
+                        "repositoryId"  => $repositoryId
+                    ];
+
+                    if (!empty($remoteShare)) {
+                        $currentData += [
+                            "label" => $remoteShare->getDocumentName(),
+                            "owner" => $remoteShare->getSender() . ' (remote)',
+                            "cr_date" => $remoteShare->getReceptionDate(),
+                            "status" => $remoteShare->getStatus()
+                        ];
+
+                        if ($remoteShare->getStatus() == 1) {
+                            // Adding the actions button
+                            $currentData += [
+                                "actions" => [[
+                                    "id" => "accept",
+                                    "message" => "Accepter",
+                                    "options" => [
+                                        "get_action" => "accept_invitation",
+                                        "remote_share_id" => $remoteShare->getId(),
+                                        "statusOnSuccess" => OCS_INVITATION_STATUS_ACCEPTED
+                                    ]
+                                ],
+                                [
+                                    "id" => "decline",
+                                    "message" => "Refuser",
+                                    "options" => [
+                                        "get_action" => "reject_invitation",
+                                        "remote_share_id" => $remoteShare->getId(),
+                                        "statusOnSuccess" => OCS_INVITATION_STATUS_REJECTED
+                                    ]
+                                ]]
+                            ];
+                        }
+                    } else {
+                        $currentData += [
+                            "label" => $n->getLabel(),
+                            "owner" => $repository->getOwner(),
+                            "cr_date" => $repository->getOption('CREATION_TIME'),
+                        ];
+                    }
+
+                    // Ensuring that mandatory options are set
+                    $currentData += [
+                        "status" => 0,
+                        "actions" => [[
+                            "id" => "view",
+                            "message" => "View",
+                            "options" => [
+                                "get_action" => "switch_repository",
+                                "repository_id" => $repositoryId
+                            ]
+                        ]]
+                    ];
+
+                    $data["shares"][] = $currentData;
+                }
+
+                echo json_encode($data);
+
+                break;
+
+            default:
+                parent::switchAction($action, $httpVars, $fileVars);
+
+                break;
+        }
+    }
+
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
         $mess = ConfService::getMessages();
+
         parent::loadNodeInfo($ajxpNode, $parentNode, $details);
+
         if(!$ajxpNode->isRoot()){
             $targetUrl = inboxAccessWrapper::translateURL($ajxpNode->getUrl());
             $repoId = parse_url($targetUrl, PHP_URL_HOST);
@@ -41,9 +153,11 @@ class inboxAccessDriver extends fsAccessDriver
             if(!is_null($r)){
                 $owner = $r->getOwner();
                 $creationTime = $r->getOption("CREATION_TIME");
+                $label = $r->getDisplay();
             }else{
                 $owner = "http://".parse_url($targetUrl, PHP_URL_HOST);
                 $creationTime = time();
+                $label = "";
             }
             $leaf = $ajxpNode->isLeaf();
             $meta = array(
@@ -53,28 +167,72 @@ class inboxAccessDriver extends fsAccessDriver
             if(!$leaf){
                 $meta["ajxp_mime"] = "shared_folder";
             }
-            if($ajxpNode->getExtension() == "invitation"){
 
-                $label = $ajxpNode->getLabel();
-                $parts = explode(".", $label);
-                array_pop($parts);
-                $shareId = array_pop($parts);
-                $ajxpNode->setLabel(implode(".", $parts));
-                $meta["ajxp_mime"] = "invitation";
-                $meta["remote_share_id"] = $shareId;
+            // Retrieving stored details
+            $originalNode = self::$output[$repoId];
+            $remoteShare = $originalNode['remote_share'];
 
-            }else if(strpos($repoId, "ocs_remote_share_") === 0){
-
-                $shareId = str_replace("ocs_remote_share_", "", $repoId);
-                $label = $ajxpNode->getLabel();
-                $label.= " (accepted)";
-                $ajxpNode->setLabel($label);
-                $meta["remote_share_accepted"] = "true";
-                $meta["remote_share_id"] = $shareId;
-
+            if (!empty($remoteShare)) {
+                $meta["remote_share_id"] = $remoteShare->getId();
+                if ($remoteShare->getStatus() == 1) {
+                    $label .= " (pending)";
+                    $meta["ajxp_mime"] = "invitation";
+                } else {
+                    $label .= " (accepted)";
+                    $meta["remote_share_accepted"] = "true";
+                }
             }
+
+            // Overriding display name with repository name
+            $ajxpNode->setLabel($label);
             $ajxpNode->mergeMetadata($meta);
         }
     }
 
+    public static function getNodes(){
+        if(isSet(self::$output)){
+            return self::$output;
+        }
+
+        $repos = ConfService::getAccessibleRepositories();
+
+        self::$output = array();
+        foreach($repos as $repo) {
+            if (!$repo->hasOwner()) {
+                continue;
+            }
+
+            $cFilter = $filter = $label = null;
+
+            $repoId = $repo->getId();
+            $url = "pydio://" . $repoId . "/";
+
+            if ($repo->hasContentFilter()) {
+                $cFilter = $repo->getContentFilter();
+                $filter = ($cFilter instanceof ContentFilter) ? array_keys($cFilter->filters)[0] : $cFilter;
+                $label = basename($filter);
+            }
+
+            if (empty($label)) {
+                $label = $repo->getDisplay();
+            }
+
+            $url .= $label;
+            if(strpos($repoId, "ocs_remote_share_") === 0){
+                // Check Status
+                $linkId = str_replace("ocs_remote_share_", "", $repoId);
+
+                $ocsStore = new \Pydio\OCS\Model\SQLStore();
+                $remoteShare = $ocsStore->remoteShareById($linkId);
+            }
+
+            self::$output[$repoId] = [
+                "label" => $label,
+                "url" => $url,
+                "remote_share" => $remoteShare
+            ];
+        }
+
+        return self::$output;
+    }
 }

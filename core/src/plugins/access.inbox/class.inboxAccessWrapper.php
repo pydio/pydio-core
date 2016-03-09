@@ -24,8 +24,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class inboxAccessWrapper implements AjxpWrapper
 {
-    private $nodes;
-    private $index;
+    private $nodesIterator;
 
     /**
      * @var Resource
@@ -36,83 +35,100 @@ class inboxAccessWrapper implements AjxpWrapper
      */
     private static $linkNode;
 
-    private static $output;
 
-    protected static function getNodes(){
-        if(isSet(self::$output)){
-            return self::$output;
-        }
-        $repos = ConfService::getAccessibleRepositories();
-        self::$output = array();
-        foreach($repos as $repo){
-            if(!$repo->hasOwner()){
-                continue;
-            }
-            $repoId = $repo->getId();
-            $url = "pydio://".$repoId."/";
-
-            if($repo->hasContentFilter()){
-                $cFilter = $repo->getContentFilter();
-                $filter = array_keys($cFilter->filters)[0];
-                $label = basename($filter);
-                if(strpos($repo->getId(), "ocs_remote_share") !== 0){
-                    $url .= $label;
-                }
-            }else{
-                $label = $repo->getDisplay();
-            }
-
-            if(strpos($repoId, "ocs_remote_share_") === 0){
-                // Check Status
-                $linkId = str_replace("ocs_remote_share_", "", $repoId);
-                $ocsStore = new \Pydio\OCS\Model\SQLStore();
-                $remoteShare = $ocsStore->remoteShareById($linkId);
-                $status = $remoteShare->getStatus();
-                if($status == 1){
-                    $label .= " (pending).".str_replace("ocs_remote_share_", "", $repoId).".invitation";
-                    $url = __FILE__;
-                }
-            }
-
-            self::$output[$label] = $url;
-        }
-        return self::$output;
-    }
-
+    /**
+     * Support for opendir().
+     *
+     * @param string $path    The path to the directory
+     * @param string $options Whether or not to enforce safe_mode (0x04). Unused.
+     *
+     * @return bool true on success
+     * @see http://www.php.net/manual/en/function.opendir.php
+     */
     public function dir_opendir($path, $options)
     {
-        $this->nodes = self::getNodes();
-        $this->index = 0;
+        $this->nodesIterator = new ArrayIterator(inboxAccessDriver::getNodes());
+
         return true;
     }
 
+    /**
+     * Close the directory listing handles
+     *
+     * @return bool true on success
+     */
+    public function dir_closedir()
+    {
+        $this->nodesIterator = null;
+
+        return true;
+    }
+
+    /**
+     * This method is called in response to rewinddir()
+     *
+     * @return boolean true on success
+     */
+    public function dir_rewinddir()
+    {
+        $this->nodesIterator->rewind();
+
+        return true;
+    }
+
+    /**
+     * This method is called in response to readdir()
+     *
+     * @return string Should return a string representing the next filename, or false if there is no next file.
+     *
+     * @link http://www.php.net/manual/en/function.readdir.php
+     */
     public function dir_readdir()
     {
-        $entry = false;
-        if($this->index < count($this->nodes)){
-            $keys = array_keys($this->nodes);
-            $entry = basename($keys[$this->index]);
+        // Skip empty result keys
+        if (!$this->nodesIterator->valid()) {
+            return false;
         }
-        $this->index++;
-        return $entry;
+
+        $key = $this->nodesIterator->key();
+        $current = $this->nodesIterator->current();
+
+        $this->nodesIterator->next();
+
+        return $key;
     }
 
     public static function translateURL($path){
+
         $pydioScheme = false;
         self::$linkNode = null;
-        $nodePath = parse_url($path, PHP_URL_PATH);
-        $nodes = self::getNodes();
-        $url = $nodes[ltrim($nodePath, "/")];
+
+        $nodes = inboxAccessDriver::getNodes();
+
+        $nodePath = basename(parse_url($path, PHP_URL_PATH));
+
+        $node = $nodes[ltrim($nodePath, '/')];
+
+        if (empty($node) || ! isset($node['url'])) {
+            return AJXP_Utils::getAjxpTmpDir();
+        }
+
+        $url = $node['url'];
+        $label = $node['label'];
+
         $scheme = parse_url($url, PHP_URL_SCHEME);
         if($scheme == "pydio"){
             self::$linkNode = new AJXP_Node($path);
             $pydioScheme = true;
         }
+
         if(empty($nodePath)){
             return AJXP_Utils::getAjxpTmpDir();
         }
+
         if($pydioScheme){
             $node = new AJXP_Node($url);
+            $node->setLabel($label);
             $node->getRepository()->driverInstance = null;
             try{
                 ConfService::loadDriverForRepository($node->getRepository());
@@ -203,26 +219,6 @@ class inboxAccessWrapper implements AjxpWrapper
     public static function isSeekable($url)
     {
         return true;
-    }
-
-    /**
-     *
-     *
-     * @return bool
-     */
-    public function dir_closedir()
-    {
-        $this->index = 0;
-    }
-
-    /**
-     * Enter description here...
-     *
-     * @return bool
-     */
-    public function dir_rewinddir()
-    {
-        $this->index = 0;
     }
 
     /**
@@ -413,7 +409,7 @@ class inboxAccessWrapper implements AjxpWrapper
         if($url == null){
             return false;
         }
-        $stat = stat($url);
+        $stat = @stat($url);
         if($stat === false){
             return false;
         }
