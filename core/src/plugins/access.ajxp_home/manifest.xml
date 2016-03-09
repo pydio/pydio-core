@@ -124,7 +124,8 @@
                                 var t = Event.findElement(e, 'div.tutorial_load_button');
                                 try{
                                     var main = t.up('div.tutorial_legend');
-                                    main.next('iframe').src = main.readAttribute('data-videoSrc');
+                                    main.next('img').remove();
+                                    main.insert({after:new Element('iframe', {class:'tutorial_video',src:main.readAttribute('data-videoSrc')})});
                                 }catch(e){}
                             });
                             var configs = ajaxplorer.getPluginConfigs('access.ajxp_home');
@@ -179,7 +180,7 @@
                             <img class="tutorial_video" src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg">
 
                             <div style="clear:left; text-align:center;">
-                                <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>
+                                <a href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>
                         </div>
                 ]]></clientForm>
                 </processing>
