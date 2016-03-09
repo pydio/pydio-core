@@ -210,7 +210,7 @@ class Pydio extends Observable{
         this.observeOnce("registry_part_loaded", function(data){
             if(data != "user/repositories") return;
             this.Registry.logXmlUser(true);
-            document.fire("ajaxplorer:repository_list_refreshed", {
+            this.fire("repository_list_refreshed", {
                 list:this.user.getRepositoriesList(),
                 active:this.user.getActiveRepository()});
         }.bind(this));

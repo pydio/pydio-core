@@ -51,7 +51,23 @@
         componentDidMount:function(){
             if(this._timer) global.clearTimeout(this._timer);
             this._timer = global.setTimeout(this.closeNavigation, 3000);
+
+            this._reloadObserver = function(){
+                if(this.isMounted()){
+                    this.setState({
+                        workspaces:this.props.pydio.user.getRepositoriesList()
+                    });
+                }
+            }.bind(this);
+            this.props.pydio.observe('repository_list_refreshed', this._reloadObserver);
         },
+
+        componentWillUnmount:function(){
+            if(this._reloadObserver){
+                this.props.pydio.stopObserving('repository_list_refreshed', this._reloadObserver);
+            }
+        },
+
 
         openNavigation:function(){
             if(!this.state.statusOpen){
