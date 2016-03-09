@@ -1481,7 +1481,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-        if(this.options.fixedSortColumn && this.options.fixedSortDirection && !contextNode.getMetadata().get("filesList.sortColumn") && !this.paginationData){
+        if(this.options.fixedSortColumn && this.options.fixedSortDirection && !contextNode.getMetadata().get("filesList.sortColumn") && (!this.paginationData || this.paginationData.get("total") == "1")){
             var col = this.columnsDef.detect(function(c){
                 return c.attributeName == this.options.fixedSortColumn;
             }.bind(this));
@@ -1878,7 +1878,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 			newRow.appendChild(tableCell);
 			if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(tableCell, ajxpNode, 'row', attributeList.get(s));
+                attributeList.get(s).modifierFunc(tableCell, ajxpNode, 'row', attributeList.get(s), newRow);
 			}
 		}
 
@@ -1967,7 +1967,7 @@ Class.create("FilesList", SelectableElements, {
 
         this.getFromCache("columns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(newRow, ajxpNode, 'thumb', pair.value);
+                pair.value.modifierFunc(newRow, ajxpNode, 'thumb', pair.value, newRow);
             }
         });
 
@@ -2102,7 +2102,7 @@ Class.create("FilesList", SelectableElements, {
             addedCell++;
             first = false;
             if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s), largeRow);
             }
         }
 
@@ -2114,7 +2114,7 @@ Class.create("FilesList", SelectableElements, {
 
         this.getFromCache("hiddenColumns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value);
+                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value, largeRow);
             }
         });
 
