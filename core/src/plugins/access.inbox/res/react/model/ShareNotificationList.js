@@ -14,8 +14,11 @@
             this._pydio = pydio;
             this.options = options || {};
 
-            this.load();
-            this._pydio.observe("registry_part_loaded", function() {this.load()}.bind(this));
+            //this.load();
+
+            this._pydio.observe("repository_list_refreshed", function() {
+                this.load();
+            }.bind(this));
         }
 
         // Getters / Setters
@@ -43,26 +46,25 @@
         }
 
         // Actions
-        load(){
-            if(ReactDispatcher.ShareNotificationDispatcher.getClient().getStatus() == 'loading') return;
-            ReactDispatcher.ShareNotificationDispatcher.getClient().setStatus('loading');
+        load() {
+            var dispatcher = ReactDispatcher.ShareNotificationDispatcher.getClient();
+            if(!dispatcher.isActive()) return;
 
             ShareNotificationList.loadShares(
                 this.options,
                 function(transport) {
-                    if(transport.responseJSON && transport.responseJSON.shares){
+                    if (transport.responseJSON){
                         this._data.shares = [];
 
                         var shares = transport.responseJSON.shares;
-
 
                         for (var i = 0; i < shares.length; i++) {
                             var share = new ReactModel.ShareNotification(shares[i]);
                             this._data.shares.push(share);
                         }
-
-                        ReactDispatcher.ShareNotificationDispatcher.getClient().setStatus('idle');
                     }
+
+                    dispatcher.setStatus('loaded');
                 }.bind(this));
         }
 

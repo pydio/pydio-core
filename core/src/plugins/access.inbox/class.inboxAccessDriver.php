@@ -66,7 +66,11 @@ class inboxAccessDriver extends fsAccessDriver
                     $repositoryId = $n->getRepositoryId();
                     $n->getRepository()->driverInstance = null;
 
-                    ConfService::loadDriverForRepository($n->getRepository());
+                    try {
+                        ConfService::loadDriverForRepository($n->getRepository());
+                    } catch (\Exception $e) {
+                        continue;
+                    }
 
                     $repository = $n->getRepository();
 
@@ -210,7 +214,10 @@ class inboxAccessDriver extends fsAccessDriver
             if ($repo->hasContentFilter()) {
                 $cFilter = $repo->getContentFilter();
                 $filter = ($cFilter instanceof ContentFilter) ? array_keys($cFilter->filters)[0] : $cFilter;
-                $label = basename($filter);
+
+                if (!is_array($filter)) {
+                    $label = basename($filter);
+                }
             }
 
             if (empty($label)) {
