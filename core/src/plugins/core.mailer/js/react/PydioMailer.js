@@ -192,8 +192,16 @@
         }
     });
 
+    var Preferences = React.createClass({
+        render: function(){
+            return <div>Preferences Panel</div>;
+        }
+    });
+
+
     var PydioMailer = global.PydioMailer || {};
     PydioMailer.Pane = Mailer;
+    PydioMailer.PreferencesPanel = Preferences;
     global.PydioMailer = PydioMailer;
 
 })(window);
