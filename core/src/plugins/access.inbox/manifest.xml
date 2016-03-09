@@ -3,89 +3,56 @@
     <class_definition filename="plugins/access.inbox/class.inboxAccessDriver.php" classname="inboxAccessDriver"/>
     <client_settings>
         <resources>
-            <js file="plugins/access.inbox/res/build/dispatcher/ShareNotificationDispatcher.js" className="ReactShareNotificationDispatcher"/>
-            <js file="plugins/access.inbox/res/build/model/ShareNotification.js" className="ReactModelShareNotification"/>
-            <js file="plugins/access.inbox/res/build/model/ShareNotificationList.js" className="ReactModelShareNotificationList"/>
-            <js file="plugins/access.inbox/res/build/ShareNotificationUI.js" className="ShareNotificationUI" depends="React,ReactModelShareNotification,ReactModelShareNotificationList,ReactShareNotificationDispatcher"/>
+            <js file="plugins/access.inbox/res/InboxCellModifier.js" className="InboxCellModifier"/>
+            <css file="plugins/access.inbox/res/inbox_style.css"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='download_all']|actions/action[@name='download']"/>
-		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 
-
         <actions>
-            <action name="load_shares">
-                <processing>
-                    <serverCallback methodName="switchAction" restParams="/file+" developerComment="Loads all current shared with me items. Workspace must support metadata management (metastore).">
-                        <output type="application/json"/>
-                    </serverCallback>
-                </processing>
-            </action>
-            <action name="open_shared_repository" dirDefault="true">
-                <gui text="462" title="462" src="download_manager.png" iconClass="icon-signin" accessKey="download_access_key" hasAccessKey="true">
-                    <context dir="" recycle="false" selection="true" actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get,inline,info_panel"/>
-                    <selectionContext dir="true" file="false" recycle="false" unique="true" allowedMimes="shared_folder"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var repo = pydio.getUserSelection().getUniqueNode().getMetadata().get("shared_repository_id");
-                        if(repo){
-                            pydio.triggerRepositoryChange(repo);
-                        }
-                    ]]></clientCallback>
-                </processing>
-            </action>
-            <action name="share_event">
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!pydio.getController().shareEventLoader) {
-                            pydio.getController().shareEventLoader = new AjxpReactDialogLoader('ShareNotificationUI', 'MainPanel', {});
-                        }
-                        pydio.getController().shareEventLoader.openDialog('react_share_panel', true);
-                    ]]></clientCallback>
-                    <clientForm id="react_share_panel"><![CDATA[
-                        <div id="react_share_panel" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
-                </processing>
-            </action>
-            <action name="accept_invitation">
-                <gui src="55" text="55" title="55" iconClass="icon-envelope">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="invitation"/>
+            <action name="inbox_accept_invitation">
+                <gui src="" text="core.ocs.1" title="core.ocs.1" iconClass="icon-ok-sign">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
+                    <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
                         var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId});
+                        PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId}, function(){
+                            pydio.fireContextRefresh();
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
-            <action name="reject_invitation">
-                <gui src="56" text="56" title="56" iconClass="icon-envelope">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="invitation"/>
+            <action name="inbox_reject_invitation">
+                <gui src="56" text="core.ocs.2" title="core.ocs.2" iconClass="icon-remove-sign">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
+                    <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
                         var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId});
+                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                            pydio.fireContextRefresh();
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
-            <action name="reject_remote_share">
-                <gui src="55" text="55" title="55" iconClass="icon-envelope">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,inline,info_panel_share"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
+            <action name="inbox_reject_remote_share">
+                <gui src="55" text="core.ocs.2" title="core.ocs.2" iconClass="icon-remove-sign">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
+                    <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
                         var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId});
+                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                            pydio.fireContextRefresh();
+                        });
                     ]]></clientCallback>
                 </processing>
             </action>
@@ -116,11 +83,16 @@
             </action>
         </actions>
         <client_configs>
-            <template_part ajxpClass="AjxpReactComponent" ajxpId="topPane" ajxpOptions='{"componentNamespace": "ShareNotificationUI", "componentName" : "MainPanel"}' />
+            <component_config className="FilesList">
+                <columns>
+                    <additional_column attributeName="share_meta_type" sortType="CellSorterValue" modifier="InboxCellModifier.updateCell" defaultVisibilty="visible" messageString="Share Type"/>
+                </columns>
+            </component_config>
         </client_configs>
 	</registry_contributions>
     <dependencies>
         <pluginClass pluginName="access.fs"/>
+        <pluginResources pluginName="access.fs"/>
     </dependencies>
     <class_stream_wrapper filename="plugins/access.inbox/class.inboxAccessWrapper.php" classname="inboxAccessWrapper" protocol="ajxp.inbox"/>
 </ajxpdriver>

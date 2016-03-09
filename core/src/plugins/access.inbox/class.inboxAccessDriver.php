@@ -26,6 +26,7 @@ use Pydio\Access\Core\Stream\Iterator\DirIterator;
 class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
+    private static $stats;
 
     public function initRepository()
     {
@@ -33,158 +34,18 @@ class inboxAccessDriver extends fsAccessDriver
         $this->urlBase = "pydio://".$this->repository->getId();
     }
 
-    /**
-     *
-     * Main callback for all share- actions.
-     * @param string $action
-     * @param array $httpVars
-     * @param array $fileVars
-     * @return null
-     * @throws Exception
-     */
-    public function switchAction($action, $httpVars, $fileVars) {
-
-        switch ($action) {
-            //------------------------------------
-            // SHARING FILE OR FOLDER
-            //------------------------------------
-            case "load_shares":
-
-                $nodes = static::getNodes();
-
-                header("Content-type:application/json");
-
-                $data = [];
-                $data["shares"] = [];
-
-                foreach ($nodes as $key => $node) {
-
-                    $n = new AJXP_Node($node['url']);
-
-                    $remoteShare = $node['remote_share'];
-
-                    $repositoryId = $n->getRepositoryId();
-                    $n->getRepository()->driverInstance = null;
-
-                    try {
-                        ConfService::loadDriverForRepository($n->getRepository());
-                    } catch (\Exception $e) {
-                        continue;
-                    }
-
-                    $repository = $n->getRepository();
-
-                    $currentData = [
-                        "repositoryId"  => $repositoryId
-                    ];
-
-                    if (!empty($remoteShare)) {
-                        $currentData += [
-                            "label" => $remoteShare->getDocumentName(),
-                            "owner" => $remoteShare->getSender() . ' (remote)',
-                            "cr_date" => $remoteShare->getReceptionDate(),
-                            "status" => $remoteShare->getStatus()
-                        ];
-
-                        if ($remoteShare->getStatus() == 1) {
-                            // Adding the actions button
-                            $currentData += [
-                                "actions" => [[
-                                    "id" => "accept",
-                                    "message" => "Accepter",
-                                    "options" => [
-                                        "get_action" => "accept_invitation",
-                                        "remote_share_id" => $remoteShare->getId(),
-                                        "statusOnSuccess" => OCS_INVITATION_STATUS_ACCEPTED
-                                    ]
-                                ],
-                                [
-                                    "id" => "decline",
-                                    "message" => "Refuser",
-                                    "options" => [
-                                        "get_action" => "reject_invitation",
-                                        "remote_share_id" => $remoteShare->getId(),
-                                        "statusOnSuccess" => OCS_INVITATION_STATUS_REJECTED
-                                    ]
-                                ]]
-                            ];
-                        }
-                    } else {
-                        $currentData += [
-                            "label" => $n->getLabel(),
-                            "owner" => $repository->getOwner(),
-                            "cr_date" => $repository->getOption('CREATION_TIME'),
-                        ];
-                    }
-
-                    // Ensuring that mandatory options are set
-                    $currentData += [
-                        "status" => 0,
-                        "actions" => [[
-                            "id" => "view",
-                            "message" => "View",
-                            "options" => [
-                                "get_action" => "switch_repository",
-                                "repository_id" => $repositoryId
-                            ]
-                        ]]
-                    ];
-
-                    $data["shares"][] = $currentData;
-                }
-
-                echo json_encode($data);
-
-                break;
-
-            default:
-                parent::switchAction($action, $httpVars, $fileVars);
-
-                break;
-        }
-    }
-
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
-        $mess = ConfService::getMessages();
-
         parent::loadNodeInfo($ajxpNode, $parentNode, $details);
-
         if(!$ajxpNode->isRoot()){
-            $targetUrl = inboxAccessWrapper::translateURL($ajxpNode->getUrl());
-            $repoId = parse_url($targetUrl, PHP_URL_HOST);
-            $r = ConfService::getRepositoryById($repoId);
-            if(!is_null($r)){
-                $owner = $r->getOwner();
-                $creationTime = $r->getOption("CREATION_TIME");
-                $label = $r->getDisplay();
-            }else{
-                $owner = "http://".parse_url($targetUrl, PHP_URL_HOST);
-                $creationTime = time();
-                $label = "";
-            }
-            $leaf = $ajxpNode->isLeaf();
-            $meta = array(
-                "shared_repository_id" => $repoId,
-                "ajxp_description" => ($leaf?"File":"Folder")." shared by ".$owner. " ". AJXP_Utils::relativeDate($creationTime, $mess)
-                );
-            if(!$leaf){
-                $meta["ajxp_mime"] = "shared_folder";
-            }
 
             // Retrieving stored details
-            $originalNode = self::$output[$repoId];
-            $remoteShare = $originalNode['remote_share'];
+            $originalNode = self::$output[$ajxpNode->getLabel()];
+            $meta = $originalNode["meta"];
+            $label = $originalNode["label"];
 
-            if (!empty($remoteShare)) {
-                $meta["remote_share_id"] = $remoteShare->getId();
-                if ($remoteShare->getStatus() == 1) {
-                    $label .= " (pending)";
-                    $meta["ajxp_mime"] = "invitation";
-                } else {
-                    $label .= " (accepted)";
-                    $meta["remote_share_accepted"] = "true";
-                }
+            if(!$ajxpNode->isLeaf()){
+                $meta["icon"] = "mime_empty.png";
             }
 
             // Overriding display name with repository name
@@ -193,53 +54,131 @@ class inboxAccessDriver extends fsAccessDriver
         }
     }
 
-    public static function getNodes(){
+    public static function getNodeData($nodePath){
+        $basename = basename(parse_url($nodePath, PHP_URL_PATH));
+        if(empty($basename)){
+            return ['stat' => stat(AJXP_Utils::getAjxpTmpDir())];
+        }
+        $allNodes = self::getNodes(false);
+        $nodeData = $allNodes[$basename];
+        if(!isSet($nodeData["stat"])){
+            if(in_array(pathinfo($basename, PATHINFO_EXTENSION), array("error", "invitation"))){
+                $stat = stat(AJXP_Utils::getAjxpTmpDir());
+            }else{
+                $url = $nodeData["url"];
+                $node = new AJXP_Node($nodeData["url"]);
+                $node->getRepository()->driverInstance = null;
+                try{
+                    ConfService::loadDriverForRepository($node->getRepository());
+                    $node->getRepository()->detectStreamWrapper(true);
+                    $stat = stat($url);
+                    self::$output[$basename]["stat"] = $stat;
+                }catch (Exception $e){
+                    $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                }
+            }
+            $nodeData["stat"] = $stat;
+        }
+        return $nodeData;
+    }
+
+    public static function getNodes($checkStats = false){
+
         if(isSet(self::$output)){
             return self::$output;
         }
 
+        $mess = ConfService::getMessages();
         $repos = ConfService::getAccessibleRepositories();
 
-        self::$output = array();
+        $output = array();
         foreach($repos as $repo) {
-            if (!$repo->hasOwner()) {
+            if (!$repo->hasOwner() || !$repo->hasContentFilter()) {
                 continue;
             }
 
-            $cFilter = $filter = $label = null;
-
             $repoId = $repo->getId();
             $url = "pydio://" . $repoId . "/";
+            $meta = array(
+                "shared_repository_id" => $repoId,
+                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". AJXP_Utils::relativeDate($repo->getOption("CREATION_TIME"), $mess),
+                "share_meta_type" => 1
+            );
 
-            if ($repo->hasContentFilter()) {
-                $cFilter = $repo->getContentFilter();
-                $filter = ($cFilter instanceof ContentFilter) ? array_keys($cFilter->filters)[0] : $cFilter;
-
-                if (!is_array($filter)) {
-                    $label = basename($filter);
-                }
-            }
-
-            if (empty($label)) {
+            $cFilter = $repo->getContentFilter();
+            $filter = ($cFilter instanceof ContentFilter) ? array_keys($cFilter->filters)[0] : $cFilter;
+            if (!is_array($filter)) {
+                $label = basename($filter);
+            }else{
                 $label = $repo->getDisplay();
             }
-
             $url .= $label;
-            if(strpos($repoId, "ocs_remote_share_") === 0){
-                // Check Status
-                $linkId = str_replace("ocs_remote_share_", "", $repoId);
 
-                $ocsStore = new \Pydio\OCS\Model\SQLStore();
-                $remoteShare = $ocsStore->remoteShareById($linkId);
+            $status = null;
+            $remoteShare = null;
+            $name = pathinfo($label, PATHINFO_FILENAME);
+            $ext = pathinfo($label, PATHINFO_EXTENSION);
+
+            $node = new AJXP_Node($url);
+            $node->setLabel($label);
+
+            if($checkStats){
+
+                $node->getRepository()->driverInstance = null;
+                try{
+                    ConfService::loadDriverForRepository($node->getRepository());
+                }catch (Exception $e){
+                    $ext = "error";
+                    $meta["ajxp_mime"] = "error";
+                }
+                $node->getRepository()->detectStreamWrapper(true);
+
+                $stat = @stat($url);
+                if($stat === false){
+                    $ext = "error";
+                    $meta["ajxp_mime"] = "error";
+                    $meta["share_meta_type"] = 2;
+                }else if(strpos($repoId, "ocs_remote_share_") === 0){
+                    // Check Status
+                    $linkId = str_replace("ocs_remote_share_", "", $repoId);
+                    $ocsStore = new \Pydio\OCS\Model\SQLStore();
+                    $remoteShare = $ocsStore->remoteShareById($linkId);
+                    $status = $remoteShare->getStatus();
+                    if($status == OCS_INVITATION_STATUS_PENDING){
+                        $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                        $ext = "invitation";
+                        $meta["ajxp_mime"] = "invitation";
+                        $meta["share_meta_type"] = 0;
+                    } else {
+                        $meta["remote_share_accepted"] = "true";
+                    }
+                    $meta["remote_share_id"] = $remoteShare->getId();
+                }
+                if($ext == "invitation"){
+                    $label .= " (pending)";
+                }else if($ext == "error"){
+                    $label .= " (error)";
+                }
+
             }
 
-            self::$output[$repoId] = [
+            $index = 0;$suffix = "";
+            while(isSet($output[$name.$suffix.".".$ext])){
+                $index ++;
+                $suffix = " ($index)";
+            }
+            $output[$name.$suffix.".".$ext] = [
                 "label" => $label,
                 "url" => $url,
-                "remote_share" => $remoteShare
+                "remote_share" => $remoteShare,
+                "meta" => $meta
             ];
+            if(isset($stat)){
+                $output[$name.$suffix.".".$ext]['stat'] = $stat;
+            }
         }
-
-        return self::$output;
+        ConfService::loadDriverForRepository(ConfService::getRepository());
+        self::$output = $output;
+        return $output;
     }
 }

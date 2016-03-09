@@ -47,7 +47,12 @@ class inboxAccessWrapper implements AjxpWrapper
      */
     public function dir_opendir($path, $options)
     {
-        $this->nodesIterator = new ArrayIterator(inboxAccessDriver::getNodes());
+        if(trim(parse_url($path, PHP_URL_PATH), "/") == ""){
+            $this->nodesIterator = new ArrayIterator(inboxAccessDriver::getNodes(true));
+        }else{
+            $this->nodesIterator = new ArrayIterator([]);
+        }
+
 
         return true;
     }
@@ -103,10 +108,8 @@ class inboxAccessWrapper implements AjxpWrapper
         $pydioScheme = false;
         self::$linkNode = null;
 
-        $nodes = inboxAccessDriver::getNodes();
-
+        $nodes = inboxAccessDriver::getNodes(false);
         $nodePath = basename(parse_url($path, PHP_URL_PATH));
-
         $node = $nodes[ltrim($nodePath, '/')];
 
         if (empty($node) || ! isset($node['url'])) {
@@ -402,6 +405,9 @@ class inboxAccessWrapper implements AjxpWrapper
      */
     public function url_stat($path, $flags)
     {
+        $nodeData = inboxAccessDriver::getNodeData($path);
+        return $nodeData["stat"];
+
         $url = self::translateURL($path);
         if(strpos($url, "invitation") === 0){
             return stat(__FILE__);
@@ -409,7 +415,7 @@ class inboxAccessWrapper implements AjxpWrapper
         if($url == null){
             return false;
         }
-        $stat = @stat($url);
+        $stat = stat($url);
         if($stat === false){
             return false;
         }
