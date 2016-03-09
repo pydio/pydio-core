@@ -111,18 +111,25 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         $newScheme = self::getNextScheme($url, $context);
         $repository = ConfService::getRepositoryById(parse_url($url, PHP_URL_HOST));
         if($currentScheme == "pydio" && $repository->hasContentFilter()){
-            $baseDir = $repository->getContentFilter()->getBaseDir();
-            if($crtInstance != null){
-                $crtInstance->currentUniquePath = $repository->getContentFilter()->getUniquePath();
-            }
-            if(!empty($baseDir) || $baseDir != "/"){
-                $crtPath = parse_url($url, PHP_URL_PATH);
-                $crtBase = basename($crtPath);
-                if(!empty($crtPath) && $crtPath != "/" && $crtBase != $repository->getContentFilter()->getUniquePath() && $crtBase != ".ajxp_meta"){
-                    throw new Exception("Cannot find file ".$crtBase);
+
+            $contentFilter = $repository->getContentFilter();
+
+            if ($contentFilter instanceof ContentFilter) {
+                $baseDir = $contentFilter->getBaseDir();
+
+                if ($crtInstance != null) {
+                    $crtInstance->currentUniquePath = $contentFilter->getUniquePath();
                 }
-                // Prepend baseDir in path
-                $url = str_replace($currentScheme."://".$repository->getId().$crtPath, $currentScheme."://".$repository->getId().rtrim($baseDir.$crtPath, "/"), $url);
+
+                if (!empty($baseDir) || $baseDir != "/") {
+                    $crtPath = parse_url($url, PHP_URL_PATH);
+                    $crtBase = basename($crtPath);
+                    if (!empty($crtPath) && $crtPath != "/" && $crtBase != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
+                        throw new Exception("Cannot find file " . $crtBase);
+                    }
+                    // Prepend baseDir in path
+                    $url = str_replace($currentScheme . "://" . $repository->getId() . $crtPath, $currentScheme . "://" . $repository->getId() . rtrim($baseDir . $crtPath, "/"), $url);
+                }
             }
         }
 
@@ -133,7 +140,6 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         return $newUrl;
     }
 
-    // TODO - problem here
     protected static function findWrapperClassName($scheme, $context = "core"){
 
         $metaWrappers = self::getMetaWrappers($context);
@@ -172,7 +178,6 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
             throw new Exception("Repository does not provide a stream wrapper!");
         }
     }
-
 
     /**
      * Return the final ajxp.XX wrapper class name.

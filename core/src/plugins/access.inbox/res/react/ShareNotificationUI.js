@@ -22,7 +22,8 @@
     const STATUS_PENDING  = 1;
     const STATUS_ACCEPTED = 2;
     const STATUS_DECLINED = 4;
-    const STATUS_ANSWERED = [STATUS_ACCEPTED, STATUS_DECLINED];
+    const STATUS_LOCAL    = 0;
+    const STATUS_ANSWERED = [STATUS_LOCAL, STATUS_ACCEPTED, STATUS_DECLINED];
 
     const CLASS_NAMES = {
         "accept": "icon-plus-sign ajxp_icon_span",

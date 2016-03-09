@@ -26,7 +26,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     var STATUS_PENDING = 1;
     var STATUS_ACCEPTED = 2;
     var STATUS_DECLINED = 4;
-    var STATUS_ANSWERED = [STATUS_ACCEPTED, STATUS_DECLINED];
+    var STATUS_LOCAL = 0;
+    var STATUS_ANSWERED = [STATUS_LOCAL, STATUS_ACCEPTED, STATUS_DECLINED];
 
     var CLASS_NAMES = {
         "accept": "icon-plus-sign ajxp_icon_span",

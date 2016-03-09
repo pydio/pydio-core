@@ -13,7 +13,9 @@
             this._data = {shares: []};
             this._pydio = pydio;
             this.options = options || {};
+
             this.load();
+            this._pydio.observe("registry_part_loaded", function() {this.load()}.bind(this));
         }
 
         // Getters / Setters

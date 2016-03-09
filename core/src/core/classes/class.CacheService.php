@@ -27,9 +27,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class CacheService
 {
-
+    /**
+     * @param $id
+     * @return bool
+     */
     public static function contains($id) {
-        //var_dump('Cotnains' . $id);
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
@@ -39,16 +41,26 @@ class CacheService
         return false;
     }
 
+    /**
+     * @param $id
+     * @param $object
+     * @param int $timelimit
+     * @return bool
+     */
     public static function save($id, $object, $timelimit = 0 ) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            return $cacheDriver->save($id, $object, $timelimit = 0);
+            return $cacheDriver->save($id, $object, $timelimit);
         }
 
         return false;
     }
 
+    /**
+     * @param $id
+     * @return bool|mixed
+     */
     public static function fetch($id) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
@@ -60,8 +72,11 @@ class CacheService
         return false;
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public static function delete($id) {
-        //var_dump('Delete' . $id);
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
@@ -71,8 +86,10 @@ class CacheService
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public static function deleteAll() {
-        //var_dump('Delete ALL' . $id);
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
