@@ -14,7 +14,7 @@
             this._pydio = pydio;
             this.options = options || {};
 
-            //this.load();
+            this.load();
 
             this._pydio.observe("repository_list_refreshed", function() {
                 this.load();
