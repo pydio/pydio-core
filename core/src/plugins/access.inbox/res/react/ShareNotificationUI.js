@@ -97,6 +97,10 @@
             ReactDispatcher.ShareNotificationDispatcher.getClient().observe('status_changed', this.sharesUpdated);
         },
 
+        componentWillUnmount: function() {
+            ReactDispatcher.ShareNotificationDispatcher.getClient().stopObserving('status_changed', this.sharesUpdated);
+        },
+
         clicked: function() {
             this.props.closeAjxpDialog();
         },
@@ -152,14 +156,8 @@
             share: React.PropTypes.instanceOf(ReactModel.ShareNotification)
         },
 
-        getInitialState: function(){
-            return {
-                share: this.props.share
-            };
-        },
-
         render: function() {
-            var share = this.state.share,
+            var share = this.props.share,
                 owner = share.getOwner(),
                 label = share.getLabel(),
                 crDate = share.getFormattedDate();

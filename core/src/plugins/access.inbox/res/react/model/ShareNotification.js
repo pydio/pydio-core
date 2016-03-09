@@ -74,7 +74,6 @@
 
         // Actions
         loadAction(options) {
-
             var statusOnSuccess = options.statusOnSuccess;
 
             delete options['statusOnSuccess'];

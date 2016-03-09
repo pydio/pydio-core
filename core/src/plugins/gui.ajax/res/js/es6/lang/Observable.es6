@@ -52,4 +52,8 @@ class Observable {
         return collected_return_values;
     }
 
+    hasObservers() {
+        return this._observers.length;
+    }
+
 }
