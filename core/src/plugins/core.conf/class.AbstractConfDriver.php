@@ -1227,9 +1227,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     }
                     if($index == $limit) break;
                 }
-                if (strlen($users)) {
-                    print("<ul>".$users."</ul>");
-                }
+                print("<ul>".$users."</ul>");
                 AuthService::setGroupFiltering(true);
 
                 break;
