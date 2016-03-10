@@ -349,7 +349,14 @@
             PydioApi.getClient().request({
                 'get_action': 'accept_invitation',
                 'remote_share_id': this.props.workspace.getShareId()
-            }, this.handleCloseAlert.bind(this), this.handleCloseAlert.bind(this));
+            }, function () {
+                // Switching status to decline
+                this.props.workspace.setAccessStatus('accepted');
+
+                this.onClick().bind(this);
+            }.bind(this), function () {
+                this.handleCloseAlert().bind(this)
+            }.bind(this));
         },
 
         handleDecline: function () {
@@ -379,10 +386,8 @@
             this.refs.dialog.dismiss();
         },
 
-        onClick:function(){
+        onClick:function() {
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
-
-
         },
 
         render:function(){
@@ -390,7 +395,7 @@
                 currentClass="workspace-entry",
                 messages = this.props.pydio.MessageHash,
                 onHover, onOut, onClick,
-                badge, remoteDialog, newWorkspace;
+                badge, badgeNum, remoteDialog, newWorkspace;
 
             if (current == this.props.workspace.getId()) {
                 currentClass +=" workspace-current";
@@ -414,6 +419,12 @@
 
             // Icons
             if (this.props.workspace.getAccessType() == "inbox") {
+                var status = this.props.workspace.getAccessStatus();
+
+                if (!isNaN(status) && status > 0) {
+                    badgeNum = <span className="icon-stack" style={{fontSize: "0.5em", lineHeight: "2em", marginBottom: "0.3em", marginLeft: "5px"}}><i className="icon-circle icon-stack-base" style={{color: "#000000"}}></i><i className="icon-light">{status}</i></span>;
+                }
+
                 badge = <span className="workspace-badge"><span className="access-icon"/></span>;
             } else if(this.props.workspace.getOwner()){
                 var overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
@@ -438,18 +449,20 @@
 
                 onClick = this.handleOpenAlert.bind(this);
 
-                remoteDialog = <div className='react-mui-context'>
-                    <ReactMUI.Dialog
-                        ref="dialog"
-                        style={{maxWidth: '420px'}}
-                        title={messages[545]}
-                        actions={actions}
-                        modal={false}
-                        dismissOnClickAway={true}
-                    >
-                        {messages[546]}
-                    </ReactMUI.Dialog>
-                </div>
+                remoteDialog =
+                    <Portal>
+                            <div className='react-mui-context' style={{position: 'absolute', width: '100%', height: '100%'}}>
+                            <ReactMUI.Dialog
+                                ref="dialog"
+                                title={messages[545]}
+                                actions={actions}
+                                modal={false}
+                                dismissOnClickAway={true}
+                            >
+                                {messages[546]}
+                            </ReactMUI.Dialog>
+                        </div>
+                    </Portal>
             }
 
             return (
@@ -461,13 +474,34 @@
                     onMouseOut={onOut}
                 >
                     {badge}
-                    <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}</span>
+                    <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}{badgeNum}</span>
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
                     {remoteDialog}
                 </div>
             );
         }
 
+    });
+
+    var Portal = React.createClass({
+        render: () => null,
+        portalElement: null,
+        componentDidMount() {
+            var p = this.props.portalId && document.getElementById(this.props.portalId);
+            if (!p) {
+                var p = document.createElement('div');
+                p.id = this.props.portalId;
+                document.body.appendChild(p);
+            }
+            this.portalElement = p;
+            this.componentDidUpdate();
+        },
+        componentWillUnmount() {
+            document.body.removeChild(this.portalElement);
+        },
+        componentDidUpdate() {
+            React.render(<div {...this.props}>{this.props.children}</div>, this.portalElement);
+        }
     });
 
     var ns = global.LeftNavigation || {};
