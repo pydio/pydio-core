@@ -92,12 +92,17 @@ class inboxAccessDriver extends fsAccessDriver
         $repos = ConfService::getAccessibleRepositories();
 
         $output = array();
+        $touchReposIds = array();
         foreach($repos as $repo) {
             if (!$repo->hasOwner() || !$repo->hasContentFilter()) {
                 continue;
             }
-
             $repoId = $repo->getId();
+
+            if(strpos("ocs_remote_share_", $repoId) !== 0){
+                $touchReposIds[] = $repoId;
+            }
+
             $url = "pydio://" . $repoId . "/";
             $meta = array(
                 "shared_repository_id" => $repoId,
@@ -155,9 +160,9 @@ class inboxAccessDriver extends fsAccessDriver
                     $meta["remote_share_id"] = $remoteShare->getId();
                 }
                 if($ext == "invitation"){
-                    $label .= " (pending)";
+                    $label .= " (".$mess["inbox_driver.4"].")";
                 }else if($ext == "error"){
-                    $label .= " (error)";
+                    $label .= " (".$mess["inbox_driver.5"].")";
                 }
 
             }
@@ -179,6 +184,15 @@ class inboxAccessDriver extends fsAccessDriver
         }
         ConfService::loadDriverForRepository(ConfService::getRepository());
         self::$output = $output;
+
+        if(count($touchReposIds) && AuthService::getLoggedUser() != null){
+            $uPref = AuthService::getLoggedUser()->getPref("repository_last_connected");
+            if(empty($uPref)) $uPref = array();
+            foreach($touchReposIds as $rId){
+                $uPref[$rId] = time();
+            }
+            AuthService::getLoggedUser()->setPref("repository_last_connected", $uPref);
+        }
         return $output;
     }
 }

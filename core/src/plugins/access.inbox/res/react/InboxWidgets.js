@@ -33,22 +33,23 @@
         },
 
         render: function(){
+            var messages = this.props.pydio.MessageHash;
             return (
                 <div className="inbox-left-panel">
-                    <h3 className="colorcode-folder">Files shared with me</h3>
-                    <div>These are the standalone files that people have shared with you. Folders are accessible directly via the left panel.</div>
-                    <h4>Quick Filtering</h4>
+                    <h3 className="colorcode-folder">{messages['inbox_driver.6']}</h3>
+                    <div>{messages['inbox_driver.7']}</div>
+                    <h4>{messages['inbox_driver.8']}</h4>
                     <div>
-                        <h5>By file name</h5>
+                        <h5>{messages['inbox_driver.9']}</h5>
                         <input type="text" placeholder="Filter..." onChange={this.handleChange} onFocus={this.focus} onBlur={this.blur}/>
                     </div>
                     <div style={{paddingTop:20}}>
-                        <h5><span className="clear" onClick={this.filterByShareMetaType.bind(this, '-1')}>Clear</span>
-                            By type
+                        <h5><span className="clear" onClick={this.filterByShareMetaType.bind(this, '-1')}>{messages['inbox_driver.11']}</span>
+                            {messages['inbox_driver.10']}
                         </h5>
-                        <span className={(this.state.meta_filter === '0'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '0')}>Invitations</span>
-                        <span className={(this.state.meta_filter === '1'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '1')}>Shares</span>
-                        <span className={(this.state.meta_filter === '2'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '2')}>Errors</span>
+                        <span className={(this.state.meta_filter === '0'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '0')}>{messages['inbox_driver.1p']}</span>
+                        <span className={(this.state.meta_filter === '1'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '1')}>{messages['inbox_driver.2p']}</span>
+                        <span className={(this.state.meta_filter === '2'?'active':'') + " share_meta_filter"} onClick={this.filterByShareMetaType.bind(this, '2')}>{messages['inbox_driver.3p']}</span>
                     </div>
                 </div>
             );
@@ -59,12 +60,13 @@
 
     function filesListCellModifier(element, ajxpNode, type, metadataDef, ajxpNodeObject){
 
+        var messages = global.pydio.MessageHash;
         if(element != null){
             var nodeMetaValue = ajxpNode.getMetadata().get('share_meta_type');
             var nodeMetaLabel;
-            if(nodeMetaValue == "0") nodeMetaLabel = "Invitation";
-            else if(nodeMetaValue == "1") nodeMetaLabel = "Share";
-            else if(nodeMetaValue == "2") nodeMetaLabel = "Error";
+            if(nodeMetaValue == "0") nodeMetaLabel = messages['inbox_driver.1'];
+            else if(nodeMetaValue == "1") nodeMetaLabel = messages['inbox_driver.2'];
+            else if(nodeMetaValue == "2") nodeMetaLabel = messages['inbox_driver.3'];
             if(element.down('.text_label')){
                 element.down('.text_label').update(nodeMetaLabel);
             }

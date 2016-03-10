@@ -5,6 +5,7 @@
         <resources>
             <js file="plugins/access.inbox/res/build/InboxWidgets.js" className="InboxWidgets"/>
             <css file="plugins/access.inbox/res/inbox_style.css"/>
+            <i18n namespace="inbox_driver" path="plugins/access.inbox/res/i18n"/>
         </resources>
     </client_settings>
     <registry_contributions>
