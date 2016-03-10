@@ -87,6 +87,7 @@ div.oneFieldForm {
   overflow: visible;
   padding: 7px 6px !important;
   text-align: center;
+  font-weight: 500;
 }
 .SF_disabled {
   img {
@@ -160,6 +161,7 @@ span.progress_number {
   position: absolute;
   text-align: center;
   width: 16px;
+  line-height: 17px;
 }
 .wizard_progress_passed {
   span.progress_number {
@@ -390,6 +392,9 @@ select.SF_input {
 .dialogBox{
   .dialogContent {
     div.SF_material {
+      select, input, div{
+        font-family: Roboto, sans-serif;
+      }
       div.SF_element {
         margin: 0;
         width: auto;
@@ -414,6 +419,7 @@ select.SF_input {
         font-size: 14px;
         margin:1px 0 0 0;
         padding: 4px 1% 0 0 !important;
+        border-bottom: 1px solid #dddddd;
       }
       textarea {
         border-radius: 0;
@@ -421,8 +427,10 @@ select.SF_input {
         font-size: 14px;
         margin:1px 0 0 0;
         padding: 4px 1% 0 0 !important;
+        border-bottom: 1px solid #dddddd;
       }
       select {
+        font-family: Roboto, sans-serif;
         border-radius: 0;
         border: 0;
         font-size: 14px;
@@ -441,7 +449,8 @@ select.SF_input {
         padding: 7px 0;
       }
       input.SF_failed {
-        border: 0 !important;
+        border:0 !important;
+        border-bottom: 1px solid @forms_validation_error_color !important;
       }
       div.SF_input.SF_inlineButton.disabled {
         opacity: 0.5;

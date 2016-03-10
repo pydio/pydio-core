@@ -975,6 +975,7 @@ div.oneFieldForm input.SF_input {
   overflow: visible;
   padding: 7px 6px !important;
   text-align: center;
+  font-weight: 500;
 }
 .SF_disabled img {
   -moz-opacity: 0.3;
@@ -1048,6 +1049,7 @@ span.progress_number {
   position: absolute;
   text-align: center;
   width: 16px;
+  line-height: 17px;
 }
 .wizard_progress_passed span.progress_number {
   background-color: #f47561;
@@ -1261,6 +1263,11 @@ select.SF_input {
 .SF_horizontal_action_destructive {
   color: #aa0000;
 }
+.dialogBox .dialogContent div.SF_material select,
+.dialogBox .dialogContent div.SF_material input,
+.dialogBox .dialogContent div.SF_material div {
+  font-family: Roboto, sans-serif;
+}
 .dialogBox .dialogContent div.SF_material div.SF_element {
   margin: 0;
   width: auto;
@@ -1285,6 +1292,7 @@ select.SF_input {
   font-size: 14px;
   margin: 1px 0 0 0;
   padding: 4px 1% 0 0 !important;
+  border-bottom: 1px solid #dddddd;
 }
 .dialogBox .dialogContent div.SF_material textarea {
   border-radius: 0;
@@ -1292,8 +1300,10 @@ select.SF_input {
   font-size: 14px;
   margin: 1px 0 0 0;
   padding: 4px 1% 0 0 !important;
+  border-bottom: 1px solid #dddddd;
 }
 .dialogBox .dialogContent div.SF_material select {
+  font-family: Roboto, sans-serif;
   border-radius: 0;
   border: 0;
   font-size: 14px;
@@ -1313,6 +1323,7 @@ select.SF_input {
 }
 .dialogBox .dialogContent div.SF_material input.SF_failed {
   border: 0 !important;
+  border-bottom: 1px solid #d8b0b0 !important;
 }
 .dialogBox .dialogContent div.SF_material div.SF_input.SF_inlineButton.disabled {
   opacity: 0.5;
@@ -4594,6 +4605,9 @@ div.dialogBox.form-user_create_repository_form div#user_tpl_container div.panelH
 div.dialogBox.form-user_create_repository_form div.dialogButtons {
   background-color: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+div.dialogBox.form-installer_form div#progressCustomMessage {
+  display: none;
 }
 div.dialogButtons.inlineEdition input {
   text-align: center;

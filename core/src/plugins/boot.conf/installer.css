@@ -11,7 +11,7 @@
 }
 #installer_form .installerWelcome{
     font-size: 13px;
-    line-height: initial;
+    line-height: 19px;
     padding: 7px 15px;
     padding-bottom: 0;
 }
@@ -47,7 +47,8 @@
 #installer_form .SF_element.form-element-ADMIN_USER_PASS, .SF_element.form-element-ADMIN_USER_PASS2{
     float: left;
     clear: none;
-    width: 50% !important;
+    width: 49% !important;
+    margin-right: 2%;
 }
 #installer_form .SF_element.passStrengthContainer{
     position: relative;
