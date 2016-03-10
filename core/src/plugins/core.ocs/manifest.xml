@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin label="CONF_MESSAGE[Open Cloud Specification]" description="CONF_MESSAGE[Implement Open Cloud Specification]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ajxp_plugin label="CONF_MESSAGE[Open Cloud API]" description="CONF_MESSAGE[Open Cloud API Implementation]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="Pydio\OCS\OCSPlugin" filename="plugins/core.ocs/OCSPlugin.php"/>
     <client_settings>
@@ -9,7 +9,7 @@
     </client_settings>
     <server_settings>
         <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
-                      description="CONF_MESSAGE[Enable Federated Sharing]" default="true" mandatory="true" expose="true"/>
+                      description="CONF_MESSAGE[Allow users to send / receive shares from other Pydio instances or from other Federated-Sharing-compatible systems]" default="true" mandatory="true" expose="true"/>
     </server_settings>
     <registry_contributions>
         <actions>
