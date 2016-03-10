@@ -34,7 +34,7 @@ $fakes = '
 // Non working exception class
 class AJXP_Exception extends Exception
 {
-    public function AJXP_Exception($msg) { echo "$msg"; exit(); }
+    public function __construct($msg) { echo "$msg"; exit(); }
 }';
 
 eval($fakes);
