@@ -29,15 +29,25 @@
 
         parseComponentConfigs:function(){
             var reg = this.props.pydio.Registry.getXML();
-            var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::'+this.props.pydioId+'"]/additional_content');
-            return contentNodes.map(function(node){
-                return {
-                    id:node.getAttribute('id'),
-                    position: parseInt(node.getAttribute('position')),
-                    type: node.getAttribute('type'),
-                    options: JSON.parse(node.getAttribute('options'))
-                };
-            }).sort(function(a,b){return a.position >= b.position});
+            //Does not work on IE 11
+            //var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::'+this.props.pydioId+'"]/additional_content');
+            var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config/additional_content');
+
+            console.log(contentNodes);
+            var result = [];
+            var compId = "AjxpReactComponent::"+this.props.pydioId;
+            contentNodes.map(function(node){
+                if(node.parentNode.getAttribute('className') == compId){
+                    result.push({
+                        id:node.getAttribute('id'),
+                        position: parseInt(node.getAttribute('position')),
+                        type: node.getAttribute('type'),
+                        options: JSON.parse(node.getAttribute('options'))
+                    });
+                }
+            });
+            result.sort(function(a,b){return a.position >= b.position ? 1 : -1});
+            return result;
         },
 
         getInitialState:function(){

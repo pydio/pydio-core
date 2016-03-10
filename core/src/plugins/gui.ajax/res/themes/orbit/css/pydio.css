@@ -4135,6 +4135,19 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel .workspaces .workspace-entry .workspace-badge span.badge-overlay {
   display: none;
 }
+.left-panel .workspaces .workspace-entry .workspace-num-badge {
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #353535;
+  display: inline-block;
+  line-height: 0.9em;
+  font-size: 0.7em;
+  font-weight: 300;
+  top: -1px;
+  position: relative;
+  border-radius: 2px;
+  padding: 2px 5px;
+  margin: 0px 0px 0px 10px;
+}
 .left-panel .workspaces .workspace-entry .workspace-label {
   white-space: nowrap;
   overflow: hidden;
@@ -4156,24 +4169,14 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel .workspaces .workspace-entry .workspace-description {
   display: none;
 }
-.left-panel .workspaces .workspace-entry .workspace-num-badge {
-  background-color: rgb(255, 255, 255);
-  color: rgb(0, 0, 0);
-  display: inline-block;
-  line-height: 0.9em;
-  font-size: 0.7em;
-  font-weight: 300;
-  top: -1px;
-  position: relative;
-  border-radius: 2px;
-  padding: 2px 5px;
-  margin: 0px 0px 0px 10px;
-}
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 0.4;
 }
 .left-panel .simple-provider {
   position: relative;
+}
+.left-panel .simple-provider .infinite-parent-smooth-height > div {
+  -ms-overflow-y: auto !important;
 }
 .left-panel .simple-provider .material-list-entry {
   padding: 6px 1px 6px 16px;
