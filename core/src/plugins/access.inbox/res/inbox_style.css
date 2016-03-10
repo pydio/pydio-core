@@ -54,14 +54,22 @@ div.inbox-left-panel input{
     display: inline-block;
     padding: 5px 10px;
     margin: 4px 8px 4px 0;
-    color: rgba(0,0,0,0.87);
-    background-color: white;
+    color: rgba(255,255,255,0.6);
+    background-color: rgba(255, 255, 255, 0.10);
     border-radius: 2px;
     text-transform: uppercase;
     font-weight: 500;
     cursor: pointer;
     font-size: 14px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.75);
+}
+
+#browser #topPane div.inbox-left-panel span.share_meta_filter:hover{
+    color:#ff796b;
 }
 #browser #topPane div.inbox-left-panel span.share_meta_filter.active{
-    background-color: #cccccc;
+    color: white;
+    box-shadow: 0 0 1px rgba(0,0,0,0.75);
+    margin-top:6px;
+    margin-bottom:3px;
 }
