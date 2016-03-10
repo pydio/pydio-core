@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS ajxp_mail_queue (
  date_event integer NOT NULL,
  notification_object bytea NOT NULL,
  html integer NOT NULL
-);
+)CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 /* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_mail_sent (
  id serial PRIMARY KEY,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ajxp_mail_sent (
  date_event integer NOT NULL,
  notification_object bytea NOT NULL,
  html integer NOT NULL
-);
+)CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 /* SEPARATOR */
 CREATE FUNCTION ajxp_send_mail() RETURNS trigger AS $ajxp_send_mail$
     BEGIN
