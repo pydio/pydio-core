@@ -13,5 +13,7 @@ $mess = array(
     "8" => "Filtrage rapide",
     "9" => "Par nom de fichier",
     "10" => "Par type",
-    "11" => "Vider"
+    "11" => "Vider",
+    "12" => "Fichiers Partagés",
+    "13" => "Les fichiers partagés avec moi par d'autres utilisateurs"
 );

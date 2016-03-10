@@ -129,6 +129,17 @@ $REPOSITORIES["ajxp_home"] = array(
     )
 );
 
+$REPOSITORIES["inbox"] = array(
+    "DISPLAY"		    =>	"Inbox",
+    "DISPLAY_ID"        =>  "inbox_driver.12",
+    "DESCRIPTION_ID"	=>	"inbox_driver.13",
+    "AJXP_SLUG"		    =>  "inbox",
+    "DRIVER"		    =>	"inbox",
+    "DRIVER_OPTIONS"    => array(
+        "DEFAULT_RIGHTS" => "r"
+    )
+);
+
 // ADMIN REPOSITORY
 $REPOSITORIES["ajxp_conf"] = array(
     "DISPLAY"		    =>	"Settings",
