@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AjxpMailer extends AJXP_Plugin
+class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 {
 
     public $mailCache;
@@ -402,4 +402,14 @@ class AjxpMailer extends AJXP_Plugin
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 
+    /**
+     * Install SQL table using a dibi driver data
+     * @param $param array("SQL_DRIVER" => $dibiDriverData)
+     * @return mixed
+     */
+    public function installSQLTables($param)
+    {
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
 }

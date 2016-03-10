@@ -16,7 +16,7 @@
 
         <actions>
             <action name="inbox_accept_invitation">
-                <gui src="" text="core.ocs.1" title="core.ocs.1" iconClass="icon-ok-sign">
+                <gui src="" text="547" title="547" iconClass="icon-ok-sign">
                     <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
@@ -30,7 +30,7 @@
                 </processing>
             </action>
             <action name="inbox_reject_invitation">
-                <gui src="56" text="core.ocs.2" title="core.ocs.2" iconClass="icon-remove-sign">
+                <gui src="56" text="548" title="548" iconClass="icon-remove-sign">
                     <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
@@ -44,7 +44,7 @@
                 </processing>
             </action>
             <action name="inbox_reject_remote_share">
-                <gui src="55" text="core.ocs.2" title="core.ocs.2" iconClass="icon-remove-sign">
+                <gui src="55" text="548" title="548" iconClass="icon-remove-sign">
                     <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
                 </gui>
