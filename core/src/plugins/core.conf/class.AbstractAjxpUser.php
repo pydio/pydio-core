@@ -363,17 +363,19 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function setArrayPref($prefName, $prefPath, $prefValue)
     {
-        if(!isSet($this->prefs[$prefName])) $this->prefs[$prefName] = array();
-        $this->prefs[$prefName][$prefPath] = $prefValue;
-        if($prefName == "history" && $prefPath == "last_repository"){
-            $this->setArrayPref("repository_last_connected", $prefValue, time());
+        $data = $this->getPref($prefName);
+        if(!is_array($data)){
+            $data = array();
         }
+        $data[$prefPath] = $prefValue;
+        $this->setPref($prefName, $data);
     }
 
     public function getArrayPref($prefName, $prefPath)
     {
-        if(!isSet($this->prefs[$prefName]) || !isSet($this->prefs[$prefName][$prefPath])) return "";
-        return $this->prefs[$prefName][$prefPath];
+        $prefArray = $this->getPref($prefName);
+        if(empty($prefArray) || !is_array($prefArray) || !isSet($prefArray[$prefPath])) return "";
+        return $prefArray[$prefPath];
     }
 
     public function addBookmark($path, $title="", $repId = -1)

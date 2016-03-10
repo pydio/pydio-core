@@ -401,7 +401,6 @@ class AJXP_Utils
                     $output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
                     $loggedUser->setPref("pending_folder", SystemTextEncoding::toUTF8(AJXP_Utils::decodeSecureMagic($parameters["folder"])));
-                    $loggedUser->save("user");
                     AuthService::updateUser($loggedUser);
                 } else {
                     $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];

@@ -438,7 +438,6 @@ class ConfService
         if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
             $loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
             $loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-            $loggedUser->save("user");
             AuthService::updateUser($loggedUser);
             unset($_SESSION["PENDING_REPOSITORY_ID"]);
             unset($_SESSION["PENDING_FOLDER"]);
@@ -539,7 +538,6 @@ class ConfService
         if ($rootDirIndex!=-1 && AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
             $loggedUser = AuthService::getLoggedUser();
             $loggedUser->setArrayPref("history", "last_repository", $rootDirIndex);
-            $loggedUser->save("user");
         }
 
     }

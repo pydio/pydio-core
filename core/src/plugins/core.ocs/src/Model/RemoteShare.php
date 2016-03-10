@@ -135,6 +135,7 @@ class RemoteShare
         );
         $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
         $repo->setRepositoryType("remote");
+        $repo->setAccessStatus($this->getStatus() == OCS_INVITATION_STATUS_ACCEPTED ? "accepted":"");
         $repo->setWriteable(false);
         $repo->setOwnerData(null, $this->getSender()." [remote]");
         if($this->isDocumentIsLeaf()){

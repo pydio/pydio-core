@@ -597,6 +597,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $user = AuthService::getLoggedUser();
                     $activeRepId = ConfService::getCurrentRepositoryId();
                     $user->setArrayPref("history", "last_repository", $activeRepId);
+                    $user->setArrayPref("repository_last_connected", $activeRepId, time());
                     $user->save("user");
                 }
                 //$logMessage = "Successfully Switched!";
