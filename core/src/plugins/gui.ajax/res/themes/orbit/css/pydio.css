@@ -4130,11 +4130,28 @@ div.menu.rootDirChooser span.rootDirTitle {
   background-color: rgba(255, 255, 255, 0.92);
   color: #353535;
   border-radius: 50%;
+  position: relative;
+}
+.left-panel .workspaces .workspace-entry .workspace-badge span.badge-overlay {
+  display: none;
 }
 .left-panel .workspaces .workspace-entry .workspace-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.left-panel .workspaces .workspace-entry .workspace-label .workspace-new {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 3px;
+  margin-left: 5px;
+  height: 13px;
+  line-height: 13px;
+  padding: 0 3px;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.63);
+  text-transform: uppercase;
 }
 .left-panel .workspaces .workspace-entry .workspace-description {
   display: none;

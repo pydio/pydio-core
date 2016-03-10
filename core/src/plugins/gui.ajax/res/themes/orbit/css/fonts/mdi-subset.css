@@ -12,8 +12,20 @@
     content: "\f2cf";
 }
 
+.mdi-file:before {
+    content: "\f309";
+}
+
+.mdi-file-multiple:before {
+    content: "\f317";
+}
+
 .mdi-folder-plus:before {
     content: "\f34c";
+}
+
+.mdi-folder:before {
+    content: "\f340";
 }
 
 .mdi-share:before {

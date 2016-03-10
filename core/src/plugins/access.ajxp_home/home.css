@@ -70,6 +70,18 @@
   line-height: 20px;
   font-weight: 500;
   background-color: rgba(255, 255, 255, 0.18);
+  position: relative;
+}
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-badge span.mdi.mdi-folder {
+  font-size: 18px;
+  margin-left: 1px;
+}
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-badge span.badge-overlay {
+  left: 16px;
+  font-size: 8px;
+  color: #009688;
+  position: absolute;
+  top: 13px;
 }
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label {
   padding: 0;
@@ -81,6 +93,19 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   display: block;
+}
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label .workspace-new {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 3px;
+  margin-left: 5px;
+  height: 13px;
+  line-height: 13px;
+  padding: 0 3px;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.63);
+  text-transform: uppercase;
 }
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-description {
   display: block;

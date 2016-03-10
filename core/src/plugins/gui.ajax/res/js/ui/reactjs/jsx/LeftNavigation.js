@@ -325,12 +325,19 @@
 
             // Icons
             var badge;
-            if(this.props.workspace.getAccessType() == "inbox"){
+            if(this.props.workspace.getAccessType() == "inbox") {
                 badge = <span className="workspace-badge"><span className="access-icon"/></span>;
+            }else if(this.props.workspace.getOwner()){
+                var overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
+                if(this.props.workspace.getRepositoryType() == "remote"){
+                    overlay = <span className="badge-overlay icon-cloud"/>;
+                }
+                badge = <span className="workspace-badge"><span className="mdi mdi-folder"/>{overlay}</span>;
             }else{
                 badge = <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>;
             }
-            var remote, remoteDialog;
+
+            var remoteDialog;
             if (this.props.workspace.getRepositoryType() == "remote"){
                 var actions = [
                     { text: 'Decline', ref: 'decline', onClick: this.handleDecline.bind(this)},
@@ -338,9 +345,6 @@
                 ];
 
                 onClick = this.handleOpenAlert.bind(this);
-
-                remote = <span className="icon-cloud"></span>;
-
                 remoteDialog = <div className='react-mui-context'>
                     <ReactMUI.Dialog
                         title="Remote File Dialog"
@@ -358,7 +362,7 @@
 
             var newWorkspace;
             if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()){
-                newWorkspace = <span className="workspace-new"> - NEW!</span>;
+                newWorkspace = <span className="workspace-new">NEW</span>;
             }
             return (
                 <div
@@ -369,11 +373,9 @@
                     onMouseOut={onOut}
                 >
                     {badge}
-                    <span className="workspace-label">{this.props.workspace.getLabel()}</span>
+                    <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}</span>
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
-                    {remote}
                     {remoteDialog}
-                    {newWorkspace}
                 </div>
             );
         }

@@ -78,6 +78,21 @@
             line-height: 20px;
             font-weight: 500;
             background-color: rgba(255,255,255, 0.18);
+            position: relative;
+
+            span.mdi.mdi-folder {
+              font-size: 18px;
+              margin-left: 1px;
+            }
+
+            span.badge-overlay{
+              left: 16px;
+              font-size: 8px;
+              color: #009688;
+              position: absolute;
+              top: 13px;
+            }
+
           }
 
           .workspace-label{
@@ -90,6 +105,19 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             display: block;
+            .workspace-new{
+              display: inline-block;
+              font-size: 10px;
+              font-weight: 500;
+              border-radius: 3px;
+              margin-left: 5px;
+              height: 13px;
+              line-height: 13px;
+              padding: 0 3px;
+              background-color: white;
+              color: rgba(0,0,0,0.63);
+              text-transform: uppercase;
+            }
           }
 
           .workspace-description{

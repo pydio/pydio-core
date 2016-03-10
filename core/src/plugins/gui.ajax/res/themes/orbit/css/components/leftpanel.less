@@ -88,9 +88,27 @@
         background-color: @leftpanel_text_color;
         color: @leftpanel_background_color;
         border-radius: 50%;
+        position: relative;
+
+        span.badge-overlay{
+          display: none;
+        }
       }
       .workspace-label{
         .nav-list-entry-label();
+        .workspace-new{
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 500;
+          border-radius: 3px;
+          margin-left: 5px;
+          height: 13px;
+          line-height: 13px;
+          padding: 0 3px;
+          background-color: white;
+          color: rgba(0,0,0,0.63);
+          text-transform: uppercase;
+        }
       }
       .workspace-description{
         display: none;
