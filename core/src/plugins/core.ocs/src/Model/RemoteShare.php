@@ -60,6 +60,10 @@ class RemoteShare
     /**
      * @var string
      */
+    var $host;
+    /**
+     * @var string
+     */
     var $ocsServiceUrl;
     /**
      * @var string
@@ -133,14 +137,17 @@ class RemoteShare
                 "META_SOURCES"		=> array()
             )
         );
+
+        $remoteHost = $this->getHost();
+        $remoteHost = !empty($remoteHost) ? '@' . $remoteHost : ' [remote]';
         $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
         $repo->setRepositoryType("remote");
         $repo->setAccessStatus($this->getStatus() == OCS_INVITATION_STATUS_ACCEPTED ? "accepted":"");
         $repo->setWriteable(false);
-        $repo->setOwnerData(null, $this->getSender()." [remote]");
+        $repo->setOwnerData(null, $this->getSender().$remoteHost);
         if($this->isDocumentIsLeaf()){
             $contentFilter = new \ContentFilter(array());
-            $contentFilter->filters["/".$this->getDocumentName()] = "/".$this->getDocumentName();
+            $contentFilter->filters["/".$this->getDocumentName()] = "/"; // . $this->getDocumentName();
             $repo->setContentFilter($contentFilter);
         }
         return $repo;
@@ -240,6 +247,13 @@ class RemoteShare
     /**
      * @return string
      */
+    public function getHost()
+    {
+        return $this->host;
+    }
+    /**
+     * @return string
+     */
     public function getOcsServiceUrl()
     {
         return $this->ocsServiceUrl;
@@ -331,6 +345,14 @@ class RemoteShare
     public function setSender($sender)
     {
         $this->sender = $sender;
+    }
+
+    /**
+     * @param string $host
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
     }
 
     /**

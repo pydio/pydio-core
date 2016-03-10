@@ -83,6 +83,7 @@ class Server extends Dummy
         $share->setReceptionDate(time());
         $share->setStatus(OCS_INVITATION_STATUS_PENDING);
 
+        $share->setHost(rtrim($remote, '/'));
         $share->setOcsServiceUrl(rtrim($remote, '/').$endpoints['share']);
         $share->setOcsDavUrl(rtrim($remote, '/').$endpoints['webdav']);
 

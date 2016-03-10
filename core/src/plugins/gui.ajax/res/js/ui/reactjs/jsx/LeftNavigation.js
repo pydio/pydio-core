@@ -413,8 +413,17 @@
         handleOpenAlert: function () {
             this.wrapper = document.body.appendChild(document.createElement('div'));
             this.wrapper.style.zIndex = 11;
+            var replacements = {
+                '%%OWNER%%': this.props.workspace.getOwner()
+            };
             var component = React.render(
-                <Confirm {...this.props} onAccept={this.handleAccept.bind(this)} onDecline={this.handleDecline.bind(this)} onDismiss={this.handleCloseAlert} />, this.wrapper);
+                <Confirm
+                    {...this.props}
+                    replacements={replacements}
+                    onAccept={this.handleAccept.bind(this)}
+                    onDecline={this.handleDecline.bind(this)}
+                    onDismiss={this.handleCloseAlert}
+                />, this.wrapper);
         },
 
         handleCloseAlert: function() {
@@ -513,22 +522,29 @@
 
         render: function () {
             var messages = this.props.pydio.MessageHash,
+                messageTitle = messages[545],
+                messageBody = messages[546],
                 actions = [
                     { text: messages[548], ref: 'decline', onClick: this.props.onDecline},
                     { text: messages[547], ref: 'accept', onClick: this.props.onAccept}
                 ];
 
+            for (var key in this.props.replacements) {
+                messageTitle = messageTitle.replace(new RegExp(key), this.props.replacements[key]);
+                messageBody = messageBody.replace(new RegExp(key), this.props.replacements[key]);
+            }
+
             return <div className='react-mui-context' style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'transparent'}}>
                 <ReactMUI.Dialog
                     ref="dialog"
-                    title={messages[545]}
+                    title={messageTitle}
                     actions={actions}
                     modal={false}
                     dismissOnClickAway={true}
                     onDismiss={this.props.onDismiss.bind(this)}
                     open={true}
                 >
-                    {messages[546]}
+                    {messageBody}
                 </ReactMUI.Dialog>
             </div>
         }

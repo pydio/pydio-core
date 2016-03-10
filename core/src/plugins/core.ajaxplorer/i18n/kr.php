@@ -646,7 +646,7 @@ $mess=array(
 "543" => "Results limited to 100 out of %s.",
 "544" => "Show All",
 "545" => "Remote Share Dialog",
-"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline"
 /* END SENTENCE */
