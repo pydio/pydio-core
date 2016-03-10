@@ -144,11 +144,15 @@
             this._observer = function(){
                 switch (options.property){
                     case "root_children":
-                        var l = Object.keys(dm.getRootNode().getChildren()).length;
+                        var l = dm.getRootNode().getChildren().size;
                         this.setState({value:l?l:''});
                         break;
                     case "root_label":
                         this.setState({value:dm.getRootNode().getLabel()});
+                        break;
+                    case "root_children_empty":
+                        var cLength = dm.getRootNode().getChildren().size;
+                        this.setState({value:!cLength?options['emptyMessage']:''});
                         break;
                     case "metadata":
                         if(options['metadata_sum']){
@@ -171,7 +175,11 @@
         },
 
         render:function(){
-            return <span className={this.props.options['className']}>{this.state.value}</span>;
+            if(!this.state.value) {
+                return null;
+            } else {
+                return (<span className={this.props.options['className']}>{this.state.value}</span>);
+            }
         }
 
     });
@@ -218,6 +226,17 @@
             if(paneData.options.dataModelBadge){
                 badge = <DataModelBadge dataModel={this.state.dataModel} options={paneData.options.dataModelBadge} />;
             }
+            var emptyMessage;
+            if(paneData.options.emptyChildrenMessage){
+                emptyMessage = <DataModelBadge
+                    dataModel={this.state.dataModel}
+                    options={{
+                        property:'root_children_empty',
+                        className:'emptyMessage',
+                        emptyMessage:messages[paneData.options.emptyChildrenMessage]
+                    }}
+                />
+            }
 
             var component;
             if(this.state.componentLaunched){
@@ -243,6 +262,7 @@
                         {title} {badge}
                     </div>
                     {component}
+                    {emptyMessage}
                 </div>
             );
 

@@ -4206,10 +4206,25 @@ div.menu.rootDirChooser span.rootDirTitle {
   border-top: 0;
   margin-top: 0;
 }
+.left-panel .simple-provider .alerts_number_badge {
+  background-color: #f5c781;
+  color: #555;
+  border-radius: 2px;
+  display: inline-block;
+  padding: 0 3px;
+}
+.left-panel .simple-provider .emptyMessage {
+  display: inline-block;
+  padding: 0 16px 8px;
+  opacity: 0.7;
+}
 .left-panel .simple-provider.closed .section-title {
   padding-bottom: 6px;
 }
 .left-panel .simple-provider.closed .material-list {
+  display: none;
+}
+.left-panel .simple-provider.closed .emptyMessage {
   display: none;
 }
 .left-panel.hidden {

@@ -149,11 +149,26 @@
       border-top:0;
       margin-top: 0;
     }
+    .alerts_number_badge{
+      background-color: @colorCodeAlert;
+      color:#555;
+      border-radius: 2px;
+      display: inline-block;
+      padding: 0 3px;
+    }
+    .emptyMessage{
+      display: inline-block;
+      padding: 0 16px 8px;
+      opacity: 0.7;
+    }
     &.closed{
       .section-title{
         padding-bottom: 6px;
       }
       .material-list{
+        display: none;
+      }
+      .emptyMessage{
         display: none;
       }
     }
