@@ -496,26 +496,40 @@
                         <if>
                             <available type="dir" file="${upgrade_export}/plugins/${plugin}/${js_source_path}"/>
                             <then>
-                                <echo message="REBUILD JS FOR PLUGIN ${plugin}"/>
                                 <copy todir="${upgrade_export}/plugins/${plugin}/${js_source_path}">
                                     <fileset dir="${local_repository_root}/plugins/${plugin}/${js_source_path}" defaultexcludes="false">
                                         <include name="*/**"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="${upgrade_export}/plugins/${plugin}">
-                                    <fileset dir="${local_repository_root}/plugins/${plugin}">
-                                        <include name="Gruntfile.js"/>
-                                        <include name="package.json"/>
-                                    </fileset>
-                                </copy>
-                                <phingcall target="grunt">
-                                    <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
-                                </phingcall>
                             </then>
                         </if>
-
                     </then>
                 </if>
+                <if>
+                    <not><equals arg1="${css_source_path}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <if>
+                            <available type="dir" file="${upgrade_export}/plugins/${plugin}/${css_source_path}"/>
+                            <then>
+                                <copy todir="${upgrade_export}/plugins/${plugin}/${css_source_path}">
+                                    <fileset dir="${local_repository_root}/plugins/${plugin}/${css_source_path}" defaultexcludes="false">
+                                        <include name="*/**"/>
+                                    </fileset>
+                                </copy>
+                            </then>
+                        </if>
+                    </then>
+                </if>
+                <echo message="REBUILD JS FOR PLUGIN ${plugin}"/>
+                <copy todir="${upgrade_export}/plugins/${plugin}">
+                    <fileset dir="${local_repository_root}/plugins/${plugin}">
+                        <include name="Gruntfile.js"/>
+                        <include name="package.json"/>
+                    </fileset>
+                </copy>
+                <phingcall target="grunt">
+                    <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
+                </phingcall>
             </then>
         </if>
 
