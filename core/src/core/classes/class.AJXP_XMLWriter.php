@@ -632,84 +632,129 @@ class AJXP_XMLWriter
         }
 
         $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
-        foreach ($accessible as $repoId => $repoObject) {
 
-            $statusString = " repository_type=\"".$repoObject->getRepositoryType()."\"";
+        $inboxStatus = 0;
+        foreach($accessible as $repoId => $repoObject){
+            if(!$repoObject->hasContentFilter()) {
+                continue;
+            }
             $accessStatus = $repoObject->getAccessStatus();
+            if(empty($accessStatus) && $loggedUser != null){
+                $lastConnected = $loggedUser->getArrayPref("repository_last_connected", $repoId);
+                if(empty($lastConnected)){
+                    $accessStatus = 1;
+                }
+            }
             if(!empty($accessStatus)){
-                $statusString .= " access_status=\"$accessStatus\" ";
-            }else if(AuthService::usersEnabled()){
-                $lastConnected = AuthService::getLoggedUser()->getArrayPref("repository_last_connected", $repoId);
-                if(!empty($lastConnected)) $statusString .= " last_connection=\"$lastConnected\" ";
+                $inboxStatus ++;
             }
+        }
 
-            $streamString = "";
-            if (in_array($repoObject->accessType, $streams)) {
-                $streamString = "allowCrossRepositoryCopy=\"true\"";
+        foreach ($accessible as $repoId => $repoObject) {
+            if($repoObject->hasContentFilter()){
+                continue;
             }
-            if ($repoObject->getUniqueUser()) {
-                $streamString .= " user_editable_repository=\"true\" ";
+            $accessStatus = '';
+            if($repoObject->getAccessType() == "inbox"){
+                $accessStatus = $inboxStatus;
             }
-            if ($repoObject->hasContentFilter()){
-                $streamString .= " hasContentFilter=\"true\"";
-            }
-            $slugString = "";
-            $slug = $repoObject->getSlug();
-            if (!empty($slug)) {
-                $slugString = "repositorySlug=\"$slug\"";
-            }
-            $isSharedString = "";
-            $currentUserIsOwner = false;
-            if ($repoObject->hasOwner()) {
-                $uId = $repoObject->getOwner();
-                if(AuthService::usersEnabled() && AuthService::getLoggedUser()->getId() == $uId){
-                    $currentUserIsOwner = true;
-                }
-                $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
-                $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
-            }
-            if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
-                $streamString .= " userScope=\"true\"";
-            }
-
-            $descTag = "";
-            $public = false;
-            if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
-            $description = $repoObject->getDescription($public);
-            if (!empty($description)) {
-                $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
-            }
-            $roleString="";
-            if($loggedUser != null){
-                $merged = $loggedUser->mergedRole;
-                $params = array();
-                foreach($exposed as $exposed_prop){
-                    $metaOptions = $repoObject->getOption("META_SOURCES");
-                    if(!isSet($metaOptions[$exposed_prop["PLUGIN_ID"]])){
-                        continue;
-                    }
-                    $value = $exposed_prop["DEFAULT"];
-                    if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
-                        $value = $metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]];
-                    }
-                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
-                    if($value !== null){
-                        if($value === true  || $value === false) $value = ($value === true ?"true":"false");
-                        $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
-                        $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
-                    }
-                }
-                $roleString.='acl="'.$merged->getAcl($repoId).'"';
-                if($merged->hasMask($repoId)){
-                    $roleString.= ' hasMask="true" ';
-                }
-            }
-            $st .= "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+            $xmlString = self::repositoryToXML($repoId, $repoObject, $exposed, $streams, $loggedUser, $accessStatus);
+            $st .= $xmlString;
         }
 
         $st .= "</repositories>";
         return $st;
     }
+
+    /**
+     * @param string $repoId
+     * @param Repository $repoObject
+     * @param array $exposed
+     * @param array $streams
+     * @param AbstractAjxpUser $loggedUser
+     * @param string $accessStatus
+     * @return string
+     * @throws Exception
+     */
+    public static function repositoryToXML($repoId, $repoObject, $exposed, $streams, $loggedUser, $accessStatus = ""){
+
+
+        $statusString = " repository_type=\"".$repoObject->getRepositoryType()."\"";
+        if(empty($accessStatus)){
+            $accessStatus = $repoObject->getAccessStatus();
+        }
+        if(!empty($accessStatus)){
+            $statusString .= " access_status=\"$accessStatus\" ";
+        }else if($loggedUser != null){
+            $lastConnected = $loggedUser->getArrayPref("repository_last_connected", $repoId);
+            if(!empty($lastConnected)) $statusString .= " last_connection=\"$lastConnected\" ";
+        }
+
+        $streamString = "";
+        if (in_array($repoObject->accessType, $streams)) {
+            $streamString = "allowCrossRepositoryCopy=\"true\"";
+        }
+        if ($repoObject->getUniqueUser()) {
+            $streamString .= " user_editable_repository=\"true\" ";
+        }
+        if ($repoObject->hasContentFilter()){
+            $streamString .= " hasContentFilter=\"true\"";
+        }
+        $slugString = "";
+        $slug = $repoObject->getSlug();
+        if (!empty($slug)) {
+            $slugString = "repositorySlug=\"$slug\"";
+        }
+        $isSharedString = "";
+        $currentUserIsOwner = false;
+        if ($repoObject->hasOwner()) {
+            $uId = $repoObject->getOwner();
+            if(AuthService::usersEnabled() && AuthService::getLoggedUser()->getId() == $uId){
+                $currentUserIsOwner = true;
+            }
+            $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
+            $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
+        }
+        if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
+            $streamString .= " userScope=\"true\"";
+        }
+
+        $descTag = "";
+        $public = false;
+        if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
+        $description = $repoObject->getDescription($public);
+        if (!empty($description)) {
+            $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
+        }
+        $roleString="";
+        if($loggedUser != null){
+            $merged = $loggedUser->mergedRole;
+            $params = array();
+            foreach($exposed as $exposed_prop){
+                $metaOptions = $repoObject->getOption("META_SOURCES");
+                if(!isSet($metaOptions[$exposed_prop["PLUGIN_ID"]])){
+                    continue;
+                }
+                $value = $exposed_prop["DEFAULT"];
+                if(isSet($metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]])){
+                    $value = $metaOptions[$exposed_prop["PLUGIN_ID"]][$exposed_prop["NAME"]];
+                }
+                $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
+                if($value !== null){
+                    if($value === true  || $value === false) $value = ($value === true ?"true":"false");
+                    $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
+                    $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
+                }
+            }
+            $roleString.='acl="'.$merged->getAcl($repoId).'"';
+            if($merged->hasMask($repoId)){
+                $roleString.= ' hasMask="true" ';
+            }
+        }
+        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+
+    }
+
     /**
      * Writes a <logging_result> tag
      * @static
