@@ -409,7 +409,11 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $base = basename($this->getBaseDir());
+        if($base == "core.mailer"){
+            $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+            return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        }
+        return true;
     }
 }
