@@ -117,7 +117,10 @@ class inboxAccessDriver extends fsAccessDriver
             }else{
                 $label = $repo->getDisplay();
             }
-            $url .= $label;
+            if(strpos($repoId, "ocs_remote_share") !== 0){
+                // FOR REMOTE SHARES, DO NOT APPEND THE DOCUMENTNAME, WE STAT THE ROOT DIRECTLY
+                $url .= $label;
+            }
 
             $status = null;
             $remoteShare = null;
