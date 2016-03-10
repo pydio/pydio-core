@@ -37,7 +37,7 @@
                 </processing>
             </action>
             <action name="consume_mail_queue">
-                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <rightsContext adminOnly="true" noUser="false" read="false" userLogged="only" write="false"/>
                 <processing>
                     <serverCallback methodName="mailConsumeQueue" restParams="/"/>
                 </processing>

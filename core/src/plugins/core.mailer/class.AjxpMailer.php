@@ -51,6 +51,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         return $this->_dibiDriver;
     }
     public function mailConsumeQueue ($action, $httpVars, $fileVars) {
+
         if ($action === "consume_mail_queue") {
             $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
             if (!dibi::isConnected()) {
@@ -67,12 +68,17 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             }
             $resultsSQL = $querySQL->fetchAll();
             $arrayResultsSQL = array();
+            $output = array("success" => [], "error" => []);
             if (count($resultsSQL) > 0) {
                 foreach ($resultsSQL as $value) {
                     $ajxpNotification = unserialize($value["notification_object"]);
+                    $ajxpAction = $ajxpNotification->getAction();
+                    $ajxpAuthor = $ajxpNotification->getAuthor();
                     $ajxpNode = new AJXP_Node($value['url']);
-                    $ajxpNode->loadNodeInfo();
-                    if ($ajxpNode->isLeaf()) {
+                    try{
+                        @$ajxpNode->loadNodeInfo();
+                    }catch(Exception $e){}
+                    if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
                         $ajxpContent = $ajxpNode->getParent()->getPath();
                     } else {
                         $ajxpContent = $ajxpNode->getPath();
@@ -80,9 +86,11 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $ajxpContent = '/';
                         }
                     }
-                    $ajxpAction = $ajxpNotification->getAction();
-                    $ajxpAuthor = $ajxpNotification->getAuthor();
-                    $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
+                    if($ajxpNode->getRepository() != null){
+                        $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
+                    }else{
+                        $ajxpNodeWorkspace = "Deleted Workspace";
+                    }
                     $ajxpKey = $value["html"]."|".$ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
                     $arrayResultsSQL[$value['recipent']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
@@ -107,10 +115,12 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     }
                     try {
                         $mailer->sendMail(array($recipent),
-                            "Compte rendu Pydio",
+                            "Pydio Digest",
                             $body);
+                        $output["success"][] = "Email sent to ".$recipent;
                     } catch (AJXP_Exception $e) {
-                        throw new AJXP_Exception($e->getMessage());
+                        $output["error"][] = "Sending email to ".$recipent.": ".$e->getMessage();
+                        //throw new AJXP_Exception($e->getMessage());
                     }
                 }
                 try {
@@ -119,6 +129,9 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     throw new AJXP_Exception($e->getMessage());
                 }
             }
+            HTMLWriter::charsetHeader("text/json");
+            $output = array("report" => "Sent ".count($output["success"])." emails", "detail" => $output);
+            echo json_encode($output);
         }
     }
 
