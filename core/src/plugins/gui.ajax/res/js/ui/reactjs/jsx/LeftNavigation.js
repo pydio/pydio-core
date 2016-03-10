@@ -324,6 +324,7 @@
                         <div className="workspace-entry" onClick={createClick} title={messages[418]}>
                             <span className="workspace-badge">+</span>
                             <span className="workspace-label">{messages[417]}</span>
+                            <span className="workspace-description">{messages[418]}</span>
                         </div>
                     </div>
                 );

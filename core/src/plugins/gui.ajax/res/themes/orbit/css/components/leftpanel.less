@@ -130,6 +130,14 @@
       .material-list-text{
         .nav-list-entry-label();
       }
+      .material-list-actions{
+        position:absolute;
+        right: 16px;
+        opacity: 0.5;
+        &:hover{
+          opacity: 1;
+        }
+      }
     }
     .mui-toolbar{
       position: absolute;
@@ -155,6 +163,13 @@
       border-radius: 2px;
       display: inline-block;
       padding: 0 3px;
+    }
+    .icon-refresh{
+      cursor: pointer;
+      transition: @bezier_transition;
+      &.rotating{
+        opacity: 0.2;
+      }
     }
     .emptyMessage{
       display: inline-block;
