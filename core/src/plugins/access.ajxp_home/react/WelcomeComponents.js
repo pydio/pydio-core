@@ -286,6 +286,33 @@
 
     var UserDashboard = React.createClass({
 
+        getInitialState:function(){
+            return {
+                workspaces: this.props.pydio.user.getRepositoriesList()
+            };
+        },
+
+        componentDidMount:function(){
+            if(this._timer) global.clearTimeout(this._timer);
+            this._timer = global.setTimeout(this.closeNavigation, 3000);
+
+            this._reloadObserver = function(){
+
+                if(this.isMounted()){
+                    this.setState({
+                        workspaces:this.props.pydio.user.getRepositoriesList()
+                    });
+                }
+            }.bind(this);
+
+            this.props.pydio.observe('repository_list_refreshed', this._reloadObserver);
+        },
+
+        componentWillUnmount:function(){
+            if(this._reloadObserver){
+                this.props.pydio.stopObserving('repository_list_refreshed', this._reloadObserver);
+            }
+        },
         switchToWorkspace:function(repoId, save){
             if(!repoId) return;
             if(save){
@@ -329,7 +356,7 @@
                         <div id="workspaces_center" className="vertical_layout vertical_fit">
                             <LeftNavigation.UserWorkspacesList
                                 pydio={this.props.pydio}
-                                workspaces={this.props.pydio.user.getRepositoriesList()}
+                                workspaces={this.state.workspaces}
                                 onHoverLink={this.onHoverLink}
                                 onOutLink={this.onOutLink}
                             />
