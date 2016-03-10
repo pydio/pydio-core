@@ -474,11 +474,11 @@
 
             if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
                 newWorkspace = <span className="workspace-new">NEW</span>;
-            }
 
-            // Dialogs
-            if (this.props.workspace.getRepositoryType() == "remote") {
-                onClick = this.handleOpenAlert.bind(this);
+                // Dialog for remote shares
+                if (this.props.workspace.getRepositoryType() == "remote") {
+                    onClick = this.handleOpenAlert.bind(this);
+                }
             }
 
             return (
