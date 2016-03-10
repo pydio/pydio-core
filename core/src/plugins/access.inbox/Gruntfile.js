@@ -7,9 +7,9 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: 'res/',
-                        src: ['**/*.es6'],
-                        dest: 'res/',
+                        cwd: 'res/react',
+                        src: ['**/*.js'],
+                        dest: 'res/build',
                         ext: '.js'
                     }
                 ]
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
         watch: {
             js: {
                 files: [
-                    "res/*.es6"
+                    "res/react/*.js"
                 ],
                 tasks: ['babel'],
                 options: {

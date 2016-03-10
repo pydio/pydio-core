@@ -3,7 +3,7 @@
     <class_definition filename="plugins/access.inbox/class.inboxAccessDriver.php" classname="inboxAccessDriver"/>
     <client_settings>
         <resources>
-            <js file="plugins/access.inbox/res/InboxCellModifier.js" className="InboxCellModifier"/>
+            <js file="plugins/access.inbox/res/build/InboxWidgets.js" className="InboxWidgets"/>
             <css file="plugins/access.inbox/res/inbox_style.css"/>
         </resources>
     </client_settings>
@@ -85,9 +85,13 @@
         <client_configs>
             <component_config className="FilesList">
                 <columns>
-                    <additional_column attributeName="share_meta_type" sortType="CellSorterValue" modifier="InboxCellModifier.updateCell" defaultVisibilty="visible" messageString="Share Type"/>
+                    <additional_column attributeName="share_meta_type" sortType="CellSorterValue" modifier="InboxWidgets.filesListCellModifier"
+                                       defaultVisibilty="visible" messageString="Share Type"/>
                 </columns>
             </component_config>
+        </client_configs>
+        <client_configs>
+            <template_part ajxpClass="AjxpReactComponent" ajxpId="topPane" ajxpOptions='{"componentNamespace":"InboxWidgets","componentName":"LeftPanel"}'/>
         </client_configs>
 	</registry_contributions>
     <dependencies>
