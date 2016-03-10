@@ -135,13 +135,12 @@
                     ]]></html>
                 </infoPanelExtension>
             </component_config>
-            <component_config className="AjxpPane::navigation_scroller">
-                <additional_content id="navigation_alerts"><![CDATA[
-                <div id="navigation_alerts" ajxp_position="0">
-                    <h3 class="colorcode-alert" ajxp_message_id="notification_center.3">AJXP_MESSAGE[notification_center.3] <span class="alerts_number_badge" id="alerts_number" ajxpClass="DataModelProperty" ajxpOptions='{"dmID":"notif_pane","property":"metadata","metadata_sum":"event_occurence"}'></span><small id="alerts_toggler"  class="simple-toggler-hide" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"notif_pane"}'>AJXP_MESSAGE[514]</small></h3>
-                    <div id="notif_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"forceClearOnRepoSwitch":true, "inlineToolbarOptions":{"toolbarsList":["inline-notifications"]}, "fit":"content", "columnsDef":[{"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},{"attributeName":"event_description", "messageString":"Description", "sortType":"String"}], "reloadOnServerMessage":"tree/reload_user_feed", "silentLoading":true, "fixedSortColumn":"event_time", "fixedSortDirection":"desc","nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"true"}, "emptyChildrenMessage":"notification_center.8","clearSelectionOnBlur":true}'></div>
-                </div>
-                ]]></additional_content>
+            <component_config className="AjxpReactComponent::left_navigator">
+                <additional_content
+                        id="navigation_alerts"
+                        position="0"
+                        type="ListProvider"
+                        options='{"title":"notification_center.3", "titleClassName":"colorcode-alert", "startOpen":true, "dataModelBadge":{"property":"metadata","metadata_sum":"event_occurence", "className":"alerts_number_badge"}, "fit":"content","silentLoading":true,"actionBarGroups":["inline-notifications"],"nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"false"},"reloadOnServerMessage":"tree/reload_user_feed", "connexion_discrete":true, "emptyChildrenMessage":"notification_center.8"}'/>
             </component_config>
         </client_configs>
     </registry_contributions>

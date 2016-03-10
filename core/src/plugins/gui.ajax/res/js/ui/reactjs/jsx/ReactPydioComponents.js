@@ -1966,7 +1966,8 @@
     var NodeListCustomProvider = React.createClass({
 
         propTypes:{
-            nodeProviderProperties:React.PropTypes.object.isRequired,
+            nodeProviderProperties:React.PropTypes.object,
+            presetDataModel:React.PropTypes.instanceOf(PydioDataModel),
             autoRefresh:React.PropTypes.number,
             actionBarGroups:React.PropTypes.array,
             heightAutoWithMax:React.PropTypes.number,
@@ -1989,12 +1990,19 @@
         },
 
         getInitialState:function(){
-            var dataModel = new PydioDataModel(true);
-            var rNodeProvider = new RemoteNodeProvider();
-            dataModel.setAjxpNodeProvider(rNodeProvider);
-            rNodeProvider.initProvider(this.props.nodeProviderProperties);
-            var rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
-            dataModel.setRootNode(rootNode);
+
+            var dataModel, rootNode;
+            if(this.props.presetDataModel){
+                dataModel = this.props.presetDataModel;
+                rootNode = dataModel.getRootNode();
+            }else{
+                dataModel = new PydioDataModel(true);
+                var rNodeProvider = new RemoteNodeProvider();
+                dataModel.setAjxpNodeProvider(rNodeProvider);
+                rNodeProvider.initProvider(this.props.nodeProviderProperties);
+                rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
+                dataModel.setRootNode(rootNode);
+            }
             if(this.props.nodeClicked){
                 // leaf
                 this.openEditor = function(node){

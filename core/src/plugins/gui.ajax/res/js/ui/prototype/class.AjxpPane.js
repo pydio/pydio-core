@@ -76,7 +76,7 @@ Class.create("AjxpPane", {
         }
 
         this.configObserver = function(event){
-            if(event.memo.className == "AjxpPane::"+htmlElement.id){
+            if(event.memo.className == this.__className +"::"+ htmlElement.id){
                 this.parseComponentConfig(event.memo.classConfig.get("all"));
             }
         }.bind(this);

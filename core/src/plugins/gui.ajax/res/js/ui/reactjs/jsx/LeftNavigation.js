@@ -37,7 +37,7 @@
                     type: node.getAttribute('type'),
                     options: JSON.parse(node.getAttribute('options'))
                 };
-            });
+            }).sort(function(a,b){return a.position >= b.position});
         },
 
         getInitialState:function(){
@@ -126,16 +126,78 @@
         }
     });
 
+    var DataModelBadge = React.createClass({
+
+        propTypes:{
+            dataModel:React.PropTypes.instanceOf(PydioDataModel),
+            options:React.PropTypes.object
+        },
+
+        getInitialState:function(){
+            return {value:''};
+        },
+
+        componentDidMount:function(){
+            var options = this.props.options;
+            var dm = this.props.dataModel;
+            this._observer = function(){
+                switch (options.property){
+                    case "root_children":
+                        var l = Object.keys(dm.getRootNode().getChildren()).length;
+                        this.setState({value:l?l:''});
+                        break;
+                    case "root_label":
+                        this.setState({value:dm.getRootNode().getLabel()});
+                        break;
+                    case "metadata":
+                        if(options['metadata_sum']){
+                            var sum = 0;
+                            dm.getRootNode().getChildren().forEach(function(c){
+                                if(c.getMetadata().get(options['metadata_sum'])) sum += parseInt(c.getMetadata().get(options['metadata_sum']));
+                            });
+                            this.setState({value:sum?sum:''});
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }.bind(this);
+            dm.getRootNode().observe("loaded", this._observer);
+        },
+
+        componentWillUnmount:function(){
+            this.props.dataModel.stopObserving("loaded", this._observer);
+        },
+
+        render:function(){
+            return <span className={this.props.options['className']}>{this.state.value}</span>;
+        }
+
+    });
+
     var CollapsableListProvider = React.createClass({
 
         propTypes:{
             paneData:React.PropTypes.object,
             pydio:React.PropTypes.instanceOf(Pydio),
-            nodeClicked:React.PropTypes.func
+            nodeClicked:React.PropTypes.func,
+            startOpen:React.PropTypes.bool
         },
 
         getInitialState:function(){
-            return {open:false, componentLaunched:false};
+
+            var dataModel = new PydioDataModel(true);
+            var rNodeProvider = new RemoteNodeProvider();
+            dataModel.setAjxpNodeProvider(rNodeProvider);
+            rNodeProvider.initProvider(this.props.paneData.options['nodeProviderProperties']);
+            var rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
+            dataModel.setRootNode(rootNode);
+
+            return {
+                open:false,
+                componentLaunched:!!this.props.paneData.options['startOpen'],
+                dataModel:dataModel
+            };
         },
 
         toggleOpen:function(){
@@ -151,6 +213,11 @@
             const className = 'simple-provider ' + (paneData.options['className'] ? paneData.options['className'] : '');
             const titleClassName = 'section-title ' + (paneData.options['titleClassName'] ? paneData.options['titleClassName'] : '');
 
+            var badge;
+            if(paneData.options.dataModelBadge){
+                badge = <DataModelBadge dataModel={this.state.dataModel} options={paneData.options.dataModelBadge} />;
+            }
+
             var component;
             if(this.state.componentLaunched){
                 component = (
@@ -161,9 +228,9 @@
                         elementHeight={36}
                         heightAutoWithMax={400}
                         nodeClicked={this.props.nodeClicked}
-                        nodeProviderProperties={paneData.options['nodeProviderProperties']}
+                        presetDataModel={this.state.dataModel}
                         reloadOnServerMessage={paneData.options['reloadOnServerMessage']}
-                        actionBarGroups={[]}
+                        actionBarGroups={paneData.options['actionBarGroups']?paneData.options['actionBarGroups']:[]}
                     />
                 );
             }
@@ -172,7 +239,7 @@
                 <div className={className + (this.state.open?" open": " closed")}>
                     <div className={titleClassName}>
                         <span className="toggle-button" onClick={this.toggleOpen}>{this.state.open?messages[514]:messages[513]}</span>
-                        {title}
+                        {title} {badge}
                     </div>
                     {component}
                 </div>
