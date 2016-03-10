@@ -1,3 +1,4 @@
+/* SEPARATOR */
 CREATE TABLE ajxp_mail_queue (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   recipent TEXT,
@@ -6,7 +7,7 @@ CREATE TABLE ajxp_mail_queue (
   notification_object blob,
   html INT
 );
-
+/* SEPARATOR */
 CREATE TABLE ajxp_mail_sent (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   recipent TEXT,
@@ -15,7 +16,7 @@ CREATE TABLE ajxp_mail_sent (
   notification_object blob,
   html INT
 );
-
+/* SEPARATOR */
 CREATE TRIGGER mail_queue_go_to_sent BEFORE DELETE ON ajxp_mail_queue
 FOR EACH ROW
     BEGIN
