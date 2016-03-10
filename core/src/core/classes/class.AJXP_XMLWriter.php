@@ -651,7 +651,7 @@ class AJXP_XMLWriter
         }
 
         foreach ($accessible as $repoId => $repoObject) {
-            if($repoObject->hasContentFilter()){
+            if(!isSet($_SESSION["CURRENT_MINISITE"]) && $repoObject->hasContentFilter()){
                 continue;
             }
             $accessStatus = '';
