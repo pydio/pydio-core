@@ -638,5 +638,9 @@ $mess=array(
 "542" => "Erreur de transfert: une extension PHP a stoppé le processus.",
 "543" => "Résultats limités au 100 premiers sur %s.",
 "544" => "Voir tout",
+"545" => "Partage à distance",
+"546" => "Cet item provient d'un système distant. Souhaîtez-vous continuer ?",
+"547" => "Accepter",
+"548" => "Refuser"
 /* END SENTENCE */
 );

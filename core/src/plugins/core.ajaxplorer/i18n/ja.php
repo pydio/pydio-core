@@ -633,14 +633,18 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
-    "537" => "File is too large! Maximum authorized size is %i",
-    "538" => "Upload error: no file found on server!",
-    "539" => "Upload error: file is partial",
-    "540" => "Upload error: cannot find the temporary directory",
-    "541" => "Upload error: cannot write into the temporary directory",
-    "542" => "Upload error: a PHP extension stopped the upload process.",
-    "543" => "Results limited to 100 out of %s.",
-    "544" => "Show All",
+"537" => "File is too large! Maximum authorized size is %i",
+"538" => "Upload error: no file found on server!",
+"539" => "Upload error: file is partial",
+"540" => "Upload error: cannot find the temporary directory",
+"541" => "Upload error: cannot write into the temporary directory",
+"542" => "Upload error: a PHP extension stopped the upload process.",
+"543" => "Results limited to 100 out of %s.",
+"544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 /* 文章はここまで */
 /* 文章終了 */
 );

@@ -656,5 +656,9 @@ $mess=array(
 "542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento",
 "543" => "Risultati limitati a 100 su %s.",
 "544" => "Visualizza tutti",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 /* END SENTENCE */
 );

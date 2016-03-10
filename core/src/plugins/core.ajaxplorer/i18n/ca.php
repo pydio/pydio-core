@@ -640,5 +640,8 @@ $mess=array(
 "542" => "Error en la pujada: una extensió de PHP ha aturat el procés de càrrega.",
 "543" => "Resultats limitats a 100 de %s.",
 "544" => "Mostrar tot",
-
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 );

@@ -645,4 +645,8 @@ $mess=array(
 "542" => "Fehler beim Hochladen: Hochladen wurde durch PHP-Erweiterung unterbrochen",
 "543" => "Results limited to 100 out of %s.",
 "544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 );
