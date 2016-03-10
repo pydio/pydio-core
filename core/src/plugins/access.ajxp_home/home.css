@@ -118,6 +118,19 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-num-badge {
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  display: inline-block;
+  line-height: 0.9em;
+  font-size: 0.7em;
+  font-weight: 300;
+  top: -1px;
+  position: relative;
+  border-radius: 2px;
+  padding: 2px 5px;
+  margin: 0px 0px 0px 10px;
+}
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.ws_selector_title h3 {
   font-size: 13px;
   font-weight: 500;

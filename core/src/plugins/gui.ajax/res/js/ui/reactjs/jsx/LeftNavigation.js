@@ -443,7 +443,7 @@
                 var status = this.props.workspace.getAccessStatus();
 
                 if (!isNaN(status) && status > 0) {
-                    badgeNum = <span className="icon-stack" style={{fontSize: "0.5em", lineHeight: "2em", marginBottom: "0.3em", marginLeft: "5px"}}><i className="icon-circle icon-stack-base" style={{color: "#000000"}}></i><i className="icon-light">{status}</i></span>;
+                    badgeNum = <span className="workspace-num-badge">{status}</span>;
                 }
 
                 badge = <span className="workspace-badge"><span className="access-icon"/></span>;
