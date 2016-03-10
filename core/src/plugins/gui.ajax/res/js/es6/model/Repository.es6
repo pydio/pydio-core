@@ -188,6 +188,10 @@ class Repository {
         return this._accessStatus;
     }
 
+    setAccessStatus(status) {
+    	this._accessStatus = status;
+    }
+
     getLastConnection(){
         return this._lastConnection;
     }

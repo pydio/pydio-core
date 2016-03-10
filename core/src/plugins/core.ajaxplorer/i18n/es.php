@@ -643,5 +643,8 @@ $mess=array(
 "542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga.",
 "543" => "Resultados limitados a 100 de %s.",
 "544" => "Mostrar todo",
-
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 );

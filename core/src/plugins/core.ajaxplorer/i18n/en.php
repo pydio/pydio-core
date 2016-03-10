@@ -638,4 +638,8 @@ $mess=array(
 "542" => "Upload error: a PHP extension stopped the upload process.",
 "543" => "Results limited to 100 out of %s.",
 "544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline"
 ); 

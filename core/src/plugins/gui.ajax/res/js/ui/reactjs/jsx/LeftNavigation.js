@@ -53,6 +53,7 @@
             this._timer = global.setTimeout(this.closeNavigation, 3000);
 
             this._reloadObserver = function(){
+
                 if(this.isMounted()){
                     this.setState({
                         workspaces:this.props.pydio.user.getRepositoriesList()
@@ -200,12 +201,11 @@
             var entries = [], sharedEntries = [], inboxEntry;
 
             this.props.workspaces.forEach(function(object, key){
-                if(object.getId().indexOf('ajxp_') === 0){
-                    return;
-                }
-                if(object.hasContentFilter()){
-                    return;
-                }
+
+                if (object.getId().indexOf('ajxp_') === 0) return;
+                if (object.hasContentFilter()) return;
+                if (object.getAccessStatus() === 'declined') return;
+
                 var entry = (
                     <WorkspaceEntry
                         {...this.props}
@@ -256,9 +256,7 @@
                     {createAction}
                 </div>
             );
-
         }
-
     });
 
     var WorkspaceEntry = React.createClass({
@@ -291,7 +289,19 @@
             PydioApi.getClient().request({
                 'get_action': 'reject_invitation',
                 'remote_share_id': this.props.workspace.getShareId()
-            }, this.handleCloseAlert.bind(this), this.handleCloseAlert.bind(this));
+            }, function () {
+                // Switching status to decline
+                this.props.workspace.setAccessStatus('declined');
+
+                this.props.pydio.fire("repository_list_refreshed", {
+                    list: this.props.pydio.user.getRepositoriesList(),
+                    active: this.props.pydio.user.getActiveRepository()
+                });
+
+                this.handleCloseAlert().bind(this);
+            }.bind(this), function () {
+                this.handleCloseAlert().bind(this)
+            }.bind(this));
         },
 
         handleOpenAlert: function () {
@@ -304,66 +314,77 @@
 
         onClick:function(){
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
+
+
         },
 
         render:function(){
-            var current = this.props.pydio.user.getActiveRepository();
-            var currentClass="workspace-entry";
-            if(current == this.props.workspace.getId()){
+            var current = this.props.pydio.user.getActiveRepository(),
+                currentClass="workspace-entry",
+                messages = this.props.pydio.MessageHash,
+                onHover, onOut, onClick,
+                badge, remoteDialog, newWorkspace;
+
+            if (current == this.props.workspace.getId()) {
                 currentClass +=" workspace-current";
             }
+
             currentClass += " workspace-access-" + this.props.workspace.getAccessType();
-            if(this.props.onHoverLink){
-                var onHover = function(event){
+
+            if (this.props.onHoverLink) {
+                onHover = function(event){
                     this.props.onHoverLink(event, this.props.workspace)
                 }.bind(this);
             }
-            if(this.props.onOutLink){
-                var onOut = function(event){this.props.onOutLink(event, this.props.ws)}.bind(this);
+
+            if (this.props.onOutLink) {
+                onOut = function(event){
+                    this.props.onOutLink(event, this.props.ws)
+                }.bind(this);
             }
-            var onClick = this.onClick.bind(this);
+
+            onClick = this.onClick.bind(this);
 
             // Icons
-            var badge;
-            if(this.props.workspace.getAccessType() == "inbox") {
+            if (this.props.workspace.getAccessType() == "inbox") {
                 badge = <span className="workspace-badge"><span className="access-icon"/></span>;
-            }else if(this.props.workspace.getOwner()){
+            } else if(this.props.workspace.getOwner()){
                 var overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
                 if(this.props.workspace.getRepositoryType() == "remote"){
                     overlay = <span className="badge-overlay icon-cloud"/>;
                 }
                 badge = <span className="workspace-badge"><span className="mdi mdi-folder"/>{overlay}</span>;
-            }else{
+            } else{
                 badge = <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>;
             }
 
-            var remoteDialog;
-            if (this.props.workspace.getRepositoryType() == "remote"){
+            if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
+                newWorkspace = <span className="workspace-new">NEW</span>;
+            }
+
+            // Dialogs
+            if (this.props.workspace.getRepositoryType() == "remote") {
                 var actions = [
-                    { text: 'Decline', ref: 'decline', onClick: this.handleDecline.bind(this)},
-                    { text: 'Accept', ref: 'accept', onClick: this.handleAccept.bind(this)}
+                    { text: messages[548], ref: 'decline', onClick: this.handleDecline.bind(this)},
+                    { text: messages[547], ref: 'accept', onClick: this.handleAccept.bind(this)}
                 ];
 
                 onClick = this.handleOpenAlert.bind(this);
+
                 remoteDialog = <div className='react-mui-context'>
                     <ReactMUI.Dialog
-                        title="Remote File Dialog"
                         ref="dialog"
+                        style={{maxWidth: '420px'}}
+                        title={messages[545]}
                         actions={actions}
                         modal={false}
                         dismissOnClickAway={true}
                     >
-                        This item has been share with you from a remote location.
-
-                        Do you want to accept it ?
+                        {messages[546]}
                     </ReactMUI.Dialog>
                 </div>
             }
 
-            var newWorkspace;
-            if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()){
-                newWorkspace = <span className="workspace-new">NEW</span>;
-            }
             return (
                 <div
                     className={currentClass}
