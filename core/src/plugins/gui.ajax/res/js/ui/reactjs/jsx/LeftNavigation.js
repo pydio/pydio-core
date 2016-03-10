@@ -95,7 +95,6 @@
         },
 
         render:function(){
-
             const additional = this.state.additionalContents.map(function(paneData){
                 if(paneData.type == 'ListProvider'){
                     return (
@@ -374,9 +373,11 @@
                 // Switching status to decline
                 this.props.workspace.setAccessStatus('accepted');
 
-                this.onClick().bind(this);
+                this.handleCloseAlert();
+                this.onClick();
+
             }.bind(this), function () {
-                this.handleCloseAlert().bind(this)
+                this.handleCloseAlert();
             }.bind(this));
         },
 
@@ -393,21 +394,25 @@
                     active: this.props.pydio.user.getActiveRepository()
                 });
 
-                this.handleCloseAlert().bind(this);
+                this.handleCloseAlert();
             }.bind(this), function () {
-                this.handleCloseAlert().bind(this)
+                this.handleCloseAlert();
             }.bind(this));
         },
 
         handleOpenAlert: function () {
-            this.refs.dialog.show();
+            this.wrapper = document.body.appendChild(document.createElement('div'));
+            this.wrapper.style.zIndex = 11;
+            var component = React.render(
+                <Confirm {...this.props} onAccept={this.handleAccept.bind(this)} onDecline={this.handleDecline.bind(this)} onDismiss={this.handleCloseAlert} />, this.wrapper);
         },
 
         handleCloseAlert: function() {
-            this.refs.dialog.dismiss();
+            this.wrapper.remove();
         },
 
         onClick:function() {
+            console.log('Switching to ', this.props.workspace.getId());
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
         },
 
@@ -463,27 +468,7 @@
 
             // Dialogs
             if (this.props.workspace.getRepositoryType() == "remote") {
-                var actions = [
-                    { text: messages[548], ref: 'decline', onClick: this.handleDecline.bind(this)},
-                    { text: messages[547], ref: 'accept', onClick: this.handleAccept.bind(this)}
-                ];
-
                 onClick = this.handleOpenAlert.bind(this);
-
-                remoteDialog =
-                    <Portal>
-                            <div className='react-mui-context' style={{position: 'absolute', width: '100%', height: '100%'}}>
-                            <ReactMUI.Dialog
-                                ref="dialog"
-                                title={messages[545]}
-                                actions={actions}
-                                modal={false}
-                                dismissOnClickAway={true}
-                            >
-                                {messages[546]}
-                            </ReactMUI.Dialog>
-                        </div>
-                    </Portal>
             }
 
             return (
@@ -504,24 +489,38 @@
 
     });
 
-    var Portal = React.createClass({
-        render: () => null,
-        portalElement: null,
-        componentDidMount() {
-            var p = this.props.portalId && document.getElementById(this.props.portalId);
-            if (!p) {
-                var p = document.createElement('div');
-                p.id = this.props.portalId;
-                document.body.appendChild(p);
-            }
-            this.portalElement = p;
-            this.componentDidUpdate();
+    var Confirm = React.createClass({
+        getDefaultProps: function() {
+            return {
+                confirmLabel: 'OK',
+                abortLabel: 'Cancel'
+            };
         },
-        componentWillUnmount() {
-            document.body.removeChild(this.portalElement);
+
+        componentDidMount: function () {
+            this.refs.dialog.show()
         },
-        componentDidUpdate() {
-            React.render(<div {...this.props}>{this.props.children}</div>, this.portalElement);
+
+        render: function () {
+            var messages = this.props.pydio.MessageHash,
+                actions = [
+                    { text: messages[548], ref: 'decline', onClick: this.props.onDecline},
+                    { text: messages[547], ref: 'accept', onClick: this.props.onAccept}
+                ];
+
+            return <div className='react-mui-context' style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'transparent'}}>
+                <ReactMUI.Dialog
+                    ref="dialog"
+                    title={messages[545]}
+                    actions={actions}
+                    modal={false}
+                    dismissOnClickAway={true}
+                    onDismiss={this.props.onDismiss.bind(this)}
+                    open={true}
+                >
+                    {messages[546]}
+                </ReactMUI.Dialog>
+            </div>
         }
     });
 
