@@ -153,6 +153,7 @@ Class.create("AjxpPane", {
         // Check additional classes
         var detectedClasses = $H();
         contentNodes.each(function(n){
+            if(!n.firstChild) return;
             var cdataContent = n.firstChild.nodeValue;
             if(cdataContent){
                 detectedClasses = detectedClasses.merge(pydio.UI.findAjxpClassesInText(cdataContent));
@@ -161,6 +162,9 @@ Class.create("AjxpPane", {
         ResourcesManager.loadClassesAndApply(detectedClasses.keys(), function(){
             var change = false;
             contentNodes.each(function(addNode){
+                if(!addNode.firstChild){
+                    return;
+                }
                 var cdataContent = addNode.firstChild.nodeValue;
                 var anchor = this.htmlElement;
                 if(cdataContent && anchor){
