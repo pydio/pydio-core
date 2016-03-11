@@ -114,6 +114,7 @@ div#team_edit_container {
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 2px;
+    z-index: 10;
 }
 
 #team_edit_container ul {
@@ -123,6 +124,21 @@ div#team_edit_container {
 
 #team_edit_container ul li{
     list-style: none;
+    padding: 8px;
+    color: rgba(0,0,0,0.87);
+}
+
+#team_edit_container ul li.selected{
+    background-color: #eee !important;
+}
+
+#team_edit_entries .user_entry{
+    padding: 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+#team_edit_entries .user_entry .delete_user_entry{
+    float: right;
+    cursor: pointer;
 }
 
 .wallet_pane{
