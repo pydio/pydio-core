@@ -38,6 +38,10 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
      */
     public static function applyInitPathHook($url) {
 
+        if (!class_exists('CommerceGuys\Guzzle\Oauth2\Oauth2Subscriber')) {
+            throw new Exception('Oauth plugin not loaded - go to ' . AJXP_BIN_FOLDER . '/guzzle from the command line and run \'composer update\' to install');
+        }
+
         // Repository information
         $urlParts = AJXP_Utils::safeParseUrl($url);
         $repository = ConfService::getRepositoryById($urlParts["host"]);
@@ -132,7 +136,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
             $accessToken = $oauth2->getAccessToken();
             $refreshToken = $oauth2->getRefreshToken();
         } catch (\Exception $e) {
-            throw new AJXP_UserAlertException("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
+            throw new AJXP_UserAlertException("Please go to <a style=\"text-decoration:underline;\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
         }
 
         // Saving tokens for later use

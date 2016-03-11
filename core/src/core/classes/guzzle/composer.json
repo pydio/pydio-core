@@ -3,6 +3,7 @@
         "guzzlehttp/guzzle": "~5",
         "guzzlehttp/command": "~0.7",
         "guzzlehttp/guzzle-services": "~0.5",
-        "gimler/guzzle-description-loader" : "*"
+        "gimler/guzzle-description-loader" : "*",
+        "commerceguys/guzzle-oauth2-plugin": "~2.0"
     }
 }

@@ -68,9 +68,6 @@ if (!isSet($OVERRIDE_SESSION)) {
 }
 session_start();
 
-if (isSet($_GET['code'])) {
-    $_SESSION['oauth_code'] = AJXP_Utils::sanitize($_GET['code'], AJXP_SANITIZE_ALPHANUM);
-}
 if (isSet($_GET["tmp_repository_id"]) || isSet($_POST["tmp_repository_id"])) {
     try{
         ConfService::switchRootDir(isset($_GET["tmp_repository_id"])?$_GET["tmp_repository_id"]:$_POST["tmp_repository_id"], true);
