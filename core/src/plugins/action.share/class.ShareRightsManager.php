@@ -415,6 +415,13 @@ class ShareRightsManager
                     $userObject->addRole($minisiteRole);
                 }
             }
+            // ADD "my shared files" REPO OTHERWISE SOME USER CANNOT ACCESS
+            if( !isSet($userEntry["HIDDEN"]) && $childRepository->hasContentFilter()){
+                $inboxRepo = ConfService::getRepositoryById("inbox");
+                if($inboxRepo !== null){
+                    $userObject->personalRole->setAcl("inbox", "r");
+                }
+            }
 
             $userObject->save("superuser");
         }
