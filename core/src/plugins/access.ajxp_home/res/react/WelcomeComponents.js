@@ -166,7 +166,7 @@
                 <div id="welcome">
                     {MessageHash['user_home.40'].replace('%s', userLabel)}
                     <p>
-                        {loginLink}
+                        {loginLink}.
                         {gettingStartedBlock}
                     </p>
                 </div>

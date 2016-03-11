@@ -4691,6 +4691,7 @@ div.dialogButtons.inlineEdition input {
 #global_toolbar div.custom_top_title,
 #global_toolbar img.custom_logo_image.linked {
   display: none;
+  z-index: 1022;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar {
