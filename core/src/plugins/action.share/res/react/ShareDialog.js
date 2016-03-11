@@ -297,14 +297,18 @@
             return {showMenu:false};
         },
         showMenu: function () {
+            console.log("show menu ? ");
             this.setState({showMenu: true});
         },
         /****************************/
         /* WARNING: PROTOTYPE CODE
          */
         hideMenu: function(event){
-            if(event && event.target.up('.mui-icon-button')){
-                return;
+            if(event && ( event.target.hasClassName('mui-icon-button') || event.target.up('.mui-icon-button'))){
+                var tg = event.target.hasClassName('mui-icon-button') ? event.target : event.target.up('.mui-icon-button');
+                if(this.refs["menuButton"] && tg == this.refs["menuButton"].getDOMNode()){
+                    return;
+                }
             }
             this.setState({showMenu: false});
         },
@@ -329,7 +333,7 @@
             if (!this.props.menus || !this.props.menus.length) {
                 return null;
             }
-            var menuAnchor = <ReactMUI.IconButton iconClassName="icon-ellipsis-vertical" onClick={this.showMenu}/>;
+            var menuAnchor = <ReactMUI.IconButton ref="menuButton" iconClassName="icon-ellipsis-vertical" onClick={this.showMenu}/>;
             if(this.state.showMenu) {
                 const menuItems = this.props.menus.map(function(m){
                     var text = m.text;
@@ -339,6 +343,7 @@
                     return {text:text, payload:m.callback};
                 });
                 var menuBox = <ReactMUI.Menu onItemClick={this.menuClicked} zDepth={0} menuItems={menuItems}/>;
+                console.log("building menu");
             }
             return (
                 <div className="user-badge-menu-box">
