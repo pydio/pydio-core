@@ -1,6 +1,9 @@
 div.form-react_share_form div.dialogTitle {
   display: none;
 }
+div.form-react_share_form div.dialogContent {
+  overflow-x: hidden !important;
+}
 div#react_share_form {
   font-family: Roboto, sans-serif;
   font-size: 13px;
