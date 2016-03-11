@@ -74,7 +74,6 @@
                 this.setState({showComplete: false}, function(){
                     global.setTimeout(function(){
                         this.refs['autosuggest'].refs['input'].getDOMNode().blur();
-                        this.setState({showComplete: true});
                     }.bind(this), 10);
                 });
             }
@@ -123,15 +122,17 @@
                     name: 'users-autosuggest',
                     className: 'react-autosuggest__input',
                     placeholder: this.props.fieldLabel,
+                    onBlur: event => this.setState({showComplete:false}),
+                    onFocus: event => this.setState({showComplete:true}),
                     value: ''   // Initial value
                 };
                 return (
-                    <div style={{position:'relative'}} className={this.props.className}>
+                    <div style={{position:'relative'}} className={this.props.className + (this.state.showComplete ? '':' list-force-hide')}>
                         <span className="suggest-search icon-search"/>
                         <ReactAutoSuggest
                             ref="autosuggest"
                             cache={false}
-                            showWhen = {input => this.state.showComplete }
+                            showWhen = {input => true }
                             inputAttributes={inputAttributes}
                             suggestions={this.getSuggestions}
                             suggestionRenderer={this.props.renderSuggestion}

@@ -394,6 +394,9 @@ div.react-autosuggest {
     position: absolute;
     width: @width0;
     z-index: 20;
+    .list-force-hide &{
+      display: none !important;
+    }
   }
   input#users-autosuggest {
     font-size: 18px;

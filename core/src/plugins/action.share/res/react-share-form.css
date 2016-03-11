@@ -373,6 +373,9 @@ div.react-autosuggest .react-autosuggest__suggestions {
   width: 370px;
   z-index: 20;
 }
+.list-force-hide div.react-autosuggest .react-autosuggest__suggestions {
+  display: none !important;
+}
 div.react-autosuggest input#users-autosuggest {
   font-size: 18px;
   padding-bottom: 9px !important;
