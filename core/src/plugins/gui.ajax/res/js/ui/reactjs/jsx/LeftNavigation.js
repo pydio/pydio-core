@@ -32,8 +32,6 @@
             //Does not work on IE 11
             //var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config[@className="AjxpReactComponent::'+this.props.pydioId+'"]/additional_content');
             var contentNodes = XMLUtils.XPathSelectNodes(reg, 'client_configs/component_config/additional_content');
-
-            console.log(contentNodes);
             var result = [];
             var compId = "AjxpReactComponent::"+this.props.pydioId;
             contentNodes.map(function(node){
@@ -431,7 +429,6 @@
         },
 
         onClick:function() {
-            console.log('Switching to ', this.props.workspace.getId());
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
         },
 

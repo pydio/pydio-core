@@ -270,6 +270,11 @@ class AjxpPluginDiscriminate extends Task
                 }else{
                     $this->project->setProperty('js_source_path', '__NOT_FOUND__');
                 }
+                if(isSet($data["css_path"])){
+                    $this->project->setProperty('css_source_path', $data["css_path"]);
+                }else{
+                    $this->project->setProperty('css_source_path', '__NOT_FOUND__');
+                }
             }
         }
     ]]></adhoc-task>

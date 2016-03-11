@@ -897,6 +897,9 @@ class AJXP_Utils
      * @return string
      */
     public static function getWorkspaceShortcutURL($repository){
+        if(empty($repository)){
+            return "";
+        }
         $repoSlug = $repository->getSlug();
         $skipHistory = ConfService::getCoreConf("SKIP_USER_HISTORY", "conf");
         if($skipHistory){

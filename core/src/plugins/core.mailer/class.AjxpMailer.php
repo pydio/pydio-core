@@ -51,6 +51,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         return $this->_dibiDriver;
     }
     public function mailConsumeQueue ($action, $httpVars, $fileVars) {
+
         if ($action === "consume_mail_queue") {
             $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
             if (!dibi::isConnected()) {
@@ -67,12 +68,17 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             }
             $resultsSQL = $querySQL->fetchAll();
             $arrayResultsSQL = array();
+            $output = array("success" => [], "error" => []);
             if (count($resultsSQL) > 0) {
                 foreach ($resultsSQL as $value) {
                     $ajxpNotification = unserialize($value["notification_object"]);
+                    $ajxpAction = $ajxpNotification->getAction();
+                    $ajxpAuthor = $ajxpNotification->getAuthor();
                     $ajxpNode = new AJXP_Node($value['url']);
-                    $ajxpNode->loadNodeInfo();
-                    if ($ajxpNode->isLeaf()) {
+                    try{
+                        @$ajxpNode->loadNodeInfo();
+                    }catch(Exception $e){}
+                    if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
                         $ajxpContent = $ajxpNode->getParent()->getPath();
                     } else {
                         $ajxpContent = $ajxpNode->getPath();
@@ -80,9 +86,11 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $ajxpContent = '/';
                         }
                     }
-                    $ajxpAction = $ajxpNotification->getAction();
-                    $ajxpAuthor = $ajxpNotification->getAuthor();
-                    $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
+                    if($ajxpNode->getRepository() != null){
+                        $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
+                    }else{
+                        $ajxpNodeWorkspace = "Deleted Workspace";
+                    }
                     $ajxpKey = $value["html"]."|".$ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
                     $arrayResultsSQL[$value['recipent']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
@@ -107,10 +115,12 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     }
                     try {
                         $mailer->sendMail(array($recipent),
-                            "Compte rendu Pydio",
+                            "Pydio Digest",
                             $body);
+                        $output["success"][] = "Email sent to ".$recipent;
                     } catch (AJXP_Exception $e) {
-                        throw new AJXP_Exception($e->getMessage());
+                        $output["error"][] = "Sending email to ".$recipent.": ".$e->getMessage();
+                        //throw new AJXP_Exception($e->getMessage());
                     }
                 }
                 try {
@@ -119,7 +129,14 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     throw new AJXP_Exception($e->getMessage());
                 }
             }
+            HTMLWriter::charsetHeader("text/json");
+            $output = array("report" => "Sent ".count($output["success"])." emails", "detail" => $output);
+            echo json_encode($output);
         }
+    }
+
+    protected function stringify($int){
+        return ($int < 10 ? "0".$int : "".$int);
     }
 
     public function processNotification(AJXP_Notification &$notification)
@@ -131,47 +148,53 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $messages = ConfService::getMessages();
             throw new AJXP_Exception($messages['core.mailer.2']);
         }
-        $notification_email_get =  $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true");
-        $notification_email_frequency =  $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL,"M");
-        $notification_email_frequency_user =  $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL,"5");
-        $notification_email =  $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
+        $notification_email_get = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true");
+        if($notification_email_get !== "true"){
+            // Do nothing!
+            return;
+        }
+        $notification_email_frequency = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL,"M");
+        $notification_email_frequency_user = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL,"5");
+        $notification_email = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
         $notification_email_send_html =  $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true");
         if ($notification_email_send_html === "true") {
             $html = 1;
         } else {
             $html = 0;
         }
-        $arrayRecipent = explode(',', $notification_email);
-        if ($notification_email_get === "true" && count($arrayRecipent) > 0 && !empty($notification_email_frequency_user)) {
+        $arrayRecipients = array();
+        $mainRecipient = $userObject->mergedRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+        if(!empty($mainRecipient)) $arrayRecipients[] = $mainRecipient;
+        $additionalRecipients = array_map("trim", explode(',', $notification_email));
+        foreach($additionalRecipients as $addR){
+            if(!empty($addR)) $arrayRecipients[] = $addR;
+        }
+        if (count($arrayRecipients) && !empty($notification_email_frequency_user)) {
             $date = new DateTime("now");
-            $hour = $date->format('H');
-            $minute = $date->format('i');
+            $year = $date->format("Y");
+            $day = $date->format("d");
+            $month = $date->format("m");
+            $hour = intval($date->format('H'));
+            $minute = intval($date->format('i'));
             $frequency = $notification_email_frequency_user;
+            $allMinute = ($hour * 60) + $minute;
+            $nextFrequency = null;
             switch ($notification_email_frequency) {
                 case "M":
                     //FOR EVERY X MIN
-                    $allMinute = ($hour * 60) + $minute;
-                    $nextInterval = $allMinute - ($allMinute % $frequency) + $frequency;
-                    $nextInterval = $nextInterval - $frequency;
-                    $nextInterval = $nextInterval / 60;
-                    $nextIntervalDecimal = $nextInterval - (int)$nextInterval;
-                    $nextIntervalMinute = $nextIntervalDecimal * 60;
-                    $nextIntervalHour = (int)$nextInterval;
-                    $nextIntervalDate = new DateTime($nextIntervalHour . ':' . $nextIntervalMinute);
-                    $nextFrequency = $nextIntervalDate->modify('+' . $frequency . ' minutes')->format('Y-m-d H:i:s');
+                    $lastInterval = $allMinute - ($allMinute % $frequency);
+                    $newMinutes = $this->stringify($lastInterval % 60);
+                    $newHour = $this->stringify(($lastInterval - $newMinutes) / 60);
+                    $lastFrequency = DateTime::createFromFormat("Y-m-d H:i", "$year-$month-$day $newHour:$newMinutes");
+                    $nextFrequency = $lastFrequency->modify("+ $frequency minutes")->getTimestamp();
                     break;
                 case "H":
                     //FOR EVERY X HOUR
                     $frequency = $frequency * 60;
-                    $allMinute = ($hour * 60) + $minute;
-                    $nextInterval = $allMinute - ($allMinute % $frequency) + $frequency;
-                    $nextInterval = $nextInterval - $frequency;
-                    $nextInterval = $nextInterval / 60;
-                    $nextIntervalDecimal = $nextInterval - (int)$nextInterval;
-                    $nextIntervalMinute = $nextIntervalDecimal * 60;
-                    $nextIntervalHour = (int)$nextInterval;
-                    $nextIntervalDate = new DateTime($nextIntervalHour . ':' . $nextIntervalMinute);
-                    $nextFrequency = $nextIntervalDate->modify('+' . $frequency . ' minutes')->format('Y-m-d H:i:s');
+                    $lastInterval = $allMinute - ($allMinute % $frequency);
+                    $newHour = $this->stringify($lastInterval / 60);
+                    $lastFrequency = DateTime::createFromFormat("Y-m-d H:i", "$year-$month-$day $newHour:00");
+                    $nextFrequency = $lastFrequency->modify("+ $frequency minutes")->getTimestamp();
                     break;
                 case "D1":
                     $compareDate = new DateTime($date->format('d-m-Y') . ' ' . $frequency . ':00');
@@ -179,7 +202,8 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         //FREQUENCY ALREADY GONE, NEXT INTERVAL => NEXT DAY
                         $compareDate = $compareDate->modify('+1 day');
                     }
-                    $nextFrequency = $compareDate->format('Y-m-d ' . $frequency . ':00');
+                    $nextFrequency = new DateTime($compareDate->format('Y-m-d ' . $frequency . ':00'));
+                    $nextFrequency = $nextFrequency->getTimestamp();
                     break;
                 case "D2":
                     //FOR EVERY DAY AT X and Y
@@ -194,27 +218,33 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         } else {
                             $nextFrequency = $date->modify('+1 day')->format('Y-m-d ' . $arrayFrequency[0] . ':00');
                         }
+                        $nextFrequency = new DateTime($nextFrequency);
+                        $nextFrequency = $nextFrequency->getTimestamp();
                     }
                     break;
                 case "W1":
                     //FOR EVERY WEEK AT THE DAY
-                    $nextFrequency = $date->modify('next ' . $frequency)->format('Y-m-d 00:00:00');
+                    $nextFrequency = $date->modify('next ' . $frequency)->getTimestamp();
                     break;
             }
-            if (!dibi::isConnected()) {
-                dibi::connect($this->getDibiDriver());
-            }
-            foreach ($arrayRecipent as $recipent) {
-                try {
-                    dibi::query("INSERT INTO [ajxp_mail_queue] ([recipent],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%b) ",
-                        trim($recipent),
-                        $notification->getNode()->getUrl(),
-                        $nextFrequency,
-                        serialize($notification),
-                        $html);
-                } catch (Exception $e) {
-                    new AJXP_Exception($e->getMessage());
+            if(!empty($nextFrequency)){
+                if (!dibi::isConnected()) {
+                    dibi::connect($this->getDibiDriver());
                 }
+                foreach ($arrayRecipients as $recipient) {
+                    try {
+                        dibi::query("INSERT INTO [ajxp_mail_queue] ([recipent],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%b) ",
+                            $recipient,
+                            $notification->getNode()->getUrl(),
+                            $nextFrequency,
+                            serialize($notification),
+                            $html);
+                    } catch (Exception $e) {
+                        $this->logError("[mailer]", $e->getMessage());
+                    }
+                }
+            }else{
+                $this->logError("[mailer]", "Could not determine email frequency from $notification_email_frequency / $notification_email_frequency_user for send email to user ".$userObject->getId());
             }
         } else {
             $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
@@ -409,7 +439,11 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $base = basename($this->getBaseDir());
+        if($base == "core.mailer"){
+            $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+            return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        }
+        return true;
     }
 }

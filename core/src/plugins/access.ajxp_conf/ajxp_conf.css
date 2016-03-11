@@ -428,3 +428,9 @@
     transition: opacity  0.4s ease;
     opacity: 1 !important;
 }
+
+.ajxp_theme_orbit .settings_main_pane .class-FilesList /*.thumbnail_selectable_cell.detailed*/,
+.ajxp_theme_orbit .settings_main_pane #tree_container
+{
+    font-family: Roboto, sans-serif;
+}

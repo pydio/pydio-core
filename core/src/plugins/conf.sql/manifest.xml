@@ -67,13 +67,13 @@
                     <clientForm id="team_edit_form"><![CDATA[
                          <div id="team_edit_form" box_width="420">
                             <div class="dialogContentMainTitle" ajxp_message_id="user_dash.59">AJXP_MESSAGE[user_dash.59]</div>
-                            <input type="text" style="width:394px;margin-bottom:30px;" id="team_edit_label"/>
+                            <input type="text" style="width:367px;margin-bottom:30px;" id="team_edit_label"/>
 
                             <div class="dialogContentMainTitle" ajxp_message_id="user_dash.60">AJXP_MESSAGE[user_dash.60]</div>
                             <div class="dialogLegend" ajxp_message_id="user_dash.56">AJXP_MESSAGE[user_dash.56]</div>
                             <div style="position: relative;">
                                 <div id="team_loader" style="position: absolute;top: 2px;right: 3px;font-size: 17px;display: none;"><span class="icon-spinner"></span></div>
-                                <input type="text" style="width:394px;" id="team_edit_input"/>
+                                <input type="text" style="width:367px;" id="team_edit_input"/>
                                 <div type="text" class="editable_users_list" id="team_edit_entries"></div>
                                 <div id="team_edit_container"></div>
                             </div>

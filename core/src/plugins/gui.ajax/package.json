@@ -1,9 +1,10 @@
 {
   "name": "gui.ajax",
-  "version": "6.2.1",
+  "version": "6.3.1",
   "description": "",
   "main": "index.js",
   "source_path":"res/js",
+  "css_path":"res/themes/orbit/css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

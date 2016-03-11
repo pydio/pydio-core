@@ -13,5 +13,7 @@ $mess = array(
     "8" => "Quick Filtering",
     "9" => "By file name",
     "10" => "By Type",
-    "11" => "Clear"
+    "11" => "Clear",
+    "12" => "Shared Files",
+    "13" => "Files shared with me by other users"
 );
