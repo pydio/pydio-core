@@ -30,8 +30,8 @@ class FileHasher extends AJXP_AbstractMetaSource
 {
     const METADATA_HASH_NAMESPACE = "file_hahser";
     /**
-    * @var MetaStoreProvider
-    */
+     * @var MetaStoreProvider
+     */
     protected $metaStore;
 
     public static function rsyncEnabled()
@@ -147,7 +147,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                 header("Content-Type:application/octet-stream");
                 header("Content-Length", strlen($data));
                 echo($data);
-            break;
+                break;
             case "filehasher_delta":
             case "filehasher_patch":
                 // HANDLE UPLOAD DATA
@@ -155,34 +155,28 @@ class FileHasher extends AJXP_AbstractMetaSource
                 if (!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
                     throw new Exception("These action should find uploaded data");
                 }
-                $uploadedData = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-sig");
-                move_uploaded_file($fileVars["userfile_0"]["tmp_name"], $uploadedData);
-
+                $signature_delta_file = $fileVars["userfile_0"]["tmp_name"];
                 $fileUrl = $selection->getUniqueNode()->getUrl();
                 $file = AJXP_MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
-                    $signatureFile = $uploadedData;
                     $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");
-                    rsync_generate_delta($signatureFile, $file, $deltaFile);
+                    rsync_generate_delta($signature_delta_file, $file, $deltaFile);
                     $this->logDebug("Computed delta file, size is ".filesize($deltaFile));
                     header("Content-Type:application/octet-stream");
                     header("Content-Length:".filesize($deltaFile));
                     readfile($deltaFile);
-                    unlink($signatureFile);
                     unlink($deltaFile);
                 } else {
                     $patched = $file.".rdiff_patched";
-                    $deltaFile = $uploadedData;
-                    rsync_patch_file($file, $deltaFile, $patched);
+                    rsync_patch_file($file, $signature_delta_file, $patched);
                     rename($patched, $file);
-                    unlink($deltaFile);
                     $node = $selection->getUniqueNode();
                     AJXP_Controller::applyHook("node.change", array($node, $node, false));
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
-            break;
+                break;
             case "stat_hash" :
                 clearstatcache();
                 header("Content-type:application/json");
@@ -228,10 +222,10 @@ class FileHasher extends AJXP_AbstractMetaSource
                     print '}';
                 }
 
-            break;
+                break;
 
 
-            break;
+                break;
         }
     }
 
@@ -246,10 +240,10 @@ class FileHasher extends AJXP_AbstractMetaSource
             if ($this->metaStore != false) {
 
                 $hashMeta = $this->metaStore->retrieveMetadata(
-                   $node,
-                   FileHasher::METADATA_HASH_NAMESPACE,
-                   false,
-                   AJXP_METADATA_SCOPE_GLOBAL);
+                    $node,
+                    FileHasher::METADATA_HASH_NAMESPACE,
+                    false,
+                    AJXP_METADATA_SCOPE_GLOBAL);
                 $mtime = filemtime($node->getUrl());
                 if(is_array($hashMeta)
                     && array_key_exists("md5", $hashMeta)
