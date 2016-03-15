@@ -918,10 +918,21 @@
         render: function(){
             var linkId = this.props.linkData.hash;
             var perms = [], previewWarning;
-            perms.push({NAME:'read',LABEL:this.context.getMessage('72')});
-            perms.push({NAME:'download', LABEL:this.context.getMessage('73')});
-            if(!this.props.shareModel.getNode().isLeaf()){
-                perms.push({NAME:'write', LABEL:this.context.getMessage('74')});
+            var currentIsFolder = !this.props.shareModel.getNode().isLeaf();
+            perms.push({
+                NAME:'read',
+                LABEL:this.context.getMessage('72'),
+                DISABLED:currentIsFolder && !this.props.shareModel.getPublicLinkPermission(linkId, 'write')
+            });
+            perms.push({
+                NAME:'download',
+                LABEL:this.context.getMessage('73')
+            });
+            if(currentIsFolder){
+                perms.push({
+                    NAME:'write',
+                    LABEL:this.context.getMessage('74')
+                });
             }
             if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission(linkId, 'read')){
                 previewWarning = <div>{this.context.getMessage('195')}</div>;
@@ -935,7 +946,7 @@
                             return (
                                 <div style={{display:'inline-block',width:'30%'}}>
                                     <ReactMUI.Checkbox
-                                        disabled={this.context.isReadonly()}
+                                        disabled={p.DISABLED || this.context.isReadonly()}
                                         type="checkbox"
                                         name={p.NAME}
                                         label={p.LABEL}
@@ -1040,6 +1051,7 @@
         render: function(){
             var linkId = this.props.linkData.hash;
             var passContainer = this.renderPasswordContainer();
+            var crtLinkDLAllowed = this.props.shareModel.getPublicLinkPermission(linkId, 'download');
             var dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
             var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
             var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
@@ -1090,7 +1102,7 @@
                                 onDismiss={null}
                             />
                         </div>
-                        <div style={{width:'50%', display:'inline-block', position:'relative'}}>
+                        <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}}>
                             <span className="ajxp_icon_span mdi mdi-download"/>
                             <ReactMUI.TextField
                                 disabled={this.context.isReadonly()}
