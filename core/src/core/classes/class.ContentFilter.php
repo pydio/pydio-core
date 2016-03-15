@@ -68,11 +68,11 @@ class ContentFilter {
     }
 
     function getBaseDir(){
-        return dirname(array_keys($this->filters)[0]);
+        return AJXP_Utils::safeDirname(array_keys($this->filters)[0]);
     }
 
     function getUniquePath(){
-        return basename(array_keys($this->filters)[0]);
+        return AJXP_Utils::safeBasename(array_keys($this->filters)[0]);
     }
 
     /**
