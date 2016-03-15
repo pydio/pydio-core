@@ -2184,6 +2184,7 @@ div#multiple_download_container div div a:hover {
 .action_bar.editor_action_bar span.actionbar_button_label {
   font-size: 11px !important;
   font-weight: bold;
+  font-family: Roboto, sans-serif;
 }
 .action_bar.editor_action_bar.full_width_action_bar {
   background-color: #dddddd;
