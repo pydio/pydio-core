@@ -502,6 +502,9 @@
         /* CUSTOM LINK HANDLE */
         /**********************/
         updateCustomLink(linkId, newValue){
+            if(newValue == linkId){
+                return;
+            }
             this._initPendingData();
             this._pendingData['links'][linkId]['custom_link'] = newValue;
             this.save();

@@ -162,6 +162,9 @@ class ShareLink
             // Existing already
             $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
+            if(strlen($value) < $this->store->hashMinLength){
+                throw new Exception("Custom link is too short, please use at least ".$this->store->hashMinLength." characters");
+            }
             $test = $this->store->loadShare($value);
             $mess = ConfService::getMessages();
             if(!empty($test)) {

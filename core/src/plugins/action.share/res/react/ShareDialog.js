@@ -855,7 +855,7 @@
                 return (
                     <div className="public-link-container edit-link">
                         <span>{publicLink.split('://')[0]}://[..]/{PathUtils.getBasename(PathUtils.getDirname(publicLink)) + '/'}</span>
-                        <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink || this.props.linkData['hash']}/>
+                        <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <ReactMUI.RaisedButton label="Ok" onClick={this.toggleEditMode}/>
                         <div className="section-legend">{this.context.getMessage('194')}</div>
                     </div>
