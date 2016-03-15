@@ -253,7 +253,7 @@
                         ref={paneData.id}
                         title={title}
                         elementHeight={36}
-                        heightAutoWithMax={400}
+                        heightAutoWithMax={4000}
                         nodeClicked={this.props.nodeClicked}
                         presetDataModel={this.state.dataModel}
                         reloadOnServerMessage={paneData.options['reloadOnServerMessage']}
