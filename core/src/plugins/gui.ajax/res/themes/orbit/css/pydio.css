@@ -190,32 +190,31 @@ kbd {
 }
 .vertical_layout {
   display: -webkit-flex;
-  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-          flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
   -webkit-flex-direction: column;
 }
 .vertical_layout > * {
   -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
           flex-shrink: 0;
 }
 .horizontal_layout {
   display: -webkit-flex;
-  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-          flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
   -webkit-flex-direction: row;
-  -webkit-box-align: stretch;
-          align-items: stretch;
+  -ms-flex-align: stretch;
+      align-items: stretch;
   -webkit-align-items: stretch;
 }
 .vertical_fit {
-  -webkit-box-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   -webkit-flex: 1;
   overflow-y: hidden;
 }
@@ -287,8 +286,7 @@ kbd {
 div.dialogBox div#element_overlay {
   background-color: #252525;
   opacity: 0;
-  -webkit-transition: opacity 0.4s ease;
-          transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 #element_overlay img {
   margin-top: 30%;
@@ -614,8 +612,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   top: 27px !important;
   right: 21px !important;
   font-size: 16px;
-  -webkit-transition: top 0.6s ease;
-          transition: top 0.6s ease;
+  transition: top 0.6s ease;
 }
 .class-FilesList .thumbnail_selectable_cell.detailed {
   margin: 0 0 !important;
@@ -1011,7 +1008,7 @@ div.wizard_buttons div {
 }
 div.wizard_progress {
   display: -webkit-flex !important;
-  display: -webkit-box !important;
+  display: -ms-flexbox !important;
   display: flex !important;
 }
 .wizard_previous {
@@ -1024,8 +1021,8 @@ span.wizard_progress_element {
   background-color: #ffffff;
   border-bottom: 3px solid #D8D7D7;
   color: #555555;
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
+      -ms-flex: 1;
           flex: 1;
   font-size: 11px;
   padding: 28px 0 14px;
@@ -1449,8 +1446,7 @@ div.shadow_class {
   height: 32px;
   margin-left: 8px;
   padding: 2px 8px;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   cursor: pointer;
 }
 .dialogBox .dialogContent .dialogButtons .dialogButton:focus {
@@ -2413,8 +2409,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 .scroller_handle {
   border-radius: 5px;
   background: #bebebe !important;
-  -webkit-transition: background-color 0.3s ease, height 0.1s ease;
-          transition: background-color 0.3s ease, height 0.1s ease;
+  transition: background-color 0.3s ease, height 0.1s ease;
 }
 .scroller_handle:hover {
   background: #6e6e6e !important;
@@ -2511,8 +2506,7 @@ div.selection_ctrl_key {
   right: 5px;
   font-size: 9px;
   cursor: default;
-  -webkit-transition: opacity ease 0.5s;
-          transition: opacity ease 0.5s;
+  transition: opacity ease 0.5s;
 }
 #search_container.search_active div#search_form input {
   width: 100%;
@@ -2553,8 +2547,7 @@ div.selection_ctrl_key {
   border: 0 #f5f5f5;
   text-align: right;
   padding-right: 30px;
-  -webkit-transition: border-color 0.5s ease, width 0.5s ease;
-          transition: border-color 0.5s ease, width 0.5s ease;
+  transition: border-color 0.5s ease, width 0.5s ease;
   border-radius: 0;
 }
 #search_container #search_form a {
@@ -2567,8 +2560,7 @@ div.selection_ctrl_key {
   position: absolute;
   right: 9px;
   top: 21px;
-  -webkit-transition: font-size ease 0.5s, top ease 0.5s, right ease 0.5s;
-          transition: font-size ease 0.5s, top ease 0.5s, right ease 0.5s;
+  transition: font-size ease 0.5s, top ease 0.5s, right ease 0.5s;
 }
 #search_container #search_form a.disabled {
   display: none;
@@ -2659,7 +2651,7 @@ div.selection_ctrl_key {
 }
 .flexbox #search_container #search_results_cont #search_results {
   display: -webkit-flex !important;
-  display: -webkit-box !important;
+  display: -ms-flexbox !important;
   display: flex !important;
 }
 #search_container #search_results_cont #search_results.fl-displayMode-detail div.scroller_track {
@@ -2745,8 +2737,7 @@ div.selection_ctrl_key {
   width: 0;
   overflow: hidden;
   margin-left: 0;
-  -webkit-transition: width 1s ease, margin-left 1s ease;
-          transition: width 1s ease, margin-left 1s ease;
+  transition: width 1s ease, margin-left 1s ease;
   margin-top: -62px;
   position: relative;
 }
@@ -2945,8 +2936,7 @@ span.toggleHeader {
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 10px 17px 6px;
-  -webkit-transition: border-color 0.3s ease;
-          transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease;
   color: #555;
   font-size: 12px;
   border-bottom: 3px solid #ff5722;
@@ -3101,16 +3091,15 @@ div.flat_tabulator span.toggleInactive span.tab_close_button {
   background-color: #30383a;
 }
 .flexbox div.horizontal_tabulator {
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-          flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
   -webkit-flex-direction: row;
 }
 .flexbox div.horizontal_tabulator div.tabulatorContainer {
   float: none;
   height: auto;
-  -webkit-box-flex: 0;
-          flex: 0 0 240px;
+  -ms-flex: 0 0 240px;
+      flex: 0 0 240px;
   -webkit-flex: 0 0 240px;
 }
 div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer {
@@ -3137,8 +3126,8 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   width: 78%;
 }
 .flexbox div.horizontal_tabulator > div.tabulatorPanelsContainer {
-  -webkit-box-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   -webkit-flex: 1;
 }
 #breadcrumb {
@@ -3256,8 +3245,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 }
 .breadcrumbs-one span.reduced:hover {
   padding: 20px 15px 20px 35px;
-  -webkit-transition: padding 1s ease;
-          transition: padding 1s ease;
+  transition: padding 1s ease;
   width: auto;
 }
 .breadcrumbs-one span.reduced:hover em {
@@ -3266,8 +3254,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 .breadcrumbs-one span.reduced.first-bread {
   height: auto;
   padding: 20px 15px 20px 1em;
-  -webkit-transition: none;
-          transition: none;
+  transition: none;
   width: 171px;
 }
 .breadcrumbs-one span.reduced.first-bread em {
@@ -3867,8 +3854,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel .infopanel_loading {
   opacity: 0;
-  -webkit-transition: opacity ease 0.2s;
-          transition: opacity ease 0.2s;
+  transition: opacity ease 0.2s;
 }
 #info_panel .infopanel_loading_finished {
   opacity: 1;
@@ -4067,8 +4053,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   color: rgba(255, 255, 255, 0.92);
   overflow-y: auto;
   box-sizing: border-box;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 .left-panel * {
@@ -4079,8 +4064,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   font-weight: 500;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   margin-top: 10px;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4095,8 +4079,8 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .nav-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -4106,6 +4090,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .nav-list-entry-icon {
   -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
           flex-shrink: 0;
   display: inline-block;
   width: 24px;
@@ -4120,8 +4105,8 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .workspaces .workspace-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -4131,6 +4116,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
   -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
           flex-shrink: 0;
   display: inline-block;
   width: 24px;
@@ -4192,8 +4178,8 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .simple-provider .material-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -4203,6 +4189,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .simple-provider .material-list-entry .material-list-icon {
   -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
           flex-shrink: 0;
   display: inline-block;
   width: 24px;
@@ -4251,8 +4238,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .simple-provider .icon-refresh {
   cursor: pointer;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .left-panel .simple-provider .icon-refresh.rotating {
   opacity: 0.2;
@@ -4633,8 +4619,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .toolbars_buttons_mixin:hover {
   background-color: rgba(255, 255, 255, 0.9);
@@ -4653,8 +4638,7 @@ div.dialogButtons.inlineEdition input {
   padding: 5px 8px;
   display: inline-block;
   margin: 0 2px 0 0;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   border-radius: 50%;
   width: 27px;
   height: 27px;
@@ -4791,8 +4775,7 @@ div.dialogButtons.inlineEdition input {
   padding: 5px 8px;
   display: inline-block;
   margin: 0 2px 0 0;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   border-radius: 50%;
   width: 27px;
   height: 27px;
@@ -4895,8 +4878,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   margin-right: 5px;
   background-color: transparent;
 }
@@ -4961,8 +4943,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   overflow: visible;
   outline: none;
   float: left;
@@ -5054,8 +5035,7 @@ div.dialogButtons.inlineEdition input {
   border-right: 2px solid #333;
   height: 20px;
   width: 15px;
-  -webkit-transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-          transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 #repo_chooser:hover {
   background-color: #353535;
@@ -5087,12 +5067,11 @@ div.dialogButtons.inlineEdition input {
   line-height: 18px;
 }
 .flexbox #browser {
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-          flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
   -webkit-flex-direction: row;
-  -webkit-box-align: stretch;
-          align-items: stretch;
+  -ms-flex-align: stretch;
+      align-items: stretch;
   -webkit-align-items: stretch;
 }
 #browser #topPane {
