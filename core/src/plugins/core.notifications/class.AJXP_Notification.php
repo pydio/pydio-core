@@ -89,7 +89,7 @@ class AJXP_Notification
 
     protected function replaceVars($tplString, $mess, $rich = true)
     {
-        $tplString = SystemTextEncoding::fromUTF8($tplString);
+        //$tplString = SystemTextEncoding::fromUTF8($tplString);
         $repoId = $this->getNode()->getRepositoryId();
         $repoObject = ConfService::getRepositoryById($repoId);
         if ($repoObject != null) {
@@ -114,7 +114,7 @@ class AJXP_Notification
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
             "AJXP_LINK"             => $this->getMainLink(),
             "AJXP_USER"             => $uLabel,
-            "AJXP_DATE"             => SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($this->getDate(),$mess)),
+            "AJXP_DATE"             => AJXP_Utils::relativeDate($this->getDate(),$mess),
         );
 
         if($replaces["AJXP_NODE_LABEL"]==$em.$me || $replaces["AJXP_NODE_LABEL"] == $em."/".$me ){

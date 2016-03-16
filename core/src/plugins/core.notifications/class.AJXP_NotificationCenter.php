@@ -207,6 +207,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
+                    $node->event_description = SystemTextEncoding::fromUTF8($node->event_description);
                     $node->event_description_long = $notif->getDescriptionLong(true);
                     $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notif->getDate(), $mess));
                     $node->short_date = AJXP_Utils::relativeDate($notif->getDate(), $mess, true);
@@ -350,6 +351,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 }
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
+                $node->event_description = SystemTextEncoding::fromUTF8($node->event_description);
                 $node->event_description_long = $notification->getDescriptionLong(true);
                 $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notification->getDate(), $mess));
                 $node->event_type = "alert";
