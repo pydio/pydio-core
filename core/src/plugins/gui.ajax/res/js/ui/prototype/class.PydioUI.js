@@ -262,7 +262,13 @@ Class.create("PydioUI", {
             for(var i=compRegistry.length;i>0;i--){
                 var el = compRegistry[i-1];
                 var ajxpId = el.ajxpId;
-                compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+                try{
+                    compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+                }catch(e){
+                    if(console){
+                        console.error('Error while initializing component', el, e);
+                    }
+                }
                 this._instancesCache.set(ajxpId, compRegistry[i-1]);
                 lastInst = compRegistry[i-1];
             }

@@ -61,11 +61,16 @@
             this._timer = global.setTimeout(this.closeNavigation, 3000);
 
             this._reloadObserver = function(){
-
-                if(this.isMounted()){
-                    this.setState({
-                        workspaces:this.props.pydio.user.getRepositoriesList()
-                    });
+                try{
+                    if(this.isMounted()){
+                        this.setState({
+                            workspaces:this.props.pydio.user.getRepositoriesList()
+                        });
+                    }
+                }catch(e){
+                    if(global.console){
+                        console.error('Error while setting state on LeftNavigation component - Probably height error on IE8', e);
+                    }
                 }
             }.bind(this);
 
