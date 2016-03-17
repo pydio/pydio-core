@@ -120,7 +120,7 @@ class ZohoEditor extends AJXP_Plugin
 
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($destStreamURL.$file);
-            $tmp = SystemTextEncoding::fromUTF8($tmp);
+            //$tmp = SystemTextEncoding::fromUTF8($tmp);
 
             $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
@@ -146,7 +146,7 @@ class ZohoEditor extends AJXP_Plugin
                 'id' => $_SESSION["ZOHO_CURRENT_UUID"],
                 'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
                 'output' => 'url',
-                'lang' => "en",
+                'lang' => $this->getFilteredOption("ZOHO_LANGUAGE"),
                 'filename' => urlencode(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
