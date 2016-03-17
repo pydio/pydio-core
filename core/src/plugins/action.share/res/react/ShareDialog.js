@@ -477,7 +477,7 @@
             }
             return (
                 <div>
-                    <h3>Local Users</h3>
+                    <h3>{this.context.getMessage('217')}</h3>
                     <div className="section-legend">{this.context.getMessage('182')}</div>
                     {usersInput}
                     {rwHeader}
@@ -1181,7 +1181,7 @@
                         {labelLegend}
                         <ReactMUI.TextField
                             disabled={this.context.isReadonly()}
-                            floatingLabelText="Description"
+                            floatingLabelText={this.context.getMessage('215')}
                             name="description"
                             onChange={this.updateDescription}
                             value={this.props.shareModel.getGlobal('description')}
@@ -1224,7 +1224,7 @@
             }
             return (
                 <div className="reset-pydio-forms">
-                    <h3>Notification</h3>
+                    <h3>{this.context.getMessage('216')}</h3>
                     {element}
                     <div className="form-legend">{this.context.getMessage('188')}</div>
                 </div>
@@ -1320,7 +1320,7 @@
                         <div className="section-legend">{this.context.getMessage('204')}</div>
                         <div>
                             <ReactMUI.TextField ref="newOwner" floatingLabelText={this.context.getMessage('205')}/>
-                            <ReactMUI.RaisedButton label="Transfer" onClick={this.transferOwnership}/>
+                            <ReactMUI.RaisedButton label={this.context.getMessage('218')} onClick={this.transferOwnership}/>
                         </div>
                     </div>
                 );

@@ -222,4 +222,8 @@ $mess = array(
     "212" => "accepted",
     "213" => "rejected",
     "214" => "not sent",
+    "215" => "Description",
+    "216" => "Notification",
+    "217" => "Local Users",
+    "218" => "Transfer",
 );
