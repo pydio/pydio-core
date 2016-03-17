@@ -61,7 +61,10 @@
   outline: none;
 }
 body {
-  font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
+}
+h3 {
+  font-weight: 500;
 }
 /*
 MAJOR STYLES
@@ -678,7 +681,6 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   padding-left: 27px !important;
   background-position: 5px 4px;
   color: rgba(0, 0, 0, 0.87);
-  letter-spacing: 1px;
 }
 .class-FilesList.fl-displayMode-list .table_rows_container span#ajxp_label {
   font-weight: normal;
@@ -849,7 +851,6 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   padding: 5px 5px 4px;
   background-color: #ffffff;
   color: rgba(0, 0, 0, 0.87);
-  letter-spacing: 1px;
   border-bottom: 0;
   height: 18px;
   overflow: hidden;
@@ -942,7 +943,6 @@ div.oneFieldForm input.SF_input {
   display: inline-block;
   float: left;
   font-size: 13px;
-  letter-spacing: 1px;
   margin-left: 12px;
   outline: none;
   overflow: visible;
@@ -966,7 +966,6 @@ div.oneFieldForm input.SF_input {
   display: inline-block;
   float: left;
   font-size: 13px;
-  letter-spacing: 1px;
   margin-left: 12px;
   outline: none;
   overflow: visible;
@@ -1078,10 +1077,8 @@ div.SF_disabled {
   font-style: italic;
 }
 div.SF_label {
-  letter-spacing: 1px;
   line-height: 22px !important;
   margin-top: 3px;
-  text-transform: uppercase;
   width: 100% !important;
 }
 input.SF_fieldCheckBox {
@@ -1277,7 +1274,6 @@ select.SF_input {
 .dialogBox .dialogContent div.SF_material div.SF_label {
   color: #8c8c8c;
   font-size: 11px;
-  letter-spacing: 0;
   line-height: 14px !important;
   margin-left: 0;
   margin-top: 17px;
@@ -1486,7 +1482,6 @@ div.shadow_class {
 }
 .dialogBox .dialogContent .SF_label {
   text-transform: none;
-  letter-spacing: normal;
   font-size: 12px;
   margin-bottom: -3px;
 }
@@ -1615,7 +1610,6 @@ div.shadow_class {
   margin: 18px 18px;
   overflow-y: auto;
   max-height: 120px;
-  letter-spacing: 0;
   line-height: 18px;
 }
 .messageBox #message_content::before {
@@ -2064,7 +2058,6 @@ div#multiple_download_container div div a:hover {
 #uploadFilesListContainer {
   vertical-align: top;
   font-size: 11px;
-  letter-spacing: 1px;
 }
 /********************************/
 /* SLIDER*/
@@ -2440,7 +2433,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 }
 #logging_string i {
   font-style: normal;
-  letter-spacing: 1px;
 }
 #logging_string i img {
   border-radius: 22px;
@@ -2457,7 +2449,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   cursor: pointer;
   float: left;
   font-size: 12px;
-  letter-spacing: 1px;
   padding: 3px 10px 7px 7px;
 }
 #logging_string .user_widget_label.withImage {
@@ -2601,8 +2592,9 @@ div.selection_ctrl_key {
 }
 #search_container #search_results_cont .search_label.close {
   display: block;
-  font-size: 30px;
-  padding: 15px 10px 17px;
+  font-size: 20px;
+  padding: 15px 10px 10px;
+  color: white;
 }
 #search_container #search_results_cont .close_results.icon-remove-sign {
   position: absolute;
@@ -2661,15 +2653,16 @@ div.selection_ctrl_key {
   clear: left;
   overflow: hidden;
   margin-bottom: 10px;
+  margin-left: 12px;
+  margin-right: 7px;
 }
 #search_container #search_results_cont #search_results div[data-groupByValue]:first-child {
   margin-top: 10px;
 }
-#search_container #search_results_cont #search_results h3 {
+#search_container #search_results_cont #search_results div[data-groupByValue] h3 {
   font-size: 20px;
-  margin: 10px 13px 10px 14px;
+  margin: 10px 1% 0 0;
   color: #515151;
-  border-bottom: 1px solid #747474;
   padding: 5px 0;
 }
 #search_container #search_results_cont #search_results div#element_overlay {
@@ -2681,13 +2674,16 @@ div.selection_ctrl_key {
   margin-top: 16px !important;
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed {
-  border-radius: 6px;
-  width: 45%;
-  margin: 0 1% !important;
-  padding-top: 0;
-  padding-bottom: 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 49%;
+  margin: 0.5% 1% 0.5% 0 !important;
+  box-sizing: border-box;
+  padding: 8px 16px 16px 5px;
   overflow: hidden;
-  height: 71px;
+  border-bottom: none;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
   /*opacity: 1;*/
@@ -2695,15 +2691,20 @@ div.selection_ctrl_key {
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed span.text_label {
   padding-top: 0;
 }
+#search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbLabel {
+  font-size: 16px !important;
+  padding-top: 11px;
+}
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
-  margin-right: 7px;
-  padding-bottom: 9px;
+  margin-right: 10px;
+  padding-top: 12px;
+  padding-bottom: 5px;
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell div.overlay_icon_div {
   display: none !important;
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell div.thumbLabel {
-  font-size: 17px;
+  font-size: 16px !important;
   padding-top: 11px;
   color: #333;
 }
@@ -2720,7 +2721,6 @@ div.selection_ctrl_key {
 }
 #search_container #search_results_cont #search_results span.metadata_chunk span.text_label {
   padding-left: 0;
-  color: #666;
 }
 #search_container #search_results_cont #search_results span.metadata_chunk.metadata_chunk_standard.metadata_chunk_mimestring_id {
   display: none;
@@ -2755,6 +2755,8 @@ div.selection_ctrl_key {
   cursor: pointer;
   font-size: 0.8em;
   float: right;
+  margin-top: 5px;
+  margin-right: 5px;
 }
 #search_container #search_results_cont #search_meta input.c3,
 #search_container #search_results_cont #search_meta span.c3 {
@@ -2821,6 +2823,8 @@ div.selection_ctrl_key {
   text-align: left;
   line-height: 17px;
   padding-top: 2px;
+  color: rgba(255, 255, 255, 0.53);
+  font-weight: 300;
 }
 #search_container #search_results_cont #search_meta div.advanced_search_section span[class^="icon-"],
 #search_container #search_results_cont #search_meta div.advanced_search_section span[class*=" icon-"] {
@@ -2830,12 +2834,12 @@ div.selection_ctrl_key {
   border-bottom: 1px solid #8fa2b6;
 }
 #search_container #search_results_cont #search_meta_detailed {
-  padding: 5px 5px 10px;
+  padding: 5px 0 10px;
   line-height: 28px;
   overflow: hidden;
 }
 #search_container #search_results_cont #search_meta div.advanced_search_section {
-  padding: 5px 5px 15px 17px;
+  padding: 5px 5px 15px 10px;
   line-height: 29px;
   display: none;
 }
@@ -2843,16 +2847,13 @@ div.selection_ctrl_key {
   display: block;
 }
 #search_container #search_results_cont #search_meta div.advanced_search_section_title {
-  font-size: 1.3em;
+  font-size: 13px;
+  font-weight: 500;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
   padding: 8px 8px 9px 10px;
   margin: 0;
-  letter-spacing: 1px;
   display: block;
   clear: left;
-  font-weight: lighter;
-}
-#search_container #search_results_cont #search_meta div.advanced_search_section_title {
-  border-left: 0;
 }
 #search_container #search_results_cont #search_meta div.advanced_search_section_title span.icon-circle {
   display: none;
@@ -2928,7 +2929,6 @@ div.selection_ctrl_key {
 div.tabbed_editor div.innerTitle {
   margin: 10px !important;
   padding: 8px !important;
-  letter-spacing: 1px !important;
 }
 span.toggleHeader {
   display: inline-block;
@@ -3033,7 +3033,6 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
   font-size: 11px;
   padding: 3px 16px 4px 8px;
   height: 35px;
-  letter-spacing: 1px;
   background-color: #ddd;
   color: #6f7b88;
   border-right: 0;
@@ -3608,7 +3607,6 @@ div.menu.menuDetails span.ajxp_icon_span {
 }
 div.menu.menuDetails span.menu_description {
   display: block;
-  letter-spacing: 0;
   line-height: 16px;
   font-size: 11px;
   color: white;
@@ -3645,7 +3643,6 @@ div.menu.rightAlignMenu {
 div.menu.rightAlignMenu a {
   padding: 8px 5px 7px 20px;
   text-align: right;
-  letter-spacing: 1px;
 }
 div.menu.rightAlignMenu a img {
   margin-right: 0;
@@ -3675,7 +3672,6 @@ div.menu.rootDirChooser li.menuTitle {
   padding: 13px 8px 15px;
   text-align: left;
   font-size: 22px;
-  letter-spacing: 1px;
   text-transform: uppercase;
   display: block;
 }
@@ -3696,7 +3692,6 @@ div.menu.rootDirChooser a {
   display: block;
   padding: 8px 5px 8px 6px;
   color: #fff;
-  letter-spacing: 1px;
 }
 div.menu.rootDirChooser a img {
   margin-right: 5px;
@@ -4720,7 +4715,6 @@ div.dialogButtons.inlineEdition input {
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
   font-size: 12px;
-  letter-spacing: 1px;
   padding: 0 18px;
   color: #ffffff;
   display: inline-block;
@@ -4754,7 +4748,6 @@ div.dialogButtons.inlineEdition input {
   font-size: 11px;
   padding: 3px 12px 4px 8px;
   height: 35px;
-  letter-spacing: 0;
   background-color: #e8e8e8;
   color: #6f7b88;
   border-right: 0;
@@ -4894,7 +4887,6 @@ div.dialogButtons.inlineEdition input {
 #info_panel .toolbarGroup a span.actionbar_button_label {
   display: block;
   text-transform: none;
-  letter-spacing: 0;
   font-size: 12px;
   font-weight: 500;
   padding-top: 3px;
@@ -4982,7 +4974,6 @@ div.dialogButtons.inlineEdition input {
   background-color: transparent;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0;
   height: 50px;
   margin-right: 6px;
   border-radius: 0;
@@ -5034,7 +5025,6 @@ div.dialogButtons.inlineEdition input {
   font-size: 15px;
   color: #ffffff;
   font-weight: normal;
-  letter-spacing: 1px;
   margin-top: 0;
   cursor: pointer;
   padding: 21px 15px 21px 15px;
@@ -5131,8 +5121,10 @@ div.dialogButtons.inlineEdition input {
 #browser #topPane div.droppableZone {
   background-color: rgba(255, 255, 255, 0.2) !important;
 }
-#browser #topPane div.thumbnail_selectable_cell.detailed:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+#browser #topPane div.thumbnail_selectable_cell.detailed:hover,
+#browser #topPane div.thumbnail_selectable_cell.detailed.selected,
+#browser #topPane div.thumbnail_selectable_cell.detailed.selected.selected-focus {
+  background-color: rgba(255, 255, 255, 0.15) !important;
 }
 #browser #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   color: #ccc;
@@ -5152,6 +5144,7 @@ div.dialogButtons.inlineEdition input {
 #browser #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   padding-top: 7px;
   padding-bottom: 7px;
+  font-weight: 300;
 }
 #browser #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel:before {
   content: "\f114";

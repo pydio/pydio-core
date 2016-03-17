@@ -135,8 +135,9 @@
 
     .search_label.close{
       display: block;
-      font-size: 30px;
-      padding: 15px 10px 17px;
+      font-size: 20px;
+      padding: 15px 10px 10px;
+      color: white;
     }
 
     .close_results.icon-remove-sign {
@@ -206,17 +207,17 @@
         clear: left;
         overflow: hidden;
         margin-bottom: 10px;
+        margin-left: 12px;
+        margin-right: 7px;
         &:first-child{
           margin-top: 10px;
         }
-      }
-
-      h3 {
-        font-size: 20px;
-        margin: 10px 13px 10px 14px;
-        color: rgb(81, 81, 81);
-        border-bottom: 1px solid rgb(116, 116, 116);
-        padding: 5px 0;
+        h3 {
+          font-size: 20px;
+          margin: 10px 1% 0 0;
+          color: rgb(81, 81, 81);
+          padding: 5px 0;
+        }
       }
 
       div#element_overlay {
@@ -229,28 +230,36 @@
       }
 
       div.thumbnail_selectable_cell.detailed{
-        border-radius: 6px;
-        width:45%;
-        margin: 0 1% !important;
-        padding-top: 0;
-        padding-bottom: 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        width:49%;
+        margin: 0.5% 1% 0.5% 0 !important;
+        box-sizing: border-box;
+        padding: 8px 16px 16px 5px;
         overflow: hidden;
-        height: 71px;
+        border-bottom: none;
+        background-color: white;
+        box-shadow: @reactBoxShadowDepthMini;
         div.thumbnail_cell_metadata {
           /*opacity: 1;*/
         }
         span.text_label{
           padding-top: 0;
         }
+        div.thumbLabel{
+          font-size: 16px !important;
+          padding-top: 11px;
+        }
 
         div.thumbnail_selectable_cell {
-          margin-right: 7px;
-          padding-bottom: 9px;
+          margin-right: 10px;
+          padding-top: 12px;
+          padding-bottom: 5px;
           div.overlay_icon_div{
             display: none !important;
           }
           div.thumbLabel{
-            font-size: 17px;
+            font-size: 16px !important;
             padding-top: 11px;
             color: #333;
           }
@@ -275,7 +284,6 @@
         }
         span.text_label{
           padding-left: 0;
-          color: #666;
         }
         &.metadata_chunk_standard.metadata_chunk_mimestring_id{
           display: none;
@@ -319,6 +327,8 @@
         cursor: pointer;
         font-size: 0.8em;
         float: right;
+        margin-top: 5px;
+        margin-right: 5px;
       }
 
       input.c3, span.c3 {
@@ -396,6 +406,8 @@
         text-align: left;
         line-height: 17px;
         padding-top: 2px;
+        color: rgba(255,255,255,0.53);
+        font-weight: 300;
       }
 
       div.advanced_search_section span[class^="icon-"],
@@ -409,13 +421,13 @@
       }
 
       &_detailed {
-        padding:5px 5px 10px;
+        padding:5px 0 10px;
         line-height: 28px;
         overflow: hidden;
       }
 
       div.advanced_search_section{
-        padding: 5px 5px 15px 17px;
+        padding: 5px 5px 15px 10px;
         line-height: 29px;
         display: none;
       }
@@ -425,22 +437,18 @@
       }
 
       div.advanced_search_section_title {
-        font-size: 1.3em;
+        font-size: 13px;
+        font-weight: 500;
+        border-top: 1px solid rgba(255,255,255,0.3);
         padding: 8px 8px 9px 10px;
         margin: 0;
-        letter-spacing: 1px;
         display: block;
         clear: left;
-        font-weight: lighter;
+        span.icon-circle{
+          display: none;
+        }
       }
 
-      div.advanced_search_section_title{
-        border-left: 0;
-      }
-
-      div.advanced_search_section_title span.icon-circle{
-        display: none;
-      }
 
       span.search_meta_opt {
         cursor: pointer;
