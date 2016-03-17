@@ -233,7 +233,11 @@ class AJXP_Notification
                 $type = "minisite.folder";
             }
         }else if($repo->hasOwner() && $repo->getOwner() != $crtUserId){
-            $type = "workspace.shared";
+            if($repo->hasContentFilter()){
+                $type = "workspace.shared.file";
+            }else{
+                $type = "workspace.shared.folder";
+            }
         }
 
         $this->locationType = $type;

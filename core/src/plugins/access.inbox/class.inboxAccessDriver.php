@@ -21,8 +21,6 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use Pydio\Access\Core\Stream\Iterator\DirIterator;
-
 class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
@@ -41,7 +39,11 @@ class inboxAccessDriver extends fsAccessDriver
 
             // Retrieving stored details
             $originalNode = self::$output[$ajxpNode->getLabel()];
-            $meta = $originalNode["meta"];
+            if(isSet($originalNode["meta"])){
+                $meta = $originalNode["meta"];
+            }else{
+                $meta = array();
+            }
             $label = $originalNode["label"];
 
             if(!$ajxpNode->isLeaf()){
@@ -71,6 +73,10 @@ class inboxAccessDriver extends fsAccessDriver
                 try{
                     ConfService::loadDriverForRepository($node->getRepository());
                     $node->getRepository()->detectStreamWrapper(true);
+                    if($node->getRepository()->hasContentFilter()){
+                        $node->setLeaf(true);
+                    }
+                    AJXP_Controller::applyHook("node.read", array(&$node));
                     $stat = stat($url);
                     self::$output[$basename]["stat"] = $stat;
                 }catch (Exception $e){
