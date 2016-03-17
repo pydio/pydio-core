@@ -76,6 +76,12 @@ class inboxAccessDriver extends fsAccessDriver
                 }catch (Exception $e){
                     $stat = stat(AJXP_Utils::getAjxpTmpDir());
                 }
+                if(is_array($stat) && AuthService::getLoggedUser() != null){
+                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($nodeData["meta"]["shared_repository_id"]);
+                    if($acl == "r"){
+                        self::disableWriteInStat($stat);
+                    }
+                }
             }
             $nodeData["stat"] = $stat;
         }
@@ -167,6 +173,13 @@ class inboxAccessDriver extends fsAccessDriver
                 }else if($ext == "error"){
                     $label .= " (".$mess["inbox_driver.5"].")";
                 }
+                if(is_array($stat) && AuthService::getLoggedUser() != null){
+                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($repoId);
+                    if($acl == "r"){
+                        self::disableWriteInStat($stat);
+                    }
+
+                }
 
             }
 
@@ -198,4 +211,15 @@ class inboxAccessDriver extends fsAccessDriver
         }
         return $output;
     }
+
+    /**
+     * @param array $stat
+     */
+    protected static function disableWriteInStat(&$stat){
+        $octRights = decoct($stat["mode"]);
+        $last = (strlen($octRights)) - 1;
+        $octRights[$last] = $octRights[$last-1] = $octRights[$last-2] = 5;
+        $stat["mode"] = $stat[2] = octdec($octRights);
+    }
+
 }

@@ -407,33 +407,6 @@ class inboxAccessWrapper implements AjxpWrapper
     {
         $nodeData = inboxAccessDriver::getNodeData($path);
         return $nodeData["stat"];
-
-        $url = self::translateURL($path);
-        if(strpos($url, "invitation") === 0){
-            return stat(__FILE__);
-        }
-        if($url == null){
-            return false;
-        }
-        $stat = stat($url);
-        if($stat === false){
-            return false;
-        }
-        if(self::$linkNode !== null){
-            ConfService::loadDriverForRepository(self::$linkNode->getRepository());
-        }
-        //$this->disableWriteInStat($stat);
-        return $stat;
-    }
-
-    /**
-     * @param array $stat
-     */
-    protected function disableWriteInStat(&$stat){
-        $octRights = decoct($stat["mode"]);
-        $last = (strlen($octRights)) - 1;
-        $octRights[$last] = $octRights[$last-1] = $octRights[$last-2] = 5;
-        $stat["mode"] = $stat[2] = octdec($octRights);
     }
 
 }

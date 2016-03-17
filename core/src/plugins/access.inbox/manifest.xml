@@ -10,7 +10,9 @@
     </client_settings>
     <registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
-		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='download_all']|actions/action[@name='download']"/>
+		<external_file filename="plugins/access.fs/fsActions.xml"
+                       include="actions/*"
+                       exclude="actions/action[@name='download_all']|actions/action[@name='download']|actions/action[@name='download_chunk']|actions/action[@name='rename']|actions/action[@name='move']|actions/action[@name='copy']|actions/action[@name='delete']|actions/action[@name='chmod']|actions/action[@name='compress']|actions/action[@name='compress_ui']"/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 
@@ -82,6 +84,124 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="copy_inbox" ctrlDragndropDefault="true">
+                <gui text="inbox_driver.14" title="inbox_driver.15" src="editcopy.png" iconClass="icon-copy" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="change_main">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="false"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+					if(pydio.user){
+						var user = pydio.user;
+						var activeRepository = user.getActiveRepository();
+					}
+					var context = pydio.getController();
+					var onLoad = function(oForm){
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						getAction.value = 'copy';
+						this.treeSelector = new TreeSelector(oForm, {
+                            nodeFilter : function(ajxpNode){
+                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
+                            }
+                        });
+						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+							var firstKey ;
+							var reposList = new Hash();
+							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
+								if(!firstKey) firstKey = pair.key;
+								reposList.set(pair.key, pair.value.getLabel());
+							}.bind(this));
+
+                            var nodeProvider = new RemoteNodeProvider();
+                            nodeProvider.initProvider({tmp_repository_id:firstKey});
+                            var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);
+                            this.treeSelector.load(rootNode);
+
+							this.treeSelector.setFilterShow(true);
+							reposList.each(function(pair){
+								this.treeSelector.appendFilterValue(pair.key, pair.value);
+							}.bind(this));
+
+							this.treeSelector.setFilterSelectedIndex(0);
+							this.treeSelector.setFilterChangeCallback(function(e){
+								externalRepo = this.filterSelector.getValue();
+								var nodeProvider = new RemoteNodeProvider();
+								nodeProvider.initProvider({tmp_repository_id:externalRepo});
+								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
+							});
+						}else{
+							this.treeSelector.load();
+						}
+					}.bind(context);
+					var onCancel = function(){
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
+					var onSubmit = function(){
+						var oForm = modal.getForm();
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						var selectedNode = this.treeSelector.getSelectedNode();
+						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
+							getAction.value = "cross_copy" ;
+						}
+						pydio.getUserSelection().updateFormOrUrl(oForm);
+						this.submitForm(oForm);
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
+					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
+					]]></clientCallback>
+                    <clientForm id="copymove_form"><![CDATA[
+					<div id="copymove_form" action="copy" box_width="272">
+						<input type="hidden" name="dest_node" value=""/>
+						<div class="dialogLegend">AJXP_MESSAGE[175]</div>
+						<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-top:5px; margin-bottom:7px; border: 1px solid #ccc;"></select>
+						<div style="height:200px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
+							<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
+						</div>
+						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
+					</div>
+				]]></clientForm>
+                    <clientListener name="contextChange"><![CDATA[
+				if(pydio){
+					var action = pydio.getController().getActionByName("copy");
+					if(action){
+						action.rightsContext.write = true;
+						var ajxpUser = pydio.user;
+						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
+							action.rightsContext.write = false;
+							pydio.getController().defaultActions['delete']('ctrldragndrop');
+							pydio.getController().defaultActions['delete']('dragndrop');
+						}
+						if(ajxpUser && ajxpUser.canWrite() && pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+						    action.rightsContext.write = false;
+						}
+						if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+							action.setLabel(247, 248);
+							action.setIconSrc('ark_extract.png');
+						}else{
+							action.setLabel(66, 159);
+							action.setIconSrc('editcopy.png');
+						}
+					}
+				}
+				]]></clientListener>
+                    <serverCallback methodName="switchAction" restParams="/" developerComment="Copy one or more items to a given target">
+                        <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                        <input_param description="Target folder where to copy" name="dest" type="path" mandatory="true"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="share_react" forbidOverride="true"/>
+            <action name="share" forbidOverride="true"/>
+            <action name="get_my_feed" forbidOverride="true"/>
+            <action name="mkdir" forbidOverride="true"/>
+            <action name="upload" forbidOverride="true"/>
+            <action name="compress" forbidOverride="true"/>
+            <action name="compress_ui" forbidOverride="true"/>
         </actions>
         <client_configs>
             <component_config className="FilesList">

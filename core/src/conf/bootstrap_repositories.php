@@ -136,7 +136,7 @@ $REPOSITORIES["inbox"] = array(
     "AJXP_SLUG"		    =>  "inbox",
     "DRIVER"		    =>	"inbox",
     "DRIVER_OPTIONS"    => array(
-        "DEFAULT_RIGHTS" => "r"
+        "DEFAULT_RIGHTS" => "rw"
     )
 );
 
