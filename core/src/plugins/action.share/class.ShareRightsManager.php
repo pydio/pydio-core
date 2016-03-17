@@ -233,7 +233,11 @@ class ShareRightsManager
             if($entry["TYPE"] == "user") {
                 $users[$entry["ID"]] = $entry;
             }else{
+                if($entry["ID"] == "AJXP_GRP_/"){
+                    $entry["ID"] = "AJXP_GRP_".AuthService::filterBaseGroup("/");
+                }
                 $groups[$entry["ID"]] = $entry;
+
             }
             $index ++;
 
@@ -307,8 +311,7 @@ class ShareRightsManager
                     );
                 }
                 $ID = $userId;
-            }else if($rId == "AJXP_GRP_/"){
-                $rId = "AJXP_GRP_/";
+            }else if($rId == "AJXP_GRP_".AuthService::filterBaseGroup("/")){
                 $TYPE = "group";
                 $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
@@ -332,9 +335,11 @@ class ShareRightsManager
                 if(isSet($loadedGroups[$groupId])) {
                     $LABEL = $loadedGroups[$groupId];
                 }
-                if($groupId == "/"){
+                /*
+                if($groupId == AuthService::filterBaseGroup("/")){
                     $LABEL = $mess["447"];
                 }
+                */
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
             }else{
