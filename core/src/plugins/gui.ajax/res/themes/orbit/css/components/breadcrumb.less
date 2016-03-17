@@ -1,8 +1,8 @@
 @breadcrumb_font_family:@fontStandard;
-@breadcrumb_text_color:rgba(0,0,0,0.63);
+@breadcrumb_text_color:rgba(0,0,0,0.67);
 @breadcrumb_background: #f5f5f5; // Appears 3 times
 @breadcrumb_hover_background: #ffffff; // Appears 2 times
-@breadcrumb_angle_color: #cccccc; // Appears 2 times
+@breadcrumb_angle_color: #e0e0e0; // Appears 2 times
 @breadcrumb_first_bread: #222222; // Appears 2 times
 @breadcrumb_refresh_hover:#fb725c;
 
@@ -20,7 +20,7 @@
   margin-top: 0;
   overflow: hidden;
   div.inner_bread {
-    width: 2000px;
+    width: 5000px;
   }
 }
 .breadcrumbs-one {
@@ -33,11 +33,15 @@
   }
   em {
     font-style: normal;
-    font-weight: 100;
+    font-weight: 500;
   }
   li {
+    font-size: 13px;
+    line-height: 22px;
     float: left;
     &:first-child {
+      font-size: 16px;
+      line-height: 20px;
       span {
         background-color: @breadcrumb_first_bread;
         border-radius: 0;
@@ -93,7 +97,7 @@
     }
     &::before {
       border-left-color: @breadcrumb_angle_color;
-      right: -1.05em;
+      right: -1.08em;
       z-index: 1;
     }
   }
@@ -129,7 +133,7 @@
     }
     &:hover {
       padding: 20px 15px 20px 35px;
-      transition:padding 1s ease;
+      transition:padding 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
       width: auto;
       em {
         visibility:visible;

@@ -3134,14 +3134,14 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   border-radius: 0 40px 40px 0;
-  color: rgba(0, 0, 0, 0.63);
+  color: rgba(0, 0, 0, 0.67);
   display: block;
   float: left;
   margin-top: 0;
   overflow: hidden;
 }
 #breadcrumb div.inner_bread {
-  width: 2000px;
+  width: 5000px;
 }
 .breadcrumbs-one {
   overflow: hidden;
@@ -3154,10 +3154,16 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 }
 .breadcrumbs-one em {
   font-style: normal;
-  font-weight: 100;
+  font-weight: 500;
 }
 .breadcrumbs-one li {
+  font-size: 13px;
+  line-height: 22px;
   float: left;
+}
+.breadcrumbs-one li:first-child {
+  font-size: 16px;
+  line-height: 20px;
 }
 .breadcrumbs-one li:first-child span {
   background-color: #222222;
@@ -3178,7 +3184,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 }
 .breadcrumbs-one span {
   background-color: #f5f5f5;
-  color: rgba(0, 0, 0, 0.63);
+  color: rgba(0, 0, 0, 0.67);
   float: left;
   height: 22px;
   padding: 22px 15px 20px 35px;
@@ -3208,8 +3214,8 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   border-left-color: #f5f5f5;
 }
 .breadcrumbs-one span::before {
-  border-left-color: #cccccc;
-  right: -1.05em;
+  border-left-color: #e0e0e0;
+  right: -1.08em;
   z-index: 1;
 }
 .breadcrumbs-one .current {
@@ -3227,7 +3233,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   content: normal;
 }
 .breadcrumbs-one i.ajxp-goto {
-  color: #cccccc;
+  color: #e0e0e0;
   cursor: pointer;
   display: inline-block;
   padding: 22px 25px;
@@ -3245,7 +3251,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 }
 .breadcrumbs-one span.reduced:hover {
   padding: 20px 15px 20px 35px;
-  transition: padding 1s ease;
+  transition: padding 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   width: auto;
 }
 .breadcrumbs-one span.reduced:hover em {
