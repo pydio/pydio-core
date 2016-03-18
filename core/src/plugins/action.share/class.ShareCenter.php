@@ -415,8 +415,8 @@ class ShareCenter extends AJXP_Plugin
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
 
-                $this->updateToMaxAllowedValue($httpVars, "FILE_MAX_DOWNLOAD", "downloadlimit");
-                $this->updateToMaxAllowedValue($httpVars, "FILE_MAX_EXPIRATION", "expiration");
+                $this->updateToMaxAllowedValue($httpVars, "downloadlimit", "FILE_MAX_DOWNLOAD");
+                $this->updateToMaxAllowedValue($httpVars, "expiration", "FILE_MAX_EXPIRATION");
 
                 $newMeta = null;
                 $httpHash = null;

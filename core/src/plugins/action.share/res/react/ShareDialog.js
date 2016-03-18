@@ -723,14 +723,35 @@
             showMailer:React.PropTypes.func
         },
 
-        toggleLink: function(event){
-            this.props.shareModel.togglePublicLink();
+        toggleLink: function(){
+            var publicLinks = this.props.shareModel.getPublicLinks();
+            if(this.state.showTemporaryPassword){
+                this.setState({showTemporaryPassword: false, temporaryPassword: null});
+            }else if(!publicLinks.length && ReactModel.Share.getAuthorizations(this.props.pydio).password_mandatory){
+                this.setState({showTemporaryPassword: true, temporaryPassword: ''});
+            }else{
+                this.props.shareModel.togglePublicLink();
+            }
+        },
+
+        getInitialState: function(){
+            return {showTemporaryPassword: false, temporaryPassword: null};
+        },
+
+        updateTemporaryPassword: function(value, event){
+            if(value == undefined) value = event.currentTarget.getValue();
+            this.setState({temporaryPassword:value});
+        },
+
+        enableLinkWithPassword:function(){
+            this.props.shareModel.enablePublicLinkWithPassword(this.state.temporaryPassword);
+            this.setState({showTemporaryPassword:false, temporaryPassword:null});
         },
 
         render: function(){
 
             var publicLinkPanes;
-            if(this.props.linkData){
+            if(this.props.linkData) {
                 publicLinkPanes = [
                     <PublicLinkField
                         showMailer={this.props.showMailer}
@@ -742,13 +763,33 @@
                     <PublicLinkPermissions
                         linkData={this.props.linkData}
                         shareModel={this.props.shareModel}
-                        key="public-perm" />,
+                        key="public-perm"/>,
                     <PublicLinkSecureOptions
                         linkData={this.props.linkData}
                         shareModel={this.props.shareModel}
+                        pydio={this.props.pydio}
                         key="public-secure"
                     />
                 ];
+            }else if(this.state.showTemporaryPassword){
+                publicLinkPanes = [
+                    <div>
+                        <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('215')}</div>
+                        <div>
+                            <div style={{float:'left'}}>
+                                <PydioForm.ValidPassword
+                                    attributes={{label:this.context.getMessage('23')}}
+                                    value={this.state.temporaryPassword}
+                                    onChange={this.updateTemporaryPassword}
+                                />
+                            </div>
+                            <div style={{marginLeft:7,marginTop: 26,float:'left'}}>
+                                <ReactMUI.RaisedButton label={this.context.getMessage('92')} secondary={true} onClick={this.enableLinkWithPassword}/>
+                            </div>
+                        </div>
+                    </div>
+                ];
+
             }else{
                 publicLinkPanes = [
                     <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('190')}</div>
@@ -764,7 +805,7 @@
                     <ReactMUI.Checkbox
                         disabled={this.context.isReadonly() || disableForNotOwner}
                         onCheck={this.toggleLink}
-                        checked={!!this.props.linkData}
+                        checked={!!this.props.linkData || this.state.showTemporaryPassword}
                         label={this.context.getMessage('189')}
                     />
                     {publicLinkPanes}
@@ -1048,6 +1089,14 @@
             }
         },
 
+        formatDate : function(dateObject){
+            var dateFormatDay = this.context.getMessage('date_format', '').split(' ').shift();
+            return dateFormatDay
+                .replace('Y', dateObject.getFullYear())
+                .replace('m', dateObject.getMonth() + 1)
+                .replace('d', dateObject.getDate());
+        },
+
         render: function(){
             var linkId = this.props.linkData.hash;
             var passContainer = this.renderPasswordContainer();
@@ -1056,8 +1105,18 @@
             var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
             var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
             var expDate = null;
+            var maxDate = null, maxDownloads = null;
+            var auth = ReactModel.Share.getAuthorizations(this.props.pydio);
+            var today = new Date();
+            if(parseInt(auth.max_expiration) > 0){
+                maxDate = new Date();
+                maxDate.setDate(today.getDate() + parseInt(auth.max_expiration));
+            }
+            if(parseInt(auth.max_downloads) > 0){
+                // todo: limit the field values by default?
+                maxDownloads = parseInt(auth.max_downloads);
+            }
             if(expirationDateValue){
-                var today = new Date();
                 expDate = new Date();
                 expDate.setDate(today.getDate() + parseInt(expirationDateValue));
                 var clearValue = function(){
@@ -1096,15 +1155,18 @@
                                 hintText={this.context.getMessage('21')}
                                 autoOk={true}
                                 minDate={new Date()}
+                                maxDate={maxDate}
                                 defaultDate={expDate}
                                 showYearSelector={true}
                                 onShow={null}
                                 onDismiss={null}
+                                formatDate={this.formatDate}
                             />
                         </div>
                         <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}}>
                             <span className="ajxp_icon_span mdi mdi-download"/>
                             <ReactMUI.TextField
+                                type="number"
                                 disabled={this.context.isReadonly()}
                                 floatingLabelText={this.context.getMessage('22')}
                                 value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}

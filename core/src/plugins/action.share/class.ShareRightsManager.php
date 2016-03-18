@@ -86,12 +86,15 @@ class ShareRightsManager
                 $this->store->testUserCanEditShare($existingRepo->getOwner(), $existingRepo->options);
             }
             $uniqueUser = $shareObject->getUniqueUser();
-
             if($guestUserPass !== null && strlen($guestUserPass)) {
                 $userPass = $guestUserPass;
                 $shareObject->setUniqueUser($uniqueUser, true);
             }else if(!$shareObject->shouldRequirePassword() || ($guestUserPass !== null && $guestUserPass == "")){
                 $shareObject->setUniqueUser($uniqueUser, false);
+            }
+            if($update && $forcePassword && !($shareObject instanceof \Pydio\OCS\Model\TargettedLink) && !$shareObject->shouldRequirePassword() && empty($guestUserPass)){
+                $mess = ConfService::getMessages();
+                throw new Exception($mess["share_center.175"]);
             }
 
         } else {

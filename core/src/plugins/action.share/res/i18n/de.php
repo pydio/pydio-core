@@ -227,4 +227,5 @@ $mess = array(
     "212" => "accepted",
     "213" => "rejected",
     "214" => "not sent",
+    "215" => "To enable a public link on a file or a folder, you first need to set up a password.",
 );

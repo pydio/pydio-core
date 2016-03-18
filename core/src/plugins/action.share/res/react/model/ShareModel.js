@@ -69,6 +69,16 @@
             this.save();
         }
 
+        enablePublicLinkWithPassword(mandatoryPassword){
+            this._pendingData['enable_public_link'] = true;
+            this._initPendingData();
+            this._pendingData['links']['ajxp_create_public_link'] = {'password':mandatoryPassword};
+            if(!this._data['links']){
+                this._data['links'] = {};
+            }
+            this.save();
+        }
+
         _initPendingData(){
             if(!this._pendingData['links']){
                 this._pendingData['links'] = {};
@@ -731,7 +741,9 @@
                 file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
                 file_workspaces : true, //pluginConfigs.get("ENABLE_FILE_SHARING"),
                 editable_hash : pluginConfigs.get("HASH_USER_EDITABLE"),
-                pass_mandatory: false
+                pass_mandatory: false,
+                max_expiration : pluginConfigs.get("FILE_MAX_EXPIRATION"),
+                max_downloads : pluginConfigs.get("FILE_MAX_DOWNLOAD")
             };
             var pass_mandatory = pluginConfigs.get("SHARE_FORCE_PASSWORD");
             if(pass_mandatory){
