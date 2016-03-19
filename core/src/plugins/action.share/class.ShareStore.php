@@ -395,7 +395,7 @@ class ShareStore {
      * @throws Exception
      * @return bool
      */
-    public function deleteShare($type, $element, $keepRepository = false)
+    public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false)
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
@@ -409,15 +409,17 @@ class ShareStore {
                 if(is_array($share) && isSet($share["REPOSITORY"])){
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
                 }
-                if($repo == null){
+                if($repo == null && !$ignoreRepoNotFound){
                     throw new Exception("repo-not-found");
                 }
-                $element = $share["REPOSITORY"];
             }
-            $this->testUserCanEditShare($repo->getOwner(), $repo->options);
-            $res = ConfService::deleteRepository($element);
-            if ($res == -1) {
-                throw new Exception($mess[427]);
+            if($repo != null){
+                $element = $share["REPOSITORY"];
+                $this->testUserCanEditShare($repo->getOwner(), $repo->options);
+                $res = ConfService::deleteRepository($element);
+                if ($res == -1) {
+                    throw new Exception($mess[427]);
+                }
             }
             if($this->sqlSupported){
                 if(isSet($share)){
@@ -565,7 +567,7 @@ class ShareStore {
         foreach($shares as $id => $data){
             $type = $data["type"];
             if($operation == "delete"){
-                $this->deleteShare($type, $id);
+                $this->deleteShare($type, $id, false, true);
                 continue;
             }
 
