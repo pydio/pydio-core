@@ -112,9 +112,11 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
             "USER_ID" => $USER_ID,
             "GROUP_PATH" => $GROUP_PATH
         );
+        /*
         foreach ($this->channels[$channelName]["MESSAGES"] as &$object) {
             $object->messageRC[$clientId] = $clientId;
         }
+        */
     }
 
     /**
