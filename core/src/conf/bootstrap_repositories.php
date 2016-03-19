@@ -136,7 +136,14 @@ $REPOSITORIES["inbox"] = array(
     "AJXP_SLUG"		    =>  "inbox",
     "DRIVER"		    =>	"inbox",
     "DRIVER_OPTIONS"    => array(
-        "DEFAULT_RIGHTS" => "rw"
+        "DEFAULT_RIGHTS" => "rw",
+        "META_SOURCES"   => array(
+            "metastore.serial"=> array(
+                "METADATA_FILE"	=> ".ajxp_meta",
+                "METADATA_FILE_LOCATION" => "infolders"
+            ),
+            "meta.watch"    => array()
+        )
     )
 );
 
