@@ -90,6 +90,18 @@ $router->addRoute('#^'.$options["path"].'$#i', new AjaXplorerHandler($logger, $A
 
 $server->on('connect', function(Devristo\Phpws\Protocol\WebSocketTransportHybi $user) use ($logger,$options, $ADMIN_KEY){
 
+	$originHeader  = $user->getHandshakeRequest()->getHeader('Origin', null);
+    $host = $user->getHandshakeRequest()->getHeader('Host')->getFieldValue();
+
+    if ($originHeader != null) {
+        $address = "https://".$host;
+        if (strpos($address, $originHeader->getFieldValue()) !== 0) {
+            $logger->err('CSRF protection in connection: detected invalid Origin header: '.$originHeader->getFieldValue());
+            $user->close();
+            return;
+        }
+    }
+    
     $h = $user->getHandshakeRequest()->getHeaders()->toArray();
     if (array_key_exists('Admin-Key',$h) && $h['Admin-Key'] == $ADMIN_KEY) {
         $logger->notice('[ECHO] Admin user connected');
