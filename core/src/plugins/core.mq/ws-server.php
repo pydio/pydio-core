@@ -112,11 +112,8 @@ $server->on('connect', function(Devristo\Phpws\Protocol\WebSocketTransportHybi $
         $curl = curl_init('http://'.$options['host'].'/index.php?get_action=ws_authenticate&key='.$ADMIN_KEY);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_COOKIESESSION, true);
-        curl_setopt($curl, CURLOPT_COOKIE, implode($c));
         curl_setopt($curl, CURLOPT_HTTPHEADER, $h);
-        $headers = array();
-        $headers[] = 'Cookie: AjaXplorer=' . implode($c);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_COOKIE, 'AjaXplorer='.$c['AjaXplorer']);
         $registry = curl_exec($curl);
         curl_close($curl);
     }else{
