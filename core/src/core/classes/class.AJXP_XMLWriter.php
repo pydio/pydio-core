@@ -176,7 +176,7 @@ class AJXP_XMLWriter
             if(AJXP_Utils::detectXSS($metaData["text"])) $metaData["text"] = "XSS Detected - Please contact your admin";
         }
         $metaData["is_file"] = ($isLeaf?"true":"false");
-
+        $metaData["ajxp_im_time"] = time();
         foreach ($metaData as $key => $value) {
             if(AJXP_Utils::detectXSS($value)) $value = "XSS Detected!";
             $value = AJXP_Utils::xmlEntities($value, true);
@@ -385,7 +385,7 @@ class AJXP_XMLWriter
             $buffer .= "<remove>";
             foreach ($diffNodes["REMOVE"] as $nodePath) {
                 $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
-                $buffer .= "<tree filename=\"$nodePath\"/>";
+                $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
             }
             $buffer .= "</remove>";
         }
