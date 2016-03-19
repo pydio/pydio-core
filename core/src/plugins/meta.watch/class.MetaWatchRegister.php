@@ -442,7 +442,8 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
     private function processActiveHook(AJXP_Notification $notification, $namespace, $parentActionType = null){
-        $node = $notification->getNode();
+        $origNode = $notification->getNode();
+        $node = new AJXP_Node($origNode->getUrl());
         $all = $this->collectWatches($node, $namespace);
         if($node->isRoot() && $node->getRepository() !== null && $node->getRepository()->hasContentFilter()){
             $node->setLeaf(true);
