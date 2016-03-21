@@ -3140,6 +3140,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   float: left;
   margin-top: 0;
   overflow: hidden;
+  height: 62px;
 }
 #breadcrumb div.inner_bread {
   width: 5000px;
@@ -3187,7 +3188,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   background-color: #f5f5f5;
   color: rgba(0, 0, 0, 0.67);
   float: left;
-  height: 22px;
+  height: 20px;
   padding: 22px 15px 20px 35px;
   position: relative;
   text-decoration: none;
