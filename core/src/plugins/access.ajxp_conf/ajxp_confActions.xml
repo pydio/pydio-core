@@ -552,7 +552,7 @@
             </gui>
             <processing>
                 <clientCallback><![CDATA[
-                    var win = window.open('https://pydio.com/?referrer=settings');
+                    var win = window.open('https://pydio.com/en/go-pro?referrer=settings');
                 ]]></clientCallback>
             </processing>
         </action>
