@@ -485,21 +485,24 @@ class ShareStore {
      * @param string $oldPath
      * @param string $newPath
      * @param string|null $parentRepositoryPath
+     * @return int Number of nodes modified in different repositories
      */
     public function moveSharesFromMetaRecursive($baseNode, $delete = false, $oldPath, $newPath, $parentRepositoryPath = null){
 
+        $modifiedDifferentNodes = 0;
         // Find shares in children
         try{
             $result = $this->getMetaManager()->collectSharesIncludingChildren($baseNode);
         }catch(Exception $e){
             // Error while loading node, ignore
-            return;
+            return $modifiedDifferentNodes;
         }
         $basePath = $baseNode->getPath();
         foreach($result as $relativePath => $metadata){
             if($relativePath == "/") {
                 $relativePath = "";
             }
+            $modifiedDifferentNodes ++;
             $changeOldNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$oldPath.$relativePath);
 
             foreach($metadata as $ownerId => $meta){
@@ -541,12 +544,13 @@ class ShareStore {
                 }
 
                 foreach($collectedRepositories as $sharedRepoId => $parentRepositoryPath){
-                    $this->moveSharesFromMetaRecursive(new AJXP_Node("pydio://".$sharedRepoId."/"), $delete, $changeOldNode->getPath(), $changeNewNode->getPath(), $parentRepositoryPath);
+                    $modifiedDifferentNodes += $this->moveSharesFromMetaRecursive(new AJXP_Node("pydio://".$sharedRepoId."/"), $delete, $changeOldNode->getPath(), $changeNewNode->getPath(), $parentRepositoryPath);
                 }
 
             }
         }
 
+        return $modifiedDifferentNodes;
 
     }
 
