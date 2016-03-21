@@ -414,7 +414,6 @@ class ShareStore {
                 }
             }
             if($repo != null){
-                $element = $share["REPOSITORY"];
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
                 $res = ConfService::deleteRepository($element);
                 if ($res == -1) {
@@ -422,7 +421,7 @@ class ShareStore {
                 }
             }
             if($this->sqlSupported){
-                if(isSet($share)){
+                if(isSet($share) && count($share)){
                     $this->confStorage->simpleStoreClear("share", $element);
                 }else{
                     $shares = $this->findSharesForRepo($element);
