@@ -243,6 +243,11 @@
     padding: 6px 7px 7px 11px;
     font-size: 14px;
     display: inline-block;
+    border-bottom: 0;
+}
+
+.settings_main_pane #editor_tabs span.toggleHeader{
+    padding-bottom: 9px;
 }
 
 #leftTabulator span.toggleHeader span[class^="icon-"],

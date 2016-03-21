@@ -2448,7 +2448,8 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 #logging_string .user_widget_label {
   cursor: pointer;
   float: left;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 300;
   padding: 3px 10px 7px 7px;
 }
 #logging_string .user_widget_label.withImage {
@@ -2457,7 +2458,8 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 }
 #logging_string .user_widget_label.withImage i {
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 300;
   padding: 3px 0 0 8px;
 }
 #logging_string img.user_widget_mini {
@@ -4714,8 +4716,9 @@ div.dialogButtons.inlineEdition input {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
-  font-size: 12px;
-  padding: 0 18px;
+  font-size: 14px;
+  padding: 4px 24px;
+  font-weight: 300;
   color: #ffffff;
   display: inline-block;
 }
