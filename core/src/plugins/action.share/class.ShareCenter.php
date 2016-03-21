@@ -418,7 +418,6 @@ class ShareCenter extends AJXP_Plugin
                 $this->updateToMaxAllowedValue($httpVars, "downloadlimit", "FILE_MAX_DOWNLOAD");
                 $this->updateToMaxAllowedValue($httpVars, "expiration", "FILE_MAX_EXPIRATION");
 
-                $newMeta = null;
                 $httpHash = null;
                 $originalHash = null;
 
@@ -541,10 +540,8 @@ class ShareCenter extends AJXP_Plugin
                  */
                 if($shareScope == "public"){
                     $ajxpNode->loadNodeInfo();
-                    $nodePathes[] = $ajxpNode->getPath();
-                    $data = array($ajxpNode->getPath() => $ajxpNode);
-                    $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => $data]);
-                    AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, $nodePathes));
+                    $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => array($ajxpNode->getPath() => $ajxpNode)]);
+                    AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
                 }
 
                 if(!isSet($httpVars["return_json"])){
@@ -703,10 +700,8 @@ class ShareCenter extends AJXP_Plugin
 
                             if(isSet($httpVars["share_scope"]) &&  $httpVars["share_scope"] == "public"){
                                 $ajxpNode->loadNodeInfo();
-                                $nodePathes[] = $ajxpNode->getPath();
-                                $data = array($ajxpNode->getPath() => $ajxpNode);
-                                $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => $data]);
-                                AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, $nodePathes));
+                                $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => [$ajxpNode->getPath() => $ajxpNode]]);
+                                AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
                             }
 
                         }
