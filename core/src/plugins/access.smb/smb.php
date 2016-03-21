@@ -309,48 +309,50 @@ class smb
                   trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
                 break;
             case 'share':
-                if ($_SESSION["COUNT"] == 0) {
-                    $_SESSION["COUNT"] = 1;
+                $id = "smb_".md5($pu["host"].$pu["user"]);
+                if ($_SESSION[$id] == 0 || true) {
+                    $_SESSION[$id] = 1;
                     //self::debug("OH HEY");
                     //$__count++;
                     //self::debug($__count);
-                if ($o = smb::look ($pu)) {
-                    $_SESSION["disk"] = $o['disk'];
-                    self::debug(print_r($_SESSION["disk"], true));
-                 //self::debug(print_r($_ENV, true));
-                   $found = FALSE;
-                   $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if (is_array($o) && isSet($o['disk']) && is_array($o['disk'])) {
-                       foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
-                           $found = TRUE;
-                           //self::debug("DISK: " . $s);
-                           $stat = stat (SMB4PHP_SMBTMP);
-                           break;
-                       }
-                   }
-                   if (! $found)
-                      //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
-                      return null;
-                 }
-                break;
-            } else {
-                //self::debug($__count);
-                //self::debug("WORKING");
-                $found = FALSE;
-                   $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if (is_array($_SESSION["disk"]) && isSet($_SESSION["disk"]) && is_array($_SESSION["disk"])) {
-                       foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
-                           $found = TRUE;
-                           //self::debug("oh boy");
-                           $stat = stat (SMB4PHP_SMBTMP);
-                           break;
-                       }
-                   }
-                   if (! $found)
-                      //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
-                      return null;
-                break;
-             }
+                    if ($o = smb::look($pu)) {
+                        $_SESSION[$id."disk"] = $o['disk'];
+                        self::debug(print_r($_SESSION[$id."disk"], true));
+                        //self::debug(print_r($_ENV, true));
+                        $found = FALSE;
+                        $lshare = strtolower($pu['share']);  # fix by Eric Leung
+                        if (is_array($o) && isSet($o['disk']) && is_array($o['disk'])) {
+                            foreach ($o['disk'] as $s){
+                                if ($lshare == strtolower($s)) {
+                                    $found = TRUE;
+                                    //self::debug("DISK: " . $s);
+                                    $stat = stat(SMB4PHP_SMBTMP);
+                                    break;
+                                }}
+                        }
+                        if (!$found)
+                            //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
+                            return null;
+                    }
+                    break;
+                } else {
+                    //self::debug($__count);
+                    //self::debug("WORKING");
+                    $found = FALSE;
+                    $lshare = strtolower($pu['share']);  # fix by Eric Leung
+                    if (is_array($_SESSION[$id."disk"]) && isSet($_SESSION[$id."disk"]) && is_array($_SESSION[$id."disk"])) {
+                        foreach ($_SESSION[$id."disk"] as $s) if ($lshare == strtolower($s)) {
+                            $found = TRUE;
+                            //self::debug("oh boy");
+                            $stat = stat(SMB4PHP_SMBTMP);
+                            break;
+                        }
+                    }
+                    if (!$found)
+                        //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
+                        return null;
+                    break;
+                }
             case 'path':
                 //self::debug('before exe'.print_r($pu, true));
                 $o = smb::execute ('dir "'.$pu['path'].'"', $pu);
