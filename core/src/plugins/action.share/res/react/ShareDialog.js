@@ -263,7 +263,8 @@
 
         render: function(){
             var currentUsers = this.props.shareModel.getSharedUsers();
-            if(ReactModel.Share.federatedSharingEnabled()){
+            var federatedEnabled = ReactModel.Share.federatedSharingEnabled();
+            if(federatedEnabled){
                 var remoteUsersBlock = (
                     <RemoteUsers
                         shareModel={this.props.shareModel}
@@ -272,8 +273,9 @@
                 );
             }
             return (
-                <div style={{padding:'0 16px 10px'}}>
+                <div style={federatedEnabled?{padding:'0 16px 10px'}:{padding:'20px 16px 10px'}}>
                     <SharedUsers
+                        showTitle={federatedEnabled}
                         users={currentUsers}
                         userObjects={this.props.shareModel.getSharedUsersAsObjects()}
                         sendInvitations={this.props.showMailer ? this.sendInvitations : null}
@@ -396,7 +398,8 @@
             userObjects:React.PropTypes.object.isRequired,
             onUserUpdate:React.PropTypes.func.isRequired,
             saveSelectionAsTeam:React.PropTypes.func,
-            sendInvitations:React.PropTypes.func
+            sendInvitations:React.PropTypes.func,
+            showTitle:React.PropTypes.bool
         },
         sendInvitationToAllUsers:function(){
             this.props.sendInvitations(this.props.userObjects);
@@ -475,9 +478,13 @@
                     />
                 );
             }
+            var title;
+            if(this.props.showTitle){
+                title = <h3>{this.context.getMessage('217')}</h3>;
+            }
             return (
                 <div>
-                    <h3>Local Users</h3>
+                    {title}
                     <div className="section-legend">{this.context.getMessage('182')}</div>
                     {usersInput}
                     {rwHeader}
@@ -610,7 +617,7 @@
                 );
             }.bind(this));
             return (
-                <div>
+                <div style={{marginTop:16}}>
                     <h3>{this.context.getMessage('207')}</h3>
                     <div className="section-legend">{this.context.getMessage('208')}</div>
                     {this.renderForm()}
@@ -1249,7 +1256,7 @@
                         {labelLegend}
                         <ReactMUI.TextField
                             disabled={this.context.isReadonly()}
-                            floatingLabelText="Description"
+                            floatingLabelText={this.context.getMessage('145')}
                             name="description"
                             onChange={this.updateDescription}
                             value={this.props.shareModel.getGlobal('description')}
@@ -1292,7 +1299,7 @@
             }
             return (
                 <div className="reset-pydio-forms">
-                    <h3>Notification</h3>
+                    <h3>{this.context.getMessage('218')}</h3>
                     {element}
                     <div className="form-legend">{this.context.getMessage('188')}</div>
                 </div>

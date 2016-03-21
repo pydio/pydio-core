@@ -9,7 +9,7 @@
     </client_settings>
     <server_settings>
         <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
-                      description="CONF_MESSAGE[Allow users to send / receive shares from other Pydio instances or from other Federated-Sharing-compatible systems]" default="true" mandatory="true" expose="true"/>
+                      description="CONF_MESSAGE[Allow users to send / receive shares from other Pydio instances or from other Federated-Sharing-compatible systems]" default="false" mandatory="true" expose="true"/>
     </server_settings>
     <registry_contributions>
         <actions>

@@ -231,4 +231,6 @@ $mess = array(
     "214" => "pas envoyé",
     "215" => "Pour activer un lien public sur un fichier ou un répertoire, vous devez lui assigner un mot de passe.",
     "216" => "Le partage a été désactivé avec succès.",
+    "217" => "Utilisateurs Locaux",
+    "218" => "Notification",
 );

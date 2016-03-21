@@ -231,4 +231,6 @@ $mess = array(
     "214" => "not sent",
     "215" => "To enable a public link on a file or a folder, you first need to set up a password.",
     "216" => "Successfully unshared element",
+    "217" => "Local Users",
+    "218" => "Notification",
 );
