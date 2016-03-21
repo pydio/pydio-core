@@ -25,6 +25,8 @@ $mess = array(
 "20"=> "Ooops, die gesuchte Datei konnte nicht gefunden werden! Möglicherweise wurde die Datei bereits entfernt oder ist nicht mehr freigegeben.",
 "21"=> "Gültigkeit (Tage): ",
 "22"=> "Erlaubte Downloads: ",
+"21b"=> "Expired on",
+"22b"=>"No more downloads",
 "23"=> "Optionales Passwort: ",
 "24"=> "Setze eine Ablaufzeit und ein Passwort für den Dateizugriff. Klicke danach auf das <span class=\"icon-plus-sign\"></span> Zeichen um ein Weblink zu generieren. Es können mehrere Links generiert werden, um diese zu unterschiedlichen Nutzern zu senden.",
 "25"=> "Kein Limit",
@@ -216,6 +218,7 @@ $mess = array(
     "201" => "Other users who access to the current workspace can update the links parameters, but they cannot delete it. Only you can stop this share or toggle its visibility",
     "202" => "Other users who access to the current workspace can update the links parameters. You are not the owner of the share so you cannot delete it or toggle its visibility",
     "203" => "Transfer Ownership",
+    "203b"=> "Transfer",
     "204" => "If the share is publicly visible and you want another user to manage this share, you can transfer its ownership.",
     "205" => "Transfer to ... (user identifier)",
     "206" => "Shares are 'private' by default: you only can see them. If you want other users who access the current workspace to see and edit this share, toggle the visibility.",
@@ -228,4 +231,5 @@ $mess = array(
     "213" => "rejected",
     "214" => "not sent",
     "215" => "To enable a public link on a file or a folder, you first need to set up a password.",
+    "216" => "Successfully unshared element",
 );

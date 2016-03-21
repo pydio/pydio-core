@@ -416,6 +416,9 @@
             }
         }
 
+        isExpired(linkId){
+            return (this._data['links'] && this._data['links'][linkId] && this._data["links"][linkId]['is_expired']);
+        }
 
         /****************************/
         /* PUBLIC LINKS PERMISSIONS */
@@ -603,7 +606,12 @@
         }
 
         stopSharing(callbackFunc = null){
-            var params = {get_action:'unshare'};
+            var params = {
+                get_action:'unshare'
+            };
+            if(this._data && this._data['share_scope']){
+                params['share_scope'] = this._data['share_scope'];
+            }
             ShareModel.prepareShareActionParameters(this.getNode(), params);
             PydioApi.getClient().request(params, function(response){
                 this._pydio.fireNodeRefresh(this._node);

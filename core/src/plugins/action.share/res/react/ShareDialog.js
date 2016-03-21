@@ -224,7 +224,7 @@
                 );
             }else{
                 var unshareButton;
-                if(this.props.shareModel.hasActiveShares()){
+                if(this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())){
                     unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
@@ -894,7 +894,7 @@
             var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly() && this.props.shareModel.currentIsOwner();
             if(this.state.editLink && editAllowed){
                 return (
-                    <div className="public-link-container edit-link">
+                    <div className={"public-link-container edit-link"}>
                         <span>{publicLink.split('://')[0]}://[..]/{PathUtils.getBasename(PathUtils.getDirname(publicLink)) + '/'}</span>
                         <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <ReactMUI.RaisedButton label="Ok" onClick={this.toggleEditMode}/>
@@ -926,7 +926,7 @@
                 return (
                     <div className="public-link-container">
                         <ReactMUI.TextField
-                            className="public-link"
+                            className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}
                             type="text"
                             name="Link"
                             ref="public-link-field"
@@ -1105,7 +1105,7 @@
             var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
             var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
             var expDate = null;
-            var maxDate = null, maxDownloads = null;
+            var maxDate = null, maxDownloads = null, dateExpired = false, dlExpired = false;
             var auth = ReactModel.Share.getAuthorizations(this.props.pydio);
             var today = new Date();
             if(parseInt(auth.max_expiration) > 0){
@@ -1117,6 +1117,9 @@
                 maxDownloads = parseInt(auth.max_downloads);
             }
             if(expirationDateValue){
+                if(expirationDateValue < 0){
+                    dateExpired = true;
+                }
                 expDate = new Date();
                 expDate.setDate(today.getDate() + parseInt(expirationDateValue));
                 var clearValue = function(){
@@ -1124,7 +1127,7 @@
                     this.refs['expirationDate'].getDOMNode().querySelector(".mui-text-field-input").value = "";
                 }.bind(this);
                 calIcon = <span className="ajxp_icon_span icon-remove-sign" onClick={clearValue}/>;
-                var calLabel = <span className="calLabelHasValue">{this.context.getMessage('21')}</span>
+                var calLabel = <span className="calLabelHasValue">{this.context.getMessage(dateExpired?'21b':'21')}</span>
             }
             if(dlLimitValue){
                 var dlCounter = this.props.shareModel.getDownloadCounter(linkId);
@@ -1135,6 +1138,9 @@
                 }.bind(this);
                 if(dlCounter) {
                     var resetLink = <a style={{cursor:'pointer'}} onClick={resetDl} title={this.context.getMessage('17')}>({this.context.getMessage('16')})</a>;
+                    if(dlCounter >= dlLimitValue){
+                        dlExpired = true;
+                    }
                 }
                 var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
             }
@@ -1144,7 +1150,7 @@
                     <div className="section-legend">{this.context.getMessage('24')}</div>
                     {passContainer}
                     <div className="expires">
-                        <div style={{width:'50%', display:'inline-block', position:'relative'}}>
+                        <div style={{width:'50%', display:'inline-block', position:'relative'}} className={dateExpired?'limit-block-expired':null}>
                             {calIcon}
                             {calLabel}
                             <ReactMUI.DatePicker
@@ -1152,7 +1158,7 @@
                                 disabled={this.context.isReadonly()}
                                 onChange={this.onDateChange}
                                 key="start"
-                                hintText={this.context.getMessage('21')}
+                                hintText={this.context.getMessage(dateExpired?'21b':'21')}
                                 autoOk={true}
                                 minDate={new Date()}
                                 maxDate={maxDate}
@@ -1163,12 +1169,12 @@
                                 formatDate={this.formatDate}
                             />
                         </div>
-                        <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}}>
+                        <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}} className={dlExpired?'limit-block-expired':null}>
                             <span className="ajxp_icon_span mdi mdi-download"/>
                             <ReactMUI.TextField
                                 type="number"
                                 disabled={this.context.isReadonly()}
-                                floatingLabelText={this.context.getMessage('22')}
+                                floatingLabelText={this.context.getMessage(dlExpired?'22b':'22')}
                                 value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                                 onChange={this.updateDLExpirationField}
                             />
@@ -1382,7 +1388,7 @@
                         <div className="section-legend">{this.context.getMessage('204')}</div>
                         <div>
                             <ReactMUI.TextField ref="newOwner" floatingLabelText={this.context.getMessage('205')}/>
-                            <ReactMUI.RaisedButton label="Transfer" onClick={this.transferOwnership}/>
+                            <ReactMUI.RaisedButton label={this.context.getMessage('203b')} onClick={this.transferOwnership}/>
                         </div>
                     </div>
                 );

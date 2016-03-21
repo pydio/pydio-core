@@ -476,6 +476,7 @@ class ShareStore {
                 throw new Exception($mess["share_center.160"]);
             }
         }
+        return true;
     }
 
     /**

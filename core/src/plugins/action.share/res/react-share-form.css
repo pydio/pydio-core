@@ -112,6 +112,10 @@ div#react_share_form .public-link-container .public-link input {
   text-align: center;
   color: #43987c;
 }
+div#react_share_form .public-link-container .public-link.link-expired input {
+  color: #aaa;
+  text-decoration: line-through;
+}
 div#react_share_form .public-link-container.edit-link > span {
   font-size: 20px;
   text-align: right;
@@ -185,6 +189,12 @@ div#react_share_form .expires .calLabelHasValue {
   color: rgba(0, 0, 0, 0.5);
   font-size: 16px;
 }
+div#react_share_form .password-container .limit-block-expired label,
+div#react_share_form .expires .limit-block-expired label,
+div#react_share_form .password-container .limit-block-expired .calLabelHasValue,
+div#react_share_form .expires .limit-block-expired .calLabelHasValue {
+  color: #d40000 !important;
+}
 div#react_share_form .password-container .mui-date-picker,
 div#react_share_form .expires .mui-date-picker {
   display: inline-block;
@@ -228,13 +238,19 @@ div#react_share_form h3 {
 }
 div#react_share_form h4 {
   padding-top: 10px;
-  font-weight: normal;
-  font-size: 17px;
+  font-weight: 500;
+  font-size: 13px;
+  margin-bottom: 0;
 }
 div#react_share_form .ownership-form .mui-text-field {
   margin-top: -20px;
   width: 230px;
   margin-right: 10px;
+}
+div#react_share_form .ownership-form .mui-text-field .mui-text-field-floating-label {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 div#react_share_form div.user-badge {
   border-bottom: 1px solid #e2e2e2;
@@ -243,17 +259,16 @@ div#react_share_form div.user-badge {
   margin-left: 50px;
   margin-right: 11px;
   padding-top: 1px;
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: row;
+      -ms-flex-direction: row;
           flex-direction: row;
 }
 div#react_share_form div.user-badge .user-badge-label {
-  -webkit-box-flex: 5;
   -webkit-flex: 5;
+      -ms-flex: 5;
           flex: 5;
   padding: 13px 0;
   white-space: nowrap;
@@ -326,8 +341,8 @@ div#react_share_form div.user-badge span.user-badge-rights-container input[name=
   margin-left: 28px;
 }
 div#react_share_form div.remote-users-add {
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   margin-top: -20px;
 }
@@ -403,8 +418,8 @@ div#ajxp_shared_info_panel .copy-message {
   font-size: 13px;
 }
 div#ajxp_shared_info_panel .uUserEntry {
-  display: -webkit-box;
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   padding: 3px 0;
   color: black;
@@ -413,8 +428,8 @@ div#ajxp_shared_info_panel .uUserEntry:last-of-type {
   border-bottom: 0;
 }
 div#ajxp_shared_info_panel .uUserEntry .uLabel {
-  -webkit-box-flex: 5;
   -webkit-flex: 5;
+      -ms-flex: 5;
           flex: 5;
   white-space: nowrap;
   overflow: hidden;
