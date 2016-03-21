@@ -45,8 +45,11 @@ class smbAuthDriver extends AbstractAuthDriver
         AJXP_Safe::clearCredentials();
         $adminUser = $this->options["ADMIN_USER"];
         $subUsers = array();
-        unset($_SESSION["COUNT"]);
-        unset($_SESSION["disk"]);
+        foreach($_SESSION as $key => $val){
+            if((substr($key,-4) === "disk") && (substr($key,0,4) == "smb_")){
+                unset($_SESSION[$key]);
+            }
+        }
         AuthService::disconnect();
         session_write_close();
         AJXP_XMLWriter::header();
@@ -84,8 +87,11 @@ class smbAuthDriver extends AbstractAuthDriver
             if (!is_dir($url)) {
                 $this->logDebug("SMB Login failure");
                 $_SESSION["AJXP_SESSION_REMOTE_PASS"] = '';
-                unset($_SESSION["COUNT"]);
-                unset($_SESSION["disk"]);
+                foreach($_SESSION as $key => $val){
+                    if((substr($key,-4) === "disk") && (substr($key,0,4) == "smb_")){
+                        unset($_SESSION[$key]);
+                    }
+                }
                 return false;
             }
             AJXP_Safe::storeCredentials($login, $pass);
