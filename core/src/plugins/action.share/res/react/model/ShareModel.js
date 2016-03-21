@@ -2,9 +2,12 @@
 
     class ShareModel extends Observable {
 
-        constructor(pydio, node){
+        constructor(pydio, node, dataModel = null){
             super();
             this._node = node;
+            if(dataModel){
+                this._dataModel = dataModel;
+            }
             this._status = 'idle';
             this._data = {link:{}};
             this._pendingData = {};
@@ -595,6 +598,8 @@
                     this._data = transport.responseJSON;
                     this._pendingData = {};
                     this._setStatus('idle');
+                }else if(transport.responseXML && XMLUtils.XPathGetSingleNodeText(transport.responseXML, '//message[@type="ERROR"]')){
+                    this._setStatus('error');
                 }
             }.bind(this));
         }
@@ -614,7 +619,14 @@
             }
             ShareModel.prepareShareActionParameters(this.getNode(), params);
             PydioApi.getClient().request(params, function(response){
-                this._pydio.fireNodeRefresh(this._node);
+                try{
+                    if(this._dataModel && this._pydio.getContextHolder() !== this._dataModel) {
+                        this._dataModel.requireContextChange(this._dataModel.getRootNode(), true);
+                    }else{
+                        this._pydio.fireNodeRefresh(this._node);
+                    }
+                }catch(e){
+                }
                 if(callbackFunc){
                     callbackFunc(response);
                 }else{

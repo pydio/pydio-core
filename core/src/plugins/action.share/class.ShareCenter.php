@@ -637,16 +637,20 @@ class ShareCenter extends AJXP_Plugin
                     echo json_encode($jsonData);
 
                 }else{
+
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
-                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
-                    header("Content-type:application/json");
-                    if(!empty($compositeShare)){
-                        $json = $this->compositeShareToJson($compositeShare);
-                        echo json_encode($json);
-                    }else{
-                        echo json_encode(array());
+                    if(!file_exists($node->getUrl())){
+                        throw new Exception("Cannot find file ".$file.": share may be lost.");
                     }
+                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
+                    if(empty($compositeShare)){
+                        throw new Exception("Cannot find share for node ".$file);
+                    }
+                    header("Content-type:application/json");
+                    $json = $this->compositeShareToJson($compositeShare);
+                    echo json_encode($json);
+
                 }
 
 

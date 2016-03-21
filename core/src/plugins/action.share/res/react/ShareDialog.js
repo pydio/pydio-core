@@ -78,7 +78,7 @@
             return {
                 status: 'idle',
                 mailerData: false,
-                model: new ReactModel.Share(this.props.pydio, this.props.selection.getUniqueNode())
+                model: new ReactModel.Share(this.props.pydio, this.props.selection.getUniqueNode(), this.props.selection)
             };
         },
 
@@ -224,7 +224,7 @@
                 );
             }else{
                 var unshareButton;
-                if(this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())){
+                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error'){
                     unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
