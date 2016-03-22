@@ -178,7 +178,7 @@
 }
 #home_account_pane #home_center_panel div#logo_div {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-  margin-top: 28%;
+  margin-top: 20%;
   position: relative;
 }
 #home_account_pane #home_center_panel.legend_visible div#logo_div {
@@ -306,16 +306,15 @@
 }
 #videos_pane {
   color: rgba(0, 0, 0, 0.87);
-  background-color: #ffffff;
+  background-color: transparent;
   position: absolute;
-  border-radius: 3px;
-  top: 2%;
-  right: 5px;
-  width: 60%;
-  height: 96%;
+  border-radius: 0;
+  top: 0;
+  right: 0;
+  width: 350px;
+  height: 100%;
   overflow: auto;
   opacity: 1;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   max-width: 930px;
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -323,60 +322,145 @@
   z-index: 20000;
   overflow-y: scroll;
 }
-#videos_pane h2 {
-  color: rgba(0, 0, 0, 0.77);
-  font-weight: 500;
+#videos_pane a {
+  text-decoration: none;
 }
 #videos_pane div.icon-remove-sign {
-  float: left;
+  float: right;
   font-size: 1em;
-  margin-left: 11px;
+  margin-right: 11px;
   margin-top: 11px;
   cursor: pointer;
+  color: white;
 }
 #videos_pane div.tutorial_title {
-  clear: left;
-  font-size: 25px;
+  font-size: 20px;
+  line-height: 22px;
   text-align: center;
-  margin: 40px 0 30px;
+  background-color: #546E7A;
+  padding: 30px;
+  color: white;
+  font-weight: 500;
 }
-#videos_pane div#dl_pydio_cont {
+#videos_pane div.tutorial_more_videos_cont {
+  background-color: #546E7A;
+  clear: left;
+  text-align: center;
+}
+#videos_pane div.tutorial_more_videos_cont a.tutorial_more_videos_button {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  color: rgba(0, 0, 0, 0.76);
+  display: inline-block;
+  margin: 20px;
+  white-space: nowrap;
+}
+#videos_pane div.tutorial_more_videos_cont a.tutorial_more_videos_button i {
+  display: inline-block;
+  margin-right: 5px;
+}
+#videos_pane .videoCards {
+  background-color: #CFD8DC;
+  padding: 10px;
+}
+#videos_pane .videoCards .video-card {
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+#videos_pane .videoCards .video-card .tutorial_legend {
+  border-radius: 3px;
+  width: 325px;
+  margin-left: 1%;
+  font-size: 14px;
+  background: white;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
+  box-sizing: border-box;
+}
+#videos_pane .videoCards .video-card .tutorial_legend h2 {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-weight: 400;
+  font-size: 26px;
+  margin-top: -40px;
+  color: white;
+  height: 40px;
+  padding: 0;
+}
+#videos_pane .videoCards .video-card .tutorial_content {
+  padding: 0 16px;
+  font-size: 13px;
+}
+#videos_pane .videoCards .video-card img.tutorial_video {
+  border-radius: 3px 3px 0 0;
+  width: 325px;
+}
+#videos_pane .videoCards .video-card div.tutorial_load_button {
+  display: block;
+  padding: 5px 18px 12px;
+  cursor: pointer;
+  text-align: right;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.63);
+}
+div#tutorial_dl_apps_pane {
+  width: 100%;
+  position: absolute;
+}
+div#tutorial_dl_apps_pane a {
+  text-decoration: none;
+  color: white;
+}
+div#tutorial_dl_apps_pane > div > div {
+  text-align: center;
+  font-weight: 500;
+}
+div#tutorial_dl_apps_pane div#dl_pydio_cont {
   width: 750px;
   margin: 0 auto;
 }
-#videos_pane div#dl_pydio_for {
+div#tutorial_dl_apps_pane div#dl_pydio_for {
+  display: none;
   float: left;
   margin: 44px 18px;
   font-size: 21px;
 }
-#videos_pane div#dl_pydio_android {
+div#tutorial_dl_apps_pane div#dl_pydio_android {
   width: 81px;
   float: left;
 }
-#videos_pane div#dl_pydio_android a.icon-mobile-phone {
+div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-mobile-phone {
   font-size: 96px;
 }
-#videos_pane div#dl_pydio_android a.icon-android {
+div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
   font-size: 30px;
   position: relative;
   top: -26px;
   left: -32px;
   color: #56be56;
 }
-#videos_pane div#dl_pydio_android div {
+div#tutorial_dl_apps_pane div#dl_pydio_android div {
   font-size: 11px;
   top: -15px;
   position: relative;
   left: -13px;
 }
-#videos_pane div#dl_pydio_ios {
+div#tutorial_dl_apps_pane div#dl_pydio_ios {
   width: 91px;
   float: left;
 }
-#videos_pane div#dl_pydio_ios a.icon-tablet {
+div#tutorial_dl_apps_pane div#dl_pydio_ios a.icon-tablet {
   font-size: 96px;
 }
-#videos_pane div#dl_pydio_ios a.icon-apple {
+div#tutorial_dl_apps_pane div#dl_pydio_ios a.icon-apple {
   font-size: 26px;
   position: relative;
   top: -33px;
@@ -384,105 +468,53 @@
   color: white;
   text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
 }
-#videos_pane div#dl_pydio_ios div {
+div#tutorial_dl_apps_pane div#dl_pydio_ios div {
   font-size: 11px;
   top: -15px;
   position: relative;
-  left: 2px;
+  left: -4px;
 }
-#videos_pane div#dl_pydio_mac {
+div#tutorial_dl_apps_pane div#dl_pydio_mac {
   width: 110px;
   float: left;
   padding-top: 14px;
 }
-#videos_pane div#dl_pydio_mac a.icon-desktop {
+div#tutorial_dl_apps_pane div#dl_pydio_mac a.icon-desktop {
   font-size: 74px;
 }
-#videos_pane div#dl_pydio_mac a.icon-apple {
+div#tutorial_dl_apps_pane div#dl_pydio_mac a.icon-apple {
   font-size: 26px;
   position: relative;
   top: -30px;
   left: -51px;
   color: #949494;
 }
-#videos_pane div#dl_pydio_mac div {
+div#tutorial_dl_apps_pane div#dl_pydio_mac div {
   font-size: 11px;
   top: -6px;
   position: relative;
-  left: 6px;
+  left: -6px;
 }
-#videos_pane div#dl_pydio_win {
+div#tutorial_dl_apps_pane div#dl_pydio_win {
   width: 100px;
   float: left;
   padding-top: 8px;
 }
-#videos_pane div#dl_pydio_win a.icon-laptop {
+div#tutorial_dl_apps_pane div#dl_pydio_win a.icon-laptop {
   font-size: 87px;
 }
-#videos_pane div#dl_pydio_win a.icon-windows {
+div#tutorial_dl_apps_pane div#dl_pydio_win a.icon-windows {
   font-size: 26px;
   position: relative;
   top: -66px;
-  left: 34px;
+  left: 0;
   color: #387aad;
 }
-#videos_pane div#dl_pydio_win div {
+div#tutorial_dl_apps_pane div#dl_pydio_win div {
   font-size: 11px;
   top: -40px;
   position: relative;
-  left: 12px;
-}
-#videos_pane div.tutorial_more_videos_cont {
-  clear: left;
-  text-align: center;
-}
-#videos_pane a.tutorial_more_videos_button {
-  text-align: center;
-  font-size: 25px;
-  background-color: #e35d52;
-  padding: 10px;
-  border-radius: 5px;
-  color: white;
-  display: inline-block;
-  margin: 40px 0;
-}
-#videos_pane #tutorials_pane h2 {
-  font-weight: normal;
-  font-size: 25px;
-}
-#videos_pane #tutorial_dl_apps_pane {
-  height: 107px;
-  background-color: #ebedf0;
-  border-top: 1px solid #6f7b88;
-  border-bottom: 1px solid #6f7b88;
-}
-#videos_pane .tutorial_legend {
-  clear: left;
-  float: left;
-  width: 40%;
-  margin-left: 5%;
-  font-size: 14px;
-  margin-top: 20px;
-}
-#videos_pane .tutorial_video {
-  width: 49%;
-  height: 300px;
-  margin-top: 20px;
-  margin-right: 5%;
-  margin-bottom: 20px;
-  border: 1px solid #333;
-  border-radius: 5px;
-  background-color: #eee;
-}
-#videos_pane div.tutorial_load_button {
-  background-color: #666;
-  display: inline-block;
-  color: white;
-  padding: 3px 11px;
-  border-radius: 6px;
-  margin-right: 15px;
-  float: right;
-  cursor: pointer;
+  left: 8px;
 }
 @media only screen and (max-width: 980px) {
   #notifications_center div.notif_event_container {

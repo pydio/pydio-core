@@ -204,7 +204,7 @@
     height: 100%;
     div#logo_div{
       transition: @bezier_transition;
-      margin-top:28%;
+      margin-top:20%;
       position: relative;
     }
     &.legend_visible div#logo_div{
@@ -356,44 +356,140 @@
 
 }
 
+@videoPaneWidth:350px;
+
 #videos_pane {
-  color: rgba(0,0,0,0.87);
-  background-color: #ffffff;
+
+  color: rgba(0, 0, 0, 0.87);
+  background-color: transparent;
   position: absolute;
-  border-radius: 3px;
-  top: 2%;
-  right: 5px;
-  width: 60%;
-  height: 96%;
+  border-radius: 0;
+  top: 0;
+  right: 0;
+  width: @videoPaneWidth;
+  height: 100%;
   overflow: auto;
   opacity: 1;
-  box-shadow: @reactBoxShadowDepth1;
   max-width: 930px;
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
-  z-index:20000;
+  z-index: 20000;
   overflow-y: scroll;
-
-  h2{
-    color: rgba(0,0,0,0.77);
-    font-weight: 500;
+  a{
+    text-decoration: none;
   }
 
   div.icon-remove-sign{
-    float: left;
+    float: right;
     font-size: 1em;
-    margin-left: 11px;
+    margin-right: 11px;
     margin-top: 11px;
     cursor: pointer;
+    color: white;
   }
   div.tutorial_title{
-    clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;
+    font-size: 20px;
+    line-height: 22px;
+    text-align:center;
+    background-color: #546E7A;
+    padding: 30px;
+    color: white;
+    font-weight: 500;
+
   }
+
+  div.tutorial_more_videos_cont{
+    background-color: #546E7A;
+    clear:left;
+    text-align:center;
+    a.tutorial_more_videos_button{
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      background-color: white;
+      padding: 5px 10px;
+      border-radius: 3px;
+      color: rgba(0,0,0,0.76);
+      display: inline-block;
+      margin: 20px;
+      white-space: nowrap;
+      i{
+        display: inline-block;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .videoCards {
+    background-color: #CFD8DC;
+    padding: 10px;
+    .video-card {
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      .tutorial_legend {
+        border-radius: 3px;
+        width: @videoPaneWidth - 25px;
+        margin-left: 1%;
+        font-size: 14px;
+        background: white;
+        box-shadow: 0 2px 3px rgba(0,0,0,.16),0 2px 3px rgba(0,0,0,.43);
+        box-sizing: border-box;
+        h2{
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          font-weight: 400;
+          font-size: 26px;
+          margin-top: -40px;
+          color: white;
+          height: 40px;
+          padding: 0;
+        }
+      }
+      .tutorial_content{
+        padding: 0 16px;
+        font-size: 13px;
+      }
+      img.tutorial_video {
+        border-radius: 3px 3px 0 0;
+        width: @videoPaneWidth - 25px;
+      }
+      div.tutorial_load_button {
+        display: block;
+        padding: 5px 18px 12px;
+        cursor: pointer;
+        text-align: right;
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 15px;
+        color: rgba(0,0,0,0.63);
+      }
+    }
+  }
+}
+
+div#tutorial_dl_apps_pane{
+
+  width: 100%;
+  position: absolute;
+  a{
+    text-decoration: none;
+    color: white;
+  }
+
+  > div > div {
+    text-align: center;
+    font-weight: 500;
+  }
+
   div#dl_pydio_cont{
     width: 750px; margin: 0 auto;
   }
   div#dl_pydio_for{
+    display: none;
     float: left;margin: 44px 18px;font-size: 21px;
   }
 
@@ -420,7 +516,7 @@
     font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);
   }
   div#dl_pydio_ios div{
-    font-size: 11px;top: -15px;position: relative;left: 2px;
+    font-size: 11px;top: -15px;position: relative;left: -4px;
   }
 
   div#dl_pydio_mac{
@@ -433,7 +529,7 @@
     font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);
   }
   div#dl_pydio_mac div{
-    font-size: 11px;top: -6px;position: relative;left: 6px;
+    font-size: 11px;top: -6px;position: relative;left: -6px;
   }
 
   div#dl_pydio_win{
@@ -443,63 +539,14 @@
     font-size: 87px;
   }
   div#dl_pydio_win a.icon-windows{
-    font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);
+    font-size: 26px;position: relative;top: -66px;left: 0;color: rgb(56, 122, 173);
   }
   div#dl_pydio_win div{
-    font-size: 11px;top: -40px;position: relative;left: 12px;
+    font-size: 11px;top: -40px;position: relative;left: 8px;
   }
 
-
-  div.tutorial_more_videos_cont{
-    clear:left; text-align:center;
-  }
-  a.tutorial_more_videos_button{
-    text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;
-  }
-
-  #tutorials_pane h2{
-    font-weight: normal;
-    font-size: 25px;
-  }
-
-  #tutorial_dl_apps_pane{
-    height: 107px;
-    background-color: #ebedf0;
-    border-top: 1px solid rgb(111,123,136);
-    border-bottom: 1px solid rgb(111,123,136);
-  }
-
-  .tutorial_legend{
-    clear: left;
-    float: left;
-    width: 40%;
-    margin-left: 5%;
-    font-size: 14px;
-    margin-top: 20px;
-  }
-
-  .tutorial_video{
-    width: 49%;
-    height: 300px;
-    margin-top: 20px;
-    margin-right: 5%;
-    margin-bottom: 20px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    background-color: #eee;
-  }
-
-  div.tutorial_load_button {
-    background-color: #666;
-    display: inline-block;
-    color: white;
-    padding: 3px 11px;
-    border-radius: 6px;
-    margin-right: 15px;
-    float: right;
-    cursor: pointer;
-  }
 }
+
 
 
 @media only screen

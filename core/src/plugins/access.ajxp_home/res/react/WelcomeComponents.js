@@ -36,83 +36,143 @@
         }
     });
 
-    var TutorialPane = React.createClass({
-
-        componentDidMount: function(){
-            $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
-                var t = Event.findElement(e, 'div.tutorial_load_button');
-                try{
-                    var main = t.up('div.tutorial_legend');
-                    if(main.next('img')){
-                        main.insert({after:'<iframe className="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="'+main.readAttribute('data-videosrc')+'"></iframe>'});
-                        main.next('img').remove();
-                    }
-                }catch(e){}
-            });
-        },
-
-        closePane: function(){
-            React.unmountComponentAtNode(document.getElementById('tutorial_panel'));
+    var DlAppElement = React.createClass({
+        propTypes:{
+            id:React.PropTypes.string,
+            configs:React.PropTypes.object,
+            configHref:React.PropTypes.string,
+            containerClassName:React.PropTypes.string,
+            iconClassName:React.PropTypes.string,
+            messageId:React.PropTypes.string
         },
 
         render: function(){
-            var configs = pydio.getPluginConfigs('access.ajxp_home');
+            return (
+                <div id={this.props.id}>
+                    <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
+                    <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
+                    <div>{MessageHash[this.props.messageId]}</div>
+                </div>
+            );
+        }
+    });
+
+    var VideoCard = React.createClass({
+
+        propTypes:{
+            videoSrc:React.PropTypes.string,
+            imageSrc:React.PropTypes.string,
+            contentMessageId:React.PropTypes.string,
+            launchVideo:React.PropTypes.func
+        },
+
+        launchVideo: function(){
+            this.props.launchVideo(this.props.videoSrc);
+        },
+
+        render: function(){
             var htmlMessage = function(id){
                 return {__html:MessageHash[id]};
             };
             return (
-                <div id="videos_pane" className="skipSibling">
-                    <div onClick={this.closePane} className="icon-remove-sign"></div>
-                    <div className="tutorial_title">{MessageHash['user_home.56']}</div>
-                    <div id="tutorial_dl_apps_pane">
-                        <div id="dl_pydio_cont">
-                            <div id="dl_pydio_for">{MessageHash['user_home.57']}</div>
-                            <div id="dl_pydio_android">
-                                <a href={configs.get('URL_APP_ANDROID')} target="_blank" className="icon-mobile-phone"></a><a href={configs.get('URL_APP_ANDROID')} target="_blank"  className="icon-android"></a><div>{MessageHash['user_home.58']}</div>
-                            </div>
-                            <div id="dl_pydio_ios">
-                                <a href={configs.get('URL_APP_IOSAPPSTORE')} target="_blank" className="icon-tablet"></a><a href={configs.get('URL_APP_IOSAPPSTORE')} target="_blank" className="icon-apple"></a><div>{MessageHash['user_home.59']}</div>
-                            </div>
-                            <div id="dl_pydio_mac" >
-                                <a href={configs.get('URL_APP_SYNC_MAC')} target="_blank" className="icon-desktop" ></a><a href={configs.get('URL_APP_SYNC_MAC')} target="_blank" className="icon-apple" ></a><div >{MessageHash['user_home.60']}</div>
-                            </div>
-                            <div id="dl_pydio_win" >
-                                <a href={configs.get('URL_APP_SYNC_WIN')} target="_blank" className="icon-laptop" ></a><a href={configs.get('URL_APP_SYNC_WIN')} target="_blank" className="icon-windows" ></a><div >{MessageHash['user_home.61']}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="tutorial_legend" data-videosrc="//www.youtube.com/embed/80kq-T6bQO4?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                        <span dangerouslySetInnerHTML={htmlMessage('user_home.62')}></span>
-                        <div className="tutorial_load_button"><i className="icon-youtube-play"></i> Play Video</div>
-                    </div>
-                    <img className="tutorial_video" src="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg"/>
-
-                    <div className="tutorial_legend" data-videosrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                        <div dangerouslySetInnerHTML={htmlMessage('user_home.63')}></div>
-                        <div className="tutorial_load_button"><i className="icon-youtube-play"></i> Play Video</div>
-                    </div>
-                    <img className="tutorial_video" src="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg"/>
-
-                    <div className="tutorial_legend" data-videosrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                        <div dangerouslySetInnerHTML={htmlMessage('user_home.64')}></div>
-                        <div className="tutorial_load_button"><i className="icon-youtube-play"></i> Play Video</div>
-                    </div>
-                    <img className="tutorial_video" src="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg"/>
-
-                    <div className="tutorial_legend" data-videosrc="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                        <div dangerouslySetInnerHTML={htmlMessage('user_home.66')}></div>
-                        <div className="tutorial_load_button"><i className="icon-youtube-play"></i> Play Video</div>
-                    </div>
-                    <img className="tutorial_video" src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"/>
-
-                    <div className="tutorial_more_videos_cont">
-                        <a  className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank"><i className="icon-youtube-play"></i>
-                            <span dangerouslySetInnerHTML={htmlMessage('user_home.65')}></span></a>
+                <div className="video-card">
+                    <div className="tutorial_legend">
+                        <img className="tutorial_video" src={this.props.imageSrc}/>
+                        <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
+                        <div className="tutorial_load_button" onClick={this.launchVideo}><i className="icon-youtube-play"/> Play Video</div>
                     </div>
                 </div>
             );
+        }
+    });
 
-            //<div dangerouslySetInnerHTML={content()}></div>
+    var VideoPlayer = React.createClass({
+
+        propTypes:{
+            videoSrc:React.PropTypes.string,
+            closePlayer:React.PropTypes.func
+        },
+
+        render: function(){
+            return (
+                <div className="video-player" style={{position:'absolute', top:0, left:0, right:0, bottom:0, zIndex:200000}}>
+                    <div className="overlay" style={{position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'black', opacity:0.4}}></div>
+                    <iframe src={this.props.videoSrc} style={{position:'absolute', top:'10%', left:'10%', width:'80%', height:'80%', border:'0'}}></iframe>
+                    <a className="icon-remove-circle" style={{position:'absolute', right:'8%', top:'7%', color:'white', textDecoration:'none'}} onClick={this.props.closePlayer}/>
+                </div>
+            );
+        }
+    });
+
+    var TutorialPane = React.createClass({
+
+        propTypes:{
+            closePane:React.PropTypes.func
+        },
+
+        closePane: function(){
+            this.props.closePane();
+        },
+
+        closePlayer:function(){
+            this.setState({player:null});
+        },
+
+        launchVideo: function(videoSrc){
+            this.setState({player:videoSrc});
+        },
+
+        render: function(){
+            var htmlMessage = function(id){
+                return {__html:MessageHash[id]};
+            };
+
+            var videoPlayer;
+            if(this.state && this.state.player){
+                videoPlayer = <VideoPlayer videoSrc={this.state.player} closePlayer={this.closePlayer}/>
+            }
+
+            return (
+                <span>
+                {videoPlayer}
+                <div id="videos_pane" className="skipSibling">
+                    <div onClick={this.closePane} className="icon-remove-sign"></div>
+                    <div className="tutorial_title">{MessageHash['user_home.56']}</div>
+                    <div className="videoCards">
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            videoSrc="//www.youtube.com/embed/80kq-T6bQO4?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
+                            imageSrc="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg"
+                            contentMessageId="user_home.62"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            videoSrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
+                            imageSrc="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg"
+                            contentMessageId="user_home.63"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            videoSrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
+                            imageSrc="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg"
+                            contentMessageId="user_home.64"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            videoSrc="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
+                            imageSrc="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"
+                            contentMessageId="user_home.66"
+                        />
+                    </div>
+                    <div className="tutorial_more_videos_cont">
+                        <a  className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank">
+                            <i className="icon-youtube-play"/>
+                            <span dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
+                        </a>
+                    </div>
+                </div>
+                </span>
+            );
         }
 
     });
@@ -128,7 +188,12 @@
         },
 
         showGettingStarted: function(){
-            this.props.controller.fireAction("open_tutorial_pane");
+            //this.props.controller.fireAction("open_tutorial_pane");
+            this.setState({showGettingStarted:true});
+        },
+
+        getInitialState:function(){
+            return {showGettingStarted:false};
         },
 
         render: function(){
@@ -161,9 +226,17 @@
                 );
             }
 
+            var gettingStartedPanel;
+            if(this.state.showGettingStarted){
+                var close = function(){
+                    this.setState({showGettingStarted:false});
+                }.bind(this);
+                gettingStartedPanel = <TutorialPane closePane={close}/>;
+            }
 
             return (
                 <div id="welcome">
+                    {gettingStartedPanel}
                     {MessageHash['user_home.40'].replace('%s', userLabel)}
                     <p>
                         {loginLink}
@@ -171,6 +244,54 @@
                     </p>
                 </div>
             )
+        }
+
+    });
+
+    var DlAppsPanel = React.createClass({
+
+        render: function(){
+            var configs = pydio.getPluginConfigs('access.ajxp_home');
+
+            return (
+                <div id="tutorial_dl_apps_pane">
+                    <div id="dl_pydio_cont">
+                        <div id="dl_pydio_for">{MessageHash['user_home.57']}</div>
+                        <DlAppElement
+                            id="dl_pydio_android"
+                            configs={configs}
+                            configHref="URL_APP_ANDROID"
+                            containerClassName="icon-mobile-phone"
+                            iconClassName="icon-android"
+                            messageId="user_home.58"
+                        />
+                        <DlAppElement
+                            id="dl_pydio_ios"
+                            configs={configs}
+                            configHref="URL_APP_IOSAPPSTORE"
+                            containerClassName="icon-tablet"
+                            iconClassName="icon-apple"
+                            messageId="user_home.59"
+                        />
+                        <DlAppElement
+                            id="dl_pydio_mac"
+                            configs={configs}
+                            configHref="URL_APP_SYNC_MAC"
+                            containerClassName="icon-desktop"
+                            iconClassName="icon-apple"
+                            messageId="user_home.60"
+                        />
+                        <DlAppElement
+                            id="dl_pydio_win"
+                            configs={configs}
+                            configHref="URL_APP_SYNC_WIN"
+                            containerClassName="icon-laptop"
+                            iconClassName="icon-windows"
+                            messageId="user_home.61"
+                        />
+                    </div>
+                </div>
+            );
         }
 
     });
@@ -227,7 +348,8 @@
         },
         render: function(){
             if(!this.state.workspace){
-                return <div id="ws_legend" className="empty_ws_legend"></div>;
+                //return <div id="ws_legend" className="empty_ws_legend"></div>;
+                return <DlAppsPanel/>
             }
             var blocks = [];
             var data = this.state.data;
