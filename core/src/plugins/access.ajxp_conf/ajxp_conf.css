@@ -53,6 +53,7 @@
     width: auto;
     float: none;
     display: inline-block;
+    height: auto;
 }
 
 .settings_main_pane #breadcrumb_container{

@@ -106,7 +106,7 @@
                     <img className="tutorial_video" src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"/>
 
                     <div className="tutorial_more_videos_cont">
-                        <a  className="tutorial_more_videos_button" href="http://pyd.io/end-user-tutorials/" target="_blank"><i className="icon-youtube-play"></i>
+                        <a  className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank"><i className="icon-youtube-play"></i>
                             <span dangerouslySetInnerHTML={htmlMessage('user_home.65')}></span></a>
                     </div>
                 </div>

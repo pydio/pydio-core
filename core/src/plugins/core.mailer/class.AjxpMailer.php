@@ -69,6 +69,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $resultsSQL = $querySQL->fetchAll();
             $arrayResultsSQL = array();
             $output = array("success" => [], "error" => []);
+            $useHtml = true;
             if (count($resultsSQL) > 0) {
                 foreach ($resultsSQL as $value) {
                     $ajxpNotification = unserialize($value["notification_object"]);
@@ -91,14 +92,20 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     }else{
                         $ajxpNodeWorkspace = "Deleted Workspace";
                     }
+                    if(!$value["html"]){
+                        $useHtml = false;
+                    }
                     $ajxpKey = $value["html"]."|".$ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
                     $arrayResultsSQL[$value['recipent']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
-                //$body = 'h1{font-size: 1.3em;border-bottom: 1px solid #555555;padding-bottom: 4px;font-weight: normal;color: #555555;}ul{list-style-type: none;padding: 0;margin-bottom: 50px;}*{font-family: Arial;font-size: 14px;color: #555;}li{margin: 20px 0px;}h1 em{font-size: 1em;color: #E35D52;font-weight: normal;}em{font-style: normal;font-weight: bold;}';
-                //make condition if the user want html mail or not
-                $body = '';
-                foreach ($arrayResultsSQL as $recipent => $arrayWorkspace) {
+                if($useHtml){
+                    $body = '<style>h1{font-size: 1.3em;border-bottom: 1px solid #555555;padding-bottom: 4px;font-weight: normal;color: #555555;}ul{list-style-type: none;padding: 0;margin-bottom: 50px;}*{font-family: Arial;font-size: 14px;color: #555;}li{margin: 20px 0px;}h1 em{font-size: 1em;color: #E35D52;font-weight: normal;}em{font-style: normal;font-weight: bold;}</style>';
+                }else{
+                    $body = '';
+                }
+                $digestTitle = ConfService::getMessages()["core.mailer.9"];
+                foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
                     foreach ($arrayWorkspace as $workspace => $arrayAjxpKey) {
                         $key = key($arrayAjxpKey);
                         $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
@@ -106,21 +113,18 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $body = $body . '<li>' . $arrayNotif[0]->getDescriptionLong(true) . ' (' . count($arrayNotif) . ')</li>';
                         }
                         $body = $body . '</ul>';
-                        if (substr($key,0,1) === "0") {
-                            $body = preg_replace('/<\/h1>/', ' \n ', $body);
-                            $body = preg_replace('/<\/li>/', ' \n ', $body);
-                            $body = preg_replace('/<\/ul>/', ' \n ', $body);
-                            $body = preg_replace('/<[^>]*>/', '', $body);
-                        }
                     }
                     try {
-                        $mailer->sendMail(array($recipent),
-                            "Pydio Digest",
-                            $body);
-                        $output["success"][] = "Email sent to ".$recipent;
+                        $mailer->sendMail(array($recipient),
+                            $digestTitle,
+                            $body,
+                            null,
+                            null,
+                            $useHtml
+                        );
+                        $output["success"][] = "Email sent to ".$recipient;
                     } catch (AJXP_Exception $e) {
-                        $output["error"][] = "Sending email to ".$recipent.": ".$e->getMessage();
-                        //throw new AJXP_Exception($e->getMessage());
+                        $output["error"][] = "Sending email to ".$recipient.": ".$e->getMessage();
                     }
                 }
                 try {
@@ -218,6 +222,8 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         $notification_email = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
         $arrayRecipients = array();
         $mainRecipient = $userObject->mergedRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+        $useHtml = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true") === "true" ? 1 : 0;
+
         if(!empty($mainRecipient)) $arrayRecipients[] = $mainRecipient;
         $additionalRecipients = array_map("trim", explode(',', $notification_email));
         foreach($additionalRecipients as $addR){
@@ -234,7 +240,6 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             );
 
             if(!empty($nextFrequency)){
-                $html = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true") === "true" ? 1 : 0;
                 if (!dibi::isConnected()) {
                     dibi::connect($this->getDibiDriver());
                 }
@@ -245,7 +250,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $notification->getNode()->getUrl(),
                             $nextFrequency,
                             serialize($notification),
-                            $html);
+                            $useHtml);
                     } catch (Exception $e) {
                         $this->logError("[mailer]", $e->getMessage());
                     }
@@ -262,7 +267,8 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         $notification->getDescriptionShort(),
                         $notification->getDescriptionLong(),
                         $notification->getAuthor(),
-                        $notification->getMainLink()
+                        $notification->getMainLink(),
+                        $useHtml
                     );
                 } catch (Exception $e) {
                     throw new AJXP_Exception($e->getMessage());
@@ -271,7 +277,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         }
     }
 
-    public function sendMail($recipients, $subject, $body, $from = null, $imageLink = null)
+    public function sendMail($recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
     {
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
@@ -307,15 +313,17 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
         }
         $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);
-        $this->sendMailImpl($recipients, $subject, $body, $from, $images);
+        $this->sendMailImpl($recipients, $subject, $body, $from, $images, $useHtml);
         if (AJXP_SERVER_DEBUG) {
+            if(!$useHtml) {
+                $rowBody = '[TEXT ONLY] '.AjxpMailer::simpleHtml2Text($rowBody);
+            }
             $line = "------------------------------------------------------------------------\n";
             file_put_contents($this->mailCache, $line."Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\nSubject: $subject\nBody:\n$rowBody\n", FILE_APPEND);
         }
     }
 
-    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array())
-    {
+    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
     }
 
     public function sendMailAction($actionName, $httpVars, $fileVars)
@@ -437,6 +445,15 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
     public function validateEmail($email)
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public static function simpleHtml2Text($html){
+
+        $html = preg_replace('/<br\>/', '\n', $html);
+        $html = preg_replace('/<br>/', '\n', $html);
+        $html = preg_replace('/<li>/', '\n * ', $html);
+        $html = preg_replace('/<\/li>/', '', $html);
+        return strip_tags($html);
     }
 
     /**

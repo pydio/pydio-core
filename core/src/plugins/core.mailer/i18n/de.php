@@ -27,4 +27,5 @@ $mess = array(
     "6" => "Betreff",
     "7" => "Nachricht",
     "8" => "Benutzer oder Email",
+    "9" => "Notifications Digest",
 );

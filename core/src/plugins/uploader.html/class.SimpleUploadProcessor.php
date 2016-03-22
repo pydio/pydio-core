@@ -93,7 +93,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
                     $s = '<tree>';
                     $s .= AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
-                    print("\n var resultString = '".$s."'; var resultXML = parent.parseXml(resultString);");
+                    print("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
                     print("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
                 }
             }
