@@ -366,13 +366,12 @@ class Repository implements AjxpGroupPathProvider
             if (isSet($parentTemplateObject)) {
                 $pvalue = $parentTemplateObject->getOption($oName, $safe);
                 $pathChanged = false;
-                if (is_string($pvalue) && strstr($pvalue, "AJXP_USE_UUID_PATH") !== false) {
-                    $pvalue = rtrim(str_replace("AJXP_USE_UUID_PATH", $this->getUniqueId(), $pvalue), "/");
+                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_UUID") !== false) {
+                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_UUID", $this->getUniqueId(), $pvalue), "/");
                     $pathChanged = true;
                 }
-                if (is_string($pvalue) && strstr($pvalue, "AJXP_USE_SLUG") !== false) {
-                    $pvalue = rtrim(str_replace("AJXP_USE_SLUG", $this->getSlug(), $pvalue), "/");
-                    #return AJXP_Utils::securePath($value);
+                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_SLUG") !== false) {
+                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $this->getSlug(), $pvalue), "/");
                     $pathChanged = true;
                 }
                 if (is_string($pvalue) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) {
