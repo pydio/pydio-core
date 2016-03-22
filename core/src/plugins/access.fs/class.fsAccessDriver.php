@@ -1493,7 +1493,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 return;
             }
     if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
-        if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
+        if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
         $filePathOrData = str_replace("\\", "/", $filePathOrData);
         $filePathOrData = SystemTextEncoding::toUTF8($filePathOrData);
         $mapping = explode('=',$_SERVER['X-Accel-Mapping']);
