@@ -2032,7 +2032,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
                 }
                 echo("</plugin_settings_values>");
-                echo("<plugin_doc><![CDATA[<p>".$ajxpPlugin->getPluginInformationHTML("Charles du Jeu", "http://pyd.io/plugins/")."</p>");
+                echo("<plugin_doc><![CDATA[<p>".$ajxpPlugin->getPluginInformationHTML("Charles du Jeu", "https://pydio.com/en/docs/references/plugins")."</p>");
                 if (file_exists($ajxpPlugin->getBaseDir()."/plugin_doc.html")) {
                     echo(file_get_contents($ajxpPlugin->getBaseDir()."/plugin_doc.html"));
                 }
