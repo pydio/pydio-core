@@ -707,12 +707,14 @@ class AJXP_XMLWriter
         }
         $isSharedString = "";
         $currentUserIsOwner = false;
+        $ownerLabel = null;
         if ($repoObject->hasOwner()) {
             $uId = $repoObject->getOwner();
             if(AuthService::usersEnabled() && AuthService::getLoggedUser()->getId() == $uId){
                 $currentUserIsOwner = true;
             }
             $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
+            $ownerLabel = $label;
             $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
@@ -722,7 +724,7 @@ class AJXP_XMLWriter
         $descTag = "";
         $public = false;
         if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
-        $description = $repoObject->getDescription($public);
+        $description = $repoObject->getDescription($public, $ownerLabel);
         if (!empty($description)) {
             $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
         }

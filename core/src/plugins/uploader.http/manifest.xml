@@ -21,9 +21,9 @@
 						actionBarGroup="put" inZip="false">
 					</context>
 				</gui>
-				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
             <action name="external_download_file">
@@ -34,7 +34,7 @@
 					</context>
 					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="download" behaviour="hidden" />
 				</gui>
-				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 				<processing>
 					<clientCallback><![CDATA[
 						fileName = ajaxplorer.getUserSelection().getUniqueFileName();
@@ -43,17 +43,17 @@
 						bgManager.queueAction("external_download", {dlfile:fileName, dir:crtDir}, MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
 						bgManager.next();
 						]]></clientCallback>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="generate_dl_bookmarklet">
 				<gui text="httpdownloader.9" title="httpdownloader.9" iconClass="icon-bookmark" src="httpdownloader_images/ICON_SIZE/add_bookmarklet.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="false" dir="true" recycle="hidden"
-						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBar="false" contextMenu="false" infoPanel="false"
 						actionBarGroup="remote" inZip="false">
 					</context>
 				</gui>
-				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 				<processing>
 					<clientCallback prepareModal="true" dialogOpenForm="dynamic_bookmarklet">
 						<dialogOnOpen><![CDATA[
@@ -110,12 +110,12 @@
 			</action>
 			<action name="update_dl_data">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="stop_dl">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 		</actions>

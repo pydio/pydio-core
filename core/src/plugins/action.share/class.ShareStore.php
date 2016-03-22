@@ -395,7 +395,7 @@ class ShareStore {
      * @throws Exception
      * @return bool
      */
-    public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false)
+    public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false, $ajxpNode = null)
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
@@ -420,6 +420,9 @@ class ShareStore {
                     throw new Exception($mess[427]);
                 }
             }
+            if($ajxpNode != null){
+                $this->getMetaManager()->removeShareFromMeta($ajxpNode, $element);
+            }
             if($this->sqlSupported){
                 if(isSet($share) && count($share)){
                     $this->confStorage->simpleStoreClear("share", $element);
@@ -428,6 +431,9 @@ class ShareStore {
                     if(count($shares)){
                         $keys = array_keys($shares);
                         $this->confStorage->simpleStoreClear("share", $keys[0]);
+                        if($ajxpNode != null){
+                            $this->getMetaManager()->removeShareFromMeta($ajxpNode, $keys[0]);
+                        }
                     }
                 }
             }
@@ -459,6 +465,12 @@ class ShareStore {
                 unlink($minisiteData["PUBLICLET_PATH"]);
             }else if($this->sqlSupported){
                 $this->confStorage->simpleStoreClear("share", $element);
+            }
+            if($ajxpNode !== null){
+                $this->getMetaManager()->removeShareFromMeta($ajxpNode, $element);
+                if(!$keepRepository){
+                    $this->getMetaManager()->removeShareFromMeta($ajxpNode, $repoId);
+                }
             }
         } else if ($type == "user") {
             $this->testUserCanEditShare($element, array());

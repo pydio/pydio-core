@@ -108,18 +108,15 @@
                     text-align: right;
                 }
                 .action_bar a{
-                    background-color: #ffffff;
-                    margin-top:3px;
                     cursor: pointer;
-                    color: #555;
                 }
                 div.class-FetchedResultPane{
                     background-color: #f8f8f8;
                 }
                 .action_bar, #buttons_bar{
-                    background-color: #ffffff;
+                    background-color: #f8f8f8;
                     height: 32px;
-                    border-bottom: 1px solid rgba(0,0,0,0.16);
+                    border-bottom: 1px solid rgba(0,0,0,0.08);
                     padding:18px 14px 12px;
                     text-align: right;
                 }

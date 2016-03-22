@@ -729,6 +729,7 @@
                 params["hash"] = meta.get('shared_element_hash');
                 params["tmp_repository_id"] = meta.get('shared_element_parent_repository');
                 params["element_type"] = meta.get('share_type');
+                params["file"] = meta.get("original_path");
             }else{
                 params["file"] = uniqueNode.getPath();
                 params["element_type"] = uniqueNode.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository";

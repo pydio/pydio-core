@@ -659,9 +659,11 @@ class ShareCenter extends AJXP_Plugin
             case "unshare":
 
                 $mess = ConfService::getMessages();
+                $userSelection = new UserSelection($this->repository, $httpVars);
                 if(isSet($httpVars["hash"])){
-
-                    $result = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"]);
+                    $sanitizedHash = AJXP_Utils::sanitize($httpVars["hash"], AJXP_SANITIZE_ALPHANUM);
+                    $ajxpNode = ($userSelection->isEmpty() ? null : $userSelection->getUniqueNode());
+                    $result = $this->getShareStore()->deleteShare($httpVars["element_type"], $sanitizedHash, false, false, $ajxpNode);
                     if($result !== false){
                         AJXP_XMLWriter::header();
                         AJXP_XMLWriter::sendMessage($mess["share_center.216"], null);

@@ -265,8 +265,8 @@
 						</div>
 						<div id="driver_form" style="margin-top:32px;"></div>
 						<div class="dialogButtons" style="direction:rtl;">
-							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/forward.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
-							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
+							<input type="submit" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
+							<input type="button" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>
 				]]></clientForm>

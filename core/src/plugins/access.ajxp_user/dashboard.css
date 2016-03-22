@@ -51,7 +51,7 @@
 
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 62px;
+    padding-top: 63px;
     background-color: #444;
 }
 
@@ -63,14 +63,13 @@ div#userdashboard_main_tab.horizontal_tabulator div.tabbed_editor{
 div#userdashboard_myparams_title{
     position: absolute;
     color: #ffffff;
-    font-weight: normal;
-    padding: 22px;
-    height: 17px;
+    font-weight: 300;
+    padding: 25px 16px;
+    height: 63px;
     font-size: 13px;
-    width: 196px;
-    left: 0;
-    background-color: #444;
-    letter-spacing: 1px;
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    box-sizing: border-box;
 }
 
 div#userdashboard_myparams_title span#dash_title{

@@ -96,7 +96,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         $useHtml = false;
                     }
                     $ajxpKey = $value["html"]."|".$ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
-                    $arrayResultsSQL[$value['recipent']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
+                    $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
                 if($useHtml){
@@ -245,7 +245,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                 }
                 foreach ($arrayRecipients as $recipient) {
                     try {
-                        dibi::query("INSERT INTO [ajxp_mail_queue] ([recipent],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%b) ",
+                        dibi::query("INSERT INTO [ajxp_mail_queue] ([recipient],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%b) ",
                             $recipient,
                             $notification->getNode()->getUrl(),
                             $nextFrequency,

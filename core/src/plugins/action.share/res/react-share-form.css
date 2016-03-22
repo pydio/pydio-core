@@ -414,6 +414,7 @@ div#ajxp_shared_info_panel .copy-button {
   border-radius: 0 2px 2px 0;
 }
 div#ajxp_shared_info_panel .copy-message {
+  padding-top: 5px;
   text-align: center;
   font-size: 13px;
 }

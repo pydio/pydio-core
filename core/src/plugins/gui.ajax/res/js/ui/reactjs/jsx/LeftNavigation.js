@@ -252,6 +252,17 @@
 
             var component;
             if(this.state.componentLaunched){
+                var entryRenderFirstLine;
+                if(paneData.options['tipAttribute']){
+                    entryRenderFirstLine = function(node){
+                        var meta = node.getMetadata().get(paneData.options['tipAttribute']);
+                        if(meta){
+                            return <div title={meta.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?(\/)?>|<\/\w+>/gi, '')}>{node.getLabel()}</div>;
+                        }else{
+                            return node.getLabel();
+                        }
+                    };
+                }
                 component = (
                     <ReactPydio.NodeListCustomProvider
                         pydio={this.props.pydio}
@@ -259,6 +270,7 @@
                         title={title}
                         elementHeight={36}
                         heightAutoWithMax={4000}
+                        entryRenderFirstLine={entryRenderFirstLine}
                         nodeClicked={this.props.nodeClicked}
                         presetDataModel={this.state.dataModel}
                         reloadOnServerMessage={paneData.options['reloadOnServerMessage']}

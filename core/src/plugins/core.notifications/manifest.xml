@@ -139,7 +139,7 @@
                         id="navigation_alerts"
                         position="0"
                         type="ListProvider"
-                        options='{"title":"notification_center.3", "titleClassName":"colorcode-alert", "startOpen":true, "dataModelBadge":{"property":"metadata","metadata_sum":"event_occurence", "className":"alerts_number_badge"}, "fit":"content","silentLoading":true,"actionBarGroups":["inline-notifications"],"nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"false"},"reloadOnServerMessage":"tree/reload_user_feed", "connexion_discrete":true, "emptyChildrenMessage":"notification_center.8"}'/>
+                        options='{"title":"notification_center.3", "titleClassName":"colorcode-alert", "startOpen":true, "dataModelBadge":{"property":"metadata","metadata_sum":"event_occurence", "className":"alerts_number_badge"}, "fit":"content","silentLoading":true,"actionBarGroups":["inline-notifications"],"nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"false"},"reloadOnServerMessage":"tree/reload_user_feed", "connexion_discrete":true, "tipAttribute":"event_description_long", "emptyChildrenMessage":"notification_center.8"}'/>
             </component_config>
         </client_configs>
     </registry_contributions>
