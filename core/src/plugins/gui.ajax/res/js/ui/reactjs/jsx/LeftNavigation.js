@@ -552,9 +552,19 @@
         }
     });
 
+    var FakeDndBackend = function(){
+        return{
+            setup:function(){},
+            teardown:function(){},
+            connectDragSource:function(){},
+            connectDragPreview:function(){},
+            connectDropTarget:function(){}
+        };
+    };
+
     var ns = global.LeftNavigation || {};
     if(global.ReactDND){
-        ns.Panel = ReactDND.DragDropContext(ReactDND.HTML5Backend)(LeftPanel);
+        ns.Panel = ReactDND.DragDropContext(FakeDndBackend)(LeftPanel);
     }else{
         ns.Panel = LeftPanel;
     }
