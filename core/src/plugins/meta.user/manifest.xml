@@ -99,7 +99,7 @@
                             var closeFunc = function(){
                                 var oForm = $(modal.getForm());
                                 userSelection.updateFormOrUrl(modal.getForm());
-                                PydioApi.getClient().submitForm(oForm);
+                                PydioApi.getClient().submitForm(oForm, true);
                                 hideLightBox(true);
                                 return false;
                             };

@@ -341,9 +341,9 @@ class PydioDataModel extends Observable{
         var parent = parentFake.findInArbo(this.getRootNode(), undefined);
         if(!parent && PathUtils.getDirname(node.getPath()) == "") parent = this.getRootNode();
         if(parent){
-            parent.addChild(node);
-            if(setSelectedAfterAdd && this.getContextNode() == parent){
-                this.setSelectedNodes([node], {});
+            let addedNode = parent.addChild(node);
+            if(addedNode && setSelectedAfterAdd && this.getContextNode() == parent){
+                this.setSelectedNodes([addedNode], {});
             }
         }
 
@@ -352,11 +352,15 @@ class PydioDataModel extends Observable{
     /**
      * Remove a node by path somewhere
      * @param path string
+     * @param imTime integer|null
      */
-    removeNodeByPath(path){
+    removeNodeByPath(path, imTime = null){
         var fake = new AjxpNode(path);
         var n = fake.findInArbo(this.getRootNode(), undefined);
         if(n){
+            if(imTime && n.getMetadata() && n.getMetadata().get("ajxp_im_time") && parseInt(n.getMetadata().get("ajxp_im_time")) >= imTime){
+                return false;
+            }
             n.getParent().removeChild(n);
             return true;
         }
@@ -389,7 +393,7 @@ class PydioDataModel extends Observable{
         }else{
             fake = new AjxpNode(original);
             n = fake.findInArbo(this.getRootNode(), undefined);
-            if(n){
+            if(n && !n.isMoreRecentThan(node)){
                 node._isLoaded = n._isLoaded;
                 n.replaceBy(node, "override");
                 if(setSelectedAfterUpdate && this.getContextNode() == n.getParent()) {

@@ -255,6 +255,11 @@ Class.create('SelectableElements', {
 
 				var scrollOffset = oEl[direction];
 				var parentHeight = parent[dimMethod]();
+                if(parent.parentNode && dimMethod == 'getHeight' && parent.parentNode.getHeight() < parentHeight){
+                    parentHeight = parent.parentNode.getHeight();
+                    parent.setStyle({height:parentHeight + 'px'});
+                    if(parent.scrollerInstance) parent.scrollerInstance.recalculateLayout(parentHeight);
+                }
 				var parentScrollTop = parent[scrollDir];
 				var elHeight = $(oEl)[dimMethod]();
 

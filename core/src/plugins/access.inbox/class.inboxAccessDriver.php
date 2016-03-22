@@ -21,8 +21,6 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use Pydio\Access\Core\Stream\Iterator\DirIterator;
-
 class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
@@ -41,7 +39,11 @@ class inboxAccessDriver extends fsAccessDriver
 
             // Retrieving stored details
             $originalNode = self::$output[$ajxpNode->getLabel()];
-            $meta = $originalNode["meta"];
+            if(isSet($originalNode["meta"])){
+                $meta = $originalNode["meta"];
+            }else{
+                $meta = array();
+            }
             $label = $originalNode["label"];
 
             if(!$ajxpNode->isLeaf()){
@@ -71,10 +73,20 @@ class inboxAccessDriver extends fsAccessDriver
                 try{
                     ConfService::loadDriverForRepository($node->getRepository());
                     $node->getRepository()->detectStreamWrapper(true);
+                    if($node->getRepository()->hasContentFilter()){
+                        $node->setLeaf(true);
+                    }
+                    AJXP_Controller::applyHook("node.read", array(&$node));
                     $stat = stat($url);
                     self::$output[$basename]["stat"] = $stat;
                 }catch (Exception $e){
                     $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                }
+                if(is_array($stat) && AuthService::getLoggedUser() != null){
+                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($nodeData["meta"]["shared_repository_id"]);
+                    if($acl == "r"){
+                        self::disableWriteInStat($stat);
+                    }
                 }
             }
             $nodeData["stat"] = $stat;
@@ -167,6 +179,13 @@ class inboxAccessDriver extends fsAccessDriver
                 }else if($ext == "error"){
                     $label .= " (".$mess["inbox_driver.5"].")";
                 }
+                if(is_array($stat) && AuthService::getLoggedUser() != null){
+                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($repoId);
+                    if($acl == "r"){
+                        self::disableWriteInStat($stat);
+                    }
+
+                }
 
             }
 
@@ -198,4 +217,15 @@ class inboxAccessDriver extends fsAccessDriver
         }
         return $output;
     }
+
+    /**
+     * @param array $stat
+     */
+    protected static function disableWriteInStat(&$stat){
+        $octRights = decoct($stat["mode"]);
+        $last = (strlen($octRights)) - 1;
+        $octRights[$last] = $octRights[$last-1] = $octRights[$last-2] = 5;
+        $stat["mode"] = $stat[2] = octdec($octRights);
+    }
+
 }

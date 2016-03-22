@@ -248,7 +248,8 @@ class RemoteNodeProvider{
         if(removes && removes.length){
             removes.forEach(function(r){
                 var p = r.getAttribute("filename");
-                targetDataModel.removeNodeByPath(p);
+                var imTime = parseInt(r.getAttribute("ajxp_im_time"));
+                targetDataModel.removeNodeByPath(p, imTime);
             });
         }
         if(adds && adds.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){

@@ -20,7 +20,8 @@
     */
 $mess=array(
     "workspace.normal" => "Dépôt AJXP_REPOSITORY_LABEL",
-    "workspace.shared" => "Répertoire partagé AJXP_REPOSITORY_LABEL",
+    "workspace.shared.folder" => "Répertoire partagé AJXP_REPOSITORY_LABEL",
+    "workspace.shared.file" => "Fichier partagé AJXP_REPOSITORY_LABEL",
     "minisite.file" => "Fichier public AJXP_REPOSITORY_LABEL",
     "minisite.folder" => "Minisite AJXP_REPOSITORY_LABEL",
     "public_user" => "un utilisateur public (connexion depuis '%s')"

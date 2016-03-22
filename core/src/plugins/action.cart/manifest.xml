@@ -49,6 +49,17 @@
                             top: 12px;
                             right: 10px;
                         }
+                        #action_cart #display_toolbar span.actionbar_button_label,
+                        #search_panel div#display_toolbar span.actionbar_button_label
+                        {
+                            display: none;
+                        }
+                        #action_cart #display_toolbar a{
+                            padding: 0 4px;
+                        }
+                        #action_cart #display_toolbar a.disabled {
+                            display: none;
+                        }
                         #action_cart div.tabulatorContainer.panelHeader{
                             margin: 0 15px;
                             border-radius: 5px;
@@ -63,18 +74,24 @@
                             min-height: 180px;
                         }
                         #action_cart .innerTabulator span.toggleHeader{
-                            background-color: #E2DECB;
-                            border: 1px solid #E2DECB;
-                            color: #555;
-                            border-radius: 16px;
+                            border: 0;
+                            border-bottom: 2px solid #E2DECB;
+                            border-radius: 0;
                             margin-right: 4px;
                             padding: 2px 6px;
+                            background: transparent;
+                            color: white;
                         }
                         #action_cart .innerTabulator span.toggleHeader.toggleInactive{
                             background-color: transparent;
-                            color: #ccc;
+                            color: rgba(255, 255, 255, 0.47);
+                            border-color: transparent;
                         }
                         #search_panel div#display_toolbar {
+                            float: right;
+                            display: inline-block;
+                            min-width: 60px;
+                            text-align: right;
                             margin-right: 40px;
                             margin-top: 5px;
                         }
@@ -83,7 +100,7 @@
                             font-size: 1.4em;
                         }
                         #action_cart div.class-FetchedResultPane{
-                            border-radius: 15px;
+                            border-radius: 8px;
                             margin: 0px 15px 10px;
                             background-color: rgba(255, 255, 255, 0.1);
                         }

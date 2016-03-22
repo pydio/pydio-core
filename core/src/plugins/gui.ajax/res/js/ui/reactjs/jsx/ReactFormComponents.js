@@ -645,18 +645,15 @@
 
     });
 
-    /**
-     * Simple RaisedButton executing the applyButtonAction
-     */
-    var InputButton = React.createClass({
+    var ActionRunnerMixin = {
 
         propTypes:{
-            attributes:React.PropTypes.object,
+            attributes:React.PropTypes.object.isRequired,
             applyButtonAction:React.PropTypes.func,
             actionCallback:React.PropTypes.func
         },
 
-        applyButton:function(){
+        applyAction:function(callback){
             var choicesValue = this.props.attributes['choices'].split(":");
             var firstPart = choicesValue.shift();
             if(firstPart == "run_client_action" && global.pydio){
@@ -672,19 +669,35 @@
                 if(this.props.attributes['name'].indexOf("/") !== -1){
                     parameters['button_key'] = PathUtils.getDirname(this.props.attributes['name']);
                 }
-                var callback = this.props.actionCallback;
-                if(!callback){
-                    callback = function(transport){
-                        var text = transport.responseText;
-                        if(text.startsWith('SUCCESS:')){
-                            global.pydio.displayMessage('SUCCESS', transport.responseText.replace('SUCCESS:', ''));
-                        }else{
-                            global.pydio.displayMessage('ERROR', transport.responseText.replace('ERROR:', ''));
-                        }
-                    };
-                }
                 this.props.applyButtonAction(parameters, callback);
             }
+        }
+
+    };
+
+    /**
+     * Simple RaisedButton executing the applyButtonAction
+     */
+    var InputButton = React.createClass({
+
+        mixins:[ActionRunnerMixin],
+
+
+        applyButton:function(){
+
+            var callback = this.props.actionCallback;
+            if(!callback){
+                callback = function(transport){
+                    var text = transport.responseText;
+                    if(text.startsWith('SUCCESS:')){
+                        global.pydio.displayMessage('SUCCESS', transport.responseText.replace('SUCCESS:', ''));
+                    }else{
+                        global.pydio.displayMessage('ERROR', transport.responseText.replace('ERROR:', ''));
+                    }
+                };
+            }
+            this.applyAction(callback);
+
         },
 
         render:function(){
@@ -697,6 +710,46 @@
             );
         }
     });
+
+
+    var MonitoringLabel = React.createClass({
+
+        mixins:[ActionRunnerMixin],
+
+        getInitialState:function(){
+            let loadingMessage = 'Loading';
+            if(this.context && this.context.getMessage){
+                loadingMessage = this.context.getMessage(466, '');
+            }else if(global.pydio && global.pydio.MessageHash){
+                loadingMessage = global.pydio.MessageHash[466];
+            }
+            return {status:loadingMessage};
+        },
+
+        componentDidMount:function(){
+            var callback = function(transport){
+                this.setState({status:transport.responseText});
+            }.bind(this);
+            this._poller = function(){
+                this.applyAction(callback);
+            }.bind(this);
+            this._poller();
+            this._pe = global.setInterval(this._poller, 10000);
+        },
+
+        componentWillUnmount:function(){
+            if(this._pe){
+                global.clearInterval(this._pe);
+            }
+        },
+
+        render: function(){
+            return (<div>{this.state.status}</div>);
+        }
+
+
+    });
+
 
     /**
      * UI to drop a file (or click to browse), used by the InputImage component.
@@ -1664,6 +1717,9 @@
                 case 'button':
                     value = <InputButton {...props}/>;
                     break;
+                case 'monitor':
+                    value = <MonitoringLabel {...props}/>;
+                    break;
                 case 'image':
                     value = <InputImage {...props}/>;
                     break;
@@ -1831,6 +1887,7 @@
     PydioForm.InputBoolean = InputBoolean;
     PydioForm.InputInteger = InputInteger;
     PydioForm.InputButton = InputButton;
+    PydioForm.MonitoringLabel = MonitoringLabel;
     PydioForm.InputSelectBox = InputSelectBox;
     PydioForm.InputImage = InputImage;
     PydioForm.FormPanel = PydioFormPanel;

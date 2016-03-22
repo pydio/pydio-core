@@ -130,6 +130,10 @@ div#react_share_form {
         text-align: center;
         color: @color2;
       }
+      &.link-expired input{
+        color: #aaa;
+        text-decoration: line-through;
+      }
     }
     &.edit-link{
       > span{
@@ -204,6 +208,11 @@ div#react_share_form {
       color: rgba(0, 0, 0, 0.5);
       font-size: 16px;
     }
+    .limit-block-expired{
+      label, .calLabelHasValue{
+        color: #d40000 !important;
+      }
+    }
     .mui-date-picker{
       display: inline-block;
       margin-top: 22px;
@@ -248,14 +257,20 @@ div#react_share_form {
   }
   h4{
     padding-top: 10px;
-    font-weight: normal;
-    font-size: 17px;
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 0;
   }
   .ownership-form{
     .mui-text-field{
       margin-top: -20px;
       width: 230px;
       margin-right: 10px;
+      .mui-text-field-floating-label{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
   div.user-badge {

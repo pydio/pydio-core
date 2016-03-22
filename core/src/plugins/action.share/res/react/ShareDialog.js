@@ -78,7 +78,7 @@
             return {
                 status: 'idle',
                 mailerData: false,
-                model: new ReactModel.Share(this.props.pydio, this.props.selection.getUniqueNode())
+                model: new ReactModel.Share(this.props.pydio, this.props.selection.getUniqueNode(), this.props.selection)
             };
         },
 
@@ -224,7 +224,7 @@
                 );
             }else{
                 var unshareButton;
-                if(this.props.shareModel.hasActiveShares()){
+                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error'){
                     unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
@@ -263,7 +263,8 @@
 
         render: function(){
             var currentUsers = this.props.shareModel.getSharedUsers();
-            if(ReactModel.Share.federatedSharingEnabled()){
+            var federatedEnabled = ReactModel.Share.federatedSharingEnabled();
+            if(federatedEnabled){
                 var remoteUsersBlock = (
                     <RemoteUsers
                         shareModel={this.props.shareModel}
@@ -272,8 +273,9 @@
                 );
             }
             return (
-                <div style={{padding:'0 16px 10px'}}>
+                <div style={federatedEnabled?{padding:'0 16px 10px'}:{padding:'20px 16px 10px'}}>
                     <SharedUsers
+                        showTitle={federatedEnabled}
                         users={currentUsers}
                         userObjects={this.props.shareModel.getSharedUsersAsObjects()}
                         sendInvitations={this.props.showMailer ? this.sendInvitations : null}
@@ -396,7 +398,8 @@
             userObjects:React.PropTypes.object.isRequired,
             onUserUpdate:React.PropTypes.func.isRequired,
             saveSelectionAsTeam:React.PropTypes.func,
-            sendInvitations:React.PropTypes.func
+            sendInvitations:React.PropTypes.func,
+            showTitle:React.PropTypes.bool
         },
         sendInvitationToAllUsers:function(){
             this.props.sendInvitations(this.props.userObjects);
@@ -475,9 +478,13 @@
                     />
                 );
             }
+            var title;
+            if(this.props.showTitle){
+                title = <h3>{this.context.getMessage('217')}</h3>;
+            }
             return (
                 <div>
-                    <h3>{this.context.getMessage('217')}</h3>
+                    {title}
                     <div className="section-legend">{this.context.getMessage('182')}</div>
                     {usersInput}
                     {rwHeader}
@@ -610,7 +617,7 @@
                 );
             }.bind(this));
             return (
-                <div>
+                <div style={{marginTop:16}}>
                     <h3>{this.context.getMessage('207')}</h3>
                     <div className="section-legend">{this.context.getMessage('208')}</div>
                     {this.renderForm()}
@@ -723,14 +730,35 @@
             showMailer:React.PropTypes.func
         },
 
-        toggleLink: function(event){
-            this.props.shareModel.togglePublicLink();
+        toggleLink: function(){
+            var publicLinks = this.props.shareModel.getPublicLinks();
+            if(this.state.showTemporaryPassword){
+                this.setState({showTemporaryPassword: false, temporaryPassword: null});
+            }else if(!publicLinks.length && ReactModel.Share.getAuthorizations(this.props.pydio).password_mandatory){
+                this.setState({showTemporaryPassword: true, temporaryPassword: ''});
+            }else{
+                this.props.shareModel.togglePublicLink();
+            }
+        },
+
+        getInitialState: function(){
+            return {showTemporaryPassword: false, temporaryPassword: null};
+        },
+
+        updateTemporaryPassword: function(value, event){
+            if(value == undefined) value = event.currentTarget.getValue();
+            this.setState({temporaryPassword:value});
+        },
+
+        enableLinkWithPassword:function(){
+            this.props.shareModel.enablePublicLinkWithPassword(this.state.temporaryPassword);
+            this.setState({showTemporaryPassword:false, temporaryPassword:null});
         },
 
         render: function(){
 
             var publicLinkPanes;
-            if(this.props.linkData){
+            if(this.props.linkData) {
                 publicLinkPanes = [
                     <PublicLinkField
                         showMailer={this.props.showMailer}
@@ -742,13 +770,33 @@
                     <PublicLinkPermissions
                         linkData={this.props.linkData}
                         shareModel={this.props.shareModel}
-                        key="public-perm" />,
+                        key="public-perm"/>,
                     <PublicLinkSecureOptions
                         linkData={this.props.linkData}
                         shareModel={this.props.shareModel}
+                        pydio={this.props.pydio}
                         key="public-secure"
                     />
                 ];
+            }else if(this.state.showTemporaryPassword){
+                publicLinkPanes = [
+                    <div>
+                        <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('215')}</div>
+                        <div>
+                            <div style={{float:'left'}}>
+                                <PydioForm.ValidPassword
+                                    attributes={{label:this.context.getMessage('23')}}
+                                    value={this.state.temporaryPassword}
+                                    onChange={this.updateTemporaryPassword}
+                                />
+                            </div>
+                            <div style={{marginLeft:7,marginTop: 26,float:'left'}}>
+                                <ReactMUI.RaisedButton label={this.context.getMessage('92')} secondary={true} onClick={this.enableLinkWithPassword}/>
+                            </div>
+                        </div>
+                    </div>
+                ];
+
             }else{
                 publicLinkPanes = [
                     <div className="section-legend" style={{marginTop:20}}>{this.context.getMessage('190')}</div>
@@ -764,7 +812,7 @@
                     <ReactMUI.Checkbox
                         disabled={this.context.isReadonly() || disableForNotOwner}
                         onCheck={this.toggleLink}
-                        checked={!!this.props.linkData}
+                        checked={!!this.props.linkData || this.state.showTemporaryPassword}
                         label={this.context.getMessage('189')}
                     />
                     {publicLinkPanes}
@@ -853,7 +901,7 @@
             var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly() && this.props.shareModel.currentIsOwner();
             if(this.state.editLink && editAllowed){
                 return (
-                    <div className="public-link-container edit-link">
+                    <div className={"public-link-container edit-link"}>
                         <span>{publicLink.split('://')[0]}://[..]/{PathUtils.getBasename(PathUtils.getDirname(publicLink)) + '/'}</span>
                         <ReactMUI.TextField onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <ReactMUI.RaisedButton label="Ok" onClick={this.toggleEditMode}/>
@@ -885,7 +933,7 @@
                 return (
                     <div className="public-link-container">
                         <ReactMUI.TextField
-                            className="public-link"
+                            className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}
                             type="text"
                             name="Link"
                             ref="public-link-field"
@@ -1048,6 +1096,14 @@
             }
         },
 
+        formatDate : function(dateObject){
+            var dateFormatDay = this.context.getMessage('date_format', '').split(' ').shift();
+            return dateFormatDay
+                .replace('Y', dateObject.getFullYear())
+                .replace('m', dateObject.getMonth() + 1)
+                .replace('d', dateObject.getDate());
+        },
+
         render: function(){
             var linkId = this.props.linkData.hash;
             var passContainer = this.renderPasswordContainer();
@@ -1056,8 +1112,21 @@
             var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
             var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
             var expDate = null;
+            var maxDate = null, maxDownloads = null, dateExpired = false, dlExpired = false;
+            var auth = ReactModel.Share.getAuthorizations(this.props.pydio);
+            var today = new Date();
+            if(parseInt(auth.max_expiration) > 0){
+                maxDate = new Date();
+                maxDate.setDate(today.getDate() + parseInt(auth.max_expiration));
+            }
+            if(parseInt(auth.max_downloads) > 0){
+                // todo: limit the field values by default?
+                maxDownloads = parseInt(auth.max_downloads);
+            }
             if(expirationDateValue){
-                var today = new Date();
+                if(expirationDateValue < 0){
+                    dateExpired = true;
+                }
                 expDate = new Date();
                 expDate.setDate(today.getDate() + parseInt(expirationDateValue));
                 var clearValue = function(){
@@ -1065,7 +1134,7 @@
                     this.refs['expirationDate'].getDOMNode().querySelector(".mui-text-field-input").value = "";
                 }.bind(this);
                 calIcon = <span className="ajxp_icon_span icon-remove-sign" onClick={clearValue}/>;
-                var calLabel = <span className="calLabelHasValue">{this.context.getMessage('21')}</span>
+                var calLabel = <span className="calLabelHasValue">{this.context.getMessage(dateExpired?'21b':'21')}</span>
             }
             if(dlLimitValue){
                 var dlCounter = this.props.shareModel.getDownloadCounter(linkId);
@@ -1076,6 +1145,9 @@
                 }.bind(this);
                 if(dlCounter) {
                     var resetLink = <a style={{cursor:'pointer'}} onClick={resetDl} title={this.context.getMessage('17')}>({this.context.getMessage('16')})</a>;
+                    if(dlCounter >= dlLimitValue){
+                        dlExpired = true;
+                    }
                 }
                 var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
             }
@@ -1085,7 +1157,7 @@
                     <div className="section-legend">{this.context.getMessage('24')}</div>
                     {passContainer}
                     <div className="expires">
-                        <div style={{width:'50%', display:'inline-block', position:'relative'}}>
+                        <div style={{width:'50%', display:'inline-block', position:'relative'}} className={dateExpired?'limit-block-expired':null}>
                             {calIcon}
                             {calLabel}
                             <ReactMUI.DatePicker
@@ -1093,20 +1165,23 @@
                                 disabled={this.context.isReadonly()}
                                 onChange={this.onDateChange}
                                 key="start"
-                                hintText={this.context.getMessage('21')}
+                                hintText={this.context.getMessage(dateExpired?'21b':'21')}
                                 autoOk={true}
                                 minDate={new Date()}
+                                maxDate={maxDate}
                                 defaultDate={expDate}
                                 showYearSelector={true}
                                 onShow={null}
                                 onDismiss={null}
+                                formatDate={this.formatDate}
                             />
                         </div>
-                        <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}}>
+                        <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}} className={dlExpired?'limit-block-expired':null}>
                             <span className="ajxp_icon_span mdi mdi-download"/>
                             <ReactMUI.TextField
+                                type="number"
                                 disabled={this.context.isReadonly()}
-                                floatingLabelText={this.context.getMessage('22')}
+                                floatingLabelText={this.context.getMessage(dlExpired?'22b':'22')}
                                 value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                                 onChange={this.updateDLExpirationField}
                             />
@@ -1181,7 +1256,7 @@
                         {labelLegend}
                         <ReactMUI.TextField
                             disabled={this.context.isReadonly()}
-                            floatingLabelText={this.context.getMessage('215')}
+                            floatingLabelText={this.context.getMessage('145')}
                             name="description"
                             onChange={this.updateDescription}
                             value={this.props.shareModel.getGlobal('description')}
@@ -1224,7 +1299,7 @@
             }
             return (
                 <div className="reset-pydio-forms">
-                    <h3>{this.context.getMessage('216')}</h3>
+                    <h3>{this.context.getMessage('218')}</h3>
                     {element}
                     <div className="form-legend">{this.context.getMessage('188')}</div>
                 </div>
@@ -1320,7 +1395,7 @@
                         <div className="section-legend">{this.context.getMessage('204')}</div>
                         <div>
                             <ReactMUI.TextField ref="newOwner" floatingLabelText={this.context.getMessage('205')}/>
-                            <ReactMUI.RaisedButton label={this.context.getMessage('218')} onClick={this.transferOwnership}/>
+                            <ReactMUI.RaisedButton label={this.context.getMessage('203b')} onClick={this.transferOwnership}/>
                         </div>
                     </div>
                 );

@@ -68,7 +68,6 @@ Class.create("XHRUploader", {
         this.contextNode = this.dataModel.getContextNode();
 
         if(window.UploaderDroppedTarget && window.UploaderDroppedTarget.ajxpNode){
-            //console.log(this.contextNode);
             this.contextNode = window.UploaderDroppedTarget.ajxpNode;
         }
 
@@ -124,8 +123,7 @@ Class.create("XHRUploader", {
 
     handleDropEventResults: function(items, files){
 
-        var isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-        if ( !isMac && items && items.length && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+        if (items && items.length && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
             var callback = this.addListRow.bind(this);
             var error = (console ? console.log : function(err){window.alert(err); }) ;
             var length = items.length;
@@ -143,6 +141,7 @@ Class.create("XHRUploader", {
                         callback(File);
                     }, error );
                 } else if (entry.isDirectory) {
+                    this.addFolderRow(entry.fullPath);
                     this.recurseDirectory(entry, function(fileEntry){
                         var relativePath = fileEntry.fullPath;
                         fileEntry.file(function(File) {
@@ -168,6 +167,7 @@ Class.create("XHRUploader", {
         var recurseDir = this.recurseDirectory.bind(this);
         var dirReader = item.createReader();
         var entries = [];
+        var oThis = this;
 
         var toArray = function(list){
             return Array.prototype.slice.call(list || [], 0);
@@ -180,6 +180,7 @@ Class.create("XHRUploader", {
 
                     $A(entries).each(function(e){
                         if(e.isDirectory){
+                            oThis.addFolderRow(e.fullPath);
                             recurseDir(e, completeHandler, errorHandler);
                         }else{
                             completeHandler(e);
@@ -224,7 +225,16 @@ Class.create("XHRUploader", {
             }.bind(this));
         }
 
-        this.initElement();
+        var element = this.mainForm.down('.dialogFocus');
+        this.initElement(element, false);
+        if('webkitdirectory' in element){
+            var div = this.mainForm.down('#fileInputContainerDiv');
+            var div2 = div.cloneNode(true);
+            div2.addClassName('folder_upload_button');
+            div.insert({after:div2});
+            div2.down('#uploadBrowseButton').update('<span class="icon-folder-open-alt"></span> ' + pydio.MessageHash['502']);
+            this.initElement(div2.down('input'), true);
+        }
 
         var dropzone = this.listTarget;
         dropzone.addClassName('droparea');
@@ -392,14 +402,27 @@ Class.create("XHRUploader", {
 	/**
 	 * Add a new file input element
 	 */
-	initElement : function(  ){
-		var element = this.mainForm.down('.dialogFocus');
-		element.setAttribute("multiple", "true");
-		if(Prototype.Browser.Gecko) element.setStyle({left:'-100px'});
+	initElement : function(element, uploadFolder ){
+
+        if(uploadFolder){
+		    element.setAttribute("webkitdirectory", "true");
+        }else{
+    		element.setAttribute("multiple", "true");
+        }
 		element.observe("change", function(event){
 			var files = element.files;
+            var folders = {};
 			for(var i=0;i<files.length;i++){
-				this.addListRow(files[i]);
+                var relPath = null;
+                if(uploadFolder && files[i]['webkitRelativePath']){
+                    relPath = '/' + files[i]['webkitRelativePath'];
+                    var folderPath = PathUtils.getDirname(relPath);
+                    if(!folders[folderPath]){
+                        this.addFolderRow(folderPath);
+                        folders[folderPath] = true;
+                    }
+                }
+				this.addListRow(files[i], relPath);
 			}
             if(this.optionPane.autoSendCheck.checked){
                 this.submit();
@@ -424,10 +447,9 @@ Class.create("XHRUploader", {
         if(this.sendButton) this.sendButton.addClassName("disabled");
 	},
 
-    /*
     pathToIndent: function( item,  itemPath ){
         var length = itemPath.split("/").length - 1;
-        if(!length) return;
+        if(length <= 1) return;
         for(var i=0;i<length;i++){
             item.insert({top: '<span class="item-indent">&nbsp;</span>'});
         }
@@ -437,11 +459,11 @@ Class.create("XHRUploader", {
 
         var row = new Element('div').update('<span class="icon-folder-close"></span> ' + getBaseName(folderPath));
         this.pathToIndent(row, folderPath);
-        row.FOLDER = true;
+        row.status = 'folder';
+        row.folderPath = folderPath;
         this.listTarget.insert(row);
 
     },
-    */
 
 	/**
 	 * Add a new row to the list of files
@@ -492,7 +514,7 @@ Class.create("XHRUploader", {
 			label = label.substr(0,20) + '[...]' + label.substr(label.length-(maxLength-20), label.length);
 		} 
 		
-		var item = new Element( 'div' );		
+		var item = new Element( 'div' ).update('<span class="icon-file-alt"></span>');
 		// Delete button
 		var delButton = new Element( 'img', {
 			src:ajxpResourcesFolder+'/images/actions/16/editdelete.png',
@@ -517,12 +539,19 @@ Class.create("XHRUploader", {
 		item.insert( label.stripTags() );
         if(relativePath){
             item.relativePath = relativePath;
+            this.pathToIndent(item, item.relativePath);
             item.insert( '<span class="item_relative_path">'+getRepName(relativePath)+'</span>' );
+            var folderItem = $A(this.listTarget.childNodes).find(function(c){
+                return c.folderPath == PathUtils.getDirname(relativePath);
+            });
+        }
+        if(folderItem){
+            folderItem.insert({after: item});
+        }else{
+            // Add it to the list
+            this.listTarget.insert( item );
         }
 
-		// Add it to the list
-		this.listTarget.insert( item );
-		
 		var id = 'pgBar_' + (this.listTarget.childNodes.length + 1);
         if(this.rowAsProgressBar){
             this.createInnerProgressBar(item, id);
@@ -765,15 +794,18 @@ Class.create("XHRUploader", {
             if(!this.createdDirs) this.createdDirs = $A();
             // Create the folder directly!
             var createConn = new Connexion();
+            createConn.onComplete = function(){
+                pydio.fireContextRefresh();
+            };
             var dirPath = getRepName(item.relativePath);
             var parts = dirPath.split("/");
             var localDir = "";
             for(var i=0;i<parts.length;i++){
+                if(!parts[i]) continue;
                 localDir += "/" + parts[i];
 
                 var fullPath = currentDir+localDir;
                 if(this.createdDirs.indexOf(localDir) == -1){
-                    item.down('span.item_relative_path').update('Creating '+localDir + '...');
                     createConn.setParameters(new Hash({
                         get_action: 'mkdir',
                         dir: getRepName(fullPath),
@@ -781,7 +813,12 @@ Class.create("XHRUploader", {
                         dirname:getBaseName(fullPath)
                     }));
                     createConn.sendSync();
-                    item.down('span.item_relative_path').update(localDir);
+                    var folderItem = $A(this.listTarget.childNodes).find(function(c){
+                        return c.folderPath == localDir;
+                    });
+                    if(folderItem){
+                        folderItem.insert({bottom:'<span class="icon-ok"></span>'});
+                    }
                     this.createdDirs.push(localDir);
                 }
             }

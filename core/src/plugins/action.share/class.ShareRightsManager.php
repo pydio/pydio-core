@@ -86,12 +86,15 @@ class ShareRightsManager
                 $this->store->testUserCanEditShare($existingRepo->getOwner(), $existingRepo->options);
             }
             $uniqueUser = $shareObject->getUniqueUser();
-
             if($guestUserPass !== null && strlen($guestUserPass)) {
                 $userPass = $guestUserPass;
                 $shareObject->setUniqueUser($uniqueUser, true);
             }else if(!$shareObject->shouldRequirePassword() || ($guestUserPass !== null && $guestUserPass == "")){
                 $shareObject->setUniqueUser($uniqueUser, false);
+            }
+            if($update && $forcePassword && !($shareObject instanceof \Pydio\OCS\Model\TargettedLink) && !$shareObject->shouldRequirePassword() && empty($guestUserPass)){
+                $mess = ConfService::getMessages();
+                throw new Exception($mess["share_center.175"]);
             }
 
         } else {
@@ -233,7 +236,11 @@ class ShareRightsManager
             if($entry["TYPE"] == "user") {
                 $users[$entry["ID"]] = $entry;
             }else{
+                if($entry["ID"] == "AJXP_GRP_/"){
+                    $entry["ID"] = "AJXP_GRP_".AuthService::filterBaseGroup("/");
+                }
                 $groups[$entry["ID"]] = $entry;
+
             }
             $index ++;
 
@@ -307,8 +314,7 @@ class ShareRightsManager
                     );
                 }
                 $ID = $userId;
-            }else if($rId == "AJXP_GRP_/"){
-                $rId = "AJXP_GRP_/";
+            }else if($rId == "AJXP_GRP_".AuthService::filterBaseGroup("/")){
                 $TYPE = "group";
                 $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
@@ -332,9 +338,11 @@ class ShareRightsManager
                 if(isSet($loadedGroups[$groupId])) {
                     $LABEL = $loadedGroups[$groupId];
                 }
-                if($groupId == "/"){
+                /*
+                if($groupId == AuthService::filterBaseGroup("/")){
                     $LABEL = $mess["447"];
                 }
+                */
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
             }else{
@@ -418,8 +426,9 @@ class ShareRightsManager
             // ADD "my shared files" REPO OTHERWISE SOME USER CANNOT ACCESS
             if( !isSet($userEntry["HIDDEN"]) && $childRepository->hasContentFilter()){
                 $inboxRepo = ConfService::getRepositoryById("inbox");
-                if($inboxRepo !== null){
-                    $userObject->personalRole->setAcl("inbox", "r");
+                $currentAcl = $userObject->mergedRole->getAcl("inbox");
+                if($inboxRepo !== null && empty($currentAcl)){
+                    $userObject->personalRole->setAcl("inbox", "rw");
                 }
             }
 

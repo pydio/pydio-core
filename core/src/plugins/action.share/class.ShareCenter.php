@@ -415,10 +415,9 @@ class ShareCenter extends AJXP_Plugin
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
 
-                $this->updateToMaxAllowedValue($httpVars, "FILE_MAX_DOWNLOAD", "downloadlimit");
-                $this->updateToMaxAllowedValue($httpVars, "FILE_MAX_EXPIRATION", "expiration");
+                $this->updateToMaxAllowedValue($httpVars, "downloadlimit", "FILE_MAX_DOWNLOAD");
+                $this->updateToMaxAllowedValue($httpVars, "expiration", "FILE_MAX_EXPIRATION");
 
-                $newMeta = null;
                 $httpHash = null;
                 $originalHash = null;
 
@@ -533,19 +532,18 @@ class ShareCenter extends AJXP_Plugin
                     }
                 }
 
-                if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
-
-                    $this->getShareStore()->getMetaManager()->addShareInMeta(
-                        $ajxpNode,
-                        $newMeta["type"],
-                        $newMeta["id"],
-                        ($shareScope == "public"),
-                        $originalHash
-                    );
-
-                }
 
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+                /*
+                 * Send IM to inform that node has been shared or unshared.
+                 * Should be done only if share scope is public.
+                 */
+                if($shareScope == "public"){
+                    $ajxpNode->loadNodeInfo();
+                    $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => array($ajxpNode->getPath() => $ajxpNode)]);
+                    AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
+                }
+
                 if(!isSet($httpVars["return_json"])){
                     header("Content-Type: text/plain");
                     print($plainResult);
@@ -639,16 +637,20 @@ class ShareCenter extends AJXP_Plugin
                     echo json_encode($jsonData);
 
                 }else{
+
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
-                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
-                    header("Content-type:application/json");
-                    if(!empty($compositeShare)){
-                        $json = $this->compositeShareToJson($compositeShare);
-                        echo json_encode($json);
-                    }else{
-                        echo json_encode(array());
+                    if(!file_exists($node->getUrl())){
+                        throw new Exception("Cannot find file ".$file.": share may be lost.");
                     }
+                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
+                    if(empty($compositeShare)){
+                        throw new Exception("Cannot find share for node ".$file);
+                    }
+                    header("Content-type:application/json");
+                    $json = $this->compositeShareToJson($compositeShare);
+                    echo json_encode($json);
+
                 }
 
 
@@ -656,12 +658,13 @@ class ShareCenter extends AJXP_Plugin
 
             case "unshare":
 
+                $mess = ConfService::getMessages();
                 if(isSet($httpVars["hash"])){
 
                     $result = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"]);
                     if($result !== false){
                         AJXP_XMLWriter::header();
-                        AJXP_XMLWriter::sendMessage("Successfully unshared element", null);
+                        AJXP_XMLWriter::sendMessage($mess["share_center.216"], null);
                         AJXP_XMLWriter::close();
                     }
 
@@ -695,9 +698,16 @@ class ShareCenter extends AJXP_Plugin
                         }
                         if($res !== false){
                             AJXP_XMLWriter::header();
-                            AJXP_XMLWriter::sendMessage("Successfully unshared element", null);
+                            AJXP_XMLWriter::sendMessage($mess["share_center.216"], null);
                             AJXP_XMLWriter::close();
                             AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+
+                            if(isSet($httpVars["share_scope"]) &&  $httpVars["share_scope"] == "public"){
+                                $ajxpNode->loadNodeInfo();
+                                $content = AJXP_XMLWriter::writeNodesDiff(["UPDATE" => [$ajxpNode->getPath() => $ajxpNode]]);
+                                AJXP_Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
+                            }
+
                         }
                     }
 
@@ -887,11 +897,13 @@ class ShareCenter extends AJXP_Plugin
                 }
             }
             $shareStore = $this->getShareStore();
-            $shareStore->moveSharesFromMetaRecursive($oldNode, $delete, $oldNode->getPath(), ($newNode != null ? $newNode->getPath() : null));
+            $modifiedNodes = $shareStore->moveSharesFromMetaRecursive($oldNode, $delete, $oldNode->getPath(), ($newNode != null ? $newNode->getPath() : null));
             // Force switching back to correct driver!
-            $oldNode->getRepository()->driverInstance = null;
-            $oldNode->setDriver(null);
-            $oldNode->getDriver();
+            if($modifiedNodes > 0){
+                $oldNode->getRepository()->driverInstance = null;
+                $oldNode->setDriver(null);
+                $oldNode->getDriver();
+            }
             return;
         }
 

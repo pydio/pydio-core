@@ -1477,7 +1477,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             print($filePathOrData);
         } else {
             if ($this->getFilteredOption("USE_XSENDFILE", $this->repository) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
-                if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
+                if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
                 $server_name = $_SERVER["SERVER_SOFTWARE"];
                 $regex = '/^(lighttpd\/1.4).([0-9]{2}$|[0-9]{3}$|[0-9]{4}$)+/';
@@ -1485,13 +1485,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $header_sendfile = "X-LIGHTTPD-send-file";
                 else
                     $header_sendfile = "X-Sendfile";
+
+
                 header($header_sendfile.": ".SystemTextEncoding::toUTF8($filePathOrData));
                 header("Content-type: application/octet-stream");
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
     if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
-        if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
+        if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
         $filePathOrData = str_replace("\\", "/", $filePathOrData);
         $filePathOrData = SystemTextEncoding::toUTF8($filePathOrData);
         $mapping = explode('=',$_SERVER['X-Accel-Mapping']);

@@ -7,7 +7,6 @@
   font-size: 15px;
   color: #ffffff;
   font-weight: normal;
-  letter-spacing: 1px;
   margin-top:0;
   cursor: pointer;
   padding: 21px 15px 21px 15px;
@@ -108,8 +107,8 @@
       background-color: rgba(255,255,255,0.2) !important;
     }
     div.thumbnail_selectable_cell.detailed{
-      &:hover{
-        background-color: rgba(255,255,255,0.15);
+      &:hover, &.selected, &.selected.selected-focus{
+        background-color: rgba(255,255,255,0.15) !important;
       }
       div.thumbLabel{
         color: #ccc;
@@ -132,6 +131,7 @@
     div.thumbnail_selectable_cell.detailed div.thumbLabel{
       padding-top: 7px;
       padding-bottom: 7px;
+      font-weight: 300;
     }
 
     div.thumbnail_selectable_cell.detailed div.thumbLabel:before{

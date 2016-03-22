@@ -15,5 +15,7 @@ $mess = array(
     "10" => "Par type",
     "11" => "Vider",
     "12" => "Fichiers Partagés",
-    "13" => "Les fichiers partagés avec moi par d'autres utilisateurs"
+    "13" => "Les fichiers partagés avec moi par d'autres utilisateurs",
+    "14" => "Copier dans un workspace",
+    "15" => "Copier dans un autre de vos workspaces",
 );

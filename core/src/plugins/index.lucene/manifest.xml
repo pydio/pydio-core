@@ -28,7 +28,7 @@
             <serverCallback hookName="node.index.recursive.start" methodName="indexationStarts"/>
             <serverCallback hookName="node.index.recursive.end" methodName="indexationEnds"/>
             <serverCallback hookName="node.index" methodName="indexationIndexNode"/>
-            <serverCallback hookName="workspace.after_delete" methodName="clearWorkspaceIndexes"/>
+            <serverCallback hookName="workspace.share_metasources" methodName="updateSharedChildOptions"/>
 		</hooks>
 		<actions>
 			<action name="search">

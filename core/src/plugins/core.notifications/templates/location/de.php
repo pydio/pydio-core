@@ -20,7 +20,8 @@
     */
 $mess=array(
     "workspace.normal" => "Arbeitsumgebung AJXP_REPOSITORY_LABEL",
-    "workspace.shared" => "Freigegebener Ordner AJXP_REPOSITORY_LABEL",
+    "workspace.shared.folder" => "Freigegebener Ordner AJXP_REPOSITORY_LABEL",
+    "workspace.shared.file" => "Freigegebene Datei AJXP_REPOSITORY_LABEL",
     "minisite.file" => "Öffentliche Datei AJXP_REPOSITORY_LABEL",
     "minisite.folder" => "Öffentlicher Ordner AJXP_REPOSITORY_LABEL",
     "public_user" => "Öffentlicher Benutzer (verbunden von '%s')"

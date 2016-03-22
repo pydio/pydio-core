@@ -246,6 +246,9 @@
                         var dialog = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {selection:dataModel, readonly:true});
                         dialog.openDialog('react_share_form', true);
                     ]]></clientCallback>
+                    <clientForm id="react_share_form"><![CDATA[
+                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
+                    ]]></clientForm>
                 </processing>
             </action>
             <action name="sharelist-load">

@@ -15,5 +15,7 @@ $mess = array(
     "10" => "By Type",
     "11" => "Clear",
     "12" => "Shared Files",
-    "13" => "Files shared with me by other users"
+    "13" => "Files shared with me by other users",
+    "14" => "Copy to a workspace",
+    "15" => "Copy file to another of your workspaces",
 );

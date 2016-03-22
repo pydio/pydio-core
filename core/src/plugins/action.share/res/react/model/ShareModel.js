@@ -2,9 +2,12 @@
 
     class ShareModel extends Observable {
 
-        constructor(pydio, node){
+        constructor(pydio, node, dataModel = null){
             super();
             this._node = node;
+            if(dataModel){
+                this._dataModel = dataModel;
+            }
             this._status = 'idle';
             this._data = {link:{}};
             this._pendingData = {};
@@ -63,6 +66,16 @@
         togglePublicLink(){
             var publicLinks = this.getPublicLinks();
             this._pendingData['enable_public_link'] = !publicLinks.length;
+            if(!this._data['links']){
+                this._data['links'] = {};
+            }
+            this.save();
+        }
+
+        enablePublicLinkWithPassword(mandatoryPassword){
+            this._pendingData['enable_public_link'] = true;
+            this._initPendingData();
+            this._pendingData['links']['ajxp_create_public_link'] = {'password':mandatoryPassword};
             if(!this._data['links']){
                 this._data['links'] = {};
             }
@@ -406,6 +419,9 @@
             }
         }
 
+        isExpired(linkId){
+            return (this._data['links'] && this._data['links'][linkId] && this._data["links"][linkId]['is_expired']);
+        }
 
         /****************************/
         /* PUBLIC LINKS PERMISSIONS */
@@ -582,6 +598,8 @@
                     this._data = transport.responseJSON;
                     this._pendingData = {};
                     this._setStatus('idle');
+                }else if(transport.responseXML && XMLUtils.XPathGetSingleNodeText(transport.responseXML, '//message[@type="ERROR"]')){
+                    this._setStatus('error');
                 }
             }.bind(this));
         }
@@ -593,10 +611,22 @@
         }
 
         stopSharing(callbackFunc = null){
-            var params = {get_action:'unshare'};
+            var params = {
+                get_action:'unshare'
+            };
+            if(this._data && this._data['share_scope']){
+                params['share_scope'] = this._data['share_scope'];
+            }
             ShareModel.prepareShareActionParameters(this.getNode(), params);
             PydioApi.getClient().request(params, function(response){
-                this._pydio.fireNodeRefresh(this._node);
+                try{
+                    if(this._dataModel && this._pydio.getContextHolder() !== this._dataModel) {
+                        this._dataModel.requireContextChange(this._dataModel.getRootNode(), true);
+                    }else{
+                        this._pydio.fireNodeRefresh(this._node);
+                    }
+                }catch(e){
+                }
                 if(callbackFunc){
                     callbackFunc(response);
                 }else{
@@ -731,7 +761,9 @@
                 file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
                 file_workspaces : true, //pluginConfigs.get("ENABLE_FILE_SHARING"),
                 editable_hash : pluginConfigs.get("HASH_USER_EDITABLE"),
-                pass_mandatory: false
+                pass_mandatory: false,
+                max_expiration : pluginConfigs.get("FILE_MAX_EXPIRATION"),
+                max_downloads : pluginConfigs.get("FILE_MAX_DOWNLOAD")
             };
             var pass_mandatory = pluginConfigs.get("SHARE_FORCE_PASSWORD");
             if(pass_mandatory){

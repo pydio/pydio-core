@@ -343,8 +343,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                     continue;
                 }
                 if ($limit != -1) {
-                    //usort($entries, array($this, "userSortFunction"));
-                    ldap_sort($conn[$i], $resourceResult, $this->ldapUserAttr);
+                    @ldap_sort($conn[$i], $resourceResult, $this->ldapUserAttr);
                 }
                 $entries = ldap_get_entries($conn[$i], $resourceResult);
 

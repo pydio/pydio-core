@@ -489,6 +489,8 @@ class AJXP_Controller
             $applyCondition = $callback->getAttribute("applyCondition");
             $plugId = $callback->getAttribute("pluginId");
             $methodName = $callback->getAttribute("methodName");
+            $dontBreakOnExceptionAtt = $callback->getAttribute("dontBreakOnException");
+            $dontBreakOnException = !empty($dontBreakOnExceptionAtt) && $dontBreakOnExceptionAtt == "true";
             $hookCallback = array(
                 "defer" => $defer,
                 "applyCondition" => $applyCondition,
@@ -502,7 +504,15 @@ class AJXP_Controller
                 if(!$apply) continue;
             }
             if($defer && $forceNonDefer) $defer = false;
-            self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
+            if($dontBreakOnException){
+                try{
+                    self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
+                }catch(Exception $e){
+                    AJXP_Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
+                }
+            }else{
+                self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
+            }
         }
     }
 

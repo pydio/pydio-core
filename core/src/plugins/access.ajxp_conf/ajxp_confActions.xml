@@ -552,7 +552,7 @@
             </gui>
             <processing>
                 <clientCallback><![CDATA[
-                    var win = window.open('https://pydio.com/?referrer=settings');
+                    var win = window.open('https://pydio.com/en/go-pro?referrer=settings');
                 ]]></clientCallback>
             </processing>
         </action>
@@ -574,6 +574,7 @@
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
+        <action name="share_react" forbidOverride="true"></action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

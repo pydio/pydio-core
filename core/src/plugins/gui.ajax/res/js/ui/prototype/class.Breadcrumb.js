@@ -137,12 +137,15 @@ Class.create("Breadcrumb", AjxpPane, {
 
     resizeUls: function(){
         var available = parseInt(this.element.getWidth());
+        var last = this.element.down('li:last');
+        var lastWidth;
+        if(last) lastWidth = last.getWidth();
         var lastOverlaps = function(){
-            var last = this.element.down('li:last');
-            return (last && last.positionedOffset()['left'] + last.getWidth() ) > available
+            return (last && last.positionedOffset()['left'] + lastWidth ) > available
         }.bind(this);
         var i=0;
         var spans = this.element.select('li > span');
+        spans.invoke("show");
         spans.invoke("removeClassName", "reduced");
         while ( lastOverlaps() && i < spans.length - 2){
             i++;
@@ -150,6 +153,11 @@ Class.create("Breadcrumb", AjxpPane, {
         }
         if(lastOverlaps() && spans.length){
             spans[0].addClassName("reduced");
+        }
+        i = 0;
+        while ( lastOverlaps() && i < spans.length - 2){
+            i++;
+            spans[i].hide();
         }
     },
 

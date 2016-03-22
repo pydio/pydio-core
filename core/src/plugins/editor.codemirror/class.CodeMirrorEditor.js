@@ -224,6 +224,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			this.initCodeMirror();
 			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
             this.goingToFullScreen = false;
+            this.resize();
 		}.bind(this) );
 
 		this.updateHistoryButtons();
