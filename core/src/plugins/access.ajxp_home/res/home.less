@@ -61,10 +61,9 @@
           font-weight: normal;
           transition: @bezier_transition;
 
-          .workspace-badge {
+          .workspace-badge{
             display: inline-block;
             float: left;
-            background-color: #111;
             border-radius: 34px;
             color: white;
             text-align: center;
@@ -105,7 +104,7 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             display: block;
-            .workspace-new{
+            .workspace-new, .workspace-num-badge{
               display: inline-block;
               font-size: 10px;
               font-weight: 500;
@@ -152,6 +151,15 @@
           }
           &:last-of-type {
             border-bottom: 0;
+          }
+          &.workspace-access-inbox{
+            .workspace-label{
+              text-transform: uppercase;
+            }
+            .workspace-badge{
+              background-color: rgba(255, 255, 255, 0.95);
+              color: rgba(0,0,0,0.63);
+            }
           }
         }
 
@@ -284,7 +292,7 @@
 
   #ws_legend{
     text-align: center;
-    font-size: 2.5em;
+    font-size: 28px;
     color: white;
     margin: 20px;
     line-height: 55px;
@@ -323,9 +331,9 @@
 
 
     > small {
-      font-size: 0.6em;
+      font-size: 13px;
       line-height: 1em;
-      display: none;
+      display: block;
       &.show_description {
         line-height: 1.9em;
         display: block;

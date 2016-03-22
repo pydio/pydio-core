@@ -53,7 +53,6 @@
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-badge {
   display: inline-block;
   float: left;
-  background-color: #111;
   border-radius: 34px;
   color: white;
   text-align: center;
@@ -91,7 +90,8 @@
   text-overflow: ellipsis;
   display: block;
 }
-#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label .workspace-new {
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label .workspace-new,
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label .workspace-num-badge {
   display: inline-block;
   font-size: 10px;
   font-weight: 500;
@@ -133,6 +133,13 @@
 }
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry:last-of-type {
   border-bottom: 0;
+}
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.workspace-access-inbox .workspace-label {
+  text-transform: uppercase;
+}
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.workspace-access-inbox .workspace-badge {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: rgba(0, 0, 0, 0.63);
 }
 #home_account_pane #home_left_bar #workspaces_center .workspaces #workspaces_button {
   padding: 38px 30px;
@@ -245,7 +252,7 @@
 }
 #home_account_pane #ws_legend {
   text-align: center;
-  font-size: 2.5em;
+  font-size: 28px;
   color: white;
   margin: 20px;
   line-height: 55px;
@@ -280,9 +287,9 @@
   opacity: 0.9;
 }
 #home_account_pane #ws_legend > small {
-  font-size: 0.6em;
+  font-size: 13px;
   line-height: 1em;
-  display: none;
+  display: block;
 }
 #home_account_pane #ws_legend > small.show_description {
   line-height: 1.9em;

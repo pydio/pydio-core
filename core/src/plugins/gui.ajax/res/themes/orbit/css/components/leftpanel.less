@@ -94,22 +94,9 @@
           display: none;
         }
       }
-      .workspace-num-badge{
-        background-color: @leftpanel_text_color;
-        color: @leftpanel_background_color;
-        display: inline-block;
-        line-height: 0.9em;
-        font-size: 0.7em;
-        font-weight: 300;
-        top: -1px;
-        position: relative;
-        border-radius: 2px;
-        padding: 2px 5px;
-        margin: 0px 0px 0px 10px;
-      }
       .workspace-label{
         .nav-list-entry-label();
-        .workspace-new{
+        .workspace-new, .workspace-num-badge{
           display: inline-block;
           font-size: 10px;
           font-weight: 500;
@@ -128,6 +115,13 @@
       }
       &.workspace-current{
         opacity: 0.4;
+      }
+      &.workspace-access-inbox{
+        margin-bottom: 10px;
+        .workspace-label{
+          text-transform: uppercase;
+          color: white;
+        }
       }
     }
   }

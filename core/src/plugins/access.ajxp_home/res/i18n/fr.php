@@ -38,7 +38,7 @@ $mess=array(
 "53"=> "Démarrage",
 "54"=> "Suivez les guides vidéos pour bien débuter avec APPLICATION_TITLE",
 "55"=> "Avez-vous besoin d'aide <a>pour débuter</a>?",
-"56"=> "Nouveau sur APPLICATION_TITLE ? Quelques guides vidéos pour vous !",
+"56"=> "Nouveau sur APPLICATION_TITLE? Quelques guides vidéos pour vous!",
 "57"=> "Télécharger APPLICATION_TITLE pour...",
 "58"=> "Appareil Android",
 "59"=> "iPhone / iPad",
@@ -78,5 +78,5 @@ $mess=array(
 <li>Garder des fichiers en cache, et interagir avec d'autres applications</li>
 <li>Protéger l'application avec un code PIN</li>
 <li>Utiliser les favoris et le moteur de recherche</li></ul>",
-"67"=> "Vous n'êtes pas %s, %logout",
+"67"=> "Vous n'êtes pas %s, %logout.",
 );

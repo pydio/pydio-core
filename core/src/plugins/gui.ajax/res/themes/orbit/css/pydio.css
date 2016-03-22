@@ -4166,25 +4166,13 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel .workspaces .workspace-entry .workspace-badge span.badge-overlay {
   display: none;
 }
-.left-panel .workspaces .workspace-entry .workspace-num-badge {
-  background-color: #dddddd;
-  color: #353535;
-  display: inline-block;
-  line-height: 0.9em;
-  font-size: 0.7em;
-  font-weight: 300;
-  top: -1px;
-  position: relative;
-  border-radius: 2px;
-  padding: 2px 5px;
-  margin: 0px 0px 0px 10px;
-}
 .left-panel .workspaces .workspace-entry .workspace-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.left-panel .workspaces .workspace-entry .workspace-label .workspace-new {
+.left-panel .workspaces .workspace-entry .workspace-label .workspace-new,
+.left-panel .workspaces .workspace-entry .workspace-label .workspace-num-badge {
   display: inline-block;
   font-size: 10px;
   font-weight: 500;
@@ -4202,6 +4190,13 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 0.4;
+}
+.left-panel .workspaces .workspace-entry.workspace-access-inbox {
+  margin-bottom: 10px;
+}
+.left-panel .workspaces .workspace-entry.workspace-access-inbox .workspace-label {
+  text-transform: uppercase;
+  color: white;
 }
 .left-panel .simple-provider {
   position: relative;
