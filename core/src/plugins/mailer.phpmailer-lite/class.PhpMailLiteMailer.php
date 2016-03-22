@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PhpMailLiteMailer extends AjxpMailer
 {
-    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array())
+    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
     {
         require_once("lib/class.phpmailer-lite.php");
         $realRecipients = $this->resolveAdresses($recipients);
@@ -56,7 +56,7 @@ class PhpMailLiteMailer extends AjxpMailer
             }
         }
         $mail->WordWrap = 50;                                 // set word wrap to 50 characters
-        $mail->IsHTML(true);                                  // set email format to HTML
+        $mail->IsHTML($useHtml);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
         $mail->Encoding = $this->getFilteredOption("MAIL_ENCODING");
         foreach ($images as $image) {
@@ -64,12 +64,16 @@ class PhpMailLiteMailer extends AjxpMailer
         }
 
         $mail->Subject = $subject;
-        if (strpos($body, "<html")!==false) {
-            $mail->Body = $body;
-        } else {
-            $mail->Body = "<html><body>".nl2br($body)."</body></html>";
+        if($useHtml){
+            if (strpos($body, "<html")!==false) {
+                $mail->Body = $body;
+            } else {
+                $mail->Body = "<html><body>".nl2br($body)."</body></html>";
+            }
+            $mail->AltBody = AjxpMailer::simpleHtml2Text($mail->Body);
+        }else{
+            $mail->Body = $mail->AltBody = AjxpMailer::simpleHtml2Text($body);
         }
-        $mail->AltBody = strip_tags($mail->Body);
 
         if (!$mail->Send()) {
             $message = "Message could not be sent\n";

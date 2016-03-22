@@ -27,4 +27,5 @@ $mess = array(
     "6" => "Sujet",
     "7" => "Message",
     "8" => "Utilisateur ou courriel",
+    "9" => "Résumé des notifications",
 );
