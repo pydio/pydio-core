@@ -70,35 +70,35 @@ class doctrineCacheDriver extends AbstractCacheDriver
                     AJXP_Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
                     return;
                 }
-                $this->_apc_init();
+                $this->_apc_init($driverOptions);
                 break;
             case "memcache":
                 if (!MEMCACHE_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Memcache extension package must be installed!");
                     return;
                 }
-                $this->_memcache_init();
+                $this->_memcache_init($driverOptions);
                 break;
             case "memcached":
                 if (!MEMCACHED_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Memcached extension package must be installed!");
                     return;
                 }
-                $this->_memcached_init();
+                $this->_memcached_init($driverOptions);
                 break;
             case "redis":
                 if (!REDIS_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Redis extension package must be installed!");
                     return;
                 }
-                $this->_redis_init();
+                $this->_redis_init($driverOptions);
                 break;
             case "xcache":
                 if (!XCACHE_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The XCache extension package must be installed!");
                     return;
                 }
-                $this->_xcache_init();
+                $this->_xcache_init($driverOptions);
                 break;
             default:
                 break;
@@ -110,13 +110,13 @@ class doctrineCacheDriver extends AbstractCacheDriver
         }
     }
 
-    public function _apc_init() {
+    public function _apc_init($options) {
         $this->cacheDriver = new Cache\ApcCache();
     }
 
-    public function _memcache_init() {
+    public function _memcache_init($options) {
         $memcache = new Memcache();
-        @$running = $memcache->connect($this->options['MEMCACHE_HOSTNAME'], $this->options['MEMCACHE_PORT']);
+        @$running = $memcache->connect($options['MEMCACHE_HOSTNAME'], $options['MEMCACHE_PORT']);
 
         if (! $running) return;
 
@@ -124,9 +124,9 @@ class doctrineCacheDriver extends AbstractCacheDriver
         $this->cacheDriver->setMemcache($memcache);
     }
 
-    public function _memcached_init() {
+    public function _memcached_init($options) {
         $memcached = new Memcached();
-        @$running = $memcached->addServer($this->options['MEMCACHED_HOSTNAME'], $this->options['MEMCACHED_PORT']);
+        @$running = $memcached->addServer($options['MEMCACHED_HOSTNAME'], $options['MEMCACHED_PORT']);
 
         if (! $running) return;
 
@@ -134,9 +134,9 @@ class doctrineCacheDriver extends AbstractCacheDriver
         $this->cacheDriver->setMemcached($memcached);
     }
 
-    public function _redis_init() {
+    public function _redis_init($options) {
         $redis = new Redis();
-        @$running = $redis->connect($this->options['REDIS_HOSTNAME'], $this->options['REDIS_PORT']);
+        @$running = $redis->connect($options['REDIS_HOSTNAME'], $options['REDIS_PORT']);
 
         if (! $running) return;
 
@@ -144,7 +144,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
         $this->cacheDriver->setRedis($redis);
     }
 
-    public function _xcache_init() {
+    public function _xcache_init($options) {
         $this->cacheDriver = new Cache\XcacheCache();
     }
 
