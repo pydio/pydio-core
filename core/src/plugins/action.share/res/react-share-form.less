@@ -16,8 +16,11 @@ div.form-react_share_form {
     display: none;
   }
   div.dialogContent{
-    overflow-x: hidden !important;
+    .ie_material_checkbox_fix{
+      -ms-overflow-x: hidden !important;
+      -ms-overflow-y: hidden !important;
   }
+}
 }
 
 div#react_share_form {
@@ -37,7 +40,7 @@ div#react_share_form {
       background-color: @color0 !important;
     }
     .mui-tab-template {
-      min-height: 300px;
+      min-height: 390px;
     }
   }
   .shared-users-rights-header {
@@ -53,12 +56,15 @@ div#react_share_form {
       text-transform: uppercase;
     }
   }
-  .suggest-search.icon-search {
+  .suggest-search.icon-search, .suggest-search.icon-refresh {
     color: #C1C1C1;
     font-size: 18px;
     position: absolute;
     right: 15px;
     top: 2px;
+  }
+  .suggest-search.icon-refresh{
+    top: 12px;
   }
   div.share-form-users{
     .react-autosuggest{
@@ -392,9 +398,7 @@ div#react_share_form {
 div.react-autosuggest {
   padding-left: 1px;
   li.react-autosuggest__suggestion{
-    .user-badge{
-      display: block !important;
-    }
+      display: block;
   }
   .react-autosuggest__suggestion--focused {
     background-color: aliceblue;

@@ -33,13 +33,19 @@
         },
 
         getInitialState:function(){
-            return {createUser: null, showComplete: true};
+            return {createUser: null, showComplete: true, loading:false};
         },
 
         getSuggestions(input, callback){
+            if(!this.state.showComplete){
+                callback(null, []);
+                return;
+            }
             var excludes = this.props.excludes;
             var disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
+            this.setState({loading:true});
             PydioUsers.Client.authorizedUsersStartingWith(input, function(users){
+                this.setState({loading:false});
                 if(disallowTemporary){
                     users = users.filter(function(user){
                         return !user.getTemporary();
@@ -51,7 +57,7 @@
                     });
                 }
                 callback(null, users);
-            }, this.props.usersOnly, this.props.existingOnly);
+            }.bind(this), this.props.usersOnly, this.props.existingOnly);
         },
 
         suggestionValue: function(suggestion){
@@ -128,7 +134,7 @@
                 };
                 return (
                     <div style={{position:'relative'}} className={this.props.className + (this.state.showComplete ? '':' list-force-hide')}>
-                        <span className="suggest-search icon-search"/>
+                        <span className={"suggest-search icon-" + (this.state.loading && this.state.showComplete ? 'refresh rotating' : 'search')}/>
                         <ReactAutoSuggest
                             ref="autosuggest"
                             cache={false}

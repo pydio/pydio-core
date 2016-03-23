@@ -808,7 +808,7 @@
                 disableForNotOwner = true;
             }
             return (
-                <div style={{padding:16}} className="reset-pydio-forms">
+                <div style={{padding:16}} className="reset-pydio-forms ie_material_checkbox_fix">
                     <ReactMUI.Checkbox
                         disabled={this.context.isReadonly() || disableForNotOwner}
                         onCheck={this.toggleLink}
@@ -989,7 +989,7 @@
                 <div>
                     <h3>{this.context.getMessage('71')}</h3>
                     <div className="section-legend">{this.context.getMessage('70r')}</div>
-                    <div style={{margin:'10px 0 20px'}}>
+                    <div style={{margin:'10px 0 20px'}} className="ie_material_checkbox_fix">
                         {perms.map(function(p){
                             return (
                                 <div style={{display:'inline-block',width:'30%'}}>
@@ -1401,7 +1401,7 @@
                 );
             }
             return (
-                <div className="reset-pydio-forms">
+                <div className="reset-pydio-forms ie_material_checkbox_fix">
                     <h3>{this.context.getMessage('199')}</h3>
                     {showToggle}
                     {showTransfer}

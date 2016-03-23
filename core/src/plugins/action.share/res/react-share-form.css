@@ -1,8 +1,9 @@
 div.form-react_share_form div.dialogTitle {
   display: none;
 }
-div.form-react_share_form div.dialogContent {
-  overflow-x: hidden !important;
+div.form-react_share_form div.dialogContent .ie_material_checkbox_fix {
+  -ms-overflow-x: hidden !important;
+  -ms-overflow-y: hidden !important;
 }
 div#react_share_form {
   font-family: Roboto, sans-serif;
@@ -21,7 +22,7 @@ div#react_share_form .mui-tabs-container .mui-tab-item-container {
   background-color: #4aceb0 !important;
 }
 div#react_share_form .mui-tabs-container .mui-tab-template {
-  min-height: 300px;
+  min-height: 390px;
 }
 div#react_share_form .shared-users-rights-header {
   color: #ADADAD;
@@ -36,12 +37,16 @@ div#react_share_form .shared-users-rights-header span {
   width: 37px;
   text-transform: uppercase;
 }
-div#react_share_form .suggest-search.icon-search {
+div#react_share_form .suggest-search.icon-search,
+div#react_share_form .suggest-search.icon-refresh {
   color: #C1C1C1;
   font-size: 18px;
   position: absolute;
   right: 15px;
   top: 2px;
+}
+div#react_share_form .suggest-search.icon-refresh {
+  top: 12px;
 }
 div#react_share_form div.share-form-users .react-autosuggest input#users-autosuggest {
   font-size: 16px;
@@ -371,8 +376,8 @@ div#react_share_form a.revert-button {
 div.react-autosuggest {
   padding-left: 1px;
 }
-div.react-autosuggest li.react-autosuggest__suggestion .user-badge {
-  display: block !important;
+div.react-autosuggest li.react-autosuggest__suggestion {
+  display: block;
 }
 div.react-autosuggest .react-autosuggest__suggestion--focused {
   background-color: aliceblue;
