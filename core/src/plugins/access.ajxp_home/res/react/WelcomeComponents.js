@@ -337,7 +337,7 @@
             }
             this._internalState = ws;
             if(!ws){
-                bufferCallback('homeWorkspaceTimer', 17000, function(){
+                bufferCallback('homeWorkspaceTimer', 7000, function(){
                     this.setState({workspace:null});
                     this.props.onHideLegend();
                 }.bind(this));
