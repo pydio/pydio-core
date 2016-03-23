@@ -49,6 +49,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('assemble-less');
-    grunt.registerTask('default', ['babel', 'less', 'watch']);
+    grunt.registerTask('default', ['babel']);
 
 };

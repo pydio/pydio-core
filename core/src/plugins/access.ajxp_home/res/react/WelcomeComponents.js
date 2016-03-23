@@ -374,11 +374,11 @@
             }
             var blocks = [];
             var data = this.state.data;
-            if(data['core.users'] && data['core.users']['internal'] != undefined && data['core.users']['external'] != undefined){
+            if(data['core.users'] && data['core.users']['users'] != undefined && data['core.users']['groups'] != undefined){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="icon-group">
-                    {MessageHash[531]} {data['core.users']['internal']}
-                    <br/>{MessageHash[532]} {data['core.users']['external']}
+                    {data['core.users']['users'] ? (MessageHash[531] + ' ' + data['core.users']['users']) : ''}
+                    {data['core.users']['groups'] ? (MessageHash[532] + ' ' + data['core.users']['groups']) : ''}
                     </HomeWorkspaceLegendInfoBlock>
                 );
             }
