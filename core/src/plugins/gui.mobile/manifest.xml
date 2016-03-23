@@ -25,7 +25,7 @@
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						userSelection = ajaxplorer.getUserSelection();
+						var userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
 							path = userSelection.getUniqueNode();
 						}

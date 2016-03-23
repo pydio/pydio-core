@@ -11,10 +11,19 @@
 
 @infopanel_toolbar_buttons_radius:0;
 
-#info_panel{
+.form-ip_content_info_panel .panelContent{
+  background-color: white !important;
+}
+
+#info_panel, .form-ip_content_info_panel{
   font-family: @infopanel_font_family;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
+
+  #modalCloseBtn{
+    display: block !important;
+    padding-top: 3px !important;
+  }
 
   div#display_toolbar {
     float: left;

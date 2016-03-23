@@ -3783,49 +3783,68 @@ div.menu.rootDirChooser span.rootDirTitle {
   text-align: left;
   font-style: italic;
 }
-#info_panel {
+.form-ip_content_info_panel .panelContent {
+  background-color: white !important;
+}
+#info_panel,
+.form-ip_content_info_panel {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
 }
-#info_panel div#display_toolbar {
+#info_panel #modalCloseBtn,
+.form-ip_content_info_panel #modalCloseBtn {
+  display: block !important;
+  padding-top: 3px !important;
+}
+#info_panel div#display_toolbar,
+.form-ip_content_info_panel div#display_toolbar {
   float: left;
   text-align: left;
   min-width: 20px;
   height: 10px;
 }
-#info_panel div#display_toolbar a {
+#info_panel div#display_toolbar a,
+.form-ip_content_info_panel div#display_toolbar a {
   background: none;
   border: none;
   margin-right: 0;
 }
-#info_panel a.sm2_link {
+#info_panel a.sm2_link,
+.form-ip_content_info_panel a.sm2_link {
   visibility: hidden;
 }
-#info_panel a img {
+#info_panel a img,
+.form-ip_content_info_panel a img {
   margin-right: 5px;
 }
-#info_panel a:hover {
+#info_panel a:hover,
+.form-ip_content_info_panel a:hover {
   text-decoration: none;
 }
-#info_panel div.folderImage {
+#info_panel div.folderImage,
+.form-ip_content_info_panel div.folderImage {
   text-align: center;
   padding-bottom: 10px;
 }
-#info_panel .infoPanelImagePreview {
+#info_panel .infoPanelImagePreview,
+.form-ip_content_info_panel .infoPanelImagePreview {
   text-align: center;
   position: relative;
   margin: 10px 16px;
   border-radius: 5px;
 }
-#info_panel .infoPanelImagePreview img {
+#info_panel .infoPanelImagePreview img,
+.form-ip_content_info_panel .infoPanelImagePreview img {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
-#info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
+#info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow,
+.form-ip_content_info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-#info_panel .infoPanelImagePreview div.infoPanelBasenameTitle {
+#info_panel .infoPanelImagePreview div.infoPanelBasenameTitle,
+.form-ip_content_info_panel .infoPanelImagePreview div.infoPanelBasenameTitle {
   color: #ff796b;
   font-weight: 500;
   font-size: 16px;
@@ -3835,19 +3854,25 @@ div.menu.rootDirChooser span.rootDirTitle {
   word-break: break-all;
 }
 #info_panel .infoPanelTable,
-#info_panel div.infoPanelRow {
+.form-ip_content_info_panel .infoPanelTable,
+#info_panel div.infoPanelRow,
+.form-ip_content_info_panel div.infoPanelRow {
   font-size: 13px;
   width: 100%;
 }
 #info_panel td.infoPanelLabel,
-#info_panel div.infoPanelLabel {
+.form-ip_content_info_panel td.infoPanelLabel,
+#info_panel div.infoPanelLabel,
+.form-ip_content_info_panel div.infoPanelLabel {
   width: 50%;
   color: #aaaaaa;
   font-size: 0.9em;
   font-weight: 500;
 }
 #info_panel td.infoPanelValue,
-#info_panel div.infoPanelValue {
+.form-ip_content_info_panel td.infoPanelValue,
+#info_panel div.infoPanelValue,
+.form-ip_content_info_panel div.infoPanelValue {
   padding: 0 0 10px;
   font-size: 1em;
   color: #222222;
@@ -3855,25 +3880,32 @@ div.menu.rootDirChooser span.rootDirTitle {
   vertical-align: top;
 }
 #info_panel td.infoPanelValue[data-metatype="css_label"],
-#info_panel div.infoPanelValue[data-metatype="css_label"] {
+.form-ip_content_info_panel td.infoPanelValue[data-metatype="css_label"],
+#info_panel div.infoPanelValue[data-metatype="css_label"],
+.form-ip_content_info_panel div.infoPanelValue[data-metatype="css_label"] {
   padding: 5px;
   border-radius: 2px;
   margin-bottom: 10px;
 }
-#info_panel div.folded_icons {
+#info_panel div.folded_icons,
+.form-ip_content_info_panel div.folded_icons {
   display: none;
 }
-#info_panel div.class-FetchedResultPane {
+#info_panel div.class-FetchedResultPane,
+.form-ip_content_info_panel div.class-FetchedResultPane {
   font-size: 13px;
 }
-#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
   padding: 0;
   cursor: default;
 }
-#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
   display: none;
 }
-#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   font-size: 1.1em;
   color: #222222;
   white-space: normal;
@@ -3881,61 +3913,74 @@ div.menu.rootDirChooser span.rootDirTitle {
   padding-top: 0;
   padding-bottom: 8px;
 }
-#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
   color: #666666;
   display: block;
   font-size: 0.8em;
   line-height: 15px;
 }
-#info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
+#info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel,
+.form-ip_content_info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
   color: #555555;
   display: block;
   font-size: 13px;
   line-height: 17px;
 }
-#info_panel div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus {
+#info_panel div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
+.form-ip_content_info_panel div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus {
   background-color: transparent !important;
 }
-#info_panel div.class-FetchedResultPane div.ajxpNodeProvider:hover {
+#info_panel div.class-FetchedResultPane div.ajxpNodeProvider:hover,
+.form-ip_content_info_panel div.class-FetchedResultPane div.ajxpNodeProvider:hover {
   background-color: transparent !important;
 }
-#info_panel div.ip_geo_cell {
+#info_panel div.ip_geo_cell,
+.form-ip_content_info_panel div.ip_geo_cell {
   position: absolute;
   right: 17px;
   margin-top: -36px;
 }
-#info_panel td.ip_geo_cell {
+#info_panel td.ip_geo_cell,
+.form-ip_content_info_panel td.ip_geo_cell {
   padding-right: 12px !important;
 }
-#info_panel #ajxp_workspace_info_panel_content {
+#info_panel #ajxp_workspace_info_panel_content,
+.form-ip_content_info_panel #ajxp_workspace_info_panel_content {
   font-size: 13px;
   margin-bottom: 15px;
 }
-#info_panel .infopanel_loading {
+#info_panel .infopanel_loading,
+.form-ip_content_info_panel .infopanel_loading {
   opacity: 0;
   transition: opacity ease 0.2s;
 }
-#info_panel .infopanel_loading_finished {
+#info_panel .infopanel_loading_finished,
+.form-ip_content_info_panel .infopanel_loading_finished {
   opacity: 1;
 }
-#info_panel .infoPanelActions {
+#info_panel .infoPanelActions,
+.form-ip_content_info_panel .infoPanelActions {
   padding: 5px;
   font-size: 11px;
   text-align: right;
 }
-#info_panel .panelContent {
+#info_panel .panelContent,
+.form-ip_content_info_panel .panelContent {
   overflow: hidden;
   background-color: #f8f8f8;
   padding-bottom: 15px;
   -webkit-font-smoothing: antialiased;
 }
-#info_panel .panelContent div.panelHeader {
+#info_panel .panelContent div.panelHeader,
+.form-ip_content_info_panel .panelContent div.panelHeader {
   font-size: 13px;
   padding: 8px 0 16px 0;
   color: #333333;
   font-weight: 500;
 }
-#info_panel .panelContent div.panelHeader span.user_meta_change {
+#info_panel .panelContent div.panelHeader span.user_meta_change,
+.form-ip_content_info_panel .panelContent div.panelHeader span.user_meta_change {
   color: #222;
   text-transform: uppercase;
   font-size: 10px;
@@ -3946,38 +3991,48 @@ div.menu.rootDirChooser span.rootDirTitle {
   cursor: pointer;
   font-weight: 300;
 }
-#info_panel .panelContent div.panelHeader span.user_meta_change:hover {
+#info_panel .panelContent div.panelHeader span.user_meta_change:hover,
+.form-ip_content_info_panel .panelContent div.panelHeader span.user_meta_change:hover {
   background-color: white;
 }
-#info_panel .panelContent div.panelHeader span[data-ajxpAction] {
+#info_panel .panelContent div.panelHeader span[data-ajxpAction],
+.form-ip_content_info_panel .panelContent div.panelHeader span[data-ajxpAction] {
   display: none;
 }
-#info_panel .panelContent i {
+#info_panel .panelContent i,
+.form-ip_content_info_panel .panelContent i {
   font-size: 13px;
   font-style: normal;
   color: #b4b8be;
   text-shadow: 1px 1px 0 #ffffff;
 }
-#info_panel .panelContent span.ajxp_icon_span {
+#info_panel .panelContent span.ajxp_icon_span,
+.form-ip_content_info_panel .panelContent span.ajxp_icon_span {
   color: #ffffff;
   margin-right: 5px;
 }
 #info_panel .panelContent a#open_with_button span.ajxp_icon_span,
-#info_panel .panelContent span#open_with_button_label {
+.form-ip_content_info_panel .panelContent a#open_with_button span.ajxp_icon_span,
+#info_panel .panelContent span#open_with_button_label,
+.form-ip_content_info_panel .panelContent span#open_with_button_label {
   display: none;
 }
-#info_panel .panelContent.scrolling td.infoPanelValue {
+#info_panel .panelContent.scrolling td.infoPanelValue,
+.form-ip_content_info_panel .panelContent.scrolling td.infoPanelValue {
   padding-right: 18px;
 }
-#info_panel .panelContent .infoPanelGroup {
+#info_panel .panelContent .infoPanelGroup,
+.form-ip_content_info_panel .panelContent .infoPanelGroup {
   border-radius: 0;
   padding: 1px;
 }
-#info_panel .panelContent div.info_panel_primary_multiple {
+#info_panel .panelContent div.info_panel_primary_multiple,
+.form-ip_content_info_panel .panelContent div.info_panel_primary_multiple {
   margin-top: 0 !important;
   border-top: 0;
 }
-#info_panel .panelContent .info_panel_multiple_tile {
+#info_panel .panelContent .info_panel_multiple_tile,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile {
   width: 27%;
   height: 76px;
   float: left;
@@ -3989,11 +4044,13 @@ div.menu.rootDirChooser span.rootDirTitle {
   border-radius: 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
 }
-#info_panel .panelContent .info_panel_multiple_tile div.tile_preview img {
+#info_panel .panelContent .info_panel_multiple_tile div.tile_preview img,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview img {
   max-width: 90%;
   max-height: 60px;
 }
-#info_panel .panelContent .info_panel_multiple_tile div.tile_label {
+#info_panel .panelContent .info_panel_multiple_tile div.tile_label,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_label {
   position: absolute;
   bottom: 1px;
   font-size: 0.7em;
@@ -4005,36 +4062,45 @@ div.menu.rootDirChooser span.rootDirTitle {
   color: #646464;
   white-space: nowrap;
 }
-#info_panel .panelContent div.toolbar_placeholder {
+#info_panel .panelContent div.toolbar_placeholder,
+.form-ip_content_info_panel .panelContent div.toolbar_placeholder {
   margin-top: 25px;
   display: inline-block;
 }
-#info_panel .panelContent div.one_has_many {
+#info_panel .panelContent div.one_has_many,
+.form-ip_content_info_panel .panelContent div.one_has_many {
   margin-top: 10px;
 }
-#info_panel .panelContent div.one_has_many div.toolbar_placeholder {
+#info_panel .panelContent div.one_has_many div.toolbar_placeholder,
+.form-ip_content_info_panel .panelContent div.one_has_many div.toolbar_placeholder {
   margin-top: 0;
 }
-#info_panel .panelContent div.toolbarGroup {
+#info_panel .panelContent div.toolbarGroup,
+.form-ip_content_info_panel .panelContent div.toolbarGroup {
   text-align: center;
 }
-#info_panel div[data-metatype="stars_rate"] {
+#info_panel div[data-metatype="stars_rate"],
+.form-ip_content_info_panel div[data-metatype="stars_rate"] {
   padding: 3px 0 30px;
 }
-#info_panel div.infoPanelLabel {
+#info_panel div.infoPanelLabel,
+.form-ip_content_info_panel div.infoPanelLabel {
   width: 100%;
 }
-#info_panel div.dimension_card_width {
+#info_panel div.dimension_card_width,
+.form-ip_content_info_panel div.dimension_card_width {
   text-align: center;
 }
-#info_panel div.dimension_card_height {
+#info_panel div.dimension_card_height,
+.form-ip_content_info_panel div.dimension_card_height {
   float: left;
   height: 37px;
   width: 28%;
   padding-top: 59px;
   text-align: right;
 }
-#info_panel div.dimension_card_rectangle {
+#info_panel div.dimension_card_rectangle,
+.form-ip_content_info_panel div.dimension_card_rectangle {
   float: left;
   height: 95px;
   width: 67%;
@@ -4044,22 +4110,27 @@ div.menu.rootDirChooser span.rootDirTitle {
   margin-left: 2%;
   border: 1px solid #AAA;
 }
-#info_panel div.infoPanelAllMetadata > div {
+#info_panel div.infoPanelAllMetadata > div,
+.form-ip_content_info_panel div.infoPanelAllMetadata > div {
   border-top: 1px solid #ddd;
   padding: 6px 16px;
 }
-#info_panel div.infoPanelAllMetadata > div#info_panel_primary {
+#info_panel div.infoPanelAllMetadata > div#info_panel_primary,
+.form-ip_content_info_panel div.infoPanelAllMetadata > div#info_panel_primary {
   padding-top: 12px;
 }
-#info_panel div.infoPanelAllMetadata > div#info_panel_primary.empty {
+#info_panel div.infoPanelAllMetadata > div#info_panel_primary.empty,
+.form-ip_content_info_panel div.infoPanelAllMetadata > div#info_panel_primary.empty {
   display: none;
 }
-#info_panel div.triple div.infoPanelAllMetadata > div {
+#info_panel div.triple div.infoPanelAllMetadata > div,
+.form-ip_content_info_panel div.triple div.infoPanelAllMetadata > div {
   float: left;
   margin: 2%;
   width: 46%;
 }
-#info_panel div.infoPanelAllMetadata span.meta_user_tag_block {
+#info_panel div.infoPanelAllMetadata span.meta_user_tag_block,
+.form-ip_content_info_panel div.infoPanelAllMetadata span.meta_user_tag_block {
   display: inline-block;
   background-color: rgba(52, 94, 121, 0.78);
   color: white;
@@ -4068,30 +4139,36 @@ div.menu.rootDirChooser span.rootDirTitle {
   margin-right: 5px;
   font-weight: 500;
 }
-#info_panel .ipanel_no_selection_select {
+#info_panel .ipanel_no_selection_select,
+.form-ip_content_info_panel .ipanel_no_selection_select {
   padding: 30px;
   color: #969aa0;
 }
-#info_panel .ipanel_no_selection_select span.icon-info-sign {
+#info_panel .ipanel_no_selection_select span.icon-info-sign,
+.form-ip_content_info_panel .ipanel_no_selection_select span.icon-info-sign {
   opacity: 0.4;
   display: block;
   text-align: center;
   font-size: 120px;
   padding: 50px 0 20px;
 }
-#info_panel #no-results-found {
+#info_panel #no-results-found,
+.form-ip_content_info_panel #no-results-found {
   color: #b4b8be;
   text-shadow: 1px 1px 0 #ffffff;
 }
-#info_panel .ipanel_no_selection_select span.label {
+#info_panel .ipanel_no_selection_select span.label,
+.form-ip_content_info_panel .ipanel_no_selection_select span.label {
   display: block;
   text-align: center;
   font-size: 13px;
 }
-#info_panel .ipanel_no_selection_data {
+#info_panel .ipanel_no_selection_data,
+.form-ip_content_info_panel .ipanel_no_selection_data {
   display: none;
 }
-#info_panel .infoPanelTable tr:last-child td {
+#info_panel .infoPanelTable tr:last-child td,
+.form-ip_content_info_panel .infoPanelTable tr:last-child td {
   border-bottom: 0;
 }
 .workspace-entry.workspace-access-inbox span.access-icon:before {
@@ -4734,7 +4811,6 @@ div.dialogButtons.inlineEdition input {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar {
-  position: relative;
   height: 47px;
   padding: 0 15px 0 5px;
   background: #009688 no-repeat 7px 7px;

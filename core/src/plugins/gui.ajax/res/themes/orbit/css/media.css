@@ -182,12 +182,16 @@ and (max-width : 420px){
         padding-top: 20%!important;*/
     }
 
+    div.dialogContent div.SF_element {
+        margin: 0 10px;
+    }
+
     #login_form, #login_form_dynamic {
         margin: 0;
     }
 
-    div.dialogContent div.SF_element {
-        margin: 0 10px;
+    #login_form div.SF_element, #login_form_dynamic div.SF_element{
+        padding-left: 0 !important;
     }
 
     #global_toolbar{
