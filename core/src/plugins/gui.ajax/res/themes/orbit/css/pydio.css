@@ -4734,6 +4734,7 @@ div.dialogButtons.inlineEdition input {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar {
+  position: relative;
   height: 47px;
   padding: 0 15px 0 5px;
   background: #009688 no-repeat 7px 7px;
