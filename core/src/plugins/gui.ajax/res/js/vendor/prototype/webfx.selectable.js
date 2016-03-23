@@ -93,6 +93,9 @@ Class.create('SelectableElements', {
 		Event.observe(this.dragSelectionElement, "mousedown", this.eventMouseDown);
 	},
 	dragStart : function(e){
+        if(!this.hasFocus){
+            pydio.UI.focusOn(this);
+        }
 		this.originalX = e.clientX;
 		this.originalY = e.clientY;
 		

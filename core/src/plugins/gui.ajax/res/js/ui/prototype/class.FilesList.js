@@ -150,6 +150,9 @@ Class.create("FilesList", SelectableElements, {
 			this._fireChange = false;
             this.setSelectedNodes(dm.getSelectedNodes());
             this._fireChange = origFC;
+            if(!this.hasFocus){
+                window.setTimeout(function(){pydio.UI.focusOn(this);}.bind(this),10);
+            }
 		}.bind(this);
 
         if(this._dataModel){
