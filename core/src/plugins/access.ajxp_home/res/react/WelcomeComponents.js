@@ -60,14 +60,13 @@
     var VideoCard = React.createClass({
 
         propTypes:{
-            videoSrc:React.PropTypes.string,
-            imageSrc:React.PropTypes.string,
+            youtubeId:React.PropTypes.string,
             contentMessageId:React.PropTypes.string,
             launchVideo:React.PropTypes.func
         },
 
         launchVideo: function(){
-            this.props.launchVideo(this.props.videoSrc);
+            this.props.launchVideo("//www.youtube.com/embed/"+this.props.youtubeId+"?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5&autoplay=1");
         },
 
         render: function(){
@@ -77,7 +76,7 @@
             return (
                 <div className="video-card">
                     <div className="tutorial_legend">
-                        <img className="tutorial_video" src={this.props.imageSrc}/>
+                        <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+this.props.youtubeId+'/0.jpg")'}}></div>
                         <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
                         <div className="tutorial_load_button" onClick={this.launchVideo}><i className="icon-youtube-play"/> Play Video</div>
                     </div>
@@ -107,7 +106,8 @@
     var TutorialPane = React.createClass({
 
         propTypes:{
-            closePane:React.PropTypes.func
+            closePane:React.PropTypes.func,
+            open:React.PropTypes.bool
         },
 
         closePane: function(){
@@ -135,32 +135,28 @@
             return (
                 <span>
                 {videoPlayer}
-                <div id="videos_pane" className="skipSibling">
+                <div id="videos_pane" className={this.props.open?"open":"closed"}>
                     <div onClick={this.closePane} className="icon-remove-sign"></div>
                     <div className="tutorial_title">{MessageHash['user_home.56']}</div>
                     <div className="videoCards">
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            videoSrc="//www.youtube.com/embed/80kq-T6bQO4?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
-                            imageSrc="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg"
+                            youtubeId="ZuVKsIa4XdU"
                             contentMessageId="user_home.62"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            videoSrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
-                            imageSrc="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg"
+                            youtubeId="ZuVKsIa4XdU"
                             contentMessageId="user_home.63"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            videoSrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
-                            imageSrc="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg"
+                            youtubeId="MEHCN64RoTY"
                             contentMessageId="user_home.64"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            videoSrc="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"
-                            imageSrc="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"
+                            youtubeId="ot2Nq-RAnYE"
                             contentMessageId="user_home.66"
                         />
                     </div>
@@ -217,6 +213,7 @@
             }
 
             var gettingStartedBlock = '';
+            var gettingStartedPanel;
             if(this.props.enableGettingStarted){
                 var dgs = function(){
                     return {__html:MessageHash["user_home.55"]};
@@ -224,15 +221,12 @@
                 gettingStartedBlock = (
                     <small> <span onClick={this.showGettingStarted} dangerouslySetInnerHTML={dgs()}/></small>
                 );
-            }
-
-            var gettingStartedPanel;
-            if(this.state.showGettingStarted){
                 var close = function(){
                     this.setState({showGettingStarted:false});
                 }.bind(this);
-                gettingStartedPanel = <TutorialPane closePane={close}/>;
+                gettingStartedPanel = <TutorialPane closePane={close} open={this.state.showGettingStarted}/>;
             }
+
 
             return (
                 <div id="welcome">

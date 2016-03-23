@@ -361,7 +361,7 @@
 
 }
 
-@videoPaneWidth:350px;
+@videoPaneWidth:320px;
 
 #videos_pane {
 
@@ -381,6 +381,12 @@
   font-weight: 300;
   z-index: 20000;
   overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: @reactBoxShadowDepth1;
+  transition: @bezier_transition;
+  &.closed{
+    right: -(@videoPaneWidth + 5px);
+  }
   a{
     text-decoration: none;
   }
@@ -395,10 +401,10 @@
   }
   div.tutorial_title{
     font-size: 20px;
-    line-height: 22px;
+    line-height: 24px;
     text-align:center;
     background-color: #546E7A;
-    padding: 30px;
+    padding: 20px;
     color: white;
     font-weight: 500;
 
@@ -447,20 +453,25 @@
           text-overflow: ellipsis;
           overflow: hidden;
           font-weight: 400;
-          font-size: 26px;
-          margin-top: -40px;
+          font-size: 24px;
+          margin-top: -35px;
           color: white;
           height: 40px;
           padding: 0;
+          margin-bottom: 8px;
         }
       }
       .tutorial_content{
         padding: 0 16px;
         font-size: 13px;
       }
-      img.tutorial_video {
-        border-radius: 3px 3px 0 0;
+      div.tutorial_video_thumb{
         width: @videoPaneWidth - 25px;
+        height: (@videoPaneWidth - 25px) * 9 / 16 - 2px;
+        background-position: center center;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        border-radius: 3px 3px 0 0;
       }
       div.tutorial_load_button {
         display: block;

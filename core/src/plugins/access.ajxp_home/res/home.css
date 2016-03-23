@@ -315,7 +315,7 @@
   border-radius: 0;
   top: 0;
   right: 0;
-  width: 350px;
+  width: 320px;
   height: 100%;
   overflow: auto;
   opacity: 1;
@@ -325,6 +325,12 @@
   font-weight: 300;
   z-index: 20000;
   overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+#videos_pane.closed {
+  right: -325px;
 }
 #videos_pane a {
   text-decoration: none;
@@ -339,10 +345,10 @@
 }
 #videos_pane div.tutorial_title {
   font-size: 20px;
-  line-height: 22px;
+  line-height: 24px;
   text-align: center;
   background-color: #546E7A;
-  padding: 30px;
+  padding: 20px;
   color: white;
   font-weight: 500;
 }
@@ -379,7 +385,7 @@
 }
 #videos_pane .videoCards .video-card .tutorial_legend {
   border-radius: 3px;
-  width: 325px;
+  width: 295px;
   margin-left: 1%;
   font-size: 14px;
   background: white;
@@ -391,19 +397,24 @@
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: 400;
-  font-size: 26px;
-  margin-top: -40px;
+  font-size: 24px;
+  margin-top: -35px;
   color: white;
   height: 40px;
   padding: 0;
+  margin-bottom: 8px;
 }
 #videos_pane .videoCards .video-card .tutorial_content {
   padding: 0 16px;
   font-size: 13px;
 }
-#videos_pane .videoCards .video-card img.tutorial_video {
+#videos_pane .videoCards .video-card div.tutorial_video_thumb {
+  width: 295px;
+  height: 163.9375px;
+  background-position: center center;
+  background-size: 100%;
+  background-repeat: no-repeat;
   border-radius: 3px 3px 0 0;
-  width: 325px;
 }
 #videos_pane .videoCards .video-card div.tutorial_load_button {
   display: block;
