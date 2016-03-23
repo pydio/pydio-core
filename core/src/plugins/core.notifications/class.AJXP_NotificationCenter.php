@@ -371,7 +371,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         $index = 1;
         foreach ($cumulated as $nodeToSend) {
-            $nodeOcc = $nodeToSend->event_occurence > 1 ? "(".$nodeToSend->event_occurence.")" : "";
+            $nodeOcc = $nodeToSend->event_occurence > 1 ? " (".$nodeToSend->event_occurence.")" : "";
             if(isSet($httpVars["merge_description"]) && $httpVars["merge_description"] == "true"){
                 if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
                     $nodeToSend->setLabel($nodeToSend->event_description." ". $nodeOcc." ".$nodeToSend->event_date);
