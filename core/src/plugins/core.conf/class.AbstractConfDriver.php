@@ -444,10 +444,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @abstract
      * @param string $repositoryId
      * @param string $rolePrefix
-     * @param bool $countOnly
+     * @param bool $splitByType
      * @return array An array of role ids
      */
-    abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false);
+    abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $splitByType = false);
     /**
      * @abstract
      * @param string $repositoryId

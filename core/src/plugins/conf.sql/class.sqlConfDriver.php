@@ -537,43 +537,100 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @abstract
      * @param string $repositoryId
      * @param string $rolePrefix
-     * @param bool $countOnly
+     * @param bool $splitByType
      * @return array()
      */
-    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
+    public function getRolesForRepository($repositoryId, $rolePrefix = '', $splitByType = false){
         $allRoles = array();
 
+        // Initing select
+        $q['select']['role_id'] = '[role_id]';
+
+        if ($splitByType) {
+            $q['select']['type'] = 'case when [role_id] LIKE \'AJXP_USR%\' then \'role_user\' when [role_id] LIKE \'AJXP_GRP%\' then \'role_grp\' else \'role_role\' end';
+        }
+
+        // Initing from
+        $q['from']['a'] = '[ajxp_roles]';
+
+        // Initing where and args
+        if(is_numeric($repositoryId)){
+            $likeRepositoryId = "i:$repositoryId;s:";
+        }else{
+            $likeRepositoryId = '"'.$repositoryId.'";s:';
+        }
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
             case "sqlite3":
             case "postgre":
-                if(!empty($rolePrefix)){
-                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ AND [role_id] LIKE %like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:', $rolePrefix);
-                }else{
-                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
-                }
+                $q['where'][] = ['[searchable_repositories] LIKE %~like~', $likeRepositoryId];
                 break;
             case "mysql":
-                if(!empty($rolePrefix)){
-                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ AND [role_id] LIKE %like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:', $rolePrefix);
-                }else{
-                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
-                }
+                $q['where'][] = ['[serial_role] LIKE %~like~', $likeRepositoryId];
                 break;
             default:
                 return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
-        $all = $children_results->fetchAll();
+
+        if(!empty($rolePrefix)){
+            $q['where'][] = ['[role_id] LIKE %like~', $rolePrefix];
+        }
+
+        // Initing group by
+        $q['groupBy'][] = '[role_id]';
+
+        // Building the request from $q
+
+        // Building select
+        $reqStr = 'SELECT';
+        foreach ($q['select'] as $k => $v) {
+            $selectStr[] = $v.' as '.$k;
+        }
+        $reqStr .= ' ';
+        $reqStr .= join(', ', $selectStr);
+        $reqStr .= ' ';
+
+        // Building from
+        $reqStr .= 'FROM';
+        foreach ($q['from'] as $k => $v) {
+            $from[] = $v.' '.$k;
+        }
+        $reqStr .= ' ';
+        $reqStr .= join(', ', $from);
+        $reqStr .= ' ';
+
+        // Building where
+        if (!empty($q['where'])) {
+            $reqStr .= 'WHERE %and';
+            $reqStr .= ' ';
+        }
+
+        // Building group by
+        if (!empty($q['where'])) {
+            $reqStr .= 'GROUP BY';
+            $reqStr .= ' ';
+            $reqStr .= join(', ', $q['groupBy']);
+            $reqStr .= ' ';
+        }
+
+        $res =  dibi::query($reqStr, $q['where']);
+        $all = $res->fetchAll();
         foreach ($all as $item) {
-            $rId = $item["role_id"];
-            $allRoles[] = $rId;
+            $rId = $item['role_id'];
+
+            if ($splitByType) {
+                $type = $item['type'];
+                $allRoles[$type][] = $rId;
+            } else {
+                $allRoles[] = $rId;
+            }
         }
 
         return $allRoles;
     }
 
 
-    public function getUsersForRole($roleId, $countOnly = false){
+    public function getUsersForRole($roleId, $countOnly = false) {
         if($countOnly){
             $res =  dibi::query("SELECT count([login]) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
             return $res->fetchSingle();
@@ -602,52 +659,19 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 else return $groupUsers;
             }
         }
+
         // Users from roles
         $internal = 0;
-        $roles = $this->getRolesForRepository($repositoryId);
-        foreach($roles as $rId){
-            if(strpos($rId, "AJXP_USR_/") === 0) continue;
-            $internal += $this->getUsersForRole($rId, true);
-        }
+        $roles = $this->getRolesForRepository($repositoryId, '', $details);
 
-        // NEW METHOD : SEARCH PERSONAL ROLE
-        if(is_numeric($repositoryId)){
-            $likeValue = "i:$repositoryId;s:";
-        }else{
-            $likeValue = '"'.$repositoryId.'";s:';
-        }
-        switch ($this->sqlDriver["driver"]) {
-            case "sqlite":
-            case "sqlite3":
-            case "postgre":
-                $q = 'SELECT count([role_id]) FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [searchable_repositories] LIKE %~like~';
-                break;
-            case "mysql":
-                $q = 'SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [serial_role] LIKE %~like~';
-                break;
-            default:
-                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
-        }
         if($details){
-            if($this->sqlDriver["driver"] == "sqlite" || $this->sqlDriver["driver"] == "sqlite3"){
-                $internalClause = " AND NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]='AJXP_USR_/'||[ajxp_user_rights].[login] AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
-                $externalClause = " AND EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]='AJXP_USR_/'||[ajxp_user_rights].[login] AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
-            }else{
-                $internalClause = " AND NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]=CONCAT('AJXP_USR_/',[ajxp_user_rights].[login]) AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
-                $externalClause = " AND EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]=CONCAT('AJXP_USR_/',[ajxp_user_rights].[login]) AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
-            }
-            $intRes = dibi::query($q.$internalClause, $likeValue);
-            $extRes = dibi::query($q.$externalClause, $likeValue);
             return array(
-                'internal' => $internal + $intRes->fetchSingle(),
-                'external' => $extRes->fetchSingle()
+                'users' => count($roles['role_user']),
+                'groups' => count($roles['role_group']) + count($roles['role_role'])
             );
         }else{
-            $res = dibi::query($q, $likeValue);
-            return $internal + $res->fetchSingle();
-
+            return count($roles);
         }
-        //$all = $res->fetchAll();
     }
 
 

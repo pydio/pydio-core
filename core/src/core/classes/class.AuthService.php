@@ -960,12 +960,12 @@ class AuthService
      * Retrieve the current users who have either read or write access to a repository
      * @param $repositoryId
      * @param string $rolePrefix
-     * @param bool $countOnly
+     * @param bool $splitByType
      * @return array
      */
-    public static function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false)
+    public static function getRolesForRepository($repositoryId, $rolePrefix = '', $splitByType = false)
     {
-        return ConfService::getConfStorageImpl()->getRolesForRepository($repositoryId, $rolePrefix, $countOnly);
+        return ConfService::getConfStorageImpl()->getRolesForRepository($repositoryId, $rolePrefix, $splitByType);
     }
 
     /**
