@@ -1884,6 +1884,9 @@ div#uploader_options_pane input {
 .dotted_container_item_mixin rect {
   fill: #ffffff;
 }
+.no-cssreflections .dotted_container_item_mixin {
+  background-image: url('../images//dl_bg.png');
+}
 div#upload_files_list div {
   overflow: hidden;
   padding-top: 10px;
@@ -1900,6 +1903,9 @@ div#upload_files_list div {
 }
 div#upload_files_list div rect {
   fill: #ffffff;
+}
+.no-cssreflections div#upload_files_list div {
+  background-image: url('../images//dl_bg.png');
 }
 div#upload_files_list span.item_relative_path {
   color: #5f5f5f;
@@ -1967,6 +1973,9 @@ div#multiple_download_container div {
 }
 div#multiple_download_container div rect {
   fill: #ffffff;
+}
+.no-cssreflections div#multiple_download_container div {
+  background-image: url('../images//dl_bg.png');
 }
 div#multiple_download_container div div a {
   display: block;
