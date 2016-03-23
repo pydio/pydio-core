@@ -15,6 +15,18 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        less: {
+            development: {
+                options: {
+                    compress: true,
+                    yuicompress: true,
+                    optimization: 2
+                },
+                files: {
+                    "res/home.css": "res/home.less"
+                }
+            }
+        },
         watch: {
             js: {
                 files: [
@@ -24,11 +36,19 @@ module.exports = function(grunt) {
                 options: {
                     spawn: false
                 }
+            },
+            styles: {
+                files: ['res/*.less'],
+                tasks: ['less'],
+                options: {
+                    nospawn: true
+                }
             }
         }
     });
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.registerTask('default', ['babel']);
+    grunt.loadNpmTasks('assemble-less');
+    grunt.registerTask('default', ['babel', 'less', 'watch']);
 
 };
