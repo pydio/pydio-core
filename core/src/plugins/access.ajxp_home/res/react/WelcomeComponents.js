@@ -251,44 +251,71 @@
     var DlAppsPanel = React.createClass({
 
         render: function(){
-            var configs = pydio.getPluginConfigs('access.ajxp_home');
+            let configs = pydio.getPluginConfigs('access.ajxp_home');
+            let mobileBlocks = [], syncBlocks = [];
+            if(configs.get('URL_APP_IOSAPPSTORE')){
+                mobileBlocks.push(
+                    <DlAppElement
+                        id="dl_pydio_ios"
+                        key="dl_pydio_ios"
+                        configs={configs}
+                        configHref="URL_APP_IOSAPPSTORE"
+                        containerClassName="icon-tablet"
+                        iconClassName="icon-apple"
+                        messageId="user_home.59"
+                    />
+
+                );
+            }
+            if(configs.get('URL_APP_ANDROID')){
+                mobileBlocks.push(
+                    <DlAppElement
+                        id="dl_pydio_android"
+                        key="dl_pydio_android"
+                        configs={configs}
+                        configHref="URL_APP_ANDROID"
+                        containerClassName="icon-mobile-phone"
+                        iconClassName="icon-android"
+                        messageId="user_home.58"
+                    />
+                );
+            }
+            if(configs.get('URL_APP_SYNC_WIN')){
+                syncBlocks.push(
+                    <DlAppElement
+                        id="dl_pydio_win"
+                        key="dl_pydio_win"
+                        configs={configs}
+                        configHref="URL_APP_SYNC_WIN"
+                        containerClassName="icon-laptop"
+                        iconClassName="icon-windows"
+                        messageId="user_home.61"
+                    />
+                );
+            }
+            if(configs.get('URL_APP_SYNC_MAC')){
+                syncBlocks.push(
+                    <DlAppElement
+                        id="dl_pydio_mac"
+                        key="dl_pydio_mac"
+                        configs={configs}
+                        configHref="URL_APP_SYNC_MAC"
+                        containerClassName="icon-desktop"
+                        iconClassName="icon-apple"
+                        messageId="user_home.60"
+                    />
+                );
+            }
+            let blocksSep;
+            if(mobileBlocks.length && syncBlocks.length){
+                blocksSep = <div className="dl_blocks_sep"></div>;
+            }
 
             return (
                 <div id="tutorial_dl_apps_pane">
                     <div id="dl_pydio_cont">
                         <div id="dl_pydio_for">{MessageHash['user_home.57']}</div>
-                        <DlAppElement
-                            id="dl_pydio_android"
-                            configs={configs}
-                            configHref="URL_APP_ANDROID"
-                            containerClassName="icon-mobile-phone"
-                            iconClassName="icon-android"
-                            messageId="user_home.58"
-                        />
-                        <DlAppElement
-                            id="dl_pydio_ios"
-                            configs={configs}
-                            configHref="URL_APP_IOSAPPSTORE"
-                            containerClassName="icon-tablet"
-                            iconClassName="icon-apple"
-                            messageId="user_home.59"
-                        />
-                        <DlAppElement
-                            id="dl_pydio_mac"
-                            configs={configs}
-                            configHref="URL_APP_SYNC_MAC"
-                            containerClassName="icon-desktop"
-                            iconClassName="icon-apple"
-                            messageId="user_home.60"
-                        />
-                        <DlAppElement
-                            id="dl_pydio_win"
-                            configs={configs}
-                            configHref="URL_APP_SYNC_WIN"
-                            containerClassName="icon-laptop"
-                            iconClassName="icon-windows"
-                            messageId="user_home.61"
-                        />
+                        {syncBlocks} {blocksSep} {mobileBlocks}
                     </div>
                 </div>
             );
@@ -316,7 +343,7 @@
             }
             this._internalState = ws;
             if(!ws){
-                bufferCallback('homeWorkspaceTimer', 7000, function(){
+                bufferCallback('homeWorkspaceTimer', 17000, function(){
                     this.setState({workspace:null});
                     this.props.onHideLegend();
                 }.bind(this));
@@ -384,7 +411,7 @@
                     <div className="repoInfo">
                     {blocks}
                     </div>
-                    <div style={{lineHeight: '0.5em'}}>
+                    <div className="enter_save_choice" style={{lineHeight: '0.5em'}}>
                         <input type="checkbox" ref="save_ws_choice" id="save_ws_choice"/>
                         <label htmlFor="save_ws_choice">{MessageHash['user_home.41']}</label>
                         <a onClick={this.enterWorkspace}>{MessageHash['user_home.42']}</a>

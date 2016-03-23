@@ -292,7 +292,7 @@
 
   #ws_legend{
     text-align: center;
-    font-size: 28px;
+    font-size: 34px;
     color: white;
     margin: 20px;
     line-height: 55px;
@@ -300,25 +300,27 @@
 
     .repoInfoBadge {
       display: inline-block;
-      font-size: 23px;
+      font-size: 24px;
       min-width: 210px;
-      max-width: 230px;
+      max-width: 210px;
       line-height: 30px;
-      border: 1px solid rgba(255,255,255,0.53);
       background-color: rgba(0, 0, 0, 0.16);
-      border-radius: 6px;
-      margin: 16px;
+      border-radius: 3px;
+      margin: 26px 8px;
       min-height: 106px;
       vertical-align: top;
-      padding: 13px 8px;
+      padding: 10px 6px;
       text-align: left;
     }
 
     .repoInfoTitle {
-      text-transform: uppercase;
-      font-size: 18px;
-      text-align: center;
-      margin-bottom: 9px;
+      font-weight: 500;
+      text-transform: none;
+      font-size: 16px;
+      text-align: left;
+      margin-bottom: 5px;
+      padding: 0 12px;
+      color: rgba(255, 255, 255, 0.76);
     }
 
     .repoInfoBadge span[class^="icon-"] {
@@ -331,20 +333,23 @@
 
 
     > small {
-      font-size: 13px;
-      line-height: 1em;
+      font-size: 16px;
+      line-height: 1.4em;
       display: block;
       &.show_description {
         line-height: 1.9em;
         display: block;
       }
     }
-    a{
-      font-size: 0.5em;
-    }
 
     &.empty_ws_legend{
       opacity: 0;
+    }
+
+    .enter_save_choice{
+      opacity: 0.7;
+      font-size: 13px;
+      margin-top: 10px;
     }
 
   }
@@ -475,6 +480,7 @@ div#tutorial_dl_apps_pane{
 
   width: 100%;
   position: absolute;
+  margin-top: 10px;
   a{
     text-decoration: none;
     color: white;
@@ -483,6 +489,14 @@ div#tutorial_dl_apps_pane{
   > div > div {
     text-align: center;
     font-weight: 500;
+    white-space: nowrap;
+  }
+
+  div.dl_blocks_sep{
+    float: left;
+    height: 90px;
+    border-right: 2px solid white;
+    margin: 0 10px;
   }
 
   div#dl_pydio_cont{
@@ -493,56 +507,47 @@ div#tutorial_dl_apps_pane{
     float: left;margin: 44px 18px;font-size: 21px;
   }
 
-  div#dl_pydio_android{
-    width: 81px; float:left;
-  }
-  div#dl_pydio_android a.icon-mobile-phone{
-    font-size: 96px;
-  }
-  div#dl_pydio_android a.icon-android{
-    font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);
-  }
-  div#dl_pydio_android div{
-    font-size: 11px;top: -15px;position: relative;left: -13px;
-  }
-
-  div#dl_pydio_ios{
-    width: 91px; float:left;
-  }
-  div#dl_pydio_ios a.icon-tablet{
-    font-size: 96px;
-  }
-  div#dl_pydio_ios a.icon-apple{
-    font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);
-  }
-  div#dl_pydio_ios div{
-    font-size: 11px;top: -15px;position: relative;left: -4px;
+  @dl_element_width:90px;
+  div#dl_pydio_win, div#dl_pydio_mac, div#dl_pydio_ios, div#dl_pydio_android{
+    width: @dl_element_width;
+    float:left;
+    padding-top: 8px;
+    position: relative;
+    a.icon-laptop, a.icon-desktop, a.icon-tablet, a.icon-mobile-phone{
+      font-size: 70px;
+    }
+    a.icon-windows, a.icon-apple, a.icon-android{
+      font-size: 22px;
+      position: absolute;
+      left:0 ;
+      top: 26px;
+      color: white;
+      width:@dl_element_width;
+    }
+    div{
+      font-size: 12px;
+      bottom: -10px;
+      width: @dl_element_width;
+      text-align: center;
+      position: absolute;
+    }
   }
 
   div#dl_pydio_mac{
-    width: 110px; float:left;padding-top: 14px;
+    a.icon-desktop{
+      font-size: 65px;
+    }
+    a.icon-apple{
+      top:18px;
+    }
+    div{
+      bottom: -14px;
+    }
   }
-  div#dl_pydio_mac a.icon-desktop{
-    font-size: 74px;
-  }
-  div#dl_pydio_mac a.icon-apple{
-    font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);
-  }
-  div#dl_pydio_mac div{
-    font-size: 11px;top: -6px;position: relative;left: -6px;
-  }
-
-  div#dl_pydio_win{
-    width: 100px; float:left;padding-top: 8px;
-  }
-  div#dl_pydio_win a.icon-laptop{
-    font-size: 87px;
-  }
-  div#dl_pydio_win a.icon-windows{
-    font-size: 26px;position: relative;top: -66px;left: 0;color: rgb(56, 122, 173);
-  }
-  div#dl_pydio_win div{
-    font-size: 11px;top: -40px;position: relative;left: 8px;
+  div#dl_pydio_android{
+    a.icon-android{
+      top:30px;
+    }
   }
 
 }
