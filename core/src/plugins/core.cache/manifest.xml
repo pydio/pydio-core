@@ -8,6 +8,6 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="cache.doctrine"/>
+        <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false"/>
     </server_settings>
 </ajxp_plugin>
