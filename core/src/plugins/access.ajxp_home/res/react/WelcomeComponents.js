@@ -375,7 +375,6 @@
             var blocks = [];
             var data = this.state.data;
             var usersData = data['core.users'];
-            console.log(usersData);
             if(usersData && usersData['users'] != undefined && usersData['groups'] != undefined){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-account-network">
