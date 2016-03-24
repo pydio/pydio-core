@@ -403,8 +403,12 @@
             if(data['meta.quota']){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="meta.quota" badgeTitle={MessageHash['meta.quota.4']} iconClass="icon-dashboard">
-                    {parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total'])}%<br/>
-                        <small>{roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small>
+                        <div className="table">
+                            <div>
+                                <div>{parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total'])}%</div>
+                                <div className='text-right'><small>{roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small></div>
+                            </div>
+                        </div>
                     </HomeWorkspaceLegendInfoBlock>
                 );
             }
