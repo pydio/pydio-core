@@ -205,7 +205,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
 
     /**
-     * @param Array $array
+     * @param array $array
      * @return Repository[]
      */
     protected function initRepoArrayFromDbFetch($array){
@@ -224,10 +224,8 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::query("SET bytea_output=escape");
         }
         $dbres = dibi::query("SELECT [uuid], [name], [val] FROM [ajxp_repo_options] WHERE [uuid] IN (%s)", $ids);
-        if (is_array($dbres)) {
-            foreach($dbres as $row){
-                $allOpts[$row['uuid']]["OPTIONS"][$row['name']] = $row['val'];
-            }
+        foreach($dbres as $row){
+            $allOpts[$row['uuid']]["OPTIONS"][$row['name']] = $row['val'];
         }
         foreach($allOpts as $repoId => $repoOptions){
             $repo = $this->repoFromDb($repoOptions["ROW"], $repoOptions["OPTIONS"]);
@@ -360,20 +358,17 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::nativeQuery("SET bytea_output=escape");
         }
         $keyName = ($slugOrAlias=="slug"?"slug":"uuid");
-
         $res = dibi::query("SELECT * FROM [ajxp_repo],[ajxp_repo_options] WHERE [ajxp_repo].[uuid] = [ajxp_repo_options].[uuid] AND [ajxp_repo].[$keyName] = %s", $value);
 
-        if (is_array($res)) {
-            $options = array();
-            foreach($res as $row){
-                $options[$row->name] = $row->val;
-            }
-            if(isSet($row)){
-                unset($row->name);
-                unset($row->val);
-                $repository = $this->repoFromDb($row, $options);
-                return $repository;
-            }
+        $options = array();
+        foreach($res as $row){
+            $options[$row->name] = $row->val;
+        }
+        if(isSet($row)){
+            unset($row->name);
+            unset($row->val);
+            $repository = $this->repoFromDb($row, $options);
+            return $repository;
         }
         return null;
     }
@@ -456,8 +451,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             }
 
         } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            return -1;
+            throw $e;
         }
     }
     /**
@@ -528,11 +522,9 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
         $usersRoles = $this->getRolesForRepository($repositoryId, "AJXP_USR_/");
-        if (is_array($usersRoles)) {
-            foreach ($usersRoles as $rId) {
-                $id = substr($rId, strlen("AJXP_USR/") + 1);
-                $result[$id] = $this->createUserObject($id);
-            }
+        foreach ($usersRoles as $rId) {
+            $id = substr($rId, strlen("AJXP_USR/") + 1);
+            $result[$id] = $this->createUserObject($id);
         }
         return $result;
     }
@@ -648,7 +640,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param string $repositoryId
      * @param boolean $details
      * @param bool $admin
-     * @return Array|int
+     * @return array|int
      */
     public function countUsersForRepository($repositoryId, $details = false, $admin=false){
         $object = ConfService::getRepositoryById($repositoryId);
@@ -906,7 +898,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
+     * @param array $deletedSubUsers
      * @throws Exception
      * @return void
      */
@@ -1084,7 +1076,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param String $keyType
      * @param String $keyId
      * @param String $userId
-     * @param Array $data
+     * @param array $data
      * @return boolean
      */
     public function saveTemporaryKey($keyType, $keyId, $userId, $data)
