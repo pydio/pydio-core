@@ -245,7 +245,7 @@ class Registry{
     findEditorsForMime (mime, restrictToPreviewProviders){
         var editors = [];
         var checkWrite = false;
-        if(this.user != null && !this.user.canWrite()){
+        if(this._pydioObject.user != null && !this._pydioObject.user.canWrite()){
             checkWrite = true;
         }
         this._extensionsRegistry.editor.forEach(function(el){

@@ -72,7 +72,7 @@ Class.create("PydioUI", {
         if(!editorData){
             var selectedMime = getAjxpMimeType(selectedNode);
             var editors = this._pydio.Registry.findEditorsForMime(selectedMime, false);
-            if(editors.length && editors[0].openable){
+            if(editors.length && editors[0].openable && !(editors[0].write && selectedNode.getMetadata().get("ajxp_readonly") === "true")){
                 editorData = editors[0];
             }
         }
