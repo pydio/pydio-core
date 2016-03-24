@@ -157,7 +157,8 @@ class inboxAccessWrapper implements AjxpWrapper
             $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($url);
             $realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($url, true);
             if(!$isRemote){
-                $tmpname = tempnam(AJXP_Utils::getAjxpTmpDir(), "real-file-inbox-pointer");
+                $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+                $tmpname = tempnam(AJXP_Utils::getAjxpTmpDir(), "real-file-inbox-pointer").".".$ext;
                 copy($realFilePointer, $tmpname);
                 $realFilePointer = $tmpname;
             }

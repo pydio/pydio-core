@@ -78,7 +78,6 @@ class inboxAccessDriver extends fsAccessDriver
                     }
                     AJXP_Controller::applyHook("node.read", array(&$node));
                     $stat = stat($url);
-                    self::$output[$basename]["stat"] = $stat;
                 }catch (Exception $e){
                     $stat = stat(AJXP_Utils::getAjxpTmpDir());
                 }
@@ -88,6 +87,7 @@ class inboxAccessDriver extends fsAccessDriver
                         self::disableWriteInStat($stat);
                     }
                 }
+                self::$output[$basename]["stat"] = $stat;
             }
             $nodeData["stat"] = $stat;
         }
