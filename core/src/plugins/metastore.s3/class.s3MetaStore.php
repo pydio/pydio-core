@@ -86,7 +86,6 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
      * @return String
      */
     private function updateNodeMetaPath($ajxpNode, $create = false){
-        $folder = false;
         $trim = trim($ajxpNode->getPath(), "/");
         if($ajxpNode->is_file !== null){
             $folder = !$ajxpNode->isLeaf();
@@ -127,7 +126,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
         $pathName = $this->updateNodeMetaPath($ajxpNode, false);
         if($pathName != null){
-            $response = $aws->copyObject(
+            $aws->copyObject(
                 array(
                     'Bucket' => $this->bucketName,
                     'Key' => $pathName,

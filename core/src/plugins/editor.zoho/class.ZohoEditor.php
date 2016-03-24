@@ -135,7 +135,6 @@ class ZohoEditor extends AJXP_Plugin
             $httpClient = new http_class();
             $httpClient->request_method = "POST";
 
-            $secureToken = $httpVars["secure_token"];
             $_SESSION["ZOHO_CURRENT_EDITED"] = $nodeUrl;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
 

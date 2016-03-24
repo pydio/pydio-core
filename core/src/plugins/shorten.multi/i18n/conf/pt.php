@@ -19,7 +19,6 @@ $mess=array(
 "Bit.ly URL Shortener" => "Redutor de URLs Bit.lyr",
 "User Name" => "Nome de Utilizador",
 "Bit.ly account user name" => "Nome de Conta de Utilizador Bit.ly",
-"API Key" => "Chave API",
 "Bit.ly account API Key" => "Chave API da conta Bit.ly",
 "Shorten Download Links before sending them back to the user." => "Shorten Download Links before sending them back to the user.",
 "Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Shorten Download Links before sending them back to the user. Requires a Bit.ly account.",

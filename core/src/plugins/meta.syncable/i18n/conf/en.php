@@ -23,6 +23,5 @@ $mess=array(
 "Track changes on this workspace to enable the synchronization with an external client" => "Track changes on this workspace to enable the synchronization with an external client",
 "SQL Tables" => "SQL Tables",
 "Install SQL Tables" => "Install SQL Tables",
-"Syncable Workspace" => "Syncable Workspace",
 "Workspace is syncable" => "Workspace is syncable",
 );

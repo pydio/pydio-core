@@ -13,7 +13,6 @@ defined('AJXP_EXEC') or die('Access not allowed');
 require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
 
 use AJXP_SchemeTranslatorWrapper;
-use AJXP_Safe;
 use AJXP_Utils;
 use AuthService;
 use CacheService;

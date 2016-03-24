@@ -11,7 +11,6 @@ namespace Pydio\Access\Core\Stream;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use AJXP_SchemeTranslatorWrapper;
-use AJXP_Safe;
 use AJXP_Utils;
 use CacheService;
 use ConfService;

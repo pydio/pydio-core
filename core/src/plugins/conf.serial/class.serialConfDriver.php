@@ -110,7 +110,7 @@ class serialConfDriver extends AbstractConfDriver
     // SAVE / EDIT / CREATE / DELETE REPOSITORY
     /**
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return array
      */
     public function listRepositories($user = null)
     {

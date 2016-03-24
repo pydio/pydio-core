@@ -406,7 +406,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             } else if (is_array($recipient)) {
                 if (array_key_exists("adress", $recipient)) {
                     if (!array_key_exists("name", $recipient)) {
-                        $recipient["name"] = $recipient["name"];
+                        $recipient["name"] = $recipient["adress"];
                     }
                     $realRecipients[] = $recipient;
                 }

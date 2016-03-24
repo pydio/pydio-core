@@ -64,7 +64,6 @@ $mess = array(
 "Your system title" => "Your system title",
 "Welcome Message" => "Welcome Message",
 "An additional message displayed at startup, on the splash screen and the login screen." => "An additional message displayed at startup, on the splash screen and the login screen.",
-"Admin Display Name" => "Admin Display Name",
 "User-friendly name of the user" => "User-friendly name of the user",
 "Welcome to Pydio" => "Welcome to Pydio",
 "Database Connexion" => "Database Connexion",

@@ -213,7 +213,7 @@ class Repository implements AjxpGroupPathProvider
             $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
         }
         $repo->options = $newOptions;
-        if ($parentId == null) {
+        if ($parentId === null) {
             $parentId = $this->getId();
         }
         $repo->setInferOptionsFromParent(true);
@@ -280,7 +280,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function setSlug($slug = null)
     {
-        if ($slug == null) {
+        if ($slug === null) {
             $this->slug = AJXP_Utils::slugify($this->display);
         } else {
             $this->slug = $slug;

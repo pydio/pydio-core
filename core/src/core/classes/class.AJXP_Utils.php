@@ -1380,7 +1380,7 @@ class AJXP_Utils
      * Stores an Array as a serialized string inside a file.
      *
      * @param String $filePath Full path to the file
-     * @param Array|Object $value The value to store
+     * @param array|Object $value The value to store
      * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
      * @param bool $silent Silently write the file, are throw an exception on problem.
      * @param string $format "ser" or "json"

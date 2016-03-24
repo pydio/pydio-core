@@ -292,7 +292,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
                         register_shutdown_function("unlink", $file);
                     }
-                    $localName = ($base==""?"Files":$base).".zip";
+                    $localName = (empty($base)?"Files":$base).".zip";
                     if(isSet($httpVars["archive_name"])){
                         $localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
                     }
@@ -449,12 +449,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 } catch (Exception $e) {
                     header("Content-Type:text/plain");
                     print $e->getMessage();
-                    return;
+                    break;
                 }
                 if (!is_file($fileName) || !$this->isWriteable($fileName, "file")) {
                     header("Content-Type:text/plain");
                     print((!$this->isWriteable($fileName, "file")?"1001":"1002"));
-                    return ;
+                    break;
                 }
                 $fp=fopen($fileName,"w");
                 fputs ($fp,$code);
@@ -944,7 +944,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                 $streamIsSeekable = AJXP_MetaStreamWrapper::wrapperIsSeekable($path);
 
-                $sharedHandle = null;
+                $sharedHandle = null; $handle = null;
                 if($streamIsSeekable){
                     $handle = opendir($path);
                     $sharedHandle = $handle;
@@ -1089,6 +1089,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $breakNow = false;
                     if(isSet($max_depth) && $max_depth > 0 && $crt_depth >= $max_depth) $breakNow = true;
                     if(isSet($max_nodes) && $max_nodes > 0 && $crt_nodes >= $max_nodes) $breakNow = true;
+                    /**
+                     * @var $nodeDir AJXP_Node
+                     */
                     foreach ($fullList["d"] as &$nodeDir) {
                         if($breakNow){
                             $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
@@ -1284,10 +1287,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     }
 
     /**
-     * @param Array $uploadData Php-upload array
+     * @param array $uploadData Php-upload array
      * @param String $destination Destination folder, including stream data
      * @param String $filename Destination filename
-     * @param Array $messages Application messages table
+     * @param array $messages Application messages table
      * @return bool
      * @throws Exception
      */
@@ -1466,7 +1469,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $size = strlen($gzippedData);
                 }
                 HTMLWriter::generateAttachmentsHeader($localName, $size, $isFile, $gzip);
-                if ($gzip) {
+                if ($gzip && isSet($gzippedData)) {
                     print $gzippedData;
                     return;
                 }
@@ -1721,7 +1724,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if(!is_file($destination."/".$fileName)) return $fileName;
         $i = 1;
         $ext = "";
-        $name = "";
         $split = explode(".", $fileName);
         if (count($split) > 1) {
             $ext = ".".$split[count($split)-1];
@@ -1919,7 +1921,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param $dest
      * @param $basedir
      * @throws Exception
-     * @return zipfile
+     * @return PclZip
      */
     public function makeZip ($src, $dest, $basedir)
     {
@@ -1968,7 +1970,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $handle=opendir($dirName);
         $shareCenter = false;
         if(class_exists("ShareCenter")){
-            $shareCenter = ShareCenter::getShareCenter("action.share");
+            $shareCenter = ShareCenter::getShareCenter();
         }
         if($handle === false){
             $this->logError(__FUNCTION__, "Cannot open folder ".$dirName);

@@ -25,8 +25,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ContentFilter {
 
-    var $filters = array();
-    var $virtualPaths = array();
+    public $filters = array();
+    public $virtualPaths = array();
 
     /**
      * @param AJXP_Node[] $nodes

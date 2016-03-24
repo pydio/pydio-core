@@ -23,6 +23,5 @@ $mess=array(
 "Track changes on this workspace to enable the synchronization with an external client" => "Änderungen an der Arbeitsumgebung protokollieren um diese mit externen Anwendungen abzugleichen",
 "SQL Tables" => "SQL-Tabellen",
 "Install SQL Tables" => "SQL-Tabellen installieren",
-"Syncable Workspace" => "Synchronisierbare Arbeitsumgebung",
 "Workspace is syncable" => "Legt fest, ob Änderungen an der Arbeitsumgebung mit externen Anwendungen abgeglichen werden können",
 );

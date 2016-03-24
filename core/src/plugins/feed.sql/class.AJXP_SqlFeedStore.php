@@ -254,7 +254,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 $startEventRow = $row;
                 break;
             }
-            $startEventNotif = new AJXP_Notification();
+            /**
+             * @var $startEventNotif AJXP_Notification
+             */
             $startEventNotif = unserialize($startEventRow->content);
             if(empty($startEventNotif)) {
                 // Ignore, empty notif;

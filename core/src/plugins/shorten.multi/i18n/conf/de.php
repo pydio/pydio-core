@@ -19,7 +19,6 @@ $mess=array(
 "Bit.ly URL Shortener" => "Bit.ly URL-Kürzungsdienst",
 "User Name" => "Benutzername",
 "Bit.ly account user name" => "Benutzername bei Bit.ly",
-"API Key" => "API Key",
 "Bit.ly account API Key" => "Bit.ly API Key",
 "Yourls domain" => "Eigene Domain",
 "Use IDN" => "Internationalisierten Domainnamen verwenden (IDN)",

@@ -64,7 +64,6 @@ $mess = array(
 "Your system title" => "Titel dieser Installation von Pydio",
 "Welcome Message" => "Willkommens-Mitteilung",
 "An additional message displayed at startup, on the splash screen and the login screen." => "Eine zusätzliche Mitteilung für die Anmelde-Seite.",
-"Admin Display Name" => "Angezeigter Name",
 "User-friendly name of the user" => "Namen den die Benutzer sehen",
 "Welcome to Pydio" => "Willkommen bei Pydio",
 "Database Connexion" => "Datenbankverbindung",

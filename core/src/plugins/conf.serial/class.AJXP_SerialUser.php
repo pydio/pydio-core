@@ -221,7 +221,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
     {
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-        return AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
+        AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
     }
 
     /**

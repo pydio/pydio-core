@@ -208,7 +208,6 @@ class AbstractAccessDriver extends AJXP_Plugin
                 return ;
             } else {
                 $base = basename($srcFile);
-                $i = 1;
                 if (is_file($realSrcFile)) {
                     $dotPos = strrpos($base, ".");
                     if ($dotPos>-1) {
@@ -253,9 +252,9 @@ class AbstractAccessDriver extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
                 if(AJXP_MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
-                    $res = rename($realSrcFile, $destFile);
+                    rename($realSrcFile, $destFile);
                 }else{
-                    $res = copy($realSrcFile, $destFile);
+                    copy($realSrcFile, $destFile);
                 }
                 AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, false));
             } else {

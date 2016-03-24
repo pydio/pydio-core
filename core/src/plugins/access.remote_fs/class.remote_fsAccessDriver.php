@@ -97,7 +97,6 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                     $httpClient->directForwarding = true;
                 }
                 $result = $httpClient->get($crtRep->getOption("URI"), $httpVars);
-                $result = $httpClient->get($crtRep->getOption("URI"), $httpVars);
             } else {
                 $result = $httpClient->post($crtRep->getOption("URI"), $httpVars);
             }

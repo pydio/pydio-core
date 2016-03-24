@@ -199,7 +199,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Intercept CONF and AUTH configs to use the BootConf Storage
         * @param String $pluginId
-        * @param String $options
+        * @param array $options
         */
     public function savePluginConfig($pluginId, $options)
     {

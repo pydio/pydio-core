@@ -113,7 +113,6 @@ $mess=array(
 "Hide files" => "Ocultar Ficheiros",
 "Comma-separated list of specific files to hide" => "Lista de ficheiros a esconder, separada por virgulas",
 "Metadata and indexation" => "Indexação e Metadata",
-"Default Metasources" => "Fontes Meta pré-Definidas",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista de Fontes Meta e de Meta Plugins, separada por virgulas, que irá ser aplicada automaticamente a todas as Áreas de Trabalho criadas por este controlador",
 "Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature.",
 "Admin email" => "Admin email",

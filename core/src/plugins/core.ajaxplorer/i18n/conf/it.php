@@ -91,7 +91,6 @@ $mess=array(
 "When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Quando una cartella contiene più elementi rispetto a quanto indicato quì, la visualizzazione passerà alla modalità paginazione, per migliorare le performance.",
 "#Items per page" => "#Elementi per pagina",
 "Once in pagination mode, number of items to display per page." => "Una volta in modalità paginazione, indica il numero di elementi da mostrare per ciascuna pagina.",
-"Default Metasources" => "Sorgenti META Principale",
 "Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista, separata da virgola, di plugin metastore e meta, che verrà automaticamente applicata a tutti i workspace creati con questo driver",
 "Auth Driver Commons" => "Driver Comuni Autenticazione",
 "Transmit Clear Pass" => "Trasmetti Password in chiaro",
