@@ -33,6 +33,8 @@
     "grunt-browserify": "~4.0.1",
     "grunt-env": "~0.4.4",
     "grunt-run":"~0.5.2",
-    "grunt-contrib-cssmin":"~0.14.0"
+    "grunt-contrib-cssmin":"~0.14.0",
+    "assemble-less": "~0.7.0",
+    "less-plugin-autoprefix": "~1.5.1"
   }
 }

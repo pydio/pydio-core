@@ -314,6 +314,7 @@
     top: 30px;
 
     .repoInfoBadge {
+      position: relative;
       display: inline-block;
       font-size: 24px;
       min-width: 210px;
@@ -321,31 +322,47 @@
       line-height: 30px;
       background-color: rgba(0, 0, 0, 0.16);
       border-radius: 3px;
+      padding: 6px 16px 6px 14px;
       margin: 26px 8px;
       min-height: 106px;
       vertical-align: top;
-      padding: 10px 6px;
       text-align: left;
+      clear: both;
+    }
+
+    .repoInfoBadge > div {
+      clear: both;
+    }
+
+    .repoInfoBox {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 14px;
+      right: 16px;
     }
 
     .repoInfoTitle {
+      float: left;
       font-weight: 500;
       text-transform: none;
       font-size: 16px;
       text-align: left;
-      margin-bottom: 5px;
-      padding: 0 12px;
       color: rgba(255, 255, 255, 0.76);
+      line-height: 45px;
     }
 
-    .repoInfoBadge span[class^="icon-"] {
+    .repoInfoBadge span[class^="mdi mdi-"] {
       display: block;
-      font-size: 45px;
-      float: left;
-      margin: 6px 16px 0 14px;
+      font-size: 30px;
+      line-height: 45px;
       opacity: 0.9;
+      text-align: right;
     }
 
+    .repoInfoBody > div {
+      width: 100%;
+    }
 
     > small {
       font-size: 16px;
@@ -368,7 +385,6 @@
     }
 
   }
-
 
   #list_cont{
       overflow-y: auto;

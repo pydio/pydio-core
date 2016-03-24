@@ -337,7 +337,7 @@
             }
             this._internalState = ws;
             if(!ws){
-                bufferCallback('homeWorkspaceTimer', 7000, function(){
+                bufferCallback('homeWorkspaceTimer', 700000, function(){
                     this.setState({workspace:null});
                     this.props.onHideLegend();
                 }.bind(this));
@@ -374,11 +374,29 @@
             }
             var blocks = [];
             var data = this.state.data;
-            if(data['core.users'] && data['core.users']['users'] != undefined && data['core.users']['groups'] != undefined){
+            var usersData = data['core.users'];
+            console.log(usersData);
+            if(usersData && usersData['users'] != undefined && usersData['groups'] != undefined){
                 blocks.push(
-                    <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="icon-group">
-                    {data['core.users']['users'] ? (MessageHash[531] + ' ' + data['core.users']['users']) : ''}
-                    {data['core.users']['groups'] ? (MessageHash[532] + ' ' + data['core.users']['groups']) : ''}
+                    <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-cloud">
+                        <div className="table">
+                            {(() => {
+                                if (usersData['users'] > 0) {
+                                    return <div>
+                                            <div>{MessageHash[531]}</div>
+                                            <div className="text-right">{usersData['users']}</div>
+                                        </div>;
+                                }
+                            })()}
+                            {(() => {
+                                if (usersData['groups'] > 0) {
+                                    return <div>
+                                            <div>{MessageHash[532]}</div>
+                                            <div className="text-right">{usersData['groups']}</div>
+                                        </div>;
+                                }
+                            })()}
+                        </div>
                     </HomeWorkspaceLegendInfoBlock>
                 );
             }
@@ -392,8 +410,8 @@
             }
             if(data['core.notifications'] && data['core.notifications'][0]){
                 blocks.push(
-                    <HomeWorkspaceLegendInfoBlock key="notifications" badgeTitle={MessageHash[4]} iconClass="icon-calendar">
-                    {data['core.notifications'][0]['short_date']}
+                    <HomeWorkspaceLegendInfoBlock key="notifications" badgeTitle={MessageHash[4]} iconClass="mdi mdi-calendar">
+                        <div className="text-center">{data['core.notifications'][0]['short_date']}</div>
                     </HomeWorkspaceLegendInfoBlock>
                 );
             }
@@ -418,11 +436,17 @@
     var HomeWorkspaceLegendInfoBlock = React.createClass({
         render:function(){
             return <div className="repoInfoBadge">
-                <div className="repoInfoTitle">
-                    {this.props.badgeTitle}
+                <div className="repoInfoBox flexbox">
+                    <div className="repoInfoHeader row header">
+                        <span className="repoInfoTitle">
+                            {this.props.badgeTitle}
+                        </span>
+                        <span className={this.props.iconClass}></span>
+                    </div>
+                    <div className="repoInfoBody row content">
+                        {this.props.children}
+                    </div>
                 </div>
-                <span className={this.props.iconClass}></span>
-                {this.props.children}
             </div>
         }
     });

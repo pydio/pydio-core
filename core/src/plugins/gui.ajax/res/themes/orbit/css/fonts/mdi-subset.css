@@ -39,3 +39,11 @@
 .mdi-upload:before {
     content: "\f63f";
 }
+
+.mdi-cloud:before {
+    content: "\f255";
+}
+
+.mdi-calendar:before {
+    content: "\f1e3";
+}

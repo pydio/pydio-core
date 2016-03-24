@@ -166,6 +166,18 @@ module.exports = function(grunt) {
                 }
             }
         },
+        less: {
+            development: {
+                options: {
+                    plugins: [
+                        new (require('less-plugin-autoprefix'))({browsers: ["last 2 versions, > 10%"]})
+                    ]
+                },
+                files: {
+                    "res/themes/orbit/css/pydio.css": "res/themes/orbit/css/pydio.less"
+                }
+            }
+        },
         watch: {
             core: {
                 files: gui_ajax_core,
@@ -181,6 +193,13 @@ module.exports = function(grunt) {
                 tasks:['babel:pydio'],
                 options: {
                     spawn: false
+                }
+            },
+            styles: {
+                files: ['res/themes/orbit/css/**/*.less'],
+                tasks: ['less', 'cssmin'],
+                options: {
+                    nospawn: true
                 }
             }
         },
@@ -208,6 +227,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('assemble-less');
     grunt.registerTask('default', [
         'babel:dist',
         'uglify:js',

@@ -224,8 +224,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::query("SET bytea_output=escape");
         }
         $dbres = dibi::query("SELECT [uuid], [name], [val] FROM [ajxp_repo_options] WHERE [uuid] IN (%s)", $ids);
-        foreach($dbres as $row){
-            $allOpts[$row['uuid']]["OPTIONS"][$row['name']] = $row['val'];
+        if (is_array($dbres)) {
+            foreach($dbres as $row){
+                $allOpts[$row['uuid']]["OPTIONS"][$row['name']] = $row['val'];
+            }
         }
         foreach($allOpts as $repoId => $repoOptions){
             $repo = $this->repoFromDb($repoOptions["ROW"], $repoOptions["OPTIONS"]);
@@ -358,17 +360,20 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::nativeQuery("SET bytea_output=escape");
         }
         $keyName = ($slugOrAlias=="slug"?"slug":"uuid");
+
         $res = dibi::query("SELECT * FROM [ajxp_repo],[ajxp_repo_options] WHERE [ajxp_repo].[uuid] = [ajxp_repo_options].[uuid] AND [ajxp_repo].[$keyName] = %s", $value);
 
-        $options = array();
-        foreach($res as $row){
-            $options[$row->name] = $row->val;
-        }
-        if(isSet($row)){
-            unset($row->name);
-            unset($row->val);
-            $repository = $this->repoFromDb($row, $options);
-            return $repository;
+        if (is_array($res)) {
+            $options = array();
+            foreach($res as $row){
+                $options[$row->name] = $row->val;
+            }
+            if(isSet($row)){
+                unset($row->name);
+                unset($row->val);
+                $repository = $this->repoFromDb($row, $options);
+                return $repository;
+            }
         }
         return null;
     }
@@ -380,7 +385,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     protected function uniquifySlug($slug, $repositoryId = null){
 
-        if($repositoryId != null){
+        if(!empty($repositoryId)){
             $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [uuid] != %s AND [slug] LIKE '".$slug."%'", $repositoryId);
         }else{
             $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [slug] LIKE '".$slug."%'");
@@ -451,10 +456,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             }
 
         } catch (DibiException $e) {
-
             echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
-
             return -1;
         }
     }
@@ -514,7 +516,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * @param string $repositoryId
-     * @return array()
+     * @return array
      */
     public function getUsersForRepository($repositoryId)
     {
@@ -526,9 +528,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
         $usersRoles = $this->getRolesForRepository($repositoryId, "AJXP_USR_/");
-        foreach($usersRoles as $rId){
-            $id = substr($rId, strlen("AJXP_USR/")+1);
-            $result[$id] = $this->createUserObject($id);
+        if (is_array($usersRoles)) {
+            foreach ($usersRoles as $rId) {
+                $id = substr($rId, strlen("AJXP_USR/") + 1);
+                $result[$id] = $this->createUserObject($id);
+            }
         }
         return $result;
     }
@@ -538,10 +542,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param string $repositoryId
      * @param string $rolePrefix
      * @param bool $splitByType
-     * @return array()
+     * @return array
      */
     public function getRolesForRepository($repositoryId, $rolePrefix = '', $splitByType = false){
-        $allRoles = array();
+
+        $allRoles = $q = $selectStr = $fromStr = [];
 
         // Initing select
         $q['select']['role_id'] = '[role_id]';
@@ -593,10 +598,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         // Building from
         $reqStr .= 'FROM';
         foreach ($q['from'] as $k => $v) {
-            $from[] = $v.' '.$k;
+            $fromStr[] = $v.' '.$k;
         }
         $reqStr .= ' ';
-        $reqStr .= join(', ', $from);
+        $reqStr .= join(', ', $fromStr);
         $reqStr .= ' ';
 
         // Building where
@@ -629,7 +634,6 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $allRoles;
     }
 
-
     public function getUsersForRole($roleId, $countOnly = false) {
         if($countOnly){
             $res =  dibi::query("SELECT count([login]) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
@@ -661,7 +665,6 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
 
         // Users from roles
-        $internal = 0;
         $roles = $this->getRolesForRepository($repositoryId, '', $details);
 
         if($details){
@@ -994,7 +997,6 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         if($relatedObjectId != ""){
             $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
         }
-        $limit = '';
         if($cursor != null){
             $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and %lmt %ofs", $wheres, $cursor[1], $cursor[0]);
         }else{
