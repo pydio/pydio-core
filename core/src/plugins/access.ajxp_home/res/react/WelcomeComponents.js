@@ -337,7 +337,7 @@
             }
             this._internalState = ws;
             if(!ws){
-                bufferCallback('homeWorkspaceTimer', 700000, function(){
+                bufferCallback('homeWorkspaceTimer', 7000, function(){
                     this.setState({workspace:null});
                     this.props.onHideLegend();
                 }.bind(this));
@@ -375,7 +375,6 @@
             var blocks = [];
             var data = this.state.data;
             var usersData = data['core.users'];
-            console.log(usersData);
             if(usersData && usersData['users'] != undefined && usersData['groups'] != undefined){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-account-network">
@@ -403,8 +402,12 @@
             if(data['meta.quota']){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="meta.quota" badgeTitle={MessageHash['meta.quota.4']} iconClass="icon-dashboard">
-                    {parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total'])}%<br/>
-                        <small>{roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small>
+                        <div className="table">
+                            <div>
+                                <div>{parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total'])}%</div>
+                                <div className='text-right'><small>{roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small></div>
+                            </div>
+                        </div>
                     </HomeWorkspaceLegendInfoBlock>
                 );
             }
@@ -501,7 +504,9 @@
             $('home_center_panel').removeClassName('legend_visible');
         },
         onHoverLink:function(event, ws){
-            this.refs.legend.setWorkspace(ws);
+            bufferCallback('hoverWorkspaceTimer', 400, function(){
+                this.refs.legend.setWorkspace(ws);
+            }.bind(this));
         },
         onOutLink:function(event, ws){
             this.refs.legend.setWorkspace(null);
