@@ -378,13 +378,13 @@
             console.log(usersData);
             if(usersData && usersData['users'] != undefined && usersData['groups'] != undefined){
                 blocks.push(
-                    <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-cloud">
+                    <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-account-network">
                         <div className="table">
                             {(() => {
                                 if (usersData['users'] > 0) {
                                     return <div>
                                             <div>{MessageHash[531]}</div>
-                                            <div className="text-right">{usersData['users']}</div>
+                                            <div className="text-center">{usersData['users']}</div>
                                         </div>;
                                 }
                             })()}
@@ -392,7 +392,7 @@
                                 if (usersData['groups'] > 0) {
                                     return <div>
                                             <div>{MessageHash[532]}</div>
-                                            <div className="text-right">{usersData['groups']}</div>
+                                            <div className="text-center">{usersData['groups']}</div>
                                         </div>;
                                 }
                             })()}
