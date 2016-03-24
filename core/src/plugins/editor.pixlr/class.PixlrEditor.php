@@ -30,16 +30,21 @@ class PixlrEditor extends AJXP_Plugin
 {
   public function switchAction($action, $httpVars, $filesVars)
   {
-    $repository = ConfService::getRepository();
-    if (!$repository->detectStreamWrapper(true)) {
-      return false;
-    }
+        $repository = ConfService::getRepository();
+        if (!$repository->detectStreamWrapper(true)) {
+          return false;
+        }
 
         $selection = new UserSelection($repository, $httpVars);
         $selectedNode = $selection->getUniqueNode();
         $selectedNodeUrl = $selectedNode->getUrl();
 
         if ($action == "post_to_server") {
+
+            if(!is_writeable($selectedNodeUrl)){
+                header("Location:".AJXP_Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
+                return false;
+            }
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
@@ -94,12 +99,23 @@ class PixlrEditor extends AJXP_Plugin
                 }
             }
 
-        header("Location: {$header['location']}"); //$response");
+            if(isSet($header) && isSet($header["location"])){
+                header("Location: {$header['location']}"); //$response");
+            }else{
+                header("Location:".AJXP_Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
+            }
 
         } else if ($action == "retrieve_pixlr_image") {
+
             $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
             $selectedNode = new AJXP_Node($selection->currentBaseUrl() . $file);
             $selectedNode->loadNodeInfo();
+
+            if(!is_writeable($selectedNode->getUrl())){
+                $this->logError("Pixlr Editor", "Trying to edit an unauthorized file ".$selectedNode->getUrl());
+                return false;
+            }
+
             $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));
             AJXP_Controller::applyHook("node.before_change", array(&$selectedNode));
             $url = $httpVars["new_url"];

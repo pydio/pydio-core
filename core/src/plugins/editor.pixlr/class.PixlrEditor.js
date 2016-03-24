@@ -84,8 +84,9 @@ Class.create("PixlrEditor", AbstractEditor, {
 			if(href && href.indexOf('image=') > -1){				
 	        	pe.stop();
 	        	this.save(href);
-			}else if(href && href.indexOf('close_pixlr')>-1){
+			}else if(href && (href.indexOf('close_pixlr')>-1 || href.indexOf('error_pixlr')>-1)){
 				pe.stop();
+                this.removeOnLoad();
 				hideLightBox(true);
 			}
 		}.bind(this) , 0.5);

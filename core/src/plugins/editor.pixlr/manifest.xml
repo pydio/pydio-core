@@ -15,7 +15,7 @@
         </resources>
 	</client_settings>
 	<clientForm id="pixlr_box"><![CDATA[
-		<div id="pixlr_box" action="edit_image" box_width="90%" box_height="90%" box_padding="0">
+		<div id="pixlr_box" style="background-color:white;" action="edit_image" box_width="90%" box_height="90%" box_padding="0">
 			<div id="pixlrContainer"></div>
 		</div>
 	]]></clientForm>
@@ -23,12 +23,12 @@
 		<actions>
 			<action name="post_to_server">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="retrieve_pixlr_image">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 		</actions>
