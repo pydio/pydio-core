@@ -181,4 +181,5 @@ $mess=array(
 "157" => "Administrator",
 "158" => "Shared", // user type shared
 "159" => "Guest",
+"160" => "Le groupe a été créé avec succès.",
 );

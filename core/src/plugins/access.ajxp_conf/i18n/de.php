@@ -182,4 +182,5 @@ $mess=array(
 "157" => "Administrator",
 "158" => "Freigabebenutzer", // user type shared
 "159" => "Gast",
+"160" => "Group was successfully created",
 );
