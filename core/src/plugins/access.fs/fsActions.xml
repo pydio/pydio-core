@@ -396,13 +396,16 @@
                 <dynamicBuilder><![CDATA[
                     var context = window.builderContext;
                     context.builderMenuItems = $A([]);
-                    var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
+                    var node = pydio.getUserSelection().getUniqueNode();
+                    var selectedMime = getAjxpMimeType(node);
+                    var nodeHasReadonly = node.getMetadata().get("ajxp_readonly") === "true";
                     var editors = pydio.Registry.findEditorsForMime(selectedMime);
                     if(editors.length){
                         var index = 0;
                         var sepAdded = false;
                         editors.each(function(el){
                             if(!el.openable) return;
+                            if(el.write && nodeHasReadonly) return;
                             if(el.mimes.include('*')){
                                 if(!sepAdded && index > 0){
                                     context.builderMenuItems.push({separator:true});
@@ -570,11 +573,11 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-				    if(ajaxplorer.getUserSelection()){
-				        var orig = ajaxplorer.getUserSelection().getSelectionSource();
+				    if(pydio.getUserSelection()){
+				        var orig = pydio.getUserSelection().getSelectionSource();
 				    }
 					var callback = function(node, newValue){
-					    if(!node) node = ajaxplorer.getUserSelection().getUniqueNode();
+					    if(!node) node = pydio.getUserSelection().getUniqueNode();
 						var filename = node.getPath();
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'rename');
@@ -582,16 +585,16 @@
 						conn.addParameter('filename_new', newValue);
 						conn.onComplete = function(transport){
 							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-							if(orig && ajaxplorer.getUserSelection()){
-								ajaxplorer.getUserSelection().setSelectionSource(orig);
+							if(orig && pydio.getUserSelection()){
+								pydio.getUserSelection().setSelectionSource(orig);
 							}
 						};
 						conn.sendAsync();
 					};
-					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
-					    ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
+					if(pydio.getUserSelection() && pydio.getUserSelection().getSelectionSource() && pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
+					    pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
                     }else{
-                        var test = ajaxplorer._focusables.detect(function(obj){return obj.hasFocus;});
+                        var test = pydio.UI._focusables.detect(function(obj){return obj.hasFocus;});
                         if (test && test.switchCurrentLabelToEdition){
                             test.switchCurrentLabelToEdition(callback);
                         }
