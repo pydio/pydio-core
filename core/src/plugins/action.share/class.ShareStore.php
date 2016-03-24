@@ -597,6 +597,9 @@ class ShareStore {
             }
 
             if(isSet($repo)){
+                if($newNode != null && $newNode->getLabel() != $oldNode->getLabel() && $repo->getDisplay() == $oldNode->getLabel()){
+                    $repo->setDisplay($newNode->getLabel());
+                }
                 $cFilter = $repo->getContentFilter();
                 $path = $repo->getOption("PATH", true);
                 $save = false;
