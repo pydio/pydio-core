@@ -152,7 +152,7 @@ class ZohoEditor extends AJXP_Plugin
                 'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
                 'output' => 'url',
                 'lang' => "en",
-                'filename' => urlencode(basename($file)),
+                'filename' => SystemTextEncoding::toUTF8(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
                 'mode' => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
