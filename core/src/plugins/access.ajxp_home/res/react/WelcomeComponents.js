@@ -141,7 +141,7 @@
                     <div className="videoCards">
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            youtubeId="ZuVKsIa4XdU"
+                            youtubeId="C6L_9QT0lDE"
                             contentMessageId="user_home.62"
                         />
                         <VideoCard
