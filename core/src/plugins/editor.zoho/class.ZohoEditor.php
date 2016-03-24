@@ -96,7 +96,11 @@ class ZohoEditor extends AJXP_Plugin
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-
+        if(AuthService::getLoggedUser() != null){
+            $repoWriteable = AuthService::getLoggedUser()->canWrite($repository->getId());
+        }else{
+            $repoWriteable = false;
+        }
         $selection = new UserSelection($repository, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
@@ -114,15 +118,16 @@ class ZohoEditor extends AJXP_Plugin
             }else{
                 $file = $selection->getUniqueFile();
             }
-            if(!is_readable($destStreamURL.$file)){
+            $nodeUrl = $destStreamURL.$file;
+            if(!is_readable($nodeUrl)){
                 throw new Exception("Cannot find file!");
             }
 
             $target = base64_decode($httpVars["parent_url"]);
-            $tmp = AJXP_MetaStreamWrapper::getRealFSReference($destStreamURL.$file);
+            $tmp = AJXP_MetaStreamWrapper::getRealFSReference($nodeUrl);
             $tmp = SystemTextEncoding::fromUTF8($tmp);
 
-            $node = new AJXP_Node($destStreamURL.$file);
+            $node = new AJXP_Node($nodeUrl);
             AJXP_Controller::applyHook("node.read", array($node));
             $this->logInfo('Preview', 'Posting content of '.$file.' to Zoho server', array("files" => $file));
 
@@ -131,7 +136,7 @@ class ZohoEditor extends AJXP_Plugin
             $httpClient->request_method = "POST";
 
             $secureToken = $httpVars["secure_token"];
-            $_SESSION["ZOHO_CURRENT_EDITED"] = $destStreamURL.$file;
+            $_SESSION["ZOHO_CURRENT_EDITED"] = $nodeUrl;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
 
             if ($this->getFilteredOption("USE_ZOHO_AGENT", $repository)) {
@@ -150,7 +155,7 @@ class ZohoEditor extends AJXP_Plugin
                 'filename' => urlencode(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
-                'mode' => 'normaledit',
+                'mode' => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
                 'saveurl'   => $saveUrl."?signature=".$b64Sig
             );
 
@@ -202,6 +207,12 @@ class ZohoEditor extends AJXP_Plugin
             $ext = pathinfo($targetFile, PATHINFO_EXTENSION);
             $node = new AJXP_Node($targetFile);
             $node->loadNodeInfo();
+
+            if(!$repoWriteable || !is_writeable($node->getUrl())){
+                $this->logError("Zoho Editor", "Trying to edit an unauthorized file ".$node->getUrl());
+                echo "NOT_ALLOWED";
+                return false;
+            }
             AJXP_Controller::applyHook("node.before_change", array(&$node));
 
             $b64Sig = $this->signID($id);
