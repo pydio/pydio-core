@@ -504,7 +504,9 @@
             $('home_center_panel').removeClassName('legend_visible');
         },
         onHoverLink:function(event, ws){
-            this.refs.legend.setWorkspace(ws);
+            bufferCallback('hoverWorkspaceTimer', 400, function(){
+                this.refs.legend.setWorkspace(ws);
+            }.bind(this));
         },
         onOutLink:function(event, ws){
             this.refs.legend.setWorkspace(null);
