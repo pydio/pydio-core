@@ -946,7 +946,10 @@ class ShareCenter extends AJXP_Plugin
                         $wsId = $sId;
                         if($type == "minisite"){
                             $minisiteData = $this->getShareStore()->loadShare($sId);
+                            if(empty($minisiteData) || !isset($minisiteData["REPOSITORY"])) continue;
                             $wsId = $minisiteData["REPOSITORY"];
+                        }else if($type == "ocs_remote"){
+                            continue;
                         }
                         $sharedNode = $metadata["SOURCE_NODE"];
                         $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));

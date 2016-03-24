@@ -212,16 +212,18 @@ class ZohoEditor extends AJXP_Plugin
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";
+                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
+                    AJXP_Controller::applyHook("node.change", array(null, &$node));
                 }
             } else {
                 if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext)) {
                     copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext, $targetFile);
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
                     echo "MODIFIED";
+                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
+                    AJXP_Controller::applyHook("node.change", array(null, &$node));
                 }
             }
-            $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
-            AJXP_Controller::applyHook("node.change", array(null, &$node));
         }
 
 
