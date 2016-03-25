@@ -597,8 +597,10 @@ class ShareStore {
             }
 
             if(isSet($repo)){
-                if($newNode != null && $newNode->getLabel() != $oldNode->getLabel() && $repo->getDisplay() == $oldNode->getLabel()){
-                    $repo->setDisplay($newNode->getLabel());
+                $oldNodeLabel = SystemTextEncoding::toUTF8($oldNode->getLabel());
+                $newNodeLabel = SystemTextEncoding::toUTF8($newNode->getLabel());
+                if($newNode != null && $newNodeLabel != $oldNodeLabel && $repo->getDisplay() == $oldNodeLabel){
+                    $repo->setDisplay($newNodeLabel);
                 }
                 $cFilter = $repo->getContentFilter();
                 $path = $repo->getOption("PATH", true);
@@ -612,7 +614,11 @@ class ShareStore {
                     }
                     $save = true;
                 }else if(!empty($path)){
-                    $path = preg_replace("#".preg_quote($oldNode->getPath(), "#")."$#", $newNode->getPath(), $path);
+
+                    $oldNodePath = SystemTextEncoding::toUTF8($oldNode->getPath());
+                    $newNodePath = SystemTextEncoding::toUTF8($newNode->getPath());
+
+                    $path = preg_replace("#".preg_quote($oldNodePath, "#")."$#", $newNodePath, $path);
                     $repo->addOption("PATH", $path);
                     $save = true;
                     $collectRepositories[$repo->getId()] = $path;
@@ -630,7 +636,9 @@ class ShareStore {
             } else {
 
                 if(isset($publicLink) && is_array($publicLink) && isSet($publicLink["FILE_PATH"])){
-                    $publicLink["FILE_PATH"] = str_replace($oldNode->getPath(), $newNode->getPath(), $publicLink["FILE_PATH"]);
+                    $oldNodePath = SystemTextEncoding::toUTF8($oldNode->getPath());
+                    $newNodePath = SystemTextEncoding::toUTF8($newNode->getPath());
+                    $publicLink["FILE_PATH"] = str_replace($oldNodePath, $newNodePath, $publicLink["FILE_PATH"]);
                     $this->deleteShare("file", $id);
                     $this->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
                     $privateShares[$id] = $data;
