@@ -369,6 +369,9 @@
 }
 #home_account_pane #ws_legend .repoInfoBadge.main .repoInfoBody {
   padding: 12px 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 #home_account_pane #ws_legend .repoInfoBadge.main .repoInfoHeader {
   padding-right: 8px;
@@ -435,7 +438,7 @@
 #videos_pane a {
   text-decoration: none;
 }
-#videos_pane div.icon-remove-sign {
+#videos_pane div.mdi.mdi-close {
   float: right;
   font-size: 1em;
   margin-right: 11px;

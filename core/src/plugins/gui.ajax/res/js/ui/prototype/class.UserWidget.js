@@ -88,7 +88,8 @@ Class.create("UserWidget", {
                 }
 
                 if (imgSrc != '') {
-                    img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
+                    var style = 'background-image: url(\''+imgSrc+'\')';
+                    img = '<div class="user_widget_mini" style="'+style+'"></div>';
                     label = '<i>' + img + displayName + '</i>';
                 }
 				var icon = this.options.iconClass || "icon-reorder";

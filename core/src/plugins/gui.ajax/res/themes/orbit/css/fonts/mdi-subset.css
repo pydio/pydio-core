@@ -47,3 +47,23 @@
 .mdi-calendar:before {
     content: "\f1e3";
 }
+
+.mdi-close:before {
+    content: "\f24c";
+}
+
+.mdi-close-box:before {
+    content: "\f24d";
+}
+
+.mdi-close-box-outline:before {
+    content: "\f24e";
+}
+
+.mdi-close-circle:before {
+    content: "\f24f";
+}
+
+.mdi-close-circle-outline:before {
+    content: "\f250";
+}

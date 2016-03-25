@@ -670,9 +670,13 @@
 
         render:function(){
             if(this.props.tooltip){
-                var style={};
-                if(this.state.show){
-                    style = {bottom: -10, top: 'inherit'};
+                var tooltipStyle={};
+                if(this.props.label){
+                    if(this.state.show){
+                        tooltipStyle = {bottom: -10, top: 'inherit'};
+                    }
+                }else{
+                    tooltipStyle = {position:'relative'};
                 }
                 var label;
                 if(this.props.label){
@@ -684,12 +688,12 @@
                     <span onMouseEnter={this.show} onMouseLeave={this.hide} style={style} className={this.props.className}>
                         {label}
                         {this.props.children}
-                        <ReactMUI.Tooltip label={this.props.tooltip} style={style} className={this.props.tooltipClassName} show={this.state.show}/>
+                        <ReactMUI.Tooltip label={this.props.tooltip} style={tooltipStyle} className={this.props.tooltipClassName} show={this.state.show}/>
                     </span>
                 );
             }else{
-                if(this.props.label) return <span>{this.props.label}</span>
-                else return <span>this.props.children</span>
+                if(this.props.label) return (<span>{this.props.label}</span>);
+                else return (<span>this.props.children</span>);
             }
         }
 

@@ -2545,22 +2545,45 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 #logging_string .user_widget_label {
   cursor: pointer;
   float: left;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 300;
-  padding: 3px 10px 7px 7px;
+  padding: 4px 10px 9px 7px;
+}
+#logging_string span.ajxp_icon_arrow {
+  display: none;
+}
+#logging_string span.icon-reorder {
+  float: right;
+  font-size: 15px;
+  display: inline-block;
+  margin: 0 0 0 12px;
 }
 #logging_string .user_widget_label.withImage {
   padding: 0;
   position: relative;
 }
+#logging_string .user_widget_label.withImage span.icon-reorder {
+  display: none;
+}
 #logging_string .user_widget_label.withImage i {
   display: inline-block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 300;
-  padding: 3px 0 0 8px;
+  padding: 6px 0 0 8px;
+  color: rgba(255, 255, 255, 0.9);
 }
-#logging_string img.user_widget_mini {
+#logging_string .user_widget_label.withImage i:hover {
+  color: white;
+}
+#logging_string div.user_widget_mini {
+  float: right;
+  width: 39px;
   height: 39px;
+  margin-top: -14px;
+  margin-left: 14px;
+  border-radius: 100%;
+  background-position: center center;
+  background-size: 100%;
   vertical-align: middle;
 }
 .droppableZone,

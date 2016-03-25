@@ -100,7 +100,7 @@
                 <div className="video-player" style={{position:'absolute', top:0, left:0, right:0, bottom:0, zIndex:200000}}>
                     <div className="overlay" style={{position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'black', opacity:0.4}}></div>
                     <iframe src={this.props.videoSrc} style={{position:'absolute', top:'10%', left:'10%', width:'80%', height:'80%', border:'0'}}></iframe>
-                    <a className="icon-remove-circle" style={{position:'absolute', right:'8%', top:'7%', color:'white', textDecoration:'none'}} onClick={this.props.closePlayer}/>
+                    <a className="mdi mdi-close" style={{position:'absolute', right:'8%', top:'7%', color:'white', textDecoration:'none'}} onClick={this.props.closePlayer}/>
                 </div>
             );
         }
@@ -139,7 +139,7 @@
                 <span>
                 {videoPlayer}
                 <div id="videos_pane" className={this.props.open?"open":"closed"}>
-                    <div onClick={this.closePane} className="icon-remove-sign"></div>
+                    <div onClick={this.closePane} className="mdi mdi-close"></div>
                     <div className="tutorial_title">{MessageHash['user_home.56']}</div>
                     <div className="videoCards">
                         <VideoCard
