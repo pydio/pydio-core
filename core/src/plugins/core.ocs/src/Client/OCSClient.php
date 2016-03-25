@@ -26,6 +26,7 @@ defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
 require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
 
 use AJXP_Utils;
+use GuzzleHttp\Exception\RequestException;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\ShareInvitation;
 use GuzzleHttp\Client as GuzzleClient;
@@ -43,13 +44,9 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public function sendInvitation(ShareInvitation $invitation)
     {
-        $url = rtrim($invitation->getTargetHost(), "/");
-        $path = parse_url($url, PHP_URL_PATH);
-        if($path == "/") $path = "";
-
-        $client = new GuzzleClient([
-            'base_url' => $url."/"
-        ]);
+        $url = $invitation->getTargetHost();
+        $client = self::getClient($url);
+        $path = self::getPath($url);
 
         $endpoints = self::findEndpointsForClient($client);
 
@@ -62,7 +59,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'remote' => AJXP_Utils::detectServerUrl(true)
         ];
 
-        $response = $client->post($path.$endpoints['share'], [
+        $response = $client->post(ltrim($path.$endpoints['share'], '/'), [
             'body' => $body
         ]);
 
@@ -83,17 +80,13 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public function cancelInvitation(ShareInvitation $invitation)
     {
-        $url = rtrim($invitation->getTargetHost(), "/");
-        $path = parse_url($url, PHP_URL_PATH);
-        if($path == "/") $path = "";
-
-        $client = new GuzzleClient([
-            'base_url' => $url."/"
-        ]);
+        $url = $invitation->getTargetHost();
+        $client = self::getClient($url);
+        $path = self::getPath($url);
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post($path.$endpoints['share'] . '/' . $invitation->getId() . '/unshare', [
+        $response = $client->post(ltrim($path.$endpoints['share'] . '/' . $invitation->getId() . '/unshare', '/'), [
             'body' => [
                 'token' => $invitation->getLinkHash()
             ]
@@ -116,9 +109,8 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public function acceptInvitation(RemoteShare $remoteShare)
     {
-        $client = new GuzzleClient([
-            'base_url' => $remoteShare->getOcsServiceUrl()."/"
-        ]);
+        $url = $remoteShare->getOcsServiceUrl();
+        $client = self::getClient($url);
 
         $response = $client->post($remoteShare->getOcsRemoteId() . '/accept', [
             'body' => [
@@ -143,9 +135,8 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public function declineInvitation(RemoteShare $remoteShare)
     {
-        $client = new GuzzleClient([
-            'base_url' => $remoteShare->getOcsServiceUrl()."/"
-        ]);
+        $url = $remoteShare->getOcsServiceUrl();
+        $client = self::getClient($url);
 
         $response = $client->post($remoteShare->getOcsRemoteId() . '/decline', [
             'body' => [
@@ -166,10 +157,7 @@ class OCSClient implements IFederated, IServiceDiscovery
      *
      */
     public static function findEndpointsForURL($url) {
-        $client = new GuzzleClient([
-            'base_url' => rtrim($url, "/") . "/"
-        ]);
-
+        $client = self::getClient($url);
         return self::findEndpointsForClient($client);
     }
 
@@ -183,8 +171,12 @@ class OCSClient implements IFederated, IServiceDiscovery
      */
     public static function findEndpointsForClient($client)
     {
-        // WARNING - This needs to be relative... :/
-        $response = $client->get('ocs-provider/');
+        try {
+            // WARNING - This needs to be relative... :/
+            $response = $client->get('ocs-provider/');
+        } catch (RequestException $e) {
+            throw new \Exception('Failed to communicate with ocs provider');
+        }
 
         if ($response->getStatusCode() != 200) {
             throw new \Exception('Could not get OCS Provider endpoints');
@@ -205,5 +197,27 @@ class OCSClient implements IFederated, IServiceDiscovery
         }
 
         return $response['services']['FEDERATED_SHARING']['endpoints'];
+    }
+
+    /**
+     * @param $url
+     * @return GuzzleClient
+     */
+    private static function getClient($url) {
+        $url = rtrim($url, "/");
+
+        return new GuzzleClient([
+            'base_url' => $url."/"
+        ]);
+    }
+
+    /**
+     * @param $url
+     * @return mixed|string
+     */
+    private static function getPath($url) {
+        $path = parse_url($url, PHP_URL_PATH);
+        if($path == "/" || $path === $url) return "";
+        return $path;
     }
 }

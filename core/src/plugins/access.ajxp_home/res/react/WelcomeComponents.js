@@ -381,6 +381,7 @@
             var blocks = [];
             var data = this.state.data;
             var usersData = data['core.users'];
+
             if(usersData && usersData['users'] != undefined && usersData['groups'] != undefined){
                 blocks.push(
                     <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash[527]} iconClass="mdi mdi-account-network">
@@ -399,6 +400,26 @@
                                             <div>{MessageHash[532]}</div>
                                             <div className="text-center">{usersData['groups']}</div>
                                         </div>;
+                                }
+                            })()}
+                        </div>
+                    </HomeWorkspaceLegendInfoBlock>
+                );
+            }
+            if(data['access.inbox']){
+                blocks.push(
+                    <HomeWorkspaceLegendInfoBlock key="core.users" badgeTitle={MessageHash['inbox_driver.2p']} iconClass="mdi mdi-file-multiple">
+                        <div className="table">
+                            <div>
+                                <div>{MessageHash['inbox_driver.16']}</div>
+                                <div className="text-center">{data['access.inbox']['files']}</div>
+                            </div>
+                            {(() => {
+                                if (this.state.workspace.getAccessStatus() > 0) {
+                                    return <div>
+                                        <div>{MessageHash['inbox_driver.17']}</div>
+                                        <div className="text-center">{this.state.workspace.getAccessStatus()}</div>
+                                    </div>;
                                 }
                             })()}
                         </div>

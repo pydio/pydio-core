@@ -603,7 +603,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
 
         // Building group by
-        if (!empty($q['where'])) {
+        if (!empty($q['groupBy'])) {
             $reqStr .= 'GROUP BY';
             $reqStr .= ' ';
             $reqStr .= join(', ', $q['groupBy']);
@@ -646,12 +646,12 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $object = ConfService::getRepositoryById($repositoryId);
         if(!$admin){
             if($object->securityScope() == "USER"){
-                if($details) return array('internal' => 1);
+                if($details) return array('users' => 1);
                 else return 1;
             }else if($object->securityScope() == "GROUP"){
                 // Count users from current group
                 $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
-                if($details) return array('internal' => $groupUsers);
+                if($details) return array('users' => $groupUsers);
                 else return $groupUsers;
             }
         }
