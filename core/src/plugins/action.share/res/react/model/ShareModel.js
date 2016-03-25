@@ -313,6 +313,13 @@
             return result;
         }
 
+        getOcsLinksByStatus() {
+            return this.getOcsLinks().sort(function(a, b) {
+                if (!a.invitation || !b.invitation) return 0
+                return b.invitation.STATUS - a.invitation.STATUS;
+            });
+        }
+
         userEntryForLink(linkId){
             var linkData;
             if(this._pendingData["ocs_links"] && this._pendingData["ocs_links"][linkId]){
@@ -546,7 +553,7 @@
             if(this._pendingData["ocs_links"][linkId]){
                 delete this._pendingData["ocs_links"][linkId];
             }
-            this._setStatus("modified");
+            this.save();
         }
 
         _ocsLinksToParameters(params){
@@ -706,6 +713,7 @@
                     this._pydio.fireNodeRefresh(this._node);
                 }else{
                     // There must have been an error, revert
+                    this.load();
                 }
             }.bind(this), null);
         }

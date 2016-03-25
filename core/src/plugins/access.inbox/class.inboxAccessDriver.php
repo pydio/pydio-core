@@ -56,6 +56,13 @@ class inboxAccessDriver extends fsAccessDriver
         }
     }
 
+    public function loadRepositoryInfo(&$data){
+        $allNodes = self::getNodes(false, false);
+        $data['access.inbox'] = array(
+            'files' => count($allNodes)
+        );
+    }
+
     public static function getNodeData($nodePath){
         $basename = basename(parse_url($nodePath, PHP_URL_PATH));
         if(empty($basename)){
@@ -94,7 +101,7 @@ class inboxAccessDriver extends fsAccessDriver
         return $nodeData;
     }
 
-    public static function getNodes($checkStats = false){
+    public static function getNodes($checkStats = false, $touch = true){
 
         if(isSet(self::$output)){
             return self::$output;
@@ -207,13 +214,15 @@ class inboxAccessDriver extends fsAccessDriver
         ConfService::loadDriverForRepository(ConfService::getRepository());
         self::$output = $output;
 
-        if(count($touchReposIds) && AuthService::getLoggedUser() != null){
-            $uPref = AuthService::getLoggedUser()->getPref("repository_last_connected");
-            if(empty($uPref)) $uPref = array();
-            foreach($touchReposIds as $rId){
-                $uPref[$rId] = time();
+        if ($touch) {
+            if (count($touchReposIds) && AuthService::getLoggedUser() != null) {
+                $uPref = AuthService::getLoggedUser()->getPref("repository_last_connected");
+                if (empty($uPref)) $uPref = array();
+                foreach ($touchReposIds as $rId) {
+                    $uPref[$rId] = time();
+                }
+                AuthService::getLoggedUser()->setPref("repository_last_connected", $uPref);
             }
-            AuthService::getLoggedUser()->setPref("repository_last_connected", $uPref);
         }
         return $output;
     }

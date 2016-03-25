@@ -18,4 +18,6 @@ $mess = array(
     "13" => "Files shared with me by other users",
     "14" => "Copy to a workspace",
     "15" => "Copy file to another of your workspaces",
+    "16" => "Total",
+    "17" => "New"
 );

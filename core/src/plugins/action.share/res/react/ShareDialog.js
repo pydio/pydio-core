@@ -299,7 +299,6 @@
             return {showMenu:false};
         },
         showMenu: function () {
-            console.log("show menu ? ");
             this.setState({showMenu: true});
         },
         /****************************/
@@ -345,7 +344,6 @@
                     return {text:text, payload:m.callback};
                 });
                 var menuBox = <ReactMUI.Menu onItemClick={this.menuClicked} zDepth={0} menuItems={menuItems}/>;
-                console.log("building menu");
             }
             return (
                 <div className="user-badge-menu-box">
@@ -604,9 +602,13 @@
             );
         },
 
-        render: function(){
+        render: function() {
+            var ocsLinks = this.props.shareModel.getOcsLinksByStatus(),
+                inv, rwHeader, hasActiveOcsLink = false;
 
-            var inv = this.props.shareModel.getOcsLinks().map(function(link){
+            inv = ocsLinks.map(function(link){
+                hasActiveOcsLink = (!hasActiveOcsLink && link && link.invitation && link.invitation.STATUS == 2) ? true : hasActiveOcsLink;
+
                 return (
                     <RemoteUserEntry
                         shareModel={this.props.shareModel}
@@ -616,15 +618,29 @@
                     />
                 );
             }.bind(this));
+
+            if(hasActiveOcsLink){
+                rwHeader = (
+                    <div>
+                        <div className="shared-users-rights-header">
+                            <span className="read">{this.context.getMessage('361', '')}</span>
+                            <span className="read">{this.context.getMessage('181')}</span>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
                 <div style={{marginTop:16}}>
                     <h3>{this.context.getMessage('207')}</h3>
                     <div className="section-legend">{this.context.getMessage('208')}</div>
                     {this.renderForm()}
-                    <div>{inv}</div>
+                    <div>
+                        {rwHeader}
+                        {inv}
+                    </div>
                 </div>
             );
-
         }
     });
 
