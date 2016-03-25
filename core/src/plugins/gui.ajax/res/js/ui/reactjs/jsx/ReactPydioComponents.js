@@ -656,7 +656,9 @@
         propTypes: {
             label:React.PropTypes.string,
             tooltip:React.PropTypes.string,
-            tooltipClassName:React.PropTypes.string
+            tooltipClassName:React.PropTypes.string,
+            className:React.PropTypes.string,
+            style:React.PropTypes.object
         },
 
         getInitialState:function(){
@@ -672,14 +674,22 @@
                 if(this.state.show){
                     style = {bottom: -10, top: 'inherit'};
                 }
+                var label;
+                if(this.props.label){
+                    label = <span className="ellipsis-label">{this.props.label}</span>;
+                }
+                var style = this.props.style || {position:'relative'};
+
                 return (
-                    <span onMouseEnter={this.show} onMouseLeave={this.hide} style={{position:'relative'}}>
-                        <span className="ellipsis-label">{this.props.label}</span>
+                    <span onMouseEnter={this.show} onMouseLeave={this.hide} style={style} className={this.props.className}>
+                        {label}
+                        {this.props.children}
                         <ReactMUI.Tooltip label={this.props.tooltip} style={style} className={this.props.tooltipClassName} show={this.state.show}/>
                     </span>
                 );
             }else{
-                return <span>{this.props.label}</span>
+                if(this.props.label) return <span>{this.props.label}</span>
+                else return <span>this.props.children</span>
             }
         }
 
