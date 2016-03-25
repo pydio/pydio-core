@@ -558,6 +558,15 @@ class ConfService
         }
     }
 
+    public static function detectSessionCorrupted($logMessage){
+        if(isSet($_SESSION["REPOSITORIES"])){
+            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            if(!$sessionNotCorrupted){
+                error_log("[session corrupted] ".$logMessage." ".$_GET["get_action"]."".$_POST["get_action"]);
+            }
+        }
+    }
+
     /**
      * @return Repository[]
      */
@@ -568,12 +577,17 @@ class ConfService
             if($sessionNotCorrupted){
                 $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
                 return $_SESSION["REPOSITORIES"];
-            }else if(isSet($this->configs["REPOSITORIES"])){
-                unset($this->configs["REPOSITORIES"]);
+            }else{
+                unset($_SESSION["REPOSITORIES"]);
             }
         }
         if (isSet($this->configs["REPOSITORIES"])) {
-            return $this->configs["REPOSITORIES"];
+            $configsNotCorrupted = array_reduce($this->configs["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            if($configsNotCorrupted){
+                return $this->configs["REPOSITORIES"];
+            }else{
+                unset($this->configs["REPOSITORIES"]);
+            }
         }
         $this->configs["REPOSITORIES"] = $this->initRepositoriesListInst();
         $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
