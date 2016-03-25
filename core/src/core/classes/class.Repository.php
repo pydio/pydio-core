@@ -713,4 +713,10 @@ class Repository implements AjxpGroupPathProvider
         return false;
     }
 
+    public function __sleep()
+    {
+        $this->driverInstance = null;
+        return array_keys(get_object_vars($this));
+    }
+
 }
