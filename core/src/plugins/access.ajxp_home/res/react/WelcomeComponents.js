@@ -43,16 +43,19 @@
             configHref:React.PropTypes.string,
             containerClassName:React.PropTypes.string,
             iconClassName:React.PropTypes.string,
-            messageId:React.PropTypes.string
+            messageId:React.PropTypes.string,
+            tooltipId:React.PropTypes.string
         },
 
         render: function(){
             return (
-                <div id={this.props.id}>
-                    <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
-                    <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
-                    <div>{MessageHash[this.props.messageId]}</div>
-                </div>
+                <ReactPydio.LabelWithTip className="dl_tooltip_container" tooltip={MessageHash[this.props.tooltipId]}>
+                    <div id={this.props.id}>
+                        <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
+                        <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
+                        <div style={{color:'white'}}>{MessageHash[this.props.messageId]}</div>
+                    </div>
+                </ReactPydio.LabelWithTip>
             );
         }
     });
@@ -257,6 +260,7 @@
                         containerClassName="icon-tablet"
                         iconClassName="icon-apple"
                         messageId="user_home.59"
+                        tooltipId="user_home.70"
                     />
 
                 );
@@ -271,6 +275,7 @@
                         containerClassName="icon-mobile-phone"
                         iconClassName="icon-android"
                         messageId="user_home.58"
+                        tooltipId="user_home.71"
                     />
                 );
             }
@@ -284,6 +289,7 @@
                         containerClassName="icon-laptop"
                         iconClassName="icon-windows"
                         messageId="user_home.61"
+                        tooltipId="user_home.68"
                     />
                 );
             }
@@ -297,6 +303,7 @@
                         containerClassName="icon-desktop"
                         iconClassName="icon-apple"
                         messageId="user_home.60"
+                        tooltipId="user_home.69"
                     />
                 );
             }
@@ -307,9 +314,8 @@
 
             return (
                 <div id="tutorial_dl_apps_pane">
-                    <div id="dl_pydio_cont">
-                        <div id="dl_pydio_for">{MessageHash['user_home.57']}</div>
-                        {syncBlocks} {blocksSep} {mobileBlocks}
+                    <div id="dl_pydio_cont" className="react-mui-context">
+                        {syncBlocks}{blocksSep}{mobileBlocks}
                     </div>
                 </div>
             );
@@ -419,17 +425,31 @@
                 );
             }
 
+            if(blocks.length == 1){
+                blocks.push(<div className="repoInfoBadge" style={{visibility:'hidden'}}></div>);
+            }
+
             return (
                 <div id="ws_legend">
-                    {this.state.workspace.getLabel()}
-                    <small>{this.state.workspace.getDescription()}</small>
+                    <div className={"repoInfoBadge main size-"+(blocks.length)}>
+                        <div className="repoInfoBox flexbox">
+                            <div className="repoInfoBody content">
+                                <h4>{this.state.workspace.getLabel()}</h4>
+                                {this.state.workspace.getDescription()}
+                            </div>
+                            <div className="repoInfoHeader row header">
+                            <span className="repoInfoTitle">
+                                <span className="enter_save_choice" style={{lineHeight: '0.5em'}}>
+                                    <input type="checkbox" ref="save_ws_choice" id="save_ws_choice"/>
+                                    <label htmlFor="save_ws_choice">{MessageHash['user_home.41']}</label>
+                                </span>
+                                <a onClick={this.enterWorkspace}>{MessageHash['user_home.42']}</a>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
                     <div className="repoInfo">
                     {blocks}
-                    </div>
-                    <div className="enter_save_choice" style={{lineHeight: '0.5em'}}>
-                        <input type="checkbox" ref="save_ws_choice" id="save_ws_choice"/>
-                        <label htmlFor="save_ws_choice">{MessageHash['user_home.41']}</label>
-                        <a onClick={this.enterWorkspace}>{MessageHash['user_home.42']}</a>
                     </div>
                 </div>
             )
@@ -438,19 +458,21 @@
 
     var HomeWorkspaceLegendInfoBlock = React.createClass({
         render:function(){
-            return <div className="repoInfoBadge">
-                <div className="repoInfoBox flexbox">
-                    <div className="repoInfoHeader row header">
-                        <span className="repoInfoTitle">
-                            {this.props.badgeTitle}
-                        </span>
-                        <span className={this.props.iconClass}></span>
-                    </div>
-                    <div className="repoInfoBody row content">
-                        {this.props.children}
+            return (
+                <div className="repoInfoBadge">
+                    <div className="repoInfoBox flexbox">
+                        <div className="repoInfoBody row content">
+                            {this.props.children}
+                        </div>
+                        <div className="repoInfoHeader row header">
+                            <span className="repoInfoTitle">
+                                {this.props.badgeTitle}
+                            </span>
+                            <span className={this.props.iconClass}/>
+                        </div>
                     </div>
                 </div>
-            </div>
+            );
         }
     });
 

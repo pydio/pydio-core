@@ -79,4 +79,8 @@ $mess=array(
 <li>Protéger l'application avec un code PIN</li>
 <li>Utiliser les favoris et le moteur de recherche</li></ul>",
 "67"=> "Vous n'êtes pas %s, %logout.",
+"68"=> "Télécharger l'appli de synchro (Windows)",
+"69"=> "Télécharger l'appli de synchro (Mac)",
+"70"=> "Application pour smarthpones iOS",
+"71"=> "Application pour smarthpones Android",
 );

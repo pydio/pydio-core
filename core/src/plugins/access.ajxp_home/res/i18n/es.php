@@ -84,5 +84,9 @@ $mess=array(
 				<li>Protegiendo la aplicación mediante un código PIN</li>
 				<li>Usando marcadores y el motor de búsqueda</li></ul>",
     "67"=> "¿No eres %s? %logout",
+    "68"=> "Download Sync Client for Windows",
+    "69"=> "Download Sync Client for Mac OSX",
+    "70"=> "Native application for iOS devices",
+    "71"=> "Native application for Android Devices",
 
 );

@@ -80,6 +80,10 @@ $mess=array(
 <li>Bescherm de app met een PIN-code</li>
 <li>Gebruik favorieten en zoekmachine</li></ul>",
 "67"=> "Als je niet %s bent, %logout.",
+    "68"=> "Download Sync Client for Windows",
+    "69"=> "Download Sync Client for Mac OSX",
+    "70"=> "Native application for iOS devices",
+    "71"=> "Native application for Android Devices",
 
 );
 
