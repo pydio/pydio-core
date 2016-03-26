@@ -1151,7 +1151,10 @@
         },
 
         removeRow:function(index){
-            var instances = LangUtils.arrayWithout(this.instances(), index);
+            var instances = this.instances();
+            var removeInst = instances[index];
+            instances = LangUtils.arrayWithout(this.instances(), index);
+            instances.push(removeInst);
             this.indexValues(instances, true);
         },
 
