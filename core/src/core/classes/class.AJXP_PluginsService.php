@@ -237,7 +237,16 @@ class AJXP_PluginsService
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_QUERIES_CACHE);
         @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
-        @unlink(AJXP_PLUGINS_REPOSITORIES_CACHE);
+        if(@unlink(AJXP_PLUGINS_REPOSITORIES_CACHE)){
+            $content = "<?php \n";
+            $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/repositories.php");
+            if($boots !== false){
+                foreach($boots as $b){
+                    $content .= 'require_once("'.$b.'");'."\n";
+                }
+            }
+            @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
+        }
     }
 
     /**
