@@ -129,7 +129,7 @@
             var params = {
                 get_action:"send_mail",
                 'emails[]': Object.keys(this.state.users),
-                mailer_input_field:this.state.subject,
+                subject:this.state.subject,
                 message:this.state.message
             };
             if(this.props.link){
