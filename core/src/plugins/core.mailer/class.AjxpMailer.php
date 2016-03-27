@@ -69,7 +69,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $resultsSQL = $querySQL->fetchAll();
             $arrayResultsSQL = array();
             $output = array("success" => [], "error" => []);
-            $useHtml = true;
+            $recipientFormats = array();
             if (count($resultsSQL) > 0) {
                 foreach ($resultsSQL as $value) {
                     $ajxpNotification = unserialize($value["notification_object"]);
@@ -92,20 +92,15 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     }else{
                         $ajxpNodeWorkspace = "Deleted Workspace";
                     }
-                    if(!$value["html"]){
-                        $useHtml = false;
-                    }
-                    $ajxpKey = $value["html"]."|".$ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
+                    $recipientFormats[$value['recipient']] = ($value["html"] == 1);
+                    $ajxpKey = $ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
                     $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
-                if($useHtml){
-                    $body = '<style>h1{font-size: 1.3em;border-bottom: 1px solid #555555;padding-bottom: 4px;font-weight: normal;color: #555555;}ul{list-style-type: none;padding: 0;margin-bottom: 50px;}*{font-family: Arial;font-size: 14px;color: #555;}li{margin: 20px 0px;}h1 em{font-size: 1em;color: #E35D52;font-weight: normal;}em{font-style: normal;font-weight: bold;}</style>';
-                }else{
-                    $body = '';
-                }
                 $digestTitle = ConfService::getMessages()["core.mailer.9"];
                 foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
+                    $useHtml = $recipientFormats[$recipient];
+                    $body = $useHtml ? "<div id='digest'>" : "";
                     foreach ($arrayWorkspace as $workspace => $arrayAjxpKey) {
                         $key = key($arrayAjxpKey);
                         $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
@@ -114,6 +109,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         }
                         $body = $body . '</ul>';
                     }
+                    $body .= $useHtml ? "</div>" : "";
                     try {
                         $mailer->sendMail(array($recipient),
                             $digestTitle,
@@ -297,16 +293,26 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         if (!empty($layoutFolder)) {
             $layoutFolder .= "/";
             $lang = ConfService::getLanguage();
-            if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")) {
-                $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html"));
-            } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")) {
-                $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html"));
+            if(!$useHtml){
+                if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt"));
+                } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.txt")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.txt"));
+                } else{
+                    $layout = "AJXP_MAIL_BODY";
+                }
+            }else{
+                if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html"));
+                } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html"));
+                }
             }
         }
         if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
-            $body = str_replace("AJXP_MAIL_BODY", nl2br($body), $layout);
+            $body = str_replace("AJXP_MAIL_BODY", $useHtml?nl2br($body):$body, $layout);
         }
-        if ($imageLink != null) {
+        if ($imageLink != null && $useHtml) {
             $body = str_replace(array("AJXP_IMAGE_LINK"), "<a href='".$imageLink."'>".'<img alt="Download" width="100" style="width: 100px;" src="cid:download_id">'."</a>", $body);
             $images[] = array("path" => AJXP_INSTALL_PATH."/".$layoutFolder."/download.png", "cid" => "download_id");
         } else {
@@ -449,9 +455,9 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 
     public static function simpleHtml2Text($html){
 
-        $html = preg_replace('/<br\>/', '\n', $html);
-        $html = preg_replace('/<br>/', '\n', $html);
-        $html = preg_replace('/<li>/', '\n * ', $html);
+        $html = preg_replace('/<br\>/', "\n", $html);
+        $html = preg_replace('/<br>/', "\n", $html);
+        $html = preg_replace('/<li>/', "\n * ", $html);
         $html = preg_replace('/<\/li>/', '', $html);
         return strip_tags($html);
     }

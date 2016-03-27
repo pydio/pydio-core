@@ -72,7 +72,7 @@ class PhpMailLiteMailer extends AjxpMailer
             }
             $mail->AltBody = AjxpMailer::simpleHtml2Text($mail->Body);
         }else{
-            $mail->Body = $mail->AltBody = AjxpMailer::simpleHtml2Text($body);
+            $mail->Body = AjxpMailer::simpleHtml2Text($body);
         }
 
         if (!$mail->Send()) {
