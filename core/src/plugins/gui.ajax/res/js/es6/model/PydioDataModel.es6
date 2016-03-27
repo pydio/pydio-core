@@ -432,6 +432,18 @@ class PydioDataModel extends Observable{
 	 * @param source String The source of this selection action
 	 */
 	setSelectedNodes (ajxpDataNodes, source){
+        if(this._selectedNodes.length == ajxpDataNodes.length){
+            if(ajxpDataNodes.length === 0) {
+                return;
+            }
+            var equal = true;
+            for(var k=0;k<ajxpDataNodes.length;k++){
+                equal = equal && ajxpDataNodes[k] == this._selectedNodes[k];
+            }
+            if(equal){
+                return;
+            }
+        }
 		if(!source){
 			this._selectionSource = {};
 		}else{

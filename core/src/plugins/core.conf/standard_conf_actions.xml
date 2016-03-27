@@ -648,8 +648,8 @@
             <infoPanelExtension mime="ajxp_root_node" attributes="">
                 <messages>
                     <message key="shared_string" id="527"/>
-                    <message key="internal_string" id="528"/>
-                    <message key="external_string" id="530"/>
+                    <message key="internal_string" id="531"/>
+                    <message key="external_string" id="532"/>
                 </messages>
                 <html><![CDATA[
                     <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
@@ -668,10 +668,10 @@
                                     $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
                                     if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
                                         var data = transport.responseJSON;
-                                        if(!data['core.users']['external']){
-                                            data['core.users']['external'] = 0;
+                                        if(!data['core.users']['groups']){
+                                            data['core.users']['groups'] = 0;
                                         }
-                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
+                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['users'] + ' <br/> #{external_string}: ' + data['core.users']['groups']);
                                     }
                                 };
                                 conn.sendAsync();

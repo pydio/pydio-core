@@ -389,7 +389,7 @@ class serialConfDriver extends AbstractConfDriver
      */
     public function countUsersForRepository($repositoryId, $details = false, $admin=false){
         $c = count($this->getUsersForRepository($repositoryId));
-        if($details) return array("internal" => $c);
+        if($details) return array("users" => $c);
         else return $c;
     }
 
