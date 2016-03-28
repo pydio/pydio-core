@@ -37,7 +37,7 @@ function securePath($path)
     return $path;
 }
 $vars = array_merge($_GET, $_POST);
-$whiteList = explode(",","xls,xlsx,ods,sxc,csv,tsv,ppt,pps,odp,sxi,doc,docx,rtf,odt,sxw");
+$whiteList = explode(",","xls,xlsx,ods,sxc,csv,tsv,ppt,pptx,pps,odp,sxi,doc,docx,rtf,odt,sxw");
 if (!isSet($vars["ajxp_action"]) && isset($vars["id"]) && isset($vars["format"]) && in_array($vars["format"], $whiteList)) {
 
     $sig = base64_decode($vars["signature"]);

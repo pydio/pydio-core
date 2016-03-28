@@ -364,10 +364,22 @@ class Repository implements AjxpGroupPathProvider
         }
         if (!$safe && $this->inferOptionsFromParent) {
             if (isSet($parentTemplateObject)) {
-                $value = $parentTemplateObject->getOption($oName, $safe);
-                if (is_string($value) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) {
-                    $val = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $value), "/")."/".$this->options[$oName];
-                    return AJXP_Utils::securePath($val);
+                $pvalue = $parentTemplateObject->getOption($oName, $safe);
+                $pathChanged = false;
+                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_UUID") !== false) {
+                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_UUID", $this->getUniqueId(), $pvalue), "/");
+                    $pathChanged = true;
+                }
+                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_SLUG") !== false) {
+                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $this->getSlug(), $pvalue), "/");
+                    $pathChanged = true;
+                }
+                if (is_string($pvalue) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) {
+                    $pvalue = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $pvalue), "/")."/".$this->options[$oName];
+                    $pathChanged = true;
+                }
+                if ($pathChanged) {
+                    return AJXP_Utils::securePath($pvalue);
                 }
             }
         }

@@ -107,7 +107,7 @@ class ZohoEditor extends AJXP_Plugin
         if ($action == "post_to_zohoserver") {
 
             $sheetExt =  explode(",", "xls,xlsx,ods,sxc,csv,tsv");
-            $presExt = explode(",", "ppt,pps,odp,sxi");
+            $presExt = explode(",", "ppt,pptx,pps,odp,sxi");
             $docExt = explode(",", "doc,docx,rtf,odt,sxw");
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
@@ -125,7 +125,7 @@ class ZohoEditor extends AJXP_Plugin
 
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($nodeUrl);
-            $tmp = SystemTextEncoding::fromUTF8($tmp);
+            //$tmp = SystemTextEncoding::fromUTF8($tmp);
 
             $node = new AJXP_Node($nodeUrl);
             AJXP_Controller::applyHook("node.read", array($node));
@@ -150,7 +150,7 @@ class ZohoEditor extends AJXP_Plugin
                 'id' => $_SESSION["ZOHO_CURRENT_UUID"],
                 'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
                 'output' => 'url',
-                'lang' => "en",
+                'lang' => $this->getFilteredOption("ZOHO_LANGUAGE"),
                 'filename' => SystemTextEncoding::toUTF8(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
