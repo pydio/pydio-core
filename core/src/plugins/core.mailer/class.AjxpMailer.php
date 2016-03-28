@@ -105,7 +105,18 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         $key = key($arrayAjxpKey);
                         $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
                         foreach ($arrayAjxpKey as $ajxpKey => $arrayNotif) {
-                            $body = $body . '<li>' . $arrayNotif[0]->getDescriptionLong(true) . ' (' . count($arrayNotif) . ')</li>';
+                            $descs = array();
+                            foreach($arrayNotif as $notif){
+                                $desc = $notif->getDescriptionLong(true);
+                                if(array_key_exists($desc, $descs)){
+                                    $descs[$desc] ++;
+                                }else{
+                                    $descs[$desc] = 1;
+                                }
+                            }
+                            foreach($descs as $sentence => $occurences){
+                                $body = $body . '<li>' . $sentence . ($occurences > 1 ? ' ('.count($arrayNotif).')' :'').'</li>';
+                            }
                         }
                         $body = $body . '</ul>';
                     }
