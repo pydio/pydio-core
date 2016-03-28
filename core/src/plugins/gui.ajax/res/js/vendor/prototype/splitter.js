@@ -237,7 +237,7 @@ Class.create("Splitter", AjxpPane, {
         var options = {
             name: oThis.htmlElement.id + '_folding_action',
             src:'view_left_close.png',
-            icon_class:'icon-remove-sign',
+            icon_class:'mdi mdi-close',
             text_id:(oThis.options.foldingButtonText?oThis.options.foldingButtonText:416),
             title_id:(oThis.options.foldingButtonText?oThis.options.foldingButtonText:415),
             text:MessageHash[(oThis.options.foldingButtonText?oThis.options.foldingButtonText:416)],
@@ -270,7 +270,7 @@ Class.create("Splitter", AjxpPane, {
             var options2 = {
                 name:'folding_close_action',
                 src:'view_left_close.png',
-                icon_class:'icon-remove-sign',
+                icon_class:'mdi mdi-close',
                 text_id:416,
                 title_id:415,
                 text:MessageHash[416],
@@ -388,7 +388,7 @@ Class.create("Splitter", AjxpPane, {
         }else{
             this.getFoldingAction().setIconSrc(
                 'view_left_'+ (state?'right':'close') + '.png',
-                (state?(pane == this.paneA?'icon-caret-right':'icon-caret-left'):'icon-remove-sign'));
+                (state?(pane == this.paneA?'icon-caret-right':'icon-caret-left'):'mdi mdi-close'));
         }
         if(pane == this.paneA && $(this.paneA).ajxpPaneObject){
             $(this.paneA).ajxpPaneObject.resize();

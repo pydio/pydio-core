@@ -67,13 +67,13 @@ Class.create("AbstractEditor" , {
             this.defaultActions = new Hash({
                 'fs' : '<a id="fsButton" class="icon-resize-full"><span message_id="235"></span></a>',
                 'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><span message_id="236"></span></a>',
-                'close':'<a id="closeButton" class="icon-remove-sign"><span message_id="86"></span></a>'
+                'close':'<a id="closeButton" class="mdi mdi-close-circle"><span message_id="86"></span></a>'
             });
         }else{
             this.defaultActions = new Hash({
                 'fs' : '<a id="fsButton" class="icon-resize-full"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
                 'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
-                'close':'<a id="closeButton" class="icon-remove-sign"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
+                'close':'<a id="closeButton" class="mdi mdi-close-circle"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
             });
         }
         if(!this.editorOptions.closable){

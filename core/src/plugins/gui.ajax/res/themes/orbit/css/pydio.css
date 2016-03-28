@@ -1990,6 +1990,7 @@ div#upload_files_list span.item-indent {
   margin-right: 3px;
 }
 div#upload_files_list span.icon-remove-sign,
+div#upload_files_list span.mdi-close,
 div#upload_files_list span.icon-ok {
   color: rgba(0, 0, 0, 0.53);
   display: block;
@@ -1999,7 +2000,8 @@ div#upload_files_list span.icon-ok {
   top: 2px;
   cursor: pointer;
 }
-div#upload_files_list span.icon-remove-sign:hover {
+div#upload_files_list span.icon-remove-sign:hover,
+div#upload_files_list span.mdi-close:hover {
   color: #d00;
 }
 div#multiple_download_container div {
@@ -2720,7 +2722,8 @@ div.selection_ctrl_key {
   padding: 15px 10px 10px;
   color: white;
 }
-#search_container #search_results_cont .close_results.icon-remove-sign {
+#search_container #search_results_cont .close_results.icon-remove-sign,
+#search_container #search_results_cont .close_results.mdi-close {
   position: absolute;
   display: inline-block;
   right: 13px;

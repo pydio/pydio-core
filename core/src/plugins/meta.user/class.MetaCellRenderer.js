@@ -353,9 +353,9 @@ Class.create("MetaCellRenderer", {
         var values = $A(value.split(",")).invoke("strip");
         element.update('');
         values.each(function(v){
-            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='icon-remove' style='cursor: pointer;'></span>");
+            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='mdi mdi-close' style='cursor: pointer;'></span>");
             element.insert(tag);
-            var remove = tag.down(".icon-remove");
+            var remove = tag.down(".mdi-close");
             remove.observe("click", function(){
                 var conn = new Connexion();
                 conn.setParameters($H({

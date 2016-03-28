@@ -1149,7 +1149,7 @@
                     this.props.shareModel.setExpirationFor(linkId, "days", "");
                     this.refs['expirationDate'].getDOMNode().querySelector(".mui-text-field-input").value = "";
                 }.bind(this);
-                calIcon = <span className="ajxp_icon_span icon-remove-sign" onClick={clearValue}/>;
+                calIcon = <span className="ajxp_icon_span mdi mdi-close-circle" onClick={clearValue}/>;
                 var calLabel = <span className="calLabelHasValue">{this.context.getMessage(dateExpired?'21b':'21')}</span>
             }
             if(dlLimitValue){

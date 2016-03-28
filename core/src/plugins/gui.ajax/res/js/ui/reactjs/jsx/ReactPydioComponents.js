@@ -92,7 +92,7 @@
 
             var remove;
             if(this.props.removable){
-                remove = <span className="button icon-remove-sign" onClick={this.removeClicked}></span>
+                remove = <span className="button mdi mdi-close" onClick={this.removeClicked}></span>
             }
             return connectDragSource(connectDropTarget(
                 <ReactMUI.Paper zDepth={1} style={{opacity:isDragging?0:1}}>
@@ -109,7 +109,7 @@
         render: function(){
             var remove;
             if(this.props.removable){
-                remove = <span className="button icon-remove-sign" onClick={this.removeClicked}></span>
+                remove = <span className="button mdi mdi-close" onClick={this.removeClicked}></span>
             }
             return (
                 <ReactMUI.Paper zDepth={1}>

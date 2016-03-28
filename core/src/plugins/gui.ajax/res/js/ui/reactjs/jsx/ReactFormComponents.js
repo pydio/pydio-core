@@ -637,7 +637,7 @@
                             {icons}
                         </FileDropzone>
                     </form>
-                    <div className="binary-remove-button" onClick={this.clearImage}><span key="remove" className="icon-remove-sign"></span> RESET</div>
+                    <div className="binary-remove-button" onClick={this.clearImage}><span key="remove" className="mdi mdi-close"></span> RESET</div>
                     <iframe style={{display:"none"}} id="uploader_hidden_iframe" name="uploader_hidden_iframe"></iframe>
                 </div>
             );
@@ -878,7 +878,7 @@
                 helper = (
                     <div>
                         <div className="helper-title">
-                            <span className="helper-close icon-remove-sign" onClick={this.closeHelper}></span>
+                            <span className="helper-close mdi mdi-close" onClick={this.closeHelper}></span>
                             Pydio Companion
                         </div>
                         <div className="helper-content">

@@ -113,7 +113,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             new klass(td, tabInfo.ajxpOptions);
             tabInfo.headerElement = td;
             if(tabInfo.closeable){
-                td.insert(new Element('span', {className:'icon-remove tab_close_button'}));
+                td.insert(new Element('span', {className:'mdi mdi-close tab_close_button'}));
                 td.down('.tab_close_button').observe('click', function(){
                     this.closeTab(tabInfo.id);
                 }.bind(this));
@@ -149,7 +149,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 this.switchTabulator(tabInfo.id);
             }.bind(this) );
             if(tabInfo.closeable){
-                td.insert(new Element('span', {className:'icon-remove tab_close_button'}));
+                td.insert(new Element('span', {className:'mdi mdi-close tab_close_button'}));
                 td.down('.tab_close_button').observe('click', function(){
                     this.closeTab(tabInfo.id);
                 }.bind(this));

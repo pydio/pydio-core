@@ -2440,7 +2440,9 @@ div#upload_files_list span.item_relative_path{
     display:none;
 }
 
-#upload_files_list span.icon-remove-sign {
+#upload_files_list span.icon-remove-sign,
+#upload_files_list span.mdi.mdi-close
+{
     color: #ccc;
     display: block;
     float: right;
@@ -2448,7 +2450,9 @@ div#upload_files_list span.item_relative_path{
     cursor: pointer;
 }
 
-#upload_files_list span.icon-remove-sign:hover{
+#upload_files_list span.icon-remove-sign:hover,
+#upload_files_list span.mdi.mdi-close:hover
+{
     color: #d00;
 }
 
@@ -3002,7 +3006,9 @@ span.search_meta_opt.checked > span {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
-.close_results.icon-remove-sign {
+.close_results.icon-remove-sign,
+.close_results.mdi.mdi-close
+{
     float: right;
     display: inline-block;
     padding: 2px 5px;

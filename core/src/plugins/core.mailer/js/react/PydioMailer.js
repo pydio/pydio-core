@@ -51,7 +51,7 @@
             var clik = function(){};
             if(this.state && this.state.remove){
                 clik = this.remove;
-                icon = <span className="avatar icon-remove"/>;
+                icon = <span className="avatar mdi mdi-close"/>;
                 className += ' remove';
             }else{
                 icon = <span className={"avatar icon-" + (this.props.user.getTemporary()?"envelope":"user")}/>;

@@ -523,7 +523,7 @@ Class.create("XHRUploader", {
 			style : '-moz-border-radius:3px;border-radius:3px;float:left;margin:1px 7px 2px 0px;padding:3px;width:16px;background-position:center top;',
 			title : MessageHash[257]
 		});
-        delButton = new Element("span", {className:"icon-remove-sign"}).update(delButton);
+        delButton = new Element("span", {className:"mdi mdi-close"}).update(delButton);
 		delButton.observe("click", function(e){
 			if(item.xhr){
 				try{

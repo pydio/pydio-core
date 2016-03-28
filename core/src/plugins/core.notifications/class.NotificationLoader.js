@@ -112,7 +112,7 @@ Class.create("NotificationLoader", {
                 var alertID = parseInt(el.getMetadata().get("alert_id"));
                 moreActions.push({
                     name:MessageHash["notification_center.7"],
-                    icon_class:"icon-remove-sign",
+                    icon_class:"mdi mdi-close-circle",
                     callback:function(e){
                         Event.stop(e);
                         Effect.Fade(e.target.up('li'));
