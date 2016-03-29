@@ -59,8 +59,8 @@ $mess=array(
 "Page size of LDAP Server" => "Anahl an Objekten, die bei einer Abfrage vom LDAP-Server geladen werden (PageSize)",
 "Search Users by Attribute" => "Attribut für Suche",
 "When looking for a user through autocomplete, search on a specific parameter instead of user ID" => "Benutzer über die Autovervollständigung anhand eines bestimmten Attributs suchen, statt über die Benutzer-ID.",
-"Fake Member from..." => "Fake Member from...",
-"If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema." => "If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema.",
-"Role Prefix (for memberof)" => "Role Prefix (for memberof)",
-"Role prefix when you mapping memberof => roleID" => "Role prefix when you mapping memberof => roleID",
+"Fake Member from..." => "Fake-Mitglied von...",
+"If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema." => "Falls es kein 'memberOf'-Attribut gibt kann es mit dieser Einstellung ein Attribut festgelegt werden. Geben Sie den Namen des Attributs ein, das abhängig vom Schema entweder MemberId, MemberUid oder das Member enthält.",
+"Role Prefix (for memberof)" => "Rollen-Prefix (von memberOf)",
+"Role prefix when you mapping memberof => roleID" => "Rollen-Prefix beim Mapping von memberof auf roleID",
 );

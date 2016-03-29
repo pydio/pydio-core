@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Tabelle erstellen",
-"2" => "SQL Abfrage hier eingeben",
+"2" => "SQL-Abfrage hier eingeben",
 "3"	=> "Suchen",
 "4"	=> "Löschen"
 );

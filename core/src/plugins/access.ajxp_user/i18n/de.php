@@ -20,7 +20,7 @@
 */
 $mess=array(
 "title"=> "Mein Dashboard",
-"desc" => "Verwalte meine Kontoeinstellungen, mein Adressbuch, geteilte Elemente, etc.",
+"desc" => "Mein Benutzerkonto, Adressbuch, Freigaben, etc. verwalten",
 "1" => "Freigegebene Benutzer",
 "2" => "Freigegebene Ordner",
 "3" => "Freigegebene Dateien",
