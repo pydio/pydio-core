@@ -20,9 +20,8 @@ div#overlay.form-login_form_dynamic {
 }
 #browser {
   font-family: Roboto, sans-serif;
-  -webkit-box-orient: vertical !important;
-  -webkit-box-direction: normal !important;
-          flex-direction: column !important;
+  -ms-flex-direction: column !important;
+      flex-direction: column !important;
   -webkit-flex-direction: column !important;
   -webkit-font-smoothing: antialiased;
 }
