@@ -128,7 +128,7 @@ class customDbAuthDriver extends AbstractAuthDriver
         return $res->fetchSingle();
     }
 
-    public function listUsers($baseGroup="/")
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         return $this->listUsersPaginated($baseGroup, null, 0, -1);
     }

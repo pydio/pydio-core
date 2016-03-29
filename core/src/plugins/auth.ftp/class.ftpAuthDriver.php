@@ -49,7 +49,7 @@ class ftpAuthDriver extends AbstractAuthDriver
         AJXP_PluginsService::findPluginById("authfront.webftp")->enabled = true;
     }
 
-    public function listUsers()
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
         if (isSet($this->options["ADMIN_USER"])) {

@@ -165,7 +165,7 @@ class imapAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false)
+    public function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHandle = null)
     {
         if($foldersOnly) return 0;
         // WILL USE IMAP FUNCTIONS TO COUNT;

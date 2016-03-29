@@ -84,7 +84,7 @@ class cmsmsAuthDriver extends AbstractAuthDriver
 
     }
 
-    public function listUsers()
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $res = dibi::query("SELECT * FROM [".$this->prefix."module_feusers_users], [".$this->prefix."module_feusers_belongs] WHERE id = userid AND groupid=%s", $this->groupid);
         $pairs = $res->fetchPairs('username', 'password');

@@ -114,7 +114,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         return true;
     }
 
-    public function listUsers()
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
         if (AuthService::ignoreUserCase()) {
@@ -143,7 +143,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
         return $result;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive=true)
     {
         return count($this->listUsersPaginated($baseGroup, $regexp));
     }

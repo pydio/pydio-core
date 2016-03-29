@@ -29,7 +29,7 @@ class smbAuthDriver extends AbstractAuthDriver
 {
     public $driverName = "smb";
 
-    public function listUsers()
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $adminUser = $this->options["ADMIN_USER"];
         return array($adminUser => $adminUser);
