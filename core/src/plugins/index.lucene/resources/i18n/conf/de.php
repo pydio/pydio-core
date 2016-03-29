@@ -20,11 +20,11 @@
 */
 $mess=array(
 "Lucene Search Engine" => "Lucene",
-"Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene Implementierung um alle Dateien zu indizieren und die Arbeitsumgebung schnell zu durchsuchen.",
-"Index Content" => "Inhalt indizieren",
-"Parses the file when possible and index its content (see plugin global options)" => "Falls möglich den Inhalt der Dateien analysieren und indizieren (siehe globale Einstellungen)",
-"Index Meta Fields" => "Metafelder indizieren",
-"Which additionnal fields to index and search" => "Welche Metafelder werden indiziert",
+"Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene Implementierung um alle Dateien zu indexieren und die Arbeitsumgebung schnell zu durchsuchen.",
+"Index Content" => "Inhalt indexieren",
+"Parses the file when possible and index its content (see plugin global options)" => "Falls möglich den Inhalt der Dateien analysieren und indexieren (siehe globale Einstellungen)",
+"Index Meta Fields" => "Metafelder indexieren",
+"Which additionnal fields to index and search" => "Welche Metafelder werden indexiert",
 "Repository keywords" => "Parameter der Arbeitsumgebung",
 "If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." => "Wenn der Ordner zur Arbeitsumgebung dynamisch generiert wird müssen die Parameter hier angegeben werden. (z.B. AJXP_USER, oder selbst angelegte)",
 "Parse Content Until" => "Maximale Dateigrösse",
