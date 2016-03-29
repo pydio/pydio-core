@@ -51,4 +51,8 @@ $mess = array(
     "Emails frequency" => "Emails frequency",
     "Receive Notifcations by email" => "Receive Notifcations by email",
     "Active notifications by email" => "Active notifications by email",
+    "Sender" => "Sender",
+    "Content" => "Content",
+    "Activate Queue" => "Activate Queue",
+    "Store emails in a queue and batch-process them. Users can choose the sending frequency. Make sure to set up a CRON on consume_mail_queue action if you use this option." => "Store emails in a queue and batch-process them. Users can choose the sending frequency. Make sure to set up a CRON on consume_mail_queue action if you use this option."
 );
