@@ -490,6 +490,7 @@ class StreamWrapper
         $params[$mainPrefix . 'path/itemname'] = basename($parts['path']);
         $params[$mainPrefix . 'path/path']     = dirname($parts['path']);
         $params[$mainPrefix . 'path/fullpath'] = rtrim(dirname($parts['path']), '/') . '/' . basename($parts['path']);
+        $params[$mainPrefix . 'path/fulluri'] = $params[$mainPrefix . 'path/basepath'] . '/' . $params[$mainPrefix . 'path/fullpath'];
 
         return $params;
     }
