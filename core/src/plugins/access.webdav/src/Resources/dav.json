@@ -30,7 +30,7 @@
                     "type" : "string",
                     "location" : "uri"
                 },
-                "path/itemname": {
+                "path/basepath": {
                     "required" : true,
                     "type" : "string",
                     "location" : "uri"
