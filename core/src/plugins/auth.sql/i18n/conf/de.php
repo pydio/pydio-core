@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Speicher",
+"DB Storage" => "DB-Speicher",
 "Stores the Authentication data in an SQL database." => "Speichert Authentifizierungsdaten in einer SQL-Datenbank.",
 "Connexion" => "Verbindung",
 "The Database Connexion" => "Die Datenbankverbindung",
 "DB Auth Storage" => "Datenbank-Speicher",
 "SQL Tables" => "SQL Tabellen",
-"Install SQL Tables" => "SQL Tabellen installieren",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 );

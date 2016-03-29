@@ -24,5 +24,5 @@ $mess=array(
 "User Name" => "Benutzername",
 "Bit.ly account user name" => "Benutzername bei Bit.ly",
 "API Key" => "API Key",
-"Bit.ly account API Key" => "Bit.ly API Key",
+"Bit.ly account API Key" => "Bit.ly API-Key",
 );

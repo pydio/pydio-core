@@ -20,7 +20,7 @@
 */
 $mess=array(
 "title"=> "Home",
-"desc" => "Welcome page",
+"desc" => "Willkommen-Seite",
 "39"=> "Arbeitsumgebung auswählen",
 "40"=> "Willkommen, %s",
 "41"=> "Diese Arbeitsumgebung standardmässig verwenden",
@@ -80,8 +80,8 @@ $mess=array(
 <li>App mit einem PIN-Code schützen</li>
 <li>Verwenden von Lesezeichen und der Suchfunktion</li></ul>",
     "67"=> "Sie sind nicht %s? %logout",
-    "68"=> "Download Sync Client for Windows",
-    "69"=> "Download Sync Client for Mac OSX",
-    "70"=> "Native application for iOS devices",
-    "71"=> "Native application for Android Devices",
+    "68"=> "Sync-Client für Windows herunterladen",
+    "69"=> "Sync-Client für Mac OSX herunterladen",
+    "70"=> "App für iOS-Geräte",
+    "71"=> "App für Android-Geräte",
 );

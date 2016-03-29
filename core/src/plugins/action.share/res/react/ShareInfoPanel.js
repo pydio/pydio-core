@@ -145,8 +145,8 @@
             if(users.length){
                 sharedUsersEntries = users.map(function(u){
                     var rights = [];
-                    if(u.RIGHT.indexOf('r') !== -1) rights.push('Read');
-                    if(u.RIGHT.indexOf('w') !== -1) rights.push('Modify');
+                    if(u.RIGHT.indexOf('r') !== -1) rights.push(global.MessageHash["share_center.31"]);
+                    if(u.RIGHT.indexOf('w') !== -1) rights.push(global.MessageHash["share_center.181"]);
                     return (
                         <div key={u.ID} className="uUserEntry">
                             <span className="uLabel">{u.LABEL}</span>

@@ -32,5 +32,5 @@ $mess=array(
 "Session Name" => "Session-Name",
 "Parameter name to pass the session id" => "Name des Parameters über den die Session-Id übergeben wird",
 "URI" => "URI",
-"Script URI on the remote server" => "Script URI auf dem Remote-Server",
+"Script URI on the remote server" => "Script-URI auf dem Remote-Server",
 );
