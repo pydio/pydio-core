@@ -973,6 +973,7 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $parentRoot = $parentRepository->getOption("PATH", false, $resolveUser);
                     $relative = substr($currentRoot, strlen($parentRoot));
+                    $relative = SystemTextEncoding::toStorageEncoding($relative);
                     $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
