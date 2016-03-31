@@ -176,10 +176,10 @@ $mess=array(
 "152" => "Ruolo Gruppo Principale",
 "153" => "Applica a tutta la gerarchia degli utenti",
 "154" => "Repository Templates",
-"155" => "Access Drivers",
+"155" => "Driver Accesso",
 "156" => "Standard", // user type standard
-"157" => "Administrator",
-"158" => "Shared", // user type shared
-"159" => "Guest",
-"160" => "Group was successfully created",
+"157" => "Amministratore",
+"158" => "Condiviso", // user type shared
+"159" => "Ospite",
+"160" => "Gruppo creato con successo",
 );
