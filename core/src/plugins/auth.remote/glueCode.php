@@ -49,9 +49,9 @@ if (!class_exists("SessionSwitcher")) {
 }
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init($FRAMEWORK_PATH);
-$userClassName = $confPlugin->getUserClassFileName();
-require_once($userClassName);
 ConfService::start();
+$confStorageDriver = ConfService::getConfStorageImpl();
+require_once($confStorageDriver->getUserClassFileName());
 
 $plugInAction = $AJXP_GLUE_GLOBALS["plugInAction"];
 $secret = $AJXP_GLUE_GLOBALS["secret"];
