@@ -252,7 +252,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                 }
                 foreach ($arrayRecipients as $recipient) {
                     try {
-                        dibi::query("INSERT INTO [ajxp_mail_queue] ([recipient],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%b) ",
+                        dibi::query("INSERT INTO [ajxp_mail_queue] ([recipient],[url],[date_event],[notification_object],[html]) VALUES (%s,%s,%s,%bin,%i) ",
                             $recipient,
                             $notification->getNode()->getUrl(),
                             $nextFrequency,

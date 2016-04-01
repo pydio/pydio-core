@@ -4988,10 +4988,10 @@ div.dialogButtons.inlineEdition input {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
-  font-size: 14px;
-  padding: 4px 24px;
+  font-size: 13px;
+  padding: 7px 24px;
   font-weight: 300;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.9);
   display: inline-block;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_span,

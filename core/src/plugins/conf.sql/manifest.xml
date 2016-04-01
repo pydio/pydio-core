@@ -110,6 +110,12 @@
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
+            <action name="ajxp_table_exists">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="only" write="true"/>
+                <processing>
+                    <serverCallback methodName="ajxpTableExists" restParams="/table_name"/>
+                </processing>
+            </action>
         </actions>
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">

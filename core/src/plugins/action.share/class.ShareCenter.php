@@ -973,6 +973,7 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $parentRoot = $parentRepository->getOption("PATH", false, $resolveUser);
                     $relative = substr($currentRoot, strlen($parentRoot));
+                    $relative = SystemTextEncoding::toStorageEncoding($relative);
                     $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
@@ -1131,7 +1132,7 @@ class ShareCenter extends AJXP_Plugin
         $mess = ConfService::getMessages();
         if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
             AuthService::disconnect();
-            self::loadMinisite(array(), $hash, $mess["share_center.165"]);
+            self::loadMinisite($data, $hash, $mess["share_center.165"]);
             return;
         }
         if(!empty($data) && is_array($data)){
@@ -1145,7 +1146,12 @@ class ShareCenter extends AJXP_Plugin
                 self::loadPubliclet($data);
             }
         }else{
-            self::loadMinisite(array(), $hash, $mess["share_center.166"]);
+            $setUrl = ConfService::getCoreConf("SERVER_URL");
+            $data = array();
+            if (!empty($setUrl)) {
+                $data["AJXP_APPLICATION_BASE"] = $setUrl;
+            }
+            self::loadMinisite($data, $hash, $mess["share_center.166"]);
         }
 
     }

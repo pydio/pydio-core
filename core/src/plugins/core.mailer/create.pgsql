@@ -1,4 +1,4 @@
-/* SEPARATOR */
+/** SEPARATOR **/
 CREATE TABLE IF NOT EXISTS ajxp_mail_queue (
  id serial PRIMARY KEY,
  recipient varchar(255) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS ajxp_mail_queue (
  notification_object bytea NOT NULL,
  html integer NOT NULL
 );
-/* SEPARATOR */
+/** SEPARATOR **/
 CREATE TABLE IF NOT EXISTS ajxp_mail_sent (
  id serial PRIMARY KEY,
  recipient varchar(255) NOT NULL,
@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS ajxp_mail_sent (
  notification_object bytea NOT NULL,
  html integer NOT NULL
 );
-/* SEPARATOR */
+/** SEPARATOR **/
+/** BLOCK **/
 CREATE FUNCTION ajxp_send_mail() RETURNS trigger AS $ajxp_send_mail$
     BEGIN
         INSERT INTO ajxp_mail_sent (recipient,url,date_event,notification_object,html)
@@ -24,6 +25,6 @@ CREATE FUNCTION ajxp_send_mail() RETURNS trigger AS $ajxp_send_mail$
         RETURN OLD;
     END;
 $ajxp_send_mail$ LANGUAGE plpgsql;
-/* SEPARATOR */
+/** SEPARATOR **/
 CREATE TRIGGER mail_queue_go_to_sent BEFORE DELETE ON ajxp_mail_queue
 FOR EACH ROW EXECUTE PROCEDURE ajxp_send_mail();

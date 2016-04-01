@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Speicher",
+"DB Storage" => "DB-Speicher",
 "Stores the conf data in an SQL database." => "Speichert Konfigurationsdaten in einer SQL-Datenbank.",
 "Connexion" => "Verbindung",
 "The Database Connexion" => "Die Datenbankverbindung",
 "Users Tmp Folder" => "Benutzerordner für temporäre Dateien",
 "The folder in which all temporary files will be stored" => "Ordner in dem alle temporären Dateien gespeichert werden",
-"SQL Tables" => "SQL Tabellen",
-"Install SQL Tables" => "SQL Tabellen installieren",
+"SQL Tables" => "SQL-Tabellen",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 );

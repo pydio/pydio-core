@@ -20,6 +20,6 @@
 */
 $mess=array(
 "PLUploader" => "Plupload",
-"PlUpload uploader support. Requires downloading and installing the PLupload sources." => "Plupload ist eine HTML5-Komponente von Drittanbietern. Nach dem Aktivieren des Plugins muss Plupload auf den Server geladen und installiert werden.",
+"PlUpload uploader support. Requires downloading and installing the PLupload sources." => "Plupload ist eine HTML5-Komponente von Drittanbietern. Nach dem Aktivieren der Erweiterung muss Plupload auf den Server geladen und installiert werden.",
 );
 

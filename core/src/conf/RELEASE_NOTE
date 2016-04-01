@@ -5,11 +5,11 @@ Pydio 6.4.0 is a stable release introducing many important new features!
 Installation is done via the "Stable" update channel in-app.
 Noticeable changes
 
-Sharing Deeply Reworked:
-Ability to now share files with other users (without creating necessarily a public link)
-Ability to toggle the visibility of a share inside a common workspace, to let other users edit this share
-Implementation of the Federated Sharing API to allow sharing files and folders accross Pydio instances, and with other software providers implementing this API (currently OwnCloud).
-Rework of the share panel, with direct-click for copy, better expiration date visualisation, and many more
+Sharing Deeply Reworked
+ * Ability to now share files with other users (without creating necessarily a public link)
+ * Ability to toggle the visibility of a share inside a common workspace, to let other users edit this share
+ * Implementation of the Federated Sharing API to allow sharing files and folders accross Pydio instances, and with other software providers implementing this API (currently OwnCloud).
+ * Rework of the share panel, with direct-click for copy, better expiration date visualisation, and many more
 UI transitioning smoothly to Material Design and ReactJS: following our previous work on the Enterprise Distribution with Material Design guidelines, and listening to your feedback about the UI. Changes are subtle (no big reorganization), but interface should be really clearer.
 Mails Digest : avoid receiving tons of emails when watching for a file or folder modification, and opt-in for an hourly/daily/weekly based digest instead.
 CacheService mechanism : extension of our previous work with in-memory cache to support many types of key-value stores (apc, memcache, reddis, etc..). We are using the well-established Doctrine Cache component.

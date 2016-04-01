@@ -1253,4 +1253,23 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+
+    public function ajxpTableExists($actionName, $httpVars, $fileVars){
+
+        $p = $this->sqlDriver;
+        if($p["driver"] == "postgre"){
+            $tableQuery = "SELECT [tablename] FROM [pg_catalog].[pg_tables] WHERE [tablename] = %s";
+        }else if($p["driver"] == "sqlite3" || $p["driver"] == "sqlite"){
+            $tableQuery = "SELECT [name] FROM [sqlite_master] WHERE type = \"table\" AND [name] = %s";
+        }else{
+            $tableQuery = "SHOW TABLES LIKE %s";
+        }
+        $tableName = AJXP_Utils::sanitize($httpVars["table_name"], AJXP_SANITIZE_ALPHANUM);
+        $tables = dibi::query($tableQuery, $tableName)->fetchPairs();
+        $exists = (count($tables) && in_array($tableName, $tables));
+        HTMLWriter::charsetHeader("application/json");
+        echo json_encode(array("result" => $exists));
+
+    }
+
 }

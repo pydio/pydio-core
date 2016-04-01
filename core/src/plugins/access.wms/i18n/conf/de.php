@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"WMS Server" => "WMS Server",
-"Browse the layers served by a WMS server." => "Layers eines WMS Servers durchsuchen.",
-"Wms Server" => "Wms Server",
-"Wms server url" => "Wms server url",
+"WMS Server" => "WMS-Server",
+"Browse the layers served by a WMS server." => "Layers eines WMS-Servers durchsuchen.",
+"Wms Server" => "WMS-Server",
+"Wms server url" => "WMS-Server-URL",
 );
