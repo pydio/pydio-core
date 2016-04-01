@@ -1,0 +1,19 @@
+---
+debian8:
+  machine: 'oar-team/debian8'
+  type: 'deb'
+  ip: '192.168.6.201'
+  apache:
+    user: 'www-data'
+    group: 'www-data'
+    root: '/var/www/html'
+    conf: '/etc/apache2/apache.conf'
+centos6.7:
+  machine: 'bento/centos-6.7'
+  type: 'centos'
+  ip: '192.168.6.202'
+  apache:
+    user: 'apache'
+    group: 'apache'
+    root: '/var/www/html'
+    conf: '/etc/httpd/conf/httpd.conf'

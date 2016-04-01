@@ -1,0 +1,117 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+config = YAML.load_file('config.yaml')
+machines = YAML.load_file('machines.yaml')
+
+chosenMachine = machines[config['box']]
+chosenVersion = config['version']
+chosenApache  = chosenMachine['apache']
+
+Vagrant.configure(2) do |config|
+
+    config.vm.define "pydio" do |node|
+        #----------------------------------
+        # Default box setup
+        #  ( apache, php, etc )
+        #----------------------------------
+        node.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+        node.ssh.forward_agent = true
+
+        node.vm.box = chosenMachine['machine']
+        node.vm.network "private_network", :ip => chosenMachine['ip']
+
+        node.vm.provider "virtualbox" do |v|
+            v.memory = 1024
+            v.cpus = 2
+        end
+
+        if File.directory?(chosenVersion['core']) then
+            installPackages = false;
+
+            node.vm.synced_folder chosenVersion['core'], chosenApache['root'], owner: chosenApache['user'], group: chosenApache['group']
+        else
+            installPackages = true;
+
+            node.vm.synced_folder "./src/", chosenApache['root'], owner: chosenApache['user'], group: chosenApache['group']
+        end
+
+        #----------------------------------
+        # Setting up LAMP
+        #----------------------------------
+        node.vm.provision :shell do |shell|
+            shell.path = File.join('provision', chosenMachine['type'], 'install-lamp.sh')
+            shell.args = ''
+        end
+
+        if installPackages then
+            if ! (chosenVersion['core'] =~ /6.*/ && chosenVersion['enterprise'] =~ /6.*/) then
+                #----------------------------------
+                # Setting up GIT and NPM
+                #----------------------------------
+                node.vm.provision :shell do |shell|
+                    shell.path = File.join('provision', chosenMachine['type'], 'install-git.sh')
+                    shell.args = ''
+                end
+            end
+
+            #----------------------------------
+            # Installing TMP dir
+            #----------------------------------
+            node.vm.provision :shell do |shell|
+                shell.path = File.join('provision', 'setup-tmp.sh')
+                shell.args = ''
+            end
+
+            #----------------------------------
+            # Installing CORE code
+            #----------------------------------
+            if defined? chosenVersion['core'] then
+                node.vm.provision :shell do |shell|
+                    shell.path = File.join('provision', 'setup-core.sh')
+                    shell.args = [chosenVersion['core'], chosenApache['root']]
+                end
+            end
+
+            #----------------------------------
+            # Installing ENTERPRISE code
+            #----------------------------------
+            if defined? chosenVersion['enterprise'] then
+                node.vm.provision :shell do |shell|
+                    shell.path = File.join('provision', 'setup-enterprise.sh')
+                    shell.args = [chosenVersion['enterprise'], chosenApache['root']]
+                end
+            end
+        end
+
+
+        #----------------------------------
+        # Installing MySQL dir
+        #----------------------------------
+        node.vm.provision :shell do |shell|
+            shell.path = File.join('provision', 'setup-mysql.sh')
+            shell.args = ''
+        end
+
+        #----------------------------------
+        # Installing APACHE dir
+        #----------------------------------
+        node.vm.provision :shell do |shell|
+            shell.path = File.join('provision', 'setup-apache.sh')
+            shell.args = [chosenApache['user'], chosenApache['group'], chosenApache['root'], chosenApache['conf']]
+        end
+
+        #----------------------------------
+        # Installing Grunt dir
+        #----------------------------------
+        node.vm.provision :shell do |shell|
+            shell.path = File.join('provision', 'setup-grunt.sh')
+            shell.args = chosenApache['root']
+        end
+
+        #node.vm.provision "shell" do |s|
+        #s.path = 'provision/populate.sh'
+        #end
+    end
+end
