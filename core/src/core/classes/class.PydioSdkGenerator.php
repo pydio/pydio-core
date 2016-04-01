@@ -105,7 +105,7 @@ class PydioSdkGenerator
                 "operations" => array(
                     array(
                         "method"        => empty($http) ? "POST" : strtoupper($http),
-                        "summary"       => substr($comment, 0, 40) . (strlen($comment) > 40 ? "..." : ""),
+                        "summary"       => substr($comment, 0, 80) . (strlen($comment) > 80 ? "..." : ""),
                         "notes"         => $comment."<br>Sdk name: ". $methodName."()",
                         "responseClass" => $outputType,
                         "nickname"      => $methodName,
@@ -140,7 +140,7 @@ class PydioSdkGenerator
             $p = $pServ->findPluginById($pluginName);
             $apidocs["apis"][] = array(
                 "path" => JSON_URL."/$versionString/".$pluginName,
-                "description" => substr($p->getManifestDescription(), 0, 40)."..."
+                "description" => $p->getManifestDescription()
             );
 
         }
