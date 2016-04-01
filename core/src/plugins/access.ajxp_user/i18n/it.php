@@ -78,8 +78,8 @@ $mess=array(
 "54"=> "Aggiorna Membri",
 "55"=> "Aggiungi/Rimuovi utenti da questo team",
 "56"=> "Aggiungi un utente per linea; inizia a scrivere nella textarea per vedere la lista di auto-completamento comparire.",
-    "57" => "Create a Team",
-    "58" => "Teams are used as a shortcut to quickly share a folder with a predefined set of users",
-    "59" => "Team Label",
-    "60" => "Team Users",
+"57" => "Crea un Team",
+"58" => "I team sono usati come collegamento rapido per condividere una cartella con un gruppo predefinito di utenti",
+"59" => "Nome Team",
+"60" => "Utenti Team",
 );
