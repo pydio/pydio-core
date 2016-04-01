@@ -214,7 +214,7 @@ module.exports = function(grunt) {
                         'res/themes/orbit/css/pydio.css',
                         'res/themes/orbit/css/animate-custom.css',
                         'res/themes/orbit/css/chosen.css',
-                        'res/themes/orbit/css/media.css#NO_MINI'
+                        'res/themes/orbit/css/media.css'
                     ]
                 }
             }
