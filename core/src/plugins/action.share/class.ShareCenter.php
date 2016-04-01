@@ -1413,6 +1413,12 @@ class ShareCenter extends AJXP_Plugin
             ($httpVars["self_watch_folder"] == "true")
         );
 
+        $this->logInfo(($update?"Update":"New")." Share", array(
+            "file" => "'".$selection->getUniqueFile()."'",
+            "files" => $selection->getFiles(),
+            "repo_uuid" => $this->repository->getId(),
+            "shared_repo_uuid" => $newRepo->getId()
+        ));
 
         return $newRepo;
     }
