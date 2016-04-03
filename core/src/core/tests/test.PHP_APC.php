@@ -32,16 +32,15 @@ class PHP_APC extends AbstractTest
     public function doTest()
     {
         $this->failedLevel = "warning";
-        $v = @extension_loaded('apc');
-        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
+
+        if (extension_loaded('apc')) {
+            $this->failedInfo = "PHP APC extension detected, this is good for better performances";
+            $this->testedParams["PHP APC extension loaded"] = "Yes";
+            return TRUE;
+        } else {
             $this->testedParams["PHP APC extension loaded"] = "No";
-            return FALSE;
-        } else if (!isSet($v)) {
             $this->failedInfo = "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
             return FALSE;
         }
-        $this->failedInfo = "PHP APC extension detected, this is good for better performances";
-        $this->testedParams["PHP APC extension loaded"] = "Yes";
-        return TRUE;
     }
 }
