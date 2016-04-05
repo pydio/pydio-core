@@ -28,11 +28,41 @@
  * @subpackage Core
  */
 
+//define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
 define("JSON_DIR", AJXP_INSTALL_PATH."/../api");
 define("JSON_URL", "https://pydio.com/static-docs/api");
+define("API_DOC_PAGE", "https://pydio.com/en/docs/references/pydio-api#!/");
 
 class PydioSdkGenerator
 {
+    static $apiGroups = [
+        "fs" => ["access.fs", "index.*", "meta.*", "editor.*", "action.share", "action.powerfs"],
+        "conf" => ["access.ajxp_conf", "action.scheduler", "action.updater"],
+        "lifecycle" => ["conf.*", "auth.*", "gui.*", "core.*", "action.avatar"],
+        "nonfs" => ["access.*"],
+        "misc" => ["*"]
+    ];
+
+    static $apiGroupsLabels = [
+        "fs" => "Most current operations on files and folders, their metadata, and additional sharing features.",
+        "conf" => "Administration task : users/groups/workspaces provisionning, maintenance tasks, etc... Generally performed using /settings/ as workspace alias.",
+        "lifecycle" => "Application objects lifecycle, like current user access rights and preferences, authentication utils, etc. As they are generally not linked to a specific workspace, these actions can be performed using /pydio/ instead of a workspace alias.",
+        "nonfs" => "Non-standard drivers accessing to structured data like IMAP, MySQL, Apis, etc.",
+        "misc" => "Other plugins actions."
+    ];
+
+    public static function findApiGroupForPlugin($pluginId){
+        list($pType, $pName) = explode(".", $pluginId);
+        foreach(self::$apiGroups as $groupName => $pluginPatterns){
+            foreach($pluginPatterns as $pattern){
+                if($pattern == "*" || $pattern == "$pType.*" || $pattern == "$pType.$pName"){
+                    return $groupName;
+                }
+            }
+        }
+        return "misc";
+    }
+
     public static function analyzeRegistry($versionString)
     {
         if(!AJXP_SERVER_DEBUG) {
@@ -96,9 +126,12 @@ class PydioSdkGenerator
             $comment = $callbackNode->getAttribute("developerComment");
             $http = $callbackNode->getAttribute("preferredHttp");
             $restParams = $callbackNode->getAttribute("restParams");
-            $prefix = "/default";
-            if($pluginName == "access.ajxp_conf"){
-                $prefix = "/ajxp_conf";
+            $prefix = "/workspace_alias";
+            $apiGroup = self::findApiGroupForPlugin($pluginName);
+            if($apiGroup == "conf"){
+                $prefix = "/settings";
+            }else if($apiGroup == "lifecycle"){
+                $prefix = "/pydio";
             }
             $api = array(
                 "path"  => $prefix."/".$actionName . (empty($restParams) ? "" : $restParams),
@@ -118,12 +151,14 @@ class PydioSdkGenerator
 
         file_put_contents($jsFile, "window.sdkMethods = ".json_encode($methods, JSON_PRETTY_PRINT));
 
-
         $apidocs = array(
             "apiVersion" => $versionString,
             "swaggerVersion" => "1.2",
             "apis" => array()
         );
+        $allDocs = array();
+        $markdowns = array();
+
         foreach($swaggerAPIs as $pluginName => $apis){
 
             echo("Writing file for $pluginName");
@@ -138,13 +173,55 @@ class PydioSdkGenerator
             );
             file_put_contents($swaggerJsonDir."/".$pluginName, json_encode($swaggerJson, JSON_PRETTY_PRINT));
             $p = $pServ->findPluginById($pluginName);
+            $apiGroup = self::findApiGroupForPlugin($pluginName);
+            if(!isset($allDocs[$apiGroup])) {
+                $allDocs[$apiGroup] = array();
+                $markdowns[$apiGroup] = array();
+            }
+            $markdowns[$apiGroup][] = self::makeMarkdown($p, $apis);
+            $allDocs[$apiGroup][] = array(
+                "path" => JSON_URL."/$versionString/".$pluginName,
+                "description" => $p->getManifestDescription()
+            );
             $apidocs["apis"][] = array(
                 "path" => JSON_URL."/$versionString/".$pluginName,
                 "description" => $p->getManifestDescription()
             );
 
         }
+        foreach($allDocs as $apiGroupName => $groupApis){
+            $groupApiDocs = array(
+                "apiVersion" => $versionString,
+                "swaggerVersion" => "1.2",
+                "apis" => $groupApis
+            );
+            file_put_contents($swaggerJsonDir."/api-docs-".$apiGroupName, json_encode($groupApiDocs, JSON_PRETTY_PRINT));
+            file_put_contents($swaggerJsonDir."/api-md-".$apiGroupName, self::$apiGroupsLabels[$apiGroupName]."\n\n".implode("", $markdowns[$apiGroupName]));
+        }
+        // Store file with all apis.
         file_put_contents($swaggerJsonDir."/api-docs", json_encode($apidocs, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * @param AJXP_Plugin $plugin
+     * @param array $apis
+     * @return string
+     */
+    static public function makeMarkdown($plugin, $apis){
+
+        $md = "\n\n";
+        $md .= "## ".$plugin->getManifestLabel()."  ";
+        $md .= "\n".$plugin->getManifestDescription()."\n\n";
+        $id = $plugin->getId();
+        foreach($apis as $index => $api) {
+            $md .= "\n";
+            $md .= "- **".$api["path"]."**  \n";
+            $md .= "  ".$api["operations"][0]["notes"]."  \n";
+            $md .= "  [Details](".API_DOC_PAGE."".$id."/".$api["operations"][0]["nickname"]."_".strtolower($api["operations"][0]["method"])."_".$index.")";
+        }
+
+        return $md;
+
     }
 
 }
