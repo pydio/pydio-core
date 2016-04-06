@@ -40,12 +40,27 @@ and (max-width : 720px) {
     span.actionbar_button_label,
     .action_bar span.actionbar_button_label,
     #get_my_feed_button_label,
-    #logging_string i,
     #logging_string *[ajxp_message_id],
     #global_toolbar span.icon-caret-down,
     #search_form a
     {
         display: none !important;
+    }
+    #logging_string{
+        margin-top: 7px;
+        height: 33px;
+        overflow: hidden;
+    }
+    #logging_string div.user_widget_mini {
+        margin-top: -5px;
+        height: 32px;
+        width: 32px;
+    }
+    #logging_string div.user_widget_label:not(withImage){
+        padding-top: 10px;
+    }
+    #logging_string div.user_widget_label:not(withImage) i{
+        display: none;
     }
     div.toolbarGroup span.ajxp_icon_span
     {
@@ -155,6 +170,8 @@ and (max-width : 420px){
 
     #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
         width: 40px !important;
+        flex: 0 0 40px;
+        -webkit-flex: 0 0 40px;
     }
 
     div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
