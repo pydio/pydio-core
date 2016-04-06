@@ -353,18 +353,29 @@
                     </div>
                 );
             }
+            
+            let workspacesTitle, sharedEntriesTitle, createActionTitle;
+            if(entries.length){
+                workspacesTitle = <div className="section-title">{messages[468]}</div>;
+            }
+            if(sharedEntries.length){
+                sharedEntriesTitle = <div className="section-title">{messages[469]}</div>;
+            }
+            if(createAction){
+                createActionTitle = <div className="section-title"></div>;
+            }
 
             return (
                 <div>
-                    <div className="section-title">{messages[468]}</div>
+                    {workspacesTitle}
                     <div className="workspaces">
                         {entries}
                     </div>
-                    <div className="section-title">{messages[469]}</div>
+                    {sharedEntriesTitle}
                     <div className="workspaces">
                         {sharedEntries}
                     </div>
-                    <div className="section-title"></div>
+                    {createActionTitle}
                     {createAction}
                 </div>
             );
