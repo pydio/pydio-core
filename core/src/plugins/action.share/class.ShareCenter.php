@@ -709,7 +709,7 @@ class ShareCenter extends AJXP_Plugin
                         foreach($shares as $shareId =>  $share){
                             $t = isSet($share["type"]) ? $share["type"] : "file";
                             try{
-                                $result = $this->getShareStore()->deleteShare($t, $shareId);
+                                $result = $this->getShareStore()->deleteShare($t, $shareId, false, true);
                             }catch(Exception $e){
                                 if($e->getMessage() == "repo-not-found"){
                                     $result = true;
@@ -941,7 +941,7 @@ class ShareCenter extends AJXP_Plugin
     public function cleanUserShares($userId){
         $shares = $this->getShareStore()->listShares($userId);
         foreach($shares as $hash => $data){
-            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash);
+            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash, false, true);
         }
     }
 
