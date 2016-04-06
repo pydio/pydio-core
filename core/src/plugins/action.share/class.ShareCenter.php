@@ -117,7 +117,7 @@ class ShareCenter extends AJXP_Plugin
             $xpathesToRemove[] = 'action[contains(@name, "share-")]';
         }else{
             $folderSharingAllowed = $this->getAuthorization("folder", "any");
-            $fileSharingAllowed = $this->getAuthorization("file");
+            $fileSharingAllowed = $this->getAuthorization("file", "any");
             if($fileSharingAllowed === false){
                 // Share file button
                 $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
@@ -143,10 +143,23 @@ class ShareCenter extends AJXP_Plugin
     /**
      * Compute right to create shares based on plugin options
      * @param string $nodeType "file"|"folder"
-     * @param string $shareType
+     * @param string $shareType "any"|"minisite"|"workspace"
      * @return bool
      */
     protected function getAuthorization($nodeType, $shareType = "any"){
+        $filesMini = $this->getFilteredOption("ENABLE_FILE_PUBLIC_LINK");
+        $filesInternal = $this->getFilteredOption("ENABLE_FILE_INTERNAL_SHARING");
+        $foldersMini = $this->getFilteredOption("ENABLE_FOLDER_PUBLIC_LINK");
+        $foldersInternal = $this->getFilteredOption("ENABLE_FOLDER_INTERNAL_SHARING");
+        if($shareType == "any"){
+            return ($nodeType == "file" ? $filesInternal || $filesMini : $foldersInternal || $foldersMini);
+        }else if($shareType == "minisite"){
+            return ($nodeType == "file" ? $filesMini : $foldersMini);
+        }else if($shareType == "workspace"){
+            return ($nodeType == "file" ? $filesInternal : $foldersInternal);
+        }
+        return false;
+        /*
         if($nodeType == "file"){
             return $this->getFilteredOption("ENABLE_FILE_PUBLIC_LINK") !== false;
         }else{
@@ -159,6 +172,7 @@ class ShareCenter extends AJXP_Plugin
                 return ($opt !== "disable");
             }
         }
+        */
     }
 
     /**
@@ -431,7 +445,8 @@ class ShareCenter extends AJXP_Plugin
 
                     $auth = $this->getAuthorization("folder", "workspace");
                     if(!$auth){
-                        throw new Exception(103);
+                        $mess = ConfService::getMessages();
+                        throw new Exception($mess["351"]);
                     }
 
                     $users = array(); $groups = array();
@@ -496,8 +511,9 @@ class ShareCenter extends AJXP_Plugin
 
                     $httpVars["return_json"] = true;
                     if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
+                    $ajxpNode->loadNodeInfo();
 
-                    $results = $this->shareNode($httpVars, $isUpdate);
+                    $results = $this->shareNode($ajxpNode, $httpVars, $isUpdate);
                     if(is_array($results) && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()){
                         foreach($results as $shareObject){
                             if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
@@ -641,11 +657,17 @@ class ShareCenter extends AJXP_Plugin
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
                     if(!file_exists($node->getUrl())){
-                        throw new Exception("Cannot find file ".$file.": share may be lost.");
+                        $mess = ConfService::getMessages();
+                        throw new Exception(str_replace('%s', "Cannot find file ".$file, $mess["share_center.219"]));
                     }
-                    $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
+                    if(isSet($httpVars["tmp_repository_id"]) && AuthService::getLoggedUser()->isAdmin()){
+                        $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node, true);
+                    }else{
+                        $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
+                    }
                     if(empty($compositeShare)){
-                        throw new Exception("Cannot find share for node ".$file);
+                        $mess = ConfService::getMessages();
+                        throw new Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
                     }
                     header("Content-type:application/json");
                     $json = $this->compositeShareToJson($compositeShare);
@@ -850,7 +872,7 @@ class ShareCenter extends AJXP_Plugin
         $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
         if(!empty($shares)){
             $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
-            if(empty($compositeShare)){
+            if(empty($compositeShare) || $compositeShare->isInvalid()){
                 $this->getShareStore()->getMetaManager()->clearNodeMeta($ajxpNode);
                 return;
             }
@@ -1221,6 +1243,23 @@ class ShareCenter extends AJXP_Plugin
 
     /**
      * @param array $httpVars
+     * @param AJXP_Node $ajxpNode
+     */
+    public function filterHttpVarsFromUniqueNode(&$httpVars, $ajxpNode){
+        $httpVars["minisite"] = true;
+        $httpVars["selection"] = true;
+        if($ajxpNode->isLeaf()){
+            $httpVars["filter_nodes"] = [$ajxpNode];
+            $httpVars["file"] = "/";
+            $httpVars["nodes"] = array("/");
+        }
+        if(!isSet($httpVars["repo_label"])){
+            $httpVars["repo_label"] = SystemTextEncoding::toUTF8($ajxpNode->getLabel());
+        }
+    }
+
+    /**
+     * @param array $httpVars
      * @param bool $update
      * @return Repository
      * @throws Exception
@@ -1228,7 +1267,8 @@ class ShareCenter extends AJXP_Plugin
     protected function createOrLoadSharedRepository($httpVars, &$update){
 
         if (!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "") {
-            throw new Exception(100);
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["349"]);
         }
 
         if (isSet($httpVars["repository_id"])) {
@@ -1241,7 +1281,8 @@ class ShareCenter extends AJXP_Plugin
         $description = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["repo_description"]), AJXP_SANITIZE_HTML);
         $exists = $this->checkRepoWithSameLabel($label, isSet($editingRepo)?$editingRepo:null);
         if($exists){
-            throw new Exception(101);
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["share_center.352"]);
         }
 
         $loggedUser = AuthService::getLoggedUser();
@@ -1263,7 +1304,8 @@ class ShareCenter extends AJXP_Plugin
             $oldScope = $editingRepo->getOption("SHARE_ACCESS");
             $currentOwner = $editingRepo->getOwner();
             if($newScope != $oldScope && $currentOwner != AuthService::getLoggedUser()->getId()){
-                throw new Exception("You are not allowed to handle this share. Please ask the owner of the share.");
+                $mess = ConfService::getMessages();
+                throw new Exception($mess["share_center.224"]);
             }
             if($newScope !== $oldScope){
                 $editingRepo->addOption("SHARE_ACCESS", $newScope);
@@ -1272,7 +1314,8 @@ class ShareCenter extends AJXP_Plugin
             if(isSet($httpVars["transfer_owner"])){
                 $newOwner = $httpVars["transfer_owner"];
                 if($newOwner != $currentOwner && $currentOwner != AuthService::getLoggedUser()->getId()){
-                    throw new Exception("You are not allowed to handle this share. Please ask the owner");
+                    $mess = ConfService::getMessages();
+                    throw new Exception($mess["share_center.224"]);
                 }
                 $editingRepo->setOwnerData($editingRepo->getParentId(), $newOwner, $editingRepo->getUniqueUser());
                 $replace = true;
@@ -1390,7 +1433,8 @@ class ShareCenter extends AJXP_Plugin
         $loggedUser = AuthService::getLoggedUser();
         $actRights = $loggedUser->mergedRole->listActionsStatesFor($this->repository);
         if (isSet($actRights["share"]) && $actRights["share"] === false) {
-            throw new Exception(103);
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["351"]);
         }
 
         $newRepo = $this->createOrLoadSharedRepository($httpVars, $update);
@@ -1455,18 +1499,20 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
+     * @param AJXP_Node $ajxpNode
      * @param array $httpVars
      * @param bool $update
      * @return Repository[]|ShareLink[]
      * @throws Exception
      */
-    public function shareNode($httpVars, &$update){
+    public function shareNode($ajxpNode, $httpVars, &$update){
 
         $hiddenUserEntries = array();
         $originalHttpVars = $httpVars;
         $ocsStore = new Pydio\OCS\Model\SQLStore();
         $ocsClient = new Pydio\OCS\Client\OCSClient();
         $userSelection = new UserSelection($this->repository, $httpVars);
+        $mess = ConfService::getMessages();
 
         /**
          * @var ShareLink[] $shareObjects
@@ -1475,6 +1521,9 @@ class ShareCenter extends AJXP_Plugin
 
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
+            if(!$this->getAuthorization($ajxpNode->isLeaf() ? "file":"folder", "minisite")){
+                throw new Exception($mess["share_center." . ($ajxpNode->isLeaf() ? "225" : "226")]);
+            }
             $this->shareObjectFromParameters($httpVars, $hiddenUserEntries, $shareObjects, "public");
         }else if(isSet($httpVars["disable_public_link"])){
             $this->getShareStore()->deleteShare("minisite", $httpVars["disable_public_link"], true);
@@ -1498,10 +1547,13 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
+        $this->filterHttpVarsFromUniqueNode($httpVars, $ajxpNode);
 
         $users = array(); $groups = array();
         $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
+        if((count($users) || count($groups)) && !$this->getAuthorization($ajxpNode->isLeaf()?"file":"folder", "workspace")){
+            $users = $groups = array();
+        }
         foreach($hiddenUserEntries as $entry){
             $users[$entry["ID"]] = $entry;
         }

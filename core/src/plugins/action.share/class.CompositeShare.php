@@ -95,6 +95,13 @@ class CompositeShare
     }
 
     /**
+     * @return bool
+     */
+    public function isInvalid(){
+        return $this->getRepository() == null;
+    }
+
+    /**
      * @param MetaWatchRegister|false $watcher
      * @param ShareRightsManager $rightsManager
      * @param PublicAccessManager $publicAccessManager
