@@ -120,7 +120,6 @@ class AJXP_Notification
         if($replaces["AJXP_NODE_LABEL"]==$em.$me || $replaces["AJXP_NODE_LABEL"] == $em."/".$me ){
             $replaces["AJXP_NODE_LABEL"] = $replaces["AJXP_REPOSITORY_LABEL"];
         }
-		
         if($replaces["AJXP_PARENT_LABEL"] == $em.$me || $replaces["AJXP_PARENT_LABEL"] == $em."/".$me ){
             $replaces["AJXP_PARENT_LABEL"] = $replaces["AJXP_REPOSITORY_LABEL"];
         }
