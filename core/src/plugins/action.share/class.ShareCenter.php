@@ -656,6 +656,12 @@ class ShareCenter extends AJXP_Plugin
 
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
+                    $loggedUser = AuthService::getLoggedUser();
+                    if(isSet($httpVars["owner"]) && $loggedUser->isAdmin()
+                        && $loggedUser->getGroupPath() == "/" && $loggedUser->getId() != AJXP_Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS)){
+                        // Impersonate the current user
+                        $node->setUser(AJXP_Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS));
+                    }
                     if(!file_exists($node->getUrl())){
                         $mess = ConfService::getMessages();
                         throw new Exception(str_replace('%s', "Cannot find file ".$file, $mess["share_center.219"]));
@@ -1634,7 +1640,7 @@ class ShareCenter extends AJXP_Plugin
 
         foreach($shares as $hash => $shareData){
 
-            $icon = "hdd_external_mount.png";
+            $icon = "folder";
             $meta = array(
                 "icon"			=> $icon,
                 "openicon"		=> $icon,
@@ -1654,16 +1660,28 @@ class ShareCenter extends AJXP_Plugin
                     continue;
                 }
                 $meta["text"] = $repoObject->getDisplay();
-                $meta["share_type_readable"] =  $repoObject->hasContentFilter() ? "Publiclet" : ($shareType == "repository"? "Workspace": "Minisite");
-                if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
-                    $meta["share_type_readable"] = "Repository or Minisite (legacy)";
+                $permissions = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, null);
+                $regularUsers = count(array_filter($permissions, function($a){
+                    return (!isSet($a["HIDDEN"]) || $a["HIDDEN"] == false);
+                })) > 0;
+                $hiddenUsers = count(array_filter($permissions, function($a){
+                    return (isSet($a["HIDDEN"]) && $a["HIDDEN"] == true);
+                })) > 0;
+                if($regularUsers && $hiddenUsers){
+                    $meta["share_type_readable"] = "Public Link & Internal Users";
+                }elseif($regularUsers){
+                    $meta["share_type_readable"] = "Internal Users";
+                }else if($hiddenUsers){
+                    $meta["share_type_readable"] = "Public Link";
+                }else{
+                    $meta["share_type_readable"] =  $repoObject->hasContentFilter() ? "Public Link" : ($shareType == "repository"? "Internal Users": "Public Link");
+                    if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
+                        $meta["share_type_readable"] = "Internal Only";
+                    }
                 }
                 $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->getPublicAccessManager()->buildPublicLink($hash));
                 $meta["shared_element_hash"] = $hash;
                 $meta["owner"] = $repoObject->getOwner();
-                if($shareType != "repository") {
-                    $meta["copy_url"]  = $this->getPublicAccessManager()->buildPublicLink($hash);
-                }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
                 if(!empty($parent)) {
                     $parentPath = $parent->getOption("PATH", false, $meta["owner"]);
@@ -1677,18 +1695,13 @@ class ShareCenter extends AJXP_Plugin
                         $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
                     }
                 }
-                if($shareType != "repository"){
-                    if($repoObject->hasContentFilter()){
-                        $meta["ajxp_shared_minisite"] = "file";
-                        $meta["icon"] = "mime_empty.png";
-                        $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
-                    }else{
-                        $meta["ajxp_shared_minisite"] = "public";
-                        $meta["icon"] = "folder.png";
-                        $meta["original_path"] = $repoObject->getOption("PATH");
-                    }
-                    $meta["icon"] = $repoObject->hasContentFilter() ? "mime_empty.png" : "folder.png";
+                if($repoObject->hasContentFilter()){
+                    $meta["ajxp_shared_minisite"] = "file";
+                    $meta["icon"] = "mime_empty.png";
+                    $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
                 }else{
+                    $meta["ajxp_shared_minisite"] = "public";
+                    $meta["icon"] = "folder.png";
                     $meta["original_path"] = $repoObject->getOption("PATH");
                 }
                 if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){

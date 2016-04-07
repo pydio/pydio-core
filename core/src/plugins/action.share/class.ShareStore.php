@@ -348,16 +348,12 @@ class ShareStore {
             }
             $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
             foreach($oldRepos as $sharedWorkspace){
-                if(!$sharedWorkspace->hasContentFilter()){
-                    $dbLets['repo-'.$sharedWorkspace->getId()] = array(
-                        "SHARE_TYPE"    => "repository",
-                        "OWNER_ID"      => $sharedWorkspace->getOwner(),
-                        "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
-                        "LEGACY_REPO_OR_MINI"   => true
-                    );
-                    //Auto Migrate? boaf.
-                    //$this->storeShare($sharedWorkspace->getParentId(), $data, "repository");
-                }
+                $dbLets['repo-'.$sharedWorkspace->getId()] = array(
+                    "SHARE_TYPE"    => "repository",
+                    "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                    "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                    "LEGACY_REPO_OR_MINI"   => true
+                );
             }
         }
 

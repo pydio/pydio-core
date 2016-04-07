@@ -758,13 +758,11 @@
                 merged      : 'true'
             };
             if(meta.get('shared_element_hash')){
-                //options["hash"] = meta.get('shared_element_hash');
-                //options["element_type"] = meta.get('share_type');
                 options["tmp_repository_id"] = meta.get('shared_element_parent_repository');
                 options["file"] = meta.get("original_path");
+                options["owner"] = meta.get("owner");
             }else{
                 options["file"] = node.getPath();
-                //options["element_type"] = node.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository";
             }
             PydioApi.getClient().request(options, completeCallback, errorCallback, settings);
         }
