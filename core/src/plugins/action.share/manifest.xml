@@ -34,8 +34,6 @@
         <resources>
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
-            <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
-            <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
@@ -81,22 +79,8 @@
                 </processing>
             </action>
             <action name="share">
-                <!--
-                <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
-                    <selectionContext dir="false" evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')" file="true" recycle="false" unique="false"/>
-                </gui>
-                -->
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <!--
-                    <clientListener name="init"><![CDATA[
-                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") == "disable" ){
-                            var action = pydio.getController().getActionByName('share');
-                            if(action) action.selectionContext.dir = false;
-                        }
-                    ]]></clientListener>
-                    -->
                     <serverCallback methodName="switchAction" restParams="/simple_share_type/file+" developerComment="Main action for sharing a file or a folder">
                         <input_param description="Path of the resource to share" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <input_param description="Simple type for sharing via the REST api, always links, public or private" name="simple_share_type" type="public|private" mandatory="false"/>
