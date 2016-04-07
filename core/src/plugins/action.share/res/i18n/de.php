@@ -83,6 +83,7 @@ $mess = array(
 "72" => "Ansehen",
 "73" => "Herunterladen",
 "74" => "Hochladen",
+"74b"=>"Edit",
 "75"=> "Bitte verwenden Sie eine positive Zahl für die Verfall- und Downloadbegrenzung.",
 "76"=> "Bitte Cookies aktivieren um auf diese Anwendung zuzugreifen",
 "77"=> "Bitte JavaScript aktivieren um auf diese Anwendung zuzugreifen",

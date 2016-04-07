@@ -82,6 +82,7 @@ $mess = array(
 "72" => "Cercar i previsualitzar",
 "73" => "Descarregar",
 "74" => "Carregar fitxers",
+"74b"=>"Edit",
 "75" => "Per favor emprau un nombre positiu tant per la caducitat com per el límit de descàrrega.",
 "76" => "Per favor habilitau les Cookies per a accedir a aquesta aplicació",
 "77" => "Per favor habilitau JavaScript per a accedir a aquesta aplicació",

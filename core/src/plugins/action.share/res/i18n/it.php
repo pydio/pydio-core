@@ -81,6 +81,7 @@ $mess = array(
     "72"=> "Sfoglia & Anteprima",
     "73"=> "Download",
     "74"=> "Upload file",
+    "74b"=>"Edit",
     "75"=> "Usare un numero positivo sia per la Scadenza che per il limite di Download.",
     "76"=> "Abilitare i Cookies per accedere a questa applicazione",
     "77"=> "Abilitare JavScript per accedere a questa applicazione",

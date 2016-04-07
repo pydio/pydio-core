@@ -63,6 +63,13 @@
             return this._data['links'][linkId]['hash_is_shorten'];
         }
 
+        fileHasWriteableEditors(){
+            console.log(this._previewEditors);
+            return this._previewEditors.filter(function(entry){
+                return (entry.canWrite);
+            }).length > 0;
+        }
+
         togglePublicLink(){
             var publicLinks = this.getPublicLinks();
             this._pendingData['enable_public_link'] = !publicLinks.length;

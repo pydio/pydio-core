@@ -83,6 +83,7 @@ $mess = array(
     "72"=> "Preview",
     "73"=> "Download",
     "74"=> "Upload files",
+    "74b"=>"Edit",
     "75"=> "Please use a positive number for both Expiration and Download limit fields.",
     "76"=> "Please enable Cookies to access this application",
     "77"=> "Please enable JavaScript to access this application",

@@ -80,6 +80,7 @@ $mess = array(
 "72"=> "Previsualizar",
 "73"=> "Descargar",
 "74"=> "Cargar",
+"74b"=>"Edit",
 "75"=> "Por favor use un número positivo para Caducidad y Límite de Descargas.",
 "76"=> "Por favor, habilite las cookies para acceder a esta aplicación",
 "77"=> "Por favor, habilite JavaScript para acceder a esta aplicación",

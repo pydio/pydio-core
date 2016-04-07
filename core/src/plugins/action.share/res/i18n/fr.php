@@ -82,6 +82,7 @@ $mess = array(
 "72"=> "Prévisualiser",
 "73"=> "Télécharger",
 "74"=> "Envoyer",
+"74b"=>"Editer",
 "75"=> "Veuillez utiliser des entiers positifs pour les champs Expiration et Nombre de téléchargements !",
 "76"=> "Merci d'activer les cookies pour accéder à cette application",
 "77"=> "Merci d'activer JavaScript pour accéder à cette application",

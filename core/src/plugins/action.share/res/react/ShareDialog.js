@@ -997,6 +997,11 @@
                     NAME:'write',
                     LABEL:this.context.getMessage('74')
                 });
+            }else if(this.props.shareModel.fileHasWriteableEditors()){
+                perms.push({
+                    NAME:'write',
+                    LABEL:this.context.getMessage('74b')
+                });
             }
             if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission(linkId, 'read')){
                 previewWarning = <div>{this.context.getMessage('195')}</div>;

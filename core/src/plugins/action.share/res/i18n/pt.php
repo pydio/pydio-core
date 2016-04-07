@@ -80,6 +80,7 @@ $mess = array(
 "72"=> "Navegar & Pré-Visualização",
 "73"=> "Transferir",
 "74"=> "Enviar ficheiros",
+"74b"=>"Edit",
 "75"=> "Por favor utilize um número positivo tanto para o campo Validade como para o Limite Máximo de Transferências.",
 "76"=> "Por favor active as cookies no seu Navegador para poder aceder a esta aplicação",
 "77"=> "Por favor active o Javascript no seu Navegador para aceder a esta aplicação",

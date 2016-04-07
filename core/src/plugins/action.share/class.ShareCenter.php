@@ -907,29 +907,35 @@ class ShareCenter extends AJXP_Plugin
      */
     public function updateNodeSharedData($oldNode=null, $newNode=null, $copy = false){
 
-        if($oldNode != null && !$copy){
-            $this->logDebug("Should update node");
-
-            $delete = false;
-            if($newNode == null) {
-                $delete = true;
-            }else{
-                $repo = $newNode->getRepository();
-                $recycle = $repo->getOption("RECYCLE_BIN");
-                if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
-                    $delete = true;
-                }
-            }
-            $shareStore = $this->getShareStore();
-            $modifiedNodes = $shareStore->moveSharesFromMetaRecursive($oldNode, $delete, $oldNode->getPath(), ($newNode != null ? $newNode->getPath() : null));
-            // Force switching back to correct driver!
-            if($modifiedNodes > 0){
-                $oldNode->getRepository()->driverInstance = null;
-                $oldNode->setDriver(null);
-                $oldNode->getDriver();
-            }
+        if($oldNode == null || $copy){
+            // Create or copy, do nothing
             return;
         }
+        if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()){
+            // Same path => must be a content update, do nothing
+            return;
+        }
+
+        $this->logDebug("Should update node");
+        $delete = false;
+        if($newNode == null) {
+            $delete = true;
+        }else{
+            $repo = $newNode->getRepository();
+            $recycle = $repo->getOption("RECYCLE_BIN");
+            if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
+                $delete = true;
+            }
+        }
+        $shareStore = $this->getShareStore();
+        $modifiedNodes = $shareStore->moveSharesFromMetaRecursive($oldNode, $delete, $oldNode->getPath(), ($newNode != null ? $newNode->getPath() : null));
+        // Force switching back to correct driver!
+        if($modifiedNodes > 0){
+            $oldNode->getRepository()->driverInstance = null;
+            $oldNode->setDriver(null);
+            $oldNode->getDriver();
+        }
+        return;
 
     }
 
