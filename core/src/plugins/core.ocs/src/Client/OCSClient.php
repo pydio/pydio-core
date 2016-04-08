@@ -46,7 +46,6 @@ class OCSClient implements IFederated, IServiceDiscovery
     {
         $url = $invitation->getTargetHost();
         $client = self::getClient($url);
-        $path = self::getPath($url);
 
         $endpoints = self::findEndpointsForClient($client);
 
@@ -59,7 +58,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'remote' => AJXP_Utils::detectServerUrl(true)
         ];
 
-        $response = $client->post(ltrim($path.$endpoints['share'], '/'), [
+        $response = $client->post(ltrim($endpoints['share'], '/'), [
             'body' => $body
         ]);
 
@@ -82,11 +81,10 @@ class OCSClient implements IFederated, IServiceDiscovery
     {
         $url = $invitation->getTargetHost();
         $client = self::getClient($url);
-        $path = self::getPath($url);
 
         $endpoints = self::findEndpointsForClient($client);
 
-        $response = $client->post(ltrim($path.$endpoints['share'] . '/' . $invitation->getId() . '/unshare', '/'), [
+        $response = $client->post(ltrim($endpoints['share'] . '/' . $invitation->getId() . '/unshare', '/'), [
             'body' => [
                 'token' => $invitation->getLinkHash()
             ]

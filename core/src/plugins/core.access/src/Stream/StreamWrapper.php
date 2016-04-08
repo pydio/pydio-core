@@ -82,6 +82,12 @@ class StreamWrapper
     protected static $nextStat = array();
 
     /**
+     * @var array The list of files not found received as response
+     * If we receive a 404 once, we should be able to tell if we created the file after that
+     */
+    protected static $filesNotFound = array();
+
+    /**
      * Register the stream wrapper
      *
      * @param Client $client to use with the stream wrapper
@@ -174,6 +180,8 @@ class StreamWrapper
             return false;
         }
 
+        $this->clearStatInfo($params['path/key']);
+
         return true;
     }
 
@@ -241,6 +249,8 @@ class StreamWrapper
             $this->triggerError("Unable to delete item : " . $e->getMessage());
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -256,6 +266,21 @@ class StreamWrapper
         }
 
         return $stat;
+    }
+
+    /*
+     * Wrapper around stat
+     */
+    public function file_exists($path) {
+        $params = $this->getParams($path);
+
+        $key = $params['path/key'];
+
+        if (isset(static::$filesNotFound[$key])) {
+            return false;
+        }
+
+        return file_exists($path);
     }
 
     /**
@@ -288,12 +313,10 @@ class StreamWrapper
         } catch (ClientException $e) {
             if ($e->getCode() == 404) {
                 static::$nextStat[$key] = false;
-
                 return false;
             }
         } catch (\Exception $e) {
             static::$nextStat[$key] = false;
-
             return $this->triggerError('Cannot access file ' . $e->getMessage(), $flags);
         }
 
@@ -314,6 +337,10 @@ class StreamWrapper
     public function mkdir($path, $mode, $options)
     {
         $params = $this->getParams($path);
+
+        $key = $params['path/key'];
+
+        $this->clearStatInfo($key);
 
         try {
             $result = $this->getClient()->mkdir($params);
@@ -337,6 +364,10 @@ class StreamWrapper
     public function rmdir($path, $options)
     {
         $params = $this->getParams($path);
+
+        $key = $params['path/key'];
+
+        $this->clearStatInfo($key);
 
         try {
             $result = $this->getClient()->rmdir($params);
@@ -587,9 +618,12 @@ class StreamWrapper
      */
     protected function clearStatInfo($path = null)
     {
-        static::$nextStat = array();
         if ($path) {
+            unset(static::$nextStat[$path]);
             clearstatcache(true, $path);
+        } else {
+            static::$nextStat = array();
+            clearstatcache(true);
         }
     }
 
