@@ -4853,6 +4853,7 @@ div#external_download > div input {
 div.dialogBox.form-originalUploadForm #modalCloseBtn,
 div.dialogBox.form-jumploader_form #modalCloseBtn,
 div.dialogBox.form-external_download #modalCloseBtn,
+div.dialogBox.form-smplayer_editor #modalCloseBtn,
 div.dialogBox.form-plupload_form #modalCloseBtn {
   display: block;
   color: rgba(0, 0, 0, 0.53);
