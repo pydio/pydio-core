@@ -1587,8 +1587,18 @@ class ShareCenter extends AJXP_Plugin
             if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
                 $invitation = $shareObject->getPendingInvitation();
                 if(!empty($invitation)){
+                    try{
+                        $ocsClient->sendInvitation($invitation);
+                    }catch (Exception $e){
+                        $this->getShareStore()->deleteShare("minisite", $shareObject->getHash(), true);
+                        $shareUserId = $shareObject->getUniqueUser();
+                        unset($users[$shareUserId]);
+                        if(!count($users) && !count($groups)){
+                            $this->getShareStore()->deleteShare("repository", $newRepo->getId());
+                        }
+                        throw $e;
+                    }
                     $ocsStore->storeInvitation($invitation);
-                    $ocsClient->sendInvitation($invitation);
                 }
             }else{
                 $this->getPublicAccessManager()->initFolder();
