@@ -459,19 +459,29 @@
             this.wrapper.remove();
         },
 
+        handleRemoveTplBasedWorkspace: function(event){
+            event.stopPropagation();
+            if(!global.confirm(this.props.pydio.MessageHash['424'])){
+                return;
+            }
+            PydioApi.getClient().request({get_action:'user_delete_repository', repository_id:this.props.workspace.getId()}, function(transport){
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
+            });
+        },
+
         onClick:function() {
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
         },
 
         render:function(){
-            var current = this.props.pydio.user.getActiveRepository(),
+            var current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
                 currentClass="workspace-entry",
                 messages = this.props.pydio.MessageHash,
                 onHover, onOut, onClick,
                 additionalAction,
                 badge, badgeNum, newWorkspace;
 
-            if (current == this.props.workspace.getId()) {
+            if (current) {
                 currentClass +=" workspace-current";
             }
 
@@ -512,14 +522,15 @@
 
             if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
                 newWorkspace = <span className="workspace-new">NEW</span>;
-
                 // Dialog for remote shares
                 if (this.props.workspace.getRepositoryType() == "remote") {
                     onClick = this.handleOpenAlert.bind(this, 'new_share');
                 }
-            }else if(this.props.workspace.getRepositoryType() == "remote"){
+            }else if(this.props.workspace.getRepositoryType() == "remote" && !current){
                 // Remote share but already accepted, add delete
                 additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleOpenAlert.bind(this, 'reject_accepted')} title={messages['550']}/>;
+            }else if(this.props.workspace.userEditable && !current){
+                additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleRemoveTplBasedWorkspace} title={messages['423']}/>;
             }
 
             return (
