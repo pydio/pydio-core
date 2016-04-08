@@ -475,6 +475,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 case "sqlite3":
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
+                case "mysqli":
                 case "mysql":
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
@@ -563,6 +564,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $q['where'][] = ['[searchable_repositories] LIKE %~like~', $likeRepositoryId];
                 break;
             case "mysql":
+            case "mysqli":
                 $q['where'][] = ['[serial_role] LIKE %~like~', $likeRepositoryId];
                 break;
             default:
@@ -744,6 +746,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                         time()
                     );
                     break;
+                case "mysqli":
                 case "mysql":
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)",
                         $roleId,
@@ -777,6 +780,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin,%s,%i)", $role->getId(), serialize($role), serialize($role->listAcls()), time());
                 }
                 break;
+            case "mysqli":
             case "mysql":
                 dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])", $role->getId(), serialize($role), time());
                 break;

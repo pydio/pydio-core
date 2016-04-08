@@ -409,6 +409,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $mFunc = "strftime('%m', [logdate])";
                 $dFunc = "date([logdate])";
                 break;
+            case "mysqli":
             case "mysql":
                 $yFunc = "YEAR([logdate])";
                 $mFunc = "MONTH([logdate])";
