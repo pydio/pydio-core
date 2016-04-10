@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -22,24 +22,24 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * Check that DOMXml is enabled
+ * Check that intl is enabled
  * @package AjaXplorer
  * @subpackage Tests
  */
-class PHP_APC extends AbstractTest
+class PHP_INTL extends AbstractTest
 {
-    public function __construct() { parent::__construct("PHP APC extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+    public function __construct() { parent::__construct("PHP INTL extension", "Pydio used intl to localize month names."); }
     public function doTest()
     {
         $this->failedLevel = "warning";
 
-        if (extension_loaded('apc')) {
-            $this->failedInfo = "PHP APC extension detected, this is good for better performances";
-            $this->testedParams["PHP APC extension loaded"] = "Yes";
+        if (extension_loaded('intl')) {
+            $this->failedInfo = "PHP INTL extension detected. Month names can be localized depending on the users language.";
+            $this->testedParams["PHP INTL extension loaded"] = "Yes";
             return TRUE;
         } else {
-            $this->testedParams["PHP APC extension loaded"] = "No";
-            $this->failedInfo = "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
+            $this->failedInfo = "PHP INTL extension missing. English month names will be used for all languages.";
+            $this->testedParams["PHP INTL extension loaded"] = "No";
             return FALSE;
         }
     }
