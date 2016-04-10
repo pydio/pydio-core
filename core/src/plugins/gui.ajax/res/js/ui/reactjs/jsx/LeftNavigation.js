@@ -353,18 +353,29 @@
                     </div>
                 );
             }
+            
+            let workspacesTitle, sharedEntriesTitle, createActionTitle;
+            if(entries.length){
+                workspacesTitle = <div className="section-title">{messages[468]}</div>;
+            }
+            if(sharedEntries.length){
+                sharedEntriesTitle = <div className="section-title">{messages[469]}</div>;
+            }
+            if(createAction){
+                createActionTitle = <div className="section-title"></div>;
+            }
 
             return (
                 <div>
-                    <div className="section-title">{messages[468]}</div>
+                    {workspacesTitle}
                     <div className="workspaces">
                         {entries}
                     </div>
-                    <div className="section-title">{messages[469]}</div>
+                    {sharedEntriesTitle}
                     <div className="workspaces">
                         {sharedEntries}
                     </div>
-                    <div className="section-title"></div>
+                    {createActionTitle}
                     {createAction}
                 </div>
             );
@@ -425,24 +436,37 @@
             }.bind(this));
         },
 
-        handleOpenAlert: function () {
+        handleOpenAlert: function (mode = 'new_share', event) {
+            event.stopPropagation();
             this.wrapper = document.body.appendChild(document.createElement('div'));
             this.wrapper.style.zIndex = 11;
             var replacements = {
                 '%%OWNER%%': this.props.workspace.getOwner()
             };
-            var component = React.render(
+            React.render(
                 <Confirm
                     {...this.props}
+                    mode={mode}
                     replacements={replacements}
-                    onAccept={this.handleAccept.bind(this)}
-                    onDecline={this.handleDecline.bind(this)}
+                    onAccept={mode == 'new_share' ? this.handleAccept.bind(this) : this.handleDecline.bind(this)}
+                    onDecline={mode == 'new_share' ? this.handleDecline.bind(this) : this.handleCloseAlert.bind(this)}
                     onDismiss={this.handleCloseAlert}
                 />, this.wrapper);
         },
 
         handleCloseAlert: function() {
+            React.unmountComponentAtNode(this.wrapper);
             this.wrapper.remove();
+        },
+
+        handleRemoveTplBasedWorkspace: function(event){
+            event.stopPropagation();
+            if(!global.confirm(this.props.pydio.MessageHash['424'])){
+                return;
+            }
+            PydioApi.getClient().request({get_action:'user_delete_repository', repository_id:this.props.workspace.getId()}, function(transport){
+                PydioApi.getClient().parseXmlMessage(transport.responseXML);
+            });
         },
 
         onClick:function() {
@@ -450,13 +474,14 @@
         },
 
         render:function(){
-            var current = this.props.pydio.user.getActiveRepository(),
+            var current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
                 currentClass="workspace-entry",
                 messages = this.props.pydio.MessageHash,
                 onHover, onOut, onClick,
-                badge, badgeNum, remoteDialog, newWorkspace;
+                additionalAction,
+                badge, badgeNum, newWorkspace;
 
-            if (current == this.props.workspace.getId()) {
+            if (current) {
                 currentClass +=" workspace-current";
             }
 
@@ -497,11 +522,15 @@
 
             if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
                 newWorkspace = <span className="workspace-new">NEW</span>;
-
                 // Dialog for remote shares
                 if (this.props.workspace.getRepositoryType() == "remote") {
-                    onClick = this.handleOpenAlert.bind(this);
+                    onClick = this.handleOpenAlert.bind(this, 'new_share');
                 }
+            }else if(this.props.workspace.getRepositoryType() == "remote" && !current){
+                // Remote share but already accepted, add delete
+                additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleOpenAlert.bind(this, 'reject_accepted')} title={messages['550']}/>;
+            }else if(this.props.workspace.userEditable && !current){
+                additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleRemoveTplBasedWorkspace} title={messages['423']}/>;
             }
 
             return (
@@ -515,7 +544,7 @@
                     {badge}
                     <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}{badgeNum}</span>
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
-                    {remoteDialog}
+                    {additionalAction}
                 </div>
             );
         }
@@ -523,11 +552,12 @@
     });
 
     var Confirm = React.createClass({
-        getDefaultProps: function() {
-            return {
-                confirmLabel: 'OK',
-                abortLabel: 'Cancel'
-            };
+
+        propTypes:{
+            pydio:React.PropTypes.instanceOf(Pydio),
+            onDecline:React.PropTypes.func,
+            onAccept:React.PropTypes.func,
+            mode:React.PropTypes.oneOf(['new_share','reject_accepted'])
         },
 
         componentDidMount: function () {
@@ -542,6 +572,13 @@
                     { text: messages[548], ref: 'decline', onClick: this.props.onDecline},
                     { text: messages[547], ref: 'accept', onClick: this.props.onAccept}
                 ];
+            if(this.props.mode == 'reject_accepted'){
+                messageBody = messages[549];
+                actions = [
+                    { text: messages[54], ref: 'decline', onClick: this.props.onDecline},
+                    { text: messages[551], ref: 'accept', onClick: this.props.onAccept}
+                ];
+            }
 
             for (var key in this.props.replacements) {
                 messageTitle = messageTitle.replace(new RegExp(key), this.props.replacements[key]);

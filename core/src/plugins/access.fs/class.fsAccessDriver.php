@@ -2040,7 +2040,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             "PATH" => SystemTextEncoding::toStorageEncoding($repository->getOption("PATH")).AJXP_Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE" => $repository->getOption("CREATE"),
             "RECYCLE_BIN" => isSet($httpVars["inherit_recycle"])? $repository->getOption("RECYCLE_BIN") : "",
-            "DEFAULT_RIGHTS" => "");
+            "DEFAULT_RIGHTS" => "",
+            "DATA_TEMPLATE" => ""
+        );
         if ($repository->getOption("USE_SESSION_CREDENTIALS")===true) {
             $newOptions["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
         }

@@ -125,7 +125,8 @@ class ShareLink
         if(isSet($this->internal["REPOSITORY"])){
             return ConfService::getRepositoryById($this->internal["REPOSITORY"]);
         }else{
-            throw new Exception("No repository attached!");
+            $mess = ConfService::getMessages();
+            throw new Exception(str_replace('%s', 'No repository attached to link', $mess["share_center.219"]));
         }
     }
 
@@ -163,7 +164,8 @@ class ShareLink
             $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
             if(strlen($value) < $this->store->hashMinLength){
-                throw new Exception("Custom link is too short, please use at least ".$this->store->hashMinLength." characters");
+                $mess = ConfService::getMessages();
+                throw new Exception(str_replace("%s", $this->store->hashMinLength, $mess["share_center.223"]));
             }
             $test = $this->store->loadShare($value);
             $mess = ConfService::getMessages();

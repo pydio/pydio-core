@@ -302,6 +302,7 @@
                     <xs:attribute name="text" use="required" type="xs:NMTOKEN"/>
                     <xs:attribute name="title" use="required" type="xs:NMTOKEN"/>
                     <xs:attribute name="write" type="xs:boolean"/>
+                    <xs:attribute name="canWrite" type="xs:boolean"/>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

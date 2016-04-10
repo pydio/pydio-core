@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
-        <global_param name="ENABLE_FILE_PUBLIC_LINK" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Enable public link generation for files]" label="CONF_MESSAGE[Enable public links for files]" type="boolean" default="true" expose="true"/>
+        <global_param name="ENABLE_FILE_PUBLIC_LINK" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Allow users to generate public links on files]" label="CONF_MESSAGE[Files: enable public links]" type="boolean" default="true" expose="true"/>
+        <global_param name="ENABLE_FILE_INTERNAL_SHARING" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Enable internal file sharing (sharing with users existing or temporary users)]" label="CONF_MESSAGE[Files: enable internal sharing]" type="boolean" mandatory="true" default="true" expose="true"/>
+        <global_param name="ENABLE_FOLDER_PUBLIC_LINK" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Allow users to generate public links on folders]" label="CONF_MESSAGE[Folders: enable public links]" type="boolean" default="true" expose="true"/>
+        <global_param name="ENABLE_FOLDER_INTERNAL_SHARING" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Enable internal folder sharing (sharing with users existing or temporary users)]" label="CONF_MESSAGE[Folders: enable internal sharing]" type="boolean" mandatory="true" default="true" expose="true"/>
         <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="true"/>
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
         <global_param name="HASH_USER_EDITABLE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Allow users to manually choose a hash for the generated links]" label="CONF_MESSAGE[Hash user-editable]" type="boolean" default="true" expose="true"/>
@@ -10,10 +13,9 @@
         <global_param name="SHARE_FORCE_PASSWORD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Do not allow users to create public links, only private links (password-protected)]" label="CONF_MESSAGE[Set password mandatory]" type="boolean" default="false" expose="true"/>
         <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="false" expose="true"/>
-        <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="select" choices="both|CONF_MESSAGE[Minisites and Workspaces],minisite|CONF_MESSAGE[Minisites only],workspace|CONF_MESSAGE[Workspaces only],disable|CONF_MESSAGE[Disable Folder Sharing]" mandatory="true" default="both" expose="true"/>
-        <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
-        <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
-        <global_param name="FORK_EVENT_FORWARDING" group="CONF_MESSAGE[Folder Sharing]" type="boolean" label="CONF_MESSAGE[Fork Events Forwarding]" description="CONF_MESSAGE[If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.]" default="false"/>
+        <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Internal Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
+        <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Internal Sharing]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
+        <global_param name="FORK_EVENT_FORWARDING" group="CONF_MESSAGE[Internal Sharing]" type="boolean" label="CONF_MESSAGE[Fork Events Forwarding]" description="CONF_MESSAGE[If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.]" default="false"/>
         <global_param name="CUSTOM_SHAREPAGE_TITLE" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Page Title]" description="CONF_MESSAGE[Share page title. Use AJXP_FILENAME keyword to display the file name.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text]" description="CONF_MESSAGE[Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND_PASS" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text w/ Pass]" description="CONF_MESSAGE[Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
@@ -32,8 +34,6 @@
         <resources>
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
-            <js file="plugins/action.share/qrcode.js" className="QRCode" autoload="false"/>
-            <js file="plugins/action.share/class.ShareCenter.js" className="ShareCenter" autoload="false"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
@@ -79,22 +79,8 @@
                 </processing>
             </action>
             <action name="share">
-                <!--
-                <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
-                    <selectionContext dir="false" evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')" file="true" recycle="false" unique="false"/>
-                </gui>
-                -->
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <!--
-                    <clientListener name="init"><![CDATA[
-                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") == "disable" ){
-                            var action = pydio.getController().getActionByName('share');
-                            if(action) action.selectionContext.dir = false;
-                        }
-                    ]]></clientListener>
-                    -->
                     <serverCallback methodName="switchAction" restParams="/simple_share_type/file+" developerComment="Main action for sharing a file or a folder">
                         <input_param description="Path of the resource to share" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <input_param description="Simple type for sharing via the REST api, always links, public or private" name="simple_share_type" type="public|private" mandatory="false"/>

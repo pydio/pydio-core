@@ -155,7 +155,8 @@ class ShareStore {
     public function loadShareObject($hash){
         $data = $this->loadShare($hash);
         if($data === false){
-            throw new Exception("Cannot find share with hash ".$hash);
+            $mess = ConfService::getMessages();
+            throw new Exception(str_replace('%s', 'Cannot find share with hash '.$hash, $mess["share_center.219"]));
         }
         if(isSet($data["TARGET"]) && $data["TARGET"] == "remote"){
             $shareObject = new Pydio\OCS\Model\TargettedLink($this, $data);
@@ -347,16 +348,12 @@ class ShareStore {
             }
             $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
             foreach($oldRepos as $sharedWorkspace){
-                if(!$sharedWorkspace->hasContentFilter()){
-                    $dbLets['repo-'.$sharedWorkspace->getId()] = array(
-                        "SHARE_TYPE"    => "repository",
-                        "OWNER_ID"      => $sharedWorkspace->getOwner(),
-                        "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
-                        "LEGACY_REPO_OR_MINI"   => true
-                    );
-                    //Auto Migrate? boaf.
-                    //$this->storeShare($sharedWorkspace->getParentId(), $data, "repository");
-                }
+                $dbLets['repo-'.$sharedWorkspace->getId()] = array(
+                    "SHARE_TYPE"    => "repository",
+                    "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                    "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                    "LEGACY_REPO_OR_MINI"   => true
+                );
             }
         }
 
@@ -392,8 +389,11 @@ class ShareStore {
     /**
      * @param String $type
      * @param String $element
-     * @throws Exception
+     * @param bool $keepRepository
+     * @param bool $ignoreRepoNotFound
+     * @param null $ajxpNode
      * @return bool
+     * @throws Exception
      */
     public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false, $ajxpNode = null)
     {
@@ -410,7 +410,7 @@ class ShareStore {
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
                 }
                 if($repo == null && !$ignoreRepoNotFound){
-                    throw new Exception("repo-not-found");
+                    throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
                 }
             }
             if($repo != null){
@@ -442,9 +442,12 @@ class ShareStore {
             $repoId = $minisiteData["REPOSITORY"];
             $repo = ConfService::getRepositoryById($repoId);
             if ($repo == null) {
-                throw new Exception('repo-not-found');
+                if(!$ignoreRepoNotFound) {
+                    throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
+                }
+            }else{
+                $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             }
-            $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             if(!$keepRepository){
                 $res = ConfService::deleteRepository($repoId);
                 if ($res == -1) {
@@ -701,7 +704,8 @@ class ShareStore {
         $repoId = $data["REPOSITORY"];
         $repo = ConfService::getRepositoryById($repoId);
         if ($repo == null) {
-            throw new Exception("Cannot find associated share");
+            $mess = ConfService::getMessages();
+            throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
         }
         $this->testUserCanEditShare($repo->getOwner(), $repo->options);
         PublicletCounter::reset($hash);
@@ -743,7 +747,7 @@ class ShareStore {
                 continue;
             }
             if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
+                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($hash)) ) {
                 if(!$currentUser) $switchBackToOriginal = true;
                 $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
@@ -781,11 +785,11 @@ class ShareStore {
                 // Cannot load this repository anymore.
             }
         }
-        if($repoLoaded){
+        if($repoLoaded && isSet($data["FILE_PATH"])){
             AJXP_Controller::registryReset();
             $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
         }
-        $this->deleteShare("file", $elementId);
+        $this->deleteShare($data['SHARE_TYPE'], $elementId, false, true);
         if(isSet($ajxpNode)){
             try{
                 $this->getMetaManager()->removeShareFromMeta($ajxpNode, $elementId);

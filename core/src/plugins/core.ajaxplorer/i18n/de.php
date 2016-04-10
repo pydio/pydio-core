@@ -648,5 +648,8 @@ $mess=array(
 "545" => "Freigabe von entferntem System",
 "546" => "Dieses Element wurde von %%OWNER%% für Sie von einem entfernten System freigegeben. Möchten sie fortfahren?",
 "547" => "Akzeptieren",
-"548" => "Ablehnen"
+"548" => "Ablehnen",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
 );
