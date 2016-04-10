@@ -21,5 +21,5 @@
 
 $mess = array(
     "Selection Cart" => "Korb",
-    "Select files to a cart and download/share all at once" => "Dateien in einem Korb sammeln und später herunterzuladen oder freizugeben.",
+    "Select files to a cart and download/share all at once" => "Dateien in einem Korb sammeln und später herunterladen oder freigeben.",
 );
