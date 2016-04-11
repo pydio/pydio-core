@@ -139,7 +139,7 @@ class PydioSdkGenerator
                     array(
                         "method"        => empty($http) ? "POST" : strtoupper($http),
                         "summary"       => substr($comment, 0, 80) . (strlen($comment) > 80 ? "..." : ""),
-                        "notes"         => $comment."<br>Sdk name: ". $methodName."()",
+                        "notes"         => $comment,
                         "responseClass" => $outputType,
                         "nickname"      => $methodName,
                         "parameters"    => $swaggerParams
