@@ -1587,6 +1587,7 @@ class ShareCenter extends AJXP_Plugin
             if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
                 $invitation = $shareObject->getPendingInvitation();
                 if(!empty($invitation)){
+                    $ocsStore->generateInvitationId($invitation);
                     try{
                         $ocsClient->sendInvitation($invitation);
                     }catch (Exception $e){

@@ -25,6 +25,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 interface IStore
 {
+
+    /**
+     * Generate a unique ID for invitation
+     * @param ShareInvitation $invitation
+     * @return mixed
+     */
+    public function generateInvitationId(ShareInvitation &$invitation);
     /**
      * Persists an invitation to store
      * @param ShareInvitation $invitation
