@@ -83,7 +83,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             $currentTime = @filemtime($url);
             if($currentTime === false && !file_exists($url)) {
                 // Deleted folder!
-                $this->logDebug(__FUNCTION__, "Folder deleted directly on storage: ".$url);
+                $this->logDebug(__FUNCTION__, "Folder deleted directly on storage: ".SystemTextEncoding::toUTF8($url));
                 $node = new AJXP_Node($url);
                 AJXP_Controller::applyHook("node.change", array(&$node, null, false), true);
                 continue;
@@ -112,35 +112,35 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         // NOW COMPUTE DIFFS
         foreach($modified as $mod_data){
             $url = $mod_data["url"];
-            $this->logDebug("Current folder is ".$url);
+            $this->logDebug("Current folder is ".SystemTextEncoding::toUTF8($url));
             $current_time = $mod_data["current_time"];
             $currentChildren = $mod_data["children"];
             $files = scandir($url);
             foreach($files as $f){
                 if($f[0] == ".") continue;
                 $nodeUrl = $url."/".$f;
-                $this->logDebug(__FUNCTION__, "Scanning ".$nodeUrl);
+                $this->logDebug(__FUNCTION__, "Scanning ".SystemTextEncoding::toUTF8($nodeUrl));
                 $node = new AJXP_Node($nodeUrl);
                 // Ignore dirs modified time
                 // if(is_dir($nodeUrl) && $mod_data["path"] != "/") continue;
                 if(!isSet($currentChildren[$f])){
                     if($this->excludeFromSync($nodeUrl)){
-                        $this->logDebug(__FUNCTION__, "Excluding item detected on storage: ".$nodeUrl);
+                        $this->logDebug(__FUNCTION__, "Excluding item detected on storage: ".SystemTextEncoding::toUTF8($nodeUrl));
                         continue;
                     }
                     // New items detected
-                    $this->logDebug(__FUNCTION__, "New item detected on storage: ".$nodeUrl);
+                    $this->logDebug(__FUNCTION__, "New item detected on storage: ".SystemTextEncoding::toUTF8($nodeUrl));
                     AJXP_Controller::applyHook("node.change", array(null, &$node, false, true), true);
                     continue;
                 }else {
                     if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
                     if(filemtime($nodeUrl) > $currentChildren[$f]){
                         if($this->excludeFromSync($nodeUrl)){
-                            $this->logDebug(__FUNCTION__, "Excluding item changed on storage: ".$nodeUrl);
+                            $this->logDebug(__FUNCTION__, "Excluding item changed on storage: ".SystemTextEncoding::toUTF8($nodeUrl));
                             continue;
                         }
                         // Changed!
-                        $this->logDebug(__FUNCTION__, "Item modified directly on storage: ".$nodeUrl);
+                        $this->logDebug(__FUNCTION__, "Item modified directly on storage: ".SystemTextEncoding::toUTF8($nodeUrl));
                         AJXP_Controller::applyHook("node.change", array(&$node, &$node, false), true);
                     }
                 }
@@ -149,11 +149,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 $this->logDebug(__FUNCTION__, "Existing children ".$cPath);
                 if(!in_array($cPath, $files)){
                     if($this->excludeFromSync($url."/".$cPath)){
-                        $this->logDebug(__FUNCTION__, "Excluding item deleted on storage: ".$url."/".$cPath);
+                        $this->logDebug(__FUNCTION__, "Excluding item deleted on storage: ".SystemTextEncoding::toUTF8($url)."/".SystemTextEncoding::toUTF8($cPath));
                         continue;
                     }
                     // Deleted
-                    $this->logDebug(__FUNCTION__, "File deleted directly on storage: ".$url."/".$cPath);
+                    $this->logDebug(__FUNCTION__, "File deleted directly on storage: ".SystemTextEncoding::toUTF8($url)."/".SystemTextEncoding::toUTF8($cPath));
                     $node = new AJXP_Node($url."/".$cPath);
                     AJXP_Controller::applyHook("node.change", array(&$node, null, false), true);
                 }
@@ -493,23 +493,23 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
                 if($oldNode == null) {
-                    AJXP_Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
+                    AJXP_Logger::debug("Ignoring ".SystemTextEncoding::toUTF8($newNode->getUrl())." for indexation");
                     return;
                 }else{
-                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
+                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".SystemTextEncoding::toUTF8($newNode->getUrl()));
                     $newNode = null;
                 }
             }
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
                 // DELETE
-                $this->logDebug('DELETE', $oldNode->getUrl());
+                $this->logDebug('DELETE', SystemTextEncoding::toUTF8($oldNode->getUrl()));
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
             } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
                 $newNode->setLeaf(!($stat['mode'] & 040000));
-                $this->logDebug('INSERT', $newNode->getUrl());
+                $this->logDebug('INSERT', SystemTextEncoding::toUTF8($newNode->getUrl()));
                 dibi::query("INSERT INTO [ajxp_index]", array(
                     "node_path" => SystemTextEncoding::toUTF8($newNode->getPath()),
                     "bytesize"  => $stat["size"],
@@ -528,7 +528,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     clearstatcache();
                     $stat = stat($newNode->getUrl());
                     $this->logDebug("Content changed", "current stat size is : " . $stat["size"]);
-                    $this->logDebug('UPDATE CONTENT', $newNode->getUrl());
+                    $this->logDebug('UPDATE CONTENT', SystemTextEncoding::toUTF8($newNode->getUrl()));
                     dibi::query("UPDATE [ajxp_index] SET ", array(
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],
@@ -537,7 +537,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     try{
                         $rowCount = dibi::getAffectedRows();
                         if($rowCount === 0){
-                            $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
+                            $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".SystemTextEncoding::toUTF8($newNode->getPath())."), creating index entry!");
                             $this->updateNodesIndex(null, $newNode, false);
                         }
                     }catch (Exception $e){}
@@ -546,19 +546,19 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     // PATH CHANGE ONLY
                     $newNode->loadNodeInfo();
                     if ($newNode->isLeaf()) {
-                        $this->logDebug('UPDATE LEAF PATH', $newNode->getUrl());
+                        $this->logDebug('UPDATE LEAF PATH', SystemTextEncoding::toUTF8($newNode->getUrl()));
                         dibi::query("UPDATE [ajxp_index] SET ", array(
                             "node_path"  => SystemTextEncoding::toUTF8($newNode->getPath()),
                         ), "WHERE [node_path] = %s AND [repository_identifier] = %s", SystemTextEncoding::toUTF8($oldNode->getPath()), $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
-                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
+                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".SystemTextEncoding::toUTF8($newNode->getPath())."), creating index entry!");
                                 $this->updateNodesIndex(null, $newNode, false);
                             }
                         }catch (Exception $e){}
                     } else {
-                        $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
+                        $this->logDebug('UPDATE FOLDER PATH', SystemTextEncoding::toUTF8($newNode->getUrl()));
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             SystemTextEncoding::toUTF8($oldNode->getPath()),
                             SystemTextEncoding::toUTF8($newNode->getPath())
@@ -566,7 +566,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
-                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".$newNode->getPath()."), relaunching a recursive indexation!");
+                                $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".SystemTextEncoding::toUTF8($newNode->getPath())."), relaunching a recursive indexation!");
                                 AJXP_Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
                             }
                         }catch (Exception $e){}

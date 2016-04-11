@@ -115,7 +115,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
      */
     public function checkFileLock($node)
     {
-        $this->logDebug("SHOULD CHECK LOCK METADATA FOR ", $node->getLabel());
+        $this->logDebug("SHOULD CHECK LOCK METADATA FOR ", SystemTextEncoding::toUTF8($node->getLabel()));
         $lock = $this->metaStore->retrieveMetadata(
            $node,
            SimpleLockManager::METADATA_LOCK_NAMESPACE,

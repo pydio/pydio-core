@@ -642,8 +642,8 @@ $mess=array(
 "546" => "Ce partage provient de %%OWNER%% d'un système distant. Souhaîtez-vous continuer ?",
 "547" => "Accepter",
 "548" => "Refuser",
-    "549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
-    "550" => "Rejeter ce partage",
-    "551" => "Rejeter",
+"549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
+"550" => "Rejeter ce partage",
+"551" => "Rejeter",
 /* END SENTENCE */
 );

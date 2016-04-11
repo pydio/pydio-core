@@ -208,7 +208,7 @@ class ZohoEditor extends AJXP_Plugin
             $node->loadNodeInfo();
 
             if(!$repoWriteable || !is_writeable($node->getUrl())){
-                $this->logError("Zoho Editor", "Trying to edit an unauthorized file ".$node->getUrl());
+                $this->logError("Zoho Editor", "Trying to edit an unauthorized file ".SystemTextEncoding::toUTF8($node->getUrl()));
                 echo "NOT_ALLOWED";
                 return false;
             }
