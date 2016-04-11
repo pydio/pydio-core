@@ -20,7 +20,7 @@
  */
 $mess = array(
     // will be replaced by the application title
-    "1" => "Archiv wir angelegt, bitte warten",
+    "1" => "Archiv wird erstellt. Bitte warten...",
     "2" => "Aktuellen Ordner neu laden",
     "3" => "Der Download des Archivs sollte automatisch starten"
 );

@@ -21,7 +21,7 @@
 
 $mess = array(
     "1" => "Schnelles Senden",
-    "2" => "Sende eine Datei, teile sie und sende eine Email mit den Link an jemand anderes.",
+    "2" => "Eine Datei freigeben und den Link per E-Mail versenden.",
     "3" => "Eine Datei auswählen",
     "4" => "Wählen Sie eine Datei zum Senden oder zieh sie in die Zone darunter",
 );

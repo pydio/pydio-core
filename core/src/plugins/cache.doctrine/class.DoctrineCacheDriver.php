@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require __DIR__ . "/doctrine/vendor/autoload.php";
 
-define('APC_EXTENSION_LOADED', extension_loaded('apc'));
+define('APC_EXTENSION_LOADED', extension_loaded('apc') || extension_loaded('apcu'));
 define('MEMCACHE_EXTENSION_LOADED', extension_loaded('memcache'));
 define('MEMCACHED_EXTENSION_LOADED', extension_loaded('memcached'));
 define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
@@ -111,7 +111,11 @@ class doctrineCacheDriver extends AbstractCacheDriver
     }
 
     public function _apc_init($options) {
-        $this->cacheDriver = new Cache\ApcCache();
+        if (extension_loaded('apcu')) {
+            $this->cacheDriver = new Cache\ApcuCache();
+        } else {
+            $this->cacheDriver = new Cache\ApcCache();
+        }
     }
 
     public function _memcache_init($options) {

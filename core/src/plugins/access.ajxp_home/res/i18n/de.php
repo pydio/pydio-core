@@ -23,8 +23,8 @@ $mess=array(
 "desc" => "Willkommen-Seite",
 "39"=> "Arbeitsumgebung auswählen",
 "40"=> "Willkommen, %s",
-"41"=> "Standardmässig verwenden",
-"42"=> "Betreten",
+"41"=> "Standardmässig öffnen",
+"42"=> "Öffnen",
 "43"=> "Mein Profil",
 "43t"=> "Alle meine persönlichen Dateien",
 "44"=> "Mein Konto",
@@ -34,11 +34,11 @@ $mess=array(
 "48"=> "Meine Benutzer",
 "49"=> "Externe Benutzer, die Sie erstellt haben",
 "50"=> "Meine Teams",
-"51"=> "Teams von Benutzern zum schnellen Teilen von Inhalten",
-"52"=> "Wollen Sie dieses Team wirklich löschen? Es werden dabei keine Benutzer gelöscht.",
+"51"=> "Um Inhalte schnell an einen bestimmten Personenkreis freizugeben.",
+"52"=> "Möchten Sie dieses Team wirklich löschen? Es werden dabei keine Benutzer gelöscht.",
     "53"=> "Erste Schritte",
     "54"=> "Machen Sie Ihre ersten Schritte mit APPLICATION_TITLE mit folgenden Video-Kurzanleitungen",
-    "55"=> "Brauchen Sie Unterstützung für die <a>ersten Schritte?</a>",
+    "55"=> "Unterstützung für die <a>ersten Schritte?</a>",
     "56"=> "Ihre ersten Schritte mit APPLICATION_TITLE? Hier finden Sie einige Videos dazu.",
     "57"=> "APPLICATION_TITLE herunterladen für...",
     "58"=> "Android",
@@ -55,21 +55,21 @@ $mess=array(
                 <li>Schellzugriff über Lesezeichen oder die Suche</li>
                 <li>Auswahl-Liste</li>
             </ul>",
-    "63"=>"<h2>Dateien mit APPLICATION_TITLE teilen</h2>
-                            In dieser Erklärung finden Sie die Grundlagen zum Teilen von Dateien mit APPLICATION_TITLE:
+    "63"=>"<h2>Dateien freigeben</h2>
+                            In dieser Erklärung finden Sie die Grundlagen zum Freigeben von Dateien mit APPLICATION_TITLE:
                             <ul>
                                 <li>Neue Web-Links erstellen</li>
                                 <li>Links internen oder externen Benutzern senden</li>
                                 <li>Benachrichtigungen beim Download eines Links</li>
                                 <li>Erstellen eines Passwort-geschützten Links</li>
                                 <li>Erstellen mehrerer Links zu einer Datei</li>
-                                <li>Teilen einer Datei beenden</li>
+                                <li>Freigabe einer Datei beenden</li>
             </ul>",
-    "64"=>"<h2>Ordner mit APPLICATION_TITLE teilen</h2>
-                            Das folgende Video erklärt das Teilen von Ordnern mit APPLICATION_TITLE
+    "64"=>"<h2>Ordner freigeben</h2>
+                            Das folgende Video erklärt das Freigeben von Ordnern mit APPLICATION_TITLE
                             <ul>
-                                <li>Als neue Arbeitsumgebung teilen</li>
-                                <li>Als öffentliche Miniseite teilen</li>
+                                <li>Als neue Arbeitsumgebung freigeben</li>
+                                <li>Als öffentlichen Link freigeben</li>
             </ul>",
     "65"=> "Mehr über APPLICATION_TITLE im YouTube-Kanal erfahren!",
     "66"=>"<h2>APPLICATION_TITLE auf iOS-Geräten verwenden</h2>
