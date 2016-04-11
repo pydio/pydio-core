@@ -51,8 +51,8 @@ $mess = array(
     "Emails frequency" => "E-Mail-Häufigkeit",
     "Receive Notifcations by email" => "Benachrichtigungen per E-Mail erhalten",
     "Active notifications by email" => "Benachrichtigungen per E-Mail",
-    "Sender" => "Sender",
-    "Content" => "Content",
-    "Activate Queue" => "Activate Queue",
-    "Store emails in a queue and batch-process them. Users can choose the sending frequency. Make sure to set up a CRON on consume_mail_queue action if you use this option." => "Store emails in a queue and batch-process them. Users can choose the sending frequency. Make sure to set up a CRON on consume_mail_queue action if you use this option."
+    "Sender" => "Absender",
+    "Content" => "Inhalt",
+    "Activate Queue" => "Warteschlange aktivieren",
+    "Store emails in a queue and batch-process them. Users can choose the sending frequency. Make sure to set up a CRON on consume_mail_queue action if you use this option." => "E-Mails werden aus einer Warteschlange versendet. Die Häufigkeit ist konfigurierbar. Stellen Sie sicher, dass per CRON die Aktion consume_mail_queue aufgerufen wird."
 );
