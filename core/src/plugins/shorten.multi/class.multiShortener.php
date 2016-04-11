@@ -13,6 +13,20 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class multiShortener extends AJXP_Plugin
 {
+
+    /**
+     * @param string $url
+     * @param string $shorten
+     */
+    public function processShortenHook($url, &$shorten){
+        $shorten = $this->generateLink($url);
+    }
+
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $params
+     */
     public function postProcess($action, $httpVars, $params)
     {
         $type = $this->getFilteredOption("SHORTEN_TYPE");
@@ -26,12 +40,24 @@ class multiShortener extends AJXP_Plugin
             $url = $params["ob_output"];
         }
 
+        $res =  $this->generateLink($url);
+        if(!empty($res)){
+            $this->updateMetaShort($httpVars["file"], $elementId, $res);
+            print($res);
+        }else{
+            print($url);
+        }
+    }
+
+    protected function generateLink($url){
+
+        $type = $this->getFilteredOption("SHORTEN_TYPE");
+        if(empty($type)) return null;
         switch (intval($type["shorten_type"])) {
             case 0:
                 if (!isSet($type["ADFLY_TYPE"]) || !isSet($type["ADFLY_APIKEY"]) || !isSet($type["ADFLY_UID"]) || !isSet($type["ADFLY_DOMAIN"])) {
-                    print($url);
                     $this->logError("Config", "adFly Shortener : you must set the api key!");
-                    return;
+                    break;
                 }
                 $adfly_type = $type["ADFLY_TYPE"];
                 $adfly_api = $type["ADFLY_APIKEY"];
@@ -42,18 +68,14 @@ class multiShortener extends AJXP_Plugin
                 $response = strip_tags($response, '<body>');
                 $response = strip_tags($response);
                 if (isSet($response)) {
-                    print($response);
-                    $this->updateMetaShort($httpVars["file"], $elementId, $response);
-                } else {
-                    print($url);
+                    return $response;
                 }
                 break;
 
             case 1:
                 if (!isSet($type["BITLY_USER"]) || !isSet($type["BITLY_APIKEY"])) {
-                    print($url);
                     $this->logError("Config", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
-                    return;
+                    break;
                 }
                 $bitly_login = $type["BITLY_USER"];
                 $bitly_api = $type["BITLY_APIKEY"];
@@ -63,18 +85,14 @@ class multiShortener extends AJXP_Plugin
                 $response = AJXP_Utils::getRemoteContent($bitly);
                 $json = json_decode($response, true);
                 if (isSet($json['results'][$url]['shortUrl'])) {
-                    print($json['results'][$url]['shortUrl']);
-                    $this->updateMetaShort($httpVars["file"], $elementId, $json['results'][$url]['shortUrl']);
-                } else {
-                    print($url);
+                    return $json['results'][$url]['shortUrl'];
                 }
                 break;
 
             case 2:
                 if (!isSet($type["GOOGL_APIKEY"])) {
-                    print($url);
                     $this->logError("Config", "Goo.gl Shortener : you must set the api key!");
-                    return;
+                    break;
                 }
                 $data = array(
                     'longUrl' => $url,
@@ -83,10 +101,10 @@ class multiShortener extends AJXP_Plugin
 
                 $options = array(
                     'http' => array(
-                    'method'  => 'POST',
-                    'content' => json_encode( $data ),
-                    'header'=>  "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n"
+                        'method'  => 'POST',
+                        'content' => json_encode( $data ),
+                        'header'=>  "Content-Type: application/json\r\n" .
+                            "Accept: application/json\r\n"
                     )
                 );
 
@@ -95,40 +113,31 @@ class multiShortener extends AJXP_Plugin
                 $result = file_get_contents( $goourl, false, $context );
                 $json = (array) json_decode( $result );
                 if (isSet($json['id'])) {
-                    print($json['id']);
-                    $this->updateMetaShort($httpVars["file"], $elementId, $json['id']);
-                } else {
-                    print($url);
+                    return $json['id'];
                 }
                 break;
 
             case 3:
                 if (!isSet($type["POST_APIKEY"])) {
-                    print($url);
                     $this->logError("Config", "po.st Shortener : you must set the api key!");
-                    return;
+                    break;
                 }
                 $post_api = $type["POST_APIKEY"];
                 $post = 'http://po.st/api/shorten?longUrl='.urlencode($url).'&apiKey='.$post_api.'&format=txt';
                 $response = AJXP_Utils::getRemoteContent($post);
                 if (isSet($response)) {
-                    print($response);
-                    $this->updateMetaShort($httpVars["file"], $elementId, $response);
-                } else {
-                    print($url);
+                    return $response;
                 }
                 break;
 
             case 4:
                 if (!isSet($type["YOURLS_DOMAIN"])) {
-                    print($url);
                     $this->logError("Config", "yourls Shortener : you must set the domain name");
-                    return;
+                    return null;
                 }
                 if (!isSet($type["YOURLS_APIKEY"])) {
-                    print($url);
                     $this->logError("Config", "yourls Shortener : you must set the api key");
-                    return;
+                    return null;
                 }
                 $useidn = false;
                 if (isSet($type["YOURLS_USEIDN"])) {
@@ -147,16 +156,18 @@ class multiShortener extends AJXP_Plugin
                         $purl['host'] = idn_to_utf8($purl['host']);
                         $shorturl = http_build_url($purl);
                     }
-                    print($shorturl);
-                    $this->updateMetaShort($httpVars["file"], $elementId, $shorturl);
-                } else {
-                    print($url);
+                    return $shorturl;
                 }
+                break;
+
+            default:
                 break;
         }
 
+        return null;
 
     }
+
     protected function updateMetaShort($file, $elementId, $shortUrl)
     {
         $context = new UserSelection(ConfService::getRepository());

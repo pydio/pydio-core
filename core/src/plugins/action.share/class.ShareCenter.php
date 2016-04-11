@@ -1602,6 +1602,16 @@ class ShareCenter extends AJXP_Plugin
                 }
             }else{
                 $this->getPublicAccessManager()->initFolder();
+                $url = $this->getPublicAccessManager()->buildPublicLink($shareObject->getHash());
+                $existingShortForm = $shareObject->getShortFormUrl();
+                if(empty($existingShortForm)){
+                    $shortForm = "";
+                    AJXP_Controller::applyHook("url.shorten", array($url, &$shortForm));
+                    if(!empty($shortForm)){
+                        $shareObject->setShortFormUrl($shortForm);
+                        $shareObject->save();
+                    }
+                }
             }
 
         }
