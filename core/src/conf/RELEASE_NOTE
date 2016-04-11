@@ -1,5 +1,49 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio Core 6.4.1 - Bug Fixes for 6.4
+
+Pydio Core 6.4.1 fixes most blocking issues revealed by the massive upgrade to 6.4.0. Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
+
+[Overview]
+Many issues fixed in shares, linked to the deep refactoring of this feature. Amongst others, the "shorten" plugins were broken.
+* UI : Missing close button on some new dialogs, mobile display of the web UI was a little buggy
+* CMS Bridges where broken due to an issue in the glueCode.php file
+* Federated Sharing: some installs could have issues with URI's.
+
+
+[Detailed Changelog]
+Fix GlueCode.php (details)
+Use longer description in api generator. (details)
+Missing media.css file in gruntfile. (details)
+Missing log for ShareNode action (details)
+Fix method signature for PHP7 (details)
+Expand api docs generator (details)
+Rework Share options for folders / files vs. public links / internal sharing - Fix #1143 Better invalid share detection and remove it from meta. Fix many error messages. (details)
+Update i18n (details)
+Core.mailer : add DROP TRIGGER IF EXISTS (details)
+Do not display section title if list is empty - Fix #1154 (details)
+Fix #1148 (details)
+Fix some media CSS (details)
+Fix various glitches on Spanish language. Close #1136 (details)
+Fix #1128 : add the ability to reject a previously accepted share. (details)
+Make sure to transfer an empty DATA_TEMPLATE value to child repository - Fix #1152 Fix broken unsharing. (details)
+Remove legacy share js resources - Discourage people to use old themes for now. (details)
+Add a canWrite attribute on editors declaration, use it in ShareDialog to detect if a file has "writeable" editors and show an additional Edit permission for public links on files. (details)
+Fix various issues with shares lists, especially in My Account & Admin panels. (details)
+Use original_path for header if present in metadata. (details)
+Fix failed remote share: make sure to remove unnecessary data on failure. (details)
+Display close icon for mp3 player. Fix #1156 (details)
+Fix htaccess tpl : replace ocs.php by opencollab.php (details)
+Rewire missing action for deleting user-created workspace. (details)
+Fixing S3 and webdav access (details)
+Fix to #1157: adding support for apcu (details)
+Fix to support mysqli (details)
+Display close icon for versioning plugins (details)
+Updated german translations and unified various words (details)
+Fixed typo (details)
+Fix broken shortener plugins : use a url.shorten hook instead of capturing share action output. Store data in share instead of metadata. (details)
+
+----
 Pydio 6.4.0 is a stable release introducing many important new features!
 
 Installation is done via the "Stable" update channel in-app.
