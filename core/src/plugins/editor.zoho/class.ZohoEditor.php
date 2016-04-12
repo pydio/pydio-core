@@ -129,7 +129,7 @@ class ZohoEditor extends AJXP_Plugin
 
             $node = new AJXP_Node($nodeUrl);
             AJXP_Controller::applyHook("node.read", array($node));
-            $this->logInfo('Preview', 'Posting content of '.$file.' to Zoho server', array("files" => $file));
+            $this->logInfo('Preview', 'Posting content of '.SystemTextEncoding::toUTF8($file).' to Zoho server', array("files" => SystemTextEncoding::toUTF8($file)));
 
             $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
             $httpClient = new http_class();
@@ -222,7 +222,7 @@ class ZohoEditor extends AJXP_Plugin
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";
-                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
+                    $this->logInfo('Edit', 'Retrieved content of '.SystemTextEncoding::toUTF8($node->getUrl()), array("files" => SystemTextEncoding::toUTF8($node->getUrl())));
                     AJXP_Controller::applyHook("node.change", array(null, &$node));
                 }
             } else {
@@ -230,7 +230,7 @@ class ZohoEditor extends AJXP_Plugin
                     copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext, $targetFile);
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
                     echo "MODIFIED";
-                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
+                    $this->logInfo('Edit', 'Retrieved content of '.SystemTextEncoding::toUTF8($node->getUrl()), array("files" => SystemTextEncoding::toUTF8($node->getUrl())));
                     AJXP_Controller::applyHook("node.change", array(null, &$node));
                 }
             }
