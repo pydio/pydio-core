@@ -9,24 +9,34 @@
       }
     ],
     "PARAMETER_SAMPLE":"array($ajxpNode)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AJXP_Node.php",
-        "LINE":158
-      },
-      {
-        "FILE":"\/core\/classes\/class.AJXP_Node.php",
-        "LINE":176
-      },
-      {
-        "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
-        "LINE":193
-      }
-    ],
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AJXP_Node.php",
+          "LINE":177
+        },
+        {
+          "FILE":"\/core\/classes\/class.AJXP_Node.php",
+          "LINE":195
+        }
+      ],
+      "meta.user":[
+        {
+          "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
+          "LINE":260
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"index.lucene",
-        "METHOD":"updateNodeIndexMeta"
+        "METHOD":"updateNodeIndexMeta",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"index.elasticsearch",
+        "METHOD":"updateNodeIndexMeta",
+        "DEFERRED":true
       }
     ]
   },
@@ -50,31 +60,21 @@
       }
     ],
     "PARAMETER_SAMPLE":"array(&$this, $contextNode, $details)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AJXP_Node.php",
-        "LINE":247
-      }
-    ],
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AJXP_Node.php",
+          "LINE":412
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"access.fs",
         "METHOD":"loadNodeInfo"
       },
       {
-        "PLUGIN_ID":"access.imap",
-        "METHOD":"enrichMetadata"
-      },
-      {
-        "PLUGIN_ID":"access.imap",
-        "METHOD":"loadNodeInfo"
-      },
-      {
-        "PLUGIN_ID":"access.webdav",
-        "METHOD":"loadNodeInfo"
-      },
-      {
-        "PLUGIN_ID":"access.hpcloud",
+        "PLUGIN_ID":"access.demo",
         "METHOD":"loadNodeInfo"
       },
       {
@@ -86,15 +86,19 @@
         "METHOD":"loadNodeInfo"
       },
       {
-        "PLUGIN_ID":"access.demo",
-        "METHOD":"loadNodeInfo"
-      },
-      {
         "PLUGIN_ID":"access.ftp",
         "METHOD":"loadNodeInfo"
       },
       {
-        "PLUGIN_ID":"access.smb",
+        "PLUGIN_ID":"access.imap",
+        "METHOD":"enrichMetadata"
+      },
+      {
+        "PLUGIN_ID":"access.imap",
+        "METHOD":"loadNodeInfo"
+      },
+      {
+        "PLUGIN_ID":"access.inbox",
         "METHOD":"loadNodeInfo"
       },
       {
@@ -106,6 +110,26 @@
         "METHOD":"loadNodeInfo"
       },
       {
+        "PLUGIN_ID":"access.sftp_psl",
+        "METHOD":"loadNodeInfo"
+      },
+      {
+        "PLUGIN_ID":"access.smb",
+        "METHOD":"loadNodeInfo"
+      },
+      {
+        "PLUGIN_ID":"access.swift",
+        "METHOD":"loadNodeInfo"
+      },
+      {
+        "PLUGIN_ID":"access.webdav",
+        "METHOD":"loadNodeInfo"
+      },
+      {
+        "PLUGIN_ID":"gui.ajax",
+        "METHOD":"nodeBookmarkMetadata"
+      },
+      {
         "PLUGIN_ID":"editor.diaporama",
         "METHOD":"extractImageMetaData"
       },
@@ -114,43 +138,43 @@
         "METHOD":"extractMimeHeaders"
       },
       {
-        "PLUGIN_ID":"meta.watch",
-        "METHOD":"enrichNode"
-      },
-      {
-        "PLUGIN_ID":"meta.svn",
-        "METHOD":"extractMeta"
-      },
-      {
-        "PLUGIN_ID":"meta.simple_lock",
-        "METHOD":"processLockMeta"
-      },
-      {
-        "PLUGIN_ID":"meta.filehasher",
-        "METHOD":"getFileHash"
-      },
-      {
-        "PLUGIN_ID":"meta.user",
-        "METHOD":"extractMeta"
+        "PLUGIN_ID":"action.share",
+        "METHOD":"nodeSharedMetadata"
       },
       {
         "PLUGIN_ID":"meta.exif",
         "METHOD":"extractMeta"
       },
       {
-        "PLUGIN_ID":"action.share",
-        "METHOD":"nodeSharedMetadata"
+        "PLUGIN_ID":"meta.comments",
+        "METHOD":"mergeMeta"
       },
       {
-        "PLUGIN_ID":"gui.ajax",
-        "METHOD":"nodeBookmarkMetadata"
+        "PLUGIN_ID":"meta.filehasher",
+        "METHOD":"getFileHash"
+      },
+      {
+        "PLUGIN_ID":"meta.simple_lock",
+        "METHOD":"processLockMeta"
+      },
+      {
+        "PLUGIN_ID":"meta.svn",
+        "METHOD":"extractMeta"
+      },
+      {
+        "PLUGIN_ID":"meta.user",
+        "METHOD":"extractMeta"
+      },
+      {
+        "PLUGIN_ID":"meta.watch",
+        "METHOD":"enrichNode"
       },
       {
         "PLUGIN_ID":"cypher.encfs",
         "METHOD":"filterENCFS"
       },
       {
-        "PLUGIN_ID":"downloader.http",
+        "PLUGIN_ID":"uploader.http",
         "METHOD":"detectDLParts"
       }
     ]
@@ -174,15 +198,26 @@
         "DESCRIPTION":"The id of the new user"
       }
     ],
-    "PARAMETER_SAMPLE":"array($userId, $userPass, $isAdmin)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":696
-      }
-    ],
+    "PARAMETER_SAMPLE":"array($userName, null, false, false)",
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":792
+        }
+      ],
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareRightsManager.php",
+          "LINE":515
+        }
+      ]
+    },
     "LISTENERS":[
-      
+      {
+        "PLUGIN_ID":"core.licence",
+        "METHOD":"checkUsersLimit"
+      }
     ]
   },
   "user.after_create":{
@@ -195,16 +230,26 @@
       }
     ],
     "PARAMETER_SAMPLE":"array($userObject)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":726
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":1049
-      }
-    ],
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":823
+        }
+      ],
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareRightsManager.php",
+          "LINE":535
+        }
+      ],
+      "core.licence-old":[
+        {
+          "FILE":"\/plugins\/core.licence-old\/class.ShareCenter.php",
+          "LINE":1079
+        }
+      ]
+    },
     "LISTENERS":[
       
     ]
@@ -219,12 +264,14 @@
       }
     ],
     "PARAMETER_SAMPLE":"array($userId)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":754
-      }
-    ],
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":851
+        }
+      ]
+    },
     "LISTENERS":[
       
     ]
@@ -239,14 +286,24 @@
       }
     ],
     "PARAMETER_SAMPLE":"array($userId)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":762
-      }
-    ],
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":860
+        }
+      ]
+    },
     "LISTENERS":[
-      
+      {
+        "PLUGIN_ID":"action.share",
+        "METHOD":"cleanUserShares",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"authfront.keystore",
+        "METHOD":"revokeUserTokens"
+      }
     ]
   },
   "msg.instant":{
@@ -263,25 +320,39 @@
         "DESCRIPTION":"Id of the repository : this message will only be transmitted to client registered to this repository"
       }
     ],
-    "PARAMETER_SAMPLE":"array(\"<reload_shared_elements\/>\", ConfService::getRepository()->getId())",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/meta.quota\/class.QuotaComputer.php",
-        "LINE":122
-      },
-      {
-        "FILE":"\/plugins\/core.conf\/class.AbstractConfDriver.php",
-        "LINE":501
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":173
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":314
-      }
-    ],
+    "PARAMETER_SAMPLE":"array(\"<metaquota usage='{$q}' total='{$t}'\/>\", $this->accessDriver->repository->getId())",
+    "TRIGGERS":{
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":551
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":559
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":732
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":737
+        }
+      ],
+      "gui.ajax":[
+        {
+          "FILE":"\/plugins\/gui.ajax\/class.AJXP_ClientDriver.php",
+          "LINE":364
+        }
+      ],
+      "meta.quota":[
+        {
+          "FILE":"\/plugins\/meta.quota\/class.QuotaComputer.php",
+          "LINE":177
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"core.mq",
@@ -298,12 +369,14 @@
         "DESCRIPTION":"Notification object filled with content, author, date, etc"
       }
     ],
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/core.notifications\/class.AJXP_NotificationCenter.php",
-        "LINE":346
-      }
-    ],
+    "TRIGGERS":{
+      "core.notifications":[
+        {
+          "FILE":"\/plugins\/core.notifications\/class.AJXP_NotificationCenter.php",
+          "LINE":476
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"core.mq",
@@ -322,24 +395,26 @@
       }
     ],
     "PARAMETER_SAMPLE":"array(&$notification)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/core.mq\/class.MqManager.php",
-        "LINE":67
-      },
-      {
-        "FILE":"\/plugins\/core.mq\/class.MqManager.php",
-        "LINE":79
-      }
-    ],
+    "TRIGGERS":{
+      "core.mq":[
+        {
+          "FILE":"\/plugins\/core.mq\/class.MqManager.php",
+          "LINE":73
+        },
+        {
+          "FILE":"\/plugins\/core.mq\/class.MqManager.php",
+          "LINE":86
+        }
+      ]
+    },
     "LISTENERS":[
-      {
-        "PLUGIN_ID":"core.notifications",
-        "METHOD":"persistNotificationToAlerts"
-      },
       {
         "PLUGIN_ID":"core.mailer",
         "METHOD":"processNotification"
+      },
+      {
+        "PLUGIN_ID":"core.notifications",
+        "METHOD":"persistNotificationToAlerts"
       }
     ]
   },
@@ -362,61 +437,59 @@
         "DESCRIPTION":"Whether this is a copy (true) or a move (false)"
       }
     ],
-    "PARAMETER_SAMPLE":"array(new AJXP_Node($origFile))",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/access.sftp\/class.sftpAccessDriver.php",
-        "LINE":148
-      },
-      {
-        "FILE":"\/plugins\/downloader.http\/class.HttpDownloader.php",
-        "LINE":147
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1400
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1575
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1592
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1727
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1753
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1817
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1872
-      },
-      {
-        "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
-        "LINE":140
-      }
-    ],
+    "PARAMETER_SAMPLE":"array(new AJXP_Node($dlFile))",
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1713
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1908
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":2014
+        }
+      ],
+      "core.access":[
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":236
+        },
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":251
+        },
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":406
+        },
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":426
+        }
+      ],
+      "uploader.http":[
+        {
+          "FILE":"\/plugins\/uploader.http\/class.HttpDownloader.php",
+          "LINE":151
+        }
+      ]
+    },
     "LISTENERS":[
       {
-        "PLUGIN_ID":"meta.simple_lock",
-        "METHOD":"checkFileLock"
+        "PLUGIN_ID":"meta.monitor_fs",
+        "METHOD":"beforePathChange"
       },
       {
         "PLUGIN_ID":"meta.quota",
         "METHOD":"precheckQuotaUsage"
       },
       {
-        "PLUGIN_ID":"action.share",
-        "METHOD":"updateNodeSharedData"
+        "PLUGIN_ID":"meta.simple_lock",
+        "METHOD":"checkFileLock"
       }
     ]
   },
@@ -429,137 +502,306 @@
         "DESCRIPTION":"New node pointing to the original path"
       }
     ],
-    "PARAMETER_SAMPLE":"array(&$node)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
-        "LINE":158
-      },
-      {
-        "FILE":"\/plugins\/access.sftp\/class.sftpAccessDriver.php",
-        "LINE":151
-      },
-      {
-        "FILE":"\/plugins\/access.sftp\/class.sftpAccessDriver.php",
-        "LINE":160
-      },
-      {
-        "FILE":"\/plugins\/downloader.http\/class.HttpDownloader.php",
-        "LINE":149
-      },
-      {
-        "FILE":"\/plugins\/downloader.http\/class.HttpDownloader.php",
-        "LINE":151
-      },
-      {
-        "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
-        "LINE":113
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":289
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":358
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":660
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":693
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1402
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1456
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1489
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1523
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1586
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1595
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1612
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1807
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1874
-      },
-      {
-        "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
-        "LINE":166
-      },
-      {
-        "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
-        "LINE":174
-      },
-      {
-        "FILE":"\/plugins\/access.ftp\/class.ftpAccessDriver.php",
-        "LINE":108
-      }
-    ],
+    "PARAMETER_SAMPLE":"array(null, $node, false)",
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":381
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":462
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":841
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1613
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1718
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1770
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1800
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1831
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1896
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":2016
+        }
+      ],
+      "access.ftp":[
+        {
+          "FILE":"\/plugins\/access.ftp\/class.ftpAccessDriver.php",
+          "LINE":112
+        }
+      ],
+      "access.sftp":[
+        {
+          "FILE":"\/plugins\/access.sftp\/class.sftpAccessDriver.php",
+          "LINE":93
+        }
+      ],
+      "action.compression":[
+        {
+          "FILE":"\/plugins\/action.compression\/class.PluginCompression.php",
+          "LINE":161
+        },
+        {
+          "FILE":"\/plugins\/action.compression\/class.PluginCompression.php",
+          "LINE":180
+        },
+        {
+          "FILE":"\/plugins\/action.compression\/class.PluginCompression.php",
+          "LINE":289
+        }
+      ],
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1026
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1031
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1040
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1046
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1055
+        }
+      ],
+      "core.access":[
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":247
+        },
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":258
+        },
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":263
+        }
+      ],
+      "editor.etherpad":[
+        {
+          "FILE":"\/plugins\/editor.etherpad\/class.EtherpadClient.php",
+          "LINE":137
+        },
+        {
+          "FILE":"\/plugins\/editor.etherpad\/class.EtherpadClient.php",
+          "LINE":143
+        }
+      ],
+      "editor.pixlr":[
+        {
+          "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
+          "LINE":153
+        }
+      ],
+      "editor.zoho":[
+        {
+          "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
+          "LINE":225
+        },
+        {
+          "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
+          "LINE":233
+        }
+      ],
+      "meta.filehasher":[
+        {
+          "FILE":"\/plugins\/meta.filehasher\/class.FileHasher.php",
+          "LINE":174
+        }
+      ],
+      "meta.syncable":[
+        {
+          "FILE":"\/plugins\/meta.syncable\/class.ChangesTracker.php",
+          "LINE":87
+        },
+        {
+          "FILE":"\/plugins\/meta.syncable\/class.ChangesTracker.php",
+          "LINE":132
+        },
+        {
+          "FILE":"\/plugins\/meta.syncable\/class.ChangesTracker.php",
+          "LINE":143
+        },
+        {
+          "FILE":"\/plugins\/meta.syncable\/class.ChangesTracker.php",
+          "LINE":157
+        }
+      ],
+      "uploader.flex":[
+        {
+          "FILE":"\/plugins\/uploader.flex\/class.FlexUploadProcessor.php",
+          "LINE":54
+        },
+        {
+          "FILE":"\/plugins\/uploader.flex\/class.FlexUploadProcessor.php",
+          "LINE":56
+        }
+      ],
+      "uploader.html":[
+        {
+          "FILE":"\/plugins\/uploader.html\/class.SimpleUploadProcessor.php",
+          "LINE":113
+        },
+        {
+          "FILE":"\/plugins\/uploader.html\/class.SimpleUploadProcessor.php",
+          "LINE":115
+        },
+        {
+          "FILE":"\/plugins\/uploader.html\/class.SimpleUploadProcessor.php",
+          "LINE":154
+        }
+      ],
+      "uploader.http":[
+        {
+          "FILE":"\/plugins\/uploader.http\/class.HttpDownloader.php",
+          "LINE":153
+        },
+        {
+          "FILE":"\/plugins\/uploader.http\/class.HttpDownloader.php",
+          "LINE":156
+        }
+      ],
+      "uploader.jumploader":[
+        {
+          "FILE":"\/plugins\/uploader.jumploader\/class.JumploaderProcessor.php",
+          "LINE":338
+        },
+        {
+          "FILE":"\/plugins\/uploader.jumploader\/class.JumploaderProcessor.php",
+          "LINE":424
+        },
+        {
+          "FILE":"\/plugins\/uploader.jumploader\/class.JumploaderProcessor.php",
+          "LINE":426
+        }
+      ],
+      "uploader.plupload":[
+        {
+          "FILE":"\/plugins\/uploader.plupload\/class.PluploadProcessor.php",
+          "LINE":145
+        },
+        {
+          "FILE":"\/plugins\/uploader.plupload\/class.PluploadProcessor.php",
+          "LINE":159
+        }
+      ]
+    },
     "LISTENERS":[
       {
+        "PLUGIN_ID":"gui.ajax",
+        "METHOD":"nodeChangeBookmarkMetadata"
+      },
+      {
         "PLUGIN_ID":"editor.diaporama",
-        "METHOD":"removeThumbnail"
+        "METHOD":"removeThumbnail",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"editor.etherpad",
+        "METHOD":"handleNodeChange"
       },
       {
         "PLUGIN_ID":"editor.imagick",
         "METHOD":"deleteImagickCache"
       },
       {
-        "PLUGIN_ID":"meta.watch",
-        "METHOD":"processChangeHook"
+        "PLUGIN_ID":"action.antivirus",
+        "METHOD":"scanFile"
       },
       {
-        "PLUGIN_ID":"meta.git",
-        "METHOD":"changesHook"
+        "PLUGIN_ID":"action.share",
+        "METHOD":"updateNodeSharedData"
       },
       {
-        "PLUGIN_ID":"meta.filehasher",
-        "METHOD":"invalidateHash"
-      },
-      {
-        "PLUGIN_ID":"meta.user",
-        "METHOD":"updateMetaLocation"
-      },
-      {
-        "PLUGIN_ID":"meta.quota",
-        "METHOD":"recomputeQuotaUsage"
+        "PLUGIN_ID":"action.share",
+        "METHOD":"forwardEventToShares",
+        "DEFERRED":true
       },
       {
         "PLUGIN_ID":"core.notifications",
-        "METHOD":"persistChangeHookToFeed"
+        "METHOD":"persistChangeHookToFeed",
+        "DEFERRED":true
       },
       {
         "PLUGIN_ID":"core.mq",
-        "METHOD":"publishNodeChange"
+        "METHOD":"publishNodeChange",
+        "DEFERRED":true
       },
       {
         "PLUGIN_ID":"index.lucene",
-        "METHOD":"updateNodeIndex"
+        "METHOD":"updateNodeIndex",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"index.elasticsearch",
+        "METHOD":"updateNodeIndex",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.syncable",
+        "METHOD":"updateNodesIndex",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.comments",
+        "METHOD":"moveMeta",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.filehasher",
+        "METHOD":"invalidateHash",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.git",
+        "METHOD":"changesHook",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.quota",
+        "METHOD":"recomputeQuotaUsage",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.user",
+        "METHOD":"updateMetaLocation",
+        "DEFERRED":true
+      },
+      {
+        "PLUGIN_ID":"meta.watch",
+        "METHOD":"processChangeHook",
+        "DEFERRED":true
       }
     ]
   },
@@ -572,38 +814,68 @@
         "DESCRIPTION":"A simple node containing the target path to create. Callback can trigger a Break Exception to prevent the node creation."
       }
     ],
-    "PARAMETER_SAMPLE":"array($destFile)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/downloader.http\/class.HttpDownloader.php",
-        "LINE":105
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":283
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":485
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":600
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1464
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1541
-      },
-      {
-        "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
-        "LINE":150
-      }
-    ],
+    "PARAMETER_SAMPLE":"array($node, filesize($target))",
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":375
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":605
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":745
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1602
+        }
+      ],
+      "access.ftp":[
+        {
+          "FILE":"\/plugins\/access.ftp\/class.ftpAccessDriver.php",
+          "LINE":99
+        }
+      ],
+      "action.compression":[
+        {
+          "FILE":"\/plugins\/action.compression\/class.PluginCompression.php",
+          "LINE":155
+        }
+      ],
+      "core.access":[
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":202
+        }
+      ],
+      "editor.etherpad":[
+        {
+          "FILE":"\/plugins\/editor.etherpad\/class.EtherpadClient.php",
+          "LINE":135
+        }
+      ],
+      "uploader.http":[
+        {
+          "FILE":"\/plugins\/uploader.http\/class.HttpDownloader.php",
+          "LINE":118
+        }
+      ],
+      "uploader.plupload":[
+        {
+          "FILE":"\/plugins\/uploader.plupload\/class.PluploadProcessor.php",
+          "LINE":155
+        }
+      ]
+    },
     "LISTENERS":[
+      {
+        "PLUGIN_ID":"meta.monitor_fs",
+        "METHOD":"beforeCreate"
+      },
       {
         "PLUGIN_ID":"meta.quota",
         "METHOD":"precheckQuotaUsage"
@@ -619,69 +891,100 @@
         "DESCRIPTION":"The node opened."
       }
     ],
-    "PARAMETER_SAMPLE":"array(&$parentAjxpNode)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_Collection.php",
-        "LINE":173
-      },
-      {
-        "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_NodeLeaf.php",
-        "LINE":75
-      },
-      {
-        "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
-        "LINE":66
-      },
-      {
-        "FILE":"\/plugins\/editor.browser\/class.FileMimeSender.php",
-        "LINE":107
-      },
-      {
-        "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
-        "LINE":52
-      },
-      {
-        "FILE":"\/plugins\/editor.video\/class.VideoReader.php",
-        "LINE":110
-      },
-      {
-        "FILE":"\/plugins\/editor.audio\/class.AudioPreviewer.php",
-        "LINE":65
-      },
-      {
-        "FILE":"\/plugins\/editor.imagick\/class.IMagickPreviewer.php",
-        "LINE":76
-      },
-      {
-        "FILE":"\/plugins\/editor.diaporama\/class.ImagePreviewer.php",
-        "LINE":88
-      },
-      {
-        "FILE":"\/plugins\/editor.eml\/class.EmlParser.php",
-        "LINE":55
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":216
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":243
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":324
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":744
-      }
-    ],
+    "PARAMETER_SAMPLE":"array($node)",
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_Collection.php",
+          "LINE":171
+        },
+        {
+          "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_NodeLeaf.php",
+          "LINE":79
+        }
+      ],
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":305
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":333
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":430
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":898
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":977
+        }
+      ],
+      "access.inbox":[
+        {
+          "FILE":"\/plugins\/access.inbox\/class.inboxAccessDriver.php",
+          "LINE":85
+        }
+      ],
+      "editor.audio":[
+        {
+          "FILE":"\/plugins\/editor.audio\/class.AudioPreviewer.php",
+          "LINE":78
+        }
+      ],
+      "editor.browser":[
+        {
+          "FILE":"\/plugins\/editor.browser\/class.FileMimeSender.php",
+          "LINE":110
+        }
+      ],
+      "editor.diaporama":[
+        {
+          "FILE":"\/plugins\/editor.diaporama\/class.ImagePreviewer.php",
+          "LINE":87
+        }
+      ],
+      "editor.eml":[
+        {
+          "FILE":"\/plugins\/editor.eml\/class.EmlParser.php",
+          "LINE":50
+        }
+      ],
+      "editor.imagick":[
+        {
+          "FILE":"\/plugins\/editor.imagick\/class.IMagickPreviewer.php",
+          "LINE":82
+        }
+      ],
+      "editor.pixlr":[
+        {
+          "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
+          "LINE":59
+        }
+      ],
+      "editor.video":[
+        {
+          "FILE":"\/plugins\/editor.video\/class.VideoReader.php",
+          "LINE":120
+        }
+      ],
+      "editor.zoho":[
+        {
+          "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
+          "LINE":130
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"meta.watch",
-        "METHOD":"processReadHook"
+        "METHOD":"processReadHook",
+        "DEFERRED":true
       }
     ]
   },
@@ -695,12 +998,14 @@
       }
     ],
     "PARAMETER_SAMPLE":"array(&$rootNodes)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/access.ajxp_conf\/class.ajxp_confAccessDriver.php",
-        "LINE":285
-      }
-    ],
+    "TRIGGERS":{
+      "access.ajxp_conf":[
+        {
+          "FILE":"\/plugins\/access.ajxp_conf\/class.ajxp_confAccessDriver.php",
+          "LINE":395
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"action.scheduler",
@@ -717,61 +1022,85 @@
         "DESCRIPTION":"Node that will be updated"
       }
     ],
-    "PARAMETER_SAMPLE":"array(&$node)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
-        "LINE":143
-      },
-      {
-        "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
-        "LINE":82
-      },
-      {
-        "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
-        "LINE":103
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":343
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":598
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":602
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1427
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1466
-      },
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1815
-      },
-      {
-        "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
-        "LINE":179
-      },
-      {
-        "FILE":"\/plugins\/access.ftp\/class.ftpAccessDriver.php",
-        "LINE":95
-      }
-    ],
+    "PARAMETER_SAMPLE":"array(new AJXP_Node($destStreamURL))",
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":447
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":743
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":747
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1600
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1743
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1776
+        },
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":1906
+        }
+      ],
+      "editor.etherpad":[
+        {
+          "FILE":"\/plugins\/editor.etherpad\/class.EtherpadClient.php",
+          "LINE":139
+        }
+      ],
+      "editor.pixlr":[
+        {
+          "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
+          "LINE":119
+        },
+        {
+          "FILE":"\/plugins\/editor.pixlr\/class.PixlrEditor.php",
+          "LINE":140
+        }
+      ],
+      "editor.zoho":[
+        {
+          "FILE":"\/plugins\/editor.zoho\/class.ZohoEditor.php",
+          "LINE":214
+        }
+      ],
+      "meta.user":[
+        {
+          "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
+          "LINE":243
+        }
+      ],
+      "uploader.plupload":[
+        {
+          "FILE":"\/plugins\/uploader.plupload\/class.PluploadProcessor.php",
+          "LINE":156
+        }
+      ]
+    },
     "LISTENERS":[
       {
-        "PLUGIN_ID":"meta.simple_lock",
-        "METHOD":"checkFileLock"
+        "PLUGIN_ID":"meta.monitor_fs",
+        "METHOD":"beforeChange"
       },
       {
         "PLUGIN_ID":"meta.quota",
         "METHOD":"precheckQuotaUsage"
+      },
+      {
+        "PLUGIN_ID":"meta.simple_lock",
+        "METHOD":"checkFileLock"
       }
     ]
   },
@@ -784,17 +1113,21 @@
         "DESCRIPTION":"Current local name to be updated."
       }
     ],
-    "PARAMETER_SAMPLE":"array($origFile, &$localName, $origWrapperData[\"classname\"])",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":212
-      },
-      {
-        "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
-        "LINE":138
-      }
-    ],
+    "PARAMETER_SAMPLE":"array($srcFile, &$localName)",
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":301
+        }
+      ],
+      "core.access":[
+        {
+          "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
+          "LINE":186
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"access.imap",
@@ -817,17 +1150,459 @@
       }
     ],
     "PARAMETER_SAMPLE":"array($metaFile, $ajxpNode)",
-    "TRIGGERS":[
-      {
-        "FILE":"\/plugins\/metastore.serial\/class.SerialMetaStore.php",
-        "LINE":260
-      }
-    ],
+    "TRIGGERS":{
+      "metastore.serial":[
+        {
+          "FILE":"\/plugins\/metastore.serial\/class.SerialMetaStore.php",
+          "LINE":300
+        }
+      ]
+    },
     "LISTENERS":[
       {
         "PLUGIN_ID":"meta.svn",
         "METHOD":"commitFile"
       }
     ]
+  },
+  "user.before_disconnect":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":440
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($user)"
+  },
+  "user.after_disconnect":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":448
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($userId)"
+  },
+  "user.before_password_change":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":761
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($userId)"
+  },
+  "user.after_password_change":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.AuthService.php",
+          "LINE":763
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"authfront.keystore",
+        "METHOD":"revokeUserTokens"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($userId)"
+  },
+  "workspace.before_create":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1000
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($oRepository)"
+  },
+  "workspace.after_create":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1006
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($oRepository)"
+  },
+  "workspace.before_update":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1141
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($oRepositoryObject)"
+  },
+  "workspace.after_update":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1147
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($oRepositoryObject)"
+  },
+  "workspace.before_delete":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1182
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($repoId)"
+  },
+  "workspace.after_delete":{
+    "TRIGGERS":{
+      "CORE":[
+        {
+          "FILE":"\/core\/classes\/class.ConfService.php",
+          "LINE":1196
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"meta.syncable",
+        "METHOD":"clearIndexForWorkspaceId"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($repoId)"
+  },
+  "admin.list_config_nodes":{
+    "TRIGGERS":{
+      "access.ajxp_admin":[
+        {
+          "FILE":"\/plugins\/access.ajxp_admin\/class.adminAccessDriver.php",
+          "LINE":265
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"action.scheduler",
+        "METHOD":"placeConfigNode"
+      },
+      {
+        "PLUGIN_ID":"core.licence",
+        "METHOD":"addAdminMenu"
+      },
+      {
+        "PLUGIN_ID":"sec.session",
+        "METHOD":"registerAdminNodes"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array(&$rootNodes)"
+  },
+  "tpl.filter_html":{
+    "TRIGGERS":{
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.LegacyPubliclet.php",
+          "LINE":115
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.LegacyPubliclet.php",
+          "LINE":123
+        },
+        {
+          "FILE":"\/plugins\/action.share\/class.MinisiteRenderer.php",
+          "LINE":78
+        }
+      ],
+      "core.licence-old":[
+        {
+          "FILE":"\/plugins\/core.licence-old\/class.ShareCenter.php",
+          "LINE":582
+        },
+        {
+          "FILE":"\/plugins\/core.licence-old\/class.ShareCenter.php",
+          "LINE":691
+        },
+        {
+          "FILE":"\/plugins\/core.licence-old\/class.ShareCenter.php",
+          "LINE":700
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"core.licence",
+        "METHOD":"filterBootTpl"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array(&$res)"
+  },
+  "repository.load_info":{
+    "TRIGGERS":{
+      "core.conf":[
+        {
+          "FILE":"\/plugins\/core.conf\/class.AbstractConfDriver.php",
+          "LINE":1243
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"access.inbox",
+        "METHOD":"loadRepositoryInfo"
+      },
+      {
+        "PLUGIN_ID":"core.notifications",
+        "METHOD":"loadRepositoryInfo"
+      },
+      {
+        "PLUGIN_ID":"meta.quota",
+        "METHOD":"loadRepositoryInfo"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array(&$data)"
+  },
+  "node.index":{
+    "TRIGGERS":{
+      "core.index":[
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":72
+        },
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":133
+        },
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":151
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"index.lucene",
+        "METHOD":"indexationIndexNode"
+      },
+      {
+        "PLUGIN_ID":"index.elasticsearch",
+        "METHOD":"indexationIndexNode"
+      },
+      {
+        "PLUGIN_ID":"meta.syncable",
+        "METHOD":"indexNode"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($childNode)"
+  },
+  "node.index.recursive.start":{
+    "TRIGGERS":{
+      "core.index":[
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":117
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"index.lucene",
+        "METHOD":"indexationStarts"
+      },
+      {
+        "PLUGIN_ID":"index.elasticsearch",
+        "METHOD":"indexationStarts"
+      },
+      {
+        "PLUGIN_ID":"meta.syncable",
+        "METHOD":"clearIndexForNode"
+      },
+      {
+        "PLUGIN_ID":"sec.session",
+        "METHOD":"onIndexationStart"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($node)"
+  },
+  "node.index.recursive.end":{
+    "TRIGGERS":{
+      "core.index":[
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":121
+        },
+        {
+          "FILE":"\/plugins\/core.index\/class.CoreIndexer.php",
+          "LINE":164
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"index.lucene",
+        "METHOD":"indexationEnds"
+      },
+      {
+        "PLUGIN_ID":"index.elasticsearch",
+        "METHOD":"indexationEnds"
+      },
+      {
+        "PLUGIN_ID":"sec.session",
+        "METHOD":"onIndexationEnd"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($node)"
+  },
+  "role.masks":{
+    "TRIGGERS":{
+      "core.mq":[
+        {
+          "FILE":"\/plugins\/core.mq\/class.MqManager.php",
+          "LINE":226
+        }
+      ],
+      "feed.sql":[
+        {
+          "FILE":"\/plugins\/feed.sql\/class.AJXP_SqlFeedStore.php",
+          "LINE":110
+        }
+      ],
+      "meta.syncable":[
+        {
+          "FILE":"\/plugins\/meta.syncable\/class.ChangesTracker.php",
+          "LINE":196
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"sec.session",
+        "METHOD":"listCurrentMasks"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($currentRepo->getId(), &$masks, AJXP_Permission::READ)"
+  },
+  "loader.filter_boot_conf":{
+    "TRIGGERS":{
+      "gui.ajax":[
+        {
+          "FILE":"\/plugins\/gui.ajax\/class.AJXP_ClientDriver.php",
+          "LINE":180
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"core.licence",
+        "METHOD":"filterBootConfHook"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array(&$preloadedBootConf)"
+  },
+  "node.index.add":{
+    "TRIGGERS":{
+      "index.lucene":[
+        {
+          "FILE":"\/plugins\/index.lucene\/class.AjxpLuceneIndexer.php",
+          "LINE":368
+        }
+      ]
+    },
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array($newNode)"
+  },
+  "before_create":{
+    "TRIGGERS":[
+      {
+        "FILE":"\/data\/personal\/admin\/AAA 12\/CCC\/ajaxplorer-4.2.3\/data\/tmp\/update\/ajaxplorer-core-upgrade-4.0.4-4.2.0\/plugins\/access.fs\/class.fsAccessDriver.php",
+        "LINE":575
+      },
+      {
+        "FILE":"\/data\/personal\/admin\/AAA 12\/CCC\/plugins555\/access.fs\/class.fsAccessDriver.php",
+        "LINE":575
+      }
+    ],
+    "LISTENERS":[
+      
+    ],
+    "PARAMETER_SAMPLE":"array(new AJXP_Node($destination.\"\/\".$userfile_name), $boxData[\"size\"])"
+  },
+  "workspace.share_metasources":{
+    "TRIGGERS":{
+      "access.fs":[
+        {
+          "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
+          "LINE":2064
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"index.lucene",
+        "METHOD":"updateSharedChildOptions"
+      },
+      {
+        "PLUGIN_ID":"meta.syncable",
+        "METHOD":"setIndexationRequiredFlag"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array(&$newOptions[\"META_SOURCES\"])"
+  },
+  "url.shorten":{
+    "TRIGGERS":{
+      "action.share":[
+        {
+          "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
+          "LINE":1609
+        }
+      ]
+    },
+    "LISTENERS":[
+      {
+        "PLUGIN_ID":"shorten.multi",
+        "METHOD":"processShortenHook"
+      }
+    ],
+    "PARAMETER_SAMPLE":"array($url, &$shortForm)"
   }
 }

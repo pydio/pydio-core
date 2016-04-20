@@ -956,7 +956,10 @@ class AJXP_Utils
         } else {
             $existingHooks = array();
         }
-        $allPhpFiles = self::glob_recursive(AJXP_INSTALL_PATH."/*.php");
+        $allPhpFiles1 = self::glob_recursive(AJXP_INSTALL_PATH."/core/classes/*.php");
+        $allPhpFiles2= self::glob_recursive(AJXP_INSTALL_PATH."/plugins/*.php");
+        $allPhpFiles3= self::glob_recursive(AJXP_INSTALL_PATH."/conf/*.php");
+        $allPhpFiles = array_merge(array_merge($allPhpFiles1, $allPhpFiles2), $allPhpFiles3);
         $hooks = array();
         foreach ($allPhpFiles as $phpFile) {
             $fileContent = file($phpFile);
@@ -966,7 +969,19 @@ class AJXP_Utils
                     $params = $matches[2];
                     foreach ($names as $index => $hookName) {
                         if(!isSet($hooks[$hookName])) $hooks[$hookName] = array("TRIGGERS" => array(), "LISTENERS" => array());
-                        $hooks[$hookName]["TRIGGERS"][] = array("FILE" => substr($phpFile, strlen(AJXP_INSTALL_PATH)), "LINE" => $lineNumber);
+                        $filename = substr($phpFile, strlen(AJXP_INSTALL_PATH));
+                        if(strpos($filename, "/plugins") === 0) {
+                            $source = explode("/", $filename)[2];
+                        } else {
+                            $source = "CORE";
+                        }
+                        if(!isSet($hooks[$hookName]["TRIGGERS"][$source])){
+                            $hooks[$hookName]["TRIGGERS"][$source] = array();
+                        }
+                        $hooks[$hookName]["TRIGGERS"][$source][] = array(
+                            "FILE" => $filename,
+                            "LINE" => $lineNumber
+                        );
                         $hooks[$hookName]["PARAMETER_SAMPLE"] = $params[$index];
                     }
                 }
@@ -979,9 +994,12 @@ class AJXP_Utils
             $name = $xmlHook->getAttribute("hookName");
             $method = $xmlHook->getAttribute("methodName");
             $pluginId = $xmlHook->getAttribute("pluginId");
+            $deferred = $xmlHook->getAttribute("defer") === "true";
             if($pluginId == "") $pluginId = $xmlHook->parentNode->parentNode->parentNode->getAttribute("id");
             if(!isSet($regHooks[$name])) $regHooks[$name] = array();
-            $regHooks[$name][] = array("PLUGIN_ID" => $pluginId, "METHOD" => $method);
+            $data = array("PLUGIN_ID" => $pluginId, "METHOD" => $method);
+            if($deferred) $data["DEFERRED"] = true;
+            $regHooks[$name][] = $data;
         }
 
         foreach ($hooks as $h => $data) {
