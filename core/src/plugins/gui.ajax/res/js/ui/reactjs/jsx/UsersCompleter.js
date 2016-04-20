@@ -33,19 +33,20 @@
         },
 
         getInitialState:function(){
-            return {createUser: null, showComplete: true, loading:false};
+            return {
+                createUser: null,
+                showComplete: true,
+                loading:0,
+                minChars:parseInt(global.pydio.getPluginConfigs("core.conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
+            };
         },
 
-        getSuggestions(input, callback){
-            if(!this.state.showComplete){
-                callback(null, []);
-                return;
-            }
+        suggestionLoader:function(input, callback){
             var excludes = this.props.excludes;
             var disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
-            this.setState({loading:true});
+            this.setState({loading:this.state.loading + 1});
             PydioUsers.Client.authorizedUsersStartingWith(input, function(users){
-                this.setState({loading:false});
+                this.setState({loading:this.state.loading - 1});
                 if(disallowTemporary){
                     users = users.filter(function(user){
                         return !user.getTemporary();
@@ -58,6 +59,17 @@
                 }
                 callback(null, users);
             }.bind(this), this.props.usersOnly, this.props.existingOnly);
+        },
+
+        getSuggestions(input, callback){
+            var minChars = this.state.minChars;
+            if(!this.state.showComplete || input.length < minChars){
+                callback(null, []);
+                return;
+            }
+            bufferCallback('suggestion-loader-users', 400, function(){
+                this.suggestionLoader(input, callback);
+            }.bind(this));
         },
 
         suggestionValue: function(suggestion){
