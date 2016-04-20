@@ -145,6 +145,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
                 AJXP_XMLWriter::requireAuth(true);
                 AJXP_XMLWriter::close();
             }
+            ConfService::getInstance()->invalidateLoadedRepositories();
         }else{
             AuthService::disconnect();
             AJXP_XMLWriter::header();
