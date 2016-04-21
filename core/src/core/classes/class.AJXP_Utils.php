@@ -973,7 +973,7 @@ class AJXP_Utils
                         if(strpos($filename, "/plugins") === 0) {
                             $source = explode("/", $filename)[2];
                         } else {
-                            $source = "CORE";
+                            $source = str_replace(array("class.", ".php"), "", array_pop(explode("/", $filename)));
                         }
                         if(!isSet($hooks[$hookName]["TRIGGERS"][$source])){
                             $hooks[$hookName]["TRIGGERS"][$source] = array();

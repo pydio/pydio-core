@@ -10,7 +10,7 @@
     ],
     "PARAMETER_SAMPLE":"array($ajxpNode)",
     "TRIGGERS":{
-      "CORE":[
+      "AJXP_Node":[
         {
           "FILE":"\/core\/classes\/class.AJXP_Node.php",
           "LINE":177
@@ -61,7 +61,7 @@
     ],
     "PARAMETER_SAMPLE":"array(&$this, $contextNode, $details)",
     "TRIGGERS":{
-      "CORE":[
+      "AJXP_Node":[
         {
           "FILE":"\/core\/classes\/class.AJXP_Node.php",
           "LINE":412
@@ -200,7 +200,7 @@
     ],
     "PARAMETER_SAMPLE":"array($userName, null, false, false)",
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":792
@@ -231,7 +231,7 @@
     ],
     "PARAMETER_SAMPLE":"array($userObject)",
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":823
@@ -265,7 +265,7 @@
     ],
     "PARAMETER_SAMPLE":"array($userId)",
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":851
@@ -287,7 +287,7 @@
     ],
     "PARAMETER_SAMPLE":"array($userId)",
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":860
@@ -893,11 +893,13 @@
     ],
     "PARAMETER_SAMPLE":"array($node)",
     "TRIGGERS":{
-      "CORE":[
+      "AJXP_Sabre_Collection":[
         {
           "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_Collection.php",
           "LINE":171
-        },
+        }
+      ],
+      "AJXP_Sabre_NodeLeaf":[
         {
           "FILE":"\/core\/classes\/sabredav\/ajaxplorer\/class.AJXP_Sabre_NodeLeaf.php",
           "LINE":79
@@ -1167,7 +1169,7 @@
   },
   "user.before_disconnect":{
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":440
@@ -1181,7 +1183,7 @@
   },
   "user.after_disconnect":{
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":448
@@ -1195,7 +1197,7 @@
   },
   "user.before_password_change":{
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":761
@@ -1209,7 +1211,7 @@
   },
   "user.after_password_change":{
     "TRIGGERS":{
-      "CORE":[
+      "AuthService":[
         {
           "FILE":"\/core\/classes\/class.AuthService.php",
           "LINE":763
@@ -1226,7 +1228,7 @@
   },
   "workspace.before_create":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1000
@@ -1240,7 +1242,7 @@
   },
   "workspace.after_create":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1006
@@ -1254,7 +1256,7 @@
   },
   "workspace.before_update":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1141
@@ -1268,7 +1270,7 @@
   },
   "workspace.after_update":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1147
@@ -1282,7 +1284,7 @@
   },
   "workspace.before_delete":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1182
@@ -1296,7 +1298,7 @@
   },
   "workspace.after_delete":{
     "TRIGGERS":{
-      "CORE":[
+      "ConfService":[
         {
           "FILE":"\/core\/classes\/class.ConfService.php",
           "LINE":1196
