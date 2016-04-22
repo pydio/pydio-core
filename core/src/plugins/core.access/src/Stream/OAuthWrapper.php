@@ -169,7 +169,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         if (!empty($_SESSION[$key])) return $_SESSION[$key];
 
         // TOKENS IN CACHE?
-        if ($tokens = CacheService::fetch($key)) return $tokens;
+        if ($tokens = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $key)) return $tokens;
 
         // TOKENS IN FILE ?
         return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key);
@@ -188,7 +188,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         AJXP_Utils::saveSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key, $value, true);
 
         // Save in cache
-        CacheService::save($key, $value);
+        CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $key, $value);
 
         // Save in session
         $_SESSION["OAUTH_ONEDRIVE_TOKENS"] = $value;

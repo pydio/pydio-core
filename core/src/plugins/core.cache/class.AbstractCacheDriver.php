@@ -20,6 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+define('AJXP_CACHE_SERVICE_NS_SHARED', 'shared');
+define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
+
 use Doctrine\Common\Cache;
 
 /**
@@ -40,22 +43,32 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
      */
     public $driverType = "cache";
 
+    /**
+     * @var Cache\CacheProvider[]
+     */
+    protected $namespacedCaches = array();
+
+
     public function init($options)
     {
       parent::init($options);
     }
 
-    abstract public function getCacheDriver();
+    /**
+     * @param string $namespace
+     * @return Cache\CacheProvider
+     */
+    abstract public function getCacheDriver($namespace=AJXP_CACHE_SERVICE_NS_SHARED);
 
     /**
      * Fetches an entry from the cache.
      *
+     * @param $namespace
      * @param string $id The id of the cache entry to fetch.
-     *
      * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
      */
-    public function fetch($id){
-        $cacheDriver = $this->getCacheDriver();
+    public function fetch($namespace, $id){
+        $cacheDriver = $this->getCacheDriver($namespace);
 
         if (isset($cacheDriver) && $cacheDriver->contains($id)) {
             $result = $cacheDriver->fetch($id);
@@ -68,12 +81,12 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     /**
      * Tests if an entry exists in the cache.
      *
+     * @param $namespace
      * @param string $id The cache id of the entry to check for.
-     *
-     * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
+     * @return bool TRUE if a cache entry exists for the given cache id, FALSE otherwise.
      */
-    public function contains($id){
-        $cacheDriver = $this->getCacheDriver();
+    public function contains($namespace, $id){
+        $cacheDriver = $this->getCacheDriver($namespace);
 
         if (! isset($cacheDriver)) {
             return false;
@@ -87,15 +100,15 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     /**
      * Puts data into the cache.
      *
-     * @param string $id       The cache id.
-     * @param mixed  $data     The cache entry/data.
-     * @param int    $lifeTime The cache lifetime.
+     * @param $namespace
+     * @param string $id The cache id.
+     * @param mixed $data The cache entry/data.
+     * @param int $lifeTime The cache lifetime.
      *                         If != 0, sets a specific lifetime for this cache entry (0 => infinite lifeTime).
-     *
-     * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
+     * @return bool TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    public function save($id, $data, $lifeTime = 0){
-        $cacheDriver = $this->getCacheDriver();
+    public function save($namespace, $id, $data, $lifeTime = 0){
+        $cacheDriver = $this->getCacheDriver($namespace);
 
         if (! isset($cacheDriver)) {
           return false;
@@ -109,12 +122,12 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     /**
      * Deletes an entry from the cache
      *
+     * @param $namespace
      * @param string $id The id of the cache entry to fetch.
-     *
-     * @return boolean TRUE if the entry was successfully deleted, FALSE otherwise.
+     * @return bool TRUE if the entry was successfully deleted, FALSE otherwise.
      */
-    public function delete($id){
-        $cacheDriver = $this->getCacheDriver();
+    public function delete($namespace, $id){
+        $cacheDriver = $this->getCacheDriver($namespace);
 
         if (isset($cacheDriver) && $cacheDriver->contains($id)) {
            $result = $cacheDriver->delete($id);
@@ -127,12 +140,12 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     /**
      * Deletes ALL entries from the cache
      *
-     * @param string $id The id of the cache entry to fetch.
+     * @param $namespace
+     * @return bool TRUE if the entries were successfully deleted, FALSE otherwise.
      *
-     * @return boolean TRUE if the entries were successfully deleted, FALSE otherwise.
      */
-    public function deleteAll(){
-        $cacheDriver = $this->getCacheDriver();
+    public function deleteAll($namespace){
+        $cacheDriver = $this->getCacheDriver($namespace);
 
         if (isset($cacheDriver)) {
            $result = $cacheDriver->deleteAll();
@@ -141,4 +154,14 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
 
         return false;
     }
+
+    public function listNamespaces(){
+        return [AJXP_CACHE_SERVICE_NS_SHARED, AJXP_CACHE_SERVICE_NS_NODES];
+    }
+
+    public function getStats($namespace){
+        $cacheDriver = $this->getCacheDriver($namespace);
+        return $cacheDriver->getStats();
+    }
+
 }

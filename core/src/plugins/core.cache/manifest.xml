@@ -10,4 +10,26 @@
     <server_settings>
         <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false"/>
     </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="cache_service_expose_stats">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="only" write="true"/>
+                <processing>
+                    <serverCallback methodName="exposeCacheStats" restParams="/namespace"/>
+                </processing>
+            </action>
+            <action name="cache_service_clear_cache">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="only" write="true"/>
+                <processing>
+                    <serverCallback methodName="clearCacheByNS" restParams="/namespace"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback methodName="loadNodeInfoFromCache" hookName="node.info.start"/>
+            <serverCallback methodName="cacheNodeInfo" hookName="node.info.end"/>
+            <serverCallback methodName="clearNodeInfoCache" hookName="node.change" defer="true"/>
+            <serverCallback methodName="clearNodeInfoCache" hookName="node.meta_change" defer="true"/>
+        </hooks>
+    </registry_contributions>
 </ajxp_plugin>

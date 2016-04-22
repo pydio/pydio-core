@@ -32,6 +32,9 @@ class ConfService
 
     private $booter;
     private $confPlugin;
+    /**
+     * @var AbstractCacheDriver
+     */
     private $cachePlugin;
     private $errors = array();
     private $configs = array();
@@ -40,7 +43,6 @@ class ConfService
     private $contextCharset;
 
     /**
-     * @param AJXP_PluginsService $ajxpPluginService
      * @return AbstractConfDriver
      */
     public function confPluginSoftLoad()
@@ -54,7 +56,6 @@ class ConfService
     }
 
     /**
-     * @param AJXP_PluginsService $ajxpPluginService
      * @return AbstractCacheDriver
      */
     public function cachePluginSoftLoad()
@@ -192,7 +193,7 @@ class ConfService
     public static function clearAllCaches(){
         AJXP_PluginsService::clearPluginsCache();
         self::clearMessagesCache();
-        CacheService::deleteAll();
+        CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
         if(function_exists('opcache_reset')){
             opcache_reset();
         }
@@ -332,7 +333,7 @@ class ConfService
 
         if($useCache){
             $cacheKey = self::getRegistryCacheKey($extendedVersion);
-            $cachedXml = CacheService::fetch($cacheKey);
+            $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
             if($cachedXml !== false){
                 $registry = new DOMDocument("1.0", "utf-8");
                 $registry->loadXML($cachedXml);
@@ -352,7 +353,7 @@ class ConfService
         }
 
         if($useCache && isSet($cacheKey)){
-            CacheService::save($cacheKey, $registry->saveXML());
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $registry->saveXML());
         }
 
         if($clone){
@@ -598,7 +599,7 @@ class ConfService
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
-        CacheService::deleteAll();
+        CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
     }
 
     private function cacheRepository($repoId, $repository){
@@ -1063,20 +1064,20 @@ class ConfService
         if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
-        $test = CacheService::fetch("repository:".$repoId);
+        $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId);
         if($test !== false){
             return $test;
         }
         $test =  $this->getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
-            CacheService::save("repository:".$repoId, $test);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $test);
             return $test;
         }
         // Finally try to search in default repositories
         if (isSet($this->configs["DEFAULT_REPOSITORIES"]) && isSet($this->configs["DEFAULT_REPOSITORIES"][$repoId])) {
             $repo = self::createRepositoryFromArray($repoId, $this->configs["DEFAULT_REPOSITORIES"][$repoId]);
             $repo->setWriteable(false);
-            CacheService::save("repository:".$repoId, $repo);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $repo);
             return $repo;
         }
         $hookedRepo = null;

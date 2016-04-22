@@ -31,7 +31,7 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
         $parts = AJXP_Utils::safeParseUrl($url);
 
         if (! ($params = self::getLocalParams(self::CACHE_KEY . $url)) &&
-            ! ($params = CacheService::fetch(self::CACHE_KEY . $url))) {
+            ! ($params = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, self::CACHE_KEY . $url))) {
 
             // Nothing in cache
             $repositoryId = $parts["host"];
@@ -61,7 +61,7 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
             $params['key'] = md5($params['keybase']);
 
             self::addLocalParams(self::CACHE_KEY . $url, $params);
-            CacheService::save(self::CACHE_KEY . $url, $params, self::CACHE_EXPIRY_TIME);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, self::CACHE_KEY . $url, $params, self::CACHE_EXPIRY_TIME);
         }
 
         $repoData = self::actualRepositoryWrapperData($parts["host"]);

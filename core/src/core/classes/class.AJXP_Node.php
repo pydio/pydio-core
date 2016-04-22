@@ -402,7 +402,9 @@ class AJXP_Node
         if($this->nodeInfoLoaded && $this->nodeInfoLevel != $details){
             $forceRefresh = true;
         }
-        if($this->nodeInfoLoaded && !$forceRefresh) return;
+        if($this->nodeInfoLoaded && !$forceRefresh){
+            return;
+        }
         if (!empty($this->_wrapperClassName)) {
             $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
             if (!isSet($registered[$this->getScheme()])) {
@@ -410,7 +412,12 @@ class AJXP_Node
                 if(is_object($driver)) $driver->detectStreamWrapper(true);
             }
         }
+        AJXP_Controller::applyHook("node.info.start", array(&$this, $contextNode, $details));
+        if($this->nodeInfoLoaded && !$forceRefresh){
+            return;
+        }
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
+        AJXP_Controller::applyHook("node.info.end", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $details;
     }
@@ -517,6 +524,23 @@ class AJXP_Node
         } else {
             $this->_metadata = array_merge($this->_metadata, $metadata);
         }
+    }
+
+    /**
+     * Return all metadata loaded during node.info, mainly used for caching.
+     * @return array
+     */
+    public function getNodeInfoMeta(){
+        return $this->_metadata;
+    }
+
+    /**
+     * Set nodeInfoLoaded to true from external.
+     * @param string $level
+     */
+    public function setInfoLoaded($level){
+        $this->nodeInfoLoaded = true;
+        $this->nodeInfoLevel = $level;
     }
 
     /**

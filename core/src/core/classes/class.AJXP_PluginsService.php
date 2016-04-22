@@ -40,6 +40,9 @@ class AJXP_PluginsService
      * @var AbstractConfDriver
      */
     private $confStorage;
+    /**
+     * @var AbstractCacheDriver
+     */
     private $cacheStorage;
     private $mixinsDoc;
     private $mixinsXPath;
@@ -65,7 +68,7 @@ class AJXP_PluginsService
 
                 // Retrieving Registry from Server Cache
                 if ($this->cacheStorage) {
-                    $res = $this->cacheStorage->fetch('plugins_registry');
+                    $res = $this->cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
 
                     $this->registry=$res;
                 }
@@ -118,7 +121,7 @@ class AJXP_PluginsService
      */
     public function savePluginsRegistryToCache() {
         if (!empty ($this->cacheStorage)) {
-            $this->cacheStorage->save("plugins_registry", $this->registry);
+            $this->cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
         }
     }
 
