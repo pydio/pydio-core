@@ -35,7 +35,7 @@ class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements Pattern
      *
      * @return string The namespaced id.
      */
-    private function getNamespacedId($id)
+    private function namespacedIdAsPattern($id)
     {
         return sprintf('%s\['.preg_quote($id, "/"), $this->internalNamespace);
     }
@@ -46,11 +46,11 @@ class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements Pattern
      */
     public function deleteKeysStartingWith($pattern)
     {
-        $pattern = '/^'.$this->getNamespacedId($pattern).'/';
+        $pattern = '/^'.$this->namespacedIdAsPattern($pattern).'/';
         //SAMPLE /^pydio-unique-id_nodes_\[list\:\/\/1/
         $iterator = new APCIterator('user', $pattern);
         foreach ($iterator as $data) {
-            $res = $this->doDelete($data['key']);
+            $this->doDelete($data['key']);
         }
     }
 

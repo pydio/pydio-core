@@ -47,7 +47,7 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
      *
      * @return string The namespaced id.
      */
-    private function getNamespacedId($id)
+    private function namespacedIdAsPattern($id)
     {
         // Escape redis MATCH special characters
         $id = str_replace(array("?", "*", "[", "]", "^", "-"), array("\?", "\*", "\[", "\]", "\^", "\-"), $id);
@@ -61,7 +61,7 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
      */
     public function deleteKeysStartingWith($pattern)
     {
-        $pattern = $this->getNamespacedId($pattern);
+        $pattern = $this->namespacedIdAsPattern($pattern);
         $it = NULL; /* Initialize our iterator to NULL */
         $this->internalRedis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY); /* retry when we get no keys back */
         while($arr_keys = $this->internalRedis->scan($it, $pattern)) {
