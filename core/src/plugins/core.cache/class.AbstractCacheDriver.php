@@ -61,6 +61,50 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     abstract public function getCacheDriver($namespace=AJXP_CACHE_SERVICE_NS_SHARED);
 
     /**
+     * @param AJXP_Node $node
+     * @param string $cacheType
+     * @param string $details
+     * @return string
+     */
+    public static function computeIdForNode($node, $cacheType, $details = ''){
+        $repo = $node->getRepository();
+        if($repo == null) return "failed-id";
+        $scope = $repo->securityScope();
+        $additional = "";
+        if($scope === "USER"){
+            $additional = AuthService::getLoggedUser()->getId()."@";
+        }else if($scope == "GROUP"){
+            $additional =  ltrim(str_replace("/", "__", AuthService::getLoggedUser()->getGroupPath()), "__")."@";
+        }
+        $scheme = parse_url($node->getUrl(), PHP_URL_SCHEME);
+        return str_replace($scheme . "://", $cacheType."://".$additional, $node->getUrl()).($details?"##".$details:"");
+    }
+
+    /**
+     * @param string $namespace
+     * @return bool
+     */
+    public function supportsPatternDelete($namespace)
+    {
+        $cacheDriver = $this->getCacheDriver($namespace);
+        return $cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
+        //return is_a($cacheDriver, "PatternClearableCache");
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $id
+     * @return bool
+     */
+    public function deleteKeyStartingWith($namespace, $id){
+        $cacheDriver = $this->getCacheDriver($namespace);
+        if(!($cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache)){
+            return false;
+        }
+        return $cacheDriver->deleteKeysStartingWith($id);
+    }
+
+    /**
      * Fetches an entry from the cache.
      *
      * @param $namespace

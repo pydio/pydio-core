@@ -41,18 +41,8 @@ class CacheStreamLayer extends AJXP_SchemeTranslatorWrapper
 
     protected function computeCacheId($path, $type){
 
-        $node = new AJXP_Node($path);
-        $repo = $node->getRepository();
-        if($repo == null) return "failed-id";
-        $scope = $repo->securityScope();
-        $additional = "";
-        if($scope === "USER"){
-            $additional = AuthService::getLoggedUser()->getId()."@";
-        }else if($scope == "GROUP"){
-            $additional =  ltrim(str_replace("/", "__", AuthService::getLoggedUser()->getGroupPath()), "__")."@";
-        }
-        return str_replace("pydio.cache://", $type."://".$additional, $path);
-
+        return AbstractCacheDriver::computeIdForNode(new AJXP_Node($path), $type);
+        
     }
 
     // Keep listing in cache

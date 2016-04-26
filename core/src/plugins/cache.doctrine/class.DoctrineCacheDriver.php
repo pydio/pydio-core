@@ -30,6 +30,7 @@ define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
 define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
+use \Pydio\Plugins\Cache\Doctrine\Ext;
 
 /**
  * Standard Memcache driver
@@ -38,7 +39,7 @@ use \Doctrine\Common\Cache;
  */
 class doctrineCacheDriver extends AbstractCacheDriver
 {
-    
+
     /**
      * @param string $namespace
      * @return Cache\CacheProvider
@@ -148,7 +149,8 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
     public function _apc_init($options) {
         if (extension_loaded('apcu')) {
-            $cacheDriver = new Cache\ApcuCache();
+            require_once ("ext/PydioApcuCache.php");
+            $cacheDriver = new Ext\PydioApcuCache();
         } else {
             $cacheDriver = new Cache\ApcCache();
         }
@@ -183,7 +185,8 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
         if (! $running) return null;
 
-        $cacheDriver = new \Doctrine\Common\Cache\RedisCache();
+        require_once "ext/PydioRedisCache.php";
+        $cacheDriver = new Ext\PydioRedisCache();
         $cacheDriver->setRedis($redis);
         return $cacheDriver;
     }

@@ -47,19 +47,24 @@ class CoreCacheLoader extends AJXP_Plugin
                 }
             }
             self::$cacheInstance = $pluginInstance;
-            if($pluginInstance !== null){
+            if($pluginInstance !== null && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
                 AJXP_MetaStreamWrapper::appendMetaWrapper("pydio.cache", "CacheStreamLayer");
             }
         }
 
         return self::$cacheInstance;
     }
+
     /**
      * @param AJXP_Node $node
      * @param AJXP_Node $contextNode
      * @param bool $details
      */
     public function cacheNodeInfo(&$node, $contextNode, $details){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
         $id = $this->computeId($node, $details);
         CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $node->getNodeInfoMeta());
     }
@@ -70,6 +75,10 @@ class CoreCacheLoader extends AJXP_Plugin
      * @param bool $details
      */
     public function loadNodeInfoFromCache(&$node, $contextNode, $details){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
         $id = $this->computeId($node, $details);
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
             $metadata = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
@@ -86,6 +95,10 @@ class CoreCacheLoader extends AJXP_Plugin
      * @param bool $copy
      */
     public function clearNodeInfoCache($from=null, $to=null, $copy = false){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
         if($from != null){
             $this->clearCacheForNode($from);
         }
@@ -98,14 +111,26 @@ class CoreCacheLoader extends AJXP_Plugin
      * @param AJXP_Node $node
      */
     protected function clearCacheForNode($node){
-        // Clear meta
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
-        // Clear stat
-        CacheStreamLayer::clearStatCache($node->getUrl());
-        // Clear parent listing
-        if($node->getParent() !== null){
-            CacheStreamLayer::clearDirCache($node->getParent()->getUrl());
+        if($node->isLeaf()){
+            // Clear meta
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+            // Clear stat
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            // Clear parent listing
+            if($node->getParent() !== null){
+                CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+            }
+        }else {
+            $cacheDriver = ConfService::getCacheDriverImpl();
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            if($node->getParent() !== null){
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+            }else{
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "list"));
+            }
         }
     }
 
@@ -115,18 +140,7 @@ class CoreCacheLoader extends AJXP_Plugin
      * @return string
      */
     protected function computeId($node, $details){
-        $repo = $node->getRepository();
-        if($repo == null) return "failed-id";
-        $scope = $repo->securityScope();
-        $additional = "";
-        if($scope === "USER"){
-            $additional = AuthService::getLoggedUser()->getId()."@";
-        }else if($scope == "GROUP"){
-            $additional =  ltrim(str_replace("/", "__", AuthService::getLoggedUser()->getGroupPath()), "__")."@";
-        }
-        $scheme = parse_url($node->getUrl(), PHP_URL_SCHEME);
-        return str_replace($scheme . "://", "node.info://".$additional, $node->getUrl())."##".($details?"all":"short");
-
+        return AbstractCacheDriver::computeIdForNode($node, "node.info", $details?"all":"short");
     }
 
     public function exposeCacheStats($actionName, $httpVars, $fileVars){
