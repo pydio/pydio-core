@@ -599,7 +599,8 @@ class ConfService
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
-        CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $this->getRegistryCacheKey(true));
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $this->getRegistryCacheKey(false));
     }
 
     private function cacheRepository($repoId, $repository){
@@ -1007,6 +1008,7 @@ class ConfService
         }
         AJXP_Controller::applyHook("workspace.after_create", array($oRepository));
         AJXP_Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
+        CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$oRepository->getId(), $oRepository);
         $this->invalidateLoadedRepositories();
         return null;
     }
@@ -1134,8 +1136,8 @@ class ConfService
     }
     /**
      * See static method
-     * @param $oldId
-     * @param $oRepositoryObject
+     * @param string $oldId
+     * @param Repository $oRepositoryObject
      * @return int
      */
     public function replaceRepositoryInst($oldId, $oRepositoryObject)
@@ -1149,6 +1151,7 @@ class ConfService
         AJXP_Controller::applyHook("workspace.after_update", array($oRepositoryObject));
         AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         $this->invalidateLoadedRepositories();
+        CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $oRepositoryObject->getId(), $oRepositoryObject);
         return 0;
     }
     /**
@@ -1198,6 +1201,7 @@ class ConfService
         AJXP_Controller::applyHook("workspace.after_delete", array($repoId));
         AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         $this->invalidateLoadedRepositories();
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$repoId);
         return 0;
     }
 
