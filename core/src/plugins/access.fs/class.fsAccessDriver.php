@@ -732,6 +732,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             $userfile_name = self::autoRenameForDest($destination, $userfile_name);
                         }
                         $this->logDebug("User filename ".$userfile_name);
+                        if(class_exists("Normalizer")){
+                            $userfile_name = Normalizer::normalize($userfile_name, Normalizer::FORM_C);
+                        }
 
                         // CHECK IF THIS IS A FORBIDDEN FILENAME
                         $this->filterUserSelectionToHidden(array($userfile_name));
