@@ -22,7 +22,7 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="deleteImagickCache"/>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache" defer="true"/>
 		</hooks>
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">
