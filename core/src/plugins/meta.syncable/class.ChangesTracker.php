@@ -195,6 +195,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         $masks = array();
         $currentRepo = $this->accessDriver->repository;
         AJXP_Controller::applyHook("role.masks", array($currentRepo->getId(), &$masks, AJXP_Permission::READ));
+        if(count($masks) == 1 && $masks[0] == "/"){
+            $masks = array();
+        }
         $recycle = $currentRepo->getOption("RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
 
