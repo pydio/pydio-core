@@ -251,7 +251,9 @@ class AuthService
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
         $rememberPass = $user->getCookieString();
-        setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+        if(self::$useSession) {
+            setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+        }
     }
 
     /**
@@ -274,7 +276,9 @@ class AuthService
         if (!empty($current) && $user != null) {
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
-        setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+        if(self::$useSession) {
+            setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+        }
     }
 
     public static function logTemporaryUser($parentUserId, $temporaryUserId)
@@ -442,7 +446,7 @@ class AuthService
             self::clearRememberCookie();
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
-            if(isSet(self::$currentUser)) unset(self::$currentUser);
+            //if(isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }

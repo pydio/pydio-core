@@ -270,21 +270,35 @@ class AJXP_Controller
      * @static
      * @param String $currentRepositoryId
      * @param String $actionName
-     * @param Array $parameters
+     * @param array $parameters
      * @param string $user
      * @param string $statusFile
      * @return null|UnixProcess
      */
     public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "")
     {
-        $token = md5(time());
-        $logDir = AJXP_CACHE_DIR."/cmd_outputs";
-        if(!is_dir($logDir)) mkdir($logDir, 0755);
-        $logFile = $logDir."/".$token.".out";
         if (empty($user)) {
             if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
             else $user = "shared";
         }
+
+        $fName = AJXP_DATA_PATH."/plugins/mq.serial/worker-queue";
+        $fData = file_get_contents($fName);
+        $data = json_decode($fData, true);
+        $data[] = array(
+            "userId" => $user,
+            "repoId" => $currentRepositoryId,
+            "actionName" => $actionName,
+            "parameters" => $parameters
+        );
+        file_put_contents($fName, json_encode($data));
+        return ;
+
+
+        $token = md5(time());
+        $logDir = AJXP_CACHE_DIR."/cmd_outputs";
+        if(!is_dir($logDir)) mkdir($logDir, 0755);
+        $logFile = $logDir."/".$token.".out";
         if (AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){

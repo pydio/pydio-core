@@ -38,8 +38,10 @@ class AJXP_XMLWriter
     public static function header($docNode="tree", $attributes=array())
     {
         if(self::$headerSent !== false && self::$headerSent == $docNode) return ;
-        header('Content-Type: text/xml; charset=UTF-8');
-        header('Cache-Control: no-cache');
+        if(!ConfService::currentContextIsCommandLine()){
+            header('Content-Type: text/xml; charset=UTF-8');
+            header('Cache-Control: no-cache');
+        }
         print('<?xml version="1.0" encoding="UTF-8"?>');
         $attString = "";
         if (count($attributes)) {
@@ -132,8 +134,10 @@ class AJXP_XMLWriter
      */
     public static function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array())
     {
-        header('Content-Type: text/xml; charset=UTF-8');
-        header('Cache-Control: no-cache');
+        if(!ConfService::currentContextIsCommandLine()) {
+            header('Content-Type: text/xml; charset=UTF-8');
+            header('Cache-Control: no-cache');
+        }
         print('<?xml version="1.0" encoding="UTF-8"?>');
         self::$headerSent = "tree";
         AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
@@ -146,8 +150,10 @@ class AJXP_XMLWriter
      */
     public static function renderAjxpHeaderNode($ajxpNode)
     {
-        header('Content-Type: text/xml; charset=UTF-8');
-        header('Cache-Control: no-cache');
+        if(!ConfService::currentContextIsCommandLine()) {
+            header('Content-Type: text/xml; charset=UTF-8');
+            header('Cache-Control: no-cache');
+        }
         print('<?xml version="1.0" encoding="UTF-8"?>');
         self::$headerSent = "tree";
         self::renderAjxpNode($ajxpNode, false);
@@ -264,7 +270,6 @@ class AJXP_XMLWriter
             AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
         }
         AJXP_XMLWriter::close();
-        exit(1);
     }
 
     /**
