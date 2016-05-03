@@ -108,6 +108,19 @@ class CoreCacheLoader extends AJXP_Plugin
     }
 
     /**
+     * @param Repository $repositoryObject
+     */
+    public function clearWorkspaceNodeInfos($repositoryObject){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
+        $node = new AJXP_Node("pydio://".$repositoryObject->getId()."/");
+        $node->setLeaf(false);
+        $this->clearCacheForNode($node);
+    }
+
+    /**
      * @param AJXP_Node $node
      */
     protected function clearCacheForNode($node){
