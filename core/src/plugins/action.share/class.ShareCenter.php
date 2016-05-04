@@ -378,6 +378,11 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
+    public function migrateLegacyShares($action, $httpVars, $fileVars){
+        require_once("class.LegacyPubliclet.php");
+        LegacyPubliclet::migrateLegacyMeta($this, $this->getShareStore(), $this->getRightsManager(), $httpVars["dry_run"] !== "run");
+    }
+    
     /**
      * Main callback for all share- actions.
      * @param string $action
@@ -879,7 +884,7 @@ class ShareCenter extends AJXP_Plugin
         if(!empty($shares)){
             $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
             if(empty($compositeShare) || $compositeShare->isInvalid()){
-                $this->getShareStore()->getMetaManager()->clearNodeMeta($ajxpNode);
+                //$this->getShareStore()->getMetaManager()->clearNodeMeta($ajxpNode);
                 return;
             }
         }
