@@ -299,6 +299,26 @@ class AJXP_Controller
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
+        if (empty($user)) {
+            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
+            else $user = "shared";
+        }
+/*
+        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.mq/vendor/autoload.php");
+        $nsq = new nsqphp\nsqphp;
+        $nsq->publishTo("localhost", 1);
+        $payload = array(
+            'msg' => 'bg',
+            'data' => [
+                'repository_id' => $currentRepositoryId,
+                'user_id'       => $user,
+                'action'        => $actionName,
+                'parameters'    => $parameters
+            ]);
+        $nsq->publish('pydio', new nsqphp\Message\Message(json_encode($payload)));
+
+        return;
+*/
         if (AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){

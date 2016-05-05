@@ -163,6 +163,14 @@ class MqManager extends AJXP_Plugin
             $this->msgExchanger->publishInstantMessage("nodes:$repositoryId", $message);
         }
 
+        /*
+        // Publish on NSQ
+        require_once(AJXP_INSTALL_PATH."core/classes/vendor/autoload.php");
+        $nsq = new nsqphp\nsqphp;
+        $nsq->publishTo("localhost", 1);
+        $nsq->publish('pydio', new nsqphp\Message\Message(json_encode(array('msg' => 'im', 'run' => $message))));
+        */
+
         // Publish for WebSockets
         $configs = $this->getConfigs();
         if ($configs["WS_SERVER_ACTIVE"]) {

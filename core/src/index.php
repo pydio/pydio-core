@@ -154,6 +154,36 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
+
+/*
+require_once (AJXP_BIN_FOLDER."/silex/vendor/autoload.php");
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+$silex = new Silex\Application();
+$silex->match("/", function(Silex\Application $silex, Request $request){
+
+    $stream = function () use ($request) {
+
+        $xmlResult = AJXP_Controller::findActionAndApply($request->get('get_action'), array_merge($request->query->all(), $request->request->all()), $_FILES);
+        if ($xmlResult !== false && $xmlResult != "") {
+            AJXP_XMLWriter::header();
+            print($xmlResult);
+            AJXP_XMLWriter::close();
+        } else if (isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth) {
+            AJXP_XMLWriter::header();
+            AJXP_XMLWriter::requireAuth();
+            AJXP_XMLWriter::close();
+        }
+
+    };
+
+    return new \Symfony\Component\HttpFoundation\StreamedResponse($stream, 200);
+
+})->method("POST|GET");
+$silex->run();
+*/
+
 $xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
 if ($xmlResult !== false && $xmlResult != "") {
     AJXP_XMLWriter::header();
