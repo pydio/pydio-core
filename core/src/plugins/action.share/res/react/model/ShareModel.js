@@ -607,15 +607,28 @@
         load(){
             if(this._status == 'loading') return;
             this._setStatus('loading');
-            ShareModel.loadSharedElementData(this._node, function(transport){
+            let cacheService = MetaCacheService.getInstance();
+            cacheService.registerMetaStream('action.share', MetaCacheService.EXPIRATION_LOCAL_NODE);
+
+            let remoteLoader = function(transport){
                 if(transport.responseJSON){
                     this._data = transport.responseJSON;
                     this._pendingData = {};
                     this._setStatus('idle');
+                    return this._data;
                 }else if(transport.responseXML && XMLUtils.XPathGetSingleNodeText(transport.responseXML, '//message[@type="ERROR"]')){
                     this._setStatus('error');
+                    return null;
                 }
-            }.bind(this));
+            }.bind(this);
+
+            let cacheLoader = function(data){
+                this._data = data;
+                this._pendingData = {};
+                this._setStatus('idle');
+            }.bind(this);
+
+            cacheService.metaForNode('action.share', this._node, ShareModel.loadSharedElementData, remoteLoader, cacheLoader);
         }
 
         save(){
