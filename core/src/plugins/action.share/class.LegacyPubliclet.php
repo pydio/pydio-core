@@ -342,31 +342,34 @@ class LegacyPubliclet
                             rename($legacyLinkFile, $legacyLinkFile.".migrated");
                             if(isSet($share["minisite"])){
                                 print("\n--Migrate legacy minisite to new minisite?");
-                                $sharedRepoId = $publiclet["REPOSITORY"];
-                                $sharedRepo = ConfService::getRepositoryById($sharedRepoId);
-                                if($sharedRepo == null){
-                                    print("\n--ERROR: Cannot find repository with id ".$sharedRepoId);
-                                    continue;
-                                }
-                                $shareLink = new ShareLink($shareStore, $publiclet);
-                                $user = $shareLink->getUniqueUser();
-                                if(AuthService::userExists($user)){
-                                    $userObject = ConfService::getConfStorageImpl()->createUserObject($user);
-                                    $userObject->setHidden(true);
-                                    print("\n--Should set existing user $user as hidden");
-                                    if(!$dryRun){
-                                        $userObject->save();
+                                try{
+                                    $sharedRepoId = $publiclet["REPOSITORY"];
+                                    $sharedRepo = ConfService::getRepositoryById($sharedRepoId);
+                                    if($sharedRepo == null){
+                                        print("\n--ERROR: Cannot find repository with id ".$sharedRepoId);
+                                        continue;
                                     }
+                                    $shareLink = new ShareLink($shareStore, $publiclet);
+                                    $user = $shareLink->getUniqueUser();
+                                    if(AuthService::userExists($user)){
+                                        $userObject = ConfService::getConfStorageImpl()->createUserObject($user);
+                                        $userObject->setHidden(true);
+                                        print("\n--Should set existing user $user as hidden");
+                                        if(!$dryRun){
+                                            $userObject->save();
+                                        }
+                                    }
+                                    $shareLink->parseHttpVars(["custom_handle" => $element]);
+                                    $shareLink->setParentRepositoryId($sharedRepo->getParentId());
+                                    print("\n--Creating the following share object");
+                                    print_r($shareLink->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
+                                    if(!$dryRun){
+                                        $shareLink->save();
+                                    }
+                                    $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "minisite"], $sharedRepoId => ["type" => "repository"]]];
+                                }catch(Exception $e){
+                                    print("\n-- Error ".$e->getMessage());
                                 }
-                                $shareLink->parseHttpVars(["custom_handle" => $element]);
-                                $shareLink->setParentRepositoryId($sharedRepo->getParentId());
-                                print("\n--Creating the following share object");
-                                print_r($shareLink->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
-                                if(!$dryRun){
-                                    $shareLink->save();
-                                }
-                                $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "minisite"], $sharedRepoId => ["type" => "repository"]]];
-
 
                             }else{
                                 print("\n--Should migrate legacy link to new minisite with ContentFilter");
