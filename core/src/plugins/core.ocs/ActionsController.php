@@ -20,6 +20,8 @@
  */
 
 namespace Pydio\OCS;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
 use Pydio\OCS\Client\OCSClient;
 use Pydio\OCS\Model\SQLStore;
 
@@ -34,7 +36,7 @@ class ActionsController
 
             case "accept_invitation":
 
-                $remoteShareId = \AJXP_Utils::sanitize($httpVars["remote_share_id"], AJXP_SANITIZE_ALPHANUM);
+                $remoteShareId = AJXP_Utils::sanitize($httpVars["remote_share_id"], AJXP_SANITIZE_ALPHANUM);
                 $store = new SQLStore();
                 $remoteShare = $store->remoteShareById($remoteShareId);
                 if($remoteShare !== null){
@@ -48,14 +50,14 @@ class ActionsController
 
             case "reject_invitation":
 
-                $remoteShareId = \AJXP_Utils::sanitize($httpVars["remote_share_id"], AJXP_SANITIZE_ALPHANUM);
+                $remoteShareId = AJXP_Utils::sanitize($httpVars["remote_share_id"], AJXP_SANITIZE_ALPHANUM);
                 $store = new SQLStore();
                 $remoteShare = $store->remoteShareById($remoteShareId);
                 if($remoteShare !== null){
                     $client = new OCSClient();
                     $client->declineInvitation($remoteShare);
                     $store->deleteRemoteShare($remoteShare);
-                    \ConfService::getInstance()->invalidateLoadedRepositories();
+                    ConfService::getInstance()->invalidateLoadedRepositories();
                 }
 
                 break;

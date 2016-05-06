@@ -20,6 +20,9 @@
  */
 namespace Pydio\Core;
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

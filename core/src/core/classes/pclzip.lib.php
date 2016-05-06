@@ -26,7 +26,9 @@
 // --------------------------------------------------------------------------------
 
   // ----- Constants
-  if (!defined('PCLZIP_READ_BLOCK_SIZE')) {
+use Pydio\Core\AJXP_Utils;
+
+if (!defined('PCLZIP_READ_BLOCK_SIZE')) {
     define( 'PCLZIP_READ_BLOCK_SIZE', 2048 );
   }
   

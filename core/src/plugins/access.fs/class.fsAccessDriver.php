@@ -1402,8 +1402,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         restore_error_handler();
         restore_exception_handler();
 
-        set_exception_handler('download_exception_handler');
-        set_error_handler('download_exception_handler');
+        set_exception_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
+        set_error_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
         if (ini_get('zlib.output_compression')) {
          AJXP_Utils::safeIniSet('zlib.output_compression', 'Off');
@@ -1979,11 +1979,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $archive = new PclZip($dest);
 
         if($basedir == "__AJXP_ZIP_FLAT__/"){
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'Pydio\Access\Driver\StreamProvider\FS\zipPreAddCallback');
         }else{
             $basedir = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase).trim($basedir);
             $this->logDebug("Basedir", array($basedir));
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'Pydio\Access\Driver\StreamProvider\FS\zipPreAddCallback');
         }
 
         if (!$vList) {
