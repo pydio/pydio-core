@@ -64,7 +64,6 @@
         }
 
         fileHasWriteableEditors(){
-            console.log(this._previewEditors);
             return this._previewEditors.filter(function(entry){
                 return (entry.canWrite);
             }).length > 0;
