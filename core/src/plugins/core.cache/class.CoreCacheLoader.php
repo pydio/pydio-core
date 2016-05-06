@@ -18,6 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Cache\Core;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Access\Core\AJXP_Node;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -40,14 +49,14 @@ class CoreCacheLoader extends AJXP_Plugin
 
         if (!isSet(self::$cacheInstance) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$cacheInstance->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
+                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver");
 
                 if ($pluginInstance != false) {
                     AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
                 }
             }
             self::$cacheInstance = $pluginInstance;
-            if($pluginInstance !== null && is_a($pluginInstance, "AbstractCacheDriver") && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
+            if($pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
                 AJXP_MetaStreamWrapper::appendMetaWrapper("pydio.cache", "CacheStreamLayer");
             }
         }

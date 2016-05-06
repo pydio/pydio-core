@@ -19,6 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -56,8 +59,8 @@ class PluginSkeleton extends AJXP_Plugin
 
     /**
      * @param String $action
-     * @param Array $httpVars
-     * @param Array $fileVars
+     * @param array $httpVars
+     * @param array $fileVars
      * @return void
      */
     public function receiveAction($action, $httpVars, $fileVars)

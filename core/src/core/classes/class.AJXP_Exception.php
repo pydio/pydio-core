@@ -18,13 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
+use Pydio\Conf\Core\ConfService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Custom exception (legacy from php4 when there were no exceptions)
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Exception extends Exception
+class AJXP_Exception extends \Exception
 {
     public function __construct($messageString, $messageId = false)
     {
@@ -41,7 +45,7 @@ class AJXP_Exception extends Exception
 
     public function errorToXml($mixed)
     {
-        if (is_a($mixed, "Exception")) {
+        if ($mixed instanceof \Exception) {
             throw $this;
         } else {
             throw new AJXP_Exception($mixed);

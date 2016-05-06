@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\DataProvider;
+use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package AjaXplorer_Plugins

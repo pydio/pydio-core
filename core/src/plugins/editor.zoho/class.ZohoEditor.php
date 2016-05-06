@@ -22,6 +22,17 @@
  * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
  * Improved by cdujeu / Https Support now necessary for zoho API.
  */
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

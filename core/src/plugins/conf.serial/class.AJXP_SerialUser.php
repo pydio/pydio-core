@@ -19,6 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -153,7 +160,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
 
         // LOAD USR ROLE LOCALLY
         $personalRole = AJXP_Utils::loadSerialFile($this->getStoragePath()."/role.ser");
-        if (is_a($personalRole, "AJXP_Role")) {
+        if ($personalRole instanceof \Pydio\Conf\Core\AJXP_Role) {
             $this->personalRole = $personalRole;
             $this->roles["AJXP_USR_"."/".$this->id] = $personalRole;
         } else {

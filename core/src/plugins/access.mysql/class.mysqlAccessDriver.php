@@ -18,6 +18,16 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\DataProvider;
+
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -138,7 +148,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                 $res = $this->execQuery($query);
                 $this->closeDbLink($link);
 
-                if (is_a($res, "AJXP_Exception")) {
+                if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                     $errorMessage = $res->messageId;
                 } else {
                     $logMessage = $query;
@@ -155,7 +165,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     if (isSet($httpVars["delete_column"])) {
                         $query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
                         $res = $this->execQuery($query);
-                        if (is_a($res, "AJXP_Exception")) {
+                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                             $errorMessage = $res->messageId;
                         } else {
                             $logMessage = $query;
@@ -177,7 +187,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                             $query.= ", ADD UNIQUE (".$httpVars["add_field_name"].")";
                         }
                         $res = $this->execQuery($query);
-                        if (is_a($res, "AJXP_Exception")) {
+                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                             $errorMessage = $res->messageId;
                         } else {
                             $logMessage = $query;
@@ -207,7 +217,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         $defString = ($row["default"]!=""?" DEFAULT ".$row["default"]."":"");
                         $query = "ALTER TABLE $current_table CHANGE ".$row["origname"]." ".$row["name"]." ".$row["type"].$sizeString.$defString." ".$row["null"];
                         $res = $this->execQuery(trim($query));
-                        if (is_a($res, "AJXP_Exception")) {
+                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                             $errorMessage = $res->messageId;
                             $this->closeDbLink($link);
                             break;
@@ -242,7 +252,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     }
                     $query = "CREATE TABLE $new_table ($fieldsDef)";
                     $res = $this->execQuery((trim($query)));
-                    if (is_a($res, "AJXP_Exception")) {
+                    if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                         $errorMessage = $res->messageId;
                     } else {
                         $logMessage = $query;
@@ -287,7 +297,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     $res = $this->execQuery($query);
                 }
                 //AJXP_Exception::errorToXml($res);
-                if (is_a($res, "AJXP_Exception")) {
+                if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
                     $errorMessage = $res->messageId;
                 } else {
                     $logMessage = $query;
@@ -567,8 +577,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
         $columns = array();
         $rows = array();
-
-        //if(is_a($result, "AJXP_Exception")) return $result;
 
         $num_rows = mysql_num_rows($result);
         $pg=$currentPage-1;

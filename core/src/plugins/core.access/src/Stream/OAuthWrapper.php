@@ -12,19 +12,18 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
 
-use AJXP_SchemeTranslatorWrapper;
-use AJXP_Utils;
-use AuthService;
-use CacheService;
+use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Cache\Core\CacheService;
 use CommerceGuys\Guzzle\Oauth2\GrantType\AuthorizationCode;
 use CommerceGuys\Guzzle\Oauth2\AccessToken;
 use CommerceGuys\Guzzle\Oauth2\GrantType\RefreshToken;
 use CommerceGuys\Guzzle\Oauth2\Oauth2Subscriber;
 use GuzzleHttp\Client as GuzzleClient;
-use ConfService;
-use AJXP_UserAlertException;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_UserAlertException;
 use Exception;
-use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Exception\RequestException;
 
 class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
@@ -161,7 +160,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         return 'OAUTH_ONEDRIVE_' . $repositoryId . '_' . $userId . '_TOKENS';
     }
     /**
-     * @return Array
+     * @return array
      */
     private static function getTokens($key)
     {

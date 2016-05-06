@@ -21,7 +21,13 @@
  * Description : Command line access of the framework.
  * DAV controller, loads the ezComponent webDav Server
  */
+
 include_once("base.conf.php");
+
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
 
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));

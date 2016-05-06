@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Abstract representation of an access to FEU athentification module(CMS Made Simple).
@@ -26,7 +30,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  *   If the user directly go to the main page, (s)he's redirected to the LOGIN_URL.
  *   The logout button link to LOGOUT_URL.
  *   The user will log in on FEU, and the remote script will call us, as
- *   ajxpPath/content.php?get_action=login_cmsms&uid=usernam&sessionid=sessionid in FEU loggedin table
+ *   ajxpPath/index.php?get_action=login_cmsms&uid=usernam&sessionid=sessionid in FEU loggedin table
 
  * You must modify conf.php like this:
  * 	"AUTH_DRIVER" => array(

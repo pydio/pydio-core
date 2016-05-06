@@ -20,6 +20,9 @@
  */
 namespace Pydio\OCS\Model;
 
+use Pydio\Access\Core\ContentFilter;
+use Pydio\Access\Core\Repository;
+use Pydio\Conf\Core\ConfService;
 use Sabre\DAV;
 use Sabre\DAV\Exception;
 
@@ -117,7 +120,7 @@ class RemoteShare
     }
 
     /**
-     * @return \Repository
+     * @return Repository
      */
     public function buildVirtualRepository(){
         $repositoryId = "ocs_remote_share_".$this->getOcsToken();
@@ -140,13 +143,13 @@ class RemoteShare
 
         $remoteHost = $this->getHost();
         $remoteHost = !empty($remoteHost) ? '@' . $remoteHost : ' [remote]';
-        $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
+        $repo = ConfService::createRepositoryFromArray($repositoryId, $data);
         $repo->setRepositoryType("remote");
         $repo->setAccessStatus($this->getStatus() == OCS_INVITATION_STATUS_ACCEPTED ? "accepted":"");
         $repo->setWriteable(false);
         $repo->setOwnerData(null, $this->getSender().$remoteHost);
         if($this->isDocumentIsLeaf()){
-            $contentFilter = new \ContentFilter(array());
+            $contentFilter = new ContentFilter(array());
             $contentFilter->filters["/".$this->getDocumentName()] = "/"; // . $this->getDocumentName();
             $repo->setContentFilter($contentFilter);
         }

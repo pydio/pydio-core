@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
-namespace AccessS3;
+namespace Pydio\Access\Driver\StreamProvider\S3;
 use Aws\S3\S3Client as AwsS3Client;
 use Aws\S3\StreamWrapper;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "class.s3CacheService.php";

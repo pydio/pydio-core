@@ -18,6 +18,16 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AjxpGroupPathProvider;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
@@ -139,7 +149,7 @@ class Repository implements AjxpGroupPathProvider
     private $contentFilterData;
 
     /**
-     * @param \ContentFilter $contentFilter
+     * @param ContentFilter $contentFilter
      */
     public function setContentFilter($contentFilter)
     {
@@ -168,7 +178,7 @@ class Repository implements AjxpGroupPathProvider
     }
 
     /**
-     * @return \ContentFilter
+     * @return ContentFilter
      */
     public function getContentFilter()
     {
@@ -288,7 +298,7 @@ class Repository implements AjxpGroupPathProvider
     }
     /**
      * Get the <client_settings> content of the manifest.xml
-     * @return DOMElement|DOMNodeList|string
+     * @return \DOMElement|\DOMNodeList|string
      */
     public function getClientSettings()
     {
@@ -352,14 +362,14 @@ class Repository implements AjxpGroupPathProvider
      * @param bool $safe Do not filter
      * @param AbstractAjxpUser $resolveUser
      * @return mixed|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function getOption($oName, $safe=false, $resolveUser = null)
     {
         if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
             $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
             if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
-                throw new Exception("Option should be loaded from parent repository, but it was not found");
+                throw new \Exception("Option should be loaded from parent repository, but it was not found");
             }
         }
         if (!$safe && $this->inferOptionsFromParent) {

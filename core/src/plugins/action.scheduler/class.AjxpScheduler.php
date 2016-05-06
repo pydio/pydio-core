@@ -19,6 +19,15 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\UnixProcess;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -201,7 +210,7 @@ class AjxpScheduler extends AJXP_Plugin
                 $data["PARAMS"],
                 $data["user_id"],
                 AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status");
-            if ($process != null && is_a($process, "UnixProcess")) {
+            if ($process != null &&  ($process instanceof UnixProcess)) {
                 $this->setTaskStatus($taskId, "RUNNING:".$process->getPid());
             } else {
                 $this->setTaskStatus($taskId, "RUNNING");

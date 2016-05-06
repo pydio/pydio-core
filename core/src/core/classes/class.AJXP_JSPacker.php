@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -89,7 +92,7 @@ class AJXP_JSPacker
 
         // Pack and write to file
         require_once("packer/class.JavaScriptPacker.php");
-        $packer = new JavaScriptPacker($jscode, $mode , true, false);
+        $packer = new \JavaScriptPacker($jscode, $mode , true, false);
         $packed = $packer->pack();
         if ($mode == "None") { // css case, hack for I.E.
             $packed = str_replace("solid#", "solid #", $packed);
@@ -113,12 +116,12 @@ class AJXP_JSPacker
             $jscode = file_get_contents($in);
             $fullcode .= $jscode;
             // Pack and write to file
-            $packer = new JavaScriptPacker($jscode, $mode , true, false);
+            $packer = new \JavaScriptPacker($jscode, $mode , true, false);
             $packed = $packer->pack();
             file_put_contents($out, $packed);
 
             // Pack and write to file
-            $packer = new JavaScriptPacker($fullcode, $mode , true, false);
+            $packer = new \JavaScriptPacker($fullcode, $mode , true, false);
             $packed = $packer->pack();
             file_put_contents($outfull, $packed);
         }

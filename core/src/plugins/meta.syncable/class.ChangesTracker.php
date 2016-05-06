@@ -19,6 +19,19 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\SqlTableProvider;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**

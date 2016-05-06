@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Metastore\Core;
+
+use Pydio\Access\Core\AJXP_Node;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 define('AJXP_METADATA_SHAREDUSER', 'AJXP_METADATA_SHAREDUSER');
@@ -63,7 +66,7 @@ interface MetaStoreProvider
      * @param int $scope
      * Either AJXP_METADATA_SCOPE_REPOSITORY (this metadata is available only inside the current repository)
      * or AJXP_METADATA_SCOPE_GLOBAL (metadata available globally).
-     * @return Array Metadata or empty array.
+     * @return array Metadata or empty array.
      */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY);
 

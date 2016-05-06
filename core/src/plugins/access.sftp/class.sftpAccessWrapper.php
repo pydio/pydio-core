@@ -19,6 +19,16 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\SFTP;
+
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
@@ -34,25 +44,25 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 function disconnectedSftp($code, $message, $language)
 {
     AJXP_Logger::info(__CLASS__,"SSH2.FTP.disconnected",$message);
-    throw new Exception('SSH2.FTP : disconnected'.$message, $code);
+    throw new \Exception('SSH2.FTP : disconnected'.$message, $code);
 }
 
 function ignoreSftp($message)
 {
     AJXP_Logger::info(__CLASS__,"SSH2.FTP.ignore",$message);
-    throw new Exception('SSH2.FTP : ignore'.$message);
+    throw new \Exception('SSH2.FTP : ignore'.$message);
 }
 
 function debugSftp($message, $language, $always_display)
 {
     AJXP_Logger::info(__CLASS__,"SSH2.FTP.debug",$message);
-    throw new Exception('SSH2.FTP : debug'.$message);
+    throw new \Exception('SSH2.FTP : debug'.$message);
 }
 
 function macerrorSftp($packet)
 {
     AJXP_Logger::info(__CLASS__,"SSH2.FTP.macerror","");
-    throw new Exception('SSH2.FTP : macerror'.$packet);
+    throw new \Exception('SSH2.FTP : macerror'.$packet);
 }
 
 
@@ -75,7 +85,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      * @param string $streamType
      * @param bool $sftpResource
      * @param bool $skipZip
-     * @throws Exception
+     * @throws \Exception
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
     protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false)
@@ -83,7 +93,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
+        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
         $path = $url["path"];
         // MAKE SURE THERE ARE NO // OR PROBLEMS LIKE THAT...
         $basePath = $repoObject->getOption("PATH");
@@ -143,7 +153,7 @@ class sftpAccessWrapper extends fsAccessWrapper
     {
         try {
             $this->realPath = $this->initPath($path);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
@@ -263,7 +273,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      * We may have performance problems on big files here.
      *
      * @param String $path
-     * @param Stream $stream
+     * @param resource $stream
      */
     public static function copyFileInStream($path, $stream)
     {

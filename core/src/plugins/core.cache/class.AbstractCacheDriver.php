@@ -18,12 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Cache\Core;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define('AJXP_CACHE_SERVICE_NS_SHARED', 'shared');
 define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Plugins\AJXP_Plugin;
 
 /**
  * @package AjaXplorer_Plugins
@@ -88,7 +93,6 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
     {
         $cacheDriver = $this->getCacheDriver($namespace);
         return $cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
-        //return is_a($cacheDriver, "PatternClearableCache");
     }
 
     /**

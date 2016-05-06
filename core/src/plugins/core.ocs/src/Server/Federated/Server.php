@@ -20,6 +20,8 @@
  */
 namespace Pydio\OCS\Server\Federated;
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Utils;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\SQLStore;
 use Pydio\OCS\Client\OCSClient;
@@ -58,14 +60,14 @@ class Server extends Dummy
 
     protected function actionReceive($parameters){
 
-        $targetUser = \AJXP_Utils::sanitize($parameters["shareWith"], AJXP_SANITIZE_EMAILCHARS);
-        if(!\AuthService::userExists($targetUser)){
+        $targetUser = AJXP_Utils::sanitize($parameters["shareWith"], AJXP_SANITIZE_EMAILCHARS);
+        if(!AuthService::userExists($targetUser)){
             throw new UserNotFoundException();
         }
-        $token          = \AJXP_Utils::sanitize($parameters["token"], AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = \AJXP_Utils::sanitize($parameters["remoteId"], AJXP_SANITIZE_ALPHANUM);
-        $documentName   = \AJXP_Utils::sanitize($parameters["name"], AJXP_SANITIZE_FILENAME);
-        $sender         = \AJXP_Utils::sanitize($parameters["owner"], AJXP_SANITIZE_EMAILCHARS);
+        $token          = AJXP_Utils::sanitize($parameters["token"], AJXP_SANITIZE_ALPHANUM);
+        $remoteId       = AJXP_Utils::sanitize($parameters["remoteId"], AJXP_SANITIZE_ALPHANUM);
+        $documentName   = AJXP_Utils::sanitize($parameters["name"], AJXP_SANITIZE_FILENAME);
+        $sender         = AJXP_Utils::sanitize($parameters["owner"], AJXP_SANITIZE_EMAILCHARS);
         $remote         = $parameters["remote"];
         $testParts = parse_url($remote);
         if(!is_array($testParts) || empty($testParts["scheme"]) || empty($testParts["host"])){
@@ -94,11 +96,11 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully received share, waiting for user response.", array("id" => $newShare->getId()));
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = AuthService::getRole("AJXP_USR_/".$targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            \AuthService::updateRole($userRole);
+            AuthService::updateRole($userRole);
         }
 
     }
@@ -140,8 +142,8 @@ class Server extends Dummy
 
     protected function actionUnshare($remoteId, $token, $parameters){
 
-        $token          = \AJXP_Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = \AJXP_Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
+        $token          = AJXP_Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
+        $remoteId       = AJXP_Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
         $store = new SQLStore();
         $remoteShare = $store->remoteShareForOcsRemoteId($remoteId);
         if(empty($remoteShare)){
@@ -155,11 +157,11 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully removed share.");
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = AuthService::getRole("AJXP_USR_/".$targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            \AuthService::updateRole($userRole);
+            AuthService::updateRole($userRole);
         }
 
     }

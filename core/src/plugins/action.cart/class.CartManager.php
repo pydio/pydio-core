@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 class CartManager extends AJXP_Plugin
 {
     public function switchAction ($actionName, $httpVars, $fileVars)

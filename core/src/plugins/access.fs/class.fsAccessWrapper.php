@@ -19,6 +19,19 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\FS;
+
+use PclZip;
+
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -26,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class fsAccessWrapper implements AjxpWrapper
+class fsAccessWrapper implements IAjxpWrapper
 {
     /**
      * FileHandle resource
@@ -64,7 +77,7 @@ class fsAccessWrapper implements AjxpWrapper
      * @param bool $skipZip
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      * @throws AJXP_Exception
-     * @throws Exception
+     * @throws \Exception
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
@@ -74,7 +87,7 @@ class fsAccessWrapper implements AjxpWrapper
         $test = trim($url["path"], "/");
         $atRoot = empty($test);
         $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
+        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
         $split = UserSelection::detectZip($url["path"]);
         $insideZip = false;
         if($split && $streamType == "file" && $split[1] != "/") $insideZip = true;
@@ -283,7 +296,7 @@ class fsAccessWrapper implements AjxpWrapper
     {
         try {
             $this->realPath = AJXP_Utils::securePath(self::initPath($path, "file"));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path (".$e->getMessage().")");
             return false;
         }
@@ -509,7 +522,7 @@ class fsAccessWrapper implements AjxpWrapper
             }
             return floatval($val);
         } else if (class_exists("COM")) {
-            $fsobj = new COM("Scripting.FileSystemObject");
+            $fsobj = new \COM("Scripting.FileSystemObject");
             $f = $fsobj->GetFile($file);
             return floatval($f->Size);
         } else if (is_file($file)) {

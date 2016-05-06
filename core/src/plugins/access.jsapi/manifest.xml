@@ -16,7 +16,7 @@
 		</resources>
 		<node_provider ajxpClass="LocalAPINodeProvider" ajxpOptions="{}"/>
 	</client_settings>
-	<class_definition filename="plugins/access.jsapi/class.jsapiAccessDriver.php" classname="jsapiAccessDriver"/>
+	<class_definition filename="plugins/access.jsapi/class.jsapiAccessDriver.php" classname="Pydio\Access\Driver\DataProvider\jsapiAccessDriver"/>
 	<registry_contributions>
 		<actions>
 			<action name="ls" dirDefault="true">

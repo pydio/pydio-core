@@ -19,6 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\Dropbox;
+
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_UserAlertException;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -54,7 +62,7 @@ class dropboxAccessDriver extends fsAccessDriver
 
         $consumerKey = $this->repository->getOption("CONSUMER_KEY");
         $consumerSecret = $this->repository->getOption("CONSUMER_SECRET");
-        $oauth = new Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
+        $oauth = new \Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
 
         // TOKENS IN SESSION?
         if(!empty($_SESSION["OAUTH_DROPBOX_TOKENS"])) return;
@@ -89,7 +97,7 @@ class dropboxAccessDriver extends fsAccessDriver
                 $oauth->setToken($_SESSION['oauth_tokens']);
                 try{
                     $tokens = $oauth->getAccessToken();
-                }catch(Exception $oauthEx){
+                }catch(\Exception $oauthEx){
                     throw new AJXP_UserAlertException($oauthEx->getMessage() . ". Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
                 }
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
@@ -98,14 +106,14 @@ class dropboxAccessDriver extends fsAccessDriver
                 return;
         }
 
-        throw new Exception("Impossible to find the dropbox tokens for accessing this workspace");
+        throw new \Exception("Impossible to find the dropbox tokens for accessing this workspace");
 
     }
 
     public function performChecks()
     {
         if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
-            throw new Exception("The PEAR HTTP_OAuth package must be installed!");
+            throw new \Exception("The PEAR HTTP_OAuth package must be installed!");
         }
     }
 
@@ -137,7 +145,7 @@ class dropboxAccessDriver extends fsAccessDriver
         $repositoryId = $this->repository->getId();
         if(AuthService::usersEnabled()) $userId = AuthService::getLoggedUser()->getId();
         else $userId = "shared";
-        return AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
+        AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
 
     public function makeSharedRepositoryOptions($httpVars, $repository)

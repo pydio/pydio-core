@@ -18,6 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Authfront\Core;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class FrontendsLoader extends AJXP_Plugin {

@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core\Filter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -30,7 +31,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Permission implements JsonSerializable
+class AJXP_Permission implements \JsonSerializable
 {
     /**
      * Use an integer number to store permission
@@ -109,7 +110,7 @@ class AJXP_Permission implements JsonSerializable
      * Test permission against an integer value
      * @param int $numPerm
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     function testPermission($numPerm){
         if(is_integer($numPerm) && ($numPerm < self::MASK)){
@@ -120,7 +121,7 @@ class AJXP_Permission implements JsonSerializable
             return (($this->value & $numPerm) === $numPerm);
         }
         else{
-            throw new Exception("Unimplemented permission : " . $numPerm);
+            throw new \Exception("Unimplemented permission : " . $numPerm);
         }
     }
 

@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Access\Core\Repository;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -32,7 +40,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      */
     protected $repository;
     /**
-     * @var AjxpWrapperProvider
+     * @var IAjxpWrapperProvider
      */
     protected $accessDriver;
 
@@ -59,7 +67,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     }
 
     /**
-     * @return AjxpWrapperProvider
+     * @return IAjxpWrapperProvider
      * @throws \Sabre\DAV\Exception\NotFound
      */
     public function getAccessDriver()
@@ -69,7 +77,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
             //ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadDriverForRepository($this->repository);
-            if (!$this->accessDriver instanceof AjxpWrapperProvider) {
+            if (!$this->accessDriver instanceof IAjxpWrapperProvider) {
                 throw new Sabre\DAV\Exception\NotFound( $this->repository->getId() );
             }
             $this->accessDriver->detectStreamWrapper(true);

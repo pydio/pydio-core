@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\Imap;
+
+use DOMNode;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -58,7 +66,7 @@ class imapAccessDriver extends fsAccessDriver
     public function performChecks()
     {
         if (!function_exists("imap_createmailbox")) {
-            throw new Exception("PHP Imap extension must be loaded to use this driver!");
+            throw new \Exception("PHP Imap extension must be loaded to use this driver!");
         }
     }
 

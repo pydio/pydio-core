@@ -18,6 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Conf\Sql;
+
+use dibi;
+use DibiException;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -58,26 +69,26 @@ class AJXP_SqlUser extends AbstractAjxpUser
 
     /**
      * User rights map. In the format Array( "repoid" => "rw | r | nothing" )
-     * @var Array
+     * @var array
      */
     public $rights;
 
     /**
      * User preferences array in the format Array( "preference_key" => "preference_value" )
-     * @var Array
+     * @var array
      */
     public $prefs;
 
     /**
      * User bookmarks array in the format Array( "repoid" => Array( Array( "path"=>"/path/to/bookmark", "title"=>"bookmark" )))
-     * @var Array
+     * @var array
      */
     public $bookmarks;
 
     /**
      * User version(?) possibly deprecated.
      *
-     * @var unknown_type
+     * @var string
      */
     public $version;
 
@@ -153,8 +164,8 @@ class AJXP_SqlUser extends AbstractAjxpUser
     /**
      * Set a user preference.
      *
-     * @param $prefName String Name of the preference.
-     * @param $prefValue String Value to assign to the preference.
+     * @param string $prefName Name of the preference.
+     * @param string|object $prefValue Value to assign to the preference.
      * @return null or -1 on error.
      * @see AbstractAjxpUser#setPref($prefName, $prefValue)
      */
@@ -244,7 +255,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             $toCompare = "";
             if(is_string($v)) $toCompare = $v;
             else if(is_array($v)) $toCompare = $v["PATH"];
-            if($toCompare == trim($path)) return ; // RETURN IF ALREADY HERE!
+            if($toCompare == trim($path)) return null; // RETURN IF ALREADY HERE!
         }
 
         try {
@@ -260,6 +271,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             return -1;
         }
         $this->bookmarks[$repId][] = array("PATH"=>trim($path), "TITLE"=>$title);
+        return null;
     }
 
     /**
@@ -292,13 +304,14 @@ class AJXP_SqlUser extends AbstractAjxpUser
                     }
                 }
             }
+        return null;
     }
 
     /**
      * Rename a user bookmark.
      *
-     * @param $path String Path of the bookmark to rename.
-     * @param $title New title to give the bookmark.
+     * @param string $path Path of the bookmark to rename.
+     * @param string $title New title to give the bookmark.
      * @return null or -1 on error.
      * @see AbstractAjxpUser#renameBookmark($path, $title)
      */
@@ -329,6 +342,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
                     }
                 }
             }
+        return null;
     }
 
     /**
@@ -443,7 +457,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
         }
 
         // CHECK USER PERSONAL ROLE
-        if (isSet($this->roles["AJXP_USR_"."/".$this->id]) && is_a($this->roles["AJXP_USR_"."/".$this->id], "AJXP_Role")) {
+        if (isSet($this->roles["AJXP_USR_"."/".$this->id]) && $this->roles["AJXP_USR_"."/".$this->id] instanceof AJXP_Role) {
             $this->personalRole = $this->roles["AJXP_USR_"."/".$this->id];
         } else {
             // MIGRATE NOW !
@@ -523,7 +537,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * Implementation uses serialised files because of the overhead incurred with a full db implementation.
      *
      * @param $key String key of data to retrieve
-     * @return Requested value
+     * @return mixed Requested value
      */
     public function getTemporaryData($key)
     {
@@ -540,8 +554,8 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * Save Temporary Data.
      * Implementation uses serialised files because of the overhead incurred with a full db implementation.
      *
-     * @param $key String key of data to save.
-     * @param $value Value to save
+     * @param string $key String key of data to save.
+     * @param mixed $value Value to save
      */
     public function saveTemporaryData($key, $value)
     {

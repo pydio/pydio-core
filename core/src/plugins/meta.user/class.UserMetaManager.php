@@ -19,6 +19,18 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -222,7 +234,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     public function editMeta($actionName, $httpVars, $fileVars)
     {
-        if (is_a($this->accessDriver, "demoAccessDriver")) {
+        if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
             throw new Exception("Write actions are disabled in demo mode!");
         }
         $repo = $this->accessDriver->repository;
@@ -339,7 +351,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     protected function loadTags(){
         $store = ConfService::getConfStorageImpl();
-        if(!is_a($store, "sqlConfDriver")) return array();
+        if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return array();
         $data = array();
         $store->simpleStoreGet("meta_user_tags", ConfService::getRepository()->getId(), "serial", $data);
         return $data;
@@ -347,7 +359,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     protected function updateTags($tagString){
         $store = ConfService::getConfStorageImpl();
-        if(!is_a($store, "sqlConfDriver")) return;
+        if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return;
         $tags = $this->loadTags();
         $tags = array_merge($tags, array_map("trim", explode(",", $tagString)));
         $tags = array_unique($tags);

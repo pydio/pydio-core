@@ -18,6 +18,18 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Gui\Ajax;
+
+use DOMXPath;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -385,4 +397,4 @@ class AJXP_ClientDriver extends AJXP_Plugin
     }
 }
 
-AJXP_Controller::registerIncludeHook("xml.filter", array("AJXP_ClientDriver", "filterXml"));
+AJXP_Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\Ajax\\AJXP_ClientDriver", "filterXml"));

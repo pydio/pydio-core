@@ -18,7 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
+
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 
 /**
  * Atomic representation of a data. This the basic node of the hierarchical data.
@@ -57,11 +65,11 @@ class AJXP_Node
      */
     protected $nodeInfoLevel = "minimal";
     /**
-     * @var Repository
+     * @var .\Repository
      */
     private $_repository;
     /**
-     * @var AbstractAccessDriver
+     * @var .\AbstractAccessDriver
      */
     private $_accessDriver;
     /**
@@ -433,7 +441,7 @@ class AJXP_Node
         $this->realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($this->_url, true);
             $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
-                register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $this->realFilePointer);
+                register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $this->realFilePointer);
             }
         }
         return $this->realFilePointer;

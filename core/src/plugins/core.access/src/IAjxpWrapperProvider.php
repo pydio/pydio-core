@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -26,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @subpackage Core
  * @interface AjxpWrapperProvider
  */
-interface AjxpWrapperProvider
+interface IAjxpWrapperProvider
 {
     /**
      * Convert a path (from the repository root) to a fully

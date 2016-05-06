@@ -1,4 +1,8 @@
 <?php
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 class AntivirusScanner extends AJXP_Plugin
 {
@@ -112,7 +116,6 @@ class AntivirusScanner extends AJXP_Plugin
             $create_folder = mkdir($this->scan_diff_folder, 0755);
             if ($create_folder == false) {
                 throw new Exception("can-t create scan_diff_folder, check permission");
-                return;
             }
         }
         while ($scanned == false) {

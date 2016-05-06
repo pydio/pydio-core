@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core\Filter;
+
+use Pydio\Core\AJXP_Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -30,7 +33,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Core
  *
  */
-class AJXP_PermissionMask implements JsonSerializable, Serializable
+class AJXP_PermissionMask implements \JsonSerializable, \Serializable
 {
     /**
      * @var array

@@ -19,6 +19,26 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\DataProvider;
+
+use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Filter\AJXP_PermissionMask;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_ProgressBarCLI;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\PydioSdkGenerator;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -581,10 +601,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "create_role":
                 $roleId = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["role_id"]), AJXP_SANITIZE_HTML_STRICT);
                 if (!strlen($roleId)) {
-                    throw new Exception($mess[349]);
+                    throw new \Exception($mess[349]);
                 }
                 if (AuthService::getRole($roleId) !== false) {
-                    throw new Exception($mess["ajxp_conf.65"]);
+                    throw new \Exception($mess["ajxp_conf.65"]);
                 }
                 $r = new AJXP_Role($roleId);
                 if (AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null) {
@@ -613,7 +633,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                         $key = "/".basename($groupPath);
                         if (!array_key_exists($key, $groups)) {
-                            throw new Exception("Cannot find group with this id!");
+                            throw new \Exception("Cannot find group with this id!");
                         }
                         $roleId = "AJXP_GRP_".$filteredGroupPath;
                         $groupLabel = $groups[$key];
@@ -624,14 +644,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $usrId = str_replace("AJXP_USR_/", "", $roleId);
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
                     if(!AuthService::canAdministrate($userObject)){
-                        throw new Exception("Cant find user!");
+                        throw new \Exception("Cant find user!");
                     }
                     $role = $userObject->personalRole;
                 } else {
                     $role = AuthService::getRole($roleId, $roleGroup);
                 }
                 if ($role === false) {
-                    throw new Exception("Cant find role! ");
+                    throw new \Exception("Cant find role! ");
                 }
                 if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
                     HTMLWriter::charsetHeader("application/json");
@@ -674,7 +694,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             if($repositoryObject->getOption("META_SOURCES") != null){
                                 $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
                             }
-                        }catch(Exception $e){
+                        }catch(\Exception $e){
                             if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
                             $this->logError("Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
                             continue;
@@ -795,7 +815,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                         $key = "/".basename($groupPath);
                         if (!array_key_exists($key, $groups)) {
-                            throw new Exception("Cannot find group with this id!");
+                            throw new \Exception("Cannot find group with this id!");
                         }
                         $groupLabel = $groups[$key];
                     }else{
@@ -807,7 +827,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $usrId = str_replace("AJXP_USR_/", "", $roleId);
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
                     if(!AuthService::canAdministrate($userObject)){
-                        throw new Exception("Cannot post role for user ".$usrId);
+                        throw new \Exception("Cannot post role for user ".$usrId);
                     }
                     $originalRole = $userObject->personalRole;
                 } else {
@@ -815,7 +835,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $originalRole = AuthService::getRole($roleId, $roleGroup);
                 }
                 if ($originalRole === false) {
-                    throw new Exception("Cant find role! ");
+                    throw new \Exception("Cant find role! ");
                 }
 
                 $jsonData = SystemTextEncoding::magicDequote($httpVars["json_data"]);
@@ -901,7 +921,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     // Reload Role
                     $savedValue = AuthService::getRole($originalRole->getId());
                     $output = array("ROLE" => $savedValue->getDataArray(true), "SUCCESS" => true);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $output = array("ERROR" => $e->getMessage());
                 }
                 HTMLWriter::charsetHeader("application/json");
@@ -918,7 +938,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (AuthService::userExists($userId)) {
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
                     if(!AuthService::canAdministrate($userObject)){
-                        throw new Exception("Cannot update user data for ".$userId);
+                        throw new \Exception("Cannot update user data for ".$userId);
                     }
                     if ($lock) {
                         $userObject->setLock($lockType);
@@ -947,10 +967,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $original_login = SystemTextEncoding::magicDequote($httpVars["new_user_login"]);
                 $new_user_login = AJXP_Utils::sanitize($original_login, AJXP_SANITIZE_EMAILCHARS);
                 if($original_login != $new_user_login){
-                    throw new Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
+                    throw new \Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
                 }
                 if (AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login)) {
-                    throw new Exception($mess["ajxp_conf.43"]);
+                    throw new \Exception($mess["ajxp_conf.43"]);
                 }
 
                 AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
@@ -973,12 +993,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "change_admin_right" :
                 $userId = $httpVars["user_id"];
                 if (!AuthService::userExists($userId)) {
-                    throw new Exception("Invalid user id!");
+                    throw new \Exception("Invalid user id!");
                 }
                 $confStorage = ConfService::getConfStorageImpl();
                 $user = $confStorage->createUserObject($userId);
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user with id ".$userId);
+                    throw new \Exception("Cannot update user with id ".$userId);
                 }
                 $user->setAdmin(($httpVars["right_value"]=="1"?true:false));
                 $user->save("superuser");
@@ -1031,7 +1051,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 $user = $confStorage->createUserObject($userId);
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user with id ".$userId);
+                    throw new \Exception("Cannot update user with id ".$userId);
                 }
                 $user->personalRole->setAcl(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
                 $user->save();
@@ -1102,7 +1122,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "user_delete_role":
 
                 if (!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExists($httpVars["user_id"]) || !AuthService::getRole($httpVars["role_id"])) {
-                    throw new Exception($mess["ajxp_conf.61"]);
+                    throw new \Exception($mess["ajxp_conf.61"]);
                 }
                 if ($action == "user_add_role") {
                     $act = "add";
@@ -1121,14 +1141,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "user_reorder_roles":
 
                 if (!isSet($httpVars["user_id"]) || !AuthService::userExists($httpVars["user_id"]) || !isSet($httpVars["roles"])) {
-                    throw new Exception($mess["ajxp_conf.61"]);
+                    throw new \Exception($mess["ajxp_conf.61"]);
                 }
                 $roles = json_decode($httpVars["roles"], true);
                 $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 $confStorage = ConfService::getConfStorageImpl();
                 $user = $confStorage->createUserObject($userId);
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user data for ".$userId);
+                    throw new \Exception("Cannot update user data for ".$userId);
                 }
                 $user->updateRolesOrder($roles);
                 $user->save("superuser");
@@ -1194,7 +1214,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $update = $httpVars["update_role_action"];
                     $roleId = $httpVars["role_id"];
                     if (AuthService::getRole($roleId) === false) {
-                        throw new Exception("Invalid role id");
+                        throw new \Exception("Invalid role id");
                     }
                 }
                 foreach ($files as $index => $file) {
@@ -1243,7 +1263,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $user = $confStorage->createUserObject($userId);
                 }
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user with id ".$userId);
+                    throw new \Exception("Cannot update user with id ".$userId);
                 }
 
                 $custom = $user->getPref("CUSTOM_PARAMS");
@@ -1273,7 +1293,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $user = $confStorage->createUserObject($userId);
                 }
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user with id ".$userId);
+                    throw new \Exception("Cannot update user with id ".$userId);
                 }
 
                 $wallet = $user->getPref("AJXP_WALLET");
@@ -1308,7 +1328,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 $user = ConfService::getConfStorageImpl()->createUserObject($userId);
                 if(!AuthService::canAdministrate($user)){
-                    throw new Exception("Cannot update user data for ".$userId);
+                    throw new \Exception("Cannot update user data for ".$userId);
                 }
                 $res = AuthService::updatePassword($userId, $httpVars["user_pwd"]);
                 AJXP_XMLWriter::header();
@@ -1324,7 +1344,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "save_user_preference":
 
                 if (!isSet($httpVars["user_id"]) || !AuthService::userExists($httpVars["user_id"]) ) {
-                    throw new Exception($mess["ajxp_conf.61"]);
+                    throw new \Exception($mess["ajxp_conf.61"]);
                 }
                 $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 if ($userId == $loggedUser->getId()) {
@@ -1334,7 +1354,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $userObject = $confStorage->createUserObject($userId);
                 }
                 if(!AuthService::canAdministrate($userObject)){
-                    throw new Exception("Cannot update user data for ".$userId);
+                    throw new \Exception("Cannot update user data for ".$userId);
                 }
 
                 $i = 0;
@@ -1418,7 +1438,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                 } else {
                     if ($currentUserIsGroupAdmin) {
-                        throw new Exception("You are not allowed to create a workspace from a driver. Use a template instead.");
+                        throw new \Exception("You are not allowed to create a workspace from a driver. Use a template instead.");
                     }
                     $pServ = AJXP_PluginsService::getInstance();
                     $driver = $pServ->getPluginByTypeName("access", $repDef["DRIVER"]);
@@ -1506,15 +1526,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repository = ConfService::getRepositoryById($repId);
                 if ($repository == null) {
-                    throw new Exception("Cannot find workspace with id $repId");
+                    throw new \Exception("Cannot find workspace with id $repId");
                 }
                 if (!AuthService::canAdministrate($repository)) {
-                    throw new Exception("You are not allowed to edit this workspace!");
+                    throw new \Exception("You are not allowed to edit this workspace!");
                 }
                 $pServ = AJXP_PluginsService::getInstance();
                 $plug = $pServ->getPluginById("access.".$repository->accessType);
                 if ($plug == null) {
-                    throw new Exception("Cannot find access driver (".$repository->accessType.") for workspace!");
+                    throw new \Exception("Cannot find access driver (".$repository->accessType.") for workspace!");
                 }
                 AJXP_XMLWriter::header("admin_data");
                 $slug = $repository->getSlug();
@@ -1646,7 +1666,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         AJXP_XMLWriter::close();
                         break;
                     }else{
-                        throw new Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
+                        throw new \Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
                     }
                 }
                 $res = 0;
@@ -1677,7 +1697,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 $newLabel = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                                 if($repo->getDisplay() != $newLabel){
                                     if ($this->repositoryExists($newLabel)) {
-                                        throw new Exception($mess["ajxp_conf.50"]);
+                                        throw new \Exception($mess["ajxp_conf.50"]);
                                     }else{
                                         $repo->setDisplay($newLabel);
                                     }
@@ -1765,7 +1785,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid workspace id! $repId");
+                    throw new \Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceType = AJXP_Utils::sanitize($httpVars["new_meta_source"], AJXP_SANITIZE_ALPHANUM);
                 if (isSet($httpVars["json_data"])) {
@@ -1776,7 +1796,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $repoOptions = $repo->getOption("META_SOURCES");
                 if (is_array($repoOptions) && isSet($repoOptions[$metaSourceType])) {
-                    throw new Exception($mess["ajxp_conf.55"]);
+                    throw new \Exception($mess["ajxp_conf.55"]);
                 }
                 if (!is_array($repoOptions)) {
                     $repoOptions = array();
@@ -1795,7 +1815,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid workspace id! $repId");
+                    throw new \Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceId = $httpVars["plugId"];
                 $repoOptions = $repo->getOption("META_SOURCES");
@@ -1805,7 +1825,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repo->addOption("META_SOURCES", $repoOptions);
                     ConfService::replaceRepository($repId, $repo);
                 }else{
-                    throw new Exception("Cannot find meta source ".$metaSourceId);
+                    throw new \Exception("Cannot find meta source ".$metaSourceId);
                 }
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.57"],null);
@@ -1817,7 +1837,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repId = $httpVars["repository_id"];
                 $repo = ConfService::getRepositoryById($repId);
                 if (!is_object($repo)) {
-                    throw new Exception("Invalid workspace id! $repId");
+                    throw new \Exception("Invalid workspace id! $repId");
                 }
                 if(isSet($httpVars["plugId"])){
                     $metaSourceId = $httpVars["plugId"];
@@ -1911,7 +1931,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 } else if (isSet($httpVars["role_id"])) {
                     $roleId = $httpVars["role_id"];
                     if (AuthService::getRole($roleId) === false) {
-                        throw new Exception($mess["ajxp_conf.67"]);
+                        throw new \Exception($mess["ajxp_conf.67"]);
                     }
                     AuthService::deleteRole($roleId);
                     AJXP_XMLWriter::header();
@@ -1967,7 +1987,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $checkErrorMessage = "";
                         try {
                             $typePlug->performChecks();
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             $checkErrorMessage = " (Warning : ".$e->getMessage().")";
                         }
                         $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[not(@group_switch_name)]"));
@@ -2053,7 +2073,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (method_exists($plugin, $httpVars["action_plugin_method"])) {
                     try {
                         $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         echo("ERROR:" . $e->getMessage());
                         break;
                     }
@@ -2195,7 +2215,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $errors = "OK";
                 try {
                     $pObject->performChecks();
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $errors = "ERROR : ".$e->getMessage();
                 }
                 $meta = array(
@@ -2843,7 +2863,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $confStorage = ConfService::getConfStorageImpl();
         $user = $confStorage->createUserObject($userId);
         if(!AuthService::canAdministrate($user)){
-            throw new Exception("Cannot update user data for ".$userId);
+            throw new \Exception("Cannot update user data for ".$userId);
         }
         if ($addOrRemove == "add") {
             $roleObject = AuthService::getRole($roleId);

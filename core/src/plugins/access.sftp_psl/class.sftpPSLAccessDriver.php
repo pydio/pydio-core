@@ -19,6 +19,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
+
+
+use DOMNode;
+use PclZip;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed' );
 
 
@@ -113,7 +122,7 @@ class sftpPSLAccessDriver extends fsAccessDriver
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $uniqfolder, PCLZIP_OPT_NO_COMPRESSION);
         $this->recursiveRmdir($uniqfolder);
         if (!$vList) {
-            throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+            throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
         return $vList;
     }

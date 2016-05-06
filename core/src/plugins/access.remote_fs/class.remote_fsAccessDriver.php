@@ -18,6 +18,19 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\RemoteFS;
+
+use DOMDocument;
+use DOMNode;
+use DOMXPath;
+use HttpClient;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -103,7 +116,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
         }
 
         if ($result === false && isSet($httpClient->errormsg)) {
-            throw new Exception(SystemTextEncoding::toUTF8($httpClient->errormsg));
+            throw new \Exception(SystemTextEncoding::toUTF8($httpClient->errormsg));
         }
 
         switch ($action) {
@@ -241,7 +254,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                             $boxData["tmp_name"] = $destName;
                             $this->storeFileToCopy($boxData);
                             $this->logDebug("End reading INPUT stream");
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             $errorCode=411;
                             $errorMessage = $e->getMessage();
                             break;

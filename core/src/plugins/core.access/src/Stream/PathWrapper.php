@@ -8,12 +8,12 @@
 
 namespace Pydio\Access\Core\Stream;
 
+use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use AJXP_SchemeTranslatorWrapper;
-use AJXP_Utils;
-use CacheService;
-use ConfService;
 
 class PathWrapper extends AJXP_SchemeTranslatorWrapper
 {

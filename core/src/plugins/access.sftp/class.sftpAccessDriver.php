@@ -19,6 +19,19 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\SFTP;
+
+use DOMNode;
+use PclZip;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -45,7 +58,7 @@ class sftpAccessDriver extends fsAccessDriver
         }
 
         if (!function_exists('ssh2_connect')) {
-            throw new Exception("You must have the php ssh2 extension active!");
+            throw new \Exception("You must have the php ssh2 extension active!");
         }
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $path = $this->repository->getOption("PATH");
@@ -102,7 +115,7 @@ class sftpAccessDriver extends fsAccessDriver
      * @param $src
      * @param $dest
      * @param $basedir
-     * @throws Exception
+     * @throws \Exception
      * @return zipfile
      */
     public function makeZip ($src, $dest, $basedir)
@@ -129,7 +142,7 @@ class sftpAccessDriver extends fsAccessDriver
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $uniqfolder, PCLZIP_OPT_NO_COMPRESSION);
         $this->recursiveRmdir($uniqfolder);
         if (!$vList) {
-            throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+            throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
         return $vList;
     }

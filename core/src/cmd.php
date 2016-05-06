@@ -20,6 +20,16 @@
  *
  * Description : Command line access of the framework.
  */
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 if (php_sapi_name() !== "cli") {
     die("This is the command line version of the framework, you are not allowed to access this page");
 }

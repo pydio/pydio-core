@@ -18,6 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Core;
+
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

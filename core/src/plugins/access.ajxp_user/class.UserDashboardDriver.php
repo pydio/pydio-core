@@ -19,6 +19,21 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\DataProvider;
+
+use DOMXPath;
+use PublicletCounter;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\SystemTextEncoding;
+use ShareCenter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package AjaXplorer_Plugins
@@ -102,7 +117,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                     if(count($splits)) $strippedDir = strtolower(urldecode($splits[0]));
                     else $strippedDir = "";
                 }
-                if (array_key_exists($strippedDir, $rootNodes)) {
+                if (!empty($strippedDir) && array_key_exists($strippedDir, $rootNodes)) {
                     AJXP_XMLWriter::header();
                     if ($strippedDir == "users") {
                         $this->listUsers();
@@ -237,7 +252,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                     continue;
                 }
                 $expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
-                if(!is_a($publicletData["REPOSITORY"], "Repository")) continue;
+                if(!(is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] instanceof Repository)) continue;
                 AJXP_XMLWriter::renderNode($hash, "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
                         "icon"		=> "html.png",
                         "password" => ($publicletData["PASSWORD"]!=""?$this->metaIcon("key").$publicletData["PASSWORD"]:""),

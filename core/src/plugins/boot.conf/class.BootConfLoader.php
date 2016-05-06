@@ -19,6 +19,21 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Conf\Core\CoreConfLoader;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Plugins\SqlTableProvider;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -240,7 +255,7 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * Create or update the bootstrap json file.
-     * @param Array $data Parsed result of the installer form
+     * @param array $data Parsed result of the installer form
      * @return array 2 entries array containing the new Conf Driver (0) and Auth Driver (1)
      * @throws Exception
      */
@@ -301,9 +316,9 @@ class BootConfLoader extends AbstractConfDriver
         $coreConf["UNIQUE_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
         $coreAuth["MASTER_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
 
-        $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
-        $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
-        $newCachePlugin = ConfService::instanciatePluginFromGlobalParams($coreCache["UNIQUE_INSTANCE_CONFIG"], "AbstractCacheDriver");
+        $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver");
+        $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "Pydio\\Auth\\Core\\AbstractAuthDriver");
+        $newCachePlugin = ConfService::instanciatePluginFromGlobalParams($coreCache["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver");
 
         $sqlPlugs = array(
             "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
@@ -531,7 +546,7 @@ class BootConfLoader extends AbstractConfDriver
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return array
      */
     public function listRepositories($user = null)
     {
@@ -540,9 +555,9 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
-     * @param Array $criteria
+     * @param array $criteria
      * @param int $count
-     * @return Array
+     * @return array
      */
     public function listRepositoriesWithCriteria($criteria, &$count = null){
         return array();
@@ -637,7 +652,7 @@ class BootConfLoader extends AbstractConfDriver
     /**
      * @param array $context
      * @param String $ID
-     * @param Stream $outputStream
+     * @param resource $outputStream
      * @return boolean
      */
     public function loadBinary($context, $ID, $outputStream = null) {
@@ -657,7 +672,7 @@ class BootConfLoader extends AbstractConfDriver
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
+     * @param array $deletedSubUsers
      */
     public function deleteUser($userId, &$deletedSubUsers) {
         return array();
@@ -759,7 +774,7 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $keyType
      * @param String $keyId
      * @param String $userId
-     * @param Array $data
+     * @param array $data
      * @return boolean
      */
     public function saveTemporaryKey($keyType, $keyId, $userId, $data){}

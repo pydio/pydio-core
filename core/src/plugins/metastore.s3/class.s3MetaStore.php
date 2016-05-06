@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Simple metadata implementation, coupled with an S3 repository, stores

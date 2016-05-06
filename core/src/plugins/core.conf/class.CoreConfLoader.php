@@ -19,6 +19,12 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Conf\Core;
+
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
  * @package AjaXplorer_Plugins
@@ -38,7 +44,7 @@ class CoreConfLoader extends AJXP_Plugin
     {
         if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
+                self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver");
                 AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("conf", self::$confImpl->getName());
             }
         }

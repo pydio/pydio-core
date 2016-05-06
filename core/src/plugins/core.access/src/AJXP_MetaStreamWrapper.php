@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Access\Core;
+
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Conf\Core\ConfService;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -32,7 +37,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_MetaStreamWrapper implements AjxpWrapper
+class AJXP_MetaStreamWrapper implements IAjxpWrapper
 {
     /**
      * @var resource
@@ -46,7 +51,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
 
     protected static $metaWrappers = [
         'core' => [
-            'pydio' => 'AJXP_MetaStreamWrapper'
+            'pydio' => 'Pydio\Access\Core\AJXP_MetaStreamWrapper'
         ]
     ];
 
@@ -62,7 +67,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         if($registered_wrappers == null){
             $registered_wrappers = stream_get_wrappers();
         }
-        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator(self::$metaWrappers));
+        $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator(self::$metaWrappers));
         foreach($it as $protocol => $className){
             if(!in_array($protocol, $registered_wrappers)){
                 stream_wrapper_register($protocol, $className);
@@ -102,7 +107,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * @param string $url
      * @param AJXP_MetaStreamWrapper $crtInstance
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     protected static function translateScheme($url, $crtInstance = null){
         $parts=parse_url($url);
@@ -125,7 +130,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
                     $crtPath = parse_url($url, PHP_URL_PATH);
                     $crtBase = basename($crtPath);
                     if (!empty($crtPath) && $crtPath != "/" && $crtBase != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
-                        throw new Exception("Cannot find file " . $crtBase);
+                        throw new \Exception("Cannot find file " . $crtBase);
                     }
                     // Prepend baseDir in path
                     $url = str_replace($currentScheme . "://" . $repository->getId() . $crtPath, $currentScheme . "://" . $repository->getId() . rtrim($baseDir . $crtPath, "/"), $url);
@@ -150,7 +155,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
             $wrapper = AJXP_PluginsService::getInstance()->getWrapperClassName($scheme);
         }
         if(empty($wrapper)) {
-            throw new Exception("Cannot find any wrapper for the scheme " . $scheme . " in context " . $context);
+            throw new \Exception("Cannot find any wrapper for the scheme " . $scheme . " in context " . $context);
         }
         return $wrapper;
     }
@@ -169,13 +174,13 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
         }
         $repository = ConfService::getRepositoryById($repositoryId);
         if(!is_a($repository, "Repository")){
-            throw new Exception("Cannot find repository with this id!");
+            throw new \Exception("Cannot find repository with this id!");
         }
         if($repository->detectStreamWrapper(false)){
             self::$cachedRepositoriesWrappers[$repositoryId] = $repository->streamData;
             return $repository->streamData;
         }else{
-            throw new Exception("Repository does not provide a stream wrapper!");
+            throw new \Exception("Repository does not provide a stream wrapper!");
         }
     }
 
@@ -183,7 +188,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * Return the final ajxp.XX wrapper class name.
      * @param $repositoryId
      * @return string mixed
-     * @throws Exception
+     * @throws \Exception
      */
     public static function actualRepositoryWrapperClass($repositoryId){
         $data = self::actualRepositoryWrapperData($repositoryId);
@@ -194,7 +199,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * Return the final ajxp.XX wrapper protocol.
      * @param $repositoryId
      * @return string mixed
-     * @throws Exception
+     * @throws \Exception
      */
     public static function actualRepositoryWrapperProtocol($repositoryId){
         $data = self::actualRepositoryWrapperData($repositoryId);
@@ -223,7 +228,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * @param string $path
      * @param bool $persistent
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getRealFSReference($path, $persistent = false)
     {
@@ -259,11 +264,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public static function isRemote()
     {
-        throw new Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsRemote() instead");
+        throw new \Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsRemote() instead");
     }
 
     /**
@@ -271,11 +276,11 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
      * @param String $url Url of the resource
      * @static
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public static function isSeekable($url)
     {
-        throw new Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsSeekable() instead");
+        throw new \Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsSeekable() instead");
     }
 
     /**

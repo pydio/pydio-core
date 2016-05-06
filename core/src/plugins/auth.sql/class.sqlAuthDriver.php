@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\SqlTableProvider;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

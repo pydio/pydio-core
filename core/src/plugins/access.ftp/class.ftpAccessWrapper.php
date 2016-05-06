@@ -19,16 +19,26 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\FTP;
+
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
-require_once(AJXP_BIN_FOLDER."/interface.AjxpWrapper.php");
 /**
  * Wrapper for encapsulation FTP accesses
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class ftpAccessWrapper implements AjxpWrapper
+class ftpAccessWrapper implements IAjxpWrapper
 {
     // Instance vars $this->
     protected $host;
@@ -61,7 +71,7 @@ class ftpAccessWrapper implements AjxpWrapper
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);
         if (!$persistent) {
-            register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }
@@ -431,7 +441,7 @@ class ftpAccessWrapper implements AjxpWrapper
         $this->repositoryId = $urlParts["host"];
         $repository = ConfService::getRepositoryById($this->repositoryId);
         if ($repository == null) {
-            throw new Exception("Cannot find repository for dynamic ftp authentication.");
+            throw new \Exception("Cannot find repository for dynamic ftp authentication.");
         }
         $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
         $this->user = $credentials["user"];
@@ -498,7 +508,7 @@ class ftpAccessWrapper implements AjxpWrapper
 
     /** This method retrieves the FTP server features as described in RFC2389
      *	A decent FTP server support MLST command to list file using UTF-8 encoding
-     *  @return an array of features (see code)
+     *  @return array of features (see code)
      */
     protected function getServerFeatures()
     {
@@ -510,7 +520,7 @@ class ftpAccessWrapper implements AjxpWrapper
             $testCd = @ftp_chdir($link, $serverPath);
             if ($testCd !== true) {
                 $res = @ftp_mkdir($link, $serverPath);
-                if(!$res) throw new Exception("Cannot create path on remote server!");
+                if(!$res) throw new \Exception("Cannot create path on remote server!");
             }
         }
 
@@ -534,6 +544,10 @@ class ftpAccessWrapper implements AjxpWrapper
         return $retArray;
     }
 
+    /**
+     * @return bool|resource
+     * @throws AJXP_Exception
+     */
     protected function createFTPLink()
     {
         // If connexion exist and is still connected

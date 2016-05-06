@@ -30,6 +30,9 @@ define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
 define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
+use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
 use \Pydio\Plugins\Cache\Doctrine\Ext;
 
 /**

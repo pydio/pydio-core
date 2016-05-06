@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
+use Pydio\Conf\Core\ConfService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Static utilitaries to encode/decode charset to/from utf8

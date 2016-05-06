@@ -18,6 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -264,7 +275,7 @@ class AJXP_XMLWriter
             }
         }
         if(!headers_sent()) AJXP_XMLWriter::header();
-        if(!empty($context) && is_object($context) && is_a($context, "AJXP_PromptException")){
+        if(!empty($context) && is_object($context) && $context instanceof AJXP_PromptException){
             AJXP_XMLWriter::write("<prompt type=\"".$context->getPromptType()."\"><message>".$message."</message><data><![CDATA[".json_encode($context->getPromptData())."]]></data></prompt>", true);
         }else{
             AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
@@ -274,13 +285,13 @@ class AJXP_XMLWriter
 
     /**
      * Catch exceptions, @see catchError
-     * @param Exception $exception
+     * @param \Exception $exception
      */
     public static function catchException($exception)
     {
         try {
             AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
-        } catch (Exception $innerEx) {
+        } catch (\Exception $innerEx) {
             error_log(get_class($innerEx)." thrown within the exception handler!");
             error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
             error_log("New exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString());
@@ -491,7 +502,7 @@ class AJXP_XMLWriter
         $driver = false;
         if ($format == "node_list") {
             $driver = ConfService::loadRepositoryDriver();
-            if (!is_a($driver, "AjxpWrapperProvider")) {
+            if (!($driver instanceof IAjxpWrapperProvider)) {
                 $driver = false;
             }
         }
@@ -558,7 +569,8 @@ class AJXP_XMLWriter
     /**
      * Extract all the user data and put it in XML
      * @static
-     * @param null $userObject * @internal param bool $details
+     * @param AbstractAjxpUser|null $userObject
+     * @internal param bool $details
      * @return string
      */
     public static function getUserXML($userObject = null)
@@ -679,7 +691,7 @@ class AJXP_XMLWriter
      * @param AbstractAjxpUser $loggedUser
      * @param string $accessStatus
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function repositoryToXML($repoId, $repoObject, $exposed, $streams, $loggedUser, $accessStatus = ""){
 

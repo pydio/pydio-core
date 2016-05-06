@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**

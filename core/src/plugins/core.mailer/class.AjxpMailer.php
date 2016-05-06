@@ -19,6 +19,18 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Plugins\SqlTableProvider;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -415,7 +427,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         }
         // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
         foreach ($recipients as $recipient) {
-            if (is_object($recipient) && is_a($recipient, "AbstractAjxpUser")) {
+            if (is_object($recipient) && $recipient instanceof AbstractAjxpUser) {
                 $resolved = $this->abstractUserToAdress($recipient);
                 if ($resolved !== false) {
                     $realRecipients[] = $resolved;

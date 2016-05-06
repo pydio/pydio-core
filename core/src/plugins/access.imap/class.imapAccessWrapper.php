@@ -18,6 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\Imap;
+
+use EmlParser;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 function rejectEmpty($element){return !empty($element);}
@@ -27,7 +36,7 @@ function rejectEmpty($element){return !empty($element);}
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class imapAccessWrapper implements AjxpWrapper
+class imapAccessWrapper implements IAjxpWrapper
 {
     public $ih;
     public $host;
@@ -51,6 +60,7 @@ class imapAccessWrapper implements AjxpWrapper
     public $mailboxes;
     public $currentAttachmentData;
 
+    protected $repositoryId;
 
     private static $currentStream;
     private static $currentRef;
@@ -155,8 +165,8 @@ class imapAccessWrapper implements AjxpWrapper
             AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Opening a new stream ".$server." with mailbox '".$this->mailbox."'");
             try {
                 $this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$this->pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage()." - imap errors  : ".print_r(imap_errors(), true), $e->getCode());
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage()." - imap errors  : ".print_r(imap_errors(), true), $e->getCode());
             }
             self::$currentStream = $this->ih;
             register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
@@ -442,8 +452,8 @@ class imapAccessWrapper implements AjxpWrapper
     /**
      * Read a file (by chunks) and copy the data directly inside the given stream.
      *
-     * @param unknown_type $path
-     * @param unknown_type $stream
+     * @param string $path
+     * @param resource $stream
      */
     public static function copyFileInStream($path, $stream)
     {
@@ -470,8 +480,8 @@ class imapAccessWrapper implements AjxpWrapper
     /**
      * Chmod implementation for this type of access.
      *
-     * @param unknown_type $path
-     * @param unknown_type $chmodValue
+     * @param string $path
+     * @param mixed $chmodValue
      */
     public static function changeMode($path, $chmodValue)
     {

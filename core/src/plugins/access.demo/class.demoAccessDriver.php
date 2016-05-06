@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\FS;
+
+use Pydio\Access\Core\Repository;
+use Pydio\Core\AJXP_XMLWriter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

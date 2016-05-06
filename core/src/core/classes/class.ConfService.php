@@ -18,6 +18,24 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Conf\Core;
+
+use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Cache\Core\CacheService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_UserAlertException;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -30,6 +48,9 @@ class ConfService
     private static $instance;
     public static $useSession = true;
 
+    /**
+     * @var AbstractConfDriver
+     */
     private $booter;
     private $confPlugin;
     /**
@@ -127,7 +148,7 @@ class ConfService
         // Loading the registry
         try {
             AJXP_PluginsService::getInstance()->loadPluginsRegistry($pluginDirPath, $this->confPlugin);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             die("Severe error while loading plugins registry : ".$e->getMessage());
         }
     }
@@ -335,7 +356,7 @@ class ConfService
             $cacheKey = self::getRegistryCacheKey($extendedVersion);
             $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
             if($cachedXml !== false){
-                $registry = new DOMDocument("1.0", "utf-8");
+                $registry = new \DOMDocument("1.0", "utf-8");
                 $registry->loadXML($cachedXml);
                 AJXP_PluginsService::updateXmlRegistry($registry, $extendedVersion);
                 if($clone){
@@ -381,7 +402,7 @@ class ConfService
     /**
      * Check the current user "specificActionsRights" and filter the full registry actions with these.
      * @static
-     * @param DOMDocument $registry
+     * @param \DOMDocument $registry
      * @return bool
      */
     public static function filterRegistryFromRole(&$registry)
@@ -391,7 +412,7 @@ class ConfService
         if($loggedUser == null) return false;
         $crtRepo = ConfService::getRepository();
         $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
-        if ($crtRepo != null && is_a($crtRepo, "Repository")) {
+        if ($crtRepo != null && $crtRepo instanceof Repository) {
             $crtRepoId = $crtRepo->getId();
         }
         $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
@@ -561,7 +582,7 @@ class ConfService
 
     public static function detectSessionCorrupted($logMessage){
         if(isSet($_SESSION["REPOSITORIES"])){
-            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_object($item) && ($item instanceof Repository); }, true);
             if(!$sessionNotCorrupted){
                 error_log("[session corrupted] ".$logMessage." ".$_GET["get_action"]."".$_POST["get_action"]);
             }
@@ -574,7 +595,7 @@ class ConfService
     private function getLoadedRepositories()
     {
         if (!isSet($this->configs["REPOSITORIES"]) && isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])){
-            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_object($item) && ($item instanceof Repository); }, true);
             if($sessionNotCorrupted){
                 $this->configs["REPOSITORIES"] = $_SESSION["REPOSITORIES"];
                 return $_SESSION["REPOSITORIES"];
@@ -583,7 +604,7 @@ class ConfService
             }
         }
         if (isSet($this->configs["REPOSITORIES"])) {
-            $configsNotCorrupted = array_reduce($this->configs["REPOSITORIES"], function($carry, $item){ return $carry && is_a($item, "Repository"); }, true);
+            $configsNotCorrupted = array_reduce($this->configs["REPOSITORIES"], function($carry, $item){ return $carry && is_object($item) && ($item instanceof Repository); }, true);
             if($configsNotCorrupted){
                 return $this->configs["REPOSITORIES"];
             }else{
@@ -941,7 +962,7 @@ class ConfService
      * Create a repository object from a config options array
      *
      * @param integer $index
-     * @param Array $repository
+     * @param array $repository
      * @return Repository
      */
     public static function createRepositoryFromArray($index, $repository)
@@ -1157,7 +1178,7 @@ class ConfService
     /**
      * Set a temp repository id but not in the session
      * @static
-     * @param $repositoryObject
+     * @param Repository $repositoryObject
      * @return void
      */
     public static function tmpReplaceRepository($repositoryObject)
@@ -1510,7 +1531,7 @@ class ConfService
             self::$usersParametersCache[$cacheId] = array();
         }
         // Passed an already loaded object
-        if(is_a($userIdOrObject, "AbstractAjxpUser")){
+        if($userIdOrObject instanceof AbstractAjxpUser){
             $value = $userIdOrObject->personalRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
             self::$usersParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
             if(empty($value) && !empty($defaultValue)) $value = $defaultValue;
@@ -1620,20 +1641,20 @@ class ConfService
     /**
      * See static method
      * @param Repository|null $repository
-     * @throws AJXP_Exception|Exception
+     * @throws AJXP_Exception|\Exception
      * @return AbstractAccessDriver
      */
     private function loadRepositoryDriverInst(&$repository = null)
     {
         $rest = false;
         if($repository == null){
-            if (isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")) {
+            if (isSet($this->configs["ACCESS_DRIVER"]) && $this->configs["ACCESS_DRIVER"] instanceof AbstractAccessDriver) {
                 return $this->configs["ACCESS_DRIVER"];
             }
             $this->switchRootDirInst();
             $repository = $this->getRepositoryInst();
             if($repository == null){
-                throw new Exception("No active repository found for user!");
+                throw new \Exception("No active repository found for user!");
             }
         }else{
             $rest = true;
@@ -1664,7 +1685,7 @@ class ConfService
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
                     $instance->beforeInitMeta($plugInstance, $repository);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }
@@ -1676,10 +1697,10 @@ class ConfService
         try {
             $plugInstance->initRepository();
             $repository->driverInstance = $plugInstance;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if(!$rest){
                 // Remove repositories from the lists
-                if(!is_a($e, "AJXP_UserAlertException")){
+                if(!($e instanceof AJXP_UserAlertException)){
                     $this->removeRepositoryFromCache($repository->getId());
                 }
                 if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
@@ -1708,10 +1729,10 @@ class ConfService
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
                     if(!method_exists($instance, "initMeta")) {
-                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                        throw new \Exception("Meta Source $plugId does not implement the initMeta method.");
                     }
                     $instance->initMeta($plugInstance);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }

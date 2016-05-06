@@ -1,4 +1,9 @@
 <?php
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+
 /**
  * Created by PhpStorm.
  * User: charles

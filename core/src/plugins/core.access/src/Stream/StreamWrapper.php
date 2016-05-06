@@ -21,16 +21,14 @@
 
 namespace Pydio\Access\Core\Stream;
 
-use AJXP_Utils;
+use Guzzle\Http\EntityBody;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use Pydio\Access\Core\Stream\Exception\NotFoundException;
+use Pydio\Access\Core\Stream\Iterator\DirIterator;
+use Pydio\Core\AJXP_Utils;
 use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
-use Pydio\Access\Core\Stream\ClientInterface;
 use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Stream\CachingStream;
 
 /**
  * Standard stream wrapper to use files with PHP streams, supporting "r", "w", "a", "x".
@@ -47,7 +45,7 @@ use GuzzleHttp\Stream\CachingStream;
 class StreamWrapper
 {
     /**
-     * @var AbstractClient Client used to send requests
+     * @var Client Client used to send requests
      */
     protected static $client;
 
@@ -398,7 +396,9 @@ class StreamWrapper
             $this->triggerError("Unable to list directory : " . $e->getMessage());
         }
 
-        $this->objectIterator = $this->getClient()->getIterator($result, $params);
+        if(isSet($result)){
+            $this->objectIterator = $this->getClient()->getIterator($result, $params);
+        }
 
         return true;
     }
@@ -470,7 +470,7 @@ class StreamWrapper
         $this->clearStatInfo($path_to);
 
         try {
-            $result = $this->getClient()->rename($params);
+            $this->getClient()->rename($params);
         } catch (\Exception $e) {
             $this->triggerError("Unable to rename item : " . $e->getMessage());
             return false;
@@ -659,7 +659,7 @@ class StreamWrapper
         fclose($tmpHandle);
 
         if (!$persistent) {
-            register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("\\Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }
@@ -692,7 +692,7 @@ class StreamWrapper
      * Gets the client from the stream context
      *
      * @return Client
-     * @throws Exception if no client has been configured
+     * @throws \Exception if no client has been configured
      */
     private function getClient()
     {

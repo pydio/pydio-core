@@ -19,6 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Filter\AJXP_PermissionMask;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('PARAM_USER_LOGIN_PREFIX', "user_");
@@ -587,10 +598,10 @@ class ShareRightsManager
         }
         $newRole = new AJXP_Role("AJXP_SHARED-".$repositoryId);
         $r = AuthService::getRole("MINISITE");
-        if (is_a($r, "AJXP_Role")) {
+        if ($r instanceof AJXP_Role) {
             if ($disableDownload) {
                 $f = AuthService::getRole("MINISITE_NODOWNLOAD");
-                if (is_a($f, "AJXP_Role")) {
+                if ($f instanceof AJXP_Role) {
                     $r = $f->override($r);
                 }
             }

@@ -5,7 +5,7 @@
           xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
           mixins="dibidriver_provider"
         >
-    <class_definition classname="CoreConfLoader" filename="plugins/core.conf/class.CoreConfLoader.php"/>
+    <class_definition classname="Pydio\Conf\Core\CoreConfLoader" filename="plugins/core.conf/class.CoreConfLoader.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core_conf" path="plugins/core.conf/i18n"/>

@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_VarsFilter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

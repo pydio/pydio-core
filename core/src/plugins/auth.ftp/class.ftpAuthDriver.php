@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper;
+use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAccessWrapper.php");

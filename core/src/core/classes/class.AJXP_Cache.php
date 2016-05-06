@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Generic caching system that can be used by the plugins. Use the static factory getItem() to generate

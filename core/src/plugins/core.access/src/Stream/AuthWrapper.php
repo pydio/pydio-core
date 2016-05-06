@@ -10,10 +10,10 @@ namespace Pydio\Access\Core\Stream;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use AJXP_SchemeTranslatorWrapper;
-use AJXP_Safe;
-use AJXP_Utils;
-use ConfService;
+use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Conf\Core\ConfService;
 
 class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 {
@@ -22,7 +22,7 @@ class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 
         $repository = ConfService::getRepositoryById($urlParts["host"]);
         if ($repository == null) {
-            throw new Exception("Cannot find repository");
+            throw new \Exception("Cannot find repository");
         }
 
         $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
@@ -30,7 +30,7 @@ class AuthWrapper extends AJXP_SchemeTranslatorWrapper
         $password = $credentials["password"];
 
         if ($user == "") {
-            throw new Exception("Cannot find user/pass for Remote Access!");
+            throw new \Exception("Cannot find user/pass for Remote Access!");
         }
 
         $repoData = self::actualRepositoryWrapperData($urlParts["host"]);

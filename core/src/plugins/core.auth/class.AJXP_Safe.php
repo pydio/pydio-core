@@ -18,6 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Core;
+
+use Pydio\Access\Core\Repository;
+use Pydio\Core\AJXP_Utils;
+
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

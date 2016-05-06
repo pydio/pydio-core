@@ -21,6 +21,14 @@
  * Description : main access point of the application, this script is called by any Ajax query.
  * Will dispatch the actions on the plugins.
  */
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 include_once("base.conf.php");
 
 if( !isSet($_GET["action"]) && !isSet($_GET["get_action"])
@@ -43,8 +51,8 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 
 if (is_file(TESTS_RESULT_FILE)) {
-    set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-    set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+    set_error_handler(array("Pydio\\Core\\AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+    set_exception_handler(array("Pydio\\Core\\AJXP_XMLWriter", "catchException"));
 }
 
 ConfService::init();
@@ -156,6 +164,7 @@ AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
 
 /*
+ * TODO : Test w/ silex framework
 require_once (AJXP_BIN_FOLDER."/silex/vendor/autoload.php");
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

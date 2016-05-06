@@ -19,6 +19,32 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\FS;
+
+use DOMNode;
+use DOMXPath;
+use finfo;
+use Normalizer;
+use PclZip;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\SystemTextEncoding;
+use ShareCenter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
@@ -32,7 +58,7 @@ if (!function_exists('download_exception_handler')) {
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
+class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvider
 {
     /**
     * @var Repository
@@ -275,7 +301,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         }
                     } else {
                         if (!file_exists($this->urlBase.$selection->getUniqueFile())) {
-                            throw new Exception("Cannot find file!");
+                            throw new \Exception("Cannot find file!");
                         }
                     }
                     $node = $selection->getUniqueNode();
@@ -374,7 +400,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     copy($file, $tmpFNAME);
                     try {
                         AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         @unlink($tmpFNAME);
                         throw $e;
                     }
@@ -420,7 +446,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $node = $selection->getUniqueNode();
                 $dlFile = $node->getUrl();
                 if(!is_readable($dlFile)){
-                    throw new Exception("Cannot access file!");
+                    throw new \Exception("Cannot access file!");
                 }
                 $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
                 if (AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false) {
@@ -446,7 +472,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
                 try {
                     AJXP_Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     header("Content-Type:text/plain");
                     print $e->getMessage();
                     break;
@@ -749,8 +775,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                                 AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
                             }
                             AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
-                        } catch (Exception $e) {
-                            throw new Exception($e->getMessage(), 507);
+                        } catch (\Exception $e) {
+                            throw new \Exception($e->getMessage(), 507);
                         }
 
                         // PARTIAL UPLOAD CASE - PREPPEND .dlpart extension
@@ -782,7 +808,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                                 }
                                 $result = @rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
                                 if($result === false){
-                                    throw new Exception("Error renaming ".$destination."/".$userfile_name." to ".$destination."/".$originalAppendTo);
+                                    throw new \Exception("Error renaming ".$destination."/".$userfile_name." to ".$destination."/".$originalAppendTo);
                                 }
                                 $userfile_name = $originalAppendTo;
                                 $partialUpload = false;
@@ -814,7 +840,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             }
                         }
 
-                    }catch(Exception $e){
+                    }catch(\Exception $e){
                         $errorCode = $e->getCode();
                         if(empty($errorCode)) $errorCode = 411;
                         return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $e->getMessage()));
@@ -863,10 +889,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
                 $testPath = @stat($path);
                 if($testPath === null || $testPath === false){
-                    throw new Exception("There was a problem trying to open folder ". $path. ", please check your Administrator");
+                    throw new \Exception("There was a problem trying to open folder ". $path. ", please check your Administrator");
                 }
                 if(!is_readable($path) && !is_writeable($path)){
-                    throw new Exception("You are not allowed to access folder " . $path);
+                    throw new \Exception("You are not allowed to access folder " . $path);
                 }
                 // Backward compat
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
@@ -1112,10 +1138,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         ), array());
                     }
                 } else {
-                    array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
+                    array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
                 }
-                array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["z"]);
-                array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
+                array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["z"]);
+                array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
                 if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
@@ -1295,7 +1321,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param String $filename Destination filename
      * @param array $messages Application messages table
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     protected function copyUploadedData($uploadData, $destination, $filename, $messages){
         if (isSet($uploadData["input_upload"])) {
@@ -1312,8 +1338,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 fclose($input);
                 fclose($output);
                 $this->logDebug("End reading INPUT stream");
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage(), 411);
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage(), 411);
             }
         } else {
             $result = @move_uploaded_file($uploadData["tmp_name"], "$destination/".$filename);
@@ -1323,7 +1349,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             }
             if (!$result) {
                 $errorMessage="$messages[33] ".$filename;
-                throw new Exception($errorMessage, 411);
+                throw new \Exception($errorMessage, 411);
             }
         }
         return true;
@@ -1339,7 +1365,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
         $already_existed = false;
         if($source == $target){
-            throw new Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
+            throw new \Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
         }
         if (file_exists($folder ."/" . $target)) {
             $already_existed = true;
@@ -1362,7 +1388,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=null, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
     {
         if(!$data && !$gzip && !file_exists($filePathOrData)){
-            throw new Exception("File $filePathOrData not found!");
+            throw new \Exception("File $filePathOrData not found!");
         }
         if ($gzip === null) {
             $gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
@@ -1442,7 +1468,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header("Content-Length: ". $length);
                 $file = fopen($filePathOrData, 'rb');
                 if(!is_resource($file)){
-                    throw new Exception("Failed opening file ".$filePathOrData);
+                    throw new \Exception("Failed opening file ".$filePathOrData);
                 }
                 fseek($file, 0);
                 $relOffset = $offset;
@@ -1519,7 +1545,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $this->logDebug("realFS!", array("file"=>$filePathOrData));
                 $fp = fopen($filePathOrData, "rb");
                 if(!is_resource($fp)){
-                    throw new Exception("Failed opening file ".$filePathOrData);
+                    throw new \Exception("Failed opening file ".$filePathOrData);
                 }
                 if ($byteOffset != -1) {
                     fseek($fp, $byteOffset);
@@ -1557,7 +1583,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $handle=@opendir($dirName);
         }
         if ($handle === false) {
-            throw new Exception("Error while trying to open directory ".$dirName);
+            throw new \Exception("Error while trying to open directory ".$dirName);
         }
         if ($foldersOnly && !AJXP_MetaStreamWrapper::wrapperIsRemote($dirName)) {
             if($dirHANDLE == null || !is_resource($dirHANDLE)){
@@ -1717,7 +1743,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         AJXP_Controller::applyHook("node.before_path_change", array(&$oldNode));
         $test = @rename($old,$new);
         if($test === false){
-            throw new Exception("Error while renaming ".$old." to ".$new);
+            throw new \Exception("Error while renaming ".$old." to ".$new);
         }
         AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
     }
@@ -1923,7 +1949,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param $src
      * @param $dest
      * @param $basedir
-     * @throws Exception
+     * @throws \Exception
      * @return PclZip
      */
     public function makeZip ($src, $dest, $basedir)
@@ -1961,7 +1987,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
 
         if (!$vList) {
-            throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+            throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
         self::$filteringDriverInstance = null;
         return $vList;

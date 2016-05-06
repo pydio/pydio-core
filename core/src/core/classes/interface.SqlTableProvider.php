@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core\Plugins;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

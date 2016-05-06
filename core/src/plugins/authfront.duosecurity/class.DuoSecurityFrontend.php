@@ -18,6 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AuthService;
+use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\CaptchaProvider;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 

@@ -18,6 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\RemoteFS;
+
+
+use HttpClient;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -25,7 +36,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class remote_fsAccessWrapper implements AjxpWrapper
+class remote_fsAccessWrapper implements IAjxpWrapper
 {
     // Instance vars $this->
     protected $host;
@@ -48,7 +59,7 @@ class remote_fsAccessWrapper implements AjxpWrapper
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);
         if (!$persistent) {
-            register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }

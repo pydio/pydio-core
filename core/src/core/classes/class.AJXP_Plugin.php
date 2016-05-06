@@ -18,6 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core\Plugins;
+
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 if (!defined('LOG_LEVEL_DEBUG')) {
@@ -33,7 +42,7 @@ if (!defined('LOG_LEVEL_DEBUG')) {
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Plugin implements Serializable
+class AJXP_Plugin implements \Serializable
 {
     protected $baseDir;
     protected $id;
@@ -42,7 +51,7 @@ class AJXP_Plugin implements Serializable
     /**
      * XPath query
      *
-     * @var DOMXPath
+     * @var \DOMXPath
      */
     private $xPath;
     protected $manifestLoaded = false;
@@ -62,7 +71,7 @@ class AJXP_Plugin implements Serializable
     /**
      * The manifest.xml loaded
      *
-     * @var DOMDocument
+     * @var \DOMDocument
      */
     protected $manifestDoc;
 
@@ -114,7 +123,7 @@ class AJXP_Plugin implements Serializable
         if(!$check) return $d;
         if (!is_dir($d)) {
             $res = @mkdir($d, 0755, true);
-            if(!$res) throw new Exception("Error while creating plugin directory for ".$this->getId());
+            if(!$res) throw new \Exception("Error while creating plugin directory for ".$this->getId());
         }
         return $d;
     }
@@ -125,13 +134,13 @@ class AJXP_Plugin implements Serializable
         if(!$check) return $d;
         if (!is_dir($d)) {
             $res = @mkdir($d, 0755, true);
-            if(!$res) throw new Exception("Error while creating plugin cache directory for ".$this->getId());
+            if(!$res) throw new \Exception("Error while creating plugin cache directory for ".$this->getId());
         }
         return $d;
     }
 
     /**
-     * @return DOMXPath
+     * @return \DOMXPath
      */
     protected function getXPath(){
         $this->unserializeManifest();
@@ -149,8 +158,8 @@ class AJXP_Plugin implements Serializable
 
     /**
      * @param string $optionName
-     * @param string|Repository $repositoryScope
-     * @param null|AbstractAjxpUser $userObject
+     * @param string|\Pydio\Access\Core\Repository $repositoryScope
+     * @param null|\Pydio\Conf\Core\AbstractAjxpUser $userObject
      * @return mixed|null
      */
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
@@ -166,7 +175,7 @@ class AJXP_Plugin implements Serializable
             if ($repositoryScope === AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
                 if($repo != null) $repositoryScope = $repo->getId();
-            }else if(is_a($repositoryScope, "Repository")){
+            }else if(is_object($repositoryScope) && $repositoryScope instanceof Repository){
                 $repo = $repositoryScope;
                 $repositoryScope = $repo->getId();
             }
@@ -205,7 +214,7 @@ class AJXP_Plugin implements Serializable
     }
     /**
      * Perform initialization checks, and throw exception if problems found.
-     * @throws Exception
+     * @throws \Exception
      */
     public function performChecks()
     {
@@ -270,11 +279,11 @@ class AJXP_Plugin implements Serializable
             }
         }
         // add manifest as a "plugins" (remove parsed contrib)
-        $pluginContrib = new DOMDocument();
+        $pluginContrib = new \DOMDocument();
         $pluginContrib->loadXML("<plugins uuidAttr='name'></plugins>");
         $manifestNode = $pluginContrib->importNode($this->manifestDoc->documentElement, true);
         $pluginContrib->documentElement->appendChild($manifestNode);
-        $xP=new DOMXPath($pluginContrib);
+        $xP=new \DOMXPath($pluginContrib);
         $regNodeParent = $xP->query("registry_contributions", $manifestNode);
         if ($regNodeParent->length) {
             $manifestNode->removeChild($regNodeParent->item(0));
@@ -295,7 +304,7 @@ class AJXP_Plugin implements Serializable
      */
     protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array(), $dry = false)
     {
-        $contribDoc = new DOMDocument();
+        $contribDoc = new \DOMDocument();
         $contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
         if (!is_array($include) && !is_array($exclude)) {
             if (!$dry) {
@@ -304,7 +313,7 @@ class AJXP_Plugin implements Serializable
             }
             return;
         }
-        $xPath = new DOMXPath($contribDoc);
+        $xPath = new \DOMXPath($contribDoc);
         $excluded = array();
         foreach ($exclude as $excludePath) {
             $children = $xPath->query($excludePath);
@@ -364,7 +373,7 @@ class AJXP_Plugin implements Serializable
     /**
      * Dynamically modify some registry contributions nodes. Can be easily derivated to enable/disable
      * some features dynamically during plugin initialization.
-     * @param DOMNode $contribNode
+     * @param \DOMNode $contribNode
      * @return void
      */
     protected function parseSpecificContributions(&$contribNode)
@@ -380,7 +389,7 @@ class AJXP_Plugin implements Serializable
 
     /**
      * Load the main manifest.xml file of the plugni
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function loadManifest()
@@ -389,17 +398,17 @@ class AJXP_Plugin implements Serializable
         if (!is_file($file)) {
             return;
         }
-        $this->manifestDoc = new DOMDocument();
+        $this->manifestDoc = new \DOMDocument();
         try {
             $this->manifestDoc->load($file);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         }
         $id = $this->manifestDoc->documentElement->getAttribute("id");
         if (empty($id) || $id != $this->getId()) {
             $this->manifestDoc->documentElement->setAttribute("id", $this->getId());
         }
-        $this->xPath = new DOMXPath($this->manifestDoc);
+        $this->xPath = new \DOMXPath($this->manifestDoc);
         $this->loadMixins();
         $this->detectStreamWrapper();
         $this->manifestLoaded = true;
@@ -473,7 +482,7 @@ class AJXP_Plugin implements Serializable
      */
     protected function unserializeManifest(){
         if($this->manifestXML != null){
-            $this->manifestDoc = new DOMDocument(1.0, "UTF-8");
+            $this->manifestDoc = new \DOMDocument(1.0, "UTF-8");
             $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
             $this->reloadXPath();
             unset($this->manifestXML);
@@ -486,7 +495,7 @@ class AJXP_Plugin implements Serializable
      * @param string $xmlNodeName
      * @param string $format
      * @param bool $externalFiles
-     * @return DOMElement|DOMNodeList|string
+     * @return \DOMElement|\DOMNodeList|string
      */
     public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false)
     {
@@ -907,7 +916,7 @@ class AJXP_Plugin implements Serializable
         if($this->manifestXML != null) $this->unserializeManifest();
         $confBranch = $this->xPath->query("plugin_configs");
         if (!$confBranch->length) {
-            $configNode = $this->manifestDoc->importNode(new DOMElement("plugin_configs", ""));
+            $configNode = $this->manifestDoc->importNode(new \DOMElement("plugin_configs", ""));
             $this->manifestDoc->documentElement->appendChild($configNode);
         } else {
             $configNode = $confBranch->item(0);
@@ -986,7 +995,7 @@ class AJXP_Plugin implements Serializable
     public function reloadXPath()
     {
         // Relaunch xpath
-        $this->xPath = new DOMXPath($this->manifestDoc);
+        $this->xPath = new \DOMXPath($this->manifestDoc);
     }
     /**
      * @param $mixinName
@@ -1014,7 +1023,7 @@ class AJXP_Plugin implements Serializable
     /**
      * Transform a simple node and its attributes to a HashTable
      *
-     * @param DOMNode $node
+     * @param \DOMNode $node
      * @return array
      */
     protected function nodeAttrToHash($node)
@@ -1031,8 +1040,8 @@ class AJXP_Plugin implements Serializable
     /**
      * Compare two nodes at first level (nodename and attributes)
      *
-     * @param DOMNode $node1
-     * @param DOMNode $node2
+     * @param \DOMNode $node1
+     * @param \DOMNode $node2
      * @return bool
      */
     protected function nodesEqual($node1, $node2)

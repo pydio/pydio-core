@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Log\Core;
+
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 if (!defined('LOG_LEVEL_DEBUG')) {

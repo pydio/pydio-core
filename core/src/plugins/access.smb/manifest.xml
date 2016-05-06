@@ -15,7 +15,6 @@
         <global_param name="SMB_ENABLE_ZIP" type="boolean" label="CONF_MESSAGE[Enable Zip]" description="CONF_MESSAGE[Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!]" mandatory="false" default="false"/>
         <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,meta.filehasher,index.lucene"/>
     </server_settings>
-	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="smbAccessDriver"/>
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
@@ -31,5 +30,6 @@
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-    <class_stream_wrapper filename="plugins/access.smb/class.smbAccessWrapper.php" classname="smbAccessWrapper" protocol="ajxp.smb"/>
+	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SMB\smbAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.smb/class.smbAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SMB\smbAccessWrapper" protocol="ajxp.smb"/>
 </ajxpdriver>

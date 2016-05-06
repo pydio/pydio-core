@@ -25,6 +25,9 @@
  * If you want to run the tests, first comment this line!
  * It is disabled for security purpose
  */
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+
 die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("base.conf.php");
 

@@ -27,6 +27,7 @@
  * @package Pydio
  * @subpackage Core
  */
+namespace Pydio\Core;
 
 //define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
 define("JSON_DIR", AJXP_INSTALL_PATH."/../api");

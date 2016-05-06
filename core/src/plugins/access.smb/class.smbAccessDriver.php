@@ -19,6 +19,19 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\SMB;
+
+use DOMNode;
+use PclZip;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -123,7 +136,7 @@ class smbAccessDriver extends fsAccessDriver
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
         }
         if (!$vList) {
-            throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+            throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
         self::$filteringDriverInstance = null;
         return $vList;

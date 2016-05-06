@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="inbox" label="CONF_MESSAGE[Inbox Workspace]" description="CONF_MESSAGE[Received Files]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/access.inbox/class.inboxAccessDriver.php" classname="inboxAccessDriver"/>
+    <class_definition filename="plugins/access.inbox/class.inboxAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Inbox\inboxAccessDriver"/>
     <client_settings>
         <resources>
             <js file="plugins/access.inbox/res/build/InboxWidgets.js" className="InboxWidgets"/>
@@ -223,5 +223,5 @@
         <pluginClass pluginName="access.fs"/>
         <pluginResources pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.inbox/class.inboxAccessWrapper.php" classname="inboxAccessWrapper" protocol="ajxp.inbox"/>
+    <class_stream_wrapper filename="plugins/access.inbox/class.inboxAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Inbox\inboxAccessWrapper" protocol="ajxp.inbox"/>
 </ajxpdriver>

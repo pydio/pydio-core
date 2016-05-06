@@ -19,6 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -30,8 +41,8 @@ class PluginCompression extends AJXP_Plugin
 {
     /**
      * @param String $action
-     * @param Array $httpVars
-     * @param Array $fileVars
+     * @param array $httpVars
+     * @param array $fileVars
      * @throws Exception
      */
     public function receiveAction($action, $httpVars, $fileVars)

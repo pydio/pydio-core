@@ -19,9 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\Swift;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+use DOMNode;
 use \OpenStack\Bootstrap;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
@@ -41,10 +49,10 @@ class swiftAccessDriver extends fsAccessDriver
     {
         // Check CURL, OPENSSL & AWS LIBRARY & PHP5.3
         if (version_compare(phpversion(), "5.3.0") < 0) {
-            throw new Exception("Php version 5.3+ is required for this plugin (must support namespaces)");
+            throw new \Exception("Php version 5.3+ is required for this plugin (must support namespaces)");
         }
         if(!file_exists($this->getBaseDir()."/openstack-sdk-php/vendor/autoload.php")){
-            throw new Exception("You must download the openstack-sdk-php and install it with Composer for this plugin");
+            throw new \Exception("You must download the openstack-sdk-php and install it with Composer for this plugin");
         }
 
     }

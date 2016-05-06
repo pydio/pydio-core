@@ -18,6 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AuthService;
+use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
@@ -46,7 +53,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
             return false;
         }
         $this->storage = ConfService::getConfStorageImpl();
-        if(!is_a($this->storage, "sqlConfDriver")) return false;
+        if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
 
         $data = null;
         $this->storage->simpleStoreGet("keystore", $token, "serial", $data);
@@ -60,7 +67,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $explode = explode("?", $_SERVER["REQUEST_URI"]);
         $server_uri = rtrim(array_shift($explode), "/");
         $decoded = array_map("urldecode", explode("/", $server_uri));
-        $decoded = array_map(array("SystemTextEncoding", "toUTF8"), $decoded);
+        $decoded = array_map(array("Pydio\\Core\\SystemTextEncoding", "toUTF8"), $decoded);
         $decoded = array_map("rawurlencode", $decoded);
         $server_uri = implode("/", $decoded);
         $server_uri = str_replace("~", "%7E", $server_uri);
@@ -81,7 +88,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
     public function revokeUserTokens($userId){
 
         $this->storage = ConfService::getConfStorageImpl();
-        if(!is_a($this->storage, "sqlConfDriver")) return false;
+        if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
 
         $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($userId).':"'.$userId.'"%');
         foreach($keys as $keyId => $keyData){
@@ -95,15 +102,15 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
     /**
      * @param String $action
-     * @param Array $httpVars
-     * @param Array $fileVars
+     * @param array $httpVars
+     * @param array $fileVars
      * @return String
      */
     function authTokenActions($action, $httpVars, $fileVars){
 
-        if(AuthService::getLoggedUser() == null) return;
+        if(AuthService::getLoggedUser() == null) return null;
         $this->storage = ConfService::getConfStorageImpl();
-        if(!is_a($this->storage, "sqlConfDriver")) return false;
+        if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
 
         $user = AuthService::getLoggedUser()->getId();
         if(AuthService::getLoggedUser()->isAdmin() && isSet($httpVars["user_id"])){

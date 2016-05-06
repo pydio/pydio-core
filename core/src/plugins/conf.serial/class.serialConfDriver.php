@@ -19,6 +19,15 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -187,7 +196,7 @@ class serialConfDriver extends AbstractConfDriver
     public function deleteRole($role)
     {
         // Mixed input Object or ID
-        if(is_a($role, "AJXP_Role")) $roleId = $role->getId();
+        if($role instanceof AJXP_Role) $roleId = $role->getId();
         else $roleId = $role;
 
         $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);

@@ -19,6 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\SqlTableProvider;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AbstractLogDriver;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -30,7 +37,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 {
     /**
-     * @var Array
+     * @var array
      */
     private $sqlDriver;
     private $queries;
@@ -40,7 +47,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      *
      * Gives the driver a chance to set up it's connection / file resource etc..
      *
-     * @param Array $options array of options specific to the logger driver.
+     * @param array $options array of options specific to the logger driver.
      * @access public
      */
     public function init($options)
@@ -147,7 +154,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $data["File"] = AJXP_Utils::safeBasename($data["File"]);
             }
             if(isSet($data["Date"])){
-                if(is_a($data["Date"], "DibiDateTime")){
+                if($data["Date"] instanceof DibiDateTime){
                     $tStamp = $data["Date"]->getTimestamp();
                 }else {
                     $tStamp = strtotime($data["Date"]);
@@ -352,7 +359,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             $test = dibi::query('SELECT [logdate] FROM [ajxp_log] WHERE [user]=%s AND [message]=%s AND [params]=%s ORDER BY [logdate] DESC %lmt %ofs', $user, $prefix, $message, 1, 0);
             $lastInsert = $test->fetchSingle();
             $now = new DateTime('NOW');
-            if(is_a($lastInsert, "DibiDateTime")){
+            if($lastInsert instanceof DibiDateTime){
                 $lastTimestamp = $lastInsert->getTimestamp();
             }else{
                 $lastTimestamp = strtotime($lastInsert);
@@ -445,7 +452,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     $fullMonth = date('F', $log_time);
                     $logM = date('m', $log_time);
                     $date = $r['logdate'];
-                    if (is_a($date, "DibiDateTime")) {
+                    if ($date instanceof DibiDateTime) {
                         $date = $date->format("Y-m-d");
                     }
                     $path = "$rootPath/$fullYear/$logM/$date";

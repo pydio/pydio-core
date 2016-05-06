@@ -20,14 +20,16 @@
  */
 namespace Pydio\OCS;
 
-use Aws\AutoScaling\Exception\ScalingActivityInProgressException;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Plugins\AJXP_Plugin;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once("vendor/autoload.php");
 
-class OCSPlugin extends \AJXP_Plugin{
+class OCSPlugin extends AJXP_Plugin{
 
     /**
      * @var ActionsController $controller
@@ -37,8 +39,8 @@ class OCSPlugin extends \AJXP_Plugin{
     public function init($options)
     {
         parent::init($options);
-        \AJXP_Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
-        \AJXP_Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
+        AJXP_Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
+        AJXP_Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
     }
 
     protected function getController(){
@@ -105,7 +107,7 @@ class OCSPlugin extends \AJXP_Plugin{
         if(!$includeShared || $scope != "user"){
             return;
         }
-        $loggedUser = \AuthService::getLoggedUser();
+        $loggedUser = AuthService::getLoggedUser();
         if($loggedUser == null){
             return;
         }
@@ -118,7 +120,7 @@ class OCSPlugin extends \AJXP_Plugin{
         }
         if(count($shares)){
             $loggedUser->recomputeMergedRole();
-            \AuthService::updateUser($loggedUser);
+            AuthService::updateUser($loggedUser);
         }
     }
 
@@ -131,11 +133,11 @@ class OCSPlugin extends \AJXP_Plugin{
         $share = $store->remoteShareById($remoteShareId);
         if($share != null){
             $repoObject = $share->buildVirtualRepository();
-            $loggedUser = \AuthService::getLoggedUser();
+            $loggedUser = AuthService::getLoggedUser();
             if($loggedUser != null){
                 $loggedUser->personalRole->setAcl($repoObject->getId(), "rw");
                 $loggedUser->recomputeMergedRole();
-                \AuthService::updateUser($loggedUser);
+                AuthService::updateUser($loggedUser);
             }
         }
     }

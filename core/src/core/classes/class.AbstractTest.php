@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Tests;
+
+use Pydio\Access\Core\Repository;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 global $MAIN_testsArray;

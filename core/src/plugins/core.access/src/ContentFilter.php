@@ -18,6 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

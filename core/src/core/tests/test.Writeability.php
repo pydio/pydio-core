@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Tests;
+
+use Pydio\Core\AJXP_VarsFilter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 

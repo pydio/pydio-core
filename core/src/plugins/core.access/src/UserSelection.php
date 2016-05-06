@@ -18,6 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Abstraction of a user selection passed via http parameters.
@@ -216,7 +221,7 @@ class UserSelection
 
     /**
      * @return AJXP_Node
-     * @throws Exception
+     * @throws \Exception
      */
     public function getUniqueNode()
     {
@@ -224,11 +229,11 @@ class UserSelection
             return $this->nodes[0];
         }
         if(!isSet($this->repository)){
-            throw new Exception("UserSelection: cannot build nodes URL without a proper repository");
+            throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
         }
         $user = AuthService::getLoggedUser();
         if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($this->repository->getId())) {
-            throw new Exception("You have no right on this action.");
+            throw new \Exception("You have no right on this action.");
         }
 
         $currentFile = $this->getUniqueFile();
@@ -240,7 +245,7 @@ class UserSelection
 
     /**
      * @return AJXP_Node[]
-     * @throws Exception
+     * @throws \Exception
      */
     public function buildNodes()
     {
@@ -248,7 +253,7 @@ class UserSelection
             return $this->nodes;
         }
         if(!isSet($this->repository)){
-            throw new Exception("UserSelection: cannot build nodes URL without a proper repository");
+            throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
         }
         $urlBase = "pydio://".$this->repository->getId();
         $nodes = array();
@@ -261,7 +266,7 @@ class UserSelection
 
     public function currentBaseUrl(){
         if(!isSet($this->repository)){
-            throw new Exception("UserSelection::currentBaseUrl: cannot build nodes URL without a proper repository");
+            throw new \Exception("UserSelection::currentBaseUrl: cannot build nodes URL without a proper repository");
         }
         return "pydio://".$this->repository->getId();
     }

@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AbstractLogDriver;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -39,7 +44,7 @@ class textLogDriver extends AbstractLogDriver
     public $fileHandle;
 
     /**
-     * @var Array stack of log messages to be written when file becomes available.
+     * @var array stack of log messages to be written when file becomes available.
      */
     public $stack;
 
@@ -116,7 +121,7 @@ class textLogDriver extends AbstractLogDriver
      * Sets the user defined options.
      * Makes sure that the folder and file exist, and makes them if they don't.
      *
-     * @param Array $options array of options specific to the logger driver.
+     * @param array $options array of options specific to the logger driver.
      * @access public
      * @return null
      */

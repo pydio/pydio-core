@@ -18,6 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Core controller for dispatching the actions.
@@ -28,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_Controller
 {
     /**
-     * @var DOMXPath
+     * @var \DOMXPath
      */
     private static $xPath;
     /**
@@ -46,13 +53,13 @@ class AJXP_Controller
      * Initialize the queryable xPath object
      * @static
      * @param bool $useCache Whether to cache the registry version in a memory cache.
-     * @return DOMXPath
+     * @return \DOMXPath
      */
     private static function initXPath($useCache = false)
     {
         if (!isSet(self::$xPath)) {
             $registry = ConfService::getFilteredXMLRegistry(false, false, $useCache);
-            self::$xPath = new DOMXPath($registry);
+            self::$xPath = new \DOMXPath($registry);
         }
         return self::$xPath;
     }
@@ -95,7 +102,7 @@ class AJXP_Controller
         if (count($paramValues) < count($paramNames)) {
             $paramNames = array_slice($paramNames, 0, count($paramValues));
         }
-        $paramValues = array_map(array("SystemTextEncoding", "toUTF8"), $paramValues);
+        $paramValues = array_map(array("Pydio\\Core\\SystemTextEncoding", "toUTF8"), $paramValues);
         $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
         return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
 
@@ -103,10 +110,10 @@ class AJXP_Controller
 
     /**
      * @static
-     * @param Array $parameters
-     * @param DOMNode $callbackNode
-     * @param DOMXPath $xPath
-     * @throws Exception
+     * @param array $parameters
+     * @param \DOMNode $callbackNode
+     * @param \DOMXPath $xPath
+     * @throws \Exception
      */
     public static function checkParams(&$parameters, $callbackNode, $xPath)
     {
@@ -121,7 +128,7 @@ class AJXP_Controller
             $defaultNode = $param->attributes->getNamedItem("default");
             $mandatory = ($param->attributes->getNamedItem("mandatory")->nodeValue == "true");
             if ($mandatory && !isSet($parameters[$name])) {
-                throw new Exception("Missing parameter '".$name."' of type '$type'");
+                throw new \Exception("Missing parameter '".$name."' of type '$type'");
             }
             if ($defaultNode != null && !isSet($parameters[$name])) {
                 $parameters[$name] = $defaultNode->nodeValue;
@@ -140,7 +147,7 @@ class AJXP_Controller
      * @param String $actionName
      * @param array $httpVars
      * @param array $fileVars
-     * @param DOMNode $action
+     * @param \DOMNode $action
      * @return mixed
      */
     public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null)
@@ -397,14 +404,14 @@ class AJXP_Controller
     /**
      * Find a callback node by its xpath query, filtering with the applyCondition if the xml attribute exists.
      * @static
-     * @param DOMXPath $xPath
-     * @param DOMNode $actionNode
+     * @param \DOMXPath $xPath
+     * @param \DOMNode $actionNode
      * @param string $query
      * @param string $actionName
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return DOMElement|bool|DOMElement[]
+     * @return \DOMElement|bool|\DOMElement[]
      */
     private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true)
     {
@@ -430,7 +437,7 @@ class AJXP_Controller
      * Check in the callback node if an applyCondition XML attribute exists, and eval its content.
      * The content must set an $apply boolean as result
      * @static
-     * @param DOMElement|DOMNode $callback
+     * @param \DOMElement|\DOMNode $callback
      * @param string $actionName
      * @param array $httpVars
      * @param array $fileVars
@@ -449,10 +456,10 @@ class AJXP_Controller
     /**
      * Applies a callback node
      * @static
-     * @param DOMElement|Array $callback The DOM Node or directly an array of attributes
+     * @param \DOMElement|array $callback The DOM Node or directly an array of attributes
      * @param String $actionName
-     * @param Array $httpVars
-     * @param Array $fileVars
+     * @param array $httpVars
+     * @param array $fileVars
      * @param null $variableArgs
      * @param bool $defer
      * @throws AJXP_Exception* @internal param \DOMXPath $xPath
@@ -516,7 +523,7 @@ class AJXP_Controller
         if(!$callbacks->length) return ;
         self::$hooksCache[$hookName] = array();
         /**
-         * @var $callback DOMElement
+         * @var $callback \DOMElement
          */
         foreach ($callbacks as $callback) {
             $defer = ($callback->getAttribute("defer") === "true");
@@ -541,7 +548,7 @@ class AJXP_Controller
             if($dontBreakOnException){
                 try{
                     self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
-                }catch(Exception $e){
+                }catch(\Exception $e){
                     AJXP_Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
                 }
             }else{
@@ -583,8 +590,8 @@ class AJXP_Controller
     /**
      * Check the rightsContext node of an action.
      * @static
-     * @param DOMNode $actionNode
-     * @param DOMXPath $xPath
+     * @param \DOMNode $actionNode
+     * @param \DOMXPath $xPath
      * @param string $right
      * @return bool
      */

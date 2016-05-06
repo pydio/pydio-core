@@ -19,6 +19,18 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Cache;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**

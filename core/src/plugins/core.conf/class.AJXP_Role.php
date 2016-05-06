@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Conf\Core;
+
+use Pydio\Access\Core\Filter\AJXP_PermissionMask;
+use Pydio\Access\Core\Repository;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -75,7 +79,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         $this->roleId = $id;
     }
 
-    public function migrateDeprectated($repositoriesList, AjxpRole $oldRole)
+    public function migrateDeprecated($repositoriesList, AjxpRole $oldRole)
     {
         $repositoriesList["ajxp.all"] = "";
         foreach ($repositoriesList as $repoId => $repoObject) {

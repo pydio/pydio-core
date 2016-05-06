@@ -18,6 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core;
+
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('AJXP_SANITIZE_HTML', 1);
@@ -59,7 +68,7 @@ class AJXP_Utils
      * Performs a natural sort on the array keys.
      * Behaves the same as ksort() with natural sorting added.
      *
-     * @param Array $array The array to sort
+     * @param array $array The array to sort
      * @return boolean
      */
     public static function natksort(&$array)
@@ -72,7 +81,7 @@ class AJXP_Utils
      * Performs a reverse natural sort on the array keys
      * Behaves the same as krsort() with natural sorting added.
      *
-     * @param Array $array The array to sort
+     * @param array $array The array to sort
      * @return boolean
      */
     public static function natkrsort(&$array)
@@ -192,7 +201,7 @@ class AJXP_Utils
             return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
         } else if ($level == AJXP_SANITIZE_FILENAME || $level == AJXP_SANITIZE_DIRNAME) {
             // Convert Hexadecimals
-            $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('AJXP_Utils', 'clearHexaCallback'), $s);
+            $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('\\Pydio\\Core\\AJXP_Utils', 'clearHexaCallback'), $s);
             // Clean up entities
             $s = preg_replace('!(&#0+[0-9]+)!','$1;',$s);
             // Decode entities
@@ -322,7 +331,7 @@ class AJXP_Utils
      * @param $boxData
      * @param bool $throwException
      * @return array|null
-     * @throws Exception
+     * @throws \Exception
      */
     public static function parseFileDataErrors($boxData, $throwException=false)
     {
@@ -342,17 +351,17 @@ class AJXP_Utils
                 // OPERA HACK, do not display "no file found error"
                 if (strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') === false) {
                     $data = $errorsArray[$userfile_error];
-                    if($throwException) throw new Exception($data[1], $data[0]);
+                    if($throwException) throw new \Exception($data[1], $data[0]);
                     return $data;
                 }
             } else {
                 $data = $errorsArray[$userfile_error];
-                if($throwException) throw new Exception($data[1], $data[0]);
+                if($throwException) throw new \Exception($data[1], $data[0]);
                 return $data;
             }
         }
         if ($userfile_tmp_name == "none" || $userfile_size == 0) {
-            if($throwException) throw new Exception($mess[31], 410);
+            if($throwException) throw new \Exception($mess[31], 410);
             return array(410, $mess[31]);
         }
         return null;
@@ -759,7 +768,7 @@ class AJXP_Utils
         }
         $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
         if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && extension_loaded("intl")){
-            $intl = IntlDateFormatter::create($messages["date_intl_locale"], IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, "MMMM");
+            $intl = \IntlDateFormatter::create($messages["date_intl_locale"], \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, null, null, "MMMM");
             $localizedMonth = $intl->format($time ? $time : time());
             $dateFuncMonth = date("F", $time ? $time : time());
             $finalDate = str_replace($dateFuncMonth, $localizedMonth, $finalDate);
@@ -1294,8 +1303,8 @@ class AJXP_Utils
         // PREPARE REPOSITORY LISTS
         $repoList = array();
         $REPOSITORIES = array();
-        require_once("../classes/class.ConfService.php");
-        require_once("../classes/class.Repository.php");
+        //require_once("../classes/class.ConfService.php");
+        //require_once("../classes/class.Repository.php");
         include(AJXP_CONF_PATH . "/bootstrap_repositories.php");
         foreach ($REPOSITORIES as $index => $repo) {
             $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
@@ -1372,7 +1381,7 @@ class AJXP_Utils
      * @param String $filePath Full path to the file
      * @param Boolean $skipCheck do not test for file existence before opening
      * @param string $format
-     * @return Array
+     * @return array
      */
     public static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
     {
@@ -1398,17 +1407,17 @@ class AJXP_Utils
      * Stores an Array as a serialized string inside a file.
      *
      * @param String $filePath Full path to the file
-     * @param array|Object $value The value to store
+     * @param array|object $value The value to store
      * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
      * @param bool $silent Silently write the file, are throw an exception on problem.
      * @param string $format "ser" or "json"
      * @param bool $jsonPrettyPrint If json, use pretty printing
-     * @throws Exception
+     * @throws \Exception
      */
     public static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser", $jsonPrettyPrint = false)
     {
         if(!in_array($format, array("ser", "json"))){
-            throw new Exception("Unsupported serialization format: ".$format);
+            throw new \Exception("Unsupported serialization format: ".$format);
         }
         $filePath = AJXP_VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))) {
@@ -1416,7 +1425,7 @@ class AJXP_Utils
             if (!is_dir(dirname($filePath))) {
                 // Creation failed
                 if($silent) return;
-                else throw new Exception("[AJXP_Utils::saveSerialFile] Cannot write into " . dirname(dirname($filePath)));
+                else throw new \Exception("[AJXP_Utils::saveSerialFile] Cannot write into " . dirname(dirname($filePath)));
             }
         }
         try {
@@ -1429,7 +1438,7 @@ class AJXP_Utils
             }
             fwrite($fp, $content);
             fclose($fp);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($silent) return;
             else throw $e;
         }
@@ -1639,8 +1648,8 @@ class AJXP_Utils
     /**
      * Sanitize a URL removin all unwanted / trailing slashes
      *
-     * @param array url_parts
-     * return string url
+     * @param array $arr
+     * @return string
      */
     public function getSanitizedUrl($arr) {
         $credentials = join(':', array_filter([$arr['user'], $arr['pass']]));
@@ -1820,7 +1829,7 @@ class AJXP_Utils
                 $configs = $bootStorage->loadPluginConfig("core", "conf");
                 $params = $configs["DIBI_PRECONFIGURATION"];
                 if (!is_array($params)) {
-                     throw new Exception("Empty SQL default connexion, there is something wrong with your setup! You may have switch to an SQL-based plugin without defining a connexion.");
+                     throw new \Exception("Empty SQL default connexion, there is something wrong with your setup! You may have switch to an SQL-based plugin without defining a connexion.");
                 }
             } else {
                 unset($params["group_switch_value"]);

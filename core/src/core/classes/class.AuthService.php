@@ -18,6 +18,21 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Core;
+use Pydio\Access\Core\Repository;
+use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\AjxpGroupPathProvider;
+use Pydio\Conf\Core\AjxpRole;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -126,7 +141,7 @@ class AuthService
     /**
      * Call the preLogUser() functino on the auth driver implementation
      * @static
-     * @param Array $httpVars
+     * @param array $httpVars
      * @return void
      */
     public static function preLogUser($httpVars)
@@ -750,7 +765,7 @@ class AuthService
     /**
      * Update the password in the auth driver implementation.
      * @static
-     * @throws Exception
+     * @throws \Exception
      * @param $userId
      * @param $userPass
      * @return bool
@@ -759,7 +774,7 @@ class AuthService
     {
         if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
             $messages = ConfService::getMessages();
-            throw new Exception($messages[378]);
+            throw new \Exception($messages[378]);
         }
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
@@ -783,7 +798,7 @@ class AuthService
     /**
      * Create a user
      * @static
-     * @throws Exception
+     * @throws \Exception
      * @param $userId
      * @param $userPass
      * @param bool $isAdmin
@@ -796,7 +811,7 @@ class AuthService
         $userId = self::filterUserSensitivity($userId);
         AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
-            throw new Exception("Reserved user id");
+            throw new \Exception("Reserved user id");
         }
         /*
         if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest") {
@@ -916,15 +931,15 @@ class AuthService
      * @param $baseGroup
      * @param $groupName
      * @param $groupLabel
-     * @throws Exception
+     * @throws \Exception
      */
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
-        if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
+        if(empty($groupName)) throw new \Exception("Please provide a name for this new group!");
         $fullGroupPath = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
         $exists = ConfService::getConfStorageImpl()->groupExists($fullGroupPath);
         if($exists){
-            throw new Exception("Group with this name already exists, please pick another name!");
+            throw new \Exception("Group with this name already exists, please pick another name!");
         }
         if(empty($groupLabel)) $groupLabel = $groupName;
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
@@ -977,7 +992,7 @@ class AuthService
      * @param $repositoryId
      * @param bool $details
      * @param bool $admin True if called in an admin context
-     * @return Array|int
+     * @return array|int
      */
     public static function countUsersForRepository($repositoryId, $details = false, $admin = false)
     {
@@ -1271,10 +1286,10 @@ class AuthService
         $roles = $confDriver->listRoles($roleIds, $excludeReserved);
         $repoList = null;
         foreach ($roles as $roleId => $roleObject) {
-            if (is_a($roleObject, "AjxpRole")) {
+            if ($roleObject instanceof AjxpRole) {
                 if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
-                $newRole->migrateDeprectated($repoList, $roleObject);
+                $newRole->migrateDeprecated($repoList, $roleObject);
                 $roles[$roleId] = $newRole;
                 self::updateRole($newRole);
             }

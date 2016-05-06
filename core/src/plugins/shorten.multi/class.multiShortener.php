@@ -4,6 +4,12 @@
 *         based in bit.ly plugin
 */
 
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**

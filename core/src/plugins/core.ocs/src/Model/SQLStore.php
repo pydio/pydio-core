@@ -20,6 +20,9 @@
  */
 namespace Pydio\OCS\Model;
 
+use Pydio\Conf\Core\ConfService;
+use Pydio\Conf\Sql\sqlConfDriver;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('OCS_SQLSTORE_FORMAT', 'serial');
@@ -29,13 +32,13 @@ define('OCS_SQLSTORE_NS_REMOTE_SHARE', 'ocs_remote_share');
 class SQLStore implements IStore
 {
     /**
-     * @var \sqlConfDriver
+     * @var sqlConfDriver
      */
     protected $storage;
 
     public function __construct()
     {
-        $storage = \ConfService::getConfStorageImpl();
+        $storage = ConfService::getConfStorageImpl();
         if($storage->getId() == "conf.sql") {
             $this->storage = $storage;
         }

@@ -18,6 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core\Plugins;
+
+use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -469,7 +475,7 @@ class AJXP_PluginsService
                 $pObject->performChecks();
                 if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
                 $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 //$this->errors[$pName] = "[$pName] ".$e->getMessage();
             }
 
@@ -653,7 +659,7 @@ class AJXP_PluginsService
     public function buildXmlRegistry($extendedVersion = true)
     {
         $actives = $this->getActivePlugins();
-        $reg = new DOMDocument();
+        $reg = new \DOMDocument();
         $reg->loadXML("<ajxp_registry></ajxp_registry>");
         foreach ($actives as $activeName=>$status) {
             if($status === false) continue;
@@ -675,7 +681,7 @@ class AJXP_PluginsService
      * Build the XML Registry if not already built, and return it.
      * @static
      * @param bool $extendedVersion
-     * @return DOMDocument The registry
+     * @return \DOMDocument The registry
      */
     public static function getXmlRegistry($extendedVersion = true)
     {
@@ -703,16 +709,16 @@ class AJXP_PluginsService
     /**
      * Append some predefined XML to a plugin instance
      * @param AJXP_Plugin $plugin
-     * @param DOMDocument $manifestDoc
+     * @param \DOMDocument $manifestDoc
      * @param String $mixinName
      */
     public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName)
     {
         // Load behaviours if not already
         if (!isSet($this->mixinsDoc)) {
-            $this->mixinsDoc = new DOMDocument();
+            $this->mixinsDoc = new \DOMDocument();
             $this->mixinsDoc->load(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
-            $this->mixinsXPath = new DOMXPath($this->mixinsDoc);
+            $this->mixinsXPath = new \DOMXPath($this->mixinsDoc);
         }
         // Merge into manifestDoc
         $nodeList = $this->mixinsXPath->query($mixinName);
@@ -735,7 +741,7 @@ class AJXP_PluginsService
      * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
      * @param bool $limitToEnabledPlugins
      * @param bool $loadExternalFiles
-     * @return DOMNode[]
+     * @return \DOMNode[]
      */
     public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
     {
@@ -769,7 +775,7 @@ class AJXP_PluginsService
 
     /**
      * Central function of the registry construction, merges some nodes into the existing registry.
-     * @param DOMDocument $original
+     * @param \DOMDocument $original
      * @param $parentName
      * @param $uuidAttr
      * @param $childrenNodes
@@ -782,7 +788,7 @@ class AJXP_PluginsService
         $parentSelection = $original->getElementsByTagName($parentName);
         if ($parentSelection->length) {
             $parentNode = $parentSelection->item(0);
-            $xPath = new DOMXPath($original);
+            $xPath = new \DOMXPath($original);
             foreach ($childrenNodes as $child) {
                 if($child->nodeType != XML_ELEMENT_NODE) continue;
                 if ($child->getAttribute($uuidAttr) == "*") {
@@ -820,8 +826,8 @@ class AJXP_PluginsService
 
     /**
      * Utilitary function
-     * @param $new
-     * @param $old
+     * @param \DOMNode $new
+     * @param \DOMNode $old
      */
     protected function mergeChildByTagName($new, &$old)
     {
@@ -857,7 +863,7 @@ class AJXP_PluginsService
 
     /**
      * Utilitary
-     * @param $node
+     * @param \DOMNode $node
      * @return bool
      */
     private function hasElementChild($node)

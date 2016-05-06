@@ -18,6 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once 'CAS.php';

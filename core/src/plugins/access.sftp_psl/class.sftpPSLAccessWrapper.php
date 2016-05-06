@@ -19,6 +19,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
+
+use Net_SSH2;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed' );
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
@@ -55,7 +66,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 
         $repoObject = ConfService::getRepositoryById($repoId);
 
-        if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
+        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
 
         $basePath = $repoObject->getOption("PATH");
         $host = $repoObject->getOption("SFTP_HOST");
@@ -115,7 +126,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     {
         try {
             $this->realPath = $this->initPath($path);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
@@ -133,9 +144,9 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
      * Fix PEAR by being sure it ends up with "/", to avoid
      * adding the current dir to the children list.
      *
-     * @param unknown_type $path
-     * @param unknown_type $options
-     * @return unknown
+     * @param string $path
+     * @param mixed $options
+     * @return bool
      */
     public function dir_opendir ($path , $options )
     {
@@ -181,6 +192,10 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
         return $stat;
     }
 
+    /**
+     * @param Repository $repoObject
+     * @return array
+     */
     public function detectRemoteUserId($repoObject)
     {
         $host = $repoObject->getOption("SFTP_HOST");
@@ -217,7 +232,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
      * We may have performance problems on big files here.
      *
      * @param String $path
-     * @param Stream $stream
+     * @param resource $stream
      */
     public static function copyFileInStream($path, $stream)
     {

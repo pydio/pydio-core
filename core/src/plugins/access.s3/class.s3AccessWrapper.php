@@ -19,6 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\S3;
+
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
@@ -45,7 +52,7 @@ class s3AccessWrapper extends fsAccessWrapper
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if (!isSet($repoObject)) {
-            $e = new Exception("Cannot find repository with id ".$repoId);
+            $e = new \Exception("Cannot find repository with id ".$repoId);
             self::$lastException = $e;
             throw $e;
         }
@@ -72,7 +79,7 @@ class s3AccessWrapper extends fsAccessWrapper
     {
         try {
             $this->realPath = $this->initPath($path, "file");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
@@ -165,7 +172,7 @@ class s3AccessWrapper extends fsAccessWrapper
            self::copyFileInStream($path, $tmpHandle);
            fclose($tmpHandle);
            if (!$persistent) {
-               register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+               register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
            }
            return $tmpFile;
     }
@@ -213,7 +220,7 @@ class s3AccessWrapper extends fsAccessWrapper
             $repoId = $fromUrl["host"];
             $repoObject = ConfService::getRepositoryById($repoId);
             if (!isSet($repoObject)) {
-                $e = new Exception("Cannot find repository with id ".$repoId);
+                $e = new \Exception("Cannot find repository with id ".$repoId);
                 self::$lastException = $e;
                 throw $e;
             }
@@ -330,7 +337,7 @@ class s3AccessWrapper extends fsAccessWrapper
                     // $c is a Aws\S3\Command\S3Command
                     AJXP_Logger::error("S3Wrapper", __FUNCTION__, "Error while copying: ".$c->getOperation()->getServiceDescription());
                 }
-                self::$lastException = new Exception("Failed moving folder: ".count($failed));
+                self::$lastException = new \Exception("Failed moving folder: ".count($failed));
                 return false;
             }
             return true;

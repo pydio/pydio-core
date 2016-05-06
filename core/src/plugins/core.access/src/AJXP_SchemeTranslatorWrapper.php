@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -28,7 +29,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements AjxpWrapper
+class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAjxpWrapper
 {
     /**
      * @var resource
@@ -54,7 +55,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
      * @param string $path
      * @param bool $persistent
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getRealFSReference($path, $persistent = false)
     {

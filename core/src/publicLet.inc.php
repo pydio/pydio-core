@@ -20,6 +20,9 @@
  *
  * Description : Specific inclusion to run publiclet scripts
  */
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 require_once("base.conf.php");
 
 $pServ = AJXP_PluginsService::getInstance();

@@ -19,6 +19,15 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\SMB;
+
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
@@ -35,14 +44,18 @@ class smbAccessWrapper extends fsAccessWrapper
      * Concretely, transform ajxp.smb:// into smb://
      *
      * @param string $path
+     * @param $streamType
+     * @param bool $storeOpenContext
+     * @param bool $skipZip
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
+     * @throws \Exception
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
         $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
+        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
         $path = $url["path"];
         // Fix if the host is defined as //MY_HOST/path/to/folder
         $hostOption = AuthService::getFilteredRepositoryOption("access.smb", $repoObject, "HOST");
@@ -81,15 +94,14 @@ class smbAccessWrapper extends fsAccessWrapper
      *
      * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile"
      * @param String $mode
-     * @param unknown_type $options
-     * @param unknown_type $opened_path
-     * @return unknown
+     * @param mixed $options
+     * @return resource|bool
      */
     public function stream_open($path, $mode, $options, &$context)
     {
         try {
             $this->realPath = $this->initPath($path, "file");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
@@ -108,9 +120,9 @@ class smbAccessWrapper extends fsAccessWrapper
      * Fix PEAR by being sure it ends up with "/", to avoid
      * adding the current dir to the children list.
      *
-     * @param unknown_type $path
-     * @param unknown_type $options
-     * @return unknown
+     * @param string $path
+     * @param mixed $options
+     * @return resource
      */
     public function dir_opendir ($path , $options )
     {

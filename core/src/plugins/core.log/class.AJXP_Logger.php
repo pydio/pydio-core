@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Log\Core;
+
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define("LOG_LEVEL_DEBUG", "Debug");
@@ -44,7 +52,7 @@ class AJXP_Logger extends AJXP_Plugin
     {
         parent::init($options);
         self::$globalOptions = $this->pluginConf;
-        $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "AbstractLogDriver");
+        $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "Pydio\\Log\\Core\\AbstractLogDriver");
         if ($this->pluginInstance != false) {
             AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
@@ -96,7 +104,7 @@ class AJXP_Logger extends AJXP_Plugin
                 if ( $level == LOG_LEVEL_ERROR && self::$globalOptions["ERROR_TO_ERROR_LOG"] === true) {
                     error_log("[PYDIO] IP $ip | user $user | $level | $prefix | from $source | ".$res);
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 error_log("Exception while logging");
                 error_log("Log message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
                 error_log("Exception is:".$e->getMessage());
@@ -277,7 +285,7 @@ class AJXP_Logger extends AJXP_Plugin
                 $st .= self::arrayToString($value);
             } else if (is_bool($value)) {
                 $st .= ($value?"true":"false");
-            } else if (is_a($value, "UserSelection")) {
+            } else if (is_object($value) && $value instanceof UserSelection) {
                 $st .= self::arrayToString($value->getFiles());
             }
 

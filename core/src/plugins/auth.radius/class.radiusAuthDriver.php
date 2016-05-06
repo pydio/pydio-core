@@ -1,4 +1,10 @@
 <?php
+use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
  * Authenticates user against an RADIUS server

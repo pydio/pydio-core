@@ -19,6 +19,20 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\FTP;
+
+use DOMNode;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Exception;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -112,7 +126,7 @@ class ftpAccessDriver extends fsAccessDriver
                     @unlink($fData["tmp_name"]);
                     AJXP_Controller::applyHook("node.change", array(null, &$node));
 
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
                 }
                 $this->logDebug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
@@ -177,7 +191,7 @@ class ftpAccessDriver extends fsAccessDriver
                             $boxData["tmp_name"] = $destName;
                             $this->storeFileToCopy($boxData);
                             $this->logDebug("End reading INPUT stream");
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             $errorCode=411;
                             $errorMessage = $e->getMessage();
                             break;
@@ -248,7 +262,7 @@ class ftpAccessDriver extends fsAccessDriver
         } else {
             if (file_exists("$location")) {
                 $test = @unlink("$location");
-                if(!$test) throw new Exception("Cannot delete file ".$location);
+                if(!$test) throw new \Exception("Cannot delete file ".$location);
             }
         }
         if (isSet($repoData["recycle"]) && basename(dirname($location)) == $repoData["recycle"]) {

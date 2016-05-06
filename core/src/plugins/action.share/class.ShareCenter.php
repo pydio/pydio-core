@@ -19,6 +19,21 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\ContentFilter;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once("class.CompositeShare.php");
 
@@ -69,7 +84,7 @@ class ShareCenter extends AJXP_Plugin
     {
         parent::init($options);
         $this->repository = ConfService::getRepository();
-        if (!is_a($this->repository->driverInstance, "AjxpWrapperProvider")) {
+        if (!($this->repository->driverInstance instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
             return;
         }
         $this->accessDriver = $this->repository->driverInstance;
@@ -454,7 +469,7 @@ class ShareCenter extends AJXP_Plugin
 
                     $result = $this->createSharedRepository($httpVars, $isUpdate, $users, $groups);
 
-                    if (is_a($result, "Repository")) {
+                    if (is_object($result) && $result instanceof Repository) {
 
                         if(!$isUpdate){
                             $this->getShareStore()->storeShare($this->repository->getId(), array(
@@ -525,7 +540,7 @@ class ShareCenter extends AJXP_Plugin
                                     ($shareScope == "public"),
                                     $hash
                                 );
-                            }else if(is_a($shareObject, "ShareLink")){
+                            }else if($shareObject instanceof ShareLink){
                                 $hash = $shareObject->getHash();
                                 $this->getShareStore()->getMetaManager()->addShareInMeta(
                                     $ajxpNode,
@@ -534,7 +549,7 @@ class ShareCenter extends AJXP_Plugin
                                     ($shareScope == "public"),
                                     ($httpHash != null && $hash != $httpHash) ? $httpHash : null
                                 );
-                            }else if(is_a($shareObject, "Repository")){
+                            }else if($shareObject instanceof Repository){
                                 $this->getShareStore()->getMetaManager()->addShareInMeta(
                                     $ajxpNode,
                                     "repository",
@@ -1729,7 +1744,7 @@ class ShareCenter extends AJXP_Plugin
                     $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
                 }
 
-            }else if(is_a($shareData["REPOSITORY"], "Repository") && !empty($shareData["FILE_PATH"])){
+            }else if($shareData["REPOSITORY"] instanceof Repository && !empty($shareData["FILE_PATH"])){
 
                 $meta["owner"] = $shareData["OWNER_ID"];
                 $meta["share_type_readable"] = "Publiclet (legacy)";

@@ -19,6 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once("class.PublicletCounter.php");
@@ -67,7 +78,7 @@ class ShareStore {
             $loader_content = '<'.'?'.'php
                     define("AJXP_EXEC", true);
                     require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/core/classes/class.AJXP_Utils.php");
-                    $hash = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
+                    $hash = Pydio\Core\AJXP_Utils::securePath(Pydio\Core\AJXP_Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
                     if(file_exists($hash.".php")){
                         require_once($hash.".php");
                     }else{
@@ -201,7 +212,7 @@ class ShareStore {
         eval($code);
         if(empty($inputData)) return false;
         $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
-        $publicletData = unserialize($inputData);
+        $publicletData = @unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
         if (!isSet($publicletData["REPOSITORY"])) {
             $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
@@ -269,7 +280,7 @@ class ShareStore {
     protected function updateShareType(&$shareData){
         if ( isSet($shareData["SHARE_TYPE"]) && $shareData["SHARE_TYPE"] == "publiclet" ) {
             $shareData["SHARE_TYPE"] = "file";
-        } else if ( isset($shareData["REPOSITORY"]) && is_a($shareData["REPOSITORY"], "Repository") ){
+        } else if ( isset($shareData["REPOSITORY"]) && $shareData["REPOSITORY"] instanceof Repository ){
             $shareData["SHARE_TYPE"] = "file";
         } else if ( isSet($shareData["PUBLICLET_PATH"]) ){
             $shareData["SHARE_TYPE"] = "minisite";
@@ -772,7 +783,7 @@ class ShareStore {
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
         $repoObject = $data["REPOSITORY"];
-        if(!is_a($repoObject, "Repository")) {
+        if(!($repoObject instanceof Repository)) {
             $repoObject = ConfService::getRepositoryById($data["REPOSITORY"]);
         }
         $repoLoaded = false;

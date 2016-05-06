@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Core;
+
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define('AJXP_FILTER_EMPTY', 'AJXP_FILTER_EMPTY');
@@ -104,7 +112,7 @@ class AbstractAuthDriver extends AJXP_Plugin
         } else {
             $xmlString = AJXP_XMLWriter::getUserXml(null);
         }
-        $dom = new DOMDocument();
+        $dom = new \DOMDocument();
         $dom->loadXML($xmlString);
         $this->registryContributions[]=$dom->documentElement;
         return $this->registryContributions;
@@ -117,7 +125,7 @@ class AbstractAuthDriver extends AJXP_Plugin
 
         if(AuthService::usersEnabled() && $this->passwordsEditable()) return ;
         // Disable password change action
-        if(!isSet($actionXpath)) $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        if(!isSet($actionXpath)) $actionXpath=new \DOMXPath($contribNode->ownerDocument);
         $passChangeNodeList = $actionXpath->query('action[@name="pass_change"]', $contribNode);
         if(!$passChangeNodeList->length) return ;
         $passChangeNode = $passChangeNodeList->item(0);

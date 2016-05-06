@@ -19,6 +19,16 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\S3;
+
+use DOMNode;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\RecycleBinManager;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Exception;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
@@ -42,8 +52,8 @@ class s3AccessDriver extends fsAccessDriver
     public function performChecks()
     {
         // Check CURL, OPENSSL & AWS LIBRARY
-        if(!extension_loaded("curl")) throw new Exception("Cannot find php_curl extension!");
-        if(!file_exists($this->getBaseDir()."/aws.phar")) throw new Exception("Cannot find AWS PHP SDK v2. Make sure the aws.phar package is installed inside access.s3 plugin.");
+        if(!extension_loaded("curl")) throw new \Exception("Cannot find php_curl extension!");
+        if(!file_exists($this->getBaseDir()."/aws.phar")) throw new \Exception("Cannot find AWS PHP SDK v2. Make sure the aws.phar package is installed inside access.s3 plugin.");
     }
 
     /**
@@ -82,7 +92,7 @@ class s3AccessDriver extends fsAccessDriver
             $sdkVersion = $this->getFilteredOption("SDK_VERSION");
             if ($sdkVersion === "v3") {
                 require_once ("class.pydioS3Client.php");
-                $this->s3Client = new AccessS3\S3Client([
+                $this->s3Client = new S3Client([
                     "version" => $apiVersion,
                     "region"  => $region,
                     "credentials" => $options
@@ -177,13 +187,13 @@ class s3AccessDriver extends fsAccessDriver
      * @param String $source Maybe updated by the function
      * @param String $target Existing part to append data
      * @return bool If the target file already existed or not.
-     * @throws Exception
+     * @throws \Exception
      */
     protected function appendUploadedData($folder, $source, $target){
 
         $already_existed = false;
         if($source == $target){
-            throw new Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
+            throw new \Exception("Something nasty happened: trying to copy $source into itself, it will create a loop!");
         }
         // S3 does not really support append. Let's grab the remote target first.
         if (file_exists($folder ."/" . $target)) {

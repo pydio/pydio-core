@@ -18,12 +18,23 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\Inbox;
+
+use ArrayIterator;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class inboxAccessWrapper implements AjxpWrapper
+class inboxAccessWrapper implements IAjxpWrapper
 {
+    /**
+     * @var ArrayIterator
+     */
     private $nodesIterator;
 
     /**
@@ -135,7 +146,7 @@ class inboxAccessWrapper implements AjxpWrapper
             $node->getRepository()->driverInstance = null;
             try{
                 ConfService::loadDriverForRepository($node->getRepository());
-            }catch (Exception $e){
+            }catch (\Exception $e){
 
             }
             $node->getRepository()->detectStreamWrapper(true);

@@ -43,9 +43,9 @@
 			</action>
 		</actions>
 	</registry_contributions>
-	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
+	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\RemoteFS\remote_fsAccessDriver"/>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-    <class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="remote_fsAccessWrapper" protocol="ajxp.remotefs"/>
+    <class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\RemoteFS\remote_fsAccessWrapper" protocol="ajxp.remotefs"/>
 </ajxpdriver>

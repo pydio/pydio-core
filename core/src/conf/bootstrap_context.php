@@ -70,10 +70,6 @@ define("ADMIN_PASSWORD", "admin");
 // example in log.serial. Do not forget the trailing slash
 // define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
 
-// KEY-VALUE-CACHE
-define("AJXP_KVCACHE_PREFIX", "pydio-unique-id");
-define("AJXP_KVCACHE_IGNORE", true);
-
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
 define("AJXP_SERVER_DEBUG"  ,	false);
@@ -96,8 +92,18 @@ define("HASH_PBKDF2_INDEX", 3);
 // MAKE SURE YOU HAVE PHP.5.3, OPENSSL, AND THAT IT DOES NOT DEGRADE PERFORMANCES
 define("USE_OPENSSL_RANDOM", false);
 
+$corePlugAutoloads = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/vendor/autoload.php", GLOB_NOSORT);
+if ($corePlugAutoloads !== false && count($corePlugAutoloads)) {
+    foreach($corePlugAutoloads as $autoloader){
+        require_once ($autoloader);
+    }
+}
+
 function AjaXplorer_autoload($className)
 {
+    // Temp : super dummy autoloader, take only class name
+    $className = array_pop(explode("\\", $className));
+
     if($className == "dibi"){
         require_once(AJXP_BIN_FOLDER."/dibi/dibi.php");
     }
@@ -123,6 +129,10 @@ function AjaXplorer_autoload($className)
     }
 }
 spl_autoload_register('AjaXplorer_autoload');
+
+include_once (AJXP_BIN_FOLDER."/compat.php");
+
+use Pydio\Core\AJXP_Utils;
 
 AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,21 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Authfront\Core;
-use Pydio\Core\Plugins\AJXP_Plugin;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
-abstract class AbstractAuthFrontend extends AJXP_Plugin {
-
-    /**
-     * Try to authenticate the user based on various external parameters
-     * Return true if user is now logged.
-     *
-     * @param array $httpVars
-     * @param bool $isLast Whether this is is the last plugin called.
-     * @return bool
-     */
-    abstract function tryToLogUser(&$httpVars, $isLast = false);
-
-} 
+class_alias("Pydio\\Access\\Core\\Filter\\AJXP_Permission", "AJXP_Permission", true);
+class_alias("Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask", "AJXP_PermissionMask", true);
+class_alias("Pydio\\Access\\Core\\AJXP_Node", "AJXP_Node", true);
+class_alias("Pydio\\Conf\\Core\\AJXP_Role", "AJXP_Role", true);
+class_alias("Pydio\\Access\\Core\\Repository", "Repository", true);
+class_alias("Pydio\\Access\\Core\\ContentFilter", "ContentFilter", true);

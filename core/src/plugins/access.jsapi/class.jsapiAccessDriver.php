@@ -18,6 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\DataProvider;
+
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -40,7 +48,8 @@ class jsapiAccessDriver extends AbstractAccessDriver
                 if (!defined("CLIENT_RESOURCES_FOLDER")) {
                     define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
                 }
-                    // Locate the file class.ClassName.js
+                $searchLocations = [];
+                // Locate the file class.ClassName.js
                 if ($jsType == "class") {
                     $searchLocations = array(
                         CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",

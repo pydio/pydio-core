@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
+namespace Pydio\Cache\Core;
+
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -39,6 +43,11 @@ class CacheStreamLayer extends AJXP_SchemeTranslatorWrapper
     private $currentBufferId = null;
     private $currentBuffer = array();
 
+    /**
+     * @param $path
+     * @param $type
+     * @return string
+     */
     protected function computeCacheId($path, $type){
 
         return AbstractCacheDriver::computeIdForNode(new AJXP_Node($path), $type);

@@ -18,6 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\DataProvider;
+
+use DOMDocument;
+use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\AJXP_XMLWriter;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -133,7 +140,7 @@ class WmsBrowser extends AbstractAccessDriver
                 if (isSet($attributes)) {
                     $bBoxAttributes = $attributes;
                 }
-            } catch (Exception $e) {}
+            } catch (\Exception $e) {}
             foreach ($bBoxAttributes as $domAttr) {
                 $metaData["bbox_".$domAttr->name] = $domAttr->value;
             }

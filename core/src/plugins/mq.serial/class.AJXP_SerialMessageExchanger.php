@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
  * Serialized file plugin to manage messages queues
@@ -29,7 +33,7 @@ class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExc
 {
 
     /**
-     * @var Array
+     * @var array
      */
     private $channels;
     private $clientsGCTime = 10;

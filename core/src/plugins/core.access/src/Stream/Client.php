@@ -21,7 +21,7 @@
 
 namespace Pydio\Access\Core\Stream;
 
-use Pydio\Access\Core\Stream\Listener\PathListener;
+use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 
 /**

@@ -18,6 +18,16 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\HTMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Metastore\Core\MetaStoreProvider;
+
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
 class CommentsMetaManager extends AJXP_AbstractMetaSource

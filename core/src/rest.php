@@ -20,10 +20,17 @@
  *
  * Description : Real RESTful API access
  */
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_PluginsService;
+
 include_once("base.conf.php");
 
-set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+set_error_handler(array("\\Pydio\\Core\\AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+set_exception_handler(array("\\Pydio\\Core\\AJXP_XMLWriter", "catchException"));
 
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::$useSession = false;

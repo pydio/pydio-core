@@ -19,6 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Plugins\SqlTableProvider;
+use Pydio\Core\SystemTextEncoding;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -64,8 +72,8 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
         }
         try {
             $node = null;
-            if(is_object($data[1]) && is_a($data[1], "AJXP_Node")) $node = $data[1];
-            else if(is_object($data[0]) && is_a($data[0], "AJXP_Node")) $node = $data[0];
+            if(is_object($data[1]) && $data[1] instanceof \Pydio\Access\Core\AJXP_Node) $node = $data[1];
+            else if(is_object($data[0]) && $data[0] instanceof \Pydio\Access\Core\AJXP_Node) $node = $data[0];
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content],[index_path]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin,%s)",
                 time(),
                 "event",
@@ -228,7 +236,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
         $data = array();
         foreach ($res as $n => $row) {
             $test = unserialize($row->content);
-            if (is_a($test, "AJXP_Notification")) {
+            if ($test instanceof AJXP_Notification) {
                 $test->alert_id = $row->id;
                 $data[] = $test;
             }
@@ -281,7 +289,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
         $res = dibi::query("SELECT [id],[content],[index_path] FROM [ajxp_feed] WHERE [etype] = %s AND [index_path] IS NULL", "alert");
         foreach ($res as $row) {
             $test = unserialize($row->content);
-            if (is_a($test, "AJXP_Notification")) {
+            if ($test instanceof AJXP_Notification) {
                 $url = $test->getNode()->getUrl();
                 try {
                     dibi::query("UPDATE [ajxp_feed] SET [index_path]=%s WHERE [id] = %i", $url, $row->id);

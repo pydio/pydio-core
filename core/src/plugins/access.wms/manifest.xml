@@ -158,5 +158,5 @@
 
 		</actions>
 	</registry_contributions>
-	<class_definition filename="plugins/access.wms/class.WmsBrowser.php" classname="WmsBrowser"/>
+	<class_definition filename="plugins/access.wms/class.WmsBrowser.php" classname="Pydio\Access\Driver\DataProvider\WmsBrowser"/>
 </ajxpdriver>

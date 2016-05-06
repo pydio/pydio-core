@@ -19,6 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\Swift;
+
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
@@ -46,7 +53,7 @@ class swiftAccessWrapper extends fsAccessWrapper
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if (!isSet($repoObject)) {
-            $e = new Exception("Cannot find repository with id ".$repoId);
+            $e = new \Exception("Cannot find repository with id ".$repoId);
             self::$lastException = $e;
             throw $e;
         }
@@ -82,7 +89,7 @@ class swiftAccessWrapper extends fsAccessWrapper
     {
         try {
             $this->realPath = $this->initPath($path, "file");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
@@ -226,7 +233,7 @@ class swiftAccessWrapper extends fsAccessWrapper
            self::copyFileInStream($path, $tmpHandle);
            fclose($tmpHandle);
            if (!$persistent) {
-               register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+               register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
            }
            return $tmpFile;
     }

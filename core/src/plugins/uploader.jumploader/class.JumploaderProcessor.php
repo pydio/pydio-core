@@ -19,6 +19,15 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\UserSelection;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -82,7 +91,7 @@ class JumploaderProcessor extends AJXP_Plugin
                 while ($it->valid()) {
                     if (!$it->isDot()) {
                         $subPathName = $it->getSubPathName();
-                        AJXP_LOGGER :: debug("Iterator SubPathName: " . $it->getSubPathName());
+                        AJXP_Logger::debug("Iterator SubPathName: " . $it->getSubPathName());
                         if (strstr($subPathName, $fileHash) != false) {
                             $explodedSubPathName = explode('.', $subPathName);
                             $resumeFileId = $explodedSubPathName[1];
@@ -100,10 +109,10 @@ class JumploaderProcessor extends AJXP_Plugin
                     return;
                 }
 
-                AJXP_LOGGER :: debug("ResumeFileID: " . $resumeFileId);
-                AJXP_LOGGER :: debug("Max Resume Index: " . max($resumeIndexes));
+                AJXP_Logger::debug("ResumeFileID: " . $resumeFileId);
+                AJXP_Logger::debug("Max Resume Index: " . max($resumeIndexes));
                 $nextResumeIndex = max($resumeIndexes) + 1;
-                AJXP_LOGGER :: debug("Next Resume Index: " . $nextResumeIndex);
+                AJXP_Logger::debug("Next Resume Index: " . $nextResumeIndex);
 
                 if (isSet($resumeFileId)) {
                     $this->logDebug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);

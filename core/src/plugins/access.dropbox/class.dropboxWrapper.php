@@ -19,18 +19,28 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
+namespace Pydio\Access\Driver\StreamProvider\Dropbox;
+
+use Dropbox_API;
+use Dropbox_Exception;
+use Dropbox_Exception_NotFound;
+use Dropbox_OAuth_PEAR;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
 require_once (AJXP_INSTALL_PATH.'/plugins/access.dropbox/dropbox-php/autoload.php');
-require_once (AJXP_BIN_FOLDER.'/interface.AjxpWrapper.php');
 
 /**
  * AjxpWrapper encapsulation the PHP Dropbox client
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class dropboxWrapper implements AjxpWrapper
+class dropboxWrapper implements IAjxpWrapper
 {
     /**
      *

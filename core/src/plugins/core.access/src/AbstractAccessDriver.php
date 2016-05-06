@@ -18,6 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\SystemTextEncoding;
+use Pydio\Log\Core\AJXP_Logger;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -74,32 +85,21 @@ class AbstractAccessDriver extends AJXP_Plugin
 
 
     /**
-     * Backward compatibility, now moved to SharedCenter::loadPubliclet();
-     * @param $data
-     * @return void
-     */
-    public function loadPubliclet($data)
-    {
-        require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareCenter.php");
-        ShareCenter::loadPubliclet($data);
-    }
-
-    /**
      * Populate publiclet options
      * @param String $filePath The path to the file to share
      * @param String $password optionnal password
      * @param String $downloadlimit optional limit for downloads
      * @param String $expires optional expiration date
      * @param Repository $repository
-     * @return Array
+     * @return array
      */
     public function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {}
 
     /**
      * Populate shared repository options
-     * @param Array $httpVars
+     * @param array $httpVars
      * @param Repository $repository
-     * @return Array
+     * @return array
      */
     public function makeSharedRepositoryOptions($httpVars, $repository){}
 
@@ -107,10 +107,10 @@ class AbstractAccessDriver extends AJXP_Plugin
      * @param $directoryPath string
      * @param $repositoryResolvedOptions array
      * @return integer
-     * @throw Exception
+     * @throw \Exception
      */
     public function directoryUsage($directoryPath, $repositoryResolvedOptions){
-        throw new Exception("Current driver does not support recursive directory usage!");
+        throw new \Exception("Current driver does not support recursive directory usage!");
     }
 
     public function crossRepositoryCopy($httpVars)
@@ -136,7 +136,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)
                 || (isSet($httpVars["moving_files"]) && !$loggedUser->canWrite($repositoryId))
             ){
-                throw new Exception($mess[364]);
+                throw new \Exception($mess[364]);
             }
         }
         $srcRepoData= array(
@@ -169,8 +169,8 @@ class AbstractAccessDriver extends AJXP_Plugin
     /**
      * @param String $destDir url of destination dir
      * @param String $srcFile url of source file
-     * @param Array $error accumulator for error messages
-     * @param Array $success accumulator for success messages
+     * @param array $error accumulator for error messages
+     * @param array $success accumulator for success messages
      * @param bool $move Whether to copy or move
      * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
      * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
@@ -262,7 +262,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                     $this->filecopy($realSrcFile, $destFile);
                     $this->changeMode($destFile, $destRepoData);
                     AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, true));
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $error[] = $e->getMessage();
                     return ;
                 }
@@ -323,8 +323,8 @@ class AbstractAccessDriver extends AJXP_Plugin
     /**
      * @param String $srcdir Url of source file
      * @param String $dstdir Url of dest file
-     * @param Array $errors Array of errors
-     * @param Array $success Array of success
+     * @param array $errors Array of errors
+     * @param array $success Array of success
      * @param bool $verbose Boolean
      * @param bool $convertSrcFile Boolean
      * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
@@ -365,7 +365,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                                 $success[] = $srcfile;
                                 $num ++;
                                 $this->changeMode($dstfile, $destRepoData);
-                            } catch (Exception $e) {
+                            } catch (\Exception $e) {
                                 $errors[] = $srcfile;
                             }
                         }
@@ -399,7 +399,7 @@ class AbstractAccessDriver extends AJXP_Plugin
     /**
      * @param $location
      * @param $repoData
-     * @throws Exception
+     * @throws \Exception
      */
     protected function deldir($location, $repoData)
     {
@@ -426,7 +426,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             if (file_exists("$location")) {
                 AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
                 $test = @unlink("$location");
-                if(!$test) throw new Exception("Cannot delete file ".$location);
+                if(!$test) throw new \Exception("Cannot delete file ".$location);
             }
         }
         if (isSet($repoData["recycle"]) && basename(dirname($location)) == $repoData["recycle"]) {
@@ -442,7 +442,7 @@ class AbstractAccessDriver extends AJXP_Plugin
      * @param array $stat
      * @param Repository $repoObject
      * @param callable $remoteDetectionCallback
-     * @var \oct $mode
+     * @var oct $mode
      */
     public static function fixPermissions(&$stat, $repoObject, $remoteDetectionCallback = null)
     {
@@ -529,8 +529,8 @@ class AbstractAccessDriver extends AJXP_Plugin
 
     /**
      * Test if userSelection is containing a hidden file, which should not be the case!
-     * @param Array $files
-     * @throws Exception
+     * @param array $files
+     * @throws \Exception
      */
     public function filterUserSelectionToHidden($files)
     {
@@ -538,10 +538,10 @@ class AbstractAccessDriver extends AJXP_Plugin
         foreach ($files as $file) {
             $file = basename($file);
             if (AJXP_Utils::isHidden($file) && !$showHiddenFiles) {
-                throw new Exception("$file Forbidden", 411);
+                throw new \Exception("$file Forbidden", 411);
             }
             if ($this->filterFile($file) || $this->filterFolder($file)) {
-                throw new Exception("$file Forbidden", 411);
+                throw new \Exception("$file Forbidden", 411);
             }
         }
     }

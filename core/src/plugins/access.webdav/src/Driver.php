@@ -24,17 +24,18 @@ namespace Pydio\Access\WebDAV;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-use AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Stream\StreamWrapper as AccessStreamWrapper;
-use ConfService;
-use RecycleBinManager;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Repository;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Access\Core\RecycleBinManager;
 
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class Driver extends \fsAccessDriver
+class Driver extends fsAccessDriver
 {
     /**
     * @var Repository

@@ -18,6 +18,22 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Conf\Sql;
+
+use DibiResult;
+use Pydio\Access\Core\ContentFilter;
+use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\AjxpRole;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Plugins\SqlTableProvider;
+
+use \dibi;
+use \DibiException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -84,7 +100,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         if(!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
-            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+            throw new \Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 
@@ -136,8 +152,8 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
      *
      *
-     * @param $result Result of a dibi::query() as array
-     * @param array|\Result $options_result Result of dibi::query() for options as array
+     * @param $result DibiResult of a dibi::query() as array
+     * @param array|DibiResult $options_result Result of dibi::query() for options as array
      * @return Repository object
      */
     public function repoFromDb($result, $options_result = Array())
@@ -165,7 +181,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             }
             $repo->options[$k] = $v;
         }
-        if(isSet($repo->options["content_filter"]) && is_a($repo->options["content_filter"], "ContentFilter")){
+        if(isSet($repo->options["content_filter"]) && $repo->options["content_filter"] instanceof ContentFilter){
             $repo->setContentFilter($repo->options["content_filter"]);
         }
 
@@ -176,7 +192,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Convert a repository object to an array, which will be stored in the database.
      *
      * @param $repository Repository
-     * @return Array containing row values, and another array with the key "options" to be stored as repo options.
+     * @return array containing row values, and another array with the key "options" to be stored as repo options.
      */
     public function repoToArray($repository)
     {
@@ -268,7 +284,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
-     * @param Array $criteria
+     * @param array $criteria
      * @param int $count possible total count
      * @return Repository[]
      */
@@ -278,7 +294,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $limit = $groupBy = "";
         $order = "ORDER BY display ASC";
 
-        if(isSet($criteria["role"]) && is_a($criteria["role"], "AJXP_Role")){
+        if(isSet($criteria["role"]) && $criteria["role"] instanceof AJXP_Role){
             return $this->listRepositoriesForRole($criteria["role"]);
         }
 
@@ -454,10 +470,12 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             throw $e;
         }
     }
+
     /**
      * Delete a repository, given its unique ID.
      *
      * @param String $repositoryId
+     * @return int|string
      */
     public function deleteRepository($repositoryId)
     {
@@ -716,9 +734,9 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $id = $role_row['role_id'];
             $serialized = $role_row['serial_role'];
             $object = unserialize($serialized);
-            if (is_a($object, "AjxpRole") || is_a($object, "AJXP_Role")) {
+            if ($object instanceof AjxpRole || $object instanceof AJXP_Role) {
                 $roles[$id] = $object;
-                if(is_a($object, "AJXP_Role")){
+                if($object instanceof AJXP_Role){
                     $object->setLastUpdated($role_row["last_updated"]);
                 }
             }
@@ -795,7 +813,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     public function deleteRole($role)
     {
         // Mixed input Object or ID
-        if(is_a($role, "AJXP_Role")) $roleId = $role->getId();
+        if($role instanceof AJXP_Role) $roleId = $role->getId();
         else $roleId = $role;
 
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $roleId);

@@ -19,7 +19,7 @@
 		<param name="PAGINATION_THRESHOLD" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[Pagination Threshold]" description="CONF_MESSAGE[When a folder will contain more items than this number, display will switch to pagination mode, for better performances.]" default="20"/>
 		<param name="PAGINATION_NUMBER" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[#Items per page]" description="CONF_MESSAGE[Once in pagination mode, number of items to display per page.]" default="20"/>
 	</server_settings>
-	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
+	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Imap\imapAccessDriver"/>
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/action[@name='ls'] | actions/action[@name='download'] | actions/action[@name='open_with'] | actions/action[@name='stat'] | actions/action[@name='get_content'] | actions/action[@name='copy']" exclude=""/>
@@ -27,12 +27,12 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
-			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
+			<serverCallback hookName="node.info" methodName="enrichMetadata"/>
+			<serverCallback hookName="dl.localname" methodName="attachmentDLName"/>
 		</hooks>
 	</registry_contributions>
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="imapAccessWrapper" protocol="ajxp.mailbox"/>
+    <class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Imap\imapAccessWrapper" protocol="ajxp.mailbox"/>
 </ajxpdriver>

@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -54,6 +57,7 @@ class PublicletCounter
         $counters = self::loadCounters();
         $counters[$publiclet]  = 0;
         self::saveCounters($counters);
+        return null;
     }
 
     public static function delete($publiclet)
@@ -64,6 +68,7 @@ class PublicletCounter
             unset($counters[$publiclet]);
             self::saveCounters($counters);
         }
+        return null;
     }
 
     private static function isActive()

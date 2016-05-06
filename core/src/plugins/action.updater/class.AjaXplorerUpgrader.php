@@ -19,6 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Utils;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
@@ -324,9 +327,7 @@ class AjaXplorerUpgrader
     public function upgradeDB()
     {
         $confDriver = ConfService::getConfStorageImpl();
-        $authDriver = ConfService::getAuthDriverImpl();
-        $logger = AJXP_Logger::getInstance();
-        if (is_a($confDriver, "sqlConfDriver")) {
+        if ($confDriver instanceof \Pydio\Conf\Sql\sqlConfDriver) {
             $conf = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
             if(!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
             switch ($conf["driver"]) {

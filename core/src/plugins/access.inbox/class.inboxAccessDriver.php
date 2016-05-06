@@ -18,13 +18,21 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Driver\StreamProvider\Inbox;
+
+use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\ContentFilter;
+use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Auth\Core\AuthService;
+use Pydio\Conf\Core\ConfService;
+use Pydio\Core\AJXP_Controller;
+use Pydio\Core\AJXP_Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
-    private static $stats;
 
     public function initRepository()
     {
@@ -85,7 +93,7 @@ class inboxAccessDriver extends fsAccessDriver
                     }
                     AJXP_Controller::applyHook("node.read", array(&$node));
                     $stat = stat($url);
-                }catch (Exception $e){
+                }catch (\Exception $e){
                     $stat = stat(AJXP_Utils::getAjxpTmpDir());
                 }
                 if(is_array($stat) && AuthService::getLoggedUser() != null){
@@ -154,7 +162,7 @@ class inboxAccessDriver extends fsAccessDriver
                 $node->getRepository()->driverInstance = null;
                 try{
                     ConfService::loadDriverForRepository($node->getRepository());
-                }catch (Exception $e){
+                }catch (\Exception $e){
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                 }

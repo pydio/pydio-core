@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Access\Core;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -26,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @subpackage Core
  * @interface AjxpWrapper
  */
-interface AjxpWrapper
+interface IAjxpWrapper
 {
     /**
      * Get a "usable" reference to a file : the real file or a tmp copy.
