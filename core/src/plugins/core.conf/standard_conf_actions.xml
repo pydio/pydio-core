@@ -656,26 +656,36 @@
                         <div class="panelHeader">#{shared_string}</div>
                         <div id="ajxp_workspace_info_panel_content"></div>
                         <script>
-                            bufferCallback("ajxp_load_repo_info_timer", 300,function(){
-                                if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
-                                    return;
-                                }
-                                if(!ajaxplorer.user) return;
-                                $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
-                                var conn = new Connexion();
-                                conn.setParameters({get_action:'load_repository_info'});
-                                conn.onComplete = function(transport){
-                                    $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
-                                    if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
-                                        var data = transport.responseJSON;
-                                        if(!data['core.users']['groups']){
-                                            data['core.users']['groups'] = 0;
-                                        }
-                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['users'] + ' <br/> #{external_string}: ' + data['core.users']['groups']);
-                                    }
+                            if(pydio.user) {
+                                var cacheService = MetaCacheService.getInstance();
+                                cacheService.registerMetaStream('workspace.info', 'MANUAL_TRIGGER');
+                                var render = function(data){
+                                    $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['users'] + ' <br/> #{external_string}: ' + data['core.users']['groups']);
                                 };
-                                conn.sendAsync();
-                            });
+                                var repoKey = pydio.user.getActiveRepository();
+                                if(cacheService.hasKey('workspace.info', repoKey)){
+                                    render(cacheService.getByKey('workspace.info', repoKey));
+                                }else{
+                                    bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+                                        if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
+                                            return;
+                                        }
+                                        $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
+                                        PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport){
+                                            $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
+                                            if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
+                                                var data = transport.responseJSON;
+                                                if(!data['core.users']['groups']){
+                                                    data['core.users']['groups'] = 0;
+                                                }
+                                            }
+                                            cacheService.setKey('workspace.info', repoKey, data);
+                                            render(data);
+                                        }, null, {discrete:true});
+                                    });
+                                }
+                            }
+
                         </script>
                     </div>
                 ]]></html>
