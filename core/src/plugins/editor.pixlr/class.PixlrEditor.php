@@ -86,7 +86,7 @@ class PixlrEditor extends AJXP_Plugin
                 "locktype"  => "source"
             );
 
-            require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
+            require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
             $arguments = array();
             $httpClient = new http_class();
             $httpClient->request_method = "POST";

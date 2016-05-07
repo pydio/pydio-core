@@ -108,7 +108,7 @@ function AjaXplorer_autoload($className)
     $className = array_pop(explode("\\", $className));
 
     if($className == "dibi"){
-        require_once(AJXP_BIN_FOLDER."/dibi/dibi.php");
+        require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");
     }
     $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
     if (file_exists($fileName)) {

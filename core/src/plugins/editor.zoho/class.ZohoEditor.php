@@ -121,7 +121,7 @@ class ZohoEditor extends AJXP_Plugin
             $presExt = explode(",", "ppt,pptx,pps,odp,sxi");
             $docExt = explode(",", "doc,docx,rtf,odt,sxw");
 
-            require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
+            require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){

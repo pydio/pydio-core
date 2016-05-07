@@ -22,7 +22,7 @@ namespace Pydio\Core;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-include_once(AJXP_BIN_FOLDER."/securimage/securimage.php");
+include_once(AJXP_BIN_FOLDER."/lib/securimage/securimage.php");
 
 /**
  * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.

@@ -91,7 +91,7 @@ class AJXP_JSPacker
         }
 
         // Pack and write to file
-        require_once("packer/class.JavaScriptPacker.php");
+        require_once(AJXP_BIN_FOLDER."/lib/packer/class.JavaScriptPacker.php");
         $packer = new \JavaScriptPacker($jscode, $mode , true, false);
         $packed = $packer->pack();
         if ($mode == "None") { // css case, hack for I.E.
@@ -107,7 +107,7 @@ class AJXP_JSPacker
 
     public function compactEach($list, $mode){
         $lines = file($list);
-        require_once("packer/class.JavaScriptPacker.php");
+        require_once(AJXP_BIN_FOLDER."/lib/packer/class.JavaScriptPacker.php");
         $fullcode = '';
         foreach($lines as $line){
             $in = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($line,"\n\r");
