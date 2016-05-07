@@ -18,9 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-defined('AJXP_EXEC') or die( 'Access not allowed');
+namespace Pydio\Tests;
 
-require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
+use Pydio\Access\Core\Repository;
+
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package AjaXplorer_Plugins

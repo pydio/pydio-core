@@ -1285,7 +1285,7 @@ class AJXP_Utils
         foreach ($files as $file) {
             require_once($file);
             // Then create the test class
-            $testName = str_replace(".php", "", substr($file, 5));
+            $testName = "Pydio\\Tests\\".str_replace(".php", "", substr($file, 5));
             if(!class_exists($testName)) continue;
             $class = new $testName();
 
@@ -1323,7 +1323,7 @@ class AJXP_Utils
             require_once($file);
             // Then create the test class
             list($accessFolder, $testFileName) = explode("/", $file);
-            $testName = str_replace(".php", "", substr($testFileName, 5) . "Test");
+            $testName = "Pydio\\Tests\\".str_replace(".php", "", substr($testFileName, 5) . "Test");
             $class = new $testName();
             foreach ($repoList as $repository) {
                 if($repository->isTemplate || $repository->getParentId() != null) continue;
