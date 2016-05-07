@@ -59,7 +59,7 @@ spl_autoload_register('AJXP_Sabre_autoload');
 
 
 
-include 'core/classes/sabredav/lib/Sabre/autoload.php';
+include AJXP_BIN_FOLDER.'/sabredav/lib/Sabre/autoload.php';
 
 if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
     $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");

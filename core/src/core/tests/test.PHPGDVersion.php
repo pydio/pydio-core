@@ -21,7 +21,6 @@
 namespace Pydio\Tests;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once('../classes/class.AbstractTest.php');
 
 /**
  * Check whether GD is installed or not

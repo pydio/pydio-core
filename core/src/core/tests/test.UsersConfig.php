@@ -24,7 +24,6 @@ use Pydio\Auth\Core\AuthService;
 use Pydio\Conf\Core\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once('../classes/class.AbstractTest.php');
 
 /**
  * Gather the users configuration

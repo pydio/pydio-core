@@ -965,7 +965,7 @@ class AJXP_Utils
         } else {
             $existingHooks = array();
         }
-        $allPhpFiles1 = self::glob_recursive(AJXP_INSTALL_PATH."/core/classes/*.php");
+        $allPhpFiles1 = self::glob_recursive(AJXP_BIN_FOLDER."/*.php");
         $allPhpFiles2= self::glob_recursive(AJXP_INSTALL_PATH."/plugins/*.php");
         $allPhpFiles3= self::glob_recursive(AJXP_INSTALL_PATH."/conf/*.php");
         $allPhpFiles = array_merge(array_merge($allPhpFiles1, $allPhpFiles2), $allPhpFiles3);

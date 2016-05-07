@@ -23,7 +23,6 @@ namespace Pydio\Tests;
 use Pydio\Conf\Core\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once('../classes/class.AbstractTest.php');
 
 /**
  * Test upload tmp dir
