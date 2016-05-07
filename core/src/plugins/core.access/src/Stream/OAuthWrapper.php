@@ -10,8 +10,6 @@ namespace Pydio\Access\Core\Stream;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
-
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Core\AJXP_Utils;
 use Pydio\Auth\Core\AuthService;

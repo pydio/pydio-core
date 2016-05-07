@@ -31,8 +31,6 @@ use Pydio\Core\AJXP_Exception;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
-
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins

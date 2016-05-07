@@ -23,8 +23,6 @@ namespace Pydio\OCS\Client;
 defined('AJXP_EXEC') or die('Access not allowed');
 defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
 
-require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
-
 use Pydio\Core\AJXP_Utils;
 use GuzzleHttp\Exception\RequestException;
 use Pydio\OCS\Model\RemoteShare;

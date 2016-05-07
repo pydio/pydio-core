@@ -16,7 +16,6 @@
 
 namespace Pydio\Access\WebDAV;
 
-require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
 require_once(AJXP_BIN_FOLDER . '/sabredav/lib/Sabre/autoload.php');
 
 

@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'b40c01b585d23bc9e6c6821c282cfa7e' => $baseDir . '/../../core/classes/sabredav/lib/Sabre/autoload.php',
+    '57d83d9e43e165d0fbbb32906a25c924' => $baseDir . '/../../core/src/sabredav/lib/Sabre/autoload.php',
 );

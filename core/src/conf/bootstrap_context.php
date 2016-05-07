@@ -53,8 +53,10 @@ define("AJXP_PLUGINS_REPOSITORIES_CACHE", AJXP_CACHE_DIR."/plugins_repositories.
 define("AJXP_PLUGINS_MESSAGES_FILE", AJXP_CACHE_DIR."/plugins_messages.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
-define("AJXP_BIN_FOLDER_REL", "core/classes");
-define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
+define("AJXP_BIN_FOLDER_REL", "core/src");
+define("AJXP_VENDOR_FOLDER_REL", "core/vendor");
+define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/src");
+define("AJXP_VENDOR_FOLDER", AJXP_INSTALL_PATH."/core/vendor");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
 define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
@@ -92,6 +94,7 @@ define("HASH_PBKDF2_INDEX", 3);
 // MAKE SURE YOU HAVE PHP.5.3, OPENSSL, AND THAT IT DOES NOT DEGRADE PERFORMANCES
 define("USE_OPENSSL_RANDOM", false);
 
+require_once (AJXP_VENDOR_FOLDER . "/autoload.php");
 $corePlugAutoloads = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/vendor/autoload.php", GLOB_NOSORT);
 if ($corePlugAutoloads !== false && count($corePlugAutoloads)) {
     foreach($corePlugAutoloads as $autoloader){
