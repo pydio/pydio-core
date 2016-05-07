@@ -21,15 +21,15 @@
 namespace Pydio\Access\Driver\DataProvider;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to send a javascript source to the browser
+ * Plugin to send a javascript source to the browser
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -39,7 +39,7 @@ class jsapiAccessDriver extends AbstractAccessDriver
     {
         switch ($action) {
             case "get_js_source" :
-                $jsName = AJXP_Utils::decodeSecureMagic($httpVars["object_name"]);
+                $jsName = Utils::decodeSecureMagic($httpVars["object_name"]);
                 $jsType = $httpVars["object_type"]; // class or interface?
                 $fName = "class.".strtolower($jsName).".js";
                 if ($jsName == "Splitter") {

@@ -19,14 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\UnixProcess;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\UnixProcess;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class AjxpScheduler extends AJXP_Plugin
+class AjxpScheduler extends Plugin
 {
     public $db;
 
@@ -89,7 +89,7 @@ class AjxpScheduler extends AJXP_Plugin
         $sVals = array();
         $repos = ConfService::getRepositoriesList("all");
         foreach ($repos as $repoId => $repoObject) {
-            $sVals[] = $repoId."|". AJXP_Utils::xmlEntities($repoObject->getDisplay());
+            $sVals[] = $repoId."|". Utils::xmlEntities($repoObject->getDisplay());
         }
         $sVals[] = "*|All Repositories";
         $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
@@ -103,7 +103,7 @@ class AjxpScheduler extends AJXP_Plugin
 
     public function getTaskById($tId)
     {
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task) {
             if ( !empty($task["task_id"]) && $task["task_id"] == $tId) {
                 return $task;
@@ -142,7 +142,7 @@ class AjxpScheduler extends AJXP_Plugin
 
     public function countCurrentlyRunning()
     {
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         $count = 0;
         foreach ($tasks as $task) {
             $s = $this->getTaskStatus($task["task_id"]);
@@ -204,7 +204,7 @@ class AjxpScheduler extends AJXP_Plugin
                 $listRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
                 $data["repository_id"] = implode(",", array_keys($listRepos));
             }
-            $process = AJXP_Controller::applyActionInBackground(
+            $process = Controller::applyActionInBackground(
                 $data["repository_id"],
                 $data["action_name"],
                 $data["PARAMS"],
@@ -256,7 +256,7 @@ class AjxpScheduler extends AJXP_Plugin
             //------------------------------------
             case "scheduler_runAll":
 
-                $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+                $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
                 $message = "";
                 $startRunning = $this->countCurrentlyRunning();
                 $statuses = array();
@@ -277,10 +277,10 @@ class AjxpScheduler extends AJXP_Plugin
                 if (ConfService::currentContextIsCommandLine()) {
                     print(date("Y-m-d H:i:s")."\t".$message."\n");
                 } else {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage($message, null);
-                    AJXP_XMLWriter::reloadDataNode();
-                    AJXP_XMLWriter::close();
+                    XMLWriter::header();
+                    XMLWriter::sendMessage($message, null);
+                    XMLWriter::reloadDataNode();
+                    XMLWriter::close();
                 }
 
                 break;
@@ -289,9 +289,9 @@ class AjxpScheduler extends AJXP_Plugin
 
                 $err = -1;
                 $this->runTask($httpVars["task_id"], null, $err, true);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::reloadDataNode();
+                XMLWriter::close();
 
                 break;
 
@@ -342,8 +342,8 @@ class AjxpScheduler extends AJXP_Plugin
     public function listTasks($nodeName, $baseDir)
     {
         $mess = ConfService::getMessages();
-        AJXP_XMLWriter::renderHeaderNode("/$baseDir/$nodeName", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
-        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
+        XMLWriter::renderHeaderNode("/$baseDir/$nodeName", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
+        XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
                  <column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
                  <column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
                  <column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
@@ -353,7 +353,7 @@ class AjxpScheduler extends AJXP_Plugin
                  <column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
                  <column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
         </columns>');
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task) {
 
             $timeArray = $this->getTimeArray($task["schedule"]);
@@ -372,13 +372,13 @@ class AjxpScheduler extends AJXP_Plugin
                 $task["LAST_EXECUTION"] = "n/a";
             }
 
-            AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
+            XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
                 (isSet($task["label"])?$task["label"]:"Action ".$task["action_name"]),
                 true,
                 $task
             );
         }
-        AJXP_XMLWriter::close();
+        XMLWriter::close();
 
     }
 
@@ -397,7 +397,7 @@ class AjxpScheduler extends AJXP_Plugin
 
     public function addOrUpdateTask($taskId, $label, $schedule, $actionName, $repositoryIds, $userId, $paramsArray)
     {
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         if (isSet($taskId)) {
             foreach ($tasks as $index => $task) {
                 if ($task["task_id"] == $taskId) {
@@ -418,25 +418,25 @@ class AjxpScheduler extends AJXP_Plugin
         $data["PARAMS"] = $paramsArray;
         if(isSet($theIndex)) $tasks[$theIndex] = $data;
         else $tasks[] = $data;
-        AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+        Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
     }
 
     public function removeTask($taskId)
     {
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $index => $task) {
             if ($task["task_id"] == $taskId) {
                 unset($tasks[$index]);
                 break;
             }
         }
-        AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+        Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
     }
 
     public function handleTasks($action, $httpVars, $fileVars)
     {
-        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
         switch ($action) {
             case "scheduler_addTask":
                 if (isSet($httpVars["task_id"])) {
@@ -477,22 +477,22 @@ class AjxpScheduler extends AJXP_Plugin
                 }
                 if(isSet($theIndex)) $tasks[$theIndex] = $data;
                 else $tasks[] = $data;
-                AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+                Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage("Successfully added/edited task", null);
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::sendMessage("Successfully added/edited task", null);
+                XMLWriter::reloadDataNode();
+                XMLWriter::close();
 
                 break;
 
             case "scheduler_removeTask" :
 
                 $this->removeTask($httpVars["task_id"]);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage("Successfully removed task", null);
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::sendMessage("Successfully removed task", null);
+                XMLWriter::reloadDataNode();
+                XMLWriter::close();
 
                 break;
 

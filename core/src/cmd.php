@@ -21,13 +21,13 @@
  * Description : Command line access of the framework.
  */
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 if (php_sapi_name() !== "cli") {
@@ -59,9 +59,9 @@ foreach ($argv as $key => $argument) {
     //echo("$key => $argument \n");
     if (preg_match($regex, $argument, $matches)) {
         if ($matches[1] == "-") {
-            $optArgs[trim($matches[2])] = SystemTextEncoding::toUTF8(trim($matches[3]));
+            $optArgs[trim($matches[2])] = TextEncoder::toUTF8(trim($matches[3]));
         } else {
-            $options[trim($matches[2])] = SystemTextEncoding::toUTF8(trim($matches[3]));
+            $options[trim($matches[2])] = TextEncoder::toUTF8(trim($matches[3]));
         }
     }
 }
@@ -154,7 +154,7 @@ if ($optRepoId !== false) {
     }
     try{
         ConfService::switchRootDir($optRepoId, true);
-    }catch(AJXP_Exception $e){}
+    }catch(PydioException $e){}
 } else {
     if ($optStatusFile) {
         file_put_contents($optStatusFile, "ERROR:You must pass a -r argument specifying either a repository id or alias");
@@ -187,9 +187,9 @@ if (AuthService::usersEnabled() && !empty($optUser)) {
         */
     }
     if (isset($loggingResult) && $loggingResult != 1) {
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult($loggingResult, false, false, "");
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult($loggingResult, false, false, "");
+        XMLWriter::close();
         if ($optStatusFile) {
             file_put_contents($optStatusFile, "ERROR:No user logged");
         }
@@ -205,7 +205,7 @@ else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_la
 $mess = ConfService::getMessages();
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-//$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
+//$ajxpDriver = PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
@@ -213,17 +213,16 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
     $loadRepo = ConfService::getRepository();
     $Driver = ConfService::loadDriverForRepository($loadRepo);
 }
-AJXP_PluginsService::getInstance()->initActivePlugins();
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
-$xmlResult = AJXP_Controller::findActionAndApply($optAction, $optArgs, array());
+PluginsService::getInstance()->initActivePlugins();
+$xmlResult = Controller::findActionAndApply($optAction, $optArgs, array());
 if ($xmlResult !== false && $xmlResult != "") {
-    AJXP_XMLWriter::header();
+    XMLWriter::header();
     print($xmlResult);
-    AJXP_XMLWriter::close();
-} else if (isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth) {
-    AJXP_XMLWriter::header();
-    AJXP_XMLWriter::requireAuth();
-    AJXP_XMLWriter::close();
+    XMLWriter::close();
+} else if (isset($requireAuth) && Controller::$lastActionNeedsAuth) {
+    XMLWriter::header();
+    XMLWriter::requireAuth();
+    XMLWriter::close();
 }
 //echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
 //echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
@@ -231,7 +230,7 @@ if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {
 
     if (!empty($nextUsers)) {
         sleep(1);
-        $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
+        $process = Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
         if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
@@ -239,14 +238,14 @@ if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {
     if (!empty($optUserQueue)) {
         sleep(1);
         //echo("Should go to next with $optUserQueue");
-        $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
+        $process = Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
         if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
     if (!empty($nextRepositories)) {
         sleep(1);
-        $process = AJXP_Controller::applyActionInBackground($nextRepositories, $optAction, $optArgs, $originalOptUser, $optStatusFile);
+        $process = Controller::applyActionInBackground($nextRepositories, $optAction, $optArgs, $originalOptUser, $optStatusFile);
         if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }

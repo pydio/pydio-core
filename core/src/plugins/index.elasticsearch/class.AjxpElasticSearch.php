@@ -20,11 +20,11 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -77,7 +77,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         }
 
         if (!empty($specKey)) {
-            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey));
+            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey));
         }
 
         /* Connexion to Elastica Client with the default parameters */
@@ -244,15 +244,15 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
 
-            AJXP_XMLWriter::header();
+            XMLWriter::header();
             foreach ($hits as $hit) {
                 $source = $hit->getSource();
 
                 if ($source["serialized_metadata"] != null) {
                     $meta = unserialize(base64_decode($source["serialized_metadata"]));
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), $meta);
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), array());
                     $tmpNode->loadNodeInfo();
                 }
 
@@ -262,10 +262,10 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 }
 
                 $tmpNode->search_score = sprintf("%0.2f", $hit->getScore());
-                AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                XMLWriter::renderAjxpNode($tmpNode);
             }
 
-            AJXP_XMLWriter::close();
+            XMLWriter::close();
 
         } else if ($actionName == "search_by_keyword") {
 
@@ -330,13 +330,13 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
 
-            AJXP_XMLWriter::header();
+            XMLWriter::header();
             foreach ($hits as $hit) {
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
@@ -344,9 +344,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                XMLWriter::renderAjxpNode($tmpNode);
             }
-            AJXP_XMLWriter::close();
+            XMLWriter::close();
         }
 
     }
@@ -485,10 +485,10 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     if ($copy == false) {
                         $this->currentType->deleteById($hit->getId());
                     }
-                    $newChildURL = str_replace(SystemTextEncoding::toUTF8($oldNode->getUrl()),
-                        SystemTextEncoding::toUTF8($newNode->getUrl()),
+                    $newChildURL = str_replace(TextEncoder::toUTF8($oldNode->getUrl()),
+                        TextEncoder::toUTF8($newNode->getUrl()),
                         $oldChildURL);
-                    $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
+                    $newChildURL = TextEncoder::fromUTF8($newChildURL);
                     $this->createIndexedDocument(new AJXP_Node($newChildURL));
                 }
             }
@@ -632,7 +632,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      */
     public function getIndexedChildrenDocuments($ajxpNode)
     {
-        $testQ = str_replace("/", "AJXPFAKESEP", SystemTextEncoding::toUTF8($ajxpNode->getPath()."/"));
+        $testQ = str_replace("/", "AJXPFAKESEP", TextEncoder::toUTF8($ajxpNode->getPath()."/"));
 
         /* we use a wildcard query to fetch all children documents relatively to their paths */
         $query = new Elastica\Query\Wildcard("node_path", $testQ."*");

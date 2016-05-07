@@ -25,8 +25,8 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -68,7 +68,7 @@ function macerrorSftp($packet)
 
 
 /**
- * AJXP_Plugin to access an ftp server over SSH
+ * Plugin to access an ftp server over SSH
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -90,7 +90,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false)
     {
-        $url = AJXP_Utils::safeParseUrl($path);
+        $url = Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
@@ -103,7 +103,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         if ($basePath[0] != "/") {
             $basePath = "/$basePath";
         }
-        $path = AJXP_Utils::securePath($path);
+        $path = Utils::securePath($path);
         if ($path[0] == "/") {
             $path = substr($path, 1);
         }
@@ -172,7 +172,7 @@ class sftpAccessWrapper extends fsAccessWrapper
     {
         $realPath = self::initPath($path);
         $stat = @stat($realPath);
-        $parts = AJXP_Utils::safeParseUrl($path);
+        $parts = Utils::safeParseUrl($path);
         $repoObject = ConfService::getRepositoryById($parts["host"]);
 
         AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
@@ -248,7 +248,7 @@ class sftpAccessWrapper extends fsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);
@@ -307,7 +307,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      */
     public static function changeMode($path, $chmodValue)
     {
-        $url = AJXP_Utils::safeParseUrl($path);
+        $url = Utils::safeParseUrl($path);
         list($connection, $remote_base_path) = self::getSshConnection($path);
         //var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
         ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
@@ -318,7 +318,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         if ($repoObject != null) {
             $url = array();
         } else {
-            $url = AJXP_Utils::safeParseUrl($path);
+            $url = Utils::safeParseUrl($path);
             $repoId = $url["host"];
             $repoObject = ConfService::getRepositoryById($repoId);
         }

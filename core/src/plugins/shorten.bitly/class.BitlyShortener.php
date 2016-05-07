@@ -21,9 +21,9 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -32,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Shorten
  */
-class BitlyShortener extends AJXP_Plugin
+class BitlyShortener extends Plugin
 {
     public function postProcess($action, $httpVars, $params)
     {
@@ -58,7 +58,7 @@ class BitlyShortener extends AJXP_Plugin
         $format = 'json';
         $version = '2.0.1';
         $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
-        $response = AJXP_Utils::getRemoteContent($bitly);
+        $response = Utils::getRemoteContent($bitly);
         $json = json_decode($response, true);
         if (isSet($json['results'][$url]['shortUrl'])) {
             print($json['results'][$url]['shortUrl']);

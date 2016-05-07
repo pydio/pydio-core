@@ -21,13 +21,13 @@
 
 use Pydio\Access\Core\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class PowerFSController extends AJXP_Plugin
+class PowerFSController extends Plugin
 {
 
     public function performChecks(){
@@ -48,7 +48,7 @@ class PowerFSController extends AJXP_Plugin
     {
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
-        $dir = AJXP_Utils::decodeSecureMagic($dir);
+        $dir = Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
@@ -66,37 +66,37 @@ class PowerFSController extends AJXP_Plugin
                     $percent = intval(file_get_contents($percentFile));
                 }
                 if ($percent < 100) {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::triggerBgAction(
+                    XMLWriter::header();
+                    XMLWriter::triggerBgAction(
                         "monitor_compression",
                         $httpVars,
                         $mess["powerfs.1"]." ($percent%)",
                         true,
                         1);
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                 } else {
                     @unlink($percentFile);
-                    AJXP_XMLWriter::header();
+                    XMLWriter::header();
                     if ($httpVars["on_end"] == "reload") {
-                        AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
+                        XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
                     } else {
-                        $archiveName = AJXP_Utils::sanitize($httpVars["archive_name"], AJXP_SANITIZE_FILENAME);
+                        $archiveName = Utils::sanitize($httpVars["archive_name"], AJXP_SANITIZE_FILENAME);
                         $archiveName = str_replace("'", "\'", $archiveName);
                         $jsCode = "
                             PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$httpVars["ope_id"]."',archive_name:'".$archiveName."'});
                         ";
-                        AJXP_XMLWriter::triggerBgJsAction($jsCode, $mess["powerfs.3"], true);
-                        AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
+                        XMLWriter::triggerBgJsAction($jsCode, $mess["powerfs.3"], true);
+                        XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
                     }
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                 }
 
                 break;
 
             case "postcompress_download":
 
-                $archive = AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
-                $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $archive = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 if (is_file($archive)) {
                     register_shutdown_function("unlink", $archive);
                     $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
@@ -108,24 +108,24 @@ class PowerFSController extends AJXP_Plugin
             case "compress" :
             case "precompress" :
 
-                $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
                     $opeId = substr(md5(time()),0,10);
                     $httpVars["ope_id"] = $opeId;
-                    AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
-                    AJXP_XMLWriter::header();
+                    Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
+                    XMLWriter::header();
                     $bgParameters = array(
-                        "dir" => SystemTextEncoding::toUTF8($dir),
-                        "archive_name"  => SystemTextEncoding::toUTF8($archiveName),
+                        "dir" => TextEncoder::toUTF8($dir),
+                        "archive_name"  => TextEncoder::toUTF8($archiveName),
                         "on_end" => (isSet($httpVars["on_end"])?$httpVars["on_end"]:"reload"),
                         "ope_id" => $opeId
                     );
-                    AJXP_XMLWriter::triggerBgAction(
+                    XMLWriter::triggerBgAction(
                         "monitor_compression",
                         $bgParameters,
                         $mess["powerfs.1"]." (0%)",
                         true);
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                     session_write_close();
                     exit();
                 }
@@ -158,11 +158,11 @@ class PowerFSController extends AJXP_Plugin
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
                 if (!$compressLocally) {
-                    $archiveName = AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".$archiveName;
+                    $archiveName = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".$archiveName;
                 }
                 chdir($rootDir);
                 $cmd = $this->getFilteredOption("ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
-                $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if ((!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) && stripos(PHP_OS, "win") === false) {
                     $cmd .= " -x .\*";

@@ -20,8 +20,8 @@
  */
 namespace Pydio\Access\Core;
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -115,7 +115,7 @@ class UserSelection
             if(strpos($v, "base64encoded:") === 0){
                 $v = base64_decode(array_pop(explode(':', $v, 2)));
             }
-            $this->files[] = AJXP_Utils::decodeSecureMagic($v);
+            $this->files[] = Utils::decodeSecureMagic($v);
             $this->isUnique = true;
             //return ;
         }
@@ -126,7 +126,7 @@ class UserSelection
                 if(strpos($v, "base64encoded:") === 0){
                     $v = base64_decode(array_pop(explode(':', $v, 2)));
                 }
-                $this->files[] = AJXP_Utils::decodeSecureMagic($v);
+                $this->files[] = Utils::decodeSecureMagic($v);
                 $index ++;
             }
             $this->isUnique = false;
@@ -138,19 +138,19 @@ class UserSelection
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
             foreach($array["nodes"] as $value){
-                $this->files[] = AJXP_Utils::decodeSecureMagic($value);
+                $this->files[] = Utils::decodeSecureMagic($value);
             }
             $this->isUnique = count($this->files) == 1;
         }
         if (isSet($array[$this->dirPrefix])) {
-            $this->dir = AJXP_Utils::securePath($array[$this->dirPrefix]);
+            $this->dir = Utils::securePath($array[$this->dirPrefix]);
             if ($test = $this->detectZip($this->dir)) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];
             }
         } else if (!$this->isEmpty() && $this->isUnique()) {
-            if ($test = $this->detectZip(AJXP_Utils::safeDirname($this->files[0]))) {
+            if ($test = $this->detectZip(Utils::safeDirname($this->files[0]))) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];
@@ -180,7 +180,7 @@ class UserSelection
      */
     public function getZipPath($decode = false)
     {
-        if($decode) return AJXP_Utils::decodeSecureMagic($this->zipFile);
+        if($decode) return \Pydio\Core\Utils\Utils::decodeSecureMagic($this->zipFile);
         else return $this->zipFile;
     }
 
@@ -191,7 +191,7 @@ class UserSelection
      */
     public function getZipLocalPath($decode = false)
     {
-        if($decode) return AJXP_Utils::decodeSecureMagic($this->localZipPath);
+        if($decode) return Utils::decodeSecureMagic($this->localZipPath);
         else return $this->localZipPath;
     }
     /**
@@ -232,7 +232,7 @@ class UserSelection
             throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
         }
         $user = AuthService::getLoggedUser();
-        if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($this->repository->getId())) {
+        if (!\Pydio\Core\Services\AuthService::usersEnabled() && $user!=null && !$user->canWrite($this->repository->getId())) {
             throw new \Exception("You have no right on this action.");
         }
 

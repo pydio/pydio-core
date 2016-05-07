@@ -23,16 +23,16 @@ namespace Pydio\Access\Driver\StreamProvider\RemoteFS;
 
 use HttpClient;
 use Pydio\Access\Core\IAjxpWrapper;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a remote server that implements Pydio API
+ * Plugin to access a remote server that implements Pydio API
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -54,12 +54,12 @@ class remote_fsAccessWrapper implements IAjxpWrapper
 
     public static function getRealFSReference($path, $persistent = FALSE)
     {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
         $tmpHandle = fopen($tmpFile, "wb");
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);
         if (!$persistent) {
-            register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }
@@ -75,7 +75,7 @@ class remote_fsAccessWrapper implements IAjxpWrapper
         $parts = $fake->parseUrl($path);
         $client = $fake->createHttpClient();
         $client->writeContentToStream($stream);
-        $client->get($fake->path."?get_action=get_content&file=".AJXP_Utils::securePath($parts["path"]));
+        $client->get($fake->path."?get_action=get_content&file=".Utils::securePath($parts["path"]));
         $client->clearContentDestStream();
     }
 
@@ -87,9 +87,9 @@ class remote_fsAccessWrapper implements IAjxpWrapper
             $this->crtParameters = array(
                 "get_action"=>"put_content",
                 "encode"	=> "base64",
-                "file" => urldecode(AJXP_Utils::securePath($parts["path"]))
+                "file" => urldecode(Utils::securePath($parts["path"]))
             );
-            $tmpFileBuffer = realpath(AJXP_Utils::getAjxpTmpDir()).md5(time());
+            $tmpFileBuffer = realpath(Utils::getAjxpTmpDir()).md5(time());
             $this->postFileData = $tmpFileBuffer;
             $this->fp = fopen($tmpFileBuffer, "w");
         } else {
@@ -158,7 +158,7 @@ class remote_fsAccessWrapper implements IAjxpWrapper
     {
         $parts = $this->parseUrl($path);
         $client = $this->createHttpClient();
-        $client->get($this->path."?get_action=stat&file=".AJXP_Utils::securePath($parts["path"]));
+        $client->get($this->path."?get_action=stat&file=".Utils::securePath($parts["path"]));
         $json = $client->getContent();
         $decode = json_decode($json, true);
         return $decode;
@@ -224,7 +224,7 @@ class remote_fsAccessWrapper implements IAjxpWrapper
                 $wallet = $loggedUser->getPref("AJXP_WALLET");
                 if (is_array($wallet) && isSet($wallet[$this->repositoryId]["AUTH_USER"])) {
                     $this->user = $wallet[$this->repositoryId]["AUTH_USER"];
-                    $this->password = AJXP_Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$this->repositoryId]["AUTH_PASS"]);
+                    $this->password = Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$this->repositoryId]["AUTH_PASS"]);
                 }
             }
         }
@@ -234,7 +234,7 @@ class remote_fsAccessWrapper implements IAjxpWrapper
             $this->password = $repository->getOption("AUTH_PASS");
         }
         if (!isSet($this->user) || $this->user=="") {
-            throw new AJXP_Exception("Cannot find user/pass for Http access!");
+            throw new PydioException("Cannot find user/pass for Http access!");
         }
 
         $this->host = $repository->getOption("HOST");
@@ -254,7 +254,7 @@ class remote_fsAccessWrapper implements IAjxpWrapper
      */
     protected function createHttpClient()
     {
-        require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
+        require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
         $httpClient = new HttpClient($this->host);
         $httpClient->cookie_host = $this->host;
         $httpClient->timeout = 50;

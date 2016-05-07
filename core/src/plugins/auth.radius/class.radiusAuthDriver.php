@@ -1,8 +1,8 @@
 <?php
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -76,9 +76,9 @@ class radiusAuthDriver extends AbstractAuthDriver
         $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
         AuthService::disconnect();
         session_write_close();
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult(2);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult(2);
+        XMLWriter::close();
     }
     public function prepareRequest($res, $login, $pass, $seed)
     {

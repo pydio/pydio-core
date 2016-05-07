@@ -20,7 +20,7 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 define('AJXP_SHARED_META_NAMESPACE', 'ajxp_shared');

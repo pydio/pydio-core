@@ -21,12 +21,12 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Cache;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocalCache;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class IMagickPreviewer extends AJXP_Plugin
+class IMagickPreviewer extends Plugin
 {
     protected $extractAll = false;
     protected $onTheFly = false;
@@ -89,10 +89,10 @@ class IMagickPreviewer extends AJXP_Plugin
 
             if ($this->extractAll) {
                 $node = new AJXP_Node($file);
-                AJXP_Controller::applyHook("node.read", array($node));
+                Controller::applyHook("node.read", array($node));
             }
 
-            $cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, array($this, "generateJpegsCallback"));
+            $cache = LocalCache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, array($this, "generateJpegsCallback"));
             $cacheData = $cache->getData();
 
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view
@@ -121,9 +121,9 @@ class IMagickPreviewer extends AJXP_Plugin
             }
 
         } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
-            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
-                $srcfile = AJXP_Utils::decodeSecureMagic($httpVars["src_file"]);
+                $srcfile = Utils::decodeSecureMagic($httpVars["src_file"]);
                 if($repository->hasContentFilter()){
                     $contentFilter = $repository->getContentFilter();
                     $srcfile = $contentFilter->filterExternalPath($srcfile);
@@ -165,8 +165,8 @@ class IMagickPreviewer extends AJXP_Plugin
         // Should remove imagick cache file
         if(!$this->handleMime($oldFile)) return;
         if ($newNode == null || $copy == false) {
-            AJXP_Cache::clearItem("imagick_thumb", $oldFile);
-            $cache = AJXP_Cache::getItem("imagick_full", $oldFile, false);
+            LocalCache::clearItem("imagick_thumb", $oldFile);
+            $cache = LocalCache::getItem("imagick_full", $oldFile, false);
             $prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());
             $files = $this->listExtractedJpg($oldFile, $prefix);
             foreach ($files as $file) {
@@ -267,7 +267,7 @@ class IMagickPreviewer extends AJXP_Plugin
         $isStream = (preg_match( "!^$wrappers_re://!", $targetFile ) === 1);
         if ($isStream) {
             $backToStreamTarget = $targetFile;
-            $targetFile = tempnam(AJXP_Utils::getAjxpTmpDir(), "imagick_").".pdf";
+            $targetFile = tempnam(Utils::getAjxpTmpDir(), "imagick_").".pdf";
         }
         $workingDir = dirname($targetFile);
         $out = array();
@@ -288,7 +288,7 @@ class IMagickPreviewer extends AJXP_Plugin
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
                 } else {
-                    $unoconv =  "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                    $unoconv =  "HOME=".Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
                 putenv('LC_CTYPE='.AJXP_LOCALE);
                 exec($unoconv, $out, $return);
@@ -328,10 +328,10 @@ class IMagickPreviewer extends AJXP_Plugin
         session_write_close(); // Be sure to give the hand back
         exec($cmd, $out, $return);
         if (is_array($out) && count($out)) {
-            throw new AJXP_Exception(implode("\n", $out));
+            throw new PydioException(implode("\n", $out));
         }
         if(!(is_file($tmpFileThumb) || is_file(str_replace(".jpg", "-0.jpg", $tmpFileThumb)))){
-            throw new AJXP_Exception("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getFilteredOption("IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
+            throw new PydioException("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getFilteredOption("IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
         }
         if (!$this->extractAll) {
             rename($tmpFileThumb, $targetFile);

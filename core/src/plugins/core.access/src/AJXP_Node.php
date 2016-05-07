@@ -22,9 +22,9 @@ namespace Pydio\Access\Core;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
 
@@ -156,7 +156,7 @@ class AJXP_Node
     {
         if (!isSet($this->_metaStore)) {
             $this->getDriver();
-            $this->_metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+            $this->_metaStore = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         }
         return $this->_metaStore;
     }
@@ -183,7 +183,7 @@ class AJXP_Node
                 if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
                 $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
             }
-            AJXP_Controller::applyHook("node.meta_change", array(&$this));
+            Controller::applyHook("node.meta_change", array(&$this));
         }
     }
 
@@ -201,7 +201,7 @@ class AJXP_Node
             if ($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])) {
                 unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
             }
-            AJXP_Controller::applyHook("node.meta_change", array(&$this));
+            Controller::applyHook("node.meta_change", array(&$this));
         }
     }
 
@@ -414,18 +414,18 @@ class AJXP_Node
             return;
         }
         if (!empty($this->_wrapperClassName)) {
-            $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
+            $registered = PluginsService::getInstance()->getRegisteredWrappers();
             if (!isSet($registered[$this->getScheme()])) {
                 $driver = $this->getDriver();
                 if(is_object($driver)) $driver->detectStreamWrapper(true);
             }
         }
-        AJXP_Controller::applyHook("node.info.start", array(&$this, $contextNode, $details));
+        Controller::applyHook("node.info.start", array(&$this, $contextNode, $details));
         if($this->nodeInfoLoaded && !$forceRefresh){
             return;
         }
-        AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
-        AJXP_Controller::applyHook("node.info.end", array(&$this, $contextNode, $details));
+        Controller::applyHook("node.info", array(&$this, $contextNode, $details));
+        Controller::applyHook("node.info.end", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $details;
     }
@@ -441,7 +441,7 @@ class AJXP_Node
         $this->realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($this->_url, true);
             $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
-                register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $this->realFilePointer);
+                register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $this->realFilePointer);
             }
         }
         return $this->realFilePointer;
@@ -603,7 +603,7 @@ class AJXP_Node
         }
 
         if (strstr($this->urlParts["scheme"], "ajxp.")!==false) {
-            $pServ = AJXP_PluginsService::getInstance();
+            $pServ = PluginsService::getInstance();
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
             $this->_wrapperClassName = "AJXP_MetaStreamWrapper";

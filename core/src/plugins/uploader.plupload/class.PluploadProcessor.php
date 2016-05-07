@@ -36,15 +36,15 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class PluploadProcessor extends AJXP_Plugin
+class PluploadProcessor extends Plugin
 {
 // 15 minutes execution time
 //@set_time_limit(15 * 60);
@@ -55,7 +55,7 @@ class PluploadProcessor extends AJXP_Plugin
     public function unifyChunks($action, &$httpVars, &$fileVars)
     {
 
-            $filename = AJXP_Utils::decodeSecureMagic($httpVars["name"]);
+            $filename = Utils::decodeSecureMagic($httpVars["name"]);
 
             $tmpName = $fileVars["file"]["tmp_name"];
             $chunk = $httpVars["chunk"];
@@ -68,14 +68,14 @@ class PluploadProcessor extends AJXP_Plugin
                 return false;
             }
             $userSelection = new UserSelection($repository);
-            $dir = AJXP_Utils::securePath($httpVars["dir"]);
+            $dir = Utils::securePath($httpVars["dir"]);
             $destStreamURL = $userSelection->currentBaseUrl().$dir."/";
 
             $driver = ConfService::loadDriverForRepository($repository);
             $remote = false;
             if (method_exists($driver, "storeFileToCopy")) {
                 $remote = true;
-                $destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($repository->getOption("TMP_UPLOAD"));
+                $destCopy = XMLWriter::replaceAjxpXmlKeywords($repository->getOption("TMP_UPLOAD"));
                 // Make tmp folder a bit more unique using secure_token
                 $tmpFolder = $destCopy."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){
@@ -85,7 +85,7 @@ class PluploadProcessor extends AJXP_Plugin
                 $fileVars["file"]["destination"] = base64_encode($dir);
             }else if(AJXP_MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
                 $remote = true;
-                $tmpFolder = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
+                $tmpFolder = Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){
                     @mkdir($tmpFolder, 0700, true);
                 }
@@ -152,21 +152,21 @@ class PluploadProcessor extends AJXP_Plugin
             /* we apply the hook if we are uploading the last chunk */
             if($chunk == $chunks-1){
                 if(!$remote){
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
+                    Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
                 }else{
                     if(method_exists($driver, "storeFileToCopy")){
                         $fileVars["file"]["tmp_name"] = $target;
                         $fileVars["file"]["name"] = $filename;
                         $driver->storeFileToCopy($fileVars["file"]);
-                        AJXP_Controller::findActionAndApply("next_to_remote", array(), array());
+                        Controller::findActionAndApply("next_to_remote", array(), array());
                     }else{
                         // Remote Driver case: copy temp file to destination
                         $node = new AJXP_Node($destStreamURL.$filename);
-                        AJXP_Controller::applyHook("node.before_create", array($node, filesize($target)));
-                        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destStreamURL)));
+                        Controller::applyHook("node.before_create", array($node, filesize($target)));
+                        Controller::applyHook("node.before_change", array(new AJXP_Node($destStreamURL)));
                         $res = copy($target, $destStreamURL.$filename);
                         if($res) @unlink($target);
-                        AJXP_Controller::applyHook("node.change", array(null, $node, false));
+                        Controller::applyHook("node.change", array(null, $node, false));
                     }
                 }
             }

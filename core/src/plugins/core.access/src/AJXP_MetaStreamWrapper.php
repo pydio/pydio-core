@@ -21,8 +21,8 @@
 
 namespace Pydio\Access\Core;
 
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -152,7 +152,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         if(isSet($metaWrappers[$scheme])){
             $wrapper = $metaWrappers[$scheme];
         }else{
-            $wrapper = AJXP_PluginsService::getInstance()->getWrapperClassName($scheme);
+            $wrapper = PluginsService::getInstance()->getWrapperClassName($scheme);
         }
         if(empty($wrapper)) {
             throw new \Exception("Cannot find any wrapper for the scheme " . $scheme . " in context " . $context);

@@ -19,11 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Authfront\Core;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-abstract class AbstractAuthFrontend extends AJXP_Plugin {
+abstract class AbstractAuthFrontend extends Plugin {
 
     /**
      * Try to authenticate the user based on various external parameters

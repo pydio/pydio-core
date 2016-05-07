@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Disclaimer
  */
-class DisclaimerProvider extends AJXP_Plugin
+class DisclaimerProvider extends Plugin
 {
 
     public function toggleDisclaimer($actionName, $httpVars, $fileVars){
@@ -57,9 +57,9 @@ class DisclaimerProvider extends AJXP_Plugin
             $res = ConfService::switchUserToActiveRepository($u, $passId);
             if (!$res) {
                 AuthService::disconnect();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::requireAuth(true);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::requireAuth(true);
+                XMLWriter::close();
             }
             ConfService::getInstance()->invalidateLoadedRepositories();
 
@@ -68,9 +68,9 @@ class DisclaimerProvider extends AJXP_Plugin
             $u->save("superuser");
 
             AuthService::disconnect();
-            AJXP_XMLWriter::header();
-            AJXP_XMLWriter::requireAuth(true);
-            AJXP_XMLWriter::close();
+            XMLWriter::header();
+            XMLWriter::requireAuth(true);
+            XMLWriter::close();
         }
     }
 

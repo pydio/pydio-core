@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Controller;
 
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Core
  *
  */
-class AJXP_ShutdownScheduler
+class ShutdownScheduler
 {
     private static $instance;
 
@@ -39,11 +39,11 @@ class AJXP_ShutdownScheduler
 
     /**
      * @static
-     * @return AJXP_ShutdownScheduler
+     * @return ShutdownScheduler
      */
     public static function getInstance()
     {
-        if(self::$instance == null) self::$instance = new AJXP_ShutdownScheduler();
+        if(self::$instance == null) self::$instance = new ShutdownScheduler();
         return self::$instance;
     }
 

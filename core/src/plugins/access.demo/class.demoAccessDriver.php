@@ -22,7 +22,7 @@
 namespace Pydio\Access\Driver\StreamProvider\FS;
 
 use Pydio\Access\Core\Repository;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -30,7 +30,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Access
  * @class demoAccessDriver
- * AJXP_Plugin to access a filesystem with all write actions disabled
+ * Plugin to access a filesystem with all write actions disabled
  */
 class demoAccessDriver extends fsAccessDriver
 {
@@ -55,7 +55,7 @@ class demoAccessDriver extends fsAccessDriver
             case "mkfile":
             case "chmod":
             case "compress":
-                return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
+                return XMLWriter::sendMessage(null, $errorMessage, false);
             break;
 
             //------------------------------------

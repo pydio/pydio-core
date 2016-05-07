@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Controller\Controller;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -63,7 +63,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             $name = ltrim($name, "/");
             AJXP_Logger::debug("CREATE FILE $name");
 
-            AJXP_Controller::findActionAndApply("mkfile", array(
+            Controller::findActionAndApply("mkfile", array(
                 "dir" => $this->path,
                 "filename" => $name
             ), array());
@@ -111,7 +111,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             $this->children = null;
         }
 
-        AJXP_Controller::findActionAndApply("mkdir", array(
+        Controller::findActionAndApply("mkdir", array(
             "dir" => $this->path,
             "dirname" => $name
         ), array());
@@ -173,7 +173,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
         $this->children = $contents;
 
         $ajxpNode = new AJXP_Node($this->getUrl());
-        AJXP_Controller::applyHook("node.read", array(&$ajxpNode));
+        Controller::applyHook("node.read", array(&$ajxpNode));
 
         return $contents;
 

@@ -18,12 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\CaptchaProvider;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\CaptchaProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -36,7 +36,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
             return false;
         }
-        if(AJXP_Utils::userAgentIsNativePydioApp()){
+        if(Utils::userAgentIsNativePydioApp()){
             return false;
         }
 
@@ -96,9 +96,9 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
             AuthService::refreshRememberCookie($loggedUser);
         }
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
+        XMLWriter::close();
 
         if($loggingResult > 0 && $loggedUser != null){
 
@@ -148,16 +148,16 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $res = ConfService::switchUserToActiveRepository($u, $passId);
             if (!$res) {
                 AuthService::disconnect();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::requireAuth(true);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::requireAuth(true);
+                XMLWriter::close();
             }
             ConfService::getInstance()->invalidateLoadedRepositories();
         }else{
             AuthService::disconnect();
-            AJXP_XMLWriter::header();
-            AJXP_XMLWriter::requireAuth(true);
-            AJXP_XMLWriter::close();
+            XMLWriter::header();
+            XMLWriter::requireAuth(true);
+            XMLWriter::close();
         }
 
     }

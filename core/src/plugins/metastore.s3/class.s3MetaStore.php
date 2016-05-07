@@ -20,7 +20,7 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 

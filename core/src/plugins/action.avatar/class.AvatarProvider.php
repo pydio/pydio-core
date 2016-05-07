@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -30,7 +30,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Avatar
  */
-class AvatarProvider extends AJXP_Plugin
+class AvatarProvider extends Plugin
 {
     public function receiveAction($action, $httpVars, $filesVars)
     {

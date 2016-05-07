@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -60,7 +60,7 @@ class multiAuthDriver extends AbstractAuthDriver
             $options = $def["OPTIONS"];
             $options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
             $options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];
-            $instance = AJXP_PluginsService::findPlugin("auth", $name);
+            $instance = PluginsService::findPlugin("auth", $name);
             if (!is_object($instance)) {
                 throw new Exception("Cannot find plugin $name for type 'auth'");
             }
@@ -75,7 +75,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         if(!$this->masterSlaveMode){
             // Enable Multiple choice login screen
-            $multi = AJXP_PluginsService::getInstance()->findPluginById("authfront.multi");
+            $multi = PluginsService::getInstance()->findPluginById("authfront.multi");
             $multi->enabled = true;
             $multi->options = $this->options;
         }

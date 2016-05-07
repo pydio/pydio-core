@@ -21,16 +21,17 @@
 
 namespace Pydio\Conf\Core;
 
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreConfLoader extends AJXP_Plugin
+class CoreConfLoader extends Plugin
 {
     /**
      * @var AbstractConfDriver
@@ -45,7 +46,7 @@ class CoreConfLoader extends AJXP_Plugin
         if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
                 self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver");
-                AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("conf", self::$confImpl->getName());
+                PluginsService::getInstance()->setPluginUniqueActiveForType("conf", self::$confImpl->getName());
             }
         }
         return self::$confImpl;
@@ -56,14 +57,14 @@ class CoreConfLoader extends AJXP_Plugin
      * @return str filepath
      */
     public static function _getBootstrapFilePath() {
-        return AJXP_Plugin::getWorkDirForPluginId("boot.conf").DIRECTORY_SEPARATOR."bootstrap.json";
+        return Plugin::getWorkDirForPluginId("boot.conf").DIRECTORY_SEPARATOR."bootstrap.json";
     }
 
     /*
      * @return array jsonData
      */
     public static function getBootstrapConf() {
-       return AJXP_Utils::loadSerialFile(self::_getBootstrapFilePath(), false, "json");
+       return \Pydio\Core\Utils\Utils::loadSerialFile(self::_getBootstrapFilePath(), false, "json");
     }
 
     /*
@@ -82,7 +83,7 @@ class CoreConfLoader extends AJXP_Plugin
         if (file_exists($jsonPath)) {
             copy($jsonPath, $jsonPath.".bak");
         }
-        AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
+        \Pydio\Core\Utils\Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
     }
 
 }

@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class LightGuiPlugin extends AJXP_Plugin
+class LightGuiPlugin extends Plugin
 {
     public function performChecks()
     {

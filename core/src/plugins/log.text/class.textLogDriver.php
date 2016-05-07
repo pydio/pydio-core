@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -135,7 +135,7 @@ class textLogDriver extends AbstractLogDriver
 
 
         $this->storageDir = isset($this->options['LOG_PATH']) ? $this->options['LOG_PATH'] : "";
-        $this->storageDir = AJXP_VarsFilter::filter($this->storageDir);
+        $this->storageDir = VarsFilter::filter($this->storageDir);
         $this->storageDir = (rtrim($this->storageDir))."/";
         $this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
         $this->USER_GROUP_RIGHTS = isset($this->options['LOG_CHMOD']) ? $this->options['LOG_CHMOD'] : 0770;
@@ -164,7 +164,7 @@ class textLogDriver extends AbstractLogDriver
      */
     public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
     {
-        if(AJXP_Utils::detectXSS($message)) $message = "XSS Detected in message!";
+        if(Utils::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
         $textMessage .= "$ip\t".strtoupper((string) $level)."\t$user\t$source\t$prefix\t$message\n";
 
@@ -271,7 +271,7 @@ class textLogDriver extends AbstractLogDriver
         $res = "";
         $lines = file($fName);
         foreach ($lines as $line) {
-            $line = AJXP_Utils::xmlEntities($line);
+            $line = Utils::xmlEntities($line);
             $matches = explode("\t",$line,7);
             if (count($matches) == 6){
                 $matches[6] = $matches[5];
@@ -282,7 +282,7 @@ class textLogDriver extends AbstractLogDriver
             if (count($matches) == 7) {
                 $fileName = $parentDir."/".$matches[0];
                 foreach ($matches as $key => $match) {
-                    $match = AJXP_Utils::xmlEntities($match);
+                    $match = Utils::xmlEntities($match);
                     $match = str_replace("\"", "'", $match);
                     $matches[$key] = $match;
                 }
@@ -291,7 +291,7 @@ class textLogDriver extends AbstractLogDriver
                 $date = $matches[0];
                 list($m,$d,$Y,$h,$i,$s) = sscanf($date, "%i-%i-%i %i:%i:%i");
                 $tStamp = mktime($h,$i,$s,$m,$d,$Y);
-                print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" source=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
+                print(TextEncoder::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" source=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
             }
         }
         return ;

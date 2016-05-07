@@ -20,9 +20,9 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -305,7 +305,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                 $this->logError(__FUNCTION__, "Error while trying to open the meta file, maybe a permission problem?");
             }
             if ($scope == AJXP_METADATA_SCOPE_GLOBAL) {
-                 AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));
+                 Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));
             }
         }
     }

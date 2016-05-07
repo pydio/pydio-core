@@ -18,8 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+namespace Pydio\Core\Utils;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_JSPacker
+class JSPacker
 {
     /**
      * Static function for packing all js and css into big files
@@ -37,12 +37,12 @@ class AJXP_JSPacker
     public static function pack()
     {
         // Make sure that the gui.* plugin is loaded
-        AJXP_PluginsService::getInstance()->getPluginsByType("gui");
+        PluginsService::getInstance()->getPluginsByType("gui");
 
         $sList = glob(CLIENT_RESOURCES_FOLDER."/js/*_list.txt");
         foreach ($sList as $list) {
             $scriptName = str_replace("_list.txt", ".js", $list);
-            AJXP_JSPacker::concatListAndPack($list,
+            JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "Normal");
             if(isSet($_GET["separate"])){
@@ -52,7 +52,7 @@ class AJXP_JSPacker
         $sList = glob(AJXP_THEME_FOLDER."/css/*_list.txt");
         foreach ($sList as $list) {
             $scriptName = str_replace("_list.txt", ".css", $list);
-            AJXP_JSPacker::concatListAndPack($list,
+            JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "None");
         }

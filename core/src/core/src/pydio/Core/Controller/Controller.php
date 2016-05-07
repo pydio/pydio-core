@@ -18,11 +18,18 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Controller;
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Controller\ShutdownScheduler;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Services;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -32,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Controller
+class Controller
 {
     /**
      * @var \DOMXPath
@@ -102,7 +109,7 @@ class AJXP_Controller
         if (count($paramValues) < count($paramNames)) {
             $paramNames = array_slice($paramNames, 0, count($paramValues));
         }
-        $paramValues = array_map(array("Pydio\\Core\\SystemTextEncoding", "toUTF8"), $paramValues);
+        $paramValues = array_map(array("Pydio\Core\Utils\TextEncoder", "toUTF8"), $paramValues);
         $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
         return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
 
@@ -152,9 +159,9 @@ class AJXP_Controller
      */
     public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null)
     {
-        $actionName = AJXP_Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
+        $actionName = Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
         if ($actionName == "cross_copy") {
-            $pService = AJXP_PluginsService::getInstance();
+            $pService = PluginsService::getInstance();
             $actives = $pService->getActivePlugins();
             $accessPlug = $pService->getPluginsByType("access");
             if (count($accessPlug)) {
@@ -180,43 +187,43 @@ class AJXP_Controller
         //Check Rights
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
-            if( $actionName != "logout" && AJXP_Controller::actionNeedsRight($action, $xPath, "userLogged", "only") && $loggedUser == null){
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::requireAuth();
-                    AJXP_XMLWriter::close();
+            if( $actionName != "logout" && Controller::actionNeedsRight($action, $xPath, "userLogged", "only") && $loggedUser == null){
+                    XMLWriter::header();
+                    XMLWriter::requireAuth();
+                    XMLWriter::close();
                     exit(1);
                 }
-            if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") &&
+            if( Controller::actionNeedsRight($action, $xPath, "adminOnly") &&
                 ($loggedUser == null || !$loggedUser->isAdmin())){
                     $mess = ConfService::getMessages();
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage(null, $mess[207]);
-                    AJXP_XMLWriter::requireAuth();
-                    AJXP_XMLWriter::close();
+                    XMLWriter::header();
+                    XMLWriter::sendMessage(null, $mess[207]);
+                    XMLWriter::requireAuth();
+                    XMLWriter::close();
                     exit(1);
                 }
-            if( AJXP_Controller::actionNeedsRight($action, $xPath, "read") &&
+            if( Controller::actionNeedsRight($action, $xPath, "read") &&
                 ($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRepositoryId().""))){
-                    AJXP_XMLWriter::header();
+                    XMLWriter::header();
                     if($actionName == "ls" & $loggedUser!=null
                         && $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
-                        AJXP_XMLWriter::close();
+                        XMLWriter::close();
                         exit(1);
                     }
                     $mess = ConfService::getMessages();
-                    AJXP_XMLWriter::sendMessage(null, $mess[208]);
-                    AJXP_XMLWriter::requireAuth();
-                    AJXP_XMLWriter::close();
+                    XMLWriter::sendMessage(null, $mess[208]);
+                    XMLWriter::requireAuth();
+                    XMLWriter::close();
                     exit(1);
                 }
-            if( AJXP_Controller::actionNeedsRight($action, $xPath, "write") &&
+            if( Controller::actionNeedsRight($action, $xPath, "write") &&
                 ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId().""))){
                     $mess = ConfService::getMessages();
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage(null, $mess[207]);
-                    AJXP_XMLWriter::requireAuth();
-                    AJXP_XMLWriter::close();
+                    XMLWriter::header();
+                    XMLWriter::sendMessage(null, $mess[207]);
+                    XMLWriter::requireAuth();
+                    XMLWriter::close();
                     exit(1);
                 }
         }
@@ -232,7 +239,7 @@ class AJXP_Controller
         if ($captureCalls !== false) {
             // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
             // executed AFTER the end of this one.
-            AJXP_ShutdownScheduler::getInstance();
+            ShutdownScheduler::getInstance();
             ob_start();
             $params = array("pre_processor_results" => array(), "post_processor_results" => array());
         }
@@ -284,11 +291,11 @@ class AJXP_Controller
      */
     public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "")
     {
+/*
         if (empty($user)) {
             if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
             else $user = "shared";
         }
-
         $fName = AJXP_DATA_PATH."/plugins/mq.serial/worker-queue";
         $fData = file_get_contents($fName);
         $data = json_decode($fData, true);
@@ -300,6 +307,7 @@ class AJXP_Controller
         );
         file_put_contents($fName, json_encode($data));
         return ;
+*/
 
 
         $token = md5(time());
@@ -326,7 +334,7 @@ class AJXP_Controller
 
         return;
 */
-        if (AuthService::usersEnabled()) {
+        if (Services\AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){
                 $cKey = "\1CDAFx¨op#";
@@ -462,7 +470,7 @@ class AJXP_Controller
      * @param array $fileVars
      * @param null $variableArgs
      * @param bool $defer
-     * @throws AJXP_Exception* @internal param \DOMXPath $xPath
+     * @throws PydioException* @internal param \DOMXPath $xPath
      * @return mixed
      */
     private static function applyCallback($callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
@@ -475,7 +483,7 @@ class AJXP_Controller
             $plugId = $callback->getAttribute("pluginId");
             $methodName = $callback->getAttribute("methodName");
         }
-        $plugInstance = AJXP_PluginsService::findPluginById($plugId);
+        $plugInstance = PluginsService::findPluginById($plugId);
         //return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
         // Do not use call_user_func, it cannot pass parameters by reference.
         if (method_exists($plugInstance, $methodName)) {
@@ -483,13 +491,13 @@ class AJXP_Controller
                 return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
             } else {
                 if ($defer == true) {
-                    AJXP_ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
+                    ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
                 } else {
                     call_user_func_array(array($plugInstance, $methodName), $variableArgs);
                 }
             }
         } else {
-            throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
+            throw new PydioException("Cannot find method $methodName for plugin $plugId!");
         }
         return null;
     }

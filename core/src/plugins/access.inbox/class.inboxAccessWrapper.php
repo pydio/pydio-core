@@ -24,8 +24,8 @@ use ArrayIterator;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -124,7 +124,7 @@ class inboxAccessWrapper implements IAjxpWrapper
         $node = $nodes[ltrim($nodePath, '/')];
 
         if (empty($node) || ! isset($node['url'])) {
-            return AJXP_Utils::getAjxpTmpDir();
+            return Utils::getAjxpTmpDir();
         }
 
         $url = $node['url'];
@@ -137,7 +137,7 @@ class inboxAccessWrapper implements IAjxpWrapper
         }
 
         if(empty($nodePath)){
-            return AJXP_Utils::getAjxpTmpDir();
+            return Utils::getAjxpTmpDir();
         }
 
         if($pydioScheme){
@@ -169,14 +169,14 @@ class inboxAccessWrapper implements IAjxpWrapper
             $realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($url, true);
             if(!$isRemote){
                 $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-                $tmpname = tempnam(AJXP_Utils::getAjxpTmpDir(), "real-file-inbox-pointer").".".$ext;
+                $tmpname = tempnam(Utils::getAjxpTmpDir(), "real-file-inbox-pointer").".".$ext;
                 copy($realFilePointer, $tmpname);
                 $realFilePointer = $tmpname;
             }
             ConfService::loadDriverForRepository(self::$linkNode->getRepository());
             return $realFilePointer;
         }else{
-            $tmpname = tempnam(AJXP_Utils::getAjxpTmpDir(), "real-file-inbox-pointer");
+            $tmpname = tempnam(Utils::getAjxpTmpDir(), "real-file-inbox-pointer");
             $source = fopen($url, "r");
             $dest = fopen($tmpname, "w");
             stream_copy_to_stream($source, $dest);

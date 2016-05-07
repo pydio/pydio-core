@@ -18,37 +18,25 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
-
-use Pydio\Conf\Core\ConfService;
+namespace Pydio\Core\PluginFramework;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+
 /**
- * Custom exception (legacy from php4 when there were no exceptions)
+ * Interface SqlTableProvider
+ * Plugins that need to have their SQL tables installed at startup
+ * must implement this interface.
  * @package Pydio
  * @subpackage Core
+ * @interface SqlTableProvider
  */
-class AJXP_Exception extends \Exception
-{
-    public function __construct($messageString, $messageId = false)
-    {
-        if ($messageId !== false && class_exists("ConfService")) {
-            $messages = ConfService::getMessages();
-            if (array_key_exists($messageId, $messages)) {
-                $messageString = $messages[$messageId];
-            } else {
-                $messageString = $messageId;
-            }
-        }
-        parent::__construct($messageString);
-    }
+interface SqlTableProvider{
 
-    public function errorToXml($mixed)
-    {
-        if ($mixed instanceof \Exception) {
-            throw $this;
-        } else {
-            throw new AJXP_Exception($mixed);
-        }
-    }
+    /**
+     * Install SQL table using a dibi driver data
+     * @param $param array("SQL_DRIVER" => $dibiDriverData)
+     * @return mixed
+     */
+    public function installSQLTables($param);
+
 }

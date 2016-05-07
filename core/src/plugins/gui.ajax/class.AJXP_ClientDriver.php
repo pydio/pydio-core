@@ -22,14 +22,14 @@ namespace Pydio\Gui\Ajax;
 
 use DOMXPath;
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -38,7 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Gui
  */
-class AJXP_ClientDriver extends AJXP_Plugin
+class AJXP_ClientDriver extends Plugin
 {
     private static $loadedBookmarks;
 
@@ -66,7 +66,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = AJXP_Utils::securePath($getValue);
+            $$getName = Utils::securePath($getValue);
         }
         $mess = ConfService::getMessages();
 
@@ -79,9 +79,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 HTMLWriter::charsetHeader();
                 $folder = CLIENT_RESOURCES_FOLDER."/html";
                 if (isSet($httpVars["pluginName"])) {
-                    $folder = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".AJXP_Utils::securePath($httpVars["pluginName"]);
+                    $folder = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".Utils::securePath($httpVars["pluginName"]);
                     if (isSet($httpVars["pluginPath"])) {
-                        $folder.= "/".AJXP_Utils::securePath($httpVars["pluginPath"]);
+                        $folder.= "/".Utils::securePath($httpVars["pluginPath"]);
                     }
                 }
                 $thFolder = AJXP_THEME_FOLDER."/html";
@@ -121,7 +121,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             case "display_doc":
 
                 HTMLWriter::charsetHeader();
-                echo HTMLWriter::getDocFile(AJXP_Utils::securePath(htmlentities($httpVars["doc_file"])));
+                echo HTMLWriter::getDocFile(Utils::securePath(htmlentities($httpVars["doc_file"])));
 
             break;
 
@@ -137,12 +137,12 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 if (!is_file(TESTS_RESULT_FILE)) {
                     $outputArray = array();
                     $testedParams = array();
-                    $passed = AJXP_Utils::runTests($outputArray, $testedParams);
+                    $passed = Utils::runTests($outputArray, $testedParams);
                     if (!$passed && !isset($httpVars["ignore_tests"])) {
-                        AJXP_Utils::testResultsToTable($outputArray, $testedParams);
+                        Utils::testResultsToTable($outputArray, $testedParams);
                         die();
                     } else {
-                        AJXP_Utils::testResultsToFile($outputArray, $testedParams);
+                        Utils::testResultsToFile($outputArray, $testedParams);
                     }
                 }
 
@@ -181,7 +181,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                 }
 
-                AJXP_Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
+                Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
 
                 $confErrors = ConfService::getErrors();
                 if (count($confErrors)) {
@@ -190,7 +190,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 // PRECOMPUTE BOOT CONF
                 if (!preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) && !preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
                     $preloadedBootConf = $this->computeBootConf();
-                    AJXP_Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
+                    Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
                     $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
                 }
 
@@ -202,7 +202,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     foreach ($serverCallbacks as $callback) {
                         $callback->parentNode->removeChild($callback);
                     }
-                    $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+                    $START_PARAMETERS["PRELOADED_REGISTRY"] = XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
                 }
 
                 $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
@@ -235,7 +235,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                         $ADDITIONAL_FRAMEWORKS = "";
                     }
                     $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
-                    $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
+                    $content = XMLWriter::replaceAjxpXmlKeywords($content, false);
                     $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
                     if ($JSON_START_PARAMETERS) {
                         $content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
@@ -249,7 +249,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             case "get_boot_conf":
 
                 $out = array();
-                AJXP_Utils::parseApplicationGetParameters($_GET, $out, $_SESSION);
+                Utils::parseApplicationGetParameters($_GET, $out, $_SESSION);
                 $config = $this->computeBootConf();
                 header("Content-type:application/json;charset=UTF-8");
                 print(json_encode($config));
@@ -374,12 +374,12 @@ class AJXP_ClientDriver extends AJXP_Plugin
         } else {
             $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         }
-        AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), AuthService::getLoggedUser()->getId()));
+        Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), AuthService::getLoggedUser()->getId()));
     }
 
     public static function filterXml(&$value)
     {
-        $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");
+        $instance = PluginsService::getInstance()->findPlugin("gui", "ajax");
         if($instance === false) return null;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];
@@ -397,4 +397,4 @@ class AJXP_ClientDriver extends AJXP_Plugin
     }
 }
 
-AJXP_Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\Ajax\\AJXP_ClientDriver", "filterXml"));
+Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\Ajax\\AJXP_ClientDriver", "filterXml"));

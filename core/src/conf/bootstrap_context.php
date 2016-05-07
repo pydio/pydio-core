@@ -110,12 +110,12 @@ function AjaXplorer_autoload($className)
     if($className == "dibi"){
         require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");
     }
-    $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
+    $fileName = AJXP_BIN_FOLDER."/pydio/Core/"."class.".$className.".php";
     if (file_exists($fileName)) {
         require_once($fileName);
         return;
     }
-    $fileName = AJXP_BIN_FOLDER."/"."interface.".$className.".php";
+    $fileName = AJXP_BIN_FOLDER."/pydio/Core/"."interface.".$className.".php";
     if (file_exists($fileName)) {
         require_once($fileName);
         return;
@@ -133,16 +133,16 @@ function AjaXplorer_autoload($className)
 }
 spl_autoload_register('AjaXplorer_autoload');
 
-include_once (AJXP_BIN_FOLDER."/compat.php");
+include_once(AJXP_INSTALL_PATH . "/core/compat.php");
 
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
 
-AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
+Utils::safeIniSet("session.cookie_httponly", 1);
 
 if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
     include(AJXP_CONF_PATH."/bootstrap_conf.php");
     if (isSet($AJXP_INISET)) {
-        foreach($AJXP_INISET as $key => $value) AJXP_Utils::safeIniSet($key, $value);
+        foreach($AJXP_INISET as $key => $value) Utils::safeIniSet($key, $value);
     }
     if (defined('AJXP_LOCALE')) {
         setlocale(LC_CTYPE, AJXP_LOCALE);

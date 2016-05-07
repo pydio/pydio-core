@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Services;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -27,7 +27,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Cache
+class LocalCache
 {
     protected $cacheDir;
     protected $cacheId;
@@ -36,19 +36,19 @@ class AJXP_Cache
     protected $idComputerCallback;
 
     /**
-     * Create an AJXP_Cache instance
+     * Create an LocalCache instance
      * @param string $pluginId
      * @param string $filepath
      * @param callable $dataCallback A function to generate the data cache. If no callback provided, will simply use the content of the master item as the cache data
      * @param string $idComputerCallback A function to generate the ID of the cache. If not provided, will generate a random hash
-     * @return AJXP_Cache
+     * @return LocalCache
      */
     public static function getItem($pluginId, $filepath, $dataCallback=null, $idComputerCallback = null)
     {
         if ($dataCallback == null) {
-            $dataCallback = array("AJXP_Cache", "simpleCopy");
+            $dataCallback = array("Pydio\\Core\\Services\\LocalCache", "simpleCopy");
         }
-        return new AJXP_Cache($pluginId,$filepath, $dataCallback, $idComputerCallback);
+        return new LocalCache($pluginId,$filepath, $dataCallback, $idComputerCallback);
     }
 
     /**
@@ -72,7 +72,7 @@ class AJXP_Cache
      */
     public static function clearItem($pluginId, $filepath)
     {
-        $inst = new AJXP_Cache($pluginId,$filepath, false);
+        $inst = new LocalCache($pluginId,$filepath, false);
         if (file_exists($inst->getId())) {
             @unlink($inst->getId());
         }
@@ -84,7 +84,6 @@ class AJXP_Cache
      * @param $filepath
      * @param $dataCallback
      * @param null $idComputerCallback
-     * @return void
      */
     function __construct($pluginId, $filepath, $dataCallback, $idComputerCallback = NULL) {
         $this->cacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);

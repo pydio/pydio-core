@@ -20,8 +20,8 @@
  */
 namespace Pydio\Access\Core;
 
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -73,11 +73,11 @@ class ContentFilter {
     }
 
     function getBaseDir(){
-        return AJXP_Utils::safeDirname(array_keys($this->filters)[0]);
+        return \Pydio\Core\Utils\Utils::safeDirname(array_keys($this->filters)[0]);
     }
 
     function getUniquePath(){
-        return AJXP_Utils::safeBasename(array_keys($this->filters)[0]);
+        return \Pydio\Core\Utils\Utils::safeBasename(array_keys($this->filters)[0]);
     }
 
     /**
@@ -122,10 +122,10 @@ class ContentFilter {
     public function toArray(){
         $data = array("filters" => array(), "virtualPaths" => array());
         foreach($this->filters as $k => $v){
-            $data["filters"][SystemTextEncoding::toUTF8($k)] = SystemTextEncoding::toUTF8($v);
+            $data["filters"][\Pydio\Core\Utils\TextEncoder::toUTF8($k)] = \Pydio\Core\Utils\TextEncoder::toUTF8($v);
         }
         foreach($this->virtualPaths as $k => $v){
-            $data["virtualPaths"][SystemTextEncoding::toUTF8($k)] = SystemTextEncoding::toUTF8($v);
+            $data["virtualPaths"][\Pydio\Core\Utils\TextEncoder::toUTF8($k)] = TextEncoder::toUTF8($v);
         }
         return $data;
     }

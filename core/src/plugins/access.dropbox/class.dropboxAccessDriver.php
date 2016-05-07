@@ -24,13 +24,13 @@ namespace Pydio\Access\Driver\StreamProvider\Dropbox;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_UserAlertException;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a dropbox account
+ * Plugin to access a dropbox account
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -55,7 +55,7 @@ class dropboxAccessDriver extends fsAccessDriver
         $this->detectStreamWrapper(true);
         $this->urlBase = "pydio://".$this->repository->getId();
 
-        if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
+        if (!Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
             $this->logError("Dropbox", "The PEAR HTTP_OAuth package must be installed!");
             return;
         }
@@ -91,14 +91,14 @@ class dropboxAccessDriver extends fsAccessDriver
                 //echo "Step 2: You must now redirect the user to:\n";
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 2;
                 $_SESSION['oauth_tokens'] = $tokens;
-                throw new AJXP_UserAlertException("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
+                throw new PydioUserAlertException("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
 
             case 2 :
                 $oauth->setToken($_SESSION['oauth_tokens']);
                 try{
                     $tokens = $oauth->getAccessToken();
                 }catch(\Exception $oauthEx){
-                    throw new AJXP_UserAlertException($oauthEx->getMessage() . ". Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
+                    throw new PydioUserAlertException($oauthEx->getMessage() . ". Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this workspace.");
                 }
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
                 $_SESSION['OAUTH_DROPBOX_TOKENS'] = $tokens;
@@ -112,7 +112,7 @@ class dropboxAccessDriver extends fsAccessDriver
 
     public function performChecks()
     {
-        if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
+        if (!Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
             throw new \Exception("The PEAR HTTP_OAuth package must be installed!");
         }
     }
@@ -137,7 +137,7 @@ class dropboxAccessDriver extends fsAccessDriver
         }else {
             $userId = "shared";
         }
-        return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens");
+        return Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens");
     }
 
     public function setTokens($oauth_tokens)
@@ -145,7 +145,7 @@ class dropboxAccessDriver extends fsAccessDriver
         $repositoryId = $this->repository->getId();
         if(AuthService::usersEnabled()) $userId = AuthService::getLoggedUser()->getId();
         else $userId = "shared";
-        AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
+        Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
 
     public function makeSharedRepositoryOptions($httpVars, $repository)

@@ -22,12 +22,12 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -73,8 +73,8 @@ class LegacyPubliclet
         }
 
         $AJXP_LINK_HAS_PASSWORD = false;
-        $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
-        AJXP_PluginsService::getInstance()->initActivePlugins();
+        $AJXP_LINK_BASENAME = TextEncoder::toUTF8(basename($data["FILE_PATH"]));
+        PluginsService::getInstance()->initActivePlugins();
 
         ConfService::setLanguage($language);
         $mess = ConfService::getMessages();
@@ -124,7 +124,7 @@ class LegacyPubliclet
                 $AJXP_LINK_WRONG_PASSWORD = (isSet($_POST['password']) && ($_POST['password'] != $data["PASSWORD"]));
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
                 $res = ('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>');
-                AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
+                Controller::applyHook("tpl.filter_html", array(&$res));
                 echo($res);
                 return;
             }
@@ -132,7 +132,7 @@ class LegacyPubliclet
             if (!isSet($_GET["dl"])) {
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
                 $res = '<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>';
-                AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
+                Controller::applyHook("tpl.filter_html", array(&$res));
                 echo($res);
                 return;
             }
@@ -159,15 +159,15 @@ class LegacyPubliclet
         $repoObject = $data["REPOSITORY"];
         ConfService::switchRootDir($repoObject->getId());
         ConfService::loadRepositoryDriver();
-        AJXP_PluginsService::getInstance()->initActivePlugins();
+        PluginsService::getInstance()->initActivePlugins();
         try {
-            $params = array("file" => SystemTextEncoding::toUTF8($data["FILE_PATH"]));
+            $params = array("file" => TextEncoder::toUTF8($data["FILE_PATH"]));
             if (isSet($data["PLUGINS_DATA"])) {
                 $params["PLUGINS_DATA"] = $data["PLUGINS_DATA"];
             }
             if (isset($_GET["ct"]) && $_GET["ct"] == "true") {
                 $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                $editors = PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
                 if (count($editors)) {
                     foreach ($editors as $editor) {
                         $xPath = new DOMXPath($editor->ownerDocument);
@@ -180,7 +180,7 @@ class LegacyPubliclet
                     }
                 }
             }
-            AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
+            Controller::findActionAndApply($data["ACTION"], $params, null);
             register_shutdown_function(array("AuthService", "clearTemporaryUser"), $shortHash);
         } catch (Exception $e) {
             AuthService::clearTemporaryUser($shortHash);
@@ -247,7 +247,7 @@ class LegacyPubliclet
             "limit" => $data['DOWNLOAD_LIMIT'],
             "repo_uuid" => $copy->uuid
         ));
-        AJXP_Controller::applyHook("node.share.create", array(
+        Controller::applyHook("node.share.create", array(
             'type' => 'file',
             'repository' => &$copy,
             'accessDriver' => &$accessDriver,

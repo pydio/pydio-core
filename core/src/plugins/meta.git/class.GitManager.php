@@ -21,11 +21,11 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -42,7 +42,7 @@ class GitManager extends AJXP_AbstractMetaSource
 
     public function performChecks()
     {
-        $ex = AJXP_Utils::searchIncludePath("VersionControl/Git.php");
+        $ex = Utils::searchIncludePath("VersionControl/Git.php");
         if (!$ex) {
             throw new Exception("Cannot find PEAR library VersionControl/Git");
         }
@@ -72,11 +72,11 @@ class GitManager extends AJXP_AbstractMetaSource
         $git = new VersionControl_Git($this->repoBase);
         switch ($actionName) {
             case "git_history":
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = Utils::decodeSecureMagic($httpVars["file"]);
                 $file = ltrim($file, "/");
                 $res = $this->gitHistory($git, $file);
-                AJXP_XMLWriter::header();
-                $ic = AJXP_Utils::mimetype($file, "image", false);
+                XMLWriter::header();
+                $ic = Utils::mimetype($file, "image", false);
                 $index = count($res);
                 $mess = ConfService::getMessages();
                 foreach ($res as &$commit) {
@@ -85,16 +85,16 @@ class GitManager extends AJXP_AbstractMetaSource
                     $commit["index"] = $index;
                     $commit["EVENT"] = $mess["meta.git.".$commit["EVENT"]];
                     $index --;
-                    AJXP_XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
+                    XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 break;
             break;
 
             case "git_revertfile":
 
-                $originalFile = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $originalFile = Utils::decodeSecureMagic($httpVars["original_file"]);
+                $file = Utils::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
 
                 $command = $git->getCommand("cat-file");
@@ -109,16 +109,16 @@ class GitManager extends AJXP_AbstractMetaSource
                 $this->executeCommandInStreams($git, $commandLine, $outputStream);
                 fclose($outputStream);
                 $this->commitChanges();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::reloadDataNode();
+                XMLWriter::close();
 
 
             break;
 
             case "git_getfile":
 
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = Utils::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
                 $attach = $httpVars["attach"];
 

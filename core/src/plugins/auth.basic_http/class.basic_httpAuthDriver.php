@@ -18,13 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to authenticate users against the Basic-HTTP mechanism
+ * Plugin to authenticate users against the Basic-HTTP mechanism
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
@@ -60,7 +60,7 @@ class basic_httpAuthDriver extends serialAuthDriver
     }
     public function getLogoutRedirect()
     {
-        return AJXP_VarsFilter::filter($this->getOption("LOGOUT_URL"));
+        return VarsFilter::filter($this->getOption("LOGOUT_URL"));
     }
 
 }

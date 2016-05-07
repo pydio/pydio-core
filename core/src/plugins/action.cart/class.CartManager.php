@@ -19,11 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
-class CartManager extends AJXP_Plugin
+class CartManager extends Plugin
 {
     public function switchAction ($actionName, $httpVars, $fileVars)
     {
@@ -31,18 +31,18 @@ class CartManager extends AJXP_Plugin
 
             // Pipe SEARCH + DOWNLOAD actions.
 
-            $indexer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("index");
+            $indexer = PluginsService::getInstance()->getUniqueActivePluginForType("index");
             if($indexer == false) return;
             $httpVars["return_selection"] = true;
             unset($httpVars["get_action"]);
-            $res = AJXP_Controller::findActionAndApply("search", $httpVars, $fileVars);
+            $res = Controller::findActionAndApply("search", $httpVars, $fileVars);
             if (isSet($res) && is_array($res)) {
                 $newHttpVars = array(
                     "selection_nodes"   => $res,
                     "dir"               => "__AJXP_ZIP_FLAT__/",
                     "archive_name"      => $httpVars["archive_name"]
                 );
-                AJXP_Controller::findActionAndApply("download", $newHttpVars, array());
+                Controller::findActionAndApply("download", $newHttpVars, array());
             }
 
         }

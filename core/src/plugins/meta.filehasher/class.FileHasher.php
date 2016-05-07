@@ -22,12 +22,12 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Cache;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\LocalCache;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -95,7 +95,7 @@ class FileHasher extends AJXP_AbstractMetaSource
     public function initMeta($accessDriver)
     {
         parent::initMeta($accessDriver);
-        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
             throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
@@ -154,7 +154,7 @@ class FileHasher extends AJXP_AbstractMetaSource
             case "filehasher_signature":
                 $file = $selection->getUniqueNode();
                 if(!file_exists($file->getUrl())) break;
-                $cacheItem = AJXP_Cache::getItem("signatures", $file->getUrl(), array($this, "generateSignature"));
+                $cacheItem = LocalCache::getItem("signatures", $file->getUrl(), array($this, "generateSignature"));
                 $data = $cacheItem->getData();
                 header("Content-Type:application/octet-stream");
                 header("Content-Length", strlen($data));
@@ -171,7 +171,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                 $fileUrl = $selection->getUniqueNode()->getUrl();
                 $file = AJXP_MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
-                    $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
+                    $deltaFile = tempnam(Utils::getAjxpTmpDir(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");
                     rsync_generate_delta($signature_delta_file, $file, $deltaFile);
                     $this->logDebug("Computed delta file, size is ".filesize($deltaFile));
@@ -184,7 +184,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                     rsync_patch_file($file, $signature_delta_file, $patched);
                     rename($patched, $file);
                     $node = $selection->getUniqueNode();
-                    AJXP_Controller::applyHook("node.change", array($node, $node, false));
+                    Controller::applyHook("node.change", array($node, $node, false));
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
@@ -229,7 +229,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                             $stat[13] = $stat["hash"] = $hash;
                             $stat = json_encode($stat);
                         }
-                        print json_encode(SystemTextEncoding::toUTF8($path)).':'.$stat . (($index < count($files) -1) ? "," : "");
+                        print json_encode(TextEncoder::toUTF8($path)).':'.$stat . (($index < count($files) -1) ? "," : "");
                     }
                     print '}';
                 }

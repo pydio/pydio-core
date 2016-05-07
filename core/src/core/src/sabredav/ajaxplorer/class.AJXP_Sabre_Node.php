@@ -21,9 +21,9 @@
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Repository;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -105,7 +105,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     {
         ob_start();
         try {
-            AJXP_Controller::findActionAndApply("delete", array(
+            Controller::findActionAndApply("delete", array(
                 "dir"       => dirname($this->path),
                 "file_0"    => $this->path
             ), array());
@@ -139,7 +139,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     {
         $data = $this->getResourceData();
         ob_start();
-        AJXP_Controller::findActionAndApply("rename", array(
+        Controller::findActionAndApply("rename", array(
             "filename_new"      => $name,
             "dir"               => dirname($this->path),
             "file"              => $this->path
@@ -241,7 +241,7 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      */
     protected function getMetastore()
     {
-        $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $metaStore = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($metaStore === false) return false;
         $metaStore->initMeta($this->getAccessDriver());
         return $metaStore;

@@ -25,8 +25,8 @@
  * If you want to run the tests, first comment this line!
  * It is disabled for security purpose
  */
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
 
 die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("base.conf.php");
@@ -245,8 +245,8 @@ if(isSet($_GET["api"])){
     $outputArray = array();
     $testedParams = array();
     $passed = true;
-    $passed = AJXP_Utils::runTests($outputArray, $testedParams);
-    AJXP_Utils::testResultsToTable($outputArray, $testedParams, true);
-    AJXP_Utils::testResultsToFile($outputArray, $testedParams);
+    $passed = Utils::runTests($outputArray, $testedParams);
+    Utils::testResultsToTable($outputArray, $testedParams, true);
+    Utils::testResultsToFile($outputArray, $testedParams);
 
 }

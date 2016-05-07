@@ -1,10 +1,10 @@
 <?php
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-class AntivirusScanner extends AJXP_Plugin
+class AntivirusScanner extends Plugin
 {
     const DEBUG_ON = 0;
 
@@ -100,7 +100,6 @@ class AntivirusScanner extends AJXP_Plugin
                 $filename = substr($filename, 1);
                 echo 'Virus has been found in : '  . $filename .  '         File removed';
             }
-            //$this->logInfo("Upload Virus File" . $this->path, array("file"=>SystemTextEncoding::fromUTF8($dir).DIRECTORY_SEPARATOR.$realpath));
         }
         return;
     }
@@ -215,7 +214,7 @@ class AntivirusScanner extends AJXP_Plugin
      */
     public function setScanMaxSize ()
     {
-        $this->scan_max_size = AJXP_Utils::convertBytes($this->getFilteredOption("SIZE"));
+        $this->scan_max_size = Utils::convertBytes($this->getFilteredOption("SIZE"));
         return ;
     }
 

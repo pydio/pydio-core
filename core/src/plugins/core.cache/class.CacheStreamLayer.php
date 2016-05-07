@@ -22,6 +22,7 @@ namespace Pydio\Cache\Core;
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Core\Services\CacheService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

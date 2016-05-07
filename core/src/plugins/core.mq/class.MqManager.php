@@ -21,13 +21,13 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\UnixProcess;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\UnixProcess;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -51,7 +51,7 @@ websocket.onmessage = function(event){console.log(event.data);};
  * @subpackage Core
  *
  */
-class MqManager extends AJXP_Plugin
+class MqManager extends Plugin
 {
 
     private $wsClient;
@@ -81,7 +81,7 @@ class MqManager extends AJXP_Plugin
     {
         if (!$this->useQueue) {
             $this->logDebug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
-            AJXP_Controller::applyHook("msg.notification", array(&$notification));
+            Controller::applyHook("msg.notification", array(&$notification));
         } else {
             if($this->msgExchanger) $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
         }
@@ -94,7 +94,7 @@ class MqManager extends AJXP_Plugin
         if (is_array($queueObjects)) {
             $this->logDebug("Processing notification queue, ".count($queueObjects)." notifs to handle");
             foreach ($queueObjects as $notification) {
-                AJXP_Controller::applyHook("msg.notification", array(&$notification));
+                Controller::applyHook("msg.notification", array(&$notification));
             }
         }
     }
@@ -120,14 +120,14 @@ class MqManager extends AJXP_Plugin
             } else {
                 $data[] = $newNode;
             }
-            $content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
+            $content = XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
         }
         if ($origNode != null && ! $update && !$copy) {
 
             $repo = $origNode->getRepositoryId();
             $targetUserId = $origNode->getUser();
             $nodePathes[] = $origNode->getPath();
-            $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
+            $content = XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
 
         }
         if (!empty($content) && $repo != "") {
@@ -228,9 +228,9 @@ class MqManager extends AJXP_Plugin
                 if (AuthService::usersEnabled()) {
                     $user = AuthService::getLoggedUser();
                     if ($user == null) {
-                        AJXP_XMLWriter::header();
-                        AJXP_XMLWriter::requireAuth();
-                        AJXP_XMLWriter::close();
+                        XMLWriter::header();
+                        XMLWriter::requireAuth();
+                        XMLWriter::close();
                         return;
                     }
                     $GROUP_PATH = $user->getGroupPath();
@@ -242,7 +242,7 @@ class MqManager extends AJXP_Plugin
                 }
                 $currentRepository = ConfService::getCurrentRepositoryId();
                 $currentRepoMasks = array(); $regexp = null;
-                AJXP_Controller::applyHook("role.masks", array($currentRepository, &$currentRepoMasks, AJXP_Permission::READ));
+                Controller::applyHook("role.masks", array($currentRepository, &$currentRepoMasks, AJXP_Permission::READ));
                 if(count($currentRepoMasks)){
                     $regexps = array();
                     foreach($currentRepoMasks as $path){
@@ -252,15 +252,15 @@ class MqManager extends AJXP_Plugin
                 }
                 $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
                 if($channelRepository != $currentRepository){
-                    AJXP_XMLWriter::header();
+                    XMLWriter::header();
                     echo "<require_registry_reload repositoryId=\"$currentRepository\"/>";
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                     return;
                 }
 
                 $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
                 if (count($data)) {
-                   AJXP_XMLWriter::header();
+                   XMLWriter::header();
                    ksort($data);
                    foreach ($data as $messageObject) {
                        if(isSet($regexp) && isSet($messageObject->nodePathes)){
@@ -275,7 +275,7 @@ class MqManager extends AJXP_Plugin
                        }
                        echo $messageObject->content;
                    }
-                   AJXP_XMLWriter::close();
+                   XMLWriter::close();
                 }
 
                 break;
@@ -296,16 +296,16 @@ class MqManager extends AJXP_Plugin
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
         }
-        $xml = AJXP_XMLWriter::getUserXML($user);
+        $xml = XMLWriter::getUserXML($user);
         // add groupPath
         if ($user->getGroupPath() != null) {
-            $groupString = "groupPath=\"".AJXP_Utils::xmlEntities($user->getGroupPath())."\"";
+            $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
         $this->logDebug("Authenticating user ".$user->id." through WebSocket");
-        AJXP_XMLWriter::header();
+        XMLWriter::header();
         echo $xml;
-        AJXP_XMLWriter::close();
+        XMLWriter::close();
 
     }
 
@@ -327,7 +327,7 @@ class MqManager extends AJXP_Plugin
         $path = escapeshellarg($params["WS_SERVER_PATH"]);
         $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$host." -port=".$port." -path=".$path;
         chdir(AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER.DIRECTORY_SEPARATOR."core.mq");
-        $process = AJXP_Controller::runCommandInBackground($cmd, null);
+        $process = Controller::runCommandInBackground($cmd, null);
         if ($process != null) {
             $pId = $process->getPid();
             $wDir = $this->getPluginWorkDir(true);

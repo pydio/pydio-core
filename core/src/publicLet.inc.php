@@ -20,12 +20,12 @@
  *
  * Description : Specific inclusion to run publiclet scripts
  */
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
 
 require_once("base.conf.php");
 
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 ConfService::init();
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
@@ -35,7 +35,7 @@ require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.Shar
 
 $fakes = '
 // Non working exception class
-class AJXP_Exception extends Exception
+class PydioException extends Exception
 {
     public function __construct($msg) { echo "$msg"; exit(); }
 }';

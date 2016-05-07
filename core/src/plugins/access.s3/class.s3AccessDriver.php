@@ -26,13 +26,13 @@ use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a webdav enabled server
+ * Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -127,7 +127,7 @@ class s3AccessDriver extends fsAccessDriver
         if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
             @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
             if(!is_dir($this->urlBase. "/" . $recycle . "/")) {
-                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+                throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
             } else {
                 $this->setHiddenAttribute(new AJXP_Node($this->urlBase. "/" . $recycle . "/"));
             }

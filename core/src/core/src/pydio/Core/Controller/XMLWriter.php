@@ -18,15 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioPromptException;
+use Pydio\Core\Services;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -36,7 +41,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_XMLWriter
+class XMLWriter
 {
     public static $headerSent = false;
 
@@ -107,7 +112,7 @@ class AJXP_XMLWriter
             foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
         }
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
-        AJXP_XMLWriter::write($string, true);
+        XMLWriter::write($string, true);
     }
 
     /**
@@ -151,7 +156,7 @@ class AJXP_XMLWriter
         }
         print('<?xml version="1.0" encoding="UTF-8"?>');
         self::$headerSent = "tree";
-        AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
+        XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
     }
 
     /**
@@ -185,18 +190,18 @@ class AJXP_XMLWriter
     {
         $string = "<tree";
         $metaData["filename"] = $nodeName;
-        if(AJXP_Utils::detectXSS($nodeName)) $metaData["filename"] = "/XSS Detected - Please contact your admin";
+        if(Utils::detectXSS($nodeName)) $metaData["filename"] = "/XSS Detected - Please contact your admin";
         if (!isSet($metaData["text"])) {
-            if(AJXP_Utils::detectXSS($nodeLabel)) $nodeLabel = "XSS Detected - Please contact your admin";
+            if(Utils::detectXSS($nodeLabel)) $nodeLabel = "XSS Detected - Please contact your admin";
             $metaData["text"] = $nodeLabel;
         }else{
-            if(AJXP_Utils::detectXSS($metaData["text"])) $metaData["text"] = "XSS Detected - Please contact your admin";
+            if(Utils::detectXSS($metaData["text"])) $metaData["text"] = "XSS Detected - Please contact your admin";
         }
         $metaData["is_file"] = ($isLeaf?"true":"false");
         $metaData["ajxp_im_time"] = time();
         foreach ($metaData as $key => $value) {
-            if(AJXP_Utils::detectXSS($value)) $value = "XSS Detected!";
-            $value = AJXP_Utils::xmlEntities($value, true);
+            if(Utils::detectXSS($value)) $value = "XSS Detected!";
+            $value = Utils::xmlEntities($value, true);
             $string .= " $key=\"$value\"";
         }
         if ($close) {
@@ -204,7 +209,7 @@ class AJXP_XMLWriter
         } else {
             $string .= ">";
         }
-        return AJXP_XMLWriter::write($string, $print);
+        return XMLWriter::write($string, $print);
     }
 
     /**
@@ -216,7 +221,7 @@ class AJXP_XMLWriter
      */
     public static function renderAjxpNode($ajxpNode, $close = true, $print = true)
     {
-        return AJXP_XMLWriter::renderNode(
+        return XMLWriter::renderNode(
             $ajxpNode->getPath(),
             $ajxpNode->getLabel(),
             $ajxpNode->isLeaf(),
@@ -274,13 +279,13 @@ class AJXP_XMLWriter
                 $message .= "\n". str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' . $func . PHP_EOL;
             }
         }
-        if(!headers_sent()) AJXP_XMLWriter::header();
-        if(!empty($context) && is_object($context) && $context instanceof AJXP_PromptException){
-            AJXP_XMLWriter::write("<prompt type=\"".$context->getPromptType()."\"><message>".$message."</message><data><![CDATA[".json_encode($context->getPromptData())."]]></data></prompt>", true);
+        if(!headers_sent()) XMLWriter::header();
+        if(!empty($context) && is_object($context) && $context instanceof PydioPromptException){
+            XMLWriter::write("<prompt type=\"".$context->getPromptType()."\"><message>".$message."</message><data><![CDATA[".json_encode($context->getPromptData())."]]></data></prompt>", true);
         }else{
-            AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
+            XMLWriter::sendMessage(null, TextEncoder::toUTF8($message), true);
         }
-        AJXP_XMLWriter::close();
+        XMLWriter::close();
     }
 
     /**
@@ -290,7 +295,7 @@ class AJXP_XMLWriter
     public static function catchException($exception)
     {
         try {
-            AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
+            XMLWriter::catchError($exception->getCode(), TextEncoder::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
         } catch (\Exception $innerEx) {
             error_log(get_class($innerEx)." thrown within the exception handler!");
             error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
@@ -319,10 +324,10 @@ class AJXP_XMLWriter
             $xml = str_replace("AJXP_SERVER_ACCESS", AJXP_SERVER_ACCESS, $xml);
         }
         $xml = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $xml);
-        $xml = str_replace("AJXP_MIMES_EDITABLE", AJXP_Utils::getAjxpMimes("editable"), $xml);
-        $xml = str_replace("AJXP_MIMES_IMAGE", AJXP_Utils::getAjxpMimes("image"), $xml);
-        $xml = str_replace("AJXP_MIMES_AUDIO", AJXP_Utils::getAjxpMimes("audio"), $xml);
-        $xml = str_replace("AJXP_MIMES_ZIP", AJXP_Utils::getAjxpMimes("zip"), $xml);
+        $xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
+        $xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
+        $xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
+        $xml = str_replace("AJXP_MIMES_ZIP", Utils::getAjxpMimes("zip"), $xml);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($authDriver != NULL) {
             $loginRedirect = $authDriver->getLoginRedirect();
@@ -345,7 +350,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("CONF_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
+                $xml = str_replace("CONF_MESSAGE[$messId]", Utils::xmlEntities($message), $xml);
             }
         }
         if (preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)) {
@@ -355,7 +360,7 @@ class AJXP_XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("MIXIN_MESSAGE[$messId]", AJXP_Utils::xmlEntities($message), $xml);
+                $xml = str_replace("MIXIN_MESSAGE[$messId]", Utils::xmlEntities($message), $xml);
             }
         }
         if ($stripSpaces) {
@@ -364,7 +369,7 @@ class AJXP_XMLWriter
         }
         $xml = str_replace(array('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"','xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"'), "", $xml);
         $tab = array(&$xml);
-        AJXP_Controller::applyIncludeHook("xml.filter", $tab);
+        Controller::applyIncludeHook("xml.filter", $tab);
         return $xml;
     }
     /**
@@ -377,9 +382,9 @@ class AJXP_XMLWriter
      */
     public static function reloadDataNode($nodePath="", $pendingSelection="", $print = true)
     {
-        $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
-        $pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
-        return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
+        $nodePath = Utils::xmlEntities($nodePath, true);
+        $pendingSelection = Utils::xmlEntities($pendingSelection, true);
+        return XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
     }
 
 
@@ -400,7 +405,7 @@ class AJXP_XMLWriter
         if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
             $buffer .= "<remove>";
             foreach ($diffNodes["REMOVE"] as $nodePath) {
-                $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
+                $nodePath = Utils::xmlEntities($nodePath, true);
                 $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
             }
             $buffer .= "</remove>";
@@ -429,7 +434,7 @@ class AJXP_XMLWriter
             $buffer .= "</update>";
         }
         $buffer .= "</nodes_diff>";
-        return AJXP_XMLWriter::write($buffer, $print);
+        return XMLWriter::write($buffer, $print);
 
         /*
         $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
@@ -447,7 +452,7 @@ class AJXP_XMLWriter
      */
     public static function reloadRepositoryList($print = true)
     {
-        return AJXP_XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
+        return XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
     }
     /**
      * Outputs a <require_auth/> tag
@@ -457,7 +462,7 @@ class AJXP_XMLWriter
      */
     public static function requireAuth($print = true)
     {
-        return AJXP_XMLWriter::write("<require_auth/>", $print);
+        return XMLWriter::write("<require_auth/>", $print);
     }
     /**
      * Triggers a background action client side
@@ -471,21 +476,21 @@ class AJXP_XMLWriter
      */
     public static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0)
     {
-        $messageId = AJXP_Utils::xmlEntities($messageId);
-        $data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
+        $messageId = Utils::xmlEntities($messageId);
+        $data = XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
         foreach ($parameters as $paramName=>$paramValue) {
-            $paramValue = AJXP_Utils::xmlEntities($paramValue);
-            $data .= AJXP_XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
+            $paramValue = Utils::xmlEntities($paramValue);
+            $data .= XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
         }
-        $data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
+        $data .= XMLWriter::write("</trigger_bg_action>", $print);
         return $data;
     }
 
     public static function triggerBgJSAction($jsCode, $messageId, $print=true, $delay = 0)
     {
-           $data = AJXP_XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);
-        $data .= AJXP_XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
-           $data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
+           $data = XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);
+        $data .= XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
+           $data .= XMLWriter::write("</trigger_bg_action>", $print);
            return $data;
        }
 
@@ -519,12 +524,12 @@ class AJXP_XMLWriter
             if ($format == "node_list") {
                 if ($driver) {
                     $node = new AJXP_Node($driver->getResourceUrl($path));
-                    $buffer .= AJXP_XMLWriter::renderAjxpNode($node, true, false);
+                    $buffer .= XMLWriter::renderAjxpNode($node, true, false);
                 } else {
-                    $buffer .= AJXP_XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
+                    $buffer .= XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
                 }
             } else {
-                $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path, true)."\" title=\"".AJXP_Utils::xmlEntities($title, true)."\"/>";
+                $buffer .= "<bookmark path=\"".Utils::xmlEntities($path, true)."\" title=\"".Utils::xmlEntities($title, true)."\"/>";
             }
         }
         if($print) {
@@ -558,12 +563,12 @@ class AJXP_XMLWriter
     {
         if ($errorMessage == null) {
             $messageType = "SUCCESS";
-            $message = AJXP_Utils::xmlContentEntities($logMessage);
+            $message = Utils::xmlContentEntities($logMessage);
         } else {
             $messageType = "ERROR";
-            $message = AJXP_Utils::xmlContentEntities($errorMessage);
+            $message = Utils::xmlContentEntities($errorMessage);
         }
-        return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
+        return XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
     }
 
     /**
@@ -579,16 +584,16 @@ class AJXP_XMLWriter
         $loggedUser = AuthService::getLoggedUser();
         $confDriver = ConfService::getConfStorageImpl();
         if($userObject != null) $loggedUser = $userObject;
-        if (!AuthService::usersEnabled()) {
+        if (!Services\AuthService::usersEnabled()) {
             $buffer.="<user id=\"shared\">";
             $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
-            $buffer.= AJXP_XMLWriter::writeRepositoriesData(null);
+            $buffer.= XMLWriter::writeRepositoriesData(null);
             $buffer.="</user>";
         } else if ($loggedUser != null) {
             $lock = $loggedUser->getLock();
             $buffer.="<user id=\"".$loggedUser->id."\">";
             $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
-            $buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser);
+            $buffer.= XMLWriter::writeRepositoriesData($loggedUser);
             $buffer.="<preferences>";
             $preferences = $confDriver->getExposedPreferences($loggedUser);
             foreach ($preferences as $prefName => $prefData) {
@@ -634,18 +639,18 @@ class AJXP_XMLWriter
         $streams = ConfService::detectRepositoryStreams(false);
 
         $exposed = array();
-        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
+        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
         if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
             $exposed = $cacheHasExposed;
         } else {
-            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
+            $exposed_props = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
             foreach($exposed_props as $exposed_prop){
                 $pluginId = $exposed_prop->parentNode->parentNode->getAttribute("id");
                 $paramName = $exposed_prop->getAttribute("name");
                 $paramDefault = $exposed_prop->getAttribute("default");
                 $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName, "DEFAULT" => $paramDefault);
             }
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
+            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
         }
 
         $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
@@ -727,12 +732,12 @@ class AJXP_XMLWriter
         $ownerLabel = null;
         if ($repoObject->hasOwner()) {
             $uId = $repoObject->getOwner();
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser()->getId() == $uId){
+            if(Services\AuthService::usersEnabled() && Services\AuthService::getLoggedUser()->getId() == $uId){
                 $currentUserIsOwner = true;
             }
             $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             $ownerLabel = $label;
-            $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
+            $isSharedString =  'owner="'.Utils::xmlEntities($label).'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
             $streamString .= " userScope=\"true\"";
@@ -743,7 +748,7 @@ class AJXP_XMLWriter
         if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
         $description = $repoObject->getDescription($public, $ownerLabel);
         if (!empty($description)) {
-            $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
+            $descTag = '<description>'.Utils::xmlEntities($description, true).'</description>';
         }
         $roleString="";
         if($loggedUser != null){
@@ -761,8 +766,8 @@ class AJXP_XMLWriter
                 $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
                 if($value !== null){
                     if($value === true  || $value === false) $value = ($value === true ?"true":"false");
-                    $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
-                    $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
+                    $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.Utils::xmlEntities($value).'"/>';
+                    $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.Utils::xmlEntities($value).'" ';
                 }
             }
             $roleString.='acl="'.$merged->getAcl($repoId).'"';
@@ -770,7 +775,7 @@ class AJXP_XMLWriter
                 $roleString.= ' hasMask="true" ';
             }
         }
-        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
 
     }
 

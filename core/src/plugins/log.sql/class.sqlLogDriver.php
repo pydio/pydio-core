@@ -19,11 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\SqlTableProvider;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -53,7 +53,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
     public function init($options)
     {
         parent::init($options);
-        $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if(!dibi::isConnected()) {
                 dibi::connect($this->sqlDriver);
@@ -62,13 +62,13 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             echo get_class($e), ': ', $e->getMessage(), "\n";
             exit(1);
         }
-        $this->queries = AJXP_Utils::loadSerialFile($this->getBaseDir()."/queries.json", false, "json");
+        $this->queries = Utils::loadSerialFile($this->getBaseDir()."/queries.json", false, "json");
     }
 
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("Please define an SQL connexion in the core configuration");
         }
@@ -114,7 +114,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $dateCursor = "logdate > '$startDate' AND logdate <= '$endDate'";
         foreach($additionalFilters as $filterField => $filterValue){
             $comparator = (strpos($filterValue, "%") !== false ? "LIKE" : "=");
-            $dateCursor .= " AND [".AJXP_Utils::sanitize($filterField, AJXP_SANITIZE_ALPHANUM)."] $comparator '".AJXP_Utils::sanitize($filterValue, AJXP_SANITIZE_EMAILCHARS)."'";
+            $dateCursor .= " AND [".Utils::sanitize($filterField, AJXP_SANITIZE_ALPHANUM)."] $comparator '".Utils::sanitize($filterValue, AJXP_SANITIZE_EMAILCHARS)."'";
         }
 
         $q = $query["SQL"];
@@ -151,7 +151,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $data = $newData;
             }
             if(isSet($data["File"])){
-                $data["File"] = AJXP_Utils::safeBasename($data["File"]);
+                $data["File"] = Utils::safeBasename($data["File"]);
             }
             if(isSet($data["Date"])){
                 if($data["Date"] instanceof DibiDateTime){
@@ -213,24 +213,24 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $query_name = $httpVars["query_name"];
         $start = 0;
         $count = 30;
-        $frequency = (isSet($httpVars["frequency"])?AJXP_Utils::sanitize($httpVars["frequency"], AJXP_SANITIZE_ALPHANUM):"auto");
+        $frequency = (isSet($httpVars["frequency"])?Utils::sanitize($httpVars["frequency"], AJXP_SANITIZE_ALPHANUM):"auto");
         if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
         if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
         $additionalFilters = array();
-        if(isSet($httpVars["user"])) $additionalFilters["user"] = AJXP_Utils::sanitize($httpVars["user"], AJXP_SANITIZE_EMAILCHARS);
-        if(isSet($httpVars["ws_id"])) $additionalFilters["repository_id"] = AJXP_Utils::sanitize($httpVars["ws_id"], AJXP_SANITIZE_ALPHANUM);
+        if(isSet($httpVars["user"])) $additionalFilters["user"] = Utils::sanitize($httpVars["user"], AJXP_SANITIZE_EMAILCHARS);
+        if(isSet($httpVars["ws_id"])) $additionalFilters["repository_id"] = Utils::sanitize($httpVars["ws_id"], AJXP_SANITIZE_ALPHANUM);
         if(isSet($httpVars["filename_filter"])){
-            $additionalFilters["basename"] = str_replace("*", "%", AJXP_Utils::sanitize($httpVars["filename_filter"], AJXP_SANITIZE_FILENAME));
+            $additionalFilters["basename"] = str_replace("*", "%", Utils::sanitize($httpVars["filename_filter"], AJXP_SANITIZE_FILENAME));
         }
         if(isSet($httpVars["dirname_filter"])){
-            $additionalFilters["dirname"] = str_replace("*", "%", AJXP_Utils::sanitize($httpVars["dirname_filter"], AJXP_SANITIZE_DIRNAME));
+            $additionalFilters["dirname"] = str_replace("*", "%", Utils::sanitize($httpVars["dirname_filter"], AJXP_SANITIZE_DIRNAME));
         }
 
 
         $queries = explode(",", $query_name);
         $meta = array();
         if(count($queries) == 1){
-            $qName = AJXP_Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM);
+            $qName = Utils::sanitize($query_name, AJXP_SANITIZE_ALPHANUM);
             $all = $this->processOneQuery($qName, $start, $count, $frequency, $additionalFilters);
             $qDef = $this->getQuery($qName);
             if($qDef !== false && isSet($qDef['AXIS'])) {
@@ -240,7 +240,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }else{
             $all = array();
             foreach($queries as $qName){
-                $qName = AJXP_Utils::sanitize($qName, AJXP_SANITIZE_ALPHANUM);
+                $qName = Utils::sanitize($qName, AJXP_SANITIZE_ALPHANUM);
                 $all[$qName] = $this->processOneQuery($qName, $start, $count, $frequency, $additionalFilters);
                 $qDef = $this->getQuery($qName);
                 if($qDef !== false && isSet($qDef['AXIS'])) {
@@ -330,9 +330,9 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $log_date = date("m-d-y", $log_unixtime);
 
         // Some actions or parameters can contain characters that need to be encoded, especially when a piece of code raises a notification or error.
-        $action = AJXP_Utils::xmlEntities($action);
-        $params = AJXP_Utils::xmlEntities($params);
-        $source = AJXP_Utils::xmlEntities($source);
+        $action = Utils::xmlEntities($action);
+        $params = Utils::xmlEntities($params);
+        $source = Utils::xmlEntities($source);
         $rowIdString = "";
         if($rowId !== null){
             $rowIdString = "cursor=\"{$rowId}\"";
@@ -370,7 +370,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             }
         }
         $files = array(array("dirname"=>"", "basename"=>""));
-        if(AJXP_Utils::detectXSS($message)){
+        if(Utils::detectXSS($message)){
             $message = "XSS Detected in Message!";
         }else if(count($nodesPathes)){
             $files = array();
@@ -464,7 +464,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                         "grid_header_title" => "Application Logs for $date",
                         "grid_actions"      => "refresh,filter,copy_as_text"
                     );
-                    $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
+                    $xml_strings[$date] = XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }
 
             } else if ($year != null) { // Get months
@@ -495,7 +495,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
             } else {
 
                 // Append Analytics Node
-                $xml_strings['0000'] = AJXP_XMLWriter::renderNode($rootPath."/all_analytics",
+                $xml_strings['0000'] = XMLWriter::renderNode($rootPath."/all_analytics",
                     "Analytics Dashboard",
                     true,
                     array(
@@ -563,7 +563,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     continue;
                 }
                 if(isSet($buffer)){
-                    $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
+                    $log_items .= TextEncoder::toUTF8($this->formatXmlLogItem(
                         $nodeName,
                         'toggle_log.png',
                         $buffer['logdate'],
@@ -579,7 +579,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                         )
                     );
                 }
-                $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
+                $log_items .= TextEncoder::toUTF8($this->formatXmlLogItem(
                     $nodeName,
                     'toggle_log.png',
                     $r['logdate'],
@@ -697,8 +697,8 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 
     public function installSQLTables($param)
     {
-        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }
 
 }

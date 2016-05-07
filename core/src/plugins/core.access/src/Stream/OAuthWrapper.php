@@ -11,16 +11,16 @@ namespace Pydio\Access\Core\Stream;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Cache\Core\CacheService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\CacheService;
 use CommerceGuys\Guzzle\Oauth2\GrantType\AuthorizationCode;
 use CommerceGuys\Guzzle\Oauth2\AccessToken;
 use CommerceGuys\Guzzle\Oauth2\GrantType\RefreshToken;
 use CommerceGuys\Guzzle\Oauth2\Oauth2Subscriber;
 use GuzzleHttp\Client as GuzzleClient;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_UserAlertException;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioUserAlertException;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 
@@ -29,7 +29,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
     /**
      * @param $url
      * @return bool|void
-     * @throws AJXP_UserAlertException
+     * @throws \Pydio\Core\Exception\PydioUserAlertException
      * @throws Exception
      */
     public static function applyInitPathHook($url) {
@@ -39,7 +39,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         }
 
         // Repository information
-        $urlParts = AJXP_Utils::safeParseUrl($url);
+        $urlParts = Utils::safeParseUrl($url);
         $repository = ConfService::getRepositoryById($urlParts["host"]);
 
         if ($repository == null) {
@@ -132,7 +132,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
             $accessToken = $oauth2->getAccessToken();
             $refreshToken = $oauth2->getRefreshToken();
         } catch (\Exception $e) {
-            throw new AJXP_UserAlertException("Please go to <a style=\"text-decoration:underline;\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
+            throw new PydioUserAlertException("Please go to <a style=\"text-decoration:underline;\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
         }
 
         // Saving tokens for later use
@@ -169,7 +169,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         if ($tokens = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $key)) return $tokens;
 
         // TOKENS IN FILE ?
-        return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key);
+        return Utils::loadSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key);
     }
 
     /**
@@ -182,7 +182,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         $value = [$accessToken, $refreshToken];
 
         // Save in file
-        AJXP_Utils::saveSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key, $value, true);
+        Utils::saveSerialFile(AJXP_DATA_PATH . '/plugins/access.onedrive/' . $key, $value, true);
 
         // Save in cache
         CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $key, $value);

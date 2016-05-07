@@ -47,7 +47,7 @@ include_once($FRAMEWORK_PATH."/base.conf.php");
 if (!class_exists("SessionSwitcher")) {
     require_once("$CURRENTPATH/sessionSwitcher.php");
 }
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 ConfService::init($FRAMEWORK_PATH);
 ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();

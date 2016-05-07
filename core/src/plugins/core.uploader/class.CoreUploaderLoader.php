@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreUploaderLoader extends AJXP_Plugin
+class CoreUploaderLoader extends Plugin
 {
     public $AUTO_LOAD_TYPE = true;
 
@@ -48,8 +48,8 @@ class CoreUploaderLoader extends AJXP_Plugin
 
     private function filterData(&$data)
     {
-        $confMaxSize = AJXP_Utils::convertBytes($data["UPLOAD_MAX_SIZE"]);
-        $UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+        $confMaxSize = Utils::convertBytes($data["UPLOAD_MAX_SIZE"]);
+        $UploadMaxSize = min(Utils::convertBytes(ini_get('upload_max_filesize')), Utils::convertBytes(ini_get('post_max_size')));
         if (intval($confMaxSize) != 0) {
             $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
         }

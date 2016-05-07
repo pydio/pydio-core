@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,7 +40,7 @@ class remote_ajxpAuthDriver extends serialAuthDriver
 
     public function preLogUser($sessionId)
     {
-        require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
+        require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
         $client = new HttpClient($this->getOption("REMOTE_SERVER"), $this->getOption("REMOTE_PORT"));
         $client->setDebug(false);
         if ($this->getOption("REMOTE_USER") != "") {

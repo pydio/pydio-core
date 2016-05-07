@@ -21,10 +21,10 @@
 use Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -54,7 +54,7 @@ class ftpAuthDriver extends AbstractAuthDriver
         }
         // ENABLE WEBFTP LOGIN SCREEN
         $this->logDebug(__FUNCTION__, "Enabling authfront.webftp");
-        AJXP_PluginsService::findPluginById("authfront.webftp")->enabled = true;
+        PluginsService::findPluginById("authfront.webftp")->enabled = true;
     }
 
     public function listUsers($baseGroup = "/", $recursive = true)
@@ -90,9 +90,9 @@ class ftpAuthDriver extends AbstractAuthDriver
         AuthService::disconnect();
         session_destroy();
         session_write_close();
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult(2);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult(2);
+        XMLWriter::close();
     }
 
     public function setFtpDataCallback($actionName, $httpVars, $fileVars)

@@ -19,14 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AJXP_NotificationCenter extends AJXP_Plugin
+class AJXP_NotificationCenter extends Plugin
 {
     /**
      * @var String
@@ -85,13 +85,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     {
         if ($this->eventStore) {
             $this->eventStore->persistAlert($notification);
-            AJXP_Controller::applyHook("msg.instant",array(
+            Controller::applyHook("msg.instant",array(
                 "<reload_user_feed/>",
                 $notification->getNode()->getRepositoryId(),
                 $notification->getTarget()
             ));
             if($notification->getNode()->getRepository() != null && $notification->getNode()->getRepository()->hasParent()){
-                AJXP_Controller::applyHook("msg.instant",array(
+                Controller::applyHook("msg.instant",array(
                     "<reload_user_feed/>",
                     $notification->getNode()->getRepository()->getParentId(),
                     $notification->getTarget()
@@ -119,7 +119,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
         $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
-        AJXP_Controller::applyHook("msg.instant",array(
+        Controller::applyHook("msg.instant",array(
             "<reload_user_feed/>",
             $repoId,
             $userId
@@ -147,8 +147,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $u = AuthService::getLoggedUser();
         if ($u == null) {
             if($httpVars["format"] == "html" || $httpVars["format"] == "array") return array();
-            AJXP_XMLWriter::header();
-            AJXP_XMLWriter::close();
+            XMLWriter::header();
+            XMLWriter::close();
             return array();
         }
         $userId = $u->getId();
@@ -182,7 +182,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         } else if($format == "json"){
             $jsonNodes = array();
         } else if($format != 'array') {
-            AJXP_XMLWriter::header();
+            XMLWriter::header();
         }
 
         // APPEND USER ALERT IN THE SAME QUERY FOR NOW
@@ -217,10 +217,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
-                    $node->event_description = SystemTextEncoding::fromUTF8($node->event_description);
+                    $node->event_description = TextEncoder::fromUTF8($node->event_description);
                     $node->event_description_long = $notif->getDescriptionLong(true);
-                    $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notif->getDate(), $mess));
-                    $node->short_date = AJXP_Utils::relativeDate($notif->getDate(), $mess, true);
+                    $node->event_date = TextEncoder::fromUTF8(Utils::relativeDate($notif->getDate(), $mess));
+                    $node->short_date = Utils::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
                     $node->event_id = $object->event_id;
@@ -256,7 +256,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                             $jsonNodes[] = $data;
                         }
                     }else{
-                        AJXP_XMLWriter::renderAjxpNode($node);
+                        XMLWriter::renderAjxpNode($node);
                     }
                 }
             }
@@ -269,7 +269,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         } else if($format == "array"){
             return $jsonNodes;
         } else {
-            AJXP_XMLWriter::close();
+            XMLWriter::close();
         }
 
     }
@@ -311,7 +311,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 echo("<h2>".$mess["notification_center.3"]."</h2>");
                 echo("<ul class='notification_list'>");
             } else {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
             }
         }
         $parentRepository = ConfService::getRepositoryById($repositoryFilter);
@@ -361,9 +361,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 }
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
-                $node->event_description = SystemTextEncoding::fromUTF8($node->event_description);
+                $node->event_description = TextEncoder::fromUTF8($node->event_description);
                 $node->event_description_long = $notification->getDescriptionLong(true);
-                $node->event_date = SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($notification->getDate(), $mess));
+                $node->event_date = TextEncoder::fromUTF8(Utils::relativeDate($notification->getDate(), $mess));
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
                 if ($node->getRepository() != null) {
@@ -404,14 +404,14 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             //$url = parse_url($nodeToSend->getUrl());
             //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
             $index ++;
-            AJXP_XMLWriter::renderAjxpNode($nodeToSend);
+            XMLWriter::renderAjxpNode($nodeToSend);
 
         }
         if (!$skipContainingTags) {
             if ($format == "html") {
                 echo("</ul>");
             } else {
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
             }
         }
 
@@ -484,7 +484,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $this->prepareNotification($notif);
         $notif->setTarget($targetId);
         //$this->sendToQueue($notif);
-        AJXP_Controller::applyHook("msg.queue_notification", array($notif));
+        Controller::applyHook("msg.queue_notification", array($notif));
 
     }
 

@@ -18,10 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -123,10 +123,10 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     protected function breakAndSendError($exceptionMsg){
 
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult(-1, null, null, null);
-        AJXP_XMLWriter::sendMessage("ERROR", $exceptionMsg);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult(-1, null, null, null);
+        XMLWriter::sendMessage("ERROR", $exceptionMsg);
+        XMLWriter::close();
         //throw new AJXP_Exception($exceptionMsg);
         exit();
 

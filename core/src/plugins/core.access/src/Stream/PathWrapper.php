@@ -9,8 +9,8 @@
 namespace Pydio\Access\Core\Stream;
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -27,7 +27,7 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
     public static function applyInitPathHook($url, $context = 'core')
     {
         $params = [];
-        $parts = AJXP_Utils::safeParseUrl($url);
+        $parts = Utils::safeParseUrl($url);
 
         if (! ($params = self::getLocalParams(self::CACHE_KEY . $url)) ) {
 

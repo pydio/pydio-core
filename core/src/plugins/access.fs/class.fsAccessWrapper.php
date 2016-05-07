@@ -25,11 +25,11 @@ use PclZip;
 
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -76,13 +76,13 @@ class fsAccessWrapper implements IAjxpWrapper
      * @param bool $storeOpenContext
      * @param bool $skipZip
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
-     * @throws AJXP_Exception
+     * @throws \Pydio\Core\Exception\PydioException
      * @throws \Exception
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
         $path = self::unPatchPathForBaseDir($path);
-        $url = AJXP_Utils::safeParseUrl($path);
+        $url = Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $test = trim($url["path"], "/");
         $atRoot = empty($test);
@@ -98,7 +98,7 @@ class fsAccessWrapper implements IAjxpWrapper
         if(isSet($url["user"]) && AuthService::usersEnabled()){
             $resolveUser = ConfService::getConfStorageImpl()->createUserObject($url["user"]);
         }
-        $resolvedPath = realpath(SystemTextEncoding::toStorageEncoding($repoObject->getOption("PATH", false, $resolveUser)));
+        $resolvedPath = realpath(TextEncoder::toStorageEncoding($repoObject->getOption("PATH", false, $resolveUser)));
 
         //var_dump($path);
         //var_dump($skipZip);
@@ -106,20 +106,20 @@ class fsAccessWrapper implements IAjxpWrapper
         if ($insideZip) {
             $zipPath = $split[0];
             $localPath = $split[1];
-            require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+            require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
             //print($streamType.$path);
                if ($streamType == "file") {
                    if (self::$crtZip == null ||  !is_array(self::$currentListingKeys)) {
-                       $tmpDir = AJXP_Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
+                       $tmpDir = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
                        mkdir($tmpDir);
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");
                        register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
-                        $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
+                        $crtZip = new PclZip(Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                         $content = $crtZip->listContent();
                         if(is_array($content)){
                             foreach ($content as $item) {
-                                $fName = AJXP_Utils::securePath($item["stored_filename"]);
+                                $fName = Utils::securePath($item["stored_filename"]);
                                 if ($fName == $localPath || "/".$fName == $localPath) {
                                     $localPath = $fName;
                                     break;
@@ -136,11 +136,11 @@ class fsAccessWrapper implements IAjxpWrapper
                            self::$currentFileKey = $key;
                            return -1;
                        } else {
-                           throw new AJXP_Exception("Cannot find key");
+                           throw new PydioException("Cannot find key");
                        }
                    }
                } else {
-                $crtZip = new PclZip(AJXP_Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
+                $crtZip = new PclZip(Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                 $liste = $crtZip->listContent();
                    if(!is_array($liste)) $liste = array();
                 if($storeOpenContext) self::$crtZip = $crtZip;
@@ -295,7 +295,7 @@ class fsAccessWrapper implements IAjxpWrapper
     public function stream_open($path, $mode, $options, &$context)
     {
         try {
-            $this->realPath = AJXP_Utils::securePath(self::initPath($path, "file"));
+            $this->realPath = Utils::securePath(self::initPath($path, "file"));
         } catch (\Exception $e) {
             AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path (".$e->getMessage().")");
             return false;

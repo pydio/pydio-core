@@ -1,7 +1,7 @@
 <?php
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 /**
@@ -47,7 +47,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
                 $pipe = true;
             }
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $unoconv = "HOME=".AJXP_Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
+            $unoconv = "HOME=".Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
             if ($pipe) {
                 $newTarget = str_replace(".$ext", ".pdf", $realFile);
                 $unoconv.= " > $newTarget";
@@ -116,7 +116,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
                 //list($from, $to) = sscanf($v, "[%s TO %s]");
                 preg_match('/\[(.*) TO (.*)\]/', $v, $matches);
                 $oldSize = $s;
-                $newSize = "ajxp_bytesize:[".intval(AJXP_Utils::convertBytes($matches[1]))." TO ".intval(AJXP_Utils::convertBytes($matches[2]))."]";
+                $newSize = "ajxp_bytesize:[".intval(Utils::convertBytes($matches[1]))." TO ".intval(Utils::convertBytes($matches[2]))."]";
             }
         }
         if(isSet($newSize) && isSet($oldSize)){
@@ -135,7 +135,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
         $specificId = "";
         $specKey = $this->getFilteredOption("repository_specific_keywords");
         if (!empty($specKey)) {
-            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), AJXP_VarsFilter::filter($specKey, $userId));
+            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $userId));
         }
         return $repositoryId.$specificId;
     }

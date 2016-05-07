@@ -104,6 +104,7 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver
          */
         $c = WebSocketFunctions::cookie_parse($h["Cookie"]);
 
+        require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
         $client = new HttpClient($this->host);
         $client->cookies = $c;
         $client->get("/{$this->path}/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);

@@ -6,9 +6,9 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -17,7 +17,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Shorten
  */
-class multiShortener extends AJXP_Plugin
+class multiShortener extends Plugin
 {
 
     /**
@@ -70,7 +70,7 @@ class multiShortener extends AJXP_Plugin
                 $adfly_uid = $type["ADFLY_UID"];
                 $adfly_dom = $type["ADFLY_DOMAIN"];
                 $adfly = 'http://api.adf.ly/api.php?key='.$adfly_api.'&uid='.$adfly_uid.'&advert_type='.$adfly_type.'&domain='.$adfly_dom.'&url='.urlencode($url);
-                $response = AJXP_Utils::getRemoteContent($adfly);
+                $response = Utils::getRemoteContent($adfly);
                 $response = strip_tags($response, '<body>');
                 $response = strip_tags($response);
                 if (isSet($response)) {
@@ -88,7 +88,7 @@ class multiShortener extends AJXP_Plugin
                 $format = 'json';
                 $version = '2.0.1';
                 $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
-                $response = AJXP_Utils::getRemoteContent($bitly);
+                $response = Utils::getRemoteContent($bitly);
                 $json = json_decode($response, true);
                 if (isSet($json['results'][$url]['shortUrl'])) {
                     return $json['results'][$url]['shortUrl'];
@@ -130,7 +130,7 @@ class multiShortener extends AJXP_Plugin
                 }
                 $post_api = $type["POST_APIKEY"];
                 $post = 'http://po.st/api/shorten?longUrl='.urlencode($url).'&apiKey='.$post_api.'&format=txt';
-                $response = AJXP_Utils::getRemoteContent($post);
+                $response = Utils::getRemoteContent($post);
                 if (isSet($response)) {
                     return $response;
                 }
@@ -152,7 +152,7 @@ class multiShortener extends AJXP_Plugin
                 $yourls_domain = $type["YOURLS_DOMAIN"];
                 $yourls_api = $type["YOURLS_APIKEY"];
                 $yourls = 'http://'.$yourls_domain.'/yourls-api.php?signature='.$yourls_api.'&action=shorturl&format=simple&url='.urlencode($url);
-                $response = AJXP_Utils::getRemoteContent($yourls);
+                $response = Utils::getRemoteContent($yourls);
                 if (isSet($response)) {
                     $shorturl = $response;
                     if ($useidn) {

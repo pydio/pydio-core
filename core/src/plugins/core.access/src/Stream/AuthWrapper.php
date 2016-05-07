@@ -12,13 +12,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Services\ConfService;
 
 class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 {
     public static function applyInitPathHook($url, $context = 'core') {
-        $urlParts = AJXP_Utils::safeParseUrl($url);
+        $urlParts = Utils::safeParseUrl($url);
 
         $repository = ConfService::getRepositoryById($urlParts["host"]);
         if ($repository == null) {

@@ -18,12 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -67,7 +67,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $explode = explode("?", $_SERVER["REQUEST_URI"]);
         $server_uri = rtrim(array_shift($explode), "/");
         $decoded = array_map("urldecode", explode("/", $server_uri));
-        $decoded = array_map(array("Pydio\\Core\\SystemTextEncoding", "toUTF8"), $decoded);
+        $decoded = array_map(array("Pydio\Core\Utils\TextEncoder", "toUTF8"), $decoded);
         $decoded = array_map("rawurlencode", $decoded);
         $server_uri = implode("/", $decoded);
         $server_uri = str_replace("~", "%7E", $server_uri);
@@ -114,7 +114,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
         $user = AuthService::getLoggedUser()->getId();
         if(AuthService::getLoggedUser()->isAdmin() && isSet($httpVars["user_id"])){
-            $user = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+            $user = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
         }
         switch($action){
             case "keystore_generate_auth_token":
@@ -126,8 +126,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
                     break;
                 }
 
-                $token = AJXP_Utils::generateRandomString();
-                $private = AJXP_Utils::generateRandomString();
+                $token = Utils::generateRandomString();
+                $private = Utils::generateRandomString();
                 $data = array("USER_ID" => $user, "PRIVATE" => $private);
                 if(!empty($httpVars["device"])){
                     // Revoke previous tokens for this device
@@ -185,7 +185,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
                             else if(strpos($agent, "Windows/8") !== false) $deviceOS = "Windows 8";
                             else if(strpos($agent, "Linux") !== false) $deviceOS = "Linux";
                         }else{
-                            $deviceOS = AJXP_Utils::osFromUserAgent($agent);
+                            $deviceOS = Utils::osFromUserAgent($agent);
                         }
                     }
                     $keyData["DEVICE_DESC"] = $deviceDesc;

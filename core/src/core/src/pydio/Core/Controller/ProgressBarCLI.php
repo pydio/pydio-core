@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Controller;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_ProgressBarCLI {
+class ProgressBarCLI {
     private $strProgress = "";
     private $strLength = 25; // 50 '='
     private $strName   = "";

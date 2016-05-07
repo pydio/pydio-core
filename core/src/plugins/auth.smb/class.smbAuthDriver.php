@@ -20,9 +20,9 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -58,9 +58,9 @@ class smbAuthDriver extends AbstractAuthDriver
         }
         AuthService::disconnect();
         session_write_close();
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult(2);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult(2);
+        XMLWriter::close();
     }
 
     public function checkPassword($login, $pass, $seed)

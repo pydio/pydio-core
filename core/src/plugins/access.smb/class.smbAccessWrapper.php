@@ -23,9 +23,9 @@ namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -52,7 +52,7 @@ class smbAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = AJXP_Utils::safeParseUrl($path);
+        $url = Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
@@ -162,7 +162,7 @@ class smbAccessWrapper extends fsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);

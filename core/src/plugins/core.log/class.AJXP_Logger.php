@@ -21,10 +21,10 @@
 namespace Pydio\Log\Core;
 
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -39,7 +39,7 @@ define("LOG_LEVEL_ERROR", "Error");
  * @static
  * Provides static access to the logging mechanism
  */
-class AJXP_Logger extends AJXP_Plugin
+class AJXP_Logger extends Plugin
 {
     /**
      * @var AbstractLogDriver
@@ -54,7 +54,7 @@ class AJXP_Logger extends AJXP_Plugin
         self::$globalOptions = $this->pluginConf;
         $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "Pydio\\Log\\Core\\AbstractLogDriver");
         if ($this->pluginInstance != false) {
-            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
+            PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
     }
@@ -311,7 +311,7 @@ class AJXP_Logger extends AJXP_Plugin
     public static function getInstance()
     {
         if (!isset(self::$loggerInstance)) {
-            $p = AJXP_PluginsService::findPlugin("core", "log");
+            $p = PluginsService::findPlugin("core", "log");
             if(is_object($p)) $p->init(array());
         }
         return self::$loggerInstance;

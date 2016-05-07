@@ -18,13 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\CaptchaProvider;
-use Pydio\Core\HTMLWriter;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\CaptchaProvider;
+use Pydio\Core\Controller\HTMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -32,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class SessionLoginFrontend extends AbstractAuthFrontend {
 
     function isEnabled(){
-        if(AJXP_Utils::detectApplicationFirstRun()) return false;
+        if(Utils::detectApplicationFirstRun()) return false;
         return parent::isEnabled();
     }
 
@@ -49,7 +49,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
         } else {
-            $userId = (isSet($httpVars["userid"])?AJXP_Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
+            $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
             $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
             $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
             $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
@@ -85,9 +85,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
             AuthService::refreshRememberCookie($loggedUser);
         }
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
+        XMLWriter::close();
 
         if($loggingResult > 0 || $isLast){
             exit();
@@ -104,9 +104,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 AuthService::disconnect();
                 $loggingResult = 2;
                 session_destroy();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::loggingResult($loggingResult, null, null, null);
+                XMLWriter::close();
 
                 break;
 
@@ -128,9 +128,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 break;
 
             case "back":
-                AJXP_XMLWriter::header("url");
+                XMLWriter::header("url");
                 echo AuthService::getLogoutAddress(false);
-                AJXP_XMLWriter::close("url");
+                XMLWriter::close("url");
                 //exit(1);
 
                 break;

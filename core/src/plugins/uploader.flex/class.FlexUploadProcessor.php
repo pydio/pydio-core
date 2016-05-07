@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class FlexUploadProcessor extends AJXP_Plugin
+class FlexUploadProcessor extends Plugin
 {
     private static $active = false;
 
@@ -55,9 +55,9 @@ class FlexUploadProcessor extends AJXP_Plugin
         if (isSet($result["SUCCESS"]) && $result["SUCCESS"] === true) {
             header('HTTP/1.0 200 OK');
             if (iSset($result["UPDATED_NODE"])) {
-                AJXP_Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
+                Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
             } else {
-                AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
+                Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
             }
             //die("200 OK");
         } else if (isSet($result["ERROR"]) && is_array($result["ERROR"])) {

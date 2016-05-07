@@ -20,19 +20,19 @@
  *
  * Description : Real RESTful API access
  */
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 
 include_once("base.conf.php");
 
-set_error_handler(array("\\Pydio\\Core\\AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-set_exception_handler(array("\\Pydio\\Core\\AJXP_XMLWriter", "catchException"));
+set_error_handler(array("\Pydio\Core\Controller\XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+set_exception_handler(array("\Pydio\Core\Controller\XMLWriter", "catchException"));
 
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 ConfService::$useSession = false;
 AuthService::$useSession = false;
 
@@ -44,7 +44,7 @@ require_once($confStorageDriver->getUserClassFileName());
 //session_name("AjaXplorer");
 //session_start();
 
-AJXP_PluginsService::getInstance()->initActivePlugins();
+PluginsService::getInstance()->initActivePlugins();
 AuthService::preLogUser(array_merge($_GET, $_POST));
 if(AuthService::getLoggedUser() == null){
     header('HTTP/1.0 401 Unauthorized');
@@ -55,7 +55,7 @@ $authDriver = ConfService::getAuthDriverImpl();
 ConfService::currentContextIsRestAPI("api");
 
 $uri = $_SERVER["REQUEST_URI"];
-$scriptUri = ltrim(AJXP_Utils::safeDirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
+$scriptUri = ltrim(Utils::safeDirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
 $uri = substr($uri, strlen($scriptUri));
 $uri = explode("/", trim($uri, "/"));
 // GET REPO ID
@@ -84,11 +84,11 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
     $confDriver = ConfService::getConfStorageImpl();
     $Driver = ConfService::loadDriverForRepository($repo);
 }
-AJXP_PluginsService::getInstance()->initActivePlugins();
+PluginsService::getInstance()->initActivePlugins();
 
-$xmlResult = AJXP_Controller::findRestActionAndApply($action, $path);
+$xmlResult = Controller::findRestActionAndApply($action, $path);
 if (!empty($xmlResult) && !headers_sent()) {
-    AJXP_XMLWriter::header();
+    XMLWriter::header();
     print($xmlResult);
-    AJXP_XMLWriter::close();
+    XMLWriter::close();
 }

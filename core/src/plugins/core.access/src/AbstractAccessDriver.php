@@ -19,14 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Access\Core;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class AbstractAccessDriver
  * Abstract representation of an action driver. Must be implemented.
  */
-class AbstractAccessDriver extends AJXP_Plugin
+class AbstractAccessDriver extends Plugin
 {
     /**
     * @var Repository
@@ -65,7 +65,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                 return;
             }
             $selection = new UserSelection($this->repository, $httpVars);
-            AJXP_Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
+            \Pydio\Core\Controller\Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
         }
         if ($actionName == "ls") {
             // UPWARD COMPATIBILTY
@@ -153,17 +153,17 @@ class AbstractAccessDriver extends AJXP_Plugin
         foreach ($files as $file) {
 
             $this->copyOrMoveFile(
-                AJXP_Utils::decodeSecureMagic($httpVars["dest"]),
+                \Pydio\Core\Utils\Utils::decodeSecureMagic($httpVars["dest"]),
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
                 $srcRepoData, $destRepoData);
 
         }
-        AJXP_XMLWriter::header();
+        XMLWriter::header();
         if (count($errorMessages)) {
-            AJXP_XMLWriter::sendMessage(null, join("\n", $errorMessages), true);
+            XMLWriter::sendMessage(null, join("\n", $errorMessages), true);
         }
-        AJXP_XMLWriter::sendMessage(join("\n", $messages), null, true);
-        AJXP_XMLWriter::close();
+        XMLWriter::sendMessage(join("\n", $messages), null, true);
+        XMLWriter::close();
     }
 
     /**
@@ -184,7 +184,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         $mess = ConfService::getMessages();
         $bName = basename($srcFile);
         $localName = '';
-        AJXP_Controller::applyHook("dl.localname", array($srcFile, &$localName));
+        Controller::applyHook("dl.localname", array($srcFile, &$localName));
         if(!empty($localName)) $bName = $localName;
         $destFile = $destUrlBase.$destDir."/".$bName;
         $realSrcFile = $srcUrlBase.$srcFile;
@@ -200,7 +200,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         }
         if (!$move) {
             $size = filesize($realSrcFile);
-            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
+            \Pydio\Core\Controller\Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
         }
         if (dirname($realSrcFile)==dirname($destFile)) {
             if ($move) {
@@ -234,7 +234,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             $succFiles = array();
             $srcNode->setLeaf(false);
             if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
+                Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) $this->deldir($destFile, $destRepoData);
                 $res = rename($realSrcFile, $destFile);
             } else {
@@ -245,23 +245,23 @@ class AbstractAccessDriver extends AJXP_Plugin
                 return ;
             } else {
                 $destNode->setLeaf(false);
-                AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, !$move));
+                Controller::applyHook("node.change", array($srcNode, $destNode, !$move));
             }
         } else {
             if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array($srcNode));
+                \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
                 if(AJXP_MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
                     rename($realSrcFile, $destFile);
                 }else{
                     copy($realSrcFile, $destFile);
                 }
-                AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, false));
+                Controller::applyHook("node.change", array($srcNode, $destNode, false));
             } else {
                 try {
                     $this->filecopy($realSrcFile, $destFile);
                     $this->changeMode($destFile, $destRepoData);
-                    AJXP_Controller::applyHook("node.change", array($srcNode, $destNode, true));
+                    \Pydio\Core\Controller\Controller::applyHook("node.change", array($srcNode, $destNode, true));
                 } catch (\Exception $e) {
                     $error[] = $e->getMessage();
                     return ;
@@ -272,24 +272,24 @@ class AbstractAccessDriver extends AJXP_Plugin
         if ($move) {
             // Now delete original
             // $this->deldir($realSrcFile); // both file and dir
-            $messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
+            $messagePart = $mess[74]." ".TextEncoder::toUTF8($destDir);
             if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
                 RecycleBinManager::fileToRecycle($srcFile);
                 $messagePart = $mess[123]." ".$mess[122];
             }
             if (is_dir($destFile)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+                $success[] = $mess[117]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             }
         } else {
             if (RecycleBinManager::recycleEnabled() && $destDir == "/".$srcRecycle) {
                 RecycleBinManager::fileToRecycle($srcFile);
             }
             if (isSet($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";
+                $success[] = $mess[117]." ".TextEncoder::toUTF8(basename($srcFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
             } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
+                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
             }
         }
 
@@ -404,7 +404,7 @@ class AbstractAccessDriver extends AJXP_Plugin
     protected function deldir($location, $repoData)
     {
         if (is_dir($location)) {
-            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+            \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
             $all=opendir($location);
             while ($file=readdir($all)) {
                 if (is_dir("$location/$file") && $file !=".." && $file!=".") {
@@ -424,7 +424,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             rmdir($location);
         } else {
             if (file_exists("$location")) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+                \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
                 $test = @unlink("$location");
                 if(!$test) throw new \Exception("Cannot delete file ".$location);
             }
@@ -462,7 +462,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                 }
 
             } else if (substr($fixPermPolicy, 0, strlen("file:")) == "file:") {
-                $filePath = AJXP_VarsFilter::filter(substr($fixPermPolicy, strlen("file:")));
+                $filePath = \Pydio\Core\Utils\VarsFilter::filter(substr($fixPermPolicy, strlen("file:")));
                 if (file_exists($filePath)) {
                     // GET A GID/UID FROM FILE
                     $lines = file($filePath);
@@ -537,7 +537,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         foreach ($files as $file) {
             $file = basename($file);
-            if (AJXP_Utils::isHidden($file) && !$showHiddenFiles) {
+            if (Utils::isHidden($file) && !$showHiddenFiles) {
                 throw new \Exception("$file Forbidden", 411);
             }
             if ($this->filterFile($file) || $this->filterFolder($file)) {
@@ -550,14 +550,14 @@ class AbstractAccessDriver extends AJXP_Plugin
     {
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         if($isLeaf === ""){
-            $isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+            $isLeaf = (is_file($nodePath."/".$nodeName) || \Pydio\Core\Utils\Utils::isBrowsableArchive($nodeName));
         }
-        if (AJXP_Utils::isHidden($nodeName) && !$showHiddenFiles) {
+        if (\Pydio\Core\Utils\Utils::isHidden($nodeName) && !$showHiddenFiles) {
             return false;
         }
         $nodeType = "d";
         if ($isLeaf) {
-            if(AJXP_Utils::isBrowsableArchive($nodeName)) $nodeType = "z";
+            if(Utils::isBrowsableArchive($nodeName)) $nodeType = "z";
             else $nodeType = "f";
         }
         if(!$lsOptions[$nodeType]) return false;
@@ -583,7 +583,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         $pathParts = pathinfo($fileName);
         if($hiddenTest){
             $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
-            if (AJXP_Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
+            if (Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
         }
         $hiddenFileNames = $this->getFilteredOption("HIDE_FILENAMES", $this->repository);
         $hiddenExtensions = $this->getFilteredOption("HIDE_EXTENSIONS", $this->repository);

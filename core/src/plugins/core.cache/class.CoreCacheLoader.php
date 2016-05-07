@@ -20,11 +20,12 @@
  */
 namespace Pydio\Cache\Core;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\CacheService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Core\AJXP_Node;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -35,7 +36,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @static
  * Provides access to the cache via the Doctrine interface
  */
-class CoreCacheLoader extends AJXP_Plugin
+class CoreCacheLoader extends Plugin
 {
     /**
      * @var AbstractCacheDriver
@@ -52,7 +53,7 @@ class CoreCacheLoader extends AJXP_Plugin
                 $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver");
 
                 if ($pluginInstance != false) {
-                    AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
+                    PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
                 }
             }
             self::$cacheInstance = $pluginInstance;
@@ -164,14 +165,14 @@ class CoreCacheLoader extends AJXP_Plugin
                 $result[] = $data;
             }
         }
-        HTMLWriter::charsetHeader("application/json");
+        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
         echo json_encode($result);
 
     }
 
     public function clearCacheByNS($actionName, $httpVars, $fileVars){
 
-        $ns = AJXP_Utils::sanitize($httpVars["namespace"], AJXP_SANITIZE_ALPHANUM);
+        $ns = \Pydio\Core\Utils\Utils::sanitize($httpVars["namespace"], AJXP_SANITIZE_ALPHANUM);
         if($ns == AJXP_CACHE_SERVICE_NS_SHARED){
             ConfService::clearAllCaches();
         }else{

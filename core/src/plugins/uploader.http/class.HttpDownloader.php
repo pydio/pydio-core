@@ -21,12 +21,12 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\UnixProcess;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\UnixProcess;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Downloader
  */
-class HttpDownloader extends AJXP_Plugin
+class HttpDownloader extends Plugin
 {
     public function switchAction($action, $httpVars, $fileVars)
     {
@@ -46,7 +46,7 @@ class HttpDownloader extends AJXP_Plugin
             return false;
         }
         $userSelection = new UserSelection($repository);
-        $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+        $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";
         $dlURL = null;
         if (isSet($httpVars["file"])) {
@@ -55,7 +55,7 @@ class HttpDownloader extends AJXP_Plugin
             $basename = basename($getPath);
             //$dlURL = $httpVars["file"];
         }else if (isSet($httpVars["dlfile"])) {
-            $dlFile = $userSelection->currentBaseUrl().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
+            $dlFile = $userSelection->currentBaseUrl().Utils::decodeSecureMagic($httpVars["dlfile"]);
             $realFile = file_get_contents($dlFile);
             if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
             $parts = parse_url($realFile);
@@ -70,13 +70,13 @@ class HttpDownloader extends AJXP_Plugin
             case "external_download":
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
 
-                    $unixProcess = AJXP_Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
+                    $unixProcess = Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
                     if ($unixProcess !== null) {
                         @file_put_contents($currentDirUrl.".".$basename.".pid", $unixProcess->getPid());
                     }
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
-                    AJXP_XMLWriter::close();
+                    XMLWriter::header();
+                    XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
+                    XMLWriter::close();
                     session_write_close();
                     exit();
                 }
@@ -125,7 +125,7 @@ class HttpDownloader extends AJXP_Plugin
                 }
                 if ($totalSize != -1) {
                     $node = new AJXP_Node($currentDirUrl.$basename);
-                    AJXP_Controller::applyHook("node.before_create", array($node, $totalSize));
+                    Controller::applyHook("node.before_create", array($node, $totalSize));
                 }
 
                 $tmpFilename = $currentDirUrl.$basename.".dlpart";
@@ -158,20 +158,20 @@ class HttpDownloader extends AJXP_Plugin
                 $httpClient->Close();
 
                 if (isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)) {
-                    AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($dlFile)));
+                    Controller::applyHook("node.before_path_change", array(new AJXP_Node($dlFile)));
                     unlink($dlFile);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
+                    Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                 }
                 $mess = ConfService::getMessages();
-                AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
-                AJXP_XMLWriter::close();
+                Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
+                XMLWriter::close();
 
 
             break;
             case "update_dl_data":
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = Utils::decodeSecureMagic($httpVars["file"]);
                 header("text/plain");
                 if (is_file($currentDirUrl.$file)) {
                     $node = new AJXP_Node($currentDirUrl.$file);
@@ -222,7 +222,7 @@ class HttpDownloader extends AJXP_Plugin
             $data = unserialize(file_get_contents($hidFile));
             if ($data["totalSize"] != -1) {
                 $ajxpNode->target_bytesize = $data["totalSize"];
-                $ajxpNode->target_filesize = AJXP_Utils::roundSize($data["totalSize"]);
+                $ajxpNode->target_filesize = Utils::roundSize($data["totalSize"]);
                 $ajxpNode->process_stoppable = (isSet($data["pid"])?"true":"false");
             }
         }

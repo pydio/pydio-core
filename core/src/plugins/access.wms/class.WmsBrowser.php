@@ -23,12 +23,12 @@ namespace Pydio\Access\Driver\DataProvider;
 use DOMDocument;
 use DOMXPath;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a WMS Server
+ * Plugin to access a WMS Server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -43,8 +43,8 @@ class WmsBrowser extends AbstractAccessDriver
                 $doc = DOMDocument::load($this->repository->getOption("HOST") . "?request=GetCapabilities");
                 $xPath = new DOMXPath($doc);
                 $dir = $httpVars["dir"];
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="wms.1" attributeName="ajxp_label" sortType="String"/><column messageId="wms.6" attributeName="srs" sortType="String"/><column messageId="wms.4" attributeName="style" sortType="String"/><column messageId="wms.5" attributeName="keywords" sortType="String"/></columns>');
+                XMLWriter::header();
+                XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="wms.1" attributeName="ajxp_label" sortType="String"/><column messageId="wms.6" attributeName="srs" sortType="String"/><column messageId="wms.4" attributeName="style" sortType="String"/><column messageId="wms.5" attributeName="keywords" sortType="String"/></columns>');
 
                 $layers = $xPath->query("Capability/Layer/Layer");
                 // Detect "levels"
@@ -75,7 +75,7 @@ class WmsBrowser extends AbstractAccessDriver
                 } else if (isSet($levels[basename($dir)])) {
                     $this->listLayers($levels[basename($dir)], $xPath, ($styleLevels?array($this,"replaceStyle"):null));
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
             break;
 
             default:
@@ -86,7 +86,7 @@ class WmsBrowser extends AbstractAccessDriver
     public function listLevels($levels)
     {
         foreach ($levels as $key => $layers) {
-            AJXP_XMLWriter::renderNode("/$key", $key, false, array(
+            XMLWriter::renderNode("/$key", $key, false, array(
                 "icon"			=> "folder.png",
                 "openicon"		=> "openfolder.png",
                 "parentname"	=> "/",
@@ -149,7 +149,7 @@ class WmsBrowser extends AbstractAccessDriver
                 $metaData = call_user_func($replaceCallback, $key, $metaData);
             }
 
-            AJXP_XMLWriter::renderNode("/".$metaData["name"], $title, true, $metaData);
+            XMLWriter::renderNode("/".$metaData["name"], $title, true, $metaData);
         }
     }
 

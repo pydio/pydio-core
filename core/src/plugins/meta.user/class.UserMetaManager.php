@@ -21,13 +21,13 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -58,7 +58,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
     {
         parent::initMeta($accessDriver);
 
-        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
             throw new Exception("The 'meta.user' plugin requires at least one active 'metastore' plugin");
         }
@@ -253,12 +253,12 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             if(!is_writable($ajxpNode->getUrl())){
                 throw new Exception("You are not allowed to perform this action");
             }
-            AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
+            Controller::applyHook("node.before_change", array(&$ajxpNode));
             foreach ($def as $key => $data) {
                 if (isSet($httpVars[$key])) {
-                    $newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
+                    $newValues[$key] = Utils::decodeSecureMagic($httpVars[$key]);
                     if($data["type"] == "tags"){
-                        $this->updateTags(AJXP_Utils::decodeSecureMagic($httpVars[$key]));
+                        $this->updateTags(Utils::decodeSecureMagic($httpVars[$key]));
                     }
                 } else {
                     if (!isset($original)) {
@@ -270,14 +270,14 @@ class UserMetaManager extends AJXP_AbstractMetaSource
                 }
             }
             $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
-            AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
+            Controller::applyHook("node.meta_change", array($ajxpNode));
 
             $nodesDiffs[$ajxpNode->getPath()] = $ajxpNode;
 
         }
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
+        XMLWriter::close();
     }
 
     /**

@@ -20,12 +20,12 @@
  */
 
 use Pydio\Access\Core\Filter\AJXP_Permission;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\SqlTableProvider;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -33,21 +33,21 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Feed
  */
-class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableProvider
+class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvider
 {
 
     private $sqlDriver;
 
     public function init($options)
     {
-        $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         parent::init($options);
     }
 
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("Please define an SQL connexion in the core configuration");
         }
@@ -84,7 +84,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 $userGroup,
                 ($repositoryScope !== false ? $repositoryScope : "ALL"),
                 serialize($data),
-                ($node!=null ? SystemTextEncoding::toUTF8($node->getUrl()):'')
+                ($node!=null ? TextEncoder::toUTF8($node->getUrl()):'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist event", $e->getMessage());
@@ -116,7 +116,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
         $repoOrs = array();
         foreach($filterByRepositories as $repoId){
             $masks = array();
-            AJXP_Controller::applyHook("role.masks", array($repoId, &$masks, AJXP_Permission::READ));
+            Controller::applyHook("role.masks", array($repoId, &$masks, AJXP_Permission::READ));
             if(count($masks)){
                 $pathesOr = array();
                 foreach($masks as $mask){
@@ -206,7 +206,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 $userId,
                 $repositoryId,
                 serialize($notif),
-                ($notif->getNode()!=null ? SystemTextEncoding::toUTF8($notif->getNode()->getUrl()):'')
+                ($notif->getNode()!=null ? TextEncoder::toUTF8($notif->getNode()->getUrl()):'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist alert", $e->getMessage());
@@ -387,8 +387,8 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
 
     public function installSQLTables($param)
     {
-        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }
 
 }

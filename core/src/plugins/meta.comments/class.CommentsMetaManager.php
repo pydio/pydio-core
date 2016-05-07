@@ -20,11 +20,11 @@
  */
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -46,12 +46,12 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     public function initMeta($accessDriver)
     {
         parent::initMeta($accessDriver);
-        $feed = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        $feed = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         if ($feed) {
             $this->storageMode = "FEED";
             $this->feedStore = $feed;
         } else {
-            $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+            $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
             if ($store === false) {
                 throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
             }
@@ -79,7 +79,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     public function moveMeta($oldFile, $newFile = null, $copy = false)
     {
         if($oldFile == null) return;
-        $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        $feedStore = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         if ($feedStore !== false) {
             $feedStore->updateMetaObject($oldFile->getRepositoryId(), $oldFile->getPath(), ($newFile!=null?$newFile->getPath():null), $copy);
             return;
@@ -111,7 +111,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     {
         $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
         $uniqNode = $userSelection->getUniqueNode();
-        $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        $feedStore = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {
             $existingFeed = array();
@@ -124,9 +124,9 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                 $uId = AuthService::getLoggedUser()->getId();
                 $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
-                    $content = substr(AJXP_Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
+                    $content = substr(Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
                 } else {
-                    $content = AJXP_Utils::decodeSecureMagic($httpVars["content"]);
+                    $content = Utils::decodeSecureMagic($httpVars["content"]);
                 }
                 $com = array(
                     "date"      => time(),
@@ -148,7 +148,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
                 }
                 HTMLWriter::charsetHeader("application/json");
-                $com["hdate"] = AJXP_Utils::relativeDate($com["date"], $mess);
+                $com["hdate"] = Utils::relativeDate($com["date"], $mess);
                 $com["path"] = $uniqNode->getPath();
                 echo json_encode($com);
 
@@ -158,8 +158,8 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
 
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
-                    $sortBy = isSet($httpVars["sort_by"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_by"]):"date";
-                    $sortDir = isSet($httpVars["sort_dir"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
+                    $sortBy = isSet($httpVars["sort_by"])?Utils::decodeSecureMagic($httpVars["sort_by"]):"date";
+                    $sortDir = isSet($httpVars["sort_dir"])?Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
                     $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]) : 0;
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
                     $uniqNode->loadNodeInfo();
@@ -181,7 +181,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                         $rPath = ltrim($rPath, "/");
                         $newItem = array(
                             "date"      =>$stdObject->date,
-                            "hdate"     => AJXP_Utils::relativeDate($stdObject->date, $mess),
+                            "hdate"     => Utils::relativeDate($stdObject->date, $mess),
                             "author"    => $stdObject->author,
                             "content"   => base64_decode($stdObject->content),
                             "path"      => $stdObject->path,
@@ -199,7 +199,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     echo json_encode($theFeed);
                 } else {
                     foreach ($existingFeed as &$item) {
-                        $item["hdate"] = AJXP_Utils::relativeDate($item["date"], $mess);
+                        $item["hdate"] = Utils::relativeDate($item["date"], $mess);
                     }
                     echo json_encode($existingFeed);
                 }
@@ -216,7 +216,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                         if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
                             continue;
                         }
-                        $fElement["hdate"] = AJXP_Utils::relativeDate($fElement["date"], $mess);
+                        $fElement["hdate"] = Utils::relativeDate($fElement["date"], $mess);
                         $reFeed[] = $fElement;
                     }
                     $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);

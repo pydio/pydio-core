@@ -24,10 +24,10 @@ namespace Pydio\Access\Driver\StreamProvider\FTP;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -66,12 +66,12 @@ class ftpAccessWrapper implements IAjxpWrapper
 
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
         $tmpHandle = fopen($tmpFile, "wb");
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);
         if (!$persistent) {
-            register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }
@@ -91,7 +91,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         $fake = new ftpAccessWrapper();
         $parts = $fake->parseUrl($path);
         $link = $fake->createFTPLink();
-        $serverPath = AJXP_Utils::securePath($fake->path."/".$parts["path"]);
+        $serverPath = Utils::securePath($fake->path."/".$parts["path"]);
         AJXP_Logger::debug($serverPath);
         ftp_fget($link, $stream, $serverPath, FTP_BINARY);
     }
@@ -101,7 +101,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         $fake = new ftpAccessWrapper();
         $parts = $fake->parseUrl($path);
         $link = $fake->createFTPLink();
-        $serverPath = AJXP_Utils::securePath($fake->path."/".$parts["path"]);
+        $serverPath = Utils::securePath($fake->path."/".$parts["path"]);
         ftp_chmod($link, $chmodValue, $serverPath);
     }
 
@@ -110,7 +110,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         if (stripos($mode, "w") !== false) {
             $this->crtMode = 'write';
             $parts = $this->parseUrl($url);
-            $this->crtTarget = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+            $this->crtTarget = Utils::securePath($this->path."/".$parts["path"]);
             $this->crtLink = $this->createFTPLink();
             $this->fp = tmpfile();
         } else {
@@ -172,7 +172,7 @@ class ftpAccessWrapper implements IAjxpWrapper
     {
       if (strpos($errstr, "Opening BINARY mode data connection") !== false)
         $errstr = "Transfer failed. Please check available disk space (quota)";
-      AJXP_XMLWriter::catchError($errno, $errstr, $errfile, $errline, $errcontext);
+      XMLWriter::catchError($errno, $errstr, $errfile, $errline, $errcontext);
     }
 
     public function stream_flush()
@@ -215,9 +215,9 @@ class ftpAccessWrapper implements IAjxpWrapper
     {
         // We are in an opendir loop
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT", $path);
-        $testLoopPath = AJXP_Utils::safeDirname($path);
+        $testLoopPath = Utils::safeDirname($path);
         if (is_array(self::$dirContent[$testLoopPath])) {
-            $search = AJXP_Utils::safeBasename($path);
+            $search = Utils::safeBasename($path);
             //if($search == "") $search = ".";
             if (array_key_exists($search, self::$dirContent[$testLoopPath])) {
                 return self::$dirContent[$testLoopPath][$search];
@@ -225,16 +225,16 @@ class ftpAccessWrapper implements IAjxpWrapper
         }
         $parts = $this->parseUrl($path);
         $link = $this->createFTPLink();
-        $serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+        $serverPath = Utils::securePath($this->path."/".$parts["path"]);
         if(empty($parts["path"])) $parts["path"] = "/";
         if ($parts["path"] == "/") {
             $basename = ".";
         } else {
-            $basename = AJXP_Utils::safeBasename($serverPath);
+            $basename = Utils::safeBasename($serverPath);
         }
 
-        $serverParent = AJXP_Utils::safeDirname($parts["path"]);
-        $serverParent = AJXP_Utils::securePath($this->path."/".$serverParent);
+        $serverParent = Utils::safeDirname($parts["path"]);
+        $serverParent = Utils::securePath($this->path."/".$serverParent);
 
         $testCd = @ftp_chdir($link, $serverPath);
         if ($testCd === true) {
@@ -277,7 +277,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         }
         $parts = $this->parseUrl($url);
         $link = $this->createFTPLink();
-        $serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+        $serverPath = Utils::securePath($this->path."/".$parts["path"]);
         $contents = $this->rawList($link, $serverPath);
         $folders = $files = array();
         foreach ($contents as $entry) {
@@ -335,8 +335,8 @@ class ftpAccessWrapper implements IAjxpWrapper
     protected function rawList($link, $serverPath, $target = 'd', $retry = true)
     {
         if ($target == 'f') {
-            $parentDir = AJXP_Utils::safeDirname($serverPath);
-            $fileName = AJXP_Utils::safeBasename($serverPath);
+            $parentDir = Utils::safeDirname($serverPath);
+            $fileName = Utils::safeBasename($serverPath);
             ftp_chdir($link, $parentDir);
             $rl_dirlist = @ftp_rawlist($link, "-a .");
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FILE RAWLIST FROM ".$parentDir);
@@ -437,7 +437,7 @@ class ftpAccessWrapper implements IAjxpWrapper
     protected function parseUrl($url, $forceLogin = false)
     {
         // URL MAY BE ajxp.ftp://username:password@host/path
-        $urlParts = AJXP_Utils::safeParseUrl($url);
+        $urlParts = Utils::safeParseUrl($url);
         $this->repositoryId = $urlParts["host"];
         $repository = ConfService::getRepositoryById($this->repositoryId);
         if ($repository == null) {
@@ -447,7 +447,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         $this->user = $credentials["user"];
         $this->password = $credentials["password"];
         if ($this->user=="") {
-            throw new AJXP_Exception("Cannot find user/pass for FTP access!");
+            throw new PydioException("Cannot find user/pass for FTP access!");
         }
         if ($repository->getOption("DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])) {
             $data = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
@@ -500,9 +500,9 @@ class ftpAccessWrapper implements IAjxpWrapper
             $parts = $this->parseUrl($url);
         } else {
             // parseUrl already called before (rename case).
-            $parts = AJXP_Utils::safeParseUrl($url);
+            $parts = Utils::safeParseUrl($url);
         }
-        $serverPath = AJXP_Utils::securePath("/$this->path/".$parts["path"]);
+        $serverPath = Utils::securePath("/$this->path/".$parts["path"]);
         return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;
     }
 
@@ -516,7 +516,7 @@ class ftpAccessWrapper implements IAjxpWrapper
 
         if (ConfService::getRepositoryById($this->repositoryId)->getOption("CREATE") == true) {
             // Test if root exists and create it otherwise
-            $serverPath = AJXP_Utils::securePath($this->path."/");
+            $serverPath = Utils::securePath($this->path."/");
             $testCd = @ftp_chdir($link, $serverPath);
             if ($testCd !== true) {
                 $res = @ftp_mkdir($link, $serverPath);
@@ -546,7 +546,7 @@ class ftpAccessWrapper implements IAjxpWrapper
 
     /**
      * @return bool|resource
-     * @throws AJXP_Exception
+     * @throws PydioException
      */
     protected function createFTPLink()
     {
@@ -566,12 +566,12 @@ class ftpAccessWrapper implements IAjxpWrapper
             $link = @ftp_connect($this->host, $this->port);
            }
         if (!$link) {
-            throw new AJXP_Exception("Cannot connect to FTP server ($this->host, $this->port)");
+            throw new PydioException("Cannot connect to FTP server ($this->host, $this->port)");
          }
         //register_shutdown_function('ftp_close', $link);
         @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
         if (!@ftp_login($link,$this->user,$this->password)) {
-            throw new AJXP_Exception("Cannot login to FTP server with user $this->user");
+            throw new PydioException("Cannot login to FTP server with user $this->user");
         }
         if (!$this->ftpActive) {
             @ftp_pasv($link, true);

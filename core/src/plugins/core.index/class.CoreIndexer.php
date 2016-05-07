@@ -21,17 +21,17 @@
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class CoreIndexer extends AJXP_Plugin {
+class CoreIndexer extends Plugin {
 
     private $verboseIndexation = false;
 
@@ -62,11 +62,11 @@ class CoreIndexer extends AJXP_Plugin {
             }
 
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                AJXP_Controller::applyActionInBackground($repositoryId, "index", $httpVars);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repositoryId), sprintf($messages["core.index.8"], $nodes[0]->getPath()), true, 2);
+                Controller::applyActionInBackground($repositoryId, "index", $httpVars);
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repositoryId), sprintf($messages["core.index.8"], $nodes[0]->getPath()), true, 2);
                 if(!isSet($httpVars["inner_apply"])){
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                 }
                 return null;
             }
@@ -81,7 +81,7 @@ class CoreIndexer extends AJXP_Plugin {
                 if(!$dir){
                     try{
                         $this->debug("Indexing - node.index ".$node->getUrl());
-                        AJXP_Controller::applyHook("node.index", array($node));
+                        Controller::applyHook("node.index", array($node));
                     }catch (Exception $e){
                         $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
                     }
@@ -99,13 +99,13 @@ class CoreIndexer extends AJXP_Plugin {
             $repoId = $httpVars["repository_id"];
             list($status, $message) = $this->getIndexStatus(ConfService::getRepositoryById($repoId), AuthService::getLoggedUser());
             if (!empty($status)) {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), $message, true, 3);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), $message, true, 3);
+                XMLWriter::close();
             } else {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("info_message", array(), $messages["core.index.5"], true, 5);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("info_message", array(), $messages["core.index.5"], true, 5);
+                XMLWriter::close();
             }
         }
         return null;
@@ -125,12 +125,12 @@ class CoreIndexer extends AJXP_Plugin {
         if($user == null && AuthService::usersEnabled()) $user = AuthService::getLoggedUser();
         if($depth == 0){
             $this->debug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());
-            $this->setIndexStatus("RUNNING", str_replace("%s", SystemTextEncoding::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
-            AJXP_Controller::applyHook("node.index.recursive.start", array($node));
+            $this->setIndexStatus("RUNNING", str_replace("%s", TextEncoder::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
+            Controller::applyHook("node.index.recursive.start", array($node));
         }else{
             if($this->isInterruptRequired($repository, $user)){
                 $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
-                AJXP_Controller::applyHook("node.index.recursive.end", array($node));
+                Controller::applyHook("node.index.recursive.end", array($node));
                 $this->releaseStatus($repository, $user);
                 throw new Exception("User interrupted");
             }
@@ -139,10 +139,10 @@ class CoreIndexer extends AJXP_Plugin {
         if(!ConfService::currentContextIsCommandLine()) @set_time_limit(120);
         $url = $node->getUrl();
         $this->debug("Indexing Node parent node ".$url);
-        $this->setIndexStatus("RUNNING", str_replace("%s", SystemTextEncoding::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
+        $this->setIndexStatus("RUNNING", str_replace("%s", TextEncoder::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
         if($node->getPath() != "/"){
             try {
-                AJXP_Controller::applyHook("node.index", array($node));
+                Controller::applyHook("node.index", array($node));
             } catch (Exception $e) {
                 $this->debug("Error Indexing Node ".$url." (".$e->getMessage().")");
             }
@@ -160,7 +160,7 @@ class CoreIndexer extends AJXP_Plugin {
                 }else{
                     try {
                         $this->debug("Indexing Node ".$childUrl);
-                        AJXP_Controller::applyHook("node.index", array($childNode));
+                        Controller::applyHook("node.index", array($childNode));
                     } catch (Exception $e) {
                         $this->debug("Error Indexing Node ".$childUrl." (".$e->getMessage().")");
                     }
@@ -173,7 +173,7 @@ class CoreIndexer extends AJXP_Plugin {
         if($depth == 0){
             $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
             $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user);
-            AJXP_Controller::applyHook("node.index.recursive.end", array($node));
+            Controller::applyHook("node.index.recursive.end", array($node));
             $this->releaseStatus($repository, $user);
             $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
         }

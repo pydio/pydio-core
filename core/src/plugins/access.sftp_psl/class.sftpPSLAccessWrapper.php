@@ -26,8 +26,8 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed' );
@@ -36,7 +36,7 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 require_once(AJXP_INSTALL_PATH."/plugins/access.sftp_psl/phpseclib/SSH2.php");
 
 /**
- * AJXP_Plugin to access a remote server using SSH File Transfer Protocol (SFTP) with phpseclib ( http://phpseclib.sourceforge.net/ )
+ * Plugin to access a remote server using SSH File Transfer Protocol (SFTP) with phpseclib ( http://phpseclib.sourceforge.net/ )
  *
  * @author	warhawk3407 <warhawk3407@gmail.com>
  * @author	Charles du Jeu <contact (at) cdujeu.me>
@@ -60,7 +60,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true)
     {
-        $url = AJXP_Utils::safeParseUrl($path);
+        $url = Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $path = $url["path"];
 
@@ -84,7 +84,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
             $basePath = "/$basePath";
         }
 
-        $path = AJXP_Utils::securePath($path);
+        $path = Utils::securePath($path);
 
         if ($path[0] == "/") {
             $path = substr($path, 1);
@@ -102,7 +102,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);
@@ -184,7 +184,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     {
         $realPath = self::initPath($path);
         $stat = @stat($realPath);
-        $parts = AJXP_Utils::safeParseUrl($path);
+        $parts = Utils::safeParseUrl($path);
         $repoObject = ConfService::getRepositoryById($parts["host"]);
 
         AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));

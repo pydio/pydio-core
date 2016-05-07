@@ -18,9 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Utils;
 
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class SystemTextEncoding
+class TextEncoder
 {
     /**
      * Change the charset of a string from input to output
@@ -102,11 +102,11 @@ class SystemTextEncoding
      */
     public static function fromUTF8($filesystemElement, $test = false)
     {
-        if ($test && !SystemTextEncoding::isUtf8($filesystemElement)) {
+        if ($test && !TextEncoder::isUtf8($filesystemElement)) {
             return $filesystemElement;
         }
-        $enc = SystemTextEncoding::getEncoding();
-        return SystemTextEncoding::changeCharset("UTF-8", $enc, $filesystemElement);
+        $enc = TextEncoder::getEncoding();
+        return TextEncoder::changeCharset("UTF-8", $enc, $filesystemElement);
     }
 
     /**
@@ -130,7 +130,7 @@ class SystemTextEncoding
      */
     public static function fromPostedFileName($filesystemElement)
     {
-        return SystemTextEncoding::fromUTF8(SystemTextEncoding::magicDequote($filesystemElement));
+        return TextEncoder::fromUTF8(TextEncoder::magicDequote($filesystemElement));
     }
 
     /**
@@ -142,11 +142,11 @@ class SystemTextEncoding
      */
     public static function toUTF8($filesystemElement, $test = true)
     {
-        if ($test && SystemTextEncoding::isUtf8($filesystemElement)) {
+        if ($test && TextEncoder::isUtf8($filesystemElement)) {
             return $filesystemElement;
         }
-        $enc = SystemTextEncoding::getEncoding();
-        return SystemTextEncoding::changeCharset($enc, "UTF-8", $filesystemElement);
+        $enc = TextEncoder::getEncoding();
+        return TextEncoder::changeCharset($enc, "UTF-8", $filesystemElement);
     }
     /**
      * Test if a string seem to be already UTF8-encoded
@@ -176,11 +176,11 @@ class SystemTextEncoding
      */
     public static function fromStorageEncoding($filesystemElement, $test = true)
     {
-        if ($test && SystemTextEncoding::isUtf8($filesystemElement)) {
+        if ($test && TextEncoder::isUtf8($filesystemElement)) {
             return $filesystemElement;
         }
-        $enc = SystemTextEncoding::getEncoding();
-        return SystemTextEncoding::changeCharset($enc, "UTF-8", $filesystemElement);
+        $enc = TextEncoder::getEncoding();
+        return TextEncoder::changeCharset($enc, "UTF-8", $filesystemElement);
     }
     /**
      * Decode a string from UTF8 to current Storage Charset
@@ -191,10 +191,10 @@ class SystemTextEncoding
      */
     public static function toStorageEncoding($filesystemElement, $test = false)
     {
-        if ($test && !SystemTextEncoding::isUtf8($filesystemElement)) {
+        if ($test && !TextEncoder::isUtf8($filesystemElement)) {
             return $filesystemElement;
         }
-        $enc = SystemTextEncoding::getEncoding();
-        return SystemTextEncoding::changeCharset("UTF-8", $enc, $filesystemElement);
+        $enc = TextEncoder::getEncoding();
+        return TextEncoder::changeCharset("UTF-8", $enc, $filesystemElement);
     }	
 }

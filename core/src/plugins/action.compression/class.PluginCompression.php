@@ -22,13 +22,13 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class PluginCompression extends AJXP_Plugin
+class PluginCompression extends Plugin
 {
     /**
      * @param String $action
@@ -52,7 +52,7 @@ class PluginCompression extends AJXP_Plugin
         $repository = ConfService::getRepository();
         $userSelection = new UserSelection($repository, $httpVars);
         $nodes = $userSelection->buildNodes();
-        $currentDirPath = AJXP_Utils::safeDirname($userSelection->getUniqueNode()->getPath());
+        $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
         $currentDirUrl = $userSelection->currentBaseUrl().$currentDirPath;
         if (empty($httpVars["compression_id"])) {
@@ -70,7 +70,7 @@ class PluginCompression extends AJXP_Plugin
         }
             $progressExtractFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressExtractID-" . $extractId . ".txt";
         if ($action == "compression") {
-            $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+            $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
             $archiveFormat = $httpVars["type_archive"];
             $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
             $acceptedExtension = false;
@@ -82,21 +82,21 @@ class PluginCompression extends AJXP_Plugin
             }
             if ($acceptedExtension == false) {
                 file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.16"]);
-                throw new AJXP_Exception($messages["compression.16"]);
+                throw new PydioException($messages["compression.16"]);
             }
             $typeArchive = $httpVars["type_archive"];
             //if we can run in background we do it
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 $archivePath = $currentDirPath.$archiveName;
                 file_put_contents($progressCompressionFileName, $messages["compression.5"]);
-                AJXP_Controller::applyActionInBackground($repository->getId(), "compression", $httpVars);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_compression_status", array(
+                Controller::applyActionInBackground($repository->getId(), "compression", $httpVars);
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("check_compression_status", array(
                     "repository_id" => $repository->getId(),
                     "compression_id" => $compressionId,
-                    "archive_path" => SystemTextEncoding::toUTF8($archivePath)
+                    "archive_path" => TextEncoder::toUTF8($archivePath)
                 ), $messages["compression.5"], true, 2);
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 return null;
             } else {
                 $maxAuthorizedSize = 4294967296;
@@ -128,10 +128,10 @@ class PluginCompression extends AJXP_Plugin
                 //WE STOP IF IT'S JUST AN EMPTY FOLDER OR NO FILES
                 if (empty($tabFilesNames)) {
                     file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.17"]);
-                    throw new AJXP_Exception($messages["compression.17"]);
+                    throw new PydioException($messages["compression.17"]);
                 }
                 try {
-                    $tmpArchiveName = tempnam(AJXP_Utils::getAjxpTmpDir(), "tar-compression") . ".tar";
+                    $tmpArchiveName = tempnam(Utils::getAjxpTmpDir(), "tar-compression") . ".tar";
                     $archive = new PharData($tmpArchiveName);
                 } catch (Exception $e) {
                     file_put_contents($progressCompressionFileName, "Error : " . $e->getMessage());
@@ -164,50 +164,50 @@ class PluginCompression extends AJXP_Plugin
                 }
                 $destArchive = AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $archiveName);
                 rename($finalArchive, $destArchive);
-                AJXP_Controller::applyHook("node.before_create", array($destArchive, filesize($destArchive)));
+                Controller::applyHook("node.before_create", array($destArchive, filesize($destArchive)));
                 if (file_exists($tmpArchiveName)) {
                     unlink($tmpArchiveName);
                     unlink(substr($tmpArchiveName, 0, -4));
                 }
                 $newNode = new AJXP_Node($currentDirUrl . $archiveName);
-                AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
+                Controller::applyHook("node.change", array(null, $newNode, false));
                 file_put_contents($progressCompressionFileName, "SUCCESS");
             }
         }
     elseif ($action == "check_compression_status") {
-        $archivePath = AJXP_Utils::decodeSecureMagic($httpVars["archive_path"]);
+        $archivePath = Utils::decodeSecureMagic($httpVars["archive_path"]);
         $progressCompression = file_get_contents($progressCompressionFileName);
         $substrProgressCompression = substr($progressCompression, 0, 5);
         if ($progressCompression != "SUCCESS" && $substrProgressCompression != "Error") {
-            AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_compression_status", array(
+            XMLWriter::header();
+                XMLWriter::triggerBgAction("check_compression_status", array(
                     "repository_id" => $repository->getId(),
                     "compression_id" => $compressionId,
-                    "archive_path" => SystemTextEncoding::toUTF8($archivePath)
+                    "archive_path" => TextEncoder::toUTF8($archivePath)
                 ), $progressCompression, true, 5);
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
             } elseif ($progressCompression == "SUCCESS") {
                 $newNode = new AJXP_Node($userSelection->currentBaseUrl() . $archivePath);
                 $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
-                AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage($messages["compression.8"], null);
-                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
-                AJXP_XMLWriter::close();
+                Controller::applyHook("node.change", array(null, $newNode, false));
+                XMLWriter::header();
+                XMLWriter::sendMessage($messages["compression.8"], null);
+                XMLWriter::writeNodesDiff($nodesDiffs, true);
+                XMLWriter::close();
                 if (file_exists($progressCompressionFileName)) {
                     unlink($progressCompressionFileName);
                 }
             } elseif ($substrProgressCompression == "Error") {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage(null, $progressCompression);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::sendMessage(null, $progressCompression);
+                XMLWriter::close();
                 if (file_exists($progressCompressionFileName)) {
                     unlink($progressCompressionFileName);
                 }
             }
     }
         elseif ($action == "extraction") {
-            $fileArchive = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
+            $fileArchive = Utils::sanitize(Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
             $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
             $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
             $acceptedArchive = false;
@@ -226,7 +226,7 @@ class PluginCompression extends AJXP_Plugin
             }
             if ($acceptedArchive == false) {
                 file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
-                throw new AJXP_Exception($messages["compression.15"]);
+                throw new PydioException($messages["compression.15"]);
             }
             $onlyFileName = substr($fileArchive, 0, -$extensionLength);
             $lastPosOnlyFileName =  strrpos($onlyFileName, "-");
@@ -242,15 +242,15 @@ class PluginCompression extends AJXP_Plugin
             }
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 file_put_contents($progressExtractFileName, $messages["compression.12"]);
-                AJXP_Controller::applyActionInBackground($repository->getId(), "extraction", $httpVars);
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_extraction_status", array(
+                Controller::applyActionInBackground($repository->getId(), "extraction", $httpVars);
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("check_extraction_status", array(
                     "repository_id" => $repository->getId(),
                     "extraction_id" => $extractId,
                     "currentDirUrl" => $currentDirUrl,
                     "onlyFileName" => $onlyFileName
                 ), $messages["compression.12"], true, 2);
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 return null;
             }
             mkdir($currentDirUrl . $onlyFileName, 0777, true);
@@ -268,18 +268,18 @@ class PluginCompression extends AJXP_Plugin
                         $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
                     } catch (Exception $e) {
                         file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
-                        throw new AJXP_Exception($e);
+                        throw new PydioException($e);
                     }
                     $counterExtract++;
                     file_put_contents($progressExtractFileName, sprintf($messages["compression.13"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
                 }
             } catch (Exception $e) {
                 file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
-                throw new AJXP_Exception($e);
+                throw new PydioException($e);
             }
             file_put_contents($progressExtractFileName, "SUCCESS");
             $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
-            AJXP_Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
+            Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
         }
     elseif ($action == "check_extraction_status") {
             $currentDirUrl = $httpVars["currentDirUrl"];
@@ -287,32 +287,32 @@ class PluginCompression extends AJXP_Plugin
             $progressExtract = file_get_contents($progressExtractFileName);
             $substrProgressExtract = substr($progressExtract, 0, 5);
             if ($progressExtract != "SUCCESS" && $progressExtract != "INDEX" && $substrProgressExtract != "Error") {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_extraction_status", array(
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("check_extraction_status", array(
                     "repository_id" => $repository->getId(),
                     "extraction_id" => $extractId,
                     "currentDirUrl" => $currentDirUrl,
                     "onlyFileName" => $onlyFileName
                 ), $progressExtract, true, 4);
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
             } elseif ($progressExtract == "SUCCESS") {
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
                 $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
-                AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
-                AJXP_XMLWriter::triggerBgAction("check_index_status", array(
+                Controller::applyHook("node.change", array(null, $newNode, false));
+                XMLWriter::header();
+                XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
+                XMLWriter::triggerBgAction("check_index_status", array(
                     "repository_id" => $newNode->getRepositoryId()
                 ), "starting indexation", true, 5);
-                AJXP_XMLWriter::writeNodesDiff($nodesDiffs, true);
-                AJXP_XMLWriter::close();
+                XMLWriter::writeNodesDiff($nodesDiffs, true);
+                XMLWriter::close();
                 if (file_exists($progressExtractFileName)) {
                     unlink($progressExtractFileName);
                 }
             } elseif ($substrProgressExtract == "Error") {
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage(null, $progressExtract);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::sendMessage(null, $progressExtract);
+                XMLWriter::close();
                 if (file_exists($progressExtractFileName)) {
                     unlink($progressExtractFileName);
                 }

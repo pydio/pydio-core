@@ -21,10 +21,11 @@
 namespace Pydio\Auth\Core;
 
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -37,7 +38,7 @@ define('AJXP_FILTER_NOT_EMPTY', 'AJXP_FILTER_NOT_EMPTY');
  * @class AbstractAuthDriver
  * Abstract representation of an authentication driver. Must be implemented by the auth plugin
  */
-class AbstractAuthDriver extends AJXP_Plugin
+class AbstractAuthDriver extends Plugin
 {
     public $options;
     public $driverName = "abstract";
@@ -48,7 +49,7 @@ class AbstractAuthDriver extends AJXP_Plugin
         switch ($action) {
 
             case "get_secure_token" :
-                HTMLWriter::charsetHeader("text/plain");
+                \Pydio\Core\Controller\HTMLWriter::charsetHeader("text/plain");
                 print AuthService::generateSecureToken();
                 //exit(0);
                 break;
@@ -107,10 +108,10 @@ class AbstractAuthDriver extends AJXP_Plugin
             if ($logged == null) {
                 return $this->registryContributions;
             } else {
-                $xmlString = AJXP_XMLWriter::getUserXml($logged);
+                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXml($logged);
             }
         } else {
-            $xmlString = AJXP_XMLWriter::getUserXml(null);
+            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXml(null);
         }
         $dom = new \DOMDocument();
         $dom->loadXML($xmlString);

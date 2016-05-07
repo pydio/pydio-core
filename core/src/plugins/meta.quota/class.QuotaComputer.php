@@ -21,12 +21,12 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -145,7 +145,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q + $delta >= $quota) {
             $mess = ConfService::getMessages();
-            throw new Exception($mess["meta.quota.3"]." (".AJXP_Utils::roundSize($quota) .")!");
+            throw new Exception($mess["meta.quota.3"]." (".Utils::roundSize($quota) .")!");
         } else if ( $soft !== false && ($q + $delta) >= $soft && $q <= $soft) {
             $this->sendSoftLimitAlert();
         }
@@ -153,7 +153,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     protected function sendSoftLimitAlert()
     {
-        $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+        $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
         if ($mailer !== false) {
             $percent = $this->getFilteredOption("SOFT_QUOTA");
             $quota = $this->getFilteredOption("DEFAULT_QUOTA");
@@ -185,7 +185,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $q = $this->accessDriver->directoryUsage("", $repoOptions);
         $this->storeUsage($q);
         $t = $this->getAuthorized();
-        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
+        Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
     }
 
     protected function storeUsage($quota)
@@ -201,7 +201,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
     {
         if(self::$loadedQuota != null) return self::$loadedQuota;
         $q = $this->getFilteredOption("DEFAULT_QUOTA");
-        self::$loadedQuota = AJXP_Utils::convertBytes($q);
+        self::$loadedQuota = Utils::convertBytes($q);
         return self::$loadedQuota;
     }
 

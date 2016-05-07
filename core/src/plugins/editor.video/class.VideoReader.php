@@ -22,11 +22,11 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class VideoReader extends AJXP_Plugin
+class VideoReader extends Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
@@ -55,7 +55,7 @@ class VideoReader extends AJXP_Plugin
             session_write_close();
             $filesize = filesize($node->getUrl());
             $filename = $node->getUrl();
-            $basename = AJXP_Utils::safeBasename($filename);
+            $basename = Utils::safeBasename($filename);
 
             //$fp = fopen($destStreamURL.$file, "r");
             if (preg_match("/\.ogv$/", $basename)) {
@@ -127,7 +127,7 @@ class VideoReader extends AJXP_Plugin
                 fflush($stream);
                 fclose($stream);
             }
-            AJXP_Controller::applyHook("node.read", array($node));
+            Controller::applyHook("node.read", array($node));
         } else if ($action == "get_sess_id") {
             HTMLWriter::charsetHeader("text/plain");
             print(session_id());

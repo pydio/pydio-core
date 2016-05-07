@@ -24,14 +24,14 @@
 
 include_once("base.conf.php");
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Log\Core\AJXP_Logger;
 
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 
 ConfService::init();
 ConfService::start();
@@ -43,7 +43,7 @@ if (!ConfService::getCoreConf("WEBDAV_ENABLE")) {
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
-AJXP_PluginsService::getInstance()->initActivePlugins();
+PluginsService::getInstance()->initActivePlugins();
 
 /**
  * @param string $className
@@ -64,7 +64,7 @@ include AJXP_BIN_FOLDER.'/sabredav/lib/Sabre/autoload.php';
 if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
     $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 } else {
-    $baseURL = AJXP_Utils::detectServerURL();
+    $baseURL = Utils::detectServerURL();
 }
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 

@@ -25,12 +25,12 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -39,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class ZohoEditor extends AJXP_Plugin
+class ZohoEditor extends Plugin
 {
     public function performChecks()
     {
@@ -125,7 +125,7 @@ class ZohoEditor extends AJXP_Plugin
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
-                $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
             }else{
                 $file = $selection->getUniqueFile();
             }
@@ -136,10 +136,9 @@ class ZohoEditor extends AJXP_Plugin
 
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($nodeUrl);
-            //$tmp = SystemTextEncoding::fromUTF8($tmp);
 
             $node = new AJXP_Node($nodeUrl);
-            AJXP_Controller::applyHook("node.read", array($node));
+            Controller::applyHook("node.read", array($node));
             $this->logInfo('Preview', 'Posting content of '.$file.' to Zoho server', array("files" => $file));
 
             $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
@@ -162,7 +161,7 @@ class ZohoEditor extends AJXP_Plugin
                 'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
                 'output' => 'url',
                 'lang' => $this->getFilteredOption("ZOHO_LANGUAGE"),
-                'filename' => SystemTextEncoding::toUTF8(basename($file)),
+                'filename' => TextEncoder::toUTF8(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
                 'mode' => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
@@ -223,18 +222,18 @@ class ZohoEditor extends AJXP_Plugin
                 echo "NOT_ALLOWED";
                 return false;
             }
-            AJXP_Controller::applyHook("node.before_change", array(&$node));
+            Controller::applyHook("node.before_change", array(&$node));
 
             $b64Sig = $this->signID($id);
 
             if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository) ) {
                 $url =  $this->getFilteredOption("ZOHO_AGENT_URL",$repository)."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
-                $data = AJXP_Utils::getRemoteContent($url);
+                $data = Utils::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";
                     $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
-                    AJXP_Controller::applyHook("node.change", array(null, &$node));
+                    Controller::applyHook("node.change", array(null, &$node));
                 }
             } else {
                 if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext)) {
@@ -242,7 +241,7 @@ class ZohoEditor extends AJXP_Plugin
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
                     echo "MODIFIED";
                     $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
-                    AJXP_Controller::applyHook("node.change", array(null, &$node));
+                    Controller::applyHook("node.change", array(null, &$node));
                 }
             }
         }

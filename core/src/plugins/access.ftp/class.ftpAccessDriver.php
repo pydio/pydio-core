@@ -25,18 +25,18 @@ use DOMNode;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a remote server using the File Transfer Protocol
+ * Plugin to access a remote server using the File Transfer Protocol
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -91,9 +91,9 @@ class ftpAccessDriver extends fsAccessDriver
             case "trigger_remote_copy":
                 if(!$this->hasFilesToCopy()) break;
                 $toCopy = $this->getFileNameToCopy();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to ftp server");
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to ftp server");
+                XMLWriter::close();
                 exit(1);
             break;
             case "next_to_remote":
@@ -107,11 +107,11 @@ class ftpAccessDriver extends fsAccessDriver
                 $destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
                 //$destPath = AJXP_Utils::decodeSecureMagic($destPath);
                 // DO NOT "SANITIZE", THE URL IS ALREADY IN THE FORM ajxp.ftp://repoId/filename
-                $destPath = SystemTextEncoding::fromPostedFileName($destPath);
+                $destPath = TextEncoder::fromPostedFileName($destPath);
                 $node = new AJXP_Node($destPath);
                 $this->logDebug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
                 try {
-                    AJXP_Controller::applyHook("node.before_create", array(&$node));
+                    Controller::applyHook("node.before_create", array(&$node));
                     $fp = fopen($destPath, "w");
                     $fSource = fopen($fData["tmp_name"], "r");
                     while (!feof($fSource)) {
@@ -124,29 +124,29 @@ class ftpAccessDriver extends fsAccessDriver
                     fclose($fp);
                     $this->logDebug("FTP Upload : end of ftp copy");
                     @unlink($fData["tmp_name"]);
-                    AJXP_Controller::applyHook("node.change", array(null, &$node));
+                    Controller::applyHook("node.change", array(null, &$node));
 
                 } catch (\Exception $e) {
                     $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
                 }
                 $this->logDebug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if ($nextFile!='') {
-                    AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".SystemTextEncoding::toUTF8($nextFile)." to remote server");
+                    XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server");
                 } else {
-                    AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
+                    XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 exit(1);
             break;
             case "upload":
-                $rep_source = AJXP_Utils::securePath("/".$httpVars['dir']);
+                $rep_source = Utils::securePath("/".$httpVars['dir']);
                 $this->logDebug("Upload : rep_source ", array($rep_source));
                 $logMessage = "";
                 foreach ($filesVars as $boxName => $boxData) {
                     if(substr($boxName, 0, 9) != "userfile_")     continue;
                     $this->logDebug("Upload : rep_source ", array($rep_source));
-                    $err = AJXP_Utils::parseFileDataErrors($boxData);
+                    $err = Utils::parseFileDataErrors($boxData);
                     if ($err != null) {
                         $errorCode = $err[0];
                         $errorMessage = $err[1];
@@ -157,7 +157,7 @@ class ftpAccessDriver extends fsAccessDriver
                         $boxData["name"] = fsAccessDriver::autoRenameForDest($destination, $boxData["name"]);
                     }
                     $boxData["destination"] = base64_encode($rep_source);
-                    $destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
+                    $destCopy = XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
                     $this->logDebug("Upload : tmp upload folder", array($destCopy));
                     if (!is_dir($destCopy)) {
                         if (! @mkdir($destCopy)) {
@@ -279,7 +279,7 @@ class ftpAccessDriver extends fsAccessDriver
         $this->logDebug("Saving user temporary data", array($fileData));
         $files[] = $fileData;
         $user->saveTemporaryData("tmp_upload", $files);
-        if(AJXP_Utils::userAgentIsNativePydioApp()){
+        if(Utils::userAgentIsNativePydioApp()){
             $this->logInfo("Up from",$_SERVER["HTTP_USER_AGENT"]." - direct triger of next to remote");
             $this->uploadActions("next_to_remote", array(), array());
         }
@@ -313,7 +313,7 @@ class ftpAccessDriver extends fsAccessDriver
     public function testParameters($params)
     {
         if (empty($params["FTP_USER"])) {
-            throw new AJXP_Exception("Even if you intend to use the credentials stored in the session, temporarily set a user and password to perform the connexion test.");
+            throw new PydioException("Even if you intend to use the credentials stored in the session, temporarily set a user and password to perform the connexion test.");
         }
         if ($params["FTP_SECURE"]) {
             $link = @ftp_ssl_connect($params["FTP_HOST"], $params["FTP_PORT"]);
@@ -321,12 +321,12 @@ class ftpAccessDriver extends fsAccessDriver
             $link = @ftp_connect($params["FTP_HOST"], $params["FTP_PORT"]);
         }
         if (!$link) {
-            throw new AJXP_Exception("Cannot connect to FTP server (".$params["FTP_HOST"].",". $params["FTP_PORT"].")");
+            throw new PydioException("Cannot connect to FTP server (".$params["FTP_HOST"].",". $params["FTP_PORT"].")");
         }
         @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
         if (!@ftp_login($link,$params["FTP_USER"],$params["FTP_PASS"])) {
             ftp_close($link);
-            throw new AJXP_Exception("Cannot login to FTP server with user ".$params["FTP_USER"]);
+            throw new PydioException("Cannot login to FTP server with user ".$params["FTP_USER"]);
         }
         if (!$params["FTP_DIRECT"]) {
             @ftp_pasv($link, true);

@@ -21,8 +21,8 @@
 namespace Pydio\Meta\Core;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -30,7 +30,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Class AJXP_AbstractMetaSource
  * Abstract class from which all meta.* plugins must extend.
  */
-abstract class AJXP_AbstractMetaSource extends AJXP_Plugin {
+abstract class AJXP_AbstractMetaSource extends Plugin {
 
     /**
      * @var AbstractAccessDriver

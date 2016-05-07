@@ -21,7 +21,7 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Controller\Controller;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -60,7 +60,7 @@ class FSMonitoringManager extends AJXP_AbstractMetaSource
     protected function informWatcher($action, $path)
     {
         $cmd = "python ".$this->getBaseDir()."/framework_watch.py --action=$action --path=". escapeshellarg($path);
-        AJXP_Controller::runCommandInBackground($cmd, $this->getBaseDir()."/cmd.out");
+        Controller::runCommandInBackground($cmd, $this->getBaseDir()."/cmd.out");
     }
 
 }

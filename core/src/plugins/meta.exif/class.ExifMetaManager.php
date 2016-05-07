@@ -22,10 +22,10 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -116,7 +116,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         $selectedNode = $userSelection->getUniqueNode();
         $realFile = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
 
-        AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
+        Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
         if($exifData === false || !is_array($exifData)) return;
         if ($exifData !== false && isSet($exifData["GPS"])) {
@@ -141,21 +141,21 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
                 if(in_array(strtolower($key), $excludeTags)) continue;
                 if(strpos($key, "UndefinedTag:") === 0) continue;
                 $value = preg_replace( '/[^[:print:]]/', '',$value);
-                $filteredData[$section][$key] = SystemTextEncoding::toUTF8($value);
+                $filteredData[$section][$key] = TextEncoder::toUTF8($value);
             }
         }
 
         if($format == "xml"){
 
-            AJXP_XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
+            XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
             foreach ($filteredData as $section => $data) {
                 print("<exifSection name='$section'>");
                 foreach ($data as $key => $value) {
-                    print("<exifTag name=\"$key\">". AJXP_Utils::xmlEntities($value)."</exifTag>");
+                    print("<exifTag name=\"$key\">". Utils::xmlEntities($value)."</exifTag>");
                 }
                 print("</exifSection>");
             }
-            AJXP_XMLWriter::close("metadata");
+            XMLWriter::close("metadata");
 
         }else{
 

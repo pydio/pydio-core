@@ -22,7 +22,7 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -100,7 +100,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             $path = $repo->getOption("PATH");
             $opt = str_replace("AJXP_REPOSITORY_PATH", $path, $opt);
         }
-        $opt = AJXP_VarsFilter::filter($opt);
+        $opt = VarsFilter::filter($opt);
         return $opt;
     }
 

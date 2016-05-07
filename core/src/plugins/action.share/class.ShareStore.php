@@ -23,11 +23,11 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -78,7 +78,7 @@ class ShareStore {
             $loader_content = '<'.'?'.'php
                     define("AJXP_EXEC", true);
                     require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/'.AJXP_BIN_FOLDER_REL.'/class.AJXP_Utils.php");
-                    $hash = Pydio\Core\AJXP_Utils::securePath(Pydio\Core\AJXP_Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
+                    $hash = Pydio\Core\Utils\AJXP_Utils::securePath(Pydio\Core\Utils\AJXP_Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
                     if(file_exists($hash.".php")){
                         require_once($hash.".php");
                     }else{
@@ -611,8 +611,8 @@ class ShareStore {
             }
 
             if(isSet($repo)){
-                $oldNodeLabel = SystemTextEncoding::toUTF8($oldNode->getLabel());
-                $newNodeLabel = SystemTextEncoding::toUTF8($newNode->getLabel());
+                $oldNodeLabel = TextEncoder::toUTF8($oldNode->getLabel());
+                $newNodeLabel = TextEncoder::toUTF8($newNode->getLabel());
                 if($newNode != null && $newNodeLabel != $oldNodeLabel && $repo->getDisplay() == $oldNodeLabel){
                     $repo->setDisplay($newNodeLabel);
                 }
@@ -629,8 +629,8 @@ class ShareStore {
                     $save = true;
                 }else if(!empty($path)){
 
-                    $oldNodePath = SystemTextEncoding::toUTF8($oldNode->getPath());
-                    $newNodePath = SystemTextEncoding::toUTF8($newNode->getPath());
+                    $oldNodePath = TextEncoder::toUTF8($oldNode->getPath());
+                    $newNodePath = TextEncoder::toUTF8($newNode->getPath());
 
                     $path = preg_replace("#".preg_quote($oldNodePath, "#")."$#", $newNodePath, $path);
                     $repo->addOption("PATH", $path);
@@ -650,8 +650,8 @@ class ShareStore {
             } else {
 
                 if(isset($publicLink) && is_array($publicLink) && isSet($publicLink["FILE_PATH"])){
-                    $oldNodePath = SystemTextEncoding::toUTF8($oldNode->getPath());
-                    $newNodePath = SystemTextEncoding::toUTF8($newNode->getPath());
+                    $oldNodePath = TextEncoder::toUTF8($oldNode->getPath());
+                    $newNodePath = TextEncoder::toUTF8($newNode->getPath());
                     $publicLink["FILE_PATH"] = str_replace($oldNodePath, $newNodePath, $publicLink["FILE_PATH"]);
                     $this->deleteShare("file", $id);
                     $this->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
@@ -797,7 +797,7 @@ class ShareStore {
             }
         }
         if($repoLoaded && isSet($data["FILE_PATH"])){
-            AJXP_Controller::registryReset();
+            Controller::registryReset();
             $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
         }
         $this->deleteShare($data['SHARE_TYPE'], $elementId, false, true);

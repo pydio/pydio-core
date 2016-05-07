@@ -21,12 +21,12 @@
  * Description : main access point of the application, this script is called by any Ajax query.
  * Will dispatch the actions on the plugins.
  */
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Log\Core\AJXP_Logger;
 
 include_once("base.conf.php");
@@ -51,8 +51,8 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 
 if (is_file(TESTS_RESULT_FILE)) {
-    set_error_handler(array("Pydio\\Core\\AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-    set_exception_handler(array("Pydio\\Core\\AJXP_XMLWriter", "catchException"));
+    set_error_handler(array("Pydio\Core\Controller\XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+    set_exception_handler(array("Pydio\Core\Controller\XMLWriter", "catchException"));
 }
 
 ConfService::init();
@@ -79,7 +79,7 @@ session_start();
 if (isSet($_GET["tmp_repository_id"]) || isSet($_POST["tmp_repository_id"])) {
     try{
         ConfService::switchRootDir(isset($_GET["tmp_repository_id"])?$_GET["tmp_repository_id"]:$_POST["tmp_repository_id"], true);
-    }catch(AJXP_Exception $e){
+    }catch(PydioException $e){
         //$requireAuth = true;
     }
 } else if (isSet($_SESSION["SWITCH_BACK_REPO_ID"])) {
@@ -115,7 +115,7 @@ if (AuthService::usersEnabled()) {
     if ($loggedUser == null || $loggedUser->getId() == "guest") {
         // Try prelogging user if the session expired but the logging data is in fact still present
         // For example, for basic_http auth.
-        AJXP_PluginsService::getInstance()->initActivePlugins();
+        PluginsService::getInstance()->initActivePlugins();
         AuthService::preLogUser($httpVars);
         $loggedUser = AuthService::getLoggedUser();
         if($loggedUser == null) $requireAuth = true;
@@ -149,7 +149,7 @@ if (AuthService::usersEnabled()) {
 }
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-//$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
+//$ajxpDriver = PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
@@ -160,15 +160,15 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
         //AuthService::disconnect();
     }
 }
-AJXP_PluginsService::getInstance()->initActivePlugins();
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
-
+PluginsService::getInstance()->initActivePlugins();
 /*
  * TODO : Test w/ silex framework
-require_once (AJXP_BIN_FOLDER."/silex/vendor/autoload.php");
+ */
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/*
+require_once (AJXP_BIN_FOLDER."/silex/vendor/autoload.php");
 $silex = new Silex\Application();
 $silex->match("/", function(Silex\Application $silex, Request $request){
 
@@ -192,15 +192,16 @@ $silex->match("/", function(Silex\Application $silex, Request $request){
 })->method("POST|GET");
 $silex->run();
 */
+$request = Request::createFromGlobals();
 
-$xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
+$xmlResult = Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
 if ($xmlResult !== false && $xmlResult != "") {
-    AJXP_XMLWriter::header();
+    XMLWriter::header();
     print($xmlResult);
-    AJXP_XMLWriter::close();
-} else if (isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth) {
-    AJXP_XMLWriter::header();
-    AJXP_XMLWriter::requireAuth();
-    AJXP_XMLWriter::close();
+    XMLWriter::close();
+} else if (isset($requireAuth) && Controller::$lastActionNeedsAuth) {
+    XMLWriter::header();
+    XMLWriter::requireAuth();
+    XMLWriter::close();
 }
 session_write_close();

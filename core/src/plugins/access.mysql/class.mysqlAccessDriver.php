@@ -22,11 +22,11 @@ namespace Pydio\Access\Driver\DataProvider;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -58,10 +58,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
         $dbname = $this->repository->getOption("DB_NAME");
         $link = @mysql_connect($host, $this->user, $this->password);
         if (!$link) {
-            throw new AJXP_Exception("Cannot connect to server!");
+            throw new PydioException("Cannot connect to server!");
         }
         if (!@mysql_select_db($dbname, $link)) {
-            throw new AJXP_Exception("Cannot find database!");
+            throw new PydioException("Cannot find database!");
         }
         return $link;
     }
@@ -69,7 +69,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
     public function closeDbLink($link)
     {
         if (!mysql_close($link)) {
-            throw new AJXP_Exception("Cannot close connection!");
+            throw new PydioException("Cannot close connection!");
         }
     }
 
@@ -78,13 +78,13 @@ class mysqlAccessDriver extends AbstractAccessDriver
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = AJXP_Utils::securePath($getValue);
+            $$getName = Utils::securePath($getValue);
         }
         $selection = new UserSelection();
         $selection->initFromHttpVars($httpVars);
         if (isSet($dir) && $action != "upload") {
             $safeDir = $dir;
-            $dir = SystemTextEncoding::fromUTF8($dir);
+            $dir = TextEncoder::fromUTF8($dir);
         }
         // FILTER DIR PAGINATION ANCHOR
         if (isSet($dir) && strstr($dir, "%23")!==false) {
@@ -93,13 +93,13 @@ class mysqlAccessDriver extends AbstractAccessDriver
             $page = $parts[1];
         }
         if (isSet($dest)) {
-            $dest = SystemTextEncoding::fromUTF8($dest);
+            $dest = TextEncoder::fromUTF8($dest);
         }
         $mess = ConfService::getMessages();
 
         // Sanitize all httpVars entries
         foreach($httpVars as $k=>&$value){
-            $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_FILENAME);
+            $value = Utils::sanitize($value, AJXP_SANITIZE_FILENAME);
         }
 
         switch ($action) {
@@ -125,7 +125,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     $index = 0;
                     foreach ($arrValues as $k=>$v) {
                         // CHECK IF AUTO KEY!!!
-                        $string .= "'".addslashes(SystemTextEncoding::fromUTF8($v))."'";
+                        $string .= "'".addslashes(TextEncoder::fromUTF8($v))."'";
                         if($index < count($arrValues)-1) $string.=",";
                         $index++;
                     }
@@ -137,7 +137,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         if ($k == $pkName) {
                             $pkValue = $v;
                         } else {
-                            $string .= $k."='".addslashes(SystemTextEncoding::fromUTF8($v))."'";
+                            $string .= $k."='".addslashes(TextEncoder::fromUTF8($v))."'";
                             if($index<count($arrValues)-1) $string.=",";
                         }
                         $index++;
@@ -148,7 +148,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                 $res = $this->execQuery($query);
                 $this->closeDbLink($link);
 
-                if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                     $errorMessage = $res->messageId;
                 } else {
                     $logMessage = $query;
@@ -165,7 +165,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     if (isSet($httpVars["delete_column"])) {
                         $query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
                         $res = $this->execQuery($query);
-                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                             $errorMessage = $res->messageId;
                         } else {
                             $logMessage = $query;
@@ -187,7 +187,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                             $query.= ", ADD UNIQUE (".$httpVars["add_field_name"].")";
                         }
                         $res = $this->execQuery($query);
-                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                             $errorMessage = $res->messageId;
                         } else {
                             $logMessage = $query;
@@ -217,7 +217,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         $defString = ($row["default"]!=""?" DEFAULT ".$row["default"]."":"");
                         $query = "ALTER TABLE $current_table CHANGE ".$row["origname"]." ".$row["name"]." ".$row["type"].$sizeString.$defString." ".$row["null"];
                         $res = $this->execQuery(trim($query));
-                        if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                             $errorMessage = $res->messageId;
                             $this->closeDbLink($link);
                             break;
@@ -252,7 +252,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     }
                     $query = "CREATE TABLE $new_table ($fieldsDef)";
                     $res = $this->execQuery((trim($query)));
-                    if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                    if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                         $errorMessage = $res->messageId;
                     } else {
                         $logMessage = $query;
@@ -297,7 +297,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     $res = $this->execQuery($query);
                 }
                 //AJXP_Exception::errorToXml($res);
-                if (is_a($res, "Pydio\\Core\\AJXP_Exception")) {
+                if (is_a($res, "Pydio\Core\Exception\PydioException")) {
                     $errorMessage = $res->messageId;
                 } else {
                     $logMessage = $query;
@@ -330,12 +330,12 @@ class mysqlAccessDriver extends AbstractAccessDriver
                 $link = $this->createDbLink();
                 //AJXP_Exception::errorToXml($link);
                 if ($dir == "") {
-                    AJXP_XMLWriter::header();
+                    XMLWriter::header();
                     $tables = $this->listTables();
-                    AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
+                    XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
-                        if(AJXP_Utils::detectXSS($tableName)) {
+                        if(Utils::detectXSS($tableName)) {
                             $tableName = "XSS Detected!";
                             $size = 'N/A';
                             $count = 'N/A';
@@ -346,7 +346,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
                     }
                     print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                 } else {
                     $tableName = basename($dir);
                     if(isSet($page))$currentPage = $page;
@@ -382,11 +382,11 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     }
                     try {
                         $result = $this->showRecords($query, $tableName, $currentPage);
-                    } catch (AJXP_Exception $ex) {
+                    } catch (PydioException $ex) {
                         unset($_SESSION["LAST_SQL_QUERY"]);
                         throw $ex;
                     }
-                    AJXP_XMLWriter::header();
+                    XMLWriter::header();
                     $blobCols = array();
                     $columnsString = '<columns switchDisplayMode="list" switchGridMode="grid">';
                     foreach ($result["COLUMNS"] as $col) {
@@ -397,10 +397,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     }
 
                     $columnsString .= '</columns>';
-                    AJXP_XMLWriter::sendFilesListComponentConfig($columnsString);
+                    XMLWriter::sendFilesListComponentConfig($columnsString);
                     //print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
                     if ($result["TOTAL_PAGES"] > 1) {
-                        AJXP_XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
+                        XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
                     }
                     foreach ($result["ROWS"] as $arbitIndex => $row) {
                         print '<tree ';
@@ -408,13 +408,13 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         foreach ($row as $key=>$value) {
                             if (in_array($key, $blobCols)) {
                                 $sizeStr = " - NULL";
-                                if(strlen($value)) $sizeStr = " - ".AJXP_Utils::roundSize(strlen($value));
+                                if(strlen($value)) $sizeStr = " - ".Utils::roundSize(strlen($value));
                                 print "$key=\"BLOB$sizeStr\" ";
                             } else {
                                 $value = str_replace("\"", "", $value);
-                                if(AJXP_Utils::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
-                                $value = AJXP_Utils::xmlEntities($value);
-                                print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
+                                if(Utils::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
+                                $value = Utils::xmlEntities($value);
+                                print $key.'="'.TextEncoder::toUTF8($value).'" ';
                                 if ($result["HAS_PK"]>0) {
                                     if (in_array($key, $result["PK_FIELDS"])) {
                                         $pkString .= $key."__".$value.".";
@@ -431,7 +431,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         }
 
                     }
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                 }
                 $this->closeDbLink($link);
                 exit(1);
@@ -440,18 +440,18 @@ class mysqlAccessDriver extends AbstractAccessDriver
         }
 
         if (isset($logMessage) || isset($errorMessage)) {
-            if(AJXP_Utils::detectXSS($logMessage) || AJXP_Utils::detectXSS($errorMessage)){
-                $xmlBuffer = AJXP_XMLWriter::sendMessage(null, "XSS Detected!", false);
+            if(Utils::detectXSS($logMessage) || Utils::detectXSS($errorMessage)){
+                $xmlBuffer = XMLWriter::sendMessage(null, "XSS Detected!", false);
             }
-            $xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
+            $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
 
         if (isset($requireAuth)) {
-            $xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
+            $xmlBuffer .= XMLWriter::requireAuth(false);
         }
 
         if (( isset($reload_current_node) && $reload_current_node == "true") || (isset($reload_file_list)) ) {
-            $xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", "", false);
+            $xmlBuffer .= XMLWriter::reloadDataNode("", "", false);
         }
 
         return $xmlBuffer;
@@ -474,7 +474,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             while ($rec = mysql_fetch_array($result)) {
                 $t+=($rec['Data_length'] + $rec['Index_length']);
             }
-            $total = AJXP_Utils::roundSize($t);
+            $total = Utils::roundSize($t);
         } else {
             $total="Unknown";
         }
@@ -602,7 +602,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
         $flds = mysql_num_fields($result);
         $fields = @mysql_list_fields( $dbname, $tablename);
         if (!$fields) {
-            throw new AJXP_Exception("Non matching fields for table '$tablename'");
+            throw new PydioException("Non matching fields for table '$tablename'");
         }
         $z=0;
         $x=0;
@@ -672,10 +672,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
                 $this->logInfo("exec", array($sql));
                 return $result;
             } else {
-                throw new AJXP_Exception($sql.":".mysql_error());
+                throw new PydioException($sql.":".mysql_error());
             }
         } else {
-            throw new AJXP_Exception('Empty Query');
+            throw new PydioException('Empty Query');
         }
     }
 

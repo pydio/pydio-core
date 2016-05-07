@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -29,19 +29,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Gui
  */
-class IOSGuiPlugin extends AJXP_Plugin
+class IOSGuiPlugin extends Plugin
 {
     public function performChecks()
     {
         if(isSet($_SESSION["CURRENT_MINISITE"])) throw new Exception("Disabled for minisites");
-        if(AJXP_Utils::userAgentIsWindowsPhone()){
+        if(Utils::userAgentIsWindowsPhone()){
             throw new Exception("No native app for windows phone");
         }
 
-        if (AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
+        if (Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
             return;
         }
-        if (AJXP_Utils::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])) {
+        if (Utils::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])) {
             return;
         }
         throw new Exception("Active only when mobile user agent detected.");

@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -111,11 +111,11 @@ class PublicAccessManager
             if($parts['scheme']) {
                 return rtrim($dlURL, "/");
             } else {
-                $host = AJXP_Utils::detectServerURL();
+                $host = Utils::detectServerURL();
                 return rtrim($host, "/")."/".trim($dlURL, "/");
             }
         } else {
-            $fullUrl = AJXP_Utils::detectServerURL(true);
+            $fullUrl = Utils::detectServerURL(true);
             return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
         }
     }
@@ -123,8 +123,8 @@ class PublicAccessManager
     public function computeMinisiteToServerURL()
     {
         $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
-        $server = rtrim(parse_url( AJXP_Utils::detectServerURL(true), PHP_URL_PATH), "/");
-        return AJXP_Utils::getTravelPath($minisite, $server);
+        $server = rtrim(parse_url( Utils::detectServerURL(true), PHP_URL_PATH), "/");
+        return Utils::getTravelPath($minisite, $server);
     }
 
     /**
@@ -147,11 +147,11 @@ class PublicAccessManager
             if($parts['scheme']) {
                 return rtrim($dlURL, "/");
             } else {
-                $host = AJXP_Utils::detectServerURL();
+                $host = Utils::detectServerURL();
                 return rtrim($host, "/")."/".trim($dlURL, "/");
             }
         } else {
-            $fullUrl = AJXP_Utils::detectServerURL(true);
+            $fullUrl = Utils::detectServerURL(true);
             return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
         }
     }

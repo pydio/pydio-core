@@ -19,12 +19,12 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -83,9 +83,9 @@ class AJXP_SerialUser extends AbstractAjxpUser
             }
         }
         parent::setGroupPath($groupPath);
-        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
         $groups[$this->getId()] = $groupPath;
-        AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        Utils::saveSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
     }
 
     public function __wakeup()
@@ -98,7 +98,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $subDir = trim($this->getGroupPath(), "/");
         $id = $this->getId();
         if(AuthService::ignoreUserCase()) $id = strtolower($id);
-        $res = AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$id;
+        $res = VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$id;
         return $res;
     }
 
@@ -109,14 +109,14 @@ class AJXP_SerialUser extends AbstractAjxpUser
 
     public function load()
     {
-        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
         if(isSet($groups[$this->getId()])) $this->groupPath = $groups[$this->getId()];
 
         $this->create = false;
-        $this->rights = AJXP_Utils::loadSerialFile($this->getStoragePath()."/rights.ser");
+        $this->rights = Utils::loadSerialFile($this->getStoragePath()."/rights.ser");
         if(count($this->rights) == 0) $this->create = true;
-        $this->prefs = AJXP_Utils::loadSerialFile($this->getStoragePath()."/prefs.ser");
-        $this->bookmarks = AJXP_Utils::loadSerialFile($this->getStoragePath()."/bookmarks.ser");
+        $this->prefs = Utils::loadSerialFile($this->getStoragePath()."/prefs.ser");
+        $this->bookmarks = Utils::loadSerialFile($this->getStoragePath()."/bookmarks.ser");
         if (isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true) {
             $this->setAdmin(true);
         }
@@ -159,7 +159,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         }
 
         // LOAD USR ROLE LOCALLY
-        $personalRole = AJXP_Utils::loadSerialFile($this->getStoragePath()."/role.ser");
+        $personalRole = Utils::loadSerialFile($this->getStoragePath()."/role.ser");
         if ($personalRole instanceof \Pydio\Conf\Core\AJXP_Role) {
             $this->personalRole = $personalRole;
             $this->roles["AJXP_USR_"."/".$this->id] = $personalRole;
@@ -167,8 +167,8 @@ class AJXP_SerialUser extends AbstractAjxpUser
             // MIGRATE NOW !
             $changes = $this->migrateRightsToPersonalRole();
             if ($changes) {
-                AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, true);
-                AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, true);
+                Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, true);
+                Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, true);
             }
         }
 
@@ -205,14 +205,14 @@ class AJXP_SerialUser extends AbstractAjxpUser
         if (isSet($this->registerForSave["rights"]) || $this->create) {
             $filteredRights = $this->rights;
             if(isSet($filteredRights["ajxp.roles"])) $filteredRights["ajxp.roles"] = $this->filterRolesForSaving($filteredRights["ajxp.roles"]);
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
+            Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
+            Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
         }
         if (isSet($this->registerForSave["prefs"])) {
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/prefs.ser", $this->prefs, !$fastCheck);
+            Utils::saveSerialFile($this->getStoragePath()."/prefs.ser", $this->prefs, !$fastCheck);
         }
         if (isSet($this->registerForSave["bookmarks"])) {
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+            Utils::saveSerialFile($this->getStoragePath()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
         }
         $this->registerForSave = array();
     }
@@ -221,14 +221,14 @@ class AJXP_SerialUser extends AbstractAjxpUser
     {
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-        return AJXP_Utils::loadSerialFile($this->getStoragePath()."/".$key.".ser",$fastCheck);
+        return Utils::loadSerialFile($this->getStoragePath()."/".$key.".ser",$fastCheck);
     }
 
     public function saveTemporaryData($key, $value)
     {
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-        AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
+        Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
     }
 
     /**

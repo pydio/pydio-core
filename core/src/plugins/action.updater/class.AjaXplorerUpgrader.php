@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -127,7 +127,7 @@ class AjaXplorerUpgrader
         if (isSet(self::$context)) {
             $json = file_get_contents($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName, null, self::$context);
         } else {
-            $json = AJXP_Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName);
+            $json = Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName);
         }
         if($format == "php") return json_decode($json, true);
         else return $json;
@@ -197,7 +197,7 @@ class AjaXplorerUpgrader
         if(self::$context){
             $content = file_get_contents($this->archiveURL, null, self::$context);
         }else{
-            $content = AJXP_Utils::getRemoteContent($this->archiveURL);
+            $content = Utils::getRemoteContent($this->archiveURL);
         }
         if ($content === false || strlen($content) == 0) {
             throw new Exception("Error while downloading");
@@ -208,7 +208,7 @@ class AjaXplorerUpgrader
 
     public function extractArchive()
     {
-        require_once(AJXP_BIN_FOLDER . "/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER . "/lib/pclzip.lib.php");
         $archive = new PclZip($this->archive);
         $result = $archive->extract(PCLZIP_OPT_PATH, $this->workingFolder);
         if ($result <= 0) {
@@ -328,7 +328,7 @@ class AjaXplorerUpgrader
     {
         $confDriver = ConfService::getConfStorageImpl();
         if ($confDriver instanceof \Pydio\Conf\Sql\sqlConfDriver) {
-            $conf = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+            $conf = Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
             if(!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
             switch ($conf["driver"]) {
                 case "sqlite":

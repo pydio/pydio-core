@@ -20,16 +20,16 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\Plugins\SqlTableProvider;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\PluginFramework\SqlTableProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
+class AjxpMailer extends Plugin implements SqlTableProvider
 {
 
     public $mailCache;
@@ -52,20 +52,20 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         $pConf = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
         if (!empty($pConf)) {
             $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer");
-            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
+            PluginsService::getInstance()->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
         }
     }
 
     protected function getDibiDriver () {
         if (!isset($this->_dibiDriver)) {
-            $this->_dibiDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value"=>"core"));
+            $this->_dibiDriver = Utils::cleanDibiDriverParameters(array("group_switch_value"=>"core"));
         }
         return $this->_dibiDriver;
     }
     public function mailConsumeQueue ($action, $httpVars, $fileVars) {
 
         if ($action === "consume_mail_queue") {
-            $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+            $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
             if (!dibi::isConnected()) {
                 dibi::connect($this->getDibiDriver());
             }
@@ -76,7 +76,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             try {
                 $querySQL = dibi::query("SELECT * FROM [ajxp_mail_queue] WHERE [date_event] <= %s", $time);
             } catch (DibiException $e) {
-                throw new AJXP_Exception($e->getMessage());
+                throw new PydioException($e->getMessage());
             }
             $resultsSQL = $querySQL->fetchAll();
             $arrayResultsSQL = array();
@@ -142,14 +142,14 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $useHtml
                         );
                         $output["success"][] = "Email sent to ".$recipient;
-                    } catch (AJXP_Exception $e) {
+                    } catch (PydioException $e) {
                         $output["error"][] = "Sending email to ".$recipient.": ".$e->getMessage();
                     }
                 }
                 try {
                     dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
                 } catch (DibiException $e) {
-                    throw new AJXP_Exception($e->getMessage());
+                    throw new PydioException($e->getMessage());
                 }
             }
             HTMLWriter::charsetHeader("text/json");
@@ -231,7 +231,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $userObject = ConfService::getConfStorageImpl()->createUserObject($notification->getTarget());
         } else {
             $messages = ConfService::getMessages();
-            throw new AJXP_Exception($messages['core.mailer.2']);
+            throw new PydioException($messages['core.mailer.2']);
         }
         if($userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true") !== "true"){
             // User does not want to receive any emails.
@@ -278,7 +278,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                 $this->logError("[mailer]", "Could not determine email frequency from $frequencyType / $frequencyDetail for send email to user ".$userObject->getId());
             }
         } else {
-            $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+            $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
             if ($mailer !== false) {
                 try {
                     $mailer->sendMail(
@@ -290,7 +290,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         $useHtml
                     );
                 } catch (Exception $e) {
-                    throw new AJXP_Exception($e->getMessage());
+                    throw new PydioException($e->getMessage());
                 }
             }
         }
@@ -358,7 +358,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
     public function sendMailAction($actionName, $httpVars, $fileVars)
     {
         $mess = ConfService::getMessages();
-        $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
+        $mailers = PluginsService::getInstance()->getActivePluginsForType("mailer");
         if (!count($mailers)) {
             throw new Exception($mess["core.mailer.3"]);
         }
@@ -378,13 +378,13 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 
         if (count($emails)) {
             $mailer->sendMail($emails, $subject, $body, $from, $imageLink);
-            AJXP_XMLWriter::header();
-            AJXP_XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
-            AJXP_XMLWriter::close();
+            XMLWriter::header();
+            XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
+            XMLWriter::close();
         } else {
-            AJXP_XMLWriter::header();
-            AJXP_XMLWriter::sendMessage(null, $mess["core.mailer.2"]);
-            AJXP_XMLWriter::close();
+            XMLWriter::header();
+            XMLWriter::sendMessage(null, $mess["core.mailer.2"]);
+            XMLWriter::close();
         }
     }
 
@@ -494,8 +494,8 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
     {
         $base = basename($this->getBaseDir());
         if($base == "core.mailer"){
-            $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-            return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+            $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+            return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
         }
         return true;
     }

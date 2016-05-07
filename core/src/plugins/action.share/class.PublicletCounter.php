@@ -18,8 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -79,7 +79,7 @@ class PublicletCounter
     private static function loadCounters()
     {
         if (!isSet(self::$counters)) {
-            self::$counters = AJXP_Utils::loadSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser");
+            self::$counters = Utils::loadSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser");
         }
         return self::$counters;
     }
@@ -87,7 +87,7 @@ class PublicletCounter
     private static function saveCounters($counters)
     {
         self::$counters = $counters;
-        AJXP_Utils::saveSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser", $counters, false);
+        Utils::saveSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser", $counters, false);
     }
 
 }

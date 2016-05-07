@@ -20,13 +20,14 @@
  */
 namespace Pydio\Access\Core;
 
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -197,7 +198,7 @@ class Repository implements AjxpGroupPathProvider
         $this->setDisplay($display);
         $this->setId($id);
         $this->uuid = md5(microtime());
-        $this->slug = AJXP_Utils::slugify($display);
+        $this->slug = \Pydio\Core\Utils\Utils::slugify($display);
         $this->inferOptionsFromParent = false;
         $this->options["CREATION_TIME"] = time();
         if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
@@ -291,7 +292,7 @@ class Repository implements AjxpGroupPathProvider
     public function setSlug($slug = null)
     {
         if ($slug === null) {
-            $this->slug = AJXP_Utils::slugify($this->display);
+            $this->slug = \Pydio\Core\Utils\Utils::slugify($this->display);
         } else {
             $this->slug = $slug;
         }
@@ -302,7 +303,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function getClientSettings()
     {
-        $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+        $plugin = PluginsService::findPlugin("access", $this->accessType);
         if(!$plugin) return "";
         if (isSet($this->parentId)) {
             $parentObject = ConfService::getRepositoryById($this->parentId);
@@ -327,10 +328,10 @@ class Repository implements AjxpGroupPathProvider
      */
     public function detectStreamWrapper($register = false, &$streams=null)
     {
-        if(isSet($this->driverInstance) && is_a($this->driverInstance, "AJXP_Plugin")){
+        if(isSet($this->driverInstance) && $this->driverInstance instanceof Plugin){
             $plugin = $this->driverInstance;
         }else{
-            $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+            $plugin = PluginsService::findPlugin("access", $this->accessType);
             $this->driverInstance = $plugin;
         }
         if(!$plugin) return(false);
@@ -389,13 +390,13 @@ class Repository implements AjxpGroupPathProvider
                     $pathChanged = true;
                 }
                 if ($pathChanged) {
-                    return AJXP_Utils::securePath($pvalue);
+                    return \Pydio\Core\Utils\Utils::securePath($pvalue);
                 }
             }
         }
         if (isSet($this->options[$oName])) {
             $value = $this->options[$oName];
-            if(!$safe) $value = AJXP_VarsFilter::filter($value, $resolveUser);
+            if(!$safe) $value = VarsFilter::filter($value, $resolveUser);
             return $value;
         }
         if ($this->inferOptionsFromParent) {
@@ -486,7 +487,7 @@ class Repository implements AjxpGroupPathProvider
                 return $mess[$this->displayStringId];
             }
         }
-        return AJXP_VarsFilter::filter($this->display);
+        return VarsFilter::filter($this->display);
     }
 
     /**
@@ -680,7 +681,7 @@ class Repository implements AjxpGroupPathProvider
         }
         if (isSet($this->parentId) && isset($this->owner)) {
             if (isSet($this->options["CREATION_TIME"])) {
-                $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+                $date = \Pydio\Core\Utils\Utils::relativeDate($this->options["CREATION_TIME"], $m);
                 return str_replace(
                     array("%date", "%user"),
                     array($date, $ownerLabel!= null ? $ownerLabel : $this->owner),
@@ -693,7 +694,7 @@ class Repository implements AjxpGroupPathProvider
                     $m["472"]);
             }
         } else if ($this->isWriteable() && isSet($this->options["CREATION_TIME"])) {
-            $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+            $date = \Pydio\Core\Utils\Utils::relativeDate($this->options["CREATION_TIME"], $m);
             if (isSet($this->options["CREATION_USER"])) {
                 return str_replace(array("%date", "%user"), array($date, $this->options["CREATION_USER"]), $m["471"]);
             } else {

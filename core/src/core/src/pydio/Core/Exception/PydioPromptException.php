@@ -18,7 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Exception;
+
+use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -33,7 +35,7 @@ define('AJXP_PROMPT_EXCEPTION_ALERT', 'AJXP_PROMPT_EXCEPTION_ALERT');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_PromptException extends AJXP_Exception{
+class PydioPromptException extends PydioException{
 
     private $promptType = "prompt";
     /**
@@ -74,14 +76,14 @@ class AJXP_PromptException extends AJXP_Exception{
      * Prompt user for credentials
      * @param $sessionVariable
      * @param $switchToRepositoryId
-     * @throws AJXP_PromptException
+     * @throws PydioPromptException
      */
     public static function testOrPromptForCredentials($sessionVariable, $switchToRepositoryId){
         if(isSet($_GET["prompt_passed_data"]) && isSet($_GET["variable_name"]) && $_GET["variable_name"] == $sessionVariable){
             $_SESSION[$sessionVariable] = true;
         }
         if(!isSet($_SESSION[$sessionVariable])){
-            throw new AJXP_PromptException(
+            throw new PydioPromptException(
                 "confirm",
                 array(
                     "DIALOG" => "Please enter your credentials for this workspace

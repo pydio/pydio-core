@@ -18,10 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Controller;
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -65,18 +67,6 @@ class HTMLWriter
             return $content;
         }
         return "File not found : ".$docFileName;
-    }
-    /**
-     * Write repository data directly as javascript string
-     * @static
-     * @return mixed|string
-     */
-    public static function repositoryDataAsJS()
-    {
-        if(AuthService::usersEnabled()) return "";
-        require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
-        require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
-        return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
     /**
      * Write the messages as Javascript
@@ -154,7 +144,7 @@ class HTMLWriter
         if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])
             || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])
             || preg_match('/ Trident/',$_SERVER['HTTP_USER_AGENT'])) {
-            $name = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($name)));
+            $name = str_replace("+", " ", urlencode(TextEncoder::toUTF8($name)));
         }
         return $name;
     }

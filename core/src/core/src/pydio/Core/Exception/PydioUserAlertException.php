@@ -18,10 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Exception;
+
+use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class AJXP_UserAlertException extends  AJXP_Exception{
+class PydioUserAlertException extends  PydioException{
 
 }

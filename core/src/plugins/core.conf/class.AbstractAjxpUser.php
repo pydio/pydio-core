@@ -20,9 +20,10 @@
  */
 namespace Pydio\Conf\Core;
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Cache\Core\CacheService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\CacheService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -131,7 +132,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         } else {
             $hashes = explode(",", $hashes);
         }
-        $newHash = md5($this->id.":".AJXP_Utils::generateRandomString());
+        $newHash = md5($this->id.":".Utils::generateRandomString());
         array_push($hashes, $newHash);
         $this->setPref("cookie_hash", implode(",",$hashes));
         $this->save("user");
@@ -445,7 +446,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function save($context = "superuser"){
         $this->_save($context);
-        CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
+        \Pydio\Core\Services\CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
     }
 
     abstract protected function _save($context = "superuser");
@@ -489,7 +490,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             // It's a shared user, we don't want it to inherit the rights...
             $this->parentRole->clearAcls();
             //... but we want the parent user's role, filtered with inheritable properties only.
-            $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
+            $stretchedParentUserRole = \Pydio\Core\Services\AuthService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
                 // REAPPLY SPECIFIC "SHARED" ROLES
@@ -618,7 +619,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public function __wakeup(){
         $this->storage = ConfService::getConfStorageImpl();
         if(!is_object($this->personalRole)){
-            $this->personalRole = AuthService::getRole("AJXP_USR_/".$this->getId());
+            $this->personalRole = \Pydio\Core\Services\AuthService::getRole("AJXP_USR_/".$this->getId());
         }
         $this->recomputeMergedRole();
     }
@@ -627,7 +628,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         if($this->lastSessionSerialization && count($this->roles)
             && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
 
-            $newRoles = AuthService::getRolesList(array_keys($this->roles));
+            $newRoles = \Pydio\Core\Services\AuthService::getRolesList(array_keys($this->roles));
             foreach($newRoles as $rId => $newRole){
                 if(strpos($rId, "AJXP_USR_/") === 0){
                     $this->personalRole = $newRole;

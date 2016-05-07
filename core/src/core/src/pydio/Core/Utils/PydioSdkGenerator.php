@@ -27,9 +27,11 @@
  * @package Pydio
  * @subpackage Core
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Utils;
 
 //define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
+use Pydio\Core\PluginFramework\PluginsService;
+
 define("JSON_DIR", AJXP_INSTALL_PATH."/../api");
 define("JSON_URL", "https://pydio.com/static-docs/api");
 define("API_DOC_PAGE", "https://pydio.com/en/docs/references/pydio-api#!/");
@@ -71,7 +73,7 @@ class PydioSdkGenerator
             return;
         }
 
-        $pServ = AJXP_PluginsService::getInstance();
+        $pServ = PluginsService::getInstance();
         $nodes = $pServ->searchAllManifests('//actions/*/processing/serverCallback[@developerComment]', 'node', false, false, true);
         $jsFile = AJXP_DATA_PATH."/public/sdkMethods.js";
         $swaggerJsonDir = JSON_DIR."/".$versionString;
@@ -204,7 +206,7 @@ class PydioSdkGenerator
     }
 
     /**
-     * @param AJXP_Plugin $plugin
+     * @param Plugin $plugin
      * @param array $apis
      * @return string
      */

@@ -19,12 +19,19 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Controller\ShutdownScheduler;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
+
 include_once("base.conf.php");
 
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 ConfService::$useSession = false;
 AuthService::$useSession = false;
 
@@ -35,7 +42,7 @@ $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 $authDriver = ConfService::getAuthDriverImpl();
 ConfService::currentContextIsRestAPI("api");
-AJXP_PluginsService::getInstance()->initActivePlugins();
+PluginsService::getInstance()->initActivePlugins();
 
 function applyTask($userId, $repoId, $actionName, $parameters){
 
@@ -60,26 +67,26 @@ function applyTask($userId, $repoId, $actionName, $parameters){
         ConfService::loadDriverForRepository($repo);
     }
     print("Init plugins\n");
-    AJXP_PluginsService::getInstance()->initActivePlugins();
+    PluginsService::getInstance()->initActivePlugins();
 
     //print "Current repos are" . implode(", ", array_keys(ConfService::getAccessibleRepositories()))."\n";
 
     print("Apply Action\n");
-    $xmlResult = AJXP_Controller::findActionAndApply($actionName, $parameters, []);
+    $xmlResult = Controller::findActionAndApply($actionName, $parameters, []);
     if (!empty($xmlResult) && !headers_sent()) {
-        AJXP_XMLWriter::header();
+        XMLWriter::header();
         print($xmlResult);
-        AJXP_XMLWriter::close();
+        XMLWriter::close();
     }
 
     print("Empty ShutdownScheduler!\n");
-    AJXP_ShutdownScheduler::getInstance()->callRegisteredShutdown();
+    ShutdownScheduler::getInstance()->callRegisteredShutdown();
 
     print("Invalidate\n");
     ConfService::getInstance()->invalidateLoadedRepositories();
     print("Disconnect\n");
     AuthService::disconnect();
-    AJXP_PluginsService::updateXmlRegistry(null, true);
+    PluginsService::updateXmlRegistry(null, true);
 
 }
 

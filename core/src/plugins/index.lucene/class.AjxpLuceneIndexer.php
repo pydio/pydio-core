@@ -20,12 +20,12 @@
  */
 
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -128,18 +128,18 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if ($this->seemsCurrentlyIndexing($repoId, 3)){
-                    AJXP_XMLWriter::sendMessage($messages["index.lucene.11"], null);
+                    XMLWriter::sendMessage($messages["index.lucene.11"], null);
                 }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                    AJXP_Controller::applyActionInBackground($repoId, "index", array());
+                    Controller::applyActionInBackground($repoId, "index", array());
                     sleep(2);
-                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
-                    AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                    XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
+                    XMLWriter::sendMessage($messages["index.lucene.7"], null);
                 }else{
-                    AJXP_XMLWriter::sendMessage($messages["index.lucene.12"], null);
+                    XMLWriter::sendMessage($messages["index.lucene.12"], null);
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 return null;
             }
             $textQuery = $httpVars["query"];
@@ -190,14 +190,14 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if (isSet($httpVars['return_selection'])) {
                 $returnNodes = array();
             } else {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
             }
             $cursor = 0;
             if(isSet($httpVars['limit'])){
                 $limit = intval($httpVars['limit']);
             }
             if(!isSet($returnNodes) && !empty($limit) && count($hits) > $limit){
-                AJXP_XMLWriter::renderPaginationData(count($hits), 1, 1);
+                XMLWriter::renderPaginationData(count($hits), 1, 1);
             }
             foreach ($hits as $hit) {
                 // Backward compatibility
@@ -205,11 +205,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     if(isSet($meta["ajxp_modiftime"])){
-                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".AJXP_Utils::relativeDate($meta["ajxp_modiftime"], $messages);
+                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".Utils::relativeDate($meta["ajxp_modiftime"], $messages);
                     }
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
                 if($tmpNode->getRepositoryId() != $repoId){
@@ -235,12 +235,12 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;
                 } else {
-                    AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                    XMLWriter::renderAjxpNode($tmpNode);
                 }
                 $cursor++;
                 if(isSet($limit) && $cursor >= $limit) break;
             }
-            if(!isSet($returnNodes)) AJXP_XMLWriter::close();
+            if(!isSet($returnNodes)) XMLWriter::close();
             if ($commitIndex) {
                 $index->commit();
             }
@@ -251,13 +251,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                    AJXP_Controller::applyActionInBackground($repoId, "index", array());
-                    AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 2);
+                    Controller::applyActionInBackground($repoId, "index", array());
+                    XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 2);
                 }
-                AJXP_XMLWriter::sendMessage($messages["index.lucene.7"], null);
-                AJXP_XMLWriter::close();
+                XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                XMLWriter::close();
                 return null;
             }
             $sParts = array();
@@ -285,16 +285,16 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if (isSet($httpVars['return_selection'])) {
                 $returnNodes = array();
             } else {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
             }
             foreach ($hits as $hit) {
                 // Backward compat with old protocols
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
@@ -314,10 +314,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;
                 } else {
-                    AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                    XMLWriter::renderAjxpNode($tmpNode);
                 }
             }
-            if(!isSet($returnNodes)) AJXP_XMLWriter::close();
+            if(!isSet($returnNodes)) XMLWriter::close();
             if ($commitIndex) {
                 $index->commit();
             }
@@ -374,7 +374,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 try {
                     $newNode = new AJXP_Node($newUrl);
                     $this->updateNodeIndex(null, $newNode, false, true);
-                    AJXP_Controller::applyHook("node.index.add", array($newNode));
+                    Controller::applyHook("node.index.add", array($newNode));
                 } catch (Exception $e) {
                     if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
                         print("Error indexing node ".$newUrl." (".$e->getMessage().") \n");
@@ -428,7 +428,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
             if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
-                $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($node->getUrl()), "node_url");
+                $term = new Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($node->getUrl()), "node_url");
                 $hits = $index->termDocs($term);
                 foreach ($hits as $hitId) {
                     $hit = $index->getDocument($hitId);
@@ -520,10 +520,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if ($copy == false) {
                     $oldIndex->delete($hit->id);
                 }
-                $newChildURL = str_replace(SystemTextEncoding::toUTF8($oldNode->getUrl()),
-                                           SystemTextEncoding::toUTF8($newNode->getUrl()),
+                $newChildURL = str_replace(TextEncoder::toUTF8($oldNode->getUrl()),
+                                           TextEncoder::toUTF8($newNode->getUrl()),
                                            $oldChildURL);
-                $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
+                $newChildURL = TextEncoder::fromUTF8($newChildURL);
                 $this->createIndexedDocument(new AJXP_Node($newChildURL), $oldIndex);
             }
         }
@@ -570,10 +570,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         if($doc == null) throw new Exception("Could not load document");
 
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_node", "yes"), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_node", "yes"), TextEncoder::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "shared"));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_bytesize", $ajxpNode->bytesize));
@@ -595,13 +595,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         foreach ($this->metaFields as $field) {
             if ($ajxpNode->$field != null) {
-                $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
+                $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), TextEncoder::getEncoding());
             }
         }
         if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
             $privateDoc = new Zend_Search_Lucene_Document();
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl(), SystemTextEncoding::getEncoding()));
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), SystemTextEncoding::getEncoding()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl(), TextEncoder::getEncoding()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), TextEncoder::getEncoding()));
 
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "user"));
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", AuthService::getLoggedUser()->getId()));
@@ -630,7 +630,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      */
     public function getIndexedDocumentId($index, $ajxpNode)
     {
-        $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($ajxpNode->getUrl()), "node_url");
+        $term = new Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($ajxpNode->getUrl()), "node_url");
         $docIds = $index->termDocs($term);
         if(!count($docIds)) return null;
         return $docIds[0];
@@ -645,7 +645,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     public function getIndexedChildrenDocuments($index, $ajxpNode)
     {
         // Try getting doc by url
-        $testQ = str_replace("/", "AJXPFAKESEP", SystemTextEncoding::toUTF8($ajxpNode->getPath()));
+        $testQ = str_replace("/", "AJXPFAKESEP", TextEncoder::toUTF8($ajxpNode->getPath()));
         $pattern = new Zend_Search_Lucene_Index_Term($testQ .'*', 'node_path');
         $query = new Zend_Search_Lucene_Search_Query_Wildcard($pattern);
         $hits = $index->find($query);

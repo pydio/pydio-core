@@ -27,8 +27,8 @@ define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\PluginFramework\Plugin;
 
 /**
  * @package AjaXplorer_Plugins
@@ -39,7 +39,7 @@ use Pydio\Core\Plugins\AJXP_Plugin;
  * Abstraction of the caching system
  * The cache will be implemented by the plugin which extends this class.
  */
-abstract class AbstractCacheDriver extends AJXP_Plugin
+abstract class AbstractCacheDriver extends Plugin
 {
     /**
      * Driver type

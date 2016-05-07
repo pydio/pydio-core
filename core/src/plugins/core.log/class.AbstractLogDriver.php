@@ -20,7 +20,7 @@
  */
 namespace Pydio\Log\Core;
 
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -43,7 +43,7 @@ if (!defined('LOG_LEVEL_DEBUG')) {
  * The object has a chance to open its stream or file from the init() method. all subsequent calls assume
  * the availability of the stream or file.
  */
-abstract class AbstractLogDriver extends AJXP_Plugin
+abstract class AbstractLogDriver extends Plugin
 {
     /**
      * Driver type

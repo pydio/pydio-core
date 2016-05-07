@@ -21,10 +21,10 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -46,7 +46,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
     public function initMeta($accessDriver)
     {
         parent::initMeta($accessDriver);
-        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
             throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
@@ -83,9 +83,9 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
                 AJXP_METADATA_SCOPE_GLOBAL
             );
         }
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::reloadDataNode();
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::reloadDataNode();
+        XMLWriter::close();
     }
 
     /**

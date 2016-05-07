@@ -18,11 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Utils;
 
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -32,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_VarsFilter
+class VarsFilter
 {
     /**
      * Filter the very basic keywords from the XML  : AJXP_USER, AJXP_INSTALL_PATH, AJXP_DATA_PATH
@@ -45,7 +47,7 @@ class AJXP_VarsFilter
     public static function filter($value, $resolveUser = null)
     {
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
-            if (AuthService::usersEnabled()) {
+            if (Services\AuthService::usersEnabled()) {
                 if($resolveUser != null){
                     if(is_string($resolveUser)){
                         $resolveUserId = $resolveUser;
@@ -73,13 +75,13 @@ class AJXP_VarsFilter
         if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
             if (AuthService::usersEnabled()) {
                 if($resolveUser != null){
-                    if(is_string($resolveUser) && AuthService::userExists($resolveUser)){
+                    if(is_string($resolveUser) && Services\AuthService::userExists($resolveUser)){
                         $loggedUser = ConfService::getConfStorageImpl()->createUserObject($resolveUser);
                     }else{
                         $loggedUser = $resolveUser;
                     }
                 }else{
-                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser = Services\AuthService::getLoggedUser();
                 }
                 if ($loggedUser != null) {
                     $gPath = $loggedUser->getGroupPath();
@@ -99,7 +101,7 @@ class AJXP_VarsFilter
             $value = str_replace("AJXP_DATA_PATH", AJXP_DATA_PATH, $value);
         }
         $tab = array(&$value);
-        AJXP_Controller::applyIncludeHook("vars.filter", $tab);
+        Controller::applyIncludeHook("vars.filter", $tab);
         return $value;
     }
 

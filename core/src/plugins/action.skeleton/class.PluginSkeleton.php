@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class PluginSkeleton extends AJXP_Plugin
+class PluginSkeleton extends Plugin
 {
     /**
      * @param DOMNode $contribNode

@@ -27,15 +27,15 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access a samba server
+ * Plugin to access a samba server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -73,7 +73,7 @@ class smbAccessDriver extends fsAccessDriver
         if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
             @mkdir($this->urlBase."/".$recycle);
             if (!is_dir($this->urlBase."/".$recycle)) {
-                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+                throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
             }
         }
         if ($recycle != "") {
@@ -106,12 +106,12 @@ class smbAccessDriver extends fsAccessDriver
     public function makeZip ($src, $dest, $basedir)
     {
         @set_time_limit(0);
-        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
 
         $filePaths = array();
         foreach ($src as $item) {
-            $url = $this->urlBase.(($item[0] == "/")? "" : "/").AJXP_Utils::securePath($item);
+            $url = $this->urlBase.(($item[0] == "/")? "" : "/").Utils::securePath($item);
             $realFile = AJXP_MetaStreamWrapper::getRealFSReference($url);
             //$basedir = trim(dirname($realFile))."/";
             if (basename($item) == "") {
@@ -119,7 +119,7 @@ class smbAccessDriver extends fsAccessDriver
             } else {
                 $shortName = basename($item);
                 if(!empty($zipEncoding)){
-                    $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $shortName);
+                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
                     if($test !== false) $shortName = $test;
                 }
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,

@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -30,7 +30,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class UpdateController extends AJXP_Plugin
+class UpdateController extends Plugin
 {
     public function init($options)
     {
@@ -122,7 +122,7 @@ class UpdateController extends AJXP_Plugin
 
             case "perform_upgrade" :
 
-                AJXP_Utils::safeIniSet("output_buffering", "Off");
+                Utils::safeIniSet("output_buffering", "Off");
                 if (AJXP_PACKAGING != "zip") {
                     $lang = ConfService::getLanguage();
                     $file = $this->getBaseDir()."/howto/linux_en.html";

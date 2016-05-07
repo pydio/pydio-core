@@ -22,8 +22,8 @@
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -167,12 +167,12 @@ class s3AccessWrapper extends fsAccessWrapper
 
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
            $tmpHandle = fopen($tmpFile, "wb");
            self::copyFileInStream($path, $tmpHandle);
            fclose($tmpHandle);
            if (!$persistent) {
-               register_shutdown_function(array("Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
+               register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $tmpFile);
            }
            return $tmpFile;
     }

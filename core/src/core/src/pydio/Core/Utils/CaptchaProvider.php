@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,7 +40,7 @@ class CaptchaProvider
     {
         $libPath = AJXP_BIN_FOLDER."/securimage";
 
-        $img = new Securimage();
+        $img = new \Securimage();
         $img->wordlist_file = $libPath."/words/words.txt";
         $img->gd_font_file = $libPath."/gdfonts/automatic.gdf";
         $img->signature_font = $img->ttf_file = $libPath."/AHGBold.ttf";
@@ -48,12 +48,12 @@ class CaptchaProvider
         $img->image_height = 80;
         $img->image_width = 170;
         $img->perturbation = 0.85;
-        $img->image_bg_color = new Securimage_Color("#f6f6f6");
-        $img->multi_text_color = array(new Securimage_Color("#3399ff"),
-                                       new Securimage_Color("#3300cc"),
-                                       new Securimage_Color("#3333cc"),
-                                       new Securimage_Color("#6666ff"),
-                                       new Securimage_Color("#99cccc")
+        $img->image_bg_color = new \Securimage_Color("#f6f6f6");
+        $img->multi_text_color = array(new \Securimage_Color("#3399ff"),
+                                       new \Securimage_Color("#3300cc"),
+                                       new \Securimage_Color("#3333cc"),
+                                       new \Securimage_Color("#6666ff"),
+                                       new \Securimage_Color("#99cccc")
                                        );
         $img->use_multi_text = true;
         $img->text_angle_minimum = -5;
@@ -61,8 +61,8 @@ class CaptchaProvider
         $img->use_transparent_text = true;
         $img->text_transparency_percentage = 30; // 100 = completely transparent
         $img->num_lines = 5;
-        $img->line_color = new Securimage_Color("#eaeaea");
-        $img->signature_color = new Securimage_Color(rand(0, 64), rand(64, 128), rand(128, 255));
+        $img->line_color = new \Securimage_Color("#eaeaea");
+        $img->signature_color = new \Securimage_Color(rand(0, 64), rand(64, 128), rand(128, 255));
         $img->use_wordlist = true;
         if (!function_exists('imagettftext')) {
             $img->use_gd_font = true;
@@ -81,7 +81,7 @@ class CaptchaProvider
      */
     public static function checkCaptchaResult($code)
     {
-        $img = new Securimage();
+        $img = new \Securimage();
         return $img->check($code);
 
     }

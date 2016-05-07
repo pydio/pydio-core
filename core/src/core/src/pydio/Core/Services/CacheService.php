@@ -18,9 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Cache\Core;
+namespace Pydio\Core\Services;
 
-use Pydio\Conf\Core\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

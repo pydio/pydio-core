@@ -18,11 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Plugins;
+namespace Pydio\Core\PluginFramework;
 
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractConfDriver;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -31,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_PluginsService
+class PluginsService
 {
     private static $instance;
     private $registry = array();
@@ -60,7 +61,7 @@ class AJXP_PluginsService
     private function _loadRegistryFromCache(){
 
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
-            $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
+            $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
             if (count($reqs)) {
                 foreach ($reqs as $fileName) {
                     if (!is_file($fileName)) {
@@ -81,7 +82,7 @@ class AJXP_PluginsService
 
                 // Retrieving Registry from files cache
                 if (empty($res)) {
-                    $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                     $this->registry=$res;
                     $this->savePluginsRegistryToCache();
                 }
@@ -155,7 +156,7 @@ class AJXP_PluginsService
             if ($handler) {
                 while ( ($item = readdir($handler)) !==false) {
                     if($item == "." || $item == ".." || !@is_dir($sourceFolder."/".$item) || strstr($item,".")===false) continue ;
-                    $plugin = new AJXP_Plugin($item, $sourceFolder."/".$item);
+                    $plugin = new Plugin($item, $sourceFolder."/".$item);
                     $plugin->loadManifest();
                     if ($plugin->manifestLoaded()) {
                         $pluginsPool[$plugin->getId()] = $plugin;
@@ -175,8 +176,8 @@ class AJXP_PluginsService
         }
 
         if (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false) {
-            AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
-            AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
+            Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
+            Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
             if (is_file(AJXP_PLUGINS_QUERIES_CACHE)) {
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
@@ -188,7 +189,7 @@ class AJXP_PluginsService
     /**
      * Load plugin class with dependencies first
      *
-     * @param AJXP_Plugin $plugin
+     * @param Plugin $plugin
      * @param array $pluginsPool
      */
     private function recursiveLoadPlugin($plugin, $pluginsPool)
@@ -225,7 +226,7 @@ class AJXP_PluginsService
     public function loadFromPluginQueriesCache($key)
     {
         if(AJXP_SKIP_CACHE) return null;
-        $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
         if (!empty($test) && is_array($test) && isset($test[$key])) {
             return $test[$key];
         }
@@ -235,10 +236,10 @@ class AJXP_PluginsService
     public function storeToPluginQueriesCache($key, $value)
     {
         if(AJXP_SKIP_CACHE) return;
-        $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
         if(!is_array($test)) $test = array();
         $test[$key] = $value;
-        AJXP_Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
+        Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
     }
 
     public static function clearPluginsCache(){
@@ -262,7 +263,7 @@ class AJXP_PluginsService
      * Simply load a plugin class, without the whole dependencies et.all
      * @param string $pluginId
      * @param array $pluginOptions
-     * @return AJXP_Plugin
+     * @return Plugin
      */
     public function softLoad($pluginId, $pluginOptions)
     {
@@ -270,7 +271,7 @@ class AJXP_PluginsService
         list($type, $name) = explode(".", $pluginId);
         if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
             /**
-             * @var AJXP_Plugin $plugin
+             * @var Plugin $plugin
              */
             $plugin = $this->registry[$type][$name];
             $plugin->init($pluginOptions);
@@ -278,7 +279,7 @@ class AJXP_PluginsService
         }
 
 
-        $plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
+        $plugin = new Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
         $plugin->loadConfigs(array()); // Load default
@@ -287,10 +288,10 @@ class AJXP_PluginsService
     }
 
     /**
-     * Find a PHP class and instanciate it to replace the empty AJXP_Plugin
+     * Find a PHP class and instanciate it to replace the empty Plugin
      *
-     * @param AJXP_Plugin $plugin
-     * @return AJXP_Plugin
+     * @param Plugin $plugin
+     * @return Plugin
      */
     private function instanciatePluginClass($plugin)
     {
@@ -300,7 +301,7 @@ class AJXP_PluginsService
         $className = $definition["classname"];
         if (is_file($filename)) {
             /**
-             * @var AJXP_Plugin $newPlugin
+             * @var Plugin $newPlugin
              */
             require_once($filename);
             $newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
@@ -314,7 +315,7 @@ class AJXP_PluginsService
 
     /**
      * Check that a plugin dependencies are loaded, disable it otherwise.
-     * @param AJXP_Plugin[] $arrayToSort
+     * @param Plugin[] $arrayToSort
      */
     private function checkDependencies(&$arrayToSort)
     {
@@ -413,7 +414,7 @@ class AJXP_PluginsService
     /**
      * All the plugins of a given type
      * @param string $type
-     * @return AJXP_Plugin[]
+     * @return Plugin[]
      */
     public function getPluginsByType($type)
     {
@@ -425,7 +426,7 @@ class AJXP_PluginsService
      * Get a plugin instance
      *
      * @param string $pluginId
-     * @return AJXP_Plugin
+     * @return Plugin
      */
     public function getPluginById($pluginId)
     {
@@ -456,7 +457,7 @@ class AJXP_PluginsService
     public function initActivePlugins()
     {
         /**
-         * @var AJXP_Plugin $pObject
+         * @var Plugin $pObject
          */
         $detected = $this->getDetectedPlugins();
         $toActivate = array();
@@ -488,7 +489,7 @@ class AJXP_PluginsService
      * @param string $type
      * @param string $name
      * @param bool $active
-     * @param AJXP_Plugin $updateInstance
+     * @param Plugin $updateInstance
      * @return void
      */
     public static function setPluginActive($type, $name, $active=true, $updateInstance = null)
@@ -500,7 +501,7 @@ class AJXP_PluginsService
      * @param $type
      * @param $name
      * @param bool $active
-     * @param AJXP_Plugin $updateInstance
+     * @param Plugin $updateInstance
      * @return void
      */
     public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null)
@@ -551,7 +552,7 @@ class AJXP_PluginsService
      * Some type require only one active plugin at a time
      * @param $type
      * @param $name
-     * @param AJXP_Plugin $updateInstance
+     * @param Plugin $updateInstance
      * @return void
      */
     public function setPluginUniqueActiveForType($type, $name, $updateInstance = null)
@@ -577,7 +578,7 @@ class AJXP_PluginsService
      * Retrieve an array of active plugins for type
      * @param string $type
      * @param bool $unique
-     * @return AJXP_Plugin[]
+     * @return Plugin[]
      */
     public function getActivePluginsForType($type, $unique = false)
     {
@@ -708,7 +709,7 @@ class AJXP_PluginsService
 
     /**
      * Append some predefined XML to a plugin instance
-     * @param AJXP_Plugin $plugin
+     * @param Plugin $plugin
      * @param \DOMDocument $manifestDoc
      * @param String $mixinName
      */
@@ -878,7 +879,7 @@ class AJXP_PluginsService
     /**
      * @param string $plugType
      * @param string $plugName
-     * @return AJXP_Plugin
+     * @return Plugin
      */
     public function getPluginByTypeName($plugType, $plugName)
     {
@@ -893,7 +894,7 @@ class AJXP_PluginsService
      *
      * @param string $type
      * @param string $name
-     * @return AJXP_Plugin
+     * @return Plugin
      */
     public static function findPlugin($type, $name)
     {
@@ -905,7 +906,7 @@ class AJXP_PluginsService
      * Simply find a plugin by its id (type.name)
      * @static
      * @param $id
-     * @return AJXP_Plugin
+     * @return Plugin
      */
     public static function findPluginById($id)
     {
@@ -918,7 +919,7 @@ class AJXP_PluginsService
     /**
      * Singleton method
      *
-     * @return AJXP_PluginsService the service instance
+     * @return PluginsService the service instance
      */
     public static function getInstance()
     {

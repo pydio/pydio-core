@@ -20,19 +20,19 @@
  */
 
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Core\CoreConfLoader;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\Plugins\SqlTableProvider;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -78,7 +78,7 @@ class BootConfLoader extends AbstractConfDriver
     public function loadManifest()
     {
         parent::loadManifest();
-        if (!AJXP_Utils::detectApplicationFirstRun()) {
+        if (!Utils::detectApplicationFirstRun()) {
             $actions = $this->getXPath()->query("server_settings|registry_contributions");
             foreach ($actions as $ac) {
                 $ac->parentNode->removeChild($ac);
@@ -93,7 +93,7 @@ class BootConfLoader extends AbstractConfDriver
 
     public function printFormFromServerSettings($fullManifest){
 
-        AJXP_XMLWriter::header("admin_data");
+        XMLWriter::header("admin_data");
         $xPath = new DOMXPath($fullManifest->ownerDocument);
         $addParams = "";
         $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
@@ -102,7 +102,7 @@ class BootConfLoader extends AbstractConfDriver
             $instType = str_replace("plugin_instance:", "", $type);
             $fieldName = $pInstNode->getAttribute("name");
             $pInstNode->setAttribute("type", "group_switch:".$fieldName);
-            $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
+            $typePlugs = PluginsService::getInstance()->getPluginsByType($instType);
             foreach ($typePlugs as $typePlug) {
                 if($typePlug->getId() == "auth.multi") continue;
                 $checkErrorMessage = "";
@@ -111,17 +111,17 @@ class BootConfLoader extends AbstractConfDriver
                 } catch (Exception $e) {
                     $checkErrorMessage = " (Warning : ".$e->getMessage().")";
                 }
-                $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
+                $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
                 $addParams .= '<global_param group_switch_name="'.$fieldName.'" name="instance_name" group_switch_label="'.$typePlug->getManifestLabel().$checkErrorMessage.'" group_switch_value="'.$typePlug->getId().'" default="'.$typePlug->getId().'" type="hidden"/>';
                 $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"".$typePlug->getManifestLabel().$checkErrorMessage."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
-                $addParams .= AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
+                $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
         $uri = $_SERVER["REQUEST_URI"];
-        if(strpos($uri, '.php') !== false) $uri = AJXP_Utils::safeDirname($uri);
+        if(strpos($uri, '.php') !== false) $uri = Utils::safeDirname($uri);
         if(empty($uri)) $uri = "/";
         $loadedValues = array(
-            "ENCODING"  => (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding()),
+            "ENCODING"  => (defined('AJXP_LOCALE')?AJXP_LOCALE:TextEncoder::getEncoding()),
             "SERVER_URI"=> $uri
         );
         foreach($loadedValues as $pName => $pValue){
@@ -129,12 +129,12 @@ class BootConfLoader extends AbstractConfDriver
             if(!$vNodes->length) continue;
             $vNodes->item(0)->setAttribute("default", $pValue);
         }
-        $allParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
+        $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
         $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
         $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
 
         echo($allParams);
-        AJXP_XMLWriter::close("admin_data");
+        XMLWriter::close("admin_data");
 
     }
 
@@ -162,7 +162,7 @@ class BootConfLoader extends AbstractConfDriver
     public function applyInstallerForm($action, $httpVars, $fileVars)
     {
         $data = array();
-        AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "");
+        Utils::parseStandardFormParameters($httpVars, $data, null, "");
 
         list($newConfigPlugin, $newAuthPlugin, $newCachePlugin) = $this->createBootstrapConf($data);
 
@@ -185,7 +185,7 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function sendInstallResult($htAccessToUpdate, $htContent){
         ConfService::clearAllCaches();
-        AJXP_Utils::setApplicationFirstRunPassed();
+        Utils::setApplicationFirstRunPassed();
 
         if($htAccessToUpdate != null){
             HTMLWriter::charsetHeader("application/json");
@@ -204,7 +204,7 @@ class BootConfLoader extends AbstractConfDriver
      * @throws Exception
      */
     public function setAdditionalData($data){
-        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding())){
+        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:TextEncoder::getEncoding())){
             file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
         }
     }
@@ -269,12 +269,12 @@ class BootConfLoader extends AbstractConfDriver
         if(!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
         if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
         if(!isSet($coreCache["UNIQUE_INSTANCE_CONFIG"])) $coreCache["UNIQUE_INSTANCE_CONFIG"] = array();
-        $coreConf["AJXP_CLI_SECRET_KEY"] = AJXP_Utils::generateRandomString(24, true);
+        $coreConf["AJXP_CLI_SECRET_KEY"] = Utils::generateRandomString(24, true);
 
         // REWRITE BOOTSTRAP.JSON
         $coreConf["DIBI_PRECONFIGURATION"] = $data["db_type"];
         if (isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])) {
-            $dbFile = AJXP_VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
+            $dbFile = VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
             if (!file_exists(dirname($dbFile))) {
                 mkdir(dirname($dbFile), 0755, true);
             }
@@ -292,7 +292,7 @@ class BootConfLoader extends AbstractConfDriver
         $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
-        $registry = AJXP_PluginsService::getInstance()->getDetectedPlugins();
+        $registry = PluginsService::getInstance()->getDetectedPlugins();
         $driverData = array("SQL_DRIVER" => $data["db_type"]);
         foreach($registry as $type => $plugins){
             foreach($plugins as $plugObject){
@@ -309,7 +309,7 @@ class BootConfLoader extends AbstractConfDriver
             unlink($oldBoot);
         }
         $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth, "core.cache" => $coreCache);
-        AJXP_Utils::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
+        Utils::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
 
 
         // Write new bootstrap and reload conf plugin!
@@ -381,7 +381,7 @@ class BootConfLoader extends AbstractConfDriver
         $newConfigPlugin = ConfService::getConfStorageImpl();
         require_once($newConfigPlugin->getUserClassFileName());
 
-        $adminLogin = AJXP_Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
+        $adminLogin = Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         AuthService::createUser($adminLogin, $adminPass, true);
@@ -404,7 +404,7 @@ class BootConfLoader extends AbstractConfDriver
             $pass  = $data[str_replace("_LOGIN", "_PASS",  $loginP)];
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
             $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
-            $saniLogin = AJXP_Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
+            $saniLogin = Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
             AuthService::createUser($saniLogin, $pass);
             $uObj = $newConfigPlugin->createUserObject($saniLogin);
             $uObj->personalRole->setParameterValue("core.conf", "email", $mail);
@@ -426,13 +426,13 @@ class BootConfLoader extends AbstractConfDriver
     public function testConnexions($action, $httpVars, $fileVars)
     {
         $data = array();
-        AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "DRIVER_OPTION_");
+        Utils::parseStandardFormParameters($httpVars, $data, null, "DRIVER_OPTION_");
 
         if ($action == "boot_test_sql_connexion") {
 
-            $p = AJXP_Utils::cleanDibiDriverParameters($data["db_type"]);
+            $p = Utils::cleanDibiDriverParameters($data["db_type"]);
             if ($p["driver"] == "sqlite3") {
-                $dbFile = AJXP_VarsFilter::filter($p["database"]);
+                $dbFile = VarsFilter::filter($p["database"]);
                 if (!file_exists(dirname($dbFile))) {
                     mkdir(dirname($dbFile), 0755, true);
                 }
@@ -445,7 +445,7 @@ class BootConfLoader extends AbstractConfDriver
 
         } else if ($action == "boot_test_mailer") {
 
-            $mailerPlug = AJXP_PluginsService::findPluginById("mailer.phpmailer-lite");
+            $mailerPlug = PluginsService::findPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),

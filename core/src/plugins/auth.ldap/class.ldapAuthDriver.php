@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_ProgressBarCLI;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\ProgressBarCLI;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -332,7 +332,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         $isListAll = (($offset == -1) && ($limit == -1) && (is_null($login)) && $regexpOnSearchAttr && (php_sapi_name() == "cli"));
         if($isListAll){
             $total = $this->getCountFromCache();
-            $progressBar = new AJXP_ProgressBarCLI();
+            $progressBar = new ProgressBarCLI();
             $progressBar->init($index, $total["count"], "Get ldap users");
         }
 
@@ -436,7 +436,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             return array();
         }
 
-        $entries = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), false, $offset, $limit, true);
+        $entries = $this->getUserEntries(Utils::regexpToLdap($regexp), false, $offset, $limit, true);
         $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
@@ -464,7 +464,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             }
         }
 
-        $res = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), true, null);
+        $res = $this->getUserEntries(Utils::regexpToLdap($regexp), true, null);
         $this->saveCountToCache($res);
         $this->dynamicFilter = null;
         return $res["count"];

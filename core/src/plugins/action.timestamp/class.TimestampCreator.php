@@ -7,14 +7,14 @@ v0.1
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class TimestampCreator extends AJXP_Plugin
+class TimestampCreator extends Plugin
 {
     public function switchAction($action, $httpVars, $fileVars)
     {
@@ -27,14 +27,14 @@ class TimestampCreator extends AJXP_Plugin
         //Check if the configuration has been initiated
         if (empty($timestamp_url) || empty($timestamp_login) || !empty($timestamp_password) ) {
             $this->logError("Config", "TimeStamp : configuration is needed");
-            throw new AJXP_Exception($mess["timestamp.4"]);
+            throw new PydioException($mess["timestamp.4"]);
         }
 
 
         //Check if after being initiated, conf. fields have some values
         if (strlen($timestamp_url)<2 || strlen($timestamp_login)<2 || strlen($timestamp_password)<2 ) {
             $this->logError("Config", "TimeStamp : configuration is incorrect");
-            throw new AJXP_Exception($mess["timestamp.4"]);
+            throw new PydioException($mess["timestamp.4"]);
         }
 
         //Get active repository
@@ -55,7 +55,7 @@ class TimestampCreator extends AJXP_Plugin
         //Check that a tokken is not going to be timestamped !
         if (substr("$file", -4)!='.ers') {
             if (file_exists($file.'.ers')) {
-                throw new AJXP_Exception($mess["timestamp.1"]);
+                throw new PydioException($mess["timestamp.1"]);
             } else {
                 //Prepare the query that will be sent to Universign
                 $dataToSend = array ('hashAlgo' => 'SHA256', 'withCert' => 'true', 'hashValue' => $hashedDataToTimestamp);
@@ -99,14 +99,14 @@ class TimestampCreator extends AJXP_Plugin
 
                 //Send the succesful message
                 $this->logInfo("TimeStamp", array("files"=>$file, "destination"=>$file.'.ers'));
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::reloadDataNode();
-                AJXP_XMLWriter::sendMessage($mess["timestamp.3"].$fileName, null);
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::reloadDataNode();
+                XMLWriter::sendMessage($mess["timestamp.3"].$fileName, null);
+                XMLWriter::close();
             }
 
         } else {
-            throw new AJXP_Exception($mess["timestamp.2"]);
+            throw new PydioException($mess["timestamp.2"]);
         }
     }
 }

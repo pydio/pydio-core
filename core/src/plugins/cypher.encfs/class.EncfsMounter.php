@@ -22,10 +22,10 @@
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -33,7 +33,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Cypher
  */
-class EncfsMounter extends AJXP_Plugin
+class EncfsMounter extends Plugin
 {
 
     protected function getWorkingPath()
@@ -57,7 +57,7 @@ class EncfsMounter extends AJXP_Plugin
 
     public function preProcessMove($actionName, &$httpVars, &$fileVars)
     {
-        $destO = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+        $destO = Utils::decodeSecureMagic($httpVars["dest"]);
         $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
         if(empty($dest)) $dest = ltrim($destO, "/");
         $userSelection = new UserSelection();
@@ -102,7 +102,7 @@ class EncfsMounter extends AJXP_Plugin
 
                 //$repo = ConfService::getRepository();
                 $workingP = rtrim($this->getWorkingPath(), "/");
-                $dir = $workingP.AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = $workingP.Utils::decodeSecureMagic($httpVars["dir"]);
 
                 if (dirname($dir) != $workingP) {
                     throw new Exception("Please cypher only folders at the root of your repository");
@@ -135,7 +135,7 @@ class EncfsMounter extends AJXP_Plugin
                 }
                 break;
             case "encfs.uncypher_folder":
-                $dir = $this->getWorkingPath().AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = $this->getWorkingPath().Utils::decodeSecureMagic($httpVars["dir"]);
                 $raw = str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", $dir);
                 $pass = $httpVars["pass"];
                 $uid = $this->getFilteredOption("ENCFS_UID");
@@ -144,9 +144,9 @@ class EncfsMounter extends AJXP_Plugin
                 }
                 break;
         }
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::reloadDataNode();
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::reloadDataNode();
+        XMLWriter::close();
 
     }
 

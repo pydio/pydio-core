@@ -26,8 +26,8 @@ use Dropbox_Exception;
 use Dropbox_Exception_NotFound;
 use Dropbox_OAuth_PEAR;
 use Pydio\Access\Core\IAjxpWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -73,7 +73,7 @@ class dropboxWrapper implements IAjxpWrapper
         }
         $basePath = $repo->getOption("PATH");
         if(empty($basePath)) $basePath = "";
-        $parts = AJXP_Utils::safeParseUrl($ajxpPath);
+        $parts = Utils::safeParseUrl($ajxpPath);
         $path = $basePath."/".ltrim($parts["path"], "/");
 
         if($path == "") return "/";
@@ -127,7 +127,7 @@ class dropboxWrapper implements IAjxpWrapper
 
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".rand();
+        $tmpFile = Utils::getAjxpTmpDir()."/".rand();
         $path = self::staticInitPath($path);
         file_put_contents($tmpFile, self::$dropbox->getFile($path));
         return $tmpFile;
@@ -292,7 +292,7 @@ class dropboxWrapper implements IAjxpWrapper
             self::$crtTmpFile = self::getRealFSReference($path);
             self::$crtWritePath = null;
         } else {
-            self::$crtTmpFile = AJXP_Utils::getAjxpTmpDir()."/".rand();
+            self::$crtTmpFile = Utils::getAjxpTmpDir()."/".rand();
             self::$crtWritePath = $path;
         }
         self::$crtHandle = fopen(self::$crtTmpFile, $mode);

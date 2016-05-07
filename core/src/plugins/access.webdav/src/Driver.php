@@ -27,11 +27,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Access\Core\RecycleBinManager;
 
 /**
- * AJXP_Plugin to access a webdav enabled server
+ * Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */

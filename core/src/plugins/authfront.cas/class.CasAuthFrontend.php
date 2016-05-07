@@ -19,12 +19,12 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -262,16 +262,16 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
                     }
 
-                    AJXP_XMLWriter::header("url");
+                    XMLWriter::header("url");
                     echo $this->cas_logoutUrl;
-                    AJXP_XMLWriter::close("url");
+                    XMLWriter::close("url");
                     session_unset();
                     session_destroy();
                 }else{
                     AuthService::disconnect();
-                    AJXP_XMLWriter::header("url");
+                    XMLWriter::header("url");
                     echo "#";
-                    AJXP_XMLWriter::close("url");
+                    XMLWriter::close("url");
                     session_unset();
                     session_destroy();
                 }
@@ -387,6 +387,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
     {
         $param = ConfService::getConfStorageImpl();
         $p = $param->sqlDriver;
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
+        return Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
     }
 }

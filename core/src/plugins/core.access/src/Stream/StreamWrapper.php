@@ -26,7 +26,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Pydio\Access\Core\Stream\Iterator\DirIterator;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
 use RecursiveArrayIterator;
 use GuzzleHttp\Stream\Stream;
 
@@ -495,7 +495,7 @@ class StreamWrapper
         $default['core']['currentProtocol'] = $this->protocol;
         stream_context_set_default($default);
 
-        $parts = AJXP_Utils::safeParseUrl($path);
+        $parts = Utils::safeParseUrl($path);
 
         $params = [];
 
@@ -651,7 +651,7 @@ class StreamWrapper
 
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
         $tmpHandle = fopen($tmpFile, "wb");
 
         self::copyFileInStream($path, $tmpHandle);
@@ -659,7 +659,7 @@ class StreamWrapper
         fclose($tmpHandle);
 
         if (!$persistent) {
-            register_shutdown_function(array("\\Pydio\\Core\\AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(array("\Pydio\Core\Utils\Utils", "silentUnlink"), $tmpFile);
         }
         return $tmpFile;
     }

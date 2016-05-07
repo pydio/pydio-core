@@ -18,13 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Plugins;
+namespace Pydio\Core\PluginFramework;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -42,7 +43,7 @@ if (!defined('LOG_LEVEL_DEBUG')) {
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Plugin implements \Serializable
+class Plugin implements \Serializable
 {
     protected $baseDir;
     protected $id;
@@ -423,7 +424,7 @@ class AJXP_Plugin implements \Serializable
     {
         if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@label", $this->manifestDoc->documentElement);
-        if($l->length) return AJXP_XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
+        if($l->length) return XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
         else return $this->id;
     }
     /**
@@ -434,7 +435,7 @@ class AJXP_Plugin implements \Serializable
     {
         if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@description", $this->manifestDoc->documentElement);
-        if($l->length) return AJXP_XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
+        if($l->length) return XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
         else return "";
     }
 
@@ -566,7 +567,7 @@ class AJXP_Plugin implements \Serializable
     }
     /**
      * Update dependencies dynamically
-     * @param AJXP_PluginsService $pluginService
+     * @param PluginsService $pluginService
      * @return void
      */
     public function updateDependencies($pluginService)
@@ -613,7 +614,7 @@ class AJXP_Plugin implements \Serializable
     /**
      * Get dependencies
      *
-     * @param AJXP_PluginsService $pluginService
+     * @param PluginsService $pluginService
      * @return array
      */
     public function getActiveDependencies($pluginService)
@@ -718,7 +719,7 @@ class AJXP_Plugin implements \Serializable
      */
     public function getConfigs()
     {
-        $core = AJXP_PluginsService::getInstance()->findPlugin("core", $this->type);
+        $core = PluginsService::getInstance()->findPlugin("core", $this->type);
         if (!empty($core)) {
             $coreConfs = $core->getConfigs();
             return array_merge($coreConfs, $this->pluginConf);
@@ -895,7 +896,7 @@ class AJXP_Plugin implements \Serializable
             $this->streamData = $streamData;
         }
         if ($register) {
-            $pServ = AJXP_PluginsService::getInstance();
+            $pServ = PluginsService::getInstance();
             $wrappers = stream_get_wrappers();
             if (!in_array($streamData["protocol"], $wrappers)) {
                 stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
@@ -1006,7 +1007,7 @@ class AJXP_Plugin implements \Serializable
         return (in_array($mixinName, $this->mixins));
     }
     /**
-     * Check if the plugin declares mixins, and load them using AJXP_PluginsService::patchPluginWithMixin method
+     * Check if the plugin declares mixins, and load them using PluginsService::patchPluginWithMixin method
      * @return void
      */
     protected function loadMixins()
@@ -1015,7 +1016,7 @@ class AJXP_Plugin implements \Serializable
         if ($attr != "") {
             $this->mixins = explode(",", $attr);
             foreach ($this->mixins as $mixin) {
-                AJXP_PluginsService::getInstance()->patchPluginWithMixin($this, $this->manifestDoc, $mixin);
+                PluginsService::getInstance()->patchPluginWithMixin($this, $this->manifestDoc, $mixin);
             }
         }
     }

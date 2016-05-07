@@ -31,7 +31,7 @@ define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
 use Pydio\Cache\Core\AbstractCacheDriver;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 use \Pydio\Plugins\Cache\Doctrine\Ext;
 
@@ -142,7 +142,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
         }
 
         if(empty($cachePrefix)){
-            $cachePrefix = AJXP_Utils::slugify(AJXP_Utils::detectServerURL(true));
+            $cachePrefix = Utils::slugify(Utils::detectServerURL(true));
         }
         $cachePrefix .= "_".$namespace."_";
         $cacheDriver->setNamespace($cachePrefix);

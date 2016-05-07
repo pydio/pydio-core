@@ -23,14 +23,14 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Cache;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocalCache;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -39,13 +39,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class EmlParser extends AJXP_Plugin
+class EmlParser extends Plugin
 {
     public static $currentListingOnlyEmails;
 
     public function performChecks()
     {
-        if (!AJXP_Utils::searchIncludePath("Mail/mimeDecode.php")) {
+        if (!Utils::searchIncludePath("Mail/mimeDecode.php")) {
             throw new Exception("Cannot find Mail/mimeDecode PEAR library");
         }
     }
@@ -61,7 +61,7 @@ class EmlParser extends AJXP_Plugin
         if($selection->isEmpty()) return;
         $node = $selection->getUniqueNode();
         $file = $node->getUrl();
-        AJXP_Controller::applyHook("node.read", array($node));
+        Controller::applyHook("node.read", array($node));
 
         $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
 
@@ -92,7 +92,7 @@ class EmlParser extends AJXP_Plugin
                                 $charset = $element->charset;
                             }
                             if ($decoded != $value) {
-                                $value = SystemTextEncoding::changeCharset($charset, "UTF-8", $decoded);
+                                $value = TextEncoder::changeCharset($charset, "UTF-8", $decoded);
                                 $node = $doc->createElement("headervalue", $value);
                                 $res = $headerNode->parentNode->replaceChild($node, $headerValueNode);
                                 $changes = true;
@@ -111,7 +111,7 @@ class EmlParser extends AJXP_Plugin
                     'decode_headers' => false
                 );
                 if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -130,7 +130,7 @@ class EmlParser extends AJXP_Plugin
                     print('<?xml version="1.0" encoding="'.$charset.'"?>');
                     print('<email_body>');
                 } else {
-                    AJXP_XMLWriter::header("email_body");
+                    XMLWriter::header("email_body");
                 }
                 if ($html!==false) {
                     print('<mimepart type="html"><![CDATA[');
@@ -143,7 +143,7 @@ class EmlParser extends AJXP_Plugin
                     print($text->body);
                     print("]]></mimepart>");
                 }
-                AJXP_XMLWriter::close("email_body");
+                XMLWriter::close("email_body");
 
             break;
             case "eml_dl_attachment":
@@ -157,7 +157,7 @@ class EmlParser extends AJXP_Plugin
                     'decode_headers' => false
                 );
                 if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -176,9 +176,9 @@ class EmlParser extends AJXP_Plugin
             break;
             case "eml_cp_attachment":
                 $attachId = $httpVars["attachment_id"];
-                $destRep = AJXP_Utils::decodeSecureMagic($httpVars["destination"]);
+                $destRep = Utils::decodeSecureMagic($httpVars["destination"]);
                 if (!isset($attachId)) {
-                    AJXP_XMLWriter::sendMessage(null, "Wrong Parameters");
+                    XMLWriter::sendMessage(null, "Wrong Parameters");
                     break;
                 }
 
@@ -189,7 +189,7 @@ class EmlParser extends AJXP_Plugin
                     'decode_headers' => false
                 );
                 if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -198,7 +198,7 @@ class EmlParser extends AJXP_Plugin
                 $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if ($part !== false) {
                     $destStreamURL = $selection->currentBaseUrl();
                     if (isSet($httpVars["dest_repository_id"])) {
@@ -216,14 +216,14 @@ class EmlParser extends AJXP_Plugin
                     if ($fp !== false) {
                         fwrite($fp, $part->body, strlen($part->body));
                         fclose($fp);
-                        AJXP_XMLWriter::sendMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep), NULL);
+                        XMLWriter::sendMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep), NULL);
                     } else {
-                        AJXP_XMLWriter::sendMessage(null, $mess["editor.eml.8"]);
+                        XMLWriter::sendMessage(null, $mess["editor.eml.8"]);
                     }
                 } else {
-                    AJXP_XMLWriter::sendMessage(null, $mess["editor.eml.9"]);
+                    XMLWriter::sendMessage(null, $mess["editor.eml.9"]);
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
             break;
 
             default:
@@ -258,7 +258,7 @@ class EmlParser extends AJXP_Plugin
             EmlParser::$currentListingOnlyEmails = true;
         }
         if ($wrapperClassName == "imapAccessWrapper") {
-            $cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
+            $cachedFile = LocalCache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
             $realFile = $cachedFile->getId();
             if (!is_file($realFile)) {
                 $cachedFile->getData();// trigger loading!
@@ -266,7 +266,7 @@ class EmlParser extends AJXP_Plugin
         } else {
             $realFile = $ajxpNode->getRealFile();
         }
-        $cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
+        $cacheItem = LocalCache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
         $data = unserialize($cacheItem->getData());
         $data["ajxp_mime"] = "eml";
         $data["mimestring"] = "Email";
@@ -301,12 +301,12 @@ class EmlParser extends AJXP_Plugin
                 $date = strtotime($hValue);
                 $metadata["eml_time"] = $date;
             }
-            $metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
+            $metadata["eml_".$hKey] = Utils::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
             //$this->logDebug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
             if ($metadata["eml_".$hKey] == "") {
-                $metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue));
-                if (!SystemTextEncoding::isUtf8($metadata["eml_".$hKey])) {
-                    $metadata["eml_".$hKey] = SystemTextEncoding::toUTF8($metadata["eml_".$hKey]);
+                $metadata["eml_".$hKey] = Utils::xmlEntities(@htmlentities($hValue));
+                if (!TextEncoder::isUtf8($metadata["eml_".$hKey])) {
+                    $metadata["eml_".$hKey] = TextEncoder::toUTF8($metadata["eml_".$hKey]);
                 }
             }
             $metadata["eml_".$hKey] = str_replace("&amp;", "&", $metadata["eml_".$hKey]);
@@ -345,7 +345,7 @@ class EmlParser extends AJXP_Plugin
 
         $dom = new DOMDocument("1.0", "UTF-8");
         $dom->loadXML($outputVars["ob_output"]);
-        $mobileAgent = AJXP_Utils::userAgentIsIOS() || AJXP_Utils::userAgentIsNativePydioApp();
+        $mobileAgent = Utils::userAgentIsIOS() || Utils::userAgentIsNativePydioApp();
         $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
             // Replace all text attributes by the "from" value
@@ -356,7 +356,7 @@ class EmlParser extends AJXP_Plugin
                     $ar = explode("&lt;", $from);
                     $from = trim(array_shift($ar));
                     $text = ($index < 10?"0":"").$index.". ".$from." &gt; ".$child->getAttribute("eml_subject");
-                    if (AJXP_Utils::userAgentIsNativePydioApp()) {
+                    if (Utils::userAgentIsNativePydioApp()) {
                         $text = html_entity_decode($text, ENT_COMPAT, "UTF-8");
                     }
                     $index ++;
@@ -390,7 +390,7 @@ class EmlParser extends AJXP_Plugin
     {
         require_once ("Mail/mimeDecode.php");
         if ($cacheRemoteContent) {
-            $cache = AJXP_Cache::getItem ( "eml_remote", $file , null, array("EmlParser", "computeCacheId"));
+            $cache = LocalCache::getItem ( "eml_remote", $file , null, array("EmlParser", "computeCacheId"));
             $content = $cache->getData ();
         } else {
             $content = file_get_contents ( $file );

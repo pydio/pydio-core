@@ -22,11 +22,11 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Cache;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocalCache;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class ImagePreviewer extends AJXP_Plugin
+class ImagePreviewer extends Plugin
 {
     private $currentDimension;
 
@@ -54,7 +54,7 @@ class ImagePreviewer extends AJXP_Plugin
         if ($action == "preview_data_proxy") {
             $file = $selection->getUniqueFile();
             if (!file_exists($destStreamURL.$file) || !is_readable($destStreamURL.$file)) {
-                header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
+                header("Content-Type: ".Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;
             }
@@ -63,11 +63,11 @@ class ImagePreviewer extends AJXP_Plugin
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;
-                $cacheItem = AJXP_Cache::getItem("diaporama_".$dimension, $destStreamURL.$file, array($this, "generateThumbnail"));
+                $cacheItem = LocalCache::getItem("diaporama_".$dimension, $destStreamURL.$file, array($this, "generateThumbnail"));
                 $data = $cacheItem->getData();
                 $cId = $cacheItem->getId();
 
-                header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($cId))."; name=\"".basename($cId)."\"");
+                header("Content-Type: ".Utils::getImageMimeType(basename($cId))."; name=\"".basename($cId)."\"");
                 header("Content-Length: ".strlen($data));
                 header('Cache-Control: public');
                 header("Pragma:");
@@ -83,7 +83,7 @@ class ImagePreviewer extends AJXP_Plugin
                 $fp = fopen($destStreamURL.$file, "r");
                 $stat = fstat($fp);
                 $filesize = $stat["size"];
-                header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
+                header("Content-Type: ".Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: ".$filesize);
                 header('Cache-Control: public');
                 header("Pragma:");
@@ -94,7 +94,7 @@ class ImagePreviewer extends AJXP_Plugin
                 AJXP_MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
                 fflush($stream);
                 fclose($stream);
-                AJXP_Controller::applyHook("node.read", array($node));
+                Controller::applyHook("node.read", array($node));
             }
         }
     }
@@ -115,7 +115,7 @@ class ImagePreviewer extends AJXP_Plugin
                 foreach ($diapoFolders as $f) {
                     $f = basename($f);
                     $this->logDebug("GLOB ".$f);
-                    AJXP_Cache::clearItem($f, $oldFile->getUrl());
+                    LocalCache::clearItem($f, $oldFile->getUrl());
                 }
             }
         }
@@ -154,7 +154,7 @@ class ImagePreviewer extends AJXP_Plugin
     {
         $currentPath = $ajxpNode->getUrl();
         $wrapperClassName = $ajxpNode->wrapperClassName;
-        $isImage = AJXP_Utils::is_image($currentPath);
+        $isImage = Utils::is_image($currentPath);
         $ajxpNode->is_image = $isImage;
         if(!$isImage) return;
         $setRemote = false;

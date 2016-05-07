@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Controller;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Controller\Controller;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -81,7 +81,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
     public function get()
     {
         $ajxpNode = new AJXP_Node($this->getUrl());
-        AJXP_Controller::applyHook("node.read", array(&$ajxpNode));
+        Controller::applyHook("node.read", array(&$ajxpNode));
         return fopen($this->getUrl(), "r");
     }
 

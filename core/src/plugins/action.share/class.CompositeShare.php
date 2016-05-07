@@ -21,9 +21,9 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -140,7 +140,7 @@ class CompositeShare
             "description"   => $this->getRepository()->getDescription(),
             "entries"       => $sharedEntries,
             "element_watch" => $elementWatch,
-            "repository_url"=> AJXP_Utils::getWorkspaceShortcutURL($this->getRepository())."/",
+            "repository_url"=> Utils::getWorkspaceShortcutURL($this->getRepository())."/",
             "content_filter"=> $cFilter,
             "share_owner"   => $this->getOwner(),
             "share_scope"    => $this->getVisibilityScope()

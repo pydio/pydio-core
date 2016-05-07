@@ -23,11 +23,11 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -85,7 +85,7 @@ class SvnManager extends AJXP_AbstractMetaSource
             }
         }
 
-        $result["DIR"] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.AJXP_Utils::decodeSecureMagic($httpVars["dir"]));
+        $result["DIR"] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.Utils::decodeSecureMagic($httpVars["dir"]));
         $result["ORIGINAL_SELECTION"] = $userSelection;
         $result["SELECTION"] = array();
         if (!$userSelection->isEmpty()) {
@@ -164,7 +164,7 @@ class SvnManager extends AJXP_AbstractMetaSource
             $switches = '--xml -rHEAD:0';
             $arg = $init["SELECTION"][0];
             $res = ExecSvnCmd($command, $arg, $switches);
-            AJXP_XMLWriter::header();
+            XMLWriter::header();
             $lines = explode(PHP_EOL, $res[IDX_STDOUT]);
             array_shift($lines);
             if (isSet($currentRev)) {
@@ -172,8 +172,8 @@ class SvnManager extends AJXP_AbstractMetaSource
             } else if (isSet($revRange)) {
                 print("<revision_range start='$revRange[0]' end='$revRange[1]'/>");
             }
-            print(SystemTextEncoding::toUTF8(implode("", $lines), false));
-            AJXP_XMLWriter::close();
+            print(TextEncoder::toUTF8(implode("", $lines), false));
+            XMLWriter::close();
         } else if ($actionName == "svndownload") {
             $revision = $httpVars["revision"];
             $realFile = $init["SELECTION"][0];
@@ -227,18 +227,18 @@ class SvnManager extends AJXP_AbstractMetaSource
     {
         switch ($actionName) {
             case "mkdir":
-                $init = $this->initDirAndSelection($httpVars, array("NEW_DIR" => AJXP_Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
+                $init = $this->initDirAndSelection($httpVars, array("NEW_DIR" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_DIR"]);
                 $this->commitMessageParams = $httpVars["dirname"];
             break;
             case "mkfile":
-                $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => AJXP_Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
+                $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
                 $this->commitMessageParams = $httpVars["filename"];
             break;
             case "upload":
                 if (isSet($filesVars) && isSet($filesVars["userfile_0"]) && isSet($filesVars["userfile_0"]["name"])) {
-                    $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => SystemTextEncoding::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
+                    $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => TextEncoder::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
                     $res = ExecSvnCmd("svn status ", $init["NEW_FILE"]);
                     if (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?") {
                         $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
@@ -258,7 +258,7 @@ class SvnManager extends AJXP_AbstractMetaSource
     public function copyOrMoveSelection($actionName, &$httpVars, $filesVars)
     {
         if ($actionName != "rename") {
-            $init = $this->initDirAndSelection($httpVars, array("DEST_DIR" => AJXP_Utils::decodeSecureMagic($httpVars["dest"])));
+            $init = $this->initDirAndSelection($httpVars, array("DEST_DIR" => Utils::decodeSecureMagic($httpVars["dest"])));
             $this->commitMessageParams = "To:".$httpVars["dest"].";items:";
         } else {
             $init = $this->initDirAndSelection($httpVars, array(), true);
@@ -270,7 +270,7 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
         foreach ($init["SELECTION"] as $selectedFile) {
             if ($actionName == "rename") {
-                $destFile = dirname($selectedFile)."/".AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
+                $destFile = dirname($selectedFile)."/".Utils::decodeSecureMagic($httpVars["filename_new"]);
                 $this->commitMessageParams = "To:".$httpVars["filename_new"].";item:".$httpVars["file"];
             } else {
                 $destFile = $init["DEST_DIR"]."/".basename($selectedFile);
@@ -288,17 +288,17 @@ class SvnManager extends AJXP_AbstractMetaSource
         $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
 
         $mess = ConfService::getMessages();
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::sendMessage($mess["meta.svn.5"], null);
-        AJXP_XMLWriter::reloadDataNode();
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::sendMessage($mess["meta.svn.5"], null);
+        XMLWriter::reloadDataNode();
+        XMLWriter::close();
     }
 
     public function deleteSelection($actionName, &$httpVars, $filesVars)
     {
         $init = $this->initDirAndSelection($httpVars, array(), true);
         if (isSet($init["RECYCLE"]) && isSet($init["RECYCLE"]["action"]) && $init["RECYCLE"]["action"] != "delete") {
-            $httpVars["dest"] = SystemTextEncoding::fromUTF8($init["RECYCLE"]["dest"]);
+            $httpVars["dest"] = TextEncoder::fromUTF8($init["RECYCLE"]["dest"]);
             $this->copyOrMoveSelection("move", $httpVars, $filesVars);
             $userSelection = $init["ORIGINAL_SELECTION"];
             $files = $userSelection->getFiles();
@@ -322,10 +322,10 @@ class SvnManager extends AJXP_AbstractMetaSource
         $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
 
         $mess = ConfService::getMessages();
-        AJXP_XMLWriter::header();
-        AJXP_XMLWriter::sendMessage($mess["meta.svn.51"], null);
-        AJXP_XMLWriter::reloadDataNode();
-        AJXP_XMLWriter::close();
+        XMLWriter::header();
+        XMLWriter::sendMessage($mess["meta.svn.51"], null);
+        XMLWriter::reloadDataNode();
+        XMLWriter::close();
     }
 
     public function commitChanges($actionName, $httpVars, $filesVars)
@@ -369,7 +369,7 @@ class SvnManager extends AJXP_AbstractMetaSource
                 $this->logError("ExtractMeta", $e->getMessage());
             }
         }
-        $fileId = SystemTextEncoding::toUTF8(basename($ajxpNode->getUrl()));
+        $fileId = TextEncoder::toUTF8(basename($ajxpNode->getUrl()));
         if (isSet($entries[$fileId])) {
             $ajxpNode->mergeMetadata($entries[$fileId]);
         }

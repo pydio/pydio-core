@@ -24,6 +24,7 @@
  * @package PThumb
  * @version 1.2.10
  */
+use Pydio\Core\Utils\Utils;
 
 /**
  * @package PThumb
@@ -527,7 +528,7 @@ class PThumb{
             $isStream = (preg_match( "!^$wrappers_re://!", $target_file ) === 1);
             if($isStream){
                 $backToStreamTarget = $target_file;
-                $target_file = tempnam(AJXP_Utils::getAjxpTmpDir(), "pthumb_");
+                $target_file = tempnam(Utils::getAjxpTmpDir(), "pthumb_");
             }
 
             switch ($format){
@@ -937,7 +938,7 @@ class PThumb{
         }
         //METHOD 2: HTTP_RETRIEVE + CURL (by class)
 		if (class_exists("HTTPRetriever") && ($force_method == null || $force_method == 2)){
-			$handle = new HTTPRetriever();
+			$handle = new \HTTPRetriever();
 			
 			//Set Options
 			$handle -> headers["Referer"] = $url;

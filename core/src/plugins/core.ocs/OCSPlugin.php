@@ -20,16 +20,16 @@
  */
 namespace Pydio\OCS;
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\Plugin;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once("vendor/autoload.php");
 
-class OCSPlugin extends AJXP_Plugin{
+class OCSPlugin extends Plugin{
 
     /**
      * @var ActionsController $controller
@@ -39,8 +39,8 @@ class OCSPlugin extends AJXP_Plugin{
     public function init($options)
     {
         parent::init($options);
-        AJXP_Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
-        AJXP_Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
+        Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
+        Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
     }
 
     protected function getController(){

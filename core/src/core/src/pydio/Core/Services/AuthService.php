@@ -18,19 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Auth\Core;
+namespace Pydio\Core\Services;
 use Pydio\Access\Core\Repository;
+use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Conf\Core\AjxpRole;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -91,7 +92,7 @@ class AuthService
             $_SESSION["SECURE_TOKENS"][] = $_SESSION["FORCE_SECURE_TOKEN"];
             return $_SESSION["FORCE_SECURE_TOKEN"];
         }
-        $newToken = AJXP_Utils::generateRandomString(32); //md5(time());
+        $newToken = Utils::generateRandomString(32); //md5(time());
         $_SESSION["SECURE_TOKENS"][] = $newToken;
         return $newToken;
     }
@@ -148,7 +149,7 @@ class AuthService
     {
         if(self::getLoggedUser() != null && self::getLoggedUser()->getId() != "guest") return ;
 
-        $frontends = AJXP_PluginsService::getInstance()->getActivePluginsForType("authfront");
+        $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");
         $index = 0;
         /**
          * @var AbstractAuthFrontend $frontendPlugin
@@ -176,7 +177,7 @@ class AuthService
      */
     public static function getBruteForceLoginArray()
     {
-        $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
+        $failedLog = Utils::getAjxpTmpDir()."/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
         $loginArray = unserialize($loginAttempt);
         $ret = array();
@@ -197,7 +198,7 @@ class AuthService
      */
     public static function setBruteForceLoginArray($loginArray)
     {
-        $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
+        $failedLog = Utils::getAjxpTmpDir()."/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
     /**
@@ -354,7 +355,7 @@ class AuthService
                     $u = $_SESSION["AJXP_USER"];
                     if($u->reloadRolesIfRequired()){
                         ConfService::getInstance()->invalidateLoadedRepositories();
-                        self::$bufferedMessage = AJXP_XMLWriter::reloadRepositoryList(false);
+                        self::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
                         $_SESSION["AJXP_USER"] = $u;
                     }
                     return 1;
@@ -381,7 +382,7 @@ class AuthService
         self::setBruteForceLoginArray($loginAttempt);
 
         if (!$authDriver->userExists($user_id)) {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => AJXP_Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
             if ($bruteForceLogin === FALSE) {
                 return -4;
             } else {
@@ -390,7 +391,7 @@ class AuthService
         }
         if (!$bypass_pwd) {
             if (!self::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
-                AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => AJXP_Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
+                AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
                 if ($bruteForceLogin === FALSE) {
                     return -4;
                 } else {
@@ -411,7 +412,7 @@ class AuthService
 
         $user = $confDriver->createUserObject($user_id);
         if ($user->getLock() == "logout") {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => AJXP_Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
             return -1;
         }
 
@@ -457,7 +458,7 @@ class AuthService
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
             $user = isSet($_SESSION["AJXP_USER"]) ? $_SESSION["AJXP_USER"] : self::$currentUser;
             $userId = $user->id;
-            AJXP_Controller::applyHook("user.before_disconnect", array($user));
+            Controller::applyHook("user.before_disconnect", array($user));
             self::clearRememberCookie();
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
@@ -465,7 +466,7 @@ class AuthService
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
-            AJXP_Controller::applyHook("user.after_disconnect", array($userId));
+            Controller::applyHook("user.after_disconnect", array($userId));
         }
     }
     /**
@@ -476,7 +477,7 @@ class AuthService
      */
     public static function bootSequence(&$START_PARAMETERS)
     {
-        if(AJXP_Utils::detectApplicationFirstRun()) return;
+        if(Utils::detectApplicationFirstRun()) return;
         if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
         $rootRole = self::getRole("AJXP_GRP_/", false);
         if ($rootRole === false) {
@@ -496,7 +497,7 @@ class AuthService
                 }
             }
             //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
-            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
+            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
                     $default = $xmlNode->getAttribute("default");
@@ -778,9 +779,9 @@ class AuthService
         }
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
-        AJXP_Controller::applyHook("user.before_password_change", array($userId));
+        Controller::applyHook("user.before_password_change", array($userId));
         $authDriver->changePassword($userId, $userPass);
-        AJXP_Controller::applyHook("user.after_password_change", array($userId));
+        Controller::applyHook("user.after_password_change", array($userId));
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
@@ -809,7 +810,7 @@ class AuthService
     public static function createUser($userId, $userPass, $isAdmin=false, $isHidden=false)
     {
         $userId = self::filterUserSensitivity($userId);
-        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
+        Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new \Exception("Reserved user id");
         }
@@ -840,7 +841,7 @@ class AuthService
             $user->setPref("AJXP_WEBDAV_DATA", $wData);
             $user->save();
         }
-        AJXP_Controller::applyHook("user.after_create", array($user));
+        Controller::applyHook("user.after_create", array($user));
         AJXP_Logger::info(__CLASS__,"Create User", array("user_id"=>$userId));
         return null;
     }
@@ -868,7 +869,7 @@ class AuthService
      */
     public static function deleteUser($userId)
     {
-        AJXP_Controller::applyHook("user.before_delete", array($userId));
+        Controller::applyHook("user.before_delete", array($userId));
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->deleteUser($userId);
@@ -877,7 +878,7 @@ class AuthService
         foreach ($subUsers as $deletedUser) {
             $authDriver->deleteUser($deletedUser);
         }
-        AJXP_Controller::applyHook("user.after_delete", array($userId));
+        Controller::applyHook("user.after_delete", array($userId));
         AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
         return true;
     }
@@ -1213,7 +1214,7 @@ class AuthService
         $test = null;
         if($logged != null){
             $test = $logged->mergedRole->filterParameterValue($pluginId, $optionName, $repository->getId(), null);
-            if(!empty($test) && !$safe) $test = AJXP_VarsFilter::filter($test);
+            if(!empty($test) && !$safe) $test = VarsFilter::filter($test);
         }
         if(empty($test)){
             return $repository->getOption($optionName, $safe);
@@ -1233,11 +1234,11 @@ class AuthService
 
         // Inherit actions
         $inheritActions = array();
-        $cacheInherit = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[@inherit='true']");
+        $cacheInherit = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[@inherit='true']");
         if ($cacheInherit !== null && is_array($cacheInherit)) {
             $inheritActions = $cacheInherit;
         } else {
-            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@inherit='true']", "node", false, false, true);
+            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[@inherit='true']", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $node) {
                     $paramName = $node->getAttribute("name");
@@ -1246,7 +1247,7 @@ class AuthService
                     $inheritActions[$pluginId][] = $paramName;
                 }
             }
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[@inherit='true']", $inheritActions);
+            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[@inherit='true']", $inheritActions);
         }
 
         // Clear ACL, Keep disabled actions, keep 'inherit' parameters.

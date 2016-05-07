@@ -23,12 +23,12 @@ use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -195,7 +195,7 @@ class ShareRightsManager
 
             if ($eType == "user") {
 
-                $u = AJXP_Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index], AJXP_SANITIZE_EMAILCHARS);
+                $u = Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index], AJXP_SANITIZE_EMAILCHARS);
                 $userExistsRead = AuthService::userExists($u);
                 if (!$userExistsRead && !isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     $index++;
@@ -220,7 +220,7 @@ class ShareRightsManager
 
             } else {
 
-                $u = AJXP_Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index]);
+                $u = Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index]);
 
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
@@ -416,7 +416,7 @@ class ShareRightsManager
                 }
             } else {
                 $mess = ConfService::getMessages();
-                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". AJXP_Utils::sanitize($childRepository->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
+                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". Utils::sanitize($childRepository->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
                 $userObject = $this->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], isset($userEntry["HIDDEN"]), $hiddenUserLabel);
             }
 
@@ -524,7 +524,7 @@ class ShareRightsManager
         }
         if(!$isHidden){
             // This is an explicit user creation - check possible limits
-            AJXP_Controller::applyHook("user.before_create", array($userName, null, false, false));
+            Controller::applyHook("user.before_create", array($userName, null, false, false));
             $limit = $parentUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
             if (!empty($limit) && intval($limit) > 0) {
                 $count = count($confDriver->getUserChildren($parentUser->getId()));
@@ -544,7 +544,7 @@ class ShareRightsManager
             $userObject->setHidden(true);
             $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $display);
         }
-        AJXP_Controller::applyHook("user.after_create", array($userObject));
+        Controller::applyHook("user.after_create", array($userObject));
 
         return $userObject;
 

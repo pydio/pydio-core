@@ -24,12 +24,12 @@ use DOMNode;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to browse a mailbox content (IMAP OR POP)
+ * Plugin to browse a mailbox content (IMAP OR POP)
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -92,7 +92,6 @@ class imapAccessDriver extends fsAccessDriver
                 $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "sortInboxFirst");
             } else {
                 // MAILS LISTING CASE
-                //$httpVars["dir"] = mb_convert_encoding($httpVars["dir"], "UTF7-IMAP", SystemTextEncoding::getEncoding());
                 $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "inverseSort");
             }
         }
@@ -115,8 +114,8 @@ class imapAccessDriver extends fsAccessDriver
                 foreach ($meta as $attach) {
                     if ($attach["x-attachment-id"] == $attachmentId) {
                         $metadata["text"] = $attach["filename"];
-                        $metadata["icon"] = AJXP_Utils::mimetype($attach["filename"], "image", false);
-                        $metadata["mimestring"] = AJXP_Utils::mimetype($attach["filename"], "text", false);
+                        $metadata["icon"] = Utils::mimetype($attach["filename"], "image", false);
+                        $metadata["mimestring"] = Utils::mimetype($attach["filename"], "text", false);
                     }
                 }
             }

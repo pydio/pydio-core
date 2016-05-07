@@ -21,16 +21,16 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class EtherpadClient extends AJXP_Plugin
+class EtherpadClient extends Plugin
 {
     public $baseURL = "http://localhost:9001";
     public $apiKey = "";
@@ -64,7 +64,7 @@ class EtherpadClient extends AJXP_Plugin
             if(isSet($metadata["pad_id"])){
                 $padID = $metadata["pad_id"];
             }else{
-                $padID = AJXP_Utils::generateRandomString();
+                $padID = Utils::generateRandomString();
                 $selectedNode->setMetadata("etherpad", array("pad_id" => $padID), AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
             }
         }
@@ -142,15 +142,15 @@ class EtherpadClient extends AJXP_Plugin
                 $dateStamp = date(" Y-m-d H:i", time());
                 $startUrl = preg_replace('"\.pad$"', $dateStamp.'.html', $origUrl);
                 $newNode = new AJXP_Node($startUrl);
-                AJXP_Controller::applyHook("node.before_create", array($newNode, strlen($content)));
+                Controller::applyHook("node.before_create", array($newNode, strlen($content)));
                 file_put_contents($newNode->getUrl(), $content);
-                AJXP_Controller::applyHook("node.change", array(null, $newNode));
+                Controller::applyHook("node.change", array(null, $newNode));
             }else{
-                AJXP_Controller::applyHook("node.before_change", array($selectedNode, strlen($content)));
+                Controller::applyHook("node.before_change", array($selectedNode, strlen($content)));
                 file_put_contents($selectedNode->getUrl(), $content);
                 clearstatcache(true, $selectedNode->getUrl());
                 $selectedNode->loadNodeInfo(true);
-                AJXP_Controller::applyHook("node.change", array($selectedNode, $selectedNode));
+                Controller::applyHook("node.change", array($selectedNode, $selectedNode));
             }
 
 
@@ -187,7 +187,7 @@ class EtherpadClient extends AJXP_Plugin
      */
     public function hideExtension(&$ajxpNode){
         if($ajxpNode->hasExtension("pad")){
-            $baseName = AJXP_Utils::safeBasename($ajxpNode->getPath());
+            $baseName = Utils::safeBasename($ajxpNode->getPath());
             $ajxpNode->setLabel(str_replace(".pad", "", $baseName));
         }
     }

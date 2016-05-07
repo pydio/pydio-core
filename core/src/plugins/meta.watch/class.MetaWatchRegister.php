@@ -21,10 +21,10 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -59,8 +59,8 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     public function initMeta($accessDriver)
     {
         parent::initMeta($accessDriver);
-        $this->notificationCenter = AJXP_PluginsService::findPluginById("core.notifications");
-        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $this->notificationCenter = PluginsService::findPluginById("core.notifications");
+        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
             throw new Exception("The 'meta.watch' plugin requires at least one active 'metastore' plugin");
         }
@@ -409,12 +409,12 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
                     );
                 }
 
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 $node->metadata = array();
                 $node->loadNodeInfo(true, false, "all");
                 $this->enrichNode($node);
-                AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array( $node->getPath() => $node )), true);
-                AJXP_XMLWriter::close();
+                XMLWriter::writeNodesDiff(array("UPDATE" => array( $node->getPath() => $node )), true);
+                XMLWriter::close();
 
                 break;
 

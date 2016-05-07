@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -192,7 +192,7 @@ class cmsmsAuthDriver extends AbstractAuthDriver
     }
     public function listUsersSerial()
     {
-        return AJXP_Utils::loadSerialFile($this->usersSerFile);
+        return Utils::loadSerialFile($this->usersSerFile);
     }
     public function getLoginRedirect()
     {

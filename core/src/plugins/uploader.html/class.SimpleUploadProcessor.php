@@ -22,11 +22,11 @@
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
 use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class SimpleUploadProcessor extends AJXP_Plugin
+class SimpleUploadProcessor extends Plugin
 {
     public function getDropBg($action, $httpVars, $fileVars)
     {
@@ -75,7 +75,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
             // create the object and assign property
             $fileVars["userfile_0"] = array(
                 "input_upload" => true,
-                "name"		   => SystemTextEncoding::fromUTF8(basename($fileNameH)),
+                "name"		   => TextEncoder::fromUTF8(basename($fileNameH)),
                 "size"		   => $fileSizeH
             );
         } else {
@@ -100,7 +100,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
                     $s = '<tree>';
-                    $s .= AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
+                    $s .= XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
                     print("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
                     print("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
@@ -112,17 +112,17 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 $message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
                 exit($message);
             } else {
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
-                    AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), true);
+                    XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), true);
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
                 /* for further implementation */
                 if (!isSet($result["PREVENT_NOTIF"])) {
                     if (isset($result["CREATED_NODE"])) {
-                        AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
+                        Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
                     } else if (isSet($result["UPDATED_NODE"])) {
-                        AJXP_Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
+                        Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
                     }
                 }
                 //exit("OK");
@@ -138,14 +138,14 @@ class SimpleUploadProcessor extends AJXP_Plugin
             return false;
         }
         $selection = new UserSelection($repository);
-        $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+        $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $destStreamURL = $selection->currentBaseUrl().$dir."/";
-        $filename = AJXP_Utils::decodeSecureMagic($httpVars["file_name"]);
+        $filename = Utils::decodeSecureMagic($httpVars["file_name"]);
 
         $chunks = array();
         $index = 0;
         while (isSet($httpVars["chunk_".$index])) {
-            $chunks[] = AJXP_Utils::decodeSecureMagic($httpVars["chunk_".$index]);
+            $chunks[] = Utils::decodeSecureMagic($httpVars["chunk_".$index]);
             $index++;
         }
 
@@ -161,6 +161,6 @@ class SimpleUploadProcessor extends AJXP_Plugin
             unlink($destStreamURL.$chunks[$i]);
         }
         fclose($newDest);
-        AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($newDest), false));
+        Controller::applyHook("node.change", array(null, new AJXP_Node($newDest), false));
     }
 }

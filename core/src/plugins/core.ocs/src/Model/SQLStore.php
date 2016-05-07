@@ -20,7 +20,7 @@
  */
 namespace Pydio\OCS\Model;
 
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
 
 defined('AJXP_EXEC') or die('Access not allowed');

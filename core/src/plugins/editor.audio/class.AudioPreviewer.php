@@ -22,12 +22,12 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -36,7 +36,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class AudioPreviewer extends AJXP_Plugin
+class AudioPreviewer extends Plugin
 {
     public function preProcessAction($action, &$httpVars, &$fileVars)
     {
@@ -62,7 +62,7 @@ class AudioPreviewer extends AJXP_Plugin
             // Backward compat
             // May be a backward compatibility problem, try to base64decode the filepath
             if(!file_exists($node->getUrl()) && strpos($httpVars["file"], "base64encoded:") === false){
-                $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
                 if(!file_exists($destStreamURL.$file)){
                     throw new Exception("Cannot find file!");
                 }else{
@@ -86,14 +86,14 @@ class AudioPreviewer extends AJXP_Plugin
             fflush($stream);
             fclose($stream);
 
-            AJXP_Controller::applyHook("node.read", array($node));
+            Controller::applyHook("node.read", array($node));
             $this->logInfo('Preview', 'Read content of '.$node->getUrl(), array("files" => $node->getUrl()));
             //exit(1);
 
         } else if ($action == "ls") {
             if (!isSet($httpVars["playlist"])) {
                 // This should not happen anyway, because of the applyCondition.
-                AJXP_Controller::passProcessDataThrough($postProcessData);
+                Controller::passProcessDataThrough($postProcessData);
                 return false;
             }
             // We transform the XML into XSPF
@@ -114,7 +114,7 @@ class AudioPreviewer extends AJXP_Plugin
                 print("<track><location>".AJXP_SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
             }
             print("</trackList>");
-            AJXP_XMLWriter::close("playlist");
+            XMLWriter::close("playlist");
         }
     }
 }

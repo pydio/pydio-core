@@ -28,10 +28,10 @@ use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 
 /**
- * AJXP_Plugin to access a webdav enabled server
+ * Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */

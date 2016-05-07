@@ -19,13 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -43,8 +43,8 @@ class MinisiteRenderer
             $error = $mess['share_center.164'];
         }
         $repository = $data["REPOSITORY"];
-        AJXP_PluginsService::getInstance()->initActivePlugins();
-        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
+        PluginsService::getInstance()->initActivePlugins();
+        $shareCenter = PluginsService::findPlugin("action", "share");
         $confs = $shareCenter->getConfigs();
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
         if(!empty($confs["CUSTOM_MINISITE_LOGO"])){
@@ -58,7 +58,7 @@ class MinisiteRenderer
         // Default value
         if(isSet($data["AJXP_TEMPLATE_NAME"])){
             $templateName = $data["AJXP_TEMPLATE_NAME"];
-            if($templateName == "ajxp_film_strip" && AJXP_Utils::userAgentIsMobile()){
+            if($templateName == "ajxp_film_strip" && Utils::userAgentIsMobile()){
                 $templateName = "ajxp_shared_folder";
             }
         }
@@ -84,8 +84,8 @@ class MinisiteRenderer
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
-        AJXP_Controller::applyHook("tpl.filter_html", array(&$html));
-        $html = AJXP_XMLWriter::replaceAjxpXmlKeywords($html);
+        Controller::applyHook("tpl.filter_html", array(&$html));
+        $html = XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
@@ -96,7 +96,7 @@ class MinisiteRenderer
         $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
-        $guiConfigs = AJXP_PluginsService::findPluginById("gui.ajax")->getConfigs();
+        $guiConfigs = PluginsService::findPluginById("gui.ajax")->getConfigs();
         $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"])){
@@ -124,16 +124,16 @@ class MinisiteRenderer
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             ConfService::switchRootDir($repository);
             ConfService::loadRepositoryDriver();
-            AJXP_PluginsService::deferBuildingRegistry();
-            AJXP_PluginsService::getInstance()->initActivePlugins();
-            AJXP_PluginsService::flushDeferredRegistryBuilding();
+            PluginsService::deferBuildingRegistry();
+            PluginsService::getInstance()->initActivePlugins();
+            PluginsService::flushDeferredRegistryBuilding();
             $errMessage = null;
             try {
                 $params = $_GET;
                 $ACTION = "download";
                 if(isset($_GET["ct"])){
                     $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                    $editors = PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
                     if (count($editors)) {
                         foreach ($editors as $editor) {
                             $xPath = new DOMXPath($editor->ownerDocument);
@@ -148,8 +148,8 @@ class MinisiteRenderer
                         }
                     }
                 }
-                AJXP_Controller::registryReset();
-                AJXP_Controller::findActionAndApply($ACTION, $params, null);
+                Controller::registryReset();
+                Controller::findActionAndApply($ACTION, $params, null);
             } catch (Exception $e) {
                 $errMessage = $e->getMessage();
             }
@@ -172,7 +172,7 @@ class MinisiteRenderer
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         }
 
-        $serverBaseUrl = AJXP_Utils::detectServerURL(true);
+        $serverBaseUrl = Utils::detectServerURL(true);
 
         // Update Host dynamically if it differ from registered one.
         $registeredHost = parse_url($tPath, PHP_URL_HOST);

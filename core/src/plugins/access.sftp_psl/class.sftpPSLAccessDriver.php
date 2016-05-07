@@ -26,7 +26,7 @@ use DOMNode;
 use PclZip;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed' );
 
@@ -34,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed' );
 
 
 /**
- * AJXP_Plugin to access a remote server using SSH File Transfer Protocol (SFTP) with phpseclib ( http://phpseclib.sourceforge.net/ )
+ * Plugin to access a remote server using SSH File Transfer Protocol (SFTP) with phpseclib ( http://phpseclib.sourceforge.net/ )
  *
  * @author	warhawk3407 <warhawk3407@gmail.com>
  * @author	Charles du Jeu <contact (at) cdujeu.me>
@@ -101,7 +101,7 @@ class sftpPSLAccessDriver extends fsAccessDriver
     public function makeZip ($src, $dest, $basedir)
     {
         @set_time_limit(60);
-        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $filePaths = array();
 
         $uniqid = uniqid();

@@ -22,10 +22,10 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class JumploaderProcessor extends AJXP_Plugin
+class JumploaderProcessor extends Plugin
 {
     /**
      * Handle UTF8 Decoding
@@ -78,7 +78,7 @@ class JumploaderProcessor extends AJXP_Plugin
         if (!isSet($httpVars["fileId"])) {
             $this->logDebug("Trying Cross-Session Resume request");
 
-            $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+            $dir = Utils::decodeSecureMagic($httpVars["dir"]);
             $repository->detectStreamWrapper(true);
             $context = new UserSelection($repository);
             $destStreamURL = $context->currentBaseUrl().$dir;
@@ -181,7 +181,7 @@ class JumploaderProcessor extends AJXP_Plugin
             if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
                 $repository = ConfService::getRepository();
-                $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = Utils::decodeSecureMagic($httpVars["dir"]);
                 $repository->detectStreamWrapper(true);
                 $context = new UserSelection($repository);
                 $destStreamURL = $context->currentBaseUrl().$dir."/";
@@ -218,7 +218,7 @@ class JumploaderProcessor extends AJXP_Plugin
         }
 
         if ($httpVars["lastPartition"]) {
-            $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+            $dir = Utils::decodeSecureMagic($httpVars["dir"]);
             $repository->detectStreamWrapper(true);
             $context = new UserSelection($repository);
             $destStreamURL = $context->currentBaseUrl().$dir."/";
@@ -317,10 +317,10 @@ class JumploaderProcessor extends AJXP_Plugin
                 // Create the folder tree as necessary
                 foreach ($subs as $key => $spath) {
                     $messtmp="";
-                    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
+                    $dirname=Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
                     $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
-                    if (AJXP_Utils::isHidden($dirname)) {
+                    if (Utils::isHidden($dirname)) {
                         $folderForbidden = true;
                         break;
                     }
@@ -345,7 +345,7 @@ class JumploaderProcessor extends AJXP_Plugin
                     $old = umask(0);
                     mkdir($url, $dirMode);
                     umask($old);
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($url), false));
+                    Controller::applyHook("node.change", array(null, new AJXP_Node($url), false));
                     $curDir .= "/".$dirname;
                 }
             }
@@ -358,10 +358,10 @@ class JumploaderProcessor extends AJXP_Plugin
                 $this->logDebug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
 
                 // Get file by name (md5 value)
-                $relPath_md5 = AJXP_Utils::decodeSecureMagic(md5($httpVars["relativePath"]));
+                $relPath_md5 = Utils::decodeSecureMagic(md5($httpVars["relativePath"]));
 
                 // original file name
-                $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
+                $relPath = Utils::decodeSecureMagic($httpVars["relativePath"]);
 
                 $target = $destStreamURL;
                 $target .= (self::$remote)? basename($relPath) : $relPath;
@@ -375,8 +375,8 @@ class JumploaderProcessor extends AJXP_Plugin
 
                 if ($httpVars["partitionCount"] > 1) {
                     if (self::$remote) {
-                        $test = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
-                        $newDest = fopen(AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"], "w");
+                        $test = Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
+                        $newDest = fopen(Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"], "w");
                         $newFile = array();
                         $length = 0;
                         for ($i = 0, $count = count($partitions); $i < $count; $i++) {
@@ -395,7 +395,7 @@ class JumploaderProcessor extends AJXP_Plugin
                         $newFile["name"] = $httpVars["partitionRealName"];
                         $newFile["error"] = 0;
                         $newFile["size"] = $length;
-                        $newFile["tmp_name"] = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
+                        $newFile["tmp_name"] = Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
                     } else {
@@ -431,9 +431,9 @@ class JumploaderProcessor extends AJXP_Plugin
 
                 if ($current != $target && $err !== false) {
                     if(!self::$remote) unlink($current);
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
+                    Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 } else if ($current == $target) {
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
+                    Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 }
             } else {
                 // Remove the file, as it should not have been uploaded!
@@ -447,7 +447,7 @@ class JumploaderProcessor extends AJXP_Plugin
         if (is_file($this->getBaseDir()."/jumploader_z.jar")) {
             return "ERROR: The applet is already installed!";
         }
-        $fileData = AJXP_Utils::getRemoteContent("http://jumploader.com/jar/jumploader_z.jar");
+        $fileData = Utils::getRemoteContent("http://jumploader.com/jar/jumploader_z.jar");
         if (!is_writable($this->getBaseDir())) {
             file_put_contents(AJXP_CACHE_DIR."/jumploader_z.jar", $fileData);
             return "ERROR: The applet was downloaded, but the folder plugins/uploader.jumploader is not writeable. Applet is located in the cache folder, please put it manually in the plugin folder.";

@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -31,11 +31,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class MobileGuiPlugin extends AJXP_Plugin
+class MobileGuiPlugin extends Plugin
 {
     public function performChecks()
     {
-        if(!AJXP_Utils::userAgentIsMobile()) throw new Exception("no");
+        if(!Utils::userAgentIsMobile()) throw new Exception("no");
     }
 
     public function parseSpecificContributions(&$contribNode){
@@ -54,7 +54,7 @@ class MobileGuiPlugin extends AJXP_Plugin
         $confs = ConfService::getConfStorageImpl()->loadPluginConfig("gui", "ajax");
         if(!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
         if($confs["GUI_THEME"] == "orbit"){
-            $pServ = AJXP_PluginsService::getInstance();
+            $pServ = PluginsService::getInstance();
             $activePlugs    = $pServ->getActivePlugins();
             $streamWrappers = $pServ->getStreamWrapperPlugins();
             $streamActive   = false;

@@ -26,7 +26,7 @@
 // --------------------------------------------------------------------------------
 
   // ----- Constants
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Utils\Utils;
 
 if (!defined('PCLZIP_READ_BLOCK_SIZE')) {
     define( 'PCLZIP_READ_BLOCK_SIZE', 2048 );
@@ -65,7 +65,7 @@ if (!defined('PCLZIP_READ_BLOCK_SIZE')) {
   // define( 'PCLZIP_TEMPORARY_DIR', '/temp/' );
   // define( 'PCLZIP_TEMPORARY_DIR', 'C:/Temp/' );
   if (!defined('PCLZIP_TEMPORARY_DIR')) {
-    define( 'PCLZIP_TEMPORARY_DIR', AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR );
+    define( 'PCLZIP_TEMPORARY_DIR', Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR );
   }
 
   // ----- Optional threshold ratio for use of temporary files

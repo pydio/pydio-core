@@ -18,9 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,7 +40,7 @@ class AJXP_Sabre_RootCollection extends Sabre\DAV\SimpleCollection
             // Refilter to make sure the driver is an AjxpWebdavProvider
             foreach ($repos as $repository) {
                 $accessType = $repository->getAccessType();
-                $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
+                $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
                 if ($driver instanceof \Pydio\Access\Core\IAjxpWrapperProvider && $repository->getOption("AJXP_WEBDAV_DISABLED") !== true) {
                     $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
                 }

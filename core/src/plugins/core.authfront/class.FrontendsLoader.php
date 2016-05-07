@@ -19,20 +19,20 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Authfront\Core;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class FrontendsLoader extends AJXP_Plugin {
+class FrontendsLoader extends Plugin {
 
     public function init($options){
 
         parent::init($options);
 
         // Load all enabled frontend plugins
-        $fronts = AJXP_PluginsService::getInstance()->getPluginsByType("authfront");
+        $fronts = PluginsService::getInstance()->getPluginsByType("authfront");
         usort($fronts, array($this, "frontendsSort"));
         foreach($fronts as $front){
             if($front->isEnabled()){
@@ -40,15 +40,15 @@ class FrontendsLoader extends AJXP_Plugin {
                 $protocol = $configs["PROTOCOL_TYPE"];
                 if($protocol == "session_only" && !AuthService::$useSession) continue;
                 if($protocol == "no_session" && AuthService::$useSession) continue;
-                AJXP_PluginsService::setPluginActive($front->getType(), $front->getName(), true);
+                PluginsService::setPluginActive($front->getType(), $front->getName(), true);
             }
         }
 
     }
 
     /**
-     * @param AJXP_Plugin $a
-     * @param AJXP_Plugin $b
+     * @param \Pydio\Core\PluginFramework\Plugin $a
+     * @param \Pydio\Core\PluginFramework\Plugin $b
      * @return int
      */
     public function frontendsSort($a, $b){

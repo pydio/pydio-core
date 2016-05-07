@@ -23,10 +23,10 @@ namespace Pydio\Access\Driver\StreamProvider\Inbox;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -74,13 +74,13 @@ class inboxAccessDriver extends fsAccessDriver
     public static function getNodeData($nodePath){
         $basename = basename(parse_url($nodePath, PHP_URL_PATH));
         if(empty($basename)){
-            return ['stat' => stat(AJXP_Utils::getAjxpTmpDir())];
+            return ['stat' => stat(Utils::getAjxpTmpDir())];
         }
         $allNodes = self::getNodes(false);
         $nodeData = $allNodes[$basename];
         if(!isSet($nodeData["stat"])){
             if(in_array(pathinfo($basename, PATHINFO_EXTENSION), array("error", "invitation"))){
-                $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                $stat = stat(Utils::getAjxpTmpDir());
             }else{
                 $url = $nodeData["url"];
                 $node = new AJXP_Node($nodeData["url"]);
@@ -91,10 +91,10 @@ class inboxAccessDriver extends fsAccessDriver
                     if($node->getRepository()->hasContentFilter()){
                         $node->setLeaf(true);
                     }
-                    AJXP_Controller::applyHook("node.read", array(&$node));
+                    Controller::applyHook("node.read", array(&$node));
                     $stat = stat($url);
                 }catch (\Exception $e){
-                    $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                    $stat = stat(Utils::getAjxpTmpDir());
                 }
                 if(is_array($stat) && AuthService::getLoggedUser() != null){
                     $acl = AuthService::getLoggedUser()->mergedRole->getAcl($nodeData["meta"]["shared_repository_id"]);
@@ -133,7 +133,7 @@ class inboxAccessDriver extends fsAccessDriver
             $url = "pydio://" . $repoId . "/";
             $meta = array(
                 "shared_repository_id" => $repoId,
-                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". AJXP_Utils::relativeDate($repo->getOption("CREATION_TIME"), $mess),
+                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". Utils::relativeDate($repo->getOption("CREATION_TIME"), $mess),
                 "share_meta_type" => 1
             );
 
@@ -180,7 +180,7 @@ class inboxAccessDriver extends fsAccessDriver
                     $remoteShare = $ocsStore->remoteShareById($linkId);
                     $status = $remoteShare->getStatus();
                     if($status == OCS_INVITATION_STATUS_PENDING){
-                        $stat = stat(AJXP_Utils::getAjxpTmpDir());
+                        $stat = stat(Utils::getAjxpTmpDir());
                         $ext = "invitation";
                         $meta["ajxp_mime"] = "invitation";
                         $meta["share_meta_type"] = 0;

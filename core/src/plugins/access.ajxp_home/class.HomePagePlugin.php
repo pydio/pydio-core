@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Access
  * @class userHome
- * AJXP_Plugin to access the shared elements of the current user
+ * Plugin to access the shared elements of the current user
  */
 class HomePagePlugin extends AbstractAccessDriver
 {

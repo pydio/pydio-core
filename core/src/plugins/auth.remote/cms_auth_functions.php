@@ -21,6 +21,7 @@
  * This functions are necessary to implement the bridge between Pydio
  * and other CMS's.
  */
+use Pydio\Log\Core\AJXP_Logger;
 
 /**
  * @package AjaXplorer_Plugins
@@ -49,11 +50,12 @@ function extractResponseCookies($client)
 
 function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
     $client->setHeadersOnly(true);
     $client->setCookies(array("wordpress_test_cookie"=>"WP+Cookie+check"));
-    $res = $client->post($uri, array(
+    $client->post($uri, array(
         "log" => $login,
         "pwd" => $pass,
         "wp-submit" => "Log In",
@@ -68,9 +70,10 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
 
 function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
-    $res = $client->get($uri);
+    $client->get($uri);
     $content = $client->getContent();
     $postData = array(
            "username" => $login,
@@ -121,9 +124,10 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
 
 function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
-    $res = $client->get($uri);
+    $client->get($uri);
     $content = $client->getContent();
     $xmlDoc = DOMDocument::loadHTML($content);
     $xPath = new DOMXPath($xmlDoc);

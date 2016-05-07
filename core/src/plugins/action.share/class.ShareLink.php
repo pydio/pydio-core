@@ -20,8 +20,8 @@
  */
 
 use Pydio\Access\Core\Repository;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -160,7 +160,7 @@ class ShareLink
 
         $data = &$this->internal;
         $data["DOWNLOAD_DISABLED"] = (isSet($httpVars["simple_right_download"]) ? false : true);
-        $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
+        $data["AJXP_APPLICATION_BASE"] = Utils::detectServerURL(true);
         if(isSet($httpVars["minisite_layout"])){
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
         }
@@ -182,7 +182,7 @@ class ShareLink
         if(isSet($httpVars["custom_handle"]) && !empty($httpVars["custom_handle"]) &&
             (!isSet($this->hash) || $httpVars["custom_handle"] != $this->hash)){
             // Existing already
-            $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
+            $value = Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
             if(strlen($value) < $this->store->hashMinLength){
                 $mess = ConfService::getMessages();

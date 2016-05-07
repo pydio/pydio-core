@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_VarsFilter;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -39,7 +39,7 @@ class serialAuthDriver extends AbstractAuthDriver
     public function init($options)
     {
         parent::init($options);
-        $this->usersSerFile = AJXP_VarsFilter::filter($this->getOption("USERS_FILEPATH"));
+        $this->usersSerFile = VarsFilter::filter($this->getOption("USERS_FILEPATH"));
     }
 
     public function performChecks()
@@ -59,7 +59,7 @@ class serialAuthDriver extends AbstractAuthDriver
 
     protected function _listAllUsers()
     {
-        $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
+        $users = Utils::loadSerialFile($this->usersSerFile);
         if (AuthService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
@@ -69,7 +69,7 @@ class serialAuthDriver extends AbstractAuthDriver
 
     public function listUsers($baseGroup = "/", $recursive = true)
     {
-        $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
+        $users = Utils::loadSerialFile($this->usersSerFile);
         if (AuthService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
@@ -123,7 +123,7 @@ class serialAuthDriver extends AbstractAuthDriver
         $userStoredPass = $this->getUserPass($login);
         if(!$userStoredPass) return false;
         if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-            return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);//($userStoredPass == md5($pass));
+            return Utils::pbkdf2_validate_password($pass, $userStoredPass);//($userStoredPass == md5($pass));
         } else {
             return (md5($userStoredPass.$seed) === $pass);
         }
@@ -145,11 +145,11 @@ class serialAuthDriver extends AbstractAuthDriver
         if(!is_array($users)) $users = array();
         if(array_key_exists($login, $users)) return "exists";
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);//md5($passwd);
+            $users[$login] = Utils::pbkdf2_create_hash($passwd);//md5($passwd);
         } else {
             $users[$login] = $passwd;
         }
-        AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+        Utils::saveSerialFile($this->usersSerFile, $users);
     }
     public function changePassword($login, $newPass)
     {
@@ -157,11 +157,11 @@ class serialAuthDriver extends AbstractAuthDriver
         $users = $this->_listAllUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);//md5($newPass);
+            $users[$login] = Utils::pbkdf2_create_hash($newPass);//md5($newPass);
         } else {
             $users[$login] = $newPass;
         }
-        AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+        Utils::saveSerialFile($this->usersSerFile, $users);
     }
     public function deleteUser($login)
     {
@@ -169,7 +169,7 @@ class serialAuthDriver extends AbstractAuthDriver
         $users = $this->_listAllUsers();
         if (is_array($users) && array_key_exists($login, $users)) {
             unset($users[$login]);
-            AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+            Utils::saveSerialFile($this->usersSerFile, $users);
         }
     }
 

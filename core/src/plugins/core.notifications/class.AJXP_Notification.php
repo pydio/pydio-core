@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\AJXP_Node;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -95,7 +95,6 @@ class AJXP_Notification
 
     protected function replaceVars($tplString, $mess, $rich = true)
     {
-        //$tplString = SystemTextEncoding::fromUTF8($tplString);
         $repoId = $this->getNode()->getRepositoryId();
         $repoObject = ConfService::getRepositoryById($repoId);
         if ($repoObject != null) {
@@ -120,7 +119,7 @@ class AJXP_Notification
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
             "AJXP_LINK"             => $this->getMainLink(),
             "AJXP_USER"             => $uLabel,
-            "AJXP_DATE"             => AJXP_Utils::relativeDate($this->getDate(),$mess),
+            "AJXP_DATE"             => Utils::relativeDate($this->getDate(),$mess),
         );
 
         if($replaces["AJXP_NODE_LABEL"]==$em.$me || $replaces["AJXP_NODE_LABEL"] == $em."/".$me ){
@@ -156,7 +155,7 @@ class AJXP_Notification
                 return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
             }
         }
-        return AJXP_Utils::getWorkspaceShortcutURL($this->getNode()->getRepository()).$this->getNode()->getPath();
+        return Utils::getWorkspaceShortcutURL($this->getNode()->getRepository()).$this->getNode()->getPath();
     }
 
     /**

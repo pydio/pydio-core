@@ -23,15 +23,16 @@ namespace Pydio\Conf\Core;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Cache\Core\CacheService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\CacheService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -41,7 +42,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class AbstractConfDriver
  * Abstract representation of a conf driver. Must be implemented by the "conf" plugin
  */
-abstract class AbstractConfDriver extends AJXP_Plugin
+abstract class AbstractConfDriver extends Plugin
 {
     public $options;
     public $driverType = "conf";
@@ -113,15 +114,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
         // PERSONAL INFORMATIONS
         $hasExposed = false;
-        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
+        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
         if ($cacheHasExposed !== null) {
             $hasExposed = $cacheHasExposed;
         } else {
-            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 $hasExposed = true;
             }
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
+            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
         }
         //$hasExposed = true;
 
@@ -417,7 +418,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         AuthService::updateAutoApplyRole($abstractUser);
         AuthService::updateAuthProvidedData($abstractUser);
         $args = array(&$abstractUser);
-        AJXP_Controller::applyIncludeHook("include.user.updateUserObject", $args);
+        Controller::applyIncludeHook("include.user.updateUserObject", $args);
         CacheService::save("shared", "pydio:user:" . $userId, $abstractUser);
         return $abstractUser;
     }
@@ -555,11 +556,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
 
         $exposed = array();
-        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
+        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
         if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
             $exposed = $cacheHasExposed;
         } else {
-            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+            $exposed_props = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
             foreach($exposed_props as $exposed_prop){
                 $parentNode = $exposed_prop->parentNode->parentNode;
                 $pluginId = $parentNode->getAttribute("id");
@@ -569,7 +570,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $paramName = $exposed_prop->getAttribute("name");
                 $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName);
             }
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $exposed);
+            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $exposed);
         }
 
         foreach ($exposed as $exposedProp) {
@@ -584,9 +585,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     {
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = AJXP_Utils::securePath($getValue);
+            $$getName = \Pydio\Core\Utils\Utils::securePath($getValue);
         }
-        if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
+        if(isSet($dir) && $action != "upload") $dir = TextEncoder::fromUTF8($dir);
         $mess = ConfService::getMessages();
 
         switch ($action) {
@@ -634,30 +635,30 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $xPath = '';
                 if (isSet($httpVars["xPath"])) {
-                    $xPath = ltrim(AJXP_Utils::securePath($httpVars["xPath"]), "/");
+                    $xPath = ltrim(Utils::securePath($httpVars["xPath"]), "/");
                 }
                 if (!empty($xPath)) {
                     $nodes = $clonePath->query($xPath);
                     if($httpVars["format"] == "json"){
-                        $data = AJXP_XMLWriter::xmlToArray($nodes->item(0));
-                        HTMLWriter::charsetHeader("application/json");
+                        $data = XMLWriter::xmlToArray($nodes->item(0));
+                        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
                         echo json_encode($data);
                     }else{
-                        AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$xPath));
+                        \Pydio\Core\Controller\XMLWriter::header("ajxp_registry_part", array("xPath"=>$xPath));
                         if ($nodes->length) {
-                            print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
+                            print(XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
                         }
-                        AJXP_XMLWriter::close("ajxp_registry_part");
+                        \Pydio\Core\Controller\XMLWriter::close("ajxp_registry_part");
                     }
                 } else {
-                    AJXP_Utils::safeIniSet("zlib.output_compression", "4096");
+                    Utils::safeIniSet("zlib.output_compression", "4096");
                     if($httpVars["format"] == "json"){
-                        $data = AJXP_XMLWriter::xmlToArray($clone);
-                        HTMLWriter::charsetHeader("application/json");
+                        $data = \Pydio\Core\Controller\XMLWriter::xmlToArray($clone);
+                        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
                         echo json_encode($data);
                     }else{
                         header('Content-Type: application/xml; charset=UTF-8');
-                        $string = AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+                        $string = \Pydio\Core\Controller\XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
                         $etag = md5($string);
                         $match = isSet($_SERVER["HTTP_IF_NONE_MATCH"])?$_SERVER["HTTP_IF_NONE_MATCH"]:'';
                         if($match == $etag){
@@ -685,8 +686,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $bmUser = $confStorage->createUserObject("shared");
                 }
                 if ($bmUser == null) {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::close();
+                    XMLWriter::header();
+                    XMLWriter::close();
                 }
                 $driver = ConfService::loadRepositoryDriver();
                 if (!($driver instanceof IAjxpWrapperProvider)) {
@@ -695,11 +696,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
 
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
-                    $bmPath = AJXP_Utils::decodeSecureMagic($httpVars["bm_path"]);
+                    $bmPath = Utils::decodeSecureMagic($httpVars["bm_path"]);
 
                     if ($httpVars["bm_action"] == "add_bookmark") {
                         $title = "";
-                        if(isSet($httpVars["bm_title"])) $title = AJXP_Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        if(isSet($httpVars["bm_title"])) $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
                         if($title == "" && $bmPath=="/") $title = ConfService::getCurrentRootDirDisplay();
                         $bmUser->addBookMark($bmPath, $title);
                         if ($driver) {
@@ -713,10 +714,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {
-                        $title = AJXP_Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
                         $bmUser->renameBookmark($bmPath, $title);
                     }
-                    AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
+                    Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
                             ConfService::getRepository()->getId(),
                             AuthService::getLoggedUser()->getId())
                     );
@@ -728,9 +729,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         $bmUser->save("user");
                     }
                 }
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks(), true, isset($httpVars["format"])?$httpVars["format"]:"legacy");
-                AJXP_XMLWriter::close();
+                XMLWriter::header();
+                XMLWriter::writeBookmarks($bmUser->getBookmarks(), true, isset($httpVars["format"])?$httpVars["format"]:"legacy");
+                XMLWriter::close();
 
             break;
 
@@ -742,8 +743,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $userObject = AuthService::getLoggedUser();
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
-                    $prefName = AJXP_Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
-                    $prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["pref_value_".$i]));
+                    $prefName = Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
+                    $prefValue = \Pydio\Core\Utils\Utils::sanitize(TextEncoder::magicDequote($httpVars["pref_value_".$i]));
                     if($prefName == "password") continue;
                     if ($prefName != "pending_folder" && $userObject == null) {
                         $i++;
@@ -770,9 +771,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
                     $updating = false;
-                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
-                    $original_id = AJXP_Utils::decodeSecureMagic($data["new_user_id"]);
-                    $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
+                    Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    $original_id = Utils::decodeSecureMagic($data["new_user_id"]);
+                    $data["new_user_id"] = Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
                     if($original_id != $data["new_user_id"]){
                         throw new \Exception(str_replace("%s", $data["new_user_id"], $mess["ajxp_conf.127"]));
                     }
@@ -799,7 +800,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 } else if($action == "user_create_user" && isSet($httpVars["NEW_existing_user_id"])){
 
                     $updating = true;
-                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    \Pydio\Core\Utils\Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
                     $userId = $data["existing_user_id"];
                     if(!AuthService::userExists($userId)){
                         throw new \Exception("Cannot find user");
@@ -815,10 +816,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 } else {
                     $updating = false;
                     $userObject = AuthService::getLoggedUser();
-                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
+                    Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
 
-                $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+                $paramNodes = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
                 if (is_array($paramNodes) && count($paramNodes)) {
                     foreach ($paramNodes as $xmlNode) {
@@ -851,12 +852,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 if ($action == "user_create_user") {
 
-                    AJXP_Controller::applyHook($updating?"user.after_update":"user.after_create", array($userObject));
+                    Controller::applyHook($updating?"user.after_update":"user.after_create", array($userObject));
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
-                        $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
+                        $mailer = PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = ConfService::getMessages();
-                            $link = AJXP_Utils::detectServerURL();
+                            $link = Utils::detectServerURL();
                             $apptitle = ConfService::getCoreConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
                             $body = str_replace(array("%s", "%link", "%user", "%pass"), array($apptitle, $link, $data["new_user_id"], $data["new_password"]), $mess["508"]);
@@ -866,9 +867,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                     echo "SUCCESS";
                 } else {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage($mess["241"], null);
-                    AJXP_XMLWriter::close();
+                    \Pydio\Core\Controller\XMLWriter::header();
+                    XMLWriter::sendMessage($mess["241"], null);
+                    \Pydio\Core\Controller\XMLWriter::close();
                 }
 
             break;
@@ -879,7 +880,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     throw new \Exception("invalid arguments");
                 }
                 $userId = $httpVars["user_id"];
-                if(!AuthService::userExists($userId)){
+                if(!\Pydio\Core\Services\AuthService::userExists($userId)){
                     throw new \Exception("Cannot find user");
                 }
                 $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
@@ -892,7 +893,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 foreach($params as $p){
                     $result[$p] = $userObject->personalRole->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
                 }
-                HTMLWriter::charsetHeader("application/json");
+                \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
                 echo json_encode($result);
 
             break;
@@ -910,7 +911,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
                     $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
                 } else {
-                    $baseURL = AJXP_Utils::detectServerURL();
+                    $baseURL = \Pydio\Core\Utils\Utils::detectServerURL();
                 }
                 $webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
                 $davData = $userObject->getPref("AJXP_WEBDAV_DATA");
@@ -944,7 +945,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $loggedUser = AuthService::getLoggedUser();
                 foreach ($repoList as $repoIndex => $repoObject) {
                     $accessType = $repoObject->getAccessType();
-                    $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
+                    $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
             if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getOption("AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
                         $davRepos[$repoIndex] = $webdavBaseUrl ."".($repoObject->getSlug()==null?$repoObject->getId():$repoObject->getSlug());
                     }
@@ -969,7 +970,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $repo = ConfService::getRepositoryById($tplId);
                 $logo = $repo->getOption("TPL_ICON_".strtoupper($iconFormat));
                 if (isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)) {
-                    header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                    header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
                     header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
                     header('Pragma:');
                     header('Cache-Control: public');
@@ -978,7 +979,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
                 } else {
                     $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
-                    header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                    header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
                     header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
                     header('Pragma:');
                     header('Cache-Control: public');
@@ -991,12 +992,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
             case  "get_user_templates_definition":
 
-                AJXP_XMLWriter::header("repository_templates");
+                \Pydio\Core\Controller\XMLWriter::header("repository_templates");
                 $count = 0;
                 $repositories = ConfService::listRepositoriesWithCriteria(array(
                     "isTemplate" => 1
                 ), $count);
-                $pServ = AJXP_PluginsService::getInstance();
+                $pServ = PluginsService::getInstance();
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     if(!$repo->getOption("TPL_USER_CAN_CREATE")) continue;
@@ -1018,13 +1019,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         }
                         if( in_array($paramNode->getAttribute("name"), $tplDefined) ) continue;
                         if($paramNode->getAttribute('no_templates') == 'true') continue;
-                        print(AJXP_XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode)));
+                        print(XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode)));
                     }
                     // ADD LABEL
                     echo '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';
                     print("</template>");
                 }
-                AJXP_XMLWriter::close("repository_templates");
+                \Pydio\Core\Controller\XMLWriter::close("repository_templates");
 
 
             break;
@@ -1034,17 +1035,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $tplId = $httpVars["template_id"];
                 $tplRepo = ConfService::getRepositoryById($tplId);
                 $options = array();
-                AJXP_Utils::parseStandardFormParameters($httpVars, $options);
+                Utils::parseStandardFormParameters($httpVars, $options);
                 $loggedUser = AuthService::getLoggedUser();
-                $newRep = $tplRepo->createTemplateChild(AJXP_Utils::sanitize($httpVars["DISPLAY"]), $options, null, $loggedUser->getId());
+                $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, null, $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
                 if (!empty($gPath)) {
                     $newRep->setGroupPath($gPath);
                 }
                 $res = ConfService::addRepository($newRep);
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if ($res == -1) {
-                    AJXP_XMLWriter::sendMessage(null, $mess[426]);
+                    XMLWriter::sendMessage(null, $mess[426]);
                 } else {
                     // Make sure we do not overwrite otherwise loaded rights.
                     $loggedUser->load();
@@ -1053,11 +1054,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $loggedUser->recomputeMergedRole();
                     AuthService::updateUser($loggedUser);
 
-                    AJXP_XMLWriter::sendMessage($mess[425], null);
-                    AJXP_XMLWriter::reloadDataNode("", $newRep->getUniqueId());
-                    AJXP_XMLWriter::reloadRepositoryList();
+                    \Pydio\Core\Controller\XMLWriter::sendMessage($mess[425], null);
+                    XMLWriter::reloadDataNode("", $newRep->getUniqueId());
+                    \Pydio\Core\Controller\XMLWriter::reloadRepositoryList();
                 }
-                AJXP_XMLWriter::close();
+                \Pydio\Core\Controller\XMLWriter::close();
 
             break;
 
@@ -1069,9 +1070,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     throw new \Exception("You are not allowed to perform this operation!");
                 }
                 $res = ConfService::deleteRepository($repoId);
-                AJXP_XMLWriter::header();
+                XMLWriter::header();
                 if ($res == -1) {
-                    AJXP_XMLWriter::sendMessage(null, $mess[427]);
+                    \Pydio\Core\Controller\XMLWriter::sendMessage(null, $mess[427]);
                 } else {
                     $loggedUser = AuthService::getLoggedUser();
                     // Make sure we do not override remotely set rights
@@ -1080,10 +1081,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
 
-                    AJXP_XMLWriter::sendMessage($mess[428], null);
-                    AJXP_XMLWriter::reloadRepositoryList();
+                    \Pydio\Core\Controller\XMLWriter::sendMessage($mess[428], null);
+                    \Pydio\Core\Controller\XMLWriter::reloadRepositoryList();
                 }
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
 
             break;
 
@@ -1256,7 +1257,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $users = AuthService::countUsersForRepository(ConfService::getRepository()->getId(), true);
                     $data["core.users"] = $users;
                     if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
-                        AJXP_Controller::applyHook("repository.load_info", array(&$data));
+                        Controller::applyHook("repository.load_info", array(&$data));
                     }
                 }
                 HTMLWriter::charsetHeader("application/json");
@@ -1267,7 +1268,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case "get_binary_param" :
 
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
+                    $file = \Pydio\Core\Utils\Utils::getAjxpTmpDir()."/".Utils::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         session_write_close();
                         header("Content-Type:image/png");
@@ -1276,14 +1277,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 } else if (isSet($httpVars["binary_id"])) {
                     if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null
                         && ( AuthService::getLoggedUser()->getId() == $httpVars["user_id"] || AuthService::getLoggedUser()->isAdmin() )) {
-                        $context = array("USER" => AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS));
+                        $context = array("USER" => \Pydio\Core\Utils\Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS));
                     } else if(AuthService::getLoggedUser() !== null) {
                         $context = array("USER" => AuthService::getLoggedUser()->getId());
                     } else {
                         $context = array();
                     }
                     session_write_close();
-                    $this->loadBinary($context, AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
+                    $this->loadBinary($context, \Pydio\Core\Utils\Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1291,13 +1292,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
+                    $file = \Pydio\Core\Utils\Utils::getAjxpTmpDir()."/". \Pydio\Core\Utils\Utils::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         header("Content-Type:image/png");
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    $this->loadBinary(array(), AJXP_Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
+                    $this->loadBinary(array(), Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1306,16 +1307,16 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if (count($fileVars)) {
                     $keys = array_keys($fileVars);
                     $boxData = $fileVars[$keys[0]];
-                    $err = AJXP_Utils::parseFileDataErrors($boxData);
+                    $err = Utils::parseFileDataErrors($boxData);
                     if ($err != null) {
 
                     } else {
                         $rand = substr(md5(time()), 0, 6);
                         $tmp = $rand."-". $boxData["name"];
-                        @move_uploaded_file($boxData["tmp_name"], AJXP_Utils::getAjxpTmpDir()."/". $tmp);
+                        @move_uploaded_file($boxData["tmp_name"], Utils::getAjxpTmpDir()."/". $tmp);
                     }
                 }
-                if (isSet($tmp) && file_exists(AJXP_Utils::getAjxpTmpDir()."/".$tmp)) {
+                if (isSet($tmp) && file_exists(Utils::getAjxpTmpDir()."/".$tmp)) {
                     print('<script type="text/javascript">');
                     print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
                     print('</script>');
@@ -1326,11 +1327,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             break;
         }
         if (isset($logMessage) || isset($errorMessage)) {
-            $xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
+            $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
 
         if (isset($requireAuth)) {
-            $xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
+            $xmlBuffer .= \Pydio\Core\Controller\XMLWriter::requireAuth(false);
         }
 
         return $xmlBuffer;
@@ -1352,7 +1353,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         if ($byUserRoles) {
             $allUserRoles = $userObject->getRoles();
         } else {
-            $allUserRoles = AuthService::getRolesList(array(), true);
+            $allUserRoles = \Pydio\Core\Services\AuthService::getRolesList(array(), true);
         }
         $allRoles = array();
         if (isset($allUserRoles)) {

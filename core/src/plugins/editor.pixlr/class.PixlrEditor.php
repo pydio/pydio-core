@@ -22,12 +22,12 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -36,7 +36,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class PixlrEditor extends AJXP_Plugin
+class PixlrEditor extends Plugin
 {
   public function switchAction($action, $httpVars, $filesVars)
   {
@@ -52,22 +52,22 @@ class PixlrEditor extends AJXP_Plugin
         if ($action == "post_to_server") {
 
             if(!is_writeable($selectedNodeUrl)){
-                header("Location:".AJXP_Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
+                header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
                 return false;
             }
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
-                $legacyFilePath = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $legacyFilePath = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
                 $selectedNode = new AJXP_Node($selection->currentBaseUrl().$legacyFilePath);
                 $selectedNodeUrl = $selectedNode->getUrl();
             }
 
             $target = rtrim(base64_decode($httpVars["parent_url"]), '/') ."/plugins/editor.pixlr";
             $tmp = AJXP_MetaStreamWrapper::getRealFSReference($selectedNodeUrl);
-            $tmp = SystemTextEncoding::fromUTF8($tmp);
+            $tmp = TextEncoder::fromUTF8($tmp);
             $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
-            AJXP_Controller::applyHook("node.read", array($selectedNode));
+            Controller::applyHook("node.read", array($selectedNode));
 
 
             $saveTarget = $target."/fake_save_pixlr.php";
@@ -112,12 +112,12 @@ class PixlrEditor extends AJXP_Plugin
             if(isSet($header) && isSet($header["location"])){
                 header("Location: {$header['location']}"); //$response");
             }else{
-                header("Location:".AJXP_Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
+                header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
             }
 
         } else if ($action == "retrieve_pixlr_image") {
 
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
+            $file = Utils::decodeSecureMagic($httpVars["original_file"]);
             $selectedNode = new AJXP_Node($selection->currentBaseUrl() . $file);
             $selectedNode->loadNodeInfo();
 
@@ -127,7 +127,7 @@ class PixlrEditor extends AJXP_Plugin
             }
 
             $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));
-            AJXP_Controller::applyHook("node.before_change", array(&$selectedNode));
+            Controller::applyHook("node.before_change", array(&$selectedNode));
             $url = $httpVars["new_url"];
             $urlParts = parse_url($url);
             $query = $urlParts["query"];
@@ -135,7 +135,7 @@ class PixlrEditor extends AJXP_Plugin
                 $scriptName = basename($urlParts["path"]);
                 $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
                 if ($token != md5($httpVars["secure_token"])) {
-                    throw new AJXP_Exception("Invalid Token, this could mean some security problem!");
+                    throw new PydioException("Invalid Token, this could mean some security problem!");
                 }
             }
             $params = array();
@@ -145,10 +145,10 @@ class PixlrEditor extends AJXP_Plugin
             $headers = get_headers($image, 1);
             $content_type = explode("/", $headers['Content-Type']);
             if ($content_type[0] != "image") {
-                throw new AJXP_Exception("Invalid File Type");
+                throw new PydioException("Invalid File Type");
             }
             $content_length = intval($headers["Content-Length"]);
-            if($content_length != 0) AJXP_Controller::applyHook("node.before_change", array(&$selectedNode, $content_length));
+            if($content_length != 0) Controller::applyHook("node.before_change", array(&$selectedNode, $content_length));
 
             $orig = fopen($image, "r");
             $target = fopen($selectedNode->getUrl(), "w");
@@ -161,7 +161,7 @@ class PixlrEditor extends AJXP_Plugin
             }
             clearstatcache(true, $selectedNode->getUrl());
             $selectedNode->loadNodeInfo(true);
-            AJXP_Controller::applyHook("node.change", array(&$selectedNode, &$selectedNode));
+            Controller::applyHook("node.change", array(&$selectedNode, &$selectedNode));
         }
 
     }

@@ -22,9 +22,9 @@ namespace Pydio\Access\Driver\StreamProvider\Imap;
 
 use EmlParser;
 use Pydio\Access\Core\IAjxpWrapper;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -32,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 function rejectEmpty($element){return !empty($element);}
 
 /**
- * AJXP_Plugin to browse a mailbox content (IMAP OR POP)
+ * Plugin to browse a mailbox content (IMAP OR POP)
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -89,7 +89,7 @@ class imapAccessWrapper implements IAjxpWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         // parse URL
-        $parts = AJXP_Utils::safeParseUrl($path);
+        $parts = Utils::safeParseUrl($path);
         $this->repositoryId = $parts["host"];
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
         if (!isset(self::$delimiter) && file_exists($mainCacheDir."/access.imap/mailbox_delim_".$this->repositoryId)) {
@@ -115,7 +115,7 @@ class imapAccessWrapper implements IAjxpWrapper
             return false;
         }
         if (!empty($this->mailbox)) {
-            $this->mailbox = mb_convert_encoding($this->mailbox, "UTF7-IMAP", SystemTextEncoding::getEncoding());
+            $this->mailbox = mb_convert_encoding($this->mailbox, "UTF7-IMAP", TextEncoder::getEncoding());
             $this->mailbox = str_replace("__delim__", (isSet(self::$delimiter)?self::$delimiter:"/"), $this->mailbox);
         }
         if (!empty($this->fragment) && strpos($this->fragment, "attachments") === 0 && strpos($this->fragment, "/")!== false) {

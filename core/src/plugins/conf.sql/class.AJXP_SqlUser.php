@@ -22,12 +22,12 @@ namespace Pydio\Conf\Sql;
 
 use dibi;
 use DibiException;
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -547,7 +547,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             AJXP_Logger::info(__CLASS__,"getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
-        return AJXP_Utils::loadSerialFile($dirPath."/".$id."/temp-".$key.".ser");
+        return Utils::loadSerialFile($dirPath."/".$id."/temp-".$key.".ser");
     }
 
     /**
@@ -565,7 +565,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             AJXP_Logger::info(__CLASS__,"setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
-        AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
+        Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
     }
 
     public function setGroupPath($groupPath, $update = false)

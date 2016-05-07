@@ -20,9 +20,9 @@
  */
 
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreAuthLoader extends AJXP_Plugin
+class CoreAuthLoader extends Plugin
 {
     /**
      * @var AbstractAuthDriver
@@ -115,11 +115,11 @@ class CoreAuthLoader extends AJXP_Plugin
                 }
                 $newOptions = array_merge($newOptions, $masterMainAuthOptions);
                 self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($newOptions, "AbstractAuthDriver");
-                AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName(), self::$authStorageImpl);
+                PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName(), self::$authStorageImpl);
 
             } else {
                 self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["MASTER_INSTANCE_CONFIG"], "Pydio\\Auth\\Core\\AbstractAuthDriver");
-                AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName());
+                PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName());
             }
         }
         return self::$authStorageImpl;

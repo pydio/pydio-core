@@ -34,15 +34,15 @@ use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Core\UserSelection;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\AJXP_XMLWriter;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_PluginsService;
-use Pydio\Core\SystemTextEncoding;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
 use ShareCenter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -53,7 +53,7 @@ if (!function_exists('download_exception_handler')) {
     function download_exception_handler($exception){}
 }
 /**
- * AJXP_Plugin to access a filesystem. Most "FS" like driver (even remote ones)
+ * Plugin to access a filesystem. Most "FS" like driver (even remote ones)
  * extend this one.
  * @package AjaXplorer_Plugins
  * @subpackage Access
@@ -80,7 +80,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository));
         }
         $create = $this->repository->getOption("CREATE");
-        $path = SystemTextEncoding::toStorageEncoding($this->repository->getOption("PATH"));
+        $path = TextEncoder::toStorageEncoding($this->repository->getOption("PATH"));
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         $chmod = $this->repository->getOption("CHMOD_VALUE");
         $this->detectStreamWrapper(true);
@@ -90,12 +90,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if ($create == true) {
             if(!is_dir($path)) @mkdir($path, 0755, true);
             if (!is_dir($path)) {
-                throw new AJXP_Exception("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
+                throw new PydioException("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
             }
             if ($recycle!= "" && !is_dir($path."/".$recycle)) {
                 @mkdir($path."/".$recycle);
                 if (!is_dir($path."/".$recycle)) {
-                    throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+                    throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
                 } else {
                     $this->setHiddenAttribute(new AJXP_Node($this->urlBase ."/".$recycle));
                 }
@@ -109,7 +109,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
         } else {
             if (!is_dir($path)) {
-                throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
+                throw new PydioException("Cannot find base path for your repository! Please check the configuration!");
             }
         }
         if ($recycle != "") {
@@ -253,13 +253,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $selection = new UserSelection($this->repository);
-        $dir = AJXP_Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
         if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
-        $dir = AJXP_Utils::securePath($dir);
+        $dir = Utils::securePath($dir);
         if ($action != "upload") {
-            $dir = AJXP_Utils::decodeSecureMagic($dir);
+            $dir = Utils::decodeSecureMagic($dir);
         }
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
@@ -269,7 +269,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         $newArgs = RecycleBinManager::filterActions($action, $selection, $dir, $httpVars);
         if(isSet($newArgs["action"])) $action = $newArgs["action"];
-        if(isSet($newArgs["dest"])) $httpVars["dest"] = SystemTextEncoding::toUTF8($newArgs["dest"]);//Re-encode!
+        if(isSet($newArgs["dest"])) $httpVars["dest"] = TextEncoder::toUTF8($newArgs["dest"]);//Re-encode!
          // FILTER DIR PAGINATION ANCHOR
         $page = null;
         if (isSet($dir) && strstr($dir, "%23")!==false) {
@@ -288,7 +288,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             //------------------------------------
             case "download":
                 $this->logInfo("Download", array("files"=>$this->addSlugToPath($selection)));
-                @set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+                @set_error_handler(array("Pydio\\Core\\Controller\\HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
                 @register_shutdown_function("restore_error_handler");
                 $zip = false;
                 if ($selection->isUnique()) {
@@ -311,25 +311,25 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($zip) {
                     // Make a temp zip and send it as download
                     $loggedUser = AuthService::getLoggedUser();
-                    $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                    $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
-                    if(!$zipFile) throw new AJXP_Exception("Error while compressing");
+                    if(!$zipFile) throw new PydioException("Error while compressing");
                     if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
                         && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
                         register_shutdown_function("unlink", $file);
                     }
                     $localName = (empty($base)?"Files":$base).".zip";
                     if(isSet($httpVars["archive_name"])){
-                        $localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
+                        $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
                     }
                     $this->readFile($file, "force-download", $localName, false, false, true);
                 } else {
                     $localName = "";
-                    AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName));
+                    Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName));
                     $this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download", $localName);
                 }
                 if (isSet($node)) {
-                    AJXP_Controller::applyHook("node.read", array(&$node));
+                    Controller::applyHook("node.read", array(&$node));
                 }
 
 
@@ -357,7 +357,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 HTMLWriter::charsetHeader("application/json");
                 print(json_encode($chunkData));
 
-                AJXP_Controller::applyHook("node.read", array(&$node));
+                Controller::applyHook("node.read", array(&$node));
 
                 break;
 
@@ -385,27 +385,27 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     // Make a temp zip and send it as download
                     $loggedUser = AuthService::getLoggedUser();
                     if (isSet($httpVars["archive_name"])) {
-                        $localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
+                        $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
                         $this->filterUserSelectionToHidden(array($localName));
                     } else {
                         $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
                     }
-                    $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
+                    $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
                     if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
                     else $baseDir = $dir;
                     $zipFile = $this->makeZip($selection->getFiles(), $file, $baseDir);
-                    if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
+                    if(!$zipFile) throw new PydioException("Error while compressing file $localName");
                     register_shutdown_function("unlink", $file);
                     $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
                     copy($file, $tmpFNAME);
                     try {
-                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
+                        Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
                     } catch (\Exception $e) {
                         @unlink($tmpFNAME);
                         throw $e;
                     }
                     @rename($tmpFNAME, $this->urlBase.$dir."/".$localName);
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
+                    Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
                     //$reloadContextNode = true;
                     //$pendingSelection = $localName;
                     $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
@@ -449,12 +449,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw new \Exception("Cannot access file!");
                 }
                 $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
-                if (AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false) {
+                if (Utils::getStreamingMimeType(basename($dlFile))!==false) {
                     $this->readFile($node->getUrl(), "stream_content");
                 } else {
                     $this->readFile($node->getUrl(), "plain");
                 }
-                AJXP_Controller::applyHook("node.read", array(&$node));
+                Controller::applyHook("node.read", array(&$node));
 
                 break;
 
@@ -468,10 +468,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
-                    $code=str_replace("&lt;","<",SystemTextEncoding::magicDequote($code));
+                    $code=str_replace("&lt;","<",TextEncoder::magicDequote($code));
                 }
                 try {
-                    AJXP_Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
+                    Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
                 } catch (\Exception $e) {
                     header("Content-Type:text/plain");
                     print $e->getMessage();
@@ -486,7 +486,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 fputs ($fp,$code);
                 fclose($fp);
                 clearstatcache(true, $fileName);
-                AJXP_Controller::applyHook("node.change", array($currentNode, $currentNode, false));
+                Controller::applyHook("node.change", array($currentNode, $currentNode, false));
                 header("Content-Type:text/plain");
                 print($mess[115]);
 
@@ -499,14 +499,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             case "move":
 
                 if ($selection->isEmpty()) {
-                    throw new AJXP_Exception("", 113);
+                    throw new PydioException("", 113);
                 }
                 $loggedUser = AuthService::getLoggedUser();
                 if($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())){
-                    throw new AJXP_Exception("You are not allowed to write", 207);
+                    throw new PydioException("You are not allowed to write", 207);
                 }
                 $success = $error = array();
-                $dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+                $dest = Utils::decodeSecureMagic($httpVars["dest"]);
                 $this->filterUserSelectionToHidden(array($httpVars["dest"]));
                 if ($selection->inZip()) {
                     // Set action to copy anycase (cannot move from the zip).
@@ -522,11 +522,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
 
                 if (count($error)) {
-                    throw new AJXP_Exception(SystemTextEncoding::toUTF8(join("\n", $error)));
+                    throw new PydioException(TextEncoder::toUTF8(join("\n", $error)));
                 } else {
                     if (isSet($httpVars["force_copy_delete"])) {
                         $errorMessage = $this->delete($selection->getFiles(), $logMessages);
-                        if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
+                        if($errorMessage) throw new PydioException(TextEncoder::toUTF8($errorMessage));
                         $this->logInfo("Copy/Delete", array("files"=>$this->addSlugToPath($selection), "destination" => $this->addSlugToPath($dest)));
                     } else {
                         $this->logInfo(($action=="move"?"Move":"Copy"), array("files"=>$this->addSlugToPath($selection), "destination"=>$this->addSlugToPath($dest)));
@@ -554,14 +554,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             case "delete":
 
                 if ($selection->isEmpty()) {
-                    throw new AJXP_Exception("", 113);
+                    throw new PydioException("", 113);
                 }
                 $logMessages = array();
                 $errorMessage = $this->delete($selection->getFiles(), $logMessages);
                 if (count($logMessages)) {
                     $logMessage = join("\n", $logMessages);
                 }
-                if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
+                if($errorMessage) throw new PydioException(TextEncoder::toUTF8($errorMessage));
                 $this->logInfo("Delete", array("files"=>$this->addSlugToPath($selection)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $nodesDiffs["REMOVE"] = array_merge($nodesDiffs["REMOVE"], $selection->getFiles());
@@ -574,7 +574,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $hardPurgeTime = intval($this->repository->getOption("PURGE_AFTER"))*3600*24;
                 $softPurgeTime = intval($this->repository->getOption("PURGE_AFTER_SOFT"))*3600*24;
-                $shareCenter = AJXP_PluginsService::findPluginById('action.share');
+                $shareCenter = PluginsService::findPluginById('action.share');
                 if( !($shareCenter && $shareCenter->isEnabled()) ) {
                     //action.share is disabled, don't look at the softPurgeTime
                     $softPurgeTime = 0;
@@ -591,19 +591,19 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             case "rename":
 
                 $file = $selection->getUniqueFile();
-                $filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
+                $filename_new = Utils::decodeSecureMagic($httpVars["filename_new"]);
                 $dest = null;
                 if (isSet($httpVars["dest"])) {
-                    $dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+                    $dest = Utils::decodeSecureMagic($httpVars["dest"]);
                     $filename_new = "";
                 }
                 $this->filterUserSelectionToHidden(array($filename_new));
                 $this->rename($file, $filename_new, $dest);
-                $logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
+                $logMessage= TextEncoder::toUTF8($file)." $mess[41] ".TextEncoder::toUTF8($filename_new);
                 //$reloadContextNode = true;
                 //$pendingSelection = $filename_new;
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
-                if($dest == null) $dest = AJXP_Utils::safeDirname($file);
+                if($dest == null) $dest = Utils::safeDirname($file);
                 $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
                 $this->logInfo("Rename", array("files"=>$this->addSlugToPath($file), "original"=>$this->addSlugToPath($file), "new"=>$filename_new));
 
@@ -617,20 +617,20 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $messtmp="";
                 $files = $selection->getFiles();
                 if(isSet($httpVars["dirname"])){
-                    $files[] = $dir ."/". AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                    $files[] = $dir ."/". Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
                 }
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $messages = array();
                 $errors = array();
                 $max_length = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
                 foreach($files as $newDirPath){
-                    $parentDir = AJXP_Utils::safeDirname($newDirPath);
-                    $basename = AJXP_Utils::safeBasename($newDirPath);
+                    $parentDir = Utils::safeDirname($newDirPath);
+                    $basename = Utils::safeBasename($newDirPath);
                     $basename = substr($basename, 0, $max_length);
                     $this->filterUserSelectionToHidden(array($basename));
                     try{
-                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($parentDir."/".$basename), -2));
-                    }catch (AJXP_Exception $e){
+                        Controller::applyHook("node.before_create", array(new AJXP_Node($parentDir."/".$basename), -2));
+                    }catch (PydioException $e){
                         $errors[] = $e->getMessage();
                         continue;
                     }
@@ -640,8 +640,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $errors[] = $error;
                         continue;
                     }
-                    $messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($basename)." $mess[39] ";
-                    if ($parentDir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($parentDir);}
+                    $messtmp.="$mess[38] ".TextEncoder::toUTF8($basename)." $mess[39] ";
+                    if ($parentDir=="") {$messtmp.="/";} else {$messtmp.= TextEncoder::toUTF8($parentDir);}
                     $messages[] = $messtmp;
                     $newNode = new AJXP_Node($this->urlBase.$parentDir."/".$basename);
                     array_push($nodesDiffs["ADD"], $newNode);
@@ -649,7 +649,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 if(count($errors)){
                     if(!count($messages)){
-                        throw new AJXP_Exception(implode('', $errors));
+                        throw new PydioException(implode('', $errors));
                     }else{
                         $errorMessage = implode("<br>", $errors);
                     }
@@ -666,9 +666,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $messtmp="";
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
-                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["node"]);
+                    $filename=Utils::decodeSecureMagic($httpVars["node"]);
                 }else{
-                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
+                    $filename=Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
                 }
                 $filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($filename));
@@ -682,10 +682,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $error = $this->createEmptyFile($dir, $filename, $content, $forceCreation);
                 if (isSet($error)) {
-                    throw new AJXP_Exception($error);
+                    throw new PydioException($error);
                 }
-                $messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
-                if ($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
+                $messtmp.="$mess[34] ".TextEncoder::toUTF8($filename)." $mess[39] ";
+                if ($dir=="") {$messtmp.="/";} else {$messtmp.=TextEncoder::toUTF8($dir);}
                 $logMessage = $messtmp;
                 //$reloadContextNode = true;
                 //$pendingSelection = $dir."/".$filename;
@@ -727,11 +727,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     'recycle'     => $this->repository->getOption('RECYCLE_BIN')
                 );
                 $this->logDebug("Upload Files Data", $fileVars);
-                $destination=$this->urlBase.AJXP_Utils::decodeSecureMagic($dir);
+                $destination=$this->urlBase.Utils::decodeSecureMagic($dir);
                 $this->logDebug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
                 if (!$this->isWriteable($destination)) {
                     $errorCode = 412;
-                    $errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
+                    $errorMessage = "$mess[38] ".TextEncoder::toUTF8($dir)." $mess[99].";
                     $this->logDebug("Upload error 412", array("destination"=>$this->addSlugToPath($destination)));
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 }
@@ -746,12 +746,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                     try{
                         // CHECK PHP UPLOAD ERRORS
-                        AJXP_Utils::parseFileDataErrors($boxData, true);
+                        Utils::parseFileDataErrors($boxData, true);
 
                         // FIND PROPER FILE NAME
-                        $userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::fromPostedFileName($boxData["name"]), AJXP_SANITIZE_FILENAME);
+                        $userfile_name=Utils::sanitize(TextEncoder::fromPostedFileName($boxData["name"]), AJXP_SANITIZE_FILENAME);
                         if (isSet($httpVars["urlencoded_filename"])) {
-                            $userfile_name = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
+                            $userfile_name = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
                         }
                         $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                         if (isSet($httpVars["auto_rename"])) {
@@ -770,11 +770,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         try {
                             if (file_exists($destination."/".$userfile_name)) {
                                 $already_existed = true;
-                                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
+                                Controller::applyHook("node.before_change", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
                             } else {
-                                AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
+                                Controller::applyHook("node.before_create", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
                             }
-                            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
+                            Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
                         } catch (\Exception $e) {
                             throw new \Exception($e->getMessage(), 507);
                         }
@@ -793,7 +793,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                         // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
                         if (isSet($httpVars["appendto_urlencoded_part"])) {
-                            $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
+                            $appendTo = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
                             if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
                                 $originalAppendTo = $appendTo;
                                 $appendTo .= ".dlpart";
@@ -822,8 +822,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $createdNode = new AJXP_Node($destination."/".$userfile_name);
                         clearstatcache(true, $createdNode->getUrl());
                         $createdNode->loadNodeInfo(true);
-                        $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-                        $logFile = $this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name;
+                        $logMessage.="$mess[34] ".TextEncoder::toUTF8($userfile_name)." $mess[35] $dir";
+                        $logFile = $this->addSlugToPath(TextEncoder::fromUTF8($dir))."/".$userfile_name;
                         $this->logInfo("Upload File", array("file"=>$logFile, "files"=> $logFile ) );
 
                         if($partialUpload){
@@ -860,15 +860,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $toNode = null;
                 $copyOrMove = false;
                 if (isSet($httpVars["from"])) {
-                    $fromNode = new AJXP_Node($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["from"]));
+                    $fromNode = new AJXP_Node($this->urlBase.Utils::decodeSecureMagic($httpVars["from"]));
                 }
                 if (isSet($httpVars["to"])) {
-                    $toNode = new AJXP_Node($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["to"]));
+                    $toNode = new AJXP_Node($this->urlBase.Utils::decodeSecureMagic($httpVars["to"]));
                 }
                 if (isSet($httpVars["copy"]) && $httpVars["copy"] == "true") {
                     $copyOrMove = true;
                 }
-                AJXP_Controller::applyHook("node.change", array($fromNode, $toNode, $copyOrMove));
+                Controller::applyHook("node.change", array($fromNode, $toNode, $copyOrMove));
 
             break;
 
@@ -881,7 +881,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 
                 $startTime = microtime();
-                $dir = AJXP_Utils::securePath($dir);
+                $dir = Utils::securePath($dir);
                 $path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
                 if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
@@ -925,11 +925,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if(!$selection->isEmpty()){
                     $uniqueNodes = $selection->buildNodes();
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
-                    AJXP_Controller::applyHook("node.read", array(&$parentAjxpNode));
-                    if (AJXP_XMLWriter::$headerSent == "tree") {
-                        AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
+                    Controller::applyHook("node.read", array(&$parentAjxpNode));
+                    if (XMLWriter::$headerSent == "tree") {
+                        XMLWriter::renderAjxpNode($parentAjxpNode, false);
                     } else {
-                        AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
+                        XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                     }
                     foreach($uniqueNodes as $node){
                         if(!file_exists($node->getUrl()) || (!is_readable($node->getUrl()) && !is_writable($node->getUrl()))) continue;
@@ -952,7 +952,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         }
                         if(isSet($httpVars["page_position"]) && $httpVars["page_position"] == "true"){
                             // Detect page position: we have to loading "siblings"
-                            $parentPath = AJXP_Utils::safeDirname($node->getPath());
+                            $parentPath = Utils::safeDirname($node->getPath());
                             $siblings = scandir($this->urlBase.$parentPath);
                             foreach($siblings as $i => $s){
                                 if($this->filterFile($s, true)) unset($siblings[$i]);
@@ -965,9 +965,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                                 $node->mergeMetadata(array("page_position" => floor($index / $limitPerPage) +1));
                             }
                         }
-                        AJXP_XMLWriter::renderAjxpNode($node);
+                        XMLWriter::renderAjxpNode($node);
                     }
-                    AJXP_XMLWriter::close();
+                    XMLWriter::close();
                     break;
                 }
 
@@ -1004,13 +1004,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
-                AJXP_Controller::applyHook("node.read", array(&$parentAjxpNode));
-                if (AJXP_XMLWriter::$headerSent == "tree") {
-                    AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
+                Controller::applyHook("node.read", array(&$parentAjxpNode));
+                if (XMLWriter::$headerSent == "tree") {
+                    XMLWriter::renderAjxpNode($parentAjxpNode, false);
                 } else {
-                    AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
+                    XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                 }
-                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! AJXP_Utils::userAgentIsNativePydioApp())) {
+                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! Utils::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
                     if ($this->getFilteredOption("REMOTE_SORTING")) {
                         $remoteOptions = array(
@@ -1023,7 +1023,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if(isSet($sharedHandle)) {
                         rewind($sharedHandle);
                     }
-                    AJXP_XMLWriter::renderPaginationData(
+                    XMLWriter::renderPaginationData(
                         $countFiles,
                         $crtPage,
                         $totalPages,
@@ -1031,7 +1031,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $remoteOptions
                     );
                     if (!$lsOptions["f"]) {
-                        AJXP_XMLWriter::close();
+                        XMLWriter::close();
                         if(isSet($sharedHandle)) {
                             closedir($sharedHandle);
                         }
@@ -1046,7 +1046,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $handle = opendir($path);
                 }
                 if (!$handle) {
-                    throw new AJXP_Exception("Cannot open dir ".$nonPatchedPath);
+                    throw new PydioException("Cannot open dir ".$nonPatchedPath);
                 }
                 $nodes = array();
                 while(false !== ($file = readdir($handle))){
@@ -1099,7 +1099,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                     $nodeType = "d";
                     if ($node->isLeaf()) {
-                        if (AJXP_Utils::isBrowsableArchive($nodeName)) {
+                        if (Utils::isBrowsableArchive($nodeName)) {
                             if ($lsOptions["f"] && $lsOptions["z"]) {
                                 $nodeType = "f";
                             } else {
@@ -1124,11 +1124,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     foreach ($fullList["d"] as &$nodeDir) {
                         if($breakNow){
                             $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
-                            AJXP_XMLWriter::renderAjxpNode($nodeDir, true);
+                            XMLWriter::renderAjxpNode($nodeDir, true);
                             continue;
                         }
                         $this->switchAction("ls", array(
-                            "dir" => SystemTextEncoding::toUTF8($nodeDir->getPath()),
+                            "dir" => TextEncoder::toUTF8($nodeDir->getPath()),
                             "options"=> $httpVars["options"],
                             "recursive" => "true",
                             "max_depth"=> $max_depth,
@@ -1138,10 +1138,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         ), array());
                     }
                 } else {
-                    array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
+                    array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["d"]);
                 }
-                array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["z"]);
-                array_map(array("\\Pydio\\Core\\AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
+                array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["z"]);
+                array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
                 if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
@@ -1149,13 +1149,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if (file_exists($this->urlBase.$recycleBinOption)) {
                         $recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
                         $recycleNode->loadNodeInfo();
-                        AJXP_XMLWriter::renderAjxpNode($recycleNode);
+                        XMLWriter::renderAjxpNode($recycleNode);
                     }
                 }
 
                 $this->logDebug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
 
-                AJXP_XMLWriter::close();
+                XMLWriter::close();
 
             break;
         }
@@ -1163,17 +1163,17 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         $xmlBuffer = "";
         if (isset($logMessage) || isset($errorMessage)) {
-            $xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
+            $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
         if ($reloadContextNode) {
             if(!isSet($pendingSelection)) $pendingSelection = "";
-            $xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", $pendingSelection, false);
+            $xmlBuffer .= XMLWriter::reloadDataNode("", $pendingSelection, false);
         }
         if (isSet($reloadDataNode)) {
-            $xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
+            $xmlBuffer .= XMLWriter::reloadDataNode($reloadDataNode, "", false);
         }
         if (isSet($nodesDiffs)) {
-            $xmlBuffer .= AJXP_XMLWriter::writeNodesDiff($nodesDiffs, false);
+            $xmlBuffer .= XMLWriter::writeNodesDiff($nodesDiffs, false);
         }
 
         return $xmlBuffer;
@@ -1239,7 +1239,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
         if (!isSet($metaData["is_file"])) {
-            $isLeaf = is_file($ajxpNode->getUrl()) || AJXP_Utils::isBrowsableArchive($nodeName);
+            $isLeaf = is_file($ajxpNode->getUrl()) || Utils::isBrowsableArchive($nodeName);
             $metaData["is_file"] = ($isLeaf?"1":"0");
         } else {
             $isLeaf = $metaData["is_file"] == "1" ? true : false;
@@ -1253,7 +1253,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $ajxpNode->setLabel($mess[122]);
             $metaData["ajxp_mime"] = "ajxp_recycle";
         } else {
-            $mimeData = AJXP_Utils::mimeData($ajxpNode->getUrl(), !$isLeaf);
+            $mimeData = Utils::mimeData($ajxpNode->getUrl(), !$isLeaf);
             $metaData["mimestring_id"] = $mimeData[0]; //AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
             $metaData["icon"] = $mimeData[1]; //AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
             if ($metaData["icon"] == "folder.png") {
@@ -1291,13 +1291,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $metaData["file_perms"] = $fPerms;
         $datemodif = $this->date_modif($ajxpNode->getUrl());
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ".AJXP_Utils::relativeDate($datemodif, $mess);
+        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ".Utils::relativeDate($datemodif, $mess);
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
             $metaData["bytesize"] = filesize($ajxpNode->getUrl());
         }
-        $metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
-        if (AJXP_Utils::isBrowsableArchive($nodeName)) {
+        $metaData["filesize"] = Utils::roundSize($metaData["bytesize"]);
+        if (Utils::isBrowsableArchive($nodeName)) {
             $metaData["ajxp_mime"] = "ajxp_browsable_archive";
         }
 
@@ -1406,7 +1406,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         set_error_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
         if (ini_get('zlib.output_compression')) {
-         AJXP_Utils::safeIniSet('zlib.output_compression', 'Off');
+         Utils::safeIniSet('zlib.output_compression', 'Off');
         }
 
         $isFile = !$data && !$gzip;
@@ -1429,7 +1429,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if ($headerType == "plain") {
             header("Content-type:text/plain");
         } else if ($headerType == "image") {
-            header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
+            header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
             header("Content-Length: ".$size);
             header('Cache-Control: public');
         } else {
@@ -1449,7 +1449,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $mimeType = trim($splitChar[0]);
                         $this->logDebug("Detected mime $mimeType for $realfile");
                     } else {
-                        $mimeType = AJXP_Utils::getStreamingMimeType(basename($filePathOrData));
+                        $mimeType = Utils::getStreamingMimeType(basename($filePathOrData));
                     }
                     header('Content-type: '.$mimeType);
                 }
@@ -1519,7 +1519,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $header_sendfile = "X-Sendfile";
 
 
-                header($header_sendfile.": ".SystemTextEncoding::toUTF8($filePathOrData));
+                header($header_sendfile.": ".TextEncoder::toUTF8($filePathOrData));
                 header("Content-type: application/octet-stream");
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
@@ -1527,7 +1527,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
         if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
         $filePathOrData = str_replace("\\", "/", $filePathOrData);
-        $filePathOrData = SystemTextEncoding::toUTF8($filePathOrData);
+        $filePathOrData = TextEncoder::toUTF8($filePathOrData);
         $mapping = explode('=',$_SERVER['X-Accel-Mapping']);
         $replacecount = 0;
         $accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
@@ -1598,7 +1598,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         while (false !== ($file = readdir($handle))) {
             if($file != "." && $file !=".."
-                && !(AJXP_Utils::isHidden($file) && !$showHiddenFiles)){
+                && !(Utils::isHidden($file) && !$showHiddenFiles)){
                 if($foldersOnly && is_file($dirName."/".$file)) continue;
                 $count++;
                 if($nonEmptyCheckOnly) break;
@@ -1627,9 +1627,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $toNode = new AJXP_Node($repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
         if(file_exists($toNode->getUrl())){
-            AJXP_Controller::applyHook("node.before_change", array($toNode, $size));
+            Controller::applyHook("node.before_change", array($toNode, $size));
         }else{
-            AJXP_Controller::applyHook("node.before_create", array($toNode, $size));
+            Controller::applyHook("node.before_create", array($toNode, $size));
         }
         return 1;
     }
@@ -1640,7 +1640,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $repoName = str_replace($realBase, "", $fullname);
         $toNode = new AJXP_Node($this->urlBase.$repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
-        AJXP_Controller::applyHook("node.change", array(null, $toNode, false));
+        Controller::applyHook("node.change", array(null, $toNode, false));
         return 1;
     }
 
@@ -1654,7 +1654,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function extractArchive($destDir, $selection, &$error, &$success)
     {
-        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $zipPath = $selection->getZipPath(true);
         $zipLocalPath = $selection->getZipLocalPath(true);
         if(strlen($zipLocalPath)>1 && $zipLocalPath[0] == "/") $zipLocalPath = substr($zipLocalPath, 1)."/";
@@ -1722,30 +1722,30 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         $nom_fic=basename($filePath);
         $mess = ConfService::getMessages();
-        $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
+        $filename_new=Utils::sanitize(TextEncoder::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
         $old=$this->urlBase.$filePath;
         if (!$this->isWriteable($old)) {
-            throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
+            throw new PydioException($mess[34]." ".$nom_fic." ".$mess[99]);
         }
         if($dest == null) $new=dirname($old)."/".$filename_new;
         else $new = $this->urlBase.$dest;
         if ($filename_new=="" && $dest == null) {
-            throw new AJXP_Exception("$mess[37]");
+            throw new PydioException("$mess[37]");
         }
         if (file_exists($new)) {
-            throw new AJXP_Exception("$filename_new $mess[43]");
+            throw new PydioException("$filename_new $mess[43]");
         }
         if (!file_exists($old)) {
-            throw new AJXP_Exception($mess[100]." $nom_fic");
+            throw new PydioException($mess[100]." $nom_fic");
         }
         $oldNode = new AJXP_Node($old);
-        AJXP_Controller::applyHook("node.before_path_change", array(&$oldNode));
+        Controller::applyHook("node.before_path_change", array(&$oldNode));
         $test = @rename($old,$new);
         if($test === false){
             throw new \Exception("Error while renaming ".$old." to ".$new);
         }
-        AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
+        Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
     }
 
     public static function autoRenameForDest($destination, $fileName)
@@ -1770,7 +1770,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function mkDir($crtDir, $newDirName, $ignoreExists = false)
     {
         $currentNodeDir = new AJXP_Node($this->urlBase.$crtDir);
-        AJXP_Controller::applyHook("node.before_change", array(&$currentNodeDir));
+        Controller::applyHook("node.before_change", array(&$currentNodeDir));
 
         $mess = ConfService::getMessages();
         if ($newDirName=="") {
@@ -1797,13 +1797,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         umask($old);
         $newNode = new AJXP_Node($this->urlBase.$crtDir."/".$newDirName);
         $newNode->setLeaf(false);
-        AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
+        Controller::applyHook("node.change", array(null, $newNode, false));
         return null;
     }
 
     public function createEmptyFile($crtDir, $newFileName, $content = "", $force = false)
     {
-        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));
+        Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));
         $mess = ConfService::getMessages();
         if ($newFileName=="") {
             return "$mess[37]";
@@ -1827,7 +1827,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $this->changeMode($this->urlBase."$crtDir/$newFileName", $repoData);
             fclose($fp);
             $newNode = new AJXP_Node($this->urlBase."$crtDir/$newFileName");
-            AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
+            Controller::applyHook("node.change", array(null, $newNode, false));
             return null;
         } else {
             return "$mess[102] $crtDir/$newFileName (".$fp.")";
@@ -1849,16 +1849,16 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
             $fileToDelete=$this->urlBase.$selectedFile;
             if (!file_exists($fileToDelete)) {
-                $logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
+                $logMessages[]=$mess[100]." ".TextEncoder::toUTF8($selectedFile);
                 continue;
             }
             $this->deldir($fileToDelete, $repoData);
             if (is_dir($fileToDelete)) {
-                $logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
+                $logMessages[]="$mess[38] ".TextEncoder::toUTF8($selectedFile)." $mess[44].";
             } else {
-                $logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
+                $logMessages[]="$mess[34] ".TextEncoder::toUTF8($selectedFile)." $mess[44].";
             }
-            AJXP_Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
+            Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
         }
         return null;
     }
@@ -1923,7 +1923,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $fromNode = $toNode = null;
         if($from != null) $fromNode = new AJXP_Node($this->urlBase.$from);
         if($to != null) $toNode = new AJXP_Node($this->urlBase.$to);
-        AJXP_Controller::applyHook("node.change", array($fromNode, $toNode, $copy));
+        Controller::applyHook("node.change", array($fromNode, $toNode, $copy));
     }
 
     /**
@@ -1933,9 +1933,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function nodeWillChange($node, $newSize = null)
     {
         if ($newSize != null) {
-            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node), $newSize));
+            Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node), $newSize));
         } else {
-            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($this->urlBase.$node)));
+            Controller::applyHook("node.before_path_change", array(new AJXP_Node($this->urlBase.$node)));
         }
     }
 
@@ -1957,17 +1957,17 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
 
         @set_time_limit(0);
-        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $filePaths = array();
         foreach ($src as $item) {
             $realFile = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase."/".$item);
-            $realFile = AJXP_Utils::securePath($realFile);
+            $realFile = Utils::securePath($realFile);
             if (basename($item) == "") {
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
             } else {
                 $shortName = basename($item);
                 if(!empty($zipEncoding)){
-                    $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $shortName);
+                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
                     if($test !== false) $shortName = $test;
                 }
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
@@ -2006,7 +2006,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             return;
         }
         while (false !== ($entry = readdir($handle))) {
-            if ($entry == "" || $entry == ".."  || AJXP_Utils::isHidden($entry) ) {
+            if ($entry == "" || $entry == ".."  || Utils::isHidden($entry) ) {
                 continue;
             }
             $fileName = $dirName."/".$entry;
@@ -2041,9 +2041,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     private function purge($fileName)
     {
         $node = new AJXP_Node($fileName);
-        AJXP_Controller::applyHook("node.before_path_change", array($node));
+        Controller::applyHook("node.before_path_change", array($node));
         unlink($fileName);
-        AJXP_Controller::applyHook("node.change", array($node));
+        Controller::applyHook("node.change", array($node));
         $this->logInfo("Purge", array("file" => $fileName, "files" => $fileName));
         print(" - Purging document : ".$fileName."\n");
     }
@@ -2066,7 +2066,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function makeSharedRepositoryOptions($httpVars, $repository)
     {
         $newOptions = array(
-            "PATH" => SystemTextEncoding::toStorageEncoding($repository->getOption("PATH")).AJXP_Utils::decodeSecureMagic($httpVars["file"]),
+            "PATH" => TextEncoder::toStorageEncoding($repository->getOption("PATH")).Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE" => $repository->getOption("CREATE"),
             "RECYCLE_BIN" => isSet($httpVars["inherit_recycle"])? $repository->getOption("RECYCLE_BIN") : "",
             "DEFAULT_RIGHTS" => "",
@@ -2091,7 +2091,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
                 }
             }
-            AJXP_Controller::applyHook("workspace.share_metasources", array(&$newOptions["META_SOURCES"]));
+            Controller::applyHook("workspace.share_metasources", array(&$newOptions["META_SOURCES"]));
         }
         return $newOptions;
     }
@@ -2105,7 +2105,7 @@ function zipPreAddCallback($value, &$header)
     $search = $header["filename"];
     $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
     if(!empty($zipEncoding)){
-        $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $header["stored_filename"]);
+        $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $header["stored_filename"]);
         if($test !== false){
             $header["stored_filename"] = $test;
         }

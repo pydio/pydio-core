@@ -28,14 +28,14 @@ use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Exception;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * AJXP_Plugin to access an ftp server over SSH
+ * Plugin to access an ftp server over SSH
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
@@ -70,10 +70,10 @@ class sftpAccessDriver extends fsAccessDriver
             if ($this->repository->getOption("CREATE")) {
                 $test = @mkdir($this->urlBase);
                 if (!$test) {
-                    throw new AJXP_Exception("Cannot create path ($path) for your repository! Please check the configuration.");
+                    throw new PydioException("Cannot create path ($path) for your repository! Please check the configuration.");
                 }
             } else {
-                throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
+                throw new PydioException("Cannot find base path ($path) for your repository! Please check the configuration!");
             }
         }
         if ($recycle != "") {
@@ -104,7 +104,7 @@ class sftpAccessDriver extends fsAccessDriver
             $remoteDest = $remote_base_path.$destDirPath;
             $this->logDebug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
             ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
-            AJXP_Controller::applyHook("node.change", array(new AJXP_Node($srcFile), new AJXP_Node($destFile), true));
+            Controller::applyHook("node.change", array(new AJXP_Node($srcFile), new AJXP_Node($destFile), true));
         } else {
             parent::filecopy($srcFile, $destFile);
         }
@@ -121,7 +121,7 @@ class sftpAccessDriver extends fsAccessDriver
     public function makeZip ($src, $dest, $basedir)
     {
         @set_time_limit(60);
-        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $filePaths = array();
 
         $uniqid = uniqid();

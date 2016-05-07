@@ -18,13 +18,19 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core;
+namespace Pydio\Core\Utils;
 
 use Pydio\Access\Core\Repository;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\dibi;
+use Pydio\Core\DibiException;
+use Pydio\Core\HttpClient;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\JSPacker;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -61,7 +67,7 @@ if (!defined('PBKDF2_HASH_ALGORITHM')) {
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Utils
+class Utils
 {
 
     /**
@@ -86,7 +92,7 @@ class AJXP_Utils
      */
     public static function natkrsort(&$array)
     {
-        AJXP_Utils::natksort($array);
+        Utils::natksort($array);
         $array = array_reverse($array, TRUE);
         return true;
     }
@@ -201,7 +207,7 @@ class AJXP_Utils
             return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
         } else if ($level == AJXP_SANITIZE_FILENAME || $level == AJXP_SANITIZE_DIRNAME) {
             // Convert Hexadecimals
-            $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('\\Pydio\\Core\\AJXP_Utils', 'clearHexaCallback'), $s);
+            $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('\Pydio\Core\Utils\Utils', 'clearHexaCallback'), $s);
             // Clean up entities
             $s = preg_replace('!(&#0+[0-9]+)!','$1;',$s);
             // Decode entities
@@ -264,7 +270,7 @@ class AJXP_Utils
      */
     public static function decodeSecureMagic($data, $sanitizeLevel = AJXP_SANITIZE_HTML)
     {
-        return SystemTextEncoding::fromUTF8(AJXP_Utils::sanitize(AJXP_Utils::securePath($data), $sanitizeLevel));
+        return TextEncoder::fromUTF8(Utils::sanitize(Utils::securePath($data), $sanitizeLevel));
     }
     /**
      * Try to load the tmp dir from the CoreConf AJXP_TMP_DIR, or the constant AJXP_TMP_DIR,
@@ -402,22 +408,21 @@ class AJXP_Utils
             } else {
                 $parameters["repository_id"] = $repository->getId();
             }
-            require_once(AJXP_BIN_FOLDER . "/class.SystemTextEncoding.php");
             if (AuthService::usersEnabled()) {
                 $loggedUser = AuthService::getLoggedUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
                     $output["FORCE_REGISTRY_RELOAD"] = true;
-                    $output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
+                    $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
-                    $loggedUser->setPref("pending_folder", SystemTextEncoding::toUTF8(AJXP_Utils::decodeSecureMagic($parameters["folder"])));
+                    $loggedUser->setPref("pending_folder", TextEncoder::toUTF8(Utils::decodeSecureMagic($parameters["folder"])));
                     AuthService::updateUser($loggedUser);
                 } else {
                     $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
-                    $session["PENDING_FOLDER"] = SystemTextEncoding::toUTF8(AJXP_Utils::decodeSecureMagic($parameters["folder"]));
+                    $session["PENDING_FOLDER"] = TextEncoder::toUTF8(Utils::decodeSecureMagic($parameters["folder"]));
                 }
             } else {
                 ConfService::switchRootDir($parameters["repository_id"]);
-                $output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
+                $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
             }
         }
 
@@ -427,7 +432,7 @@ class AJXP_Utils
         }
         if (ConfService::getConf("JS_DEBUG") && isSet($parameters["compile"])) {
             require_once(AJXP_BIN_FOLDER . "/class.AJXP_JSPacker.php");
-            AJXP_JSPacker::pack();
+            JSPacker::pack();
         }
         if (ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])) {
             if (isSet($parameters["extract"])) {
@@ -548,9 +553,9 @@ class AJXP_Utils
     {
         if ($keyword == "editable") {
             // Gather editors!
-            $pServ = AJXP_PluginsService::getInstance();
+            $pServ = PluginsService::getInstance();
             $plugs = $pServ->getPluginsByType("editor");
-            //$plugin = new AJXP_Plugin();
+            //$plugin = new Plugin();
             $mimes = array();
             foreach ($plugs as $plugin) {
                 $node = $plugin->getManifestRawContent("/editor/@mimes", "node");
@@ -793,8 +798,8 @@ class AJXP_Utils
     public static function xmlEntities($string, $toUtf8 = false)
     {
         $xmlSafe = str_replace(array("&", "<", ">", "\"", "\n", "\r"), array("&amp;", "&lt;", "&gt;", "&quot;", "&#13;", "&#10;"), $string);
-        if ($toUtf8 && SystemTextEncoding::getEncoding() != "UTF-8") {
-            return SystemTextEncoding::toUTF8($xmlSafe);
+        if ($toUtf8 && TextEncoder::getEncoding() != "UTF-8") {
+            return TextEncoder::toUTF8($xmlSafe);
         } else {
             return $xmlSafe;
         }
@@ -812,7 +817,7 @@ class AJXP_Utils
     {
         $xmlSafe = str_replace(array("&", "<", ">", "\""), array("&amp;", "&lt;", "&gt;", "&quot;"), $string);
         if ($toUtf8) {
-            return SystemTextEncoding::toUTF8($xmlSafe);
+            return TextEncoder::toUTF8($xmlSafe);
         } else {
             return $xmlSafe;
         }
@@ -973,7 +978,7 @@ class AJXP_Utils
         foreach ($allPhpFiles as $phpFile) {
             $fileContent = file($phpFile);
             foreach ($fileContent as $lineNumber => $line) {
-                if (preg_match_all('/AJXP_Controller::applyHook\("([^"]+)", (.*)\)/', $line, $matches)) {
+                if (preg_match_all('/Controller::applyHook\("([^"]+)", (.*)\)/', $line, $matches)) {
                     $names = $matches[1];
                     $params = $matches[2];
                     foreach ($names as $index => $hookName) {
@@ -997,7 +1002,7 @@ class AJXP_Utils
 
             }
         }
-        $registryHooks = AJXP_PluginsService::getInstance()->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
+        $registryHooks = PluginsService::getInstance()->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
         $regHooks = array();
         foreach ($registryHooks as $xmlHook) {
             $name = $xmlHook->getAttribute("hookName");
@@ -1093,9 +1098,9 @@ class AJXP_Utils
      */
     public static function extractConfStringsFromManifests()
     {
-        $plugins = AJXP_PluginsService::getInstance()->getDetectedPlugins();
+        $plugins = PluginsService::getInstance()->getDetectedPlugins();
         /**
-         * @var AJXP_Plugin $plug
+         * @var Plugin $plug
          */
         foreach ($plugins as $pType => $plugs) {
             foreach ($plugs as $plug) {
@@ -1139,7 +1144,7 @@ class AJXP_Utils
     public static function updateAllI18nLibraries($createLanguage = "")
     {
         // UPDATE EN => OTHER LANGUAGES
-        $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
+        $nodes = PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
         foreach ($nodes as $node) {
             $nameSpace = $node->getAttribute("namespace");
             $path = AJXP_INSTALL_PATH . "/" . $node->getAttribute("path");
@@ -1385,7 +1390,7 @@ class AJXP_Utils
      */
     public static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
     {
-        $filePath = AJXP_VarsFilter::filter($filePath);
+        $filePath = VarsFilter::filter($filePath);
         $result = array();
         if ($skipCheck) {
             $fileLines = @file($filePath);
@@ -1419,7 +1424,7 @@ class AJXP_Utils
         if(!in_array($format, array("ser", "json"))){
             throw new \Exception("Unsupported serialization format: ".$format);
         }
-        $filePath = AJXP_VarsFilter::filter($filePath);
+        $filePath = VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))) {
             @mkdir(dirname($filePath), 0755, true);
             if (!is_dir(dirname($filePath))) {
@@ -1707,7 +1712,7 @@ class AJXP_Utils
                         }
                         $value = "";
                     } else {
-                        $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                        $file = Utils::getAjxpTmpDir()."/".$value;
                         if (file_exists($file)) {
                             $id= !empty($level["original_binary"]) ? $level["original_binary"] : null;
                             $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
@@ -1756,7 +1761,7 @@ class AJXP_Utils
                                 }
                                 $value = "";
                             } else {
-                                $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                                $file = Utils::getAjxpTmpDir()."/".$value;
                                 if (file_exists($file)) {
                                     $id= !empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
                                     $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
@@ -1774,7 +1779,7 @@ class AJXP_Utils
                         $value = json_decode($value, true);
                     }
                     if (!in_array($type, array("textarea", "boolean", "text/json"))) {
-                        $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
+                        $value = Utils::sanitize($value, AJXP_SANITIZE_HTML);
                     }
                     unset($repDef[$key."_ajxptype"]);
                 }
@@ -1836,7 +1841,7 @@ class AJXP_Utils
             }
             foreach ($params as $k => $v) {
                 $explode = explode("_", $k, 2);
-                $params[array_pop($explode)] = AJXP_VarsFilter::filter($v);
+                $params[array_pop($explode)] = VarsFilter::filter($v);
                 unset($params[$k]);
             }
         }

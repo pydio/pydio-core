@@ -21,11 +21,11 @@
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\HTMLWriter;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class FileMimeSender extends AJXP_Plugin
+class FileMimeSender extends Plugin
 {
     public function switchAction($action, $httpVars, $filesVars)
     {
@@ -116,7 +116,7 @@ class FileMimeSender extends AJXP_Plugin
             fflush($stream);
             fclose($stream);
 
-            AJXP_Controller::applyHook("node.read", array($selectedNode));
+            Controller::applyHook("node.read", array($selectedNode));
             $this->logInfo('Download', 'Read content of '.$selectedNodeUrl, array("files" => $selectedNodeUrl));
 
         }

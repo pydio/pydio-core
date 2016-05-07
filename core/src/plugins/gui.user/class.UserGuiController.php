@@ -18,12 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AuthService;
-use Pydio\Conf\Core\ConfService;
-use Pydio\Core\AJXP_Controller;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
-use Pydio\Core\Plugins\AJXP_PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -33,7 +33,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class UserGuiController
  * Handle the specific /user access point
  */
-class UserGuiController extends AJXP_Plugin
+class UserGuiController extends Plugin
 {
 
     /**
@@ -89,7 +89,7 @@ class UserGuiController extends AJXP_Plugin
                         "ALERT" => $e->getMessage()
                     );
                 }
-                AJXP_Controller::findActionAndApply("get_boot_gui", array(), array());
+                Controller::findActionAndApply("get_boot_gui", array(), array());
                 unset($_SESSION['OVERRIDE_GUI_START_PARAMETERS']);
 
                 break;
@@ -102,12 +102,12 @@ class UserGuiController extends AJXP_Plugin
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($httpVars["email"]);
                     $email = $userObject->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($email)) {
-                        $uuid = AJXP_Utils::generateRandomString(48);
-                        ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, AJXP_Utils::decodeSecureMagic($httpVars["email"]), array());
-                        $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
+                        $uuid = Utils::generateRandomString(48);
+                        ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, Utils::decodeSecureMagic($httpVars["email"]), array());
+                        $mailer = PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = ConfService::getMessages();
-                            $link = AJXP_Utils::detectServerURL()."/user/reset-password/".$uuid;
+                            $link = Utils::detectServerURL()."/user/reset-password/".$uuid;
                             $mailer->sendMail(array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';

@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AuthService;
-use Pydio\Core\AJXP_Utils;
-use Pydio\Core\Plugins\AJXP_Plugin;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -31,19 +31,19 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Mq
  */
-class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchanger
+class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
 {
 
     public function init($options)
     {
            parent::init($options);
-           $this->sqlDriver = $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+           $this->sqlDriver = $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
        }
 
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("Please define an SQL connexion in the core configuration");
         }
@@ -64,7 +64,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         }
         if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
             if(!isset($this->channels)) $this->channels = array();
-            $data = AJXP_Utils::loadSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName");
+            $data = Utils::loadSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName");
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -84,7 +84,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         if (isSet($this->channels) && is_array($this->channels)) {
             foreach ($this->channels as $channelName => $data) {
                 if (is_array($data)) {
-                    AJXP_Utils::saveSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName", $data);
+                    Utils::saveSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName", $data);
                 }
             }
         }
