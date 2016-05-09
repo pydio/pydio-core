@@ -22,7 +22,6 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -103,51 +102,11 @@ class FileHasher extends AJXP_AbstractMetaSource
         $this->metaStore->initMeta($accessDriver);
     }
 
-    private function getTreeName()
-    {
-        $repo = $this->accessDriver->repository;
-        $base = AJXP_SHARED_CACHE_DIR."/trees/tree-".$repo->getId();
-        $secuScope = $repo->securityScope();
-        if ($secuScope == "USER") {
-            $base .= "-".AuthService::getLoggedUser()->getId();
-        } else if ($secuScope == "GROUP") {
-            $base .= "-".str_replace("/", "_", AuthService::getLoggedUser()->getGroupPath());
-        }
-        return $base . "-full.xml";
-    }
-
-    public function checkFullTreeCache($actionName, &$httpVars, &$fileVars)
-    {
-        $cName = $this->getTreeName();
-        if (is_file($cName)) {
-            header('Content-Type: text/xml; charset=UTF-8');
-            header('Cache-Control: no-cache');
-            if ( strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') ) {
-                header('Content-Encoding:deflate');
-                readfile($cName.".gz");
-            } else {
-                readfile($cName);
-            }
-            exit();
-        }
-    }
-
-    public function cacheFullTree($actionName, $httpVars, $postProcessData)
-    {
-        $cName = $this->getTreeName();
-        if(!is_dir(dirname($cName))) mkdir(dirname($cName));
-        $xmlString = $postProcessData["ob_output"];
-        file_put_contents($cName, $xmlString);
-        file_put_contents($cName.".gz", gzdeflate($xmlString, 9));
-        print($xmlString);
-    }
-
     public function switchActions($actionName, $httpVars, $fileVars)
     {
-        //$urlBase = $this->accessDriver
         $repository = $this->accessDriver->repository;
         if (!$repository->detectStreamWrapper(true)) {
-            return false;
+            return;
         }
         $selection = new UserSelection($repository, $httpVars);
         switch ($actionName) {
@@ -316,9 +275,6 @@ class FileHasher extends AJXP_AbstractMetaSource
         if($this->metaStore == false) return;
         if ($oldNode != null) {
             $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
-        }
-        if ($this->getFilteredOption("CACHE_XML_TREE") === true && is_file($this->getTreeName())) {
-            @unlink($this->getTreeName());
         }
     }
 

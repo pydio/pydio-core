@@ -3,7 +3,6 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.filehasher/class.FileHasher.php" classname="FileHasher"/>
     <server_settings>
-        <param name="CACHE_XML_TREE" type="boolean" default="false" label="CONF_MESSAGE[Cache full tree]" description="CONF_MESSAGE[Cache XML tree and invalidate on node change]"/>
         <global_param name="RSYNC_SUPPORTED" type="boolean" label="CONF_MESSAGE[Rsync Support]" description="CONF_MESSAGE[Dont edit, it will be detected by the server]" expose="true"/>
     </server_settings>
    	<client_settings>
@@ -45,14 +44,6 @@
                            <output type="json"/>
                        </serverCallback>
                    </processing>
-               </action>
-               <action name="ls" dirDefault="true">
-                   <pre_processing>
-                       <serverCallback methodName="checkFullTreeCache" applyCondition="$apply=isSet($httpVars['recursive']);"/>
-                   </pre_processing>
-                   <post_processing>
-                       <serverCallback methodName="cacheFullTree" capture="true" applyCondition="$apply=isSet($httpVars['recursive']);"/>
-                   </post_processing>
                </action>
            </actions>
    		<hooks>

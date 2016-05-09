@@ -43,7 +43,7 @@ class ImagePreviewer extends Plugin
     {
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
-            return false;
+            return;
         }
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
