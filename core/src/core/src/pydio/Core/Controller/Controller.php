@@ -121,6 +121,25 @@ class Controller
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable|null $nextCallable
+     * @return ResponseInterface
+     * @throws AuthRequiredException
+     */
+    public static function registryActionMiddleware(ServerRequestInterface &$request, ResponseInterface &$response, callable $nextCallable = null){
+        $action = null;
+        if(ConfService::currentContextIsRestAPI()){
+            $action = Controller::parseRestParameters($request);
+        }
+        $response = Controller::run($request, $action);
+        if($nextCallable != null){
+            $response = call_user_func($nextCallable, $request, $response);
+        }
+        return $response;
+    }
+
+    /**
      * @static
      * @param array $parameters
      * @param \DOMNode $callbackNode

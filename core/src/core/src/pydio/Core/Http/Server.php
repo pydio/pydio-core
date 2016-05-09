@@ -20,13 +20,14 @@
  */
 namespace Pydio\Core\Http;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -39,12 +40,20 @@ class Server
     private $mode;
     private $request;
     private $requireAuth = false;
+    private $middleWares;
 
     public function __construct($serverMode = PYDIO_SERVER_MODE_SESSION){
+
         $this->mode = $serverMode;
         if($this->mode == PYDIO_SERVER_MODE_REST){
             $this->requireAuth = true;
         }
+        $this->middleWares = new \SplStack();
+        $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
+
+        $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array($this, "simpleEmitterMiddleware"));
+
     }
 
     public function getRequest(){
@@ -54,15 +63,33 @@ class Server
         return $this->request;
     }
 
-
-    public function listen(){
-
-        $action = null;
-        if($this->mode == PYDIO_SERVER_MODE_REST){
-            $action = Controller::parseRestParameters($this->request);
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    protected function nextCallable(&$request, &$response){
+        if($this->middleWares->valid()){
+            $callable = $this->middleWares->current();
+            $this->middleWares->next();
+            $response = call_user_func($callable, $request, $response, function($req, $res){
+                return $this->nextCallable($req, $res);
+            });
         }
+        return $response;
+    }
+
+    /**
+     * @param $request
+     * @param $response
+     * @param callable|null $next
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
+    public function simpleEmitterMiddleware($request, $response, $next = null){
         try{
-            $response = Controller::run($this->getRequest(), $action);
+            if($next !== null){
+                $response = call_user_func($next, $request, $response);
+            }
             if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse)) {
                 $emitter = new \Zend\Diactoros\Response\SapiEmitter();
                 $emitter->emit($response);
@@ -72,6 +99,17 @@ class Server
                 throw $authExc;
             }
         }
+    }
+
+    public function addMiddleware(callable $middleWareCallable){
+        $this->middleWares->push($middleWareCallable);
+    }
+
+    public function listen(){
+
+        $response = new Response();
+        $this->middleWares->rewind();
+        $this->nextCallable($this->request, $response);
 
     }
 
