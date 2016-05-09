@@ -606,7 +606,7 @@ class AJXP_Node
             $pServ = PluginsService::getInstance();
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
-            $this->_wrapperClassName = "AJXP_MetaStreamWrapper";
+            $this->_wrapperClassName = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
         }
     }
 

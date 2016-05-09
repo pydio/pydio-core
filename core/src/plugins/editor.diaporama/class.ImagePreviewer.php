@@ -126,8 +126,9 @@ class ImagePreviewer extends Plugin
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
         $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
+
         if (!$pThumb->isError()) {
-            $pThumb->remote_wrapper = "AJXP_MetaStreamWrapper";
+            $pThumb->remote_wrapper = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
             //$this->logDebug("Will fit thumbnail");
             $sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
             //$this->logDebug("Will print thumbnail");
