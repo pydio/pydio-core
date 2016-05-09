@@ -191,7 +191,7 @@
 			</action>
 			<action name="get_boot_conf" skipSecureToken="true">
 				<processing>
-					<serverCallback methodName="switchAction"/>
+					<serverCallback methodName="getBootConf"/>
 				</processing>
 			</action>
 		</actions>
