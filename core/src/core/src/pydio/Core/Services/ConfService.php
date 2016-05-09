@@ -286,6 +286,8 @@ class ConfService
     {
         if(!empty($restBase)){
             self::$restAPIContext = $restBase;
+            self::$useSession = false;
+            AuthService::$useSession = false;
             return $restBase;
         }else{
             return self::$restAPIContext;
@@ -359,6 +361,23 @@ class ConfService
         if(isSet(self::$tmpCacheStorageImpl)) return self::$tmpCacheStorageImpl;
         return PluginsService::getInstance()->getPluginById("core.cache")->getCacheImpl();
     }
+
+    /**
+     * @throws \Exception
+     */
+    public static function reloadServicesAndActivePlugins(){
+
+        // THIS FIRST DRIVERS DO NOT NEED ID CHECK
+        ConfService::getAuthDriverImpl();
+        // DRIVERS BELOW NEED IDENTIFICATION CHECK
+        if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
+            ConfService::getConfStorageImpl();
+            ConfService::loadRepositoryDriver();
+        }
+        PluginsService::getInstance()->initActivePlugins();
+        
+    }
+
 
     public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
 
@@ -503,11 +522,12 @@ class ConfService
     {
         self::getInstance()->switchRootDirInst($rootDirIndex, $temporary);
     }
+
     /**
      * Switch the current repository
-     * @param $rootDirIndex
+     * @param int $rootDirIndex
      * @param bool $temporary
-     * @return void
+     * @throws PydioException
      */
     public function switchRootDirInst($rootDirIndex=-1, $temporary=false)
     {

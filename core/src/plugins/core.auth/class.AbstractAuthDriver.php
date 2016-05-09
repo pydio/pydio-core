@@ -132,13 +132,7 @@ class AbstractAuthDriver extends Plugin
         $passChangeNode = $passChangeNodeList->item(0);
         $contribNode->removeChild($passChangeNode);
     }
-
-    /**
-     * Old way of prelogging user, replaced by authentication frontends
-     * @param String $sessionId
-     */
-    public function preLogUser($sessionId){}
-
+    
     /**
      * Wether users can be listed using offset and limit
      * @return bool

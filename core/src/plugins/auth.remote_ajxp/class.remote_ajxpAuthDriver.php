@@ -38,6 +38,11 @@ class remote_ajxpAuthDriver extends serialAuthDriver
         return false;
     }
 
+    /**
+     * Legacy preLogUser method, not used anymore
+     * Should be replaced by an authfront plugin.
+     * @param String $sessionId
+     */
     public function preLogUser($sessionId)
     {
         require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");

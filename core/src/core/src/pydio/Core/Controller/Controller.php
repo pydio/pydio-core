@@ -78,78 +78,7 @@ class Controller
         self::$xPath = null;
         self::$hooksCache = array();
     }
-
-    /**
-     * @bool $rest
-     * @return ServerRequestInterface
-     */
-    public static function initServerRequest($rest = false){
-
-        $request = ServerRequestFactory::fromGlobals();
-        $httpVars = $request->getQueryParams();
-        $postParams = $request->getParsedBody();
-        if(is_array($postParams)){
-            $httpVars = array_merge($httpVars, $postParams);
-        }
-        $request = $request->withParsedBody($httpVars);
-
-        if($rest){
-            $serverData = $request->getServerParams();
-            $uri = $serverData["REQUEST_URI"];
-            $scriptUri = ltrim(Utils::safeDirname($serverData["SCRIPT_NAME"]),'/')."/api/";
-            $uri = substr($uri, strlen($scriptUri));
-            $uri = explode("/", trim($uri, "/"));
-            $repoID = array_shift($uri);
-            $action = array_shift($uri);
-            $path = "/".implode("/", $uri);
-            return $request->withAttribute("action", $action)
-                ->withAttribute("rest_path", $path)
-                ->withAttribute("rest_repository_id", $repoID);
-
-        }else{
-            return $request;
-        }
-
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return static
-     */
-    public static function requestHandlerDetectAction(ServerRequestInterface &$request){
-        $serverData = $request->getServerParams();
-        $params = $request->getParsedBody();
-        if(isSet($params["get_action"])){
-            $action = $params["get_action"];
-        }else if(isSet($params["action"])){
-            $action = $params["action"];
-        }else if (preg_match('/MSIE 7/',$serverData['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$serverData['HTTP_USER_AGENT'])) {
-            $action = "get_boot_gui";
-        } else {
-            $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
-        }
-        $request = $request->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS));
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @throws PydioException
-     */
-    public static function requestHandlerSecureToken(ServerRequestInterface $request){
-
-        $pluginsUnSecureActions = ConfService::getDeclaredUnsecureActions();
-        $unSecureActions = array_merge($pluginsUnSecureActions, array("get_secure_token"));
-        if (!in_array($request->getAttribute("action"), $unSecureActions) && AuthService::getSecureToken()) {
-            $params = $request->getParsedBody();
-            if(array_key_exists("secure_token", $params)){
-                $token = $params["secure_token"];
-            }
-            if ( !isSet($token) || !AuthService::checkSecureToken($token)) {
-                throw new PydioException("You are not allowed to access this resource.");
-            }
-        }
-    }
-
+    
 
     /**
      * @param ServerRequestInterface $request
@@ -274,7 +203,6 @@ class Controller
                     if($actionName == "ls" & $loggedUser!=null
                         && $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
-                        // TODO : Set in Response object
                         $response = new Response();
                         $response->getBody()->write(XMLWriter::wrapDocument(""));
                         return $response;

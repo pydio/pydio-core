@@ -140,7 +140,7 @@ class AuthService
         return null;
     }
     /**
-     * Call the preLogUser() functino on the auth driver implementation
+     * Call tryToLogUser() functions on the registered authfront drivers
      * @static
      * @param array $httpVars
      * @return void
@@ -164,11 +164,7 @@ class AuthService
             $index ++;
             if($res) break;
         }
-        // Keep old-fashioned test, should be removed
-        $authDriver = ConfService::getAuthDriverImpl();
-        $authDriver->preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
 
-        return ;
     }
     /**
      * The array is located in the AjxpTmpDir/failedAJXP.log

@@ -280,7 +280,7 @@ class multiAuthDriver extends AbstractAuthDriver
         return $groups;
     }
 
-
+    /*
     public function preLogUser($remoteSessionId)
     {
         if ($this->masterSlaveMode) {
@@ -299,6 +299,7 @@ class multiAuthDriver extends AbstractAuthDriver
             throw new Exception("No driver instanciated in multi driver!");
         }
     }
+    */
 
     public function userExistsWrite($login)
     {
