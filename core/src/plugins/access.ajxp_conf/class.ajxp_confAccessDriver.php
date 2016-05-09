@@ -22,6 +22,8 @@
 namespace Pydio\Access\Driver\DataProvider;
 
 use DOMXPath;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Repository;
@@ -334,14 +336,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
-    public function preProcessBookmarkAction($action, &$httpVars, $fileVars)
-    {
+    public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response){
+        $httpVars = $request->getParsedBody();
         if (isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && AuthService::usersEnabled()) {
             $bmUser = AuthService::getLoggedUser();
             $bookmarks = $bmUser->getBookmarks();
             foreach ($bookmarks as $bm) {
                 if ($bm["PATH"] == $httpVars["bm_path"]) {
                     $httpVars["bm_action"] = "delete_bookmark";
+                    $request = $request->withParsedBody($httpVars);
                     break;
                 }
             }

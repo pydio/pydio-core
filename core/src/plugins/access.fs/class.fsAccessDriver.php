@@ -37,6 +37,7 @@ use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Repository;
 use Pydio\Access\Core\UserSelection;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Http\AsyncResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -416,6 +417,160 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     */
+    public function downloadAction(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $selection = new UserSelection($this->repository);
+        $httpVars = $request->getParsedBody();
+        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+            $dir = fsAccessWrapper::patchPathForBaseDir($dir);
+        }
+        $dir = Utils::securePath($dir);
+        $selection->initFromHttpVars($httpVars);
+        if (!$selection->isEmpty()) {
+            $this->filterUserSelectionToHidden($selection->getFiles());
+        }
+
+        $action = $request->getAttribute("action");
+
+        switch ($action){
+            case "download":
+
+                $this->logInfo("Download", array("files"=>$this->addSlugToPath($selection)));
+                @set_error_handler(array("Pydio\\Core\\Controller\\HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+                @register_shutdown_function("restore_error_handler");
+                $zip = false;
+                if ($selection->isUnique()) {
+                    if (is_dir($this->urlBase.$selection->getUniqueFile())) {
+                        $zip = true;
+                        $base = basename($selection->getUniqueFile());
+                        $uniqDir = dirname($selection->getUniqueFile());
+                        if(!empty($uniqDir) && $uniqDir != "/"){
+                            $dir = dirname($selection->getUniqueFile());
+                        }
+                    } else {
+                        if (!file_exists($this->urlBase.$selection->getUniqueFile())) {
+                            throw new \Exception("Cannot find file!");
+                        }
+                    }
+                    $node = $selection->getUniqueNode();
+                } else {
+                    $zip = true;
+                }
+                if ($zip) {
+                    // Make a temp zip and send it as download
+                    $loggedUser = AuthService::getLoggedUser();
+                    $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                    $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
+                    if(!$zipFile) throw new PydioException("Error while compressing");
+                    if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
+                        && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
+                        register_shutdown_function("unlink", $file);
+                    }
+                    $localName = (empty($base)?"Files":$base).".zip";
+                    if(isSet($httpVars["archive_name"])){
+                        $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
+                    }
+                    $response = $response->withBody(new AsyncResponseStream(function () use($file, $localName){
+                        $this->readFile($file, "force-download", $localName, false, false, true);
+                    }));
+                } else {
+                    $localName = "";
+                    Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName));
+                    $file = $this->urlBase.$selection->getUniqueFile();
+                    $response = $response->withBody(new AsyncResponseStream(function () use($file, $localName){
+                        $this->readFile($file, "force-download", $localName);
+                    }));
+                }
+                if (isSet($node)) {
+                    Controller::applyHook("node.read", array(&$node));
+                }
+
+                break;
+
+            case "get_content":
+
+                $node = $selection->getUniqueNode();
+                $dlFile = $node->getUrl();
+                if(!is_readable($dlFile)){
+                    throw new \Exception("Cannot access file!");
+                }
+                $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
+
+                if (Utils::getStreamingMimeType(basename($dlFile))!==false) {
+                    $readMode  = "stream_content";
+                } else {
+                    $readMode  = "plain";
+                }
+                $url = $node->getUrl();
+                $response = $response->withBody(new AsyncResponseStream(function() use($url, $readMode){
+                    $this->readFile($url, $readMode);
+                }));
+
+                Controller::applyHook("node.read", array(&$node));
+
+                break;
+
+            case "prepare_chunk_dl" :
+
+                $chunkCount = intval($httpVars["chunk_count"]);
+                $node = $selection->getUniqueNode();
+
+                $fileId = $node->getUrl();
+                $sessionKey = "chunk_file_".md5($fileId.time());
+                $totalSize = filesize($fileId);
+                $chunkSize = intval ( $totalSize / $chunkCount );
+                $realFile  = AJXP_MetaStreamWrapper::getRealFSReference($fileId, true);
+                $chunkData = array(
+                    "localname"	  => basename($fileId),
+                    "chunk_count" => $chunkCount,
+                    "chunk_size"  => $chunkSize,
+                    "total_size"  => $totalSize,
+                    "file_id"	  => $sessionKey
+                );
+
+                $_SESSION[$sessionKey] = array_merge($chunkData, array("file"=>$realFile));
+                $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
+                $response->getBody()->write(json_encode($chunkData));
+
+                Controller::applyHook("node.read", array(&$node));
+
+                break;
+
+            case "download_chunk" :
+
+                $chunkIndex = intval($httpVars["chunk_index"]);
+                $chunkKey = $httpVars["file_id"];
+                $sessData = $_SESSION[$chunkKey];
+                $realFile = $sessData["file"];
+                $chunkSize = $sessData["chunk_size"];
+                $offset = $chunkSize * $chunkIndex;
+                if ($chunkIndex == $sessData["chunk_count"]-1) {
+                    // Compute the last chunk real length
+                    $chunkSize = $sessData["total_size"] - ($chunkSize * ($sessData["chunk_count"]-1));
+                    if (AJXP_MetaStreamWrapper::wrapperIsRemote($this->urlBase)) {
+                        register_shutdown_function("unlink", $realFile);
+                    }
+                }
+                $localName = $sessData["localname"].".".sprintf("%03d", $chunkIndex+1);
+                $response = $response->withBody(new AsyncResponseStream(function() use($realFile, $localName, $offset, $chunkSize){
+                    $this->readFile($realFile, "force-download", $localName, false, false, true, $offset, $chunkSize);
+                }));
+
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         parent::accessPreprocess($action, $httpVars, $fileVars);
@@ -447,6 +602,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $reloadContextNode = false;
 
         switch ($action) {
+            /*
             //------------------------------------
             //	DOWNLOAD
             //------------------------------------
@@ -498,52 +654,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
 
                 break;
+            */
 
-            case "prepare_chunk_dl" :
-
-                $chunkCount = intval($httpVars["chunk_count"]);
-                $node = $selection->getUniqueNode();
-
-                $fileId = $node->getUrl();
-                $sessionKey = "chunk_file_".md5($fileId.time());
-                $totalSize = filesize($fileId);
-                $chunkSize = intval ( $totalSize / $chunkCount );
-                $realFile  = AJXP_MetaStreamWrapper::getRealFSReference($fileId, true);
-                $chunkData = array(
-                    "localname"	  => basename($fileId),
-                    "chunk_count" => $chunkCount,
-                    "chunk_size"  => $chunkSize,
-                    "total_size"  => $totalSize,
-                    "file_id"	  => $sessionKey
-                );
-
-                $_SESSION[$sessionKey] = array_merge($chunkData, array("file"=>$realFile));
-                HTMLWriter::charsetHeader("application/json");
-                print(json_encode($chunkData));
-
-                Controller::applyHook("node.read", array(&$node));
-
-                break;
-
-            case "download_chunk" :
-
-                $chunkIndex = intval($httpVars["chunk_index"]);
-                $chunkKey = $httpVars["file_id"];
-                $sessData = $_SESSION[$chunkKey];
-                $realFile = $sessData["file"];
-                $chunkSize = $sessData["chunk_size"];
-                $offset = $chunkSize * $chunkIndex;
-                if ($chunkIndex == $sessData["chunk_count"]-1) {
-                    // Compute the last chunk real length
-                    $chunkSize = $sessData["total_size"] - ($chunkSize * ($sessData["chunk_count"]-1));
-                    if (AJXP_MetaStreamWrapper::wrapperIsRemote($this->urlBase)) {
-                        register_shutdown_function("unlink", $realFile);
-                    }
-                }
-                $this->readFile($realFile, "force-download", $sessData["localname"].".".sprintf("%03d", $chunkIndex+1), false, false, true, $offset, $chunkSize);
-
-
-            break;
 
             case "compress" :
                     // Make a temp zip and send it as download
@@ -605,23 +717,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             //------------------------------------
             //	ONLINE EDIT
             //------------------------------------
-            case "get_content":
-
-                $node = $selection->getUniqueNode();
-                $dlFile = $node->getUrl();
-                if(!is_readable($dlFile)){
-                    throw new \Exception("Cannot access file!");
-                }
-                $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
-                if (Utils::getStreamingMimeType(basename($dlFile))!==false) {
-                    $this->readFile($node->getUrl(), "stream_content");
-                } else {
-                    $this->readFile($node->getUrl(), "plain");
-                }
-                Controller::applyHook("node.read", array(&$node));
-
-                break;
-
             case "put_content":
                 if(!isset($httpVars["content"])) break;
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
@@ -1416,9 +1511,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     /**
      * @param String $folder Folder destination
-     * @param String $target Existing part to append data
      * @param String $source Maybe updated by the function
+     * @param String $target Existing part to append data
      * @return bool If the target file already existed or not.
+     * @throws \Exception
      */
     protected function appendUploadedData($folder, $source, $target){
 

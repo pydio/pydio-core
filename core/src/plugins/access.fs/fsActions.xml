@@ -272,7 +272,7 @@
 						}
 					}
 					]]></clientListener>
-				<serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
+				<serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                     <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <output type="stream"/>
 				</serverCallback>
@@ -519,7 +519,7 @@
 		<action name="get_content">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
 			<processing>
-				<serverCallback methodName="switchAction" restParams="/node+" developerComment="Alternative to Download, without attachment headers but more in a stream-like format, depending on file type (image, audio, video, plain text).">
+				<serverCallback methodName="downloadAction" restParams="/node+" developerComment="Alternative to Download, without attachment headers but more in a stream-like format, depending on file type (image, audio, video, plain text).">
                     <input_param description="Path of the node" name="node" type="path" mandatory="true"/>
 				</serverCallback>
 			</processing>
@@ -880,7 +880,7 @@
         <action name="prepare_chunk_dl">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
             <processing>
-                <serverCallback methodName="switchAction" restParams="/chunk_count/node+" developerComment="Use the filesize of the file to generate an list of pieces to be downloaded using {download_chunk} action. Will generate a unique file_id to be used later.">
+                <serverCallback methodName="downloadAction" restParams="/chunk_count/node+" developerComment="Use the filesize of the file to generate an list of pieces to be downloaded using {download_chunk} action. Will generate a unique file_id to be used later.">
                     <input_param description="Selected node" name="node" type="path" mandatory="true"/>
                     <input_param description="Number of pieces to create for the file" name="chunk_count" type="integer"/>
                     <output type="application/json"/>
@@ -948,7 +948,7 @@
 					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>
 					</div>]]>
                 </clientForm>
-                <serverCallback methodName="switchAction" restParams="/chunk_index/file_id" developerComment="Chunk file into pieces before downloading the pieces. Can be handy for problematic and limited servers.">
+                <serverCallback methodName="downloadAction" restParams="/chunk_index/file_id" developerComment="Chunk file into pieces before downloading the pieces. Can be handy for problematic and limited servers.">
                     <input_param description="Unique key generated during the {prepare_chunk_dl} action." name="file_id" type="string"/>
                     <input_param description="Position of the file to download" name="chunk_index" type="integer"/>
                 </serverCallback>
