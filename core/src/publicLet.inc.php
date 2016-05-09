@@ -29,8 +29,6 @@ $pServ = PluginsService::getInstance();
 ConfService::init();
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
-$confDriver = ConfService::getConfStorageImpl();
-require_once($confDriver->getUserClassFileName());
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php");
 
 $fakes = '

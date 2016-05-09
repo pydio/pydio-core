@@ -45,7 +45,6 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         $rememberPass = "";
         $secureToken = "";
         $loggedUser = null;
-        include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
         if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
         } else {
@@ -122,7 +121,6 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 break;
 
             case "get_captcha":
-                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
                 CaptchaProvider::sendCaptcha();
                 //exit(0) ;
                 break;

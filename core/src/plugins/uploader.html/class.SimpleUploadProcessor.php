@@ -21,7 +21,7 @@
 
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\UserSelection;
-use Pydio\Conf\Core\ConfService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -48,23 +48,30 @@ class SimpleUploadProcessor extends Plugin
         readfile($img);
     }
 
-    public function preProcess($action, &$httpVars, &$fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
+        $httpVars = $request->getParsedBody();
+        $serverData = $request->getServerParams();
         if (!isSet($httpVars["input_stream"]) || isSet($httpVars["force_post"])) {
-            return false;
+            return;
         }
 
         $headersCheck = isset(
-                $_SERVER['CONTENT_LENGTH'],
-                $_SERVER['HTTP_X_FILE_NAME']
+                $serverData['CONTENT_LENGTH'],
+                $serverData['HTTP_X_FILE_NAME']
             ) ;
-        if (isSet($_SERVER['HTTP_X_FILE_SIZE'])) {
-            if ($_SERVER['CONTENT_LENGTH'] != $_SERVER['HTTP_X_FILE_SIZE']) {
+        if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
+            if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
                 exit('Warning, wrong headers');
             }
         }
-        $fileNameH = $_SERVER['HTTP_X_FILE_NAME'];
-        $fileSizeH = $_SERVER['CONTENT_LENGTH'];
+        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+        $fileSizeH = $serverData['CONTENT_LENGTH'];
 
         if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
             $httpVars["dir"] = "/";
@@ -72,51 +79,60 @@ class SimpleUploadProcessor extends Plugin
         $this->logDebug("SimpleUpload::preProcess", $httpVars);
 
         if ($headersCheck) {
-            // create the object and assign property
-            $fileVars["userfile_0"] = array(
-                "input_upload" => true,
-                "name"		   => TextEncoder::fromUTF8(basename($fileNameH)),
-                "size"		   => $fileSizeH
-            );
+            /** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
+            $uploadedFile = array_shift($request->getUploadedFiles());
+            // Update UploadedFile object built on input stream with file name and size
+            $uploadedFile = new \Zend\Diactoros\UploadedFile($uploadedFile->getStream(), $fileNameH, $uploadedFile->getError(), TextEncoder::fromUTF8(basename($fileNameH)));
+            $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
         } else {
-            exit("Warning, missing headers!");
+            throw new \Pydio\Core\Exception\PydioException("Warning, missing headers!");
         }
     }
 
-    public function postProcess($action, $httpVars, $postProcessData)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     */
+    public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
+        $httpVars = $request->getParsedBody();
         if (!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"]) && !isSet($httpVars["force_post"])) {
-            return false;
+            return;
         }
         $this->logDebug("SimpleUploadProc is active");
-        $result = $postProcessData["processor_result"];
+        $result = $request->getAttribute("upload_process_result");
 
         if (isSet($httpVars["simple_uploader"])) {
+            $response = $response->withHeader("Content-type", "text/html; charset=UTF-8");
             print("<html><script language=\"javascript\">\n");
             if (isSet($result["ERROR"])) {
                 $message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
-                print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
+                $response->getBody()->write("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
             } else {
                 print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
                     $s = '<tree>';
                     $s .= XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
-                    print("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
-                    print("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
+                    $response->getBody()->write("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
+                    $response->getBody()->write("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
                 }
             }
-            print("</script></html>");
+            $response->getBody()->write("</script></html>");
         } else {
             if (isSet($result["ERROR"])) {
                 $message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
-                exit($message);
+                $response = $response->withHeader("Content-type", "text/plain; charset=UTF-8");
+                $response->getBody()->write($message);
             } else {
-                XMLWriter::header();
+
+                $nodesDiff = "";
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
-                    XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), true);
+                    $nodesDiff = XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                 }
-                XMLWriter::close();
+                $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
+                $response->getBody()->write(XMLWriter::wrapDocument($nodesDiff));
+
                 /* for further implementation */
                 if (!isSet($result["PREVENT_NOTIF"])) {
                     if (isset($result["CREATED_NODE"])) {
@@ -125,10 +141,8 @@ class SimpleUploadProcessor extends Plugin
                         Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
                     }
                 }
-                //exit("OK");
             }
         }
-
     }
 
     public function unifyChunks($action, $httpVars, $fileVars)

@@ -32,9 +32,6 @@ AuthService::$useSession = false;
 ConfService::init();
 ConfService::start();
 
-$confStorageDriver = ConfService::getConfStorageImpl();
-require_once($confStorageDriver->getUserClassFileName());
-
 $pServ->initActivePlugins();
 
 /**

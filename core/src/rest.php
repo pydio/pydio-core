@@ -23,14 +23,11 @@
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 
 include_once("base.conf.php");
 
-set_error_handler(array("\Pydio\Core\Controller\XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-set_exception_handler(array("\Pydio\Core\Controller\XMLWriter", "catchException"));
+ConfService::registerCatchAll();
 
 $pServ = PluginsService::getInstance();
 ConfService::$useSession = false;
@@ -39,12 +36,8 @@ AuthService::$useSession = false;
 ConfService::init();
 ConfService::start();
 
-$confStorageDriver = ConfService::getConfStorageImpl();
-require_once($confStorageDriver->getUserClassFileName());
-//session_name("AjaXplorer");
-//session_start();
-
 PluginsService::getInstance()->initActivePlugins();
+
 AuthService::preLogUser(array_merge($_GET, $_POST));
 if(AuthService::getLoggedUser() == null){
     header('HTTP/1.0 401 Unauthorized');
@@ -54,15 +47,8 @@ if(AuthService::getLoggedUser() == null){
 $authDriver = ConfService::getAuthDriverImpl();
 ConfService::currentContextIsRestAPI("api");
 
-$uri = $_SERVER["REQUEST_URI"];
-$scriptUri = ltrim(Utils::safeDirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
-$uri = substr($uri, strlen($scriptUri));
-$uri = explode("/", trim($uri, "/"));
-// GET REPO ID
-$repoID = array_shift($uri);
-// GET ACTION NAME
-$action = array_shift($uri);
-$path = "/".implode("/", $uri);
+$request = Controller::initServerRequest(true);
+$repoID = $request->getAttribute("rest_repository_id");
 if($repoID == 'pydio'){
     ConfService::switchRootDir();
     $repo = ConfService::getRepository();
@@ -71,7 +57,6 @@ if($repoID == 'pydio'){
     if ($repo == null) {
         die("Cannot find repository with ID ".$repoID);
     }
-
     if(!ConfService::repositoryIsAccessible($repo->getId(), $repo, AuthService::getLoggedUser(), false, true)){
         header('HTTP/1.0 401 Unauthorized');
         echo 'You are not authorized to access this workspace.';
@@ -86,9 +71,10 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
 }
 PluginsService::getInstance()->initActivePlugins();
 
-$xmlResult = Controller::findRestActionAndApply($action, $path);
-if (!empty($xmlResult) && !headers_sent()) {
-    XMLWriter::header();
-    print($xmlResult);
-    XMLWriter::close();
+
+$action = Controller::parseRestParameters($request);
+$response = Controller::run($request, $action);
+if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse)) {
+    $emitter = new \Zend\Diactoros\Response\SapiEmitter();
+    $emitter->emit($response);
 }

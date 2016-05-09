@@ -20,17 +20,20 @@
  */
 namespace Pydio\Core\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\AJXP_Logger;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -77,12 +80,86 @@ class Controller
     }
 
     /**
-     * @param $actionName
-     * @param $path
-     * @return bool
+     * @bool $rest
+     * @return ServerRequestInterface
      */
-    public static function findRestActionAndApply($actionName, $path)
-    {
+    public static function initServerRequest($rest = false){
+
+        $request = ServerRequestFactory::fromGlobals();
+        $httpVars = $request->getQueryParams();
+        $postParams = $request->getParsedBody();
+        if(is_array($postParams)){
+            $httpVars = array_merge($httpVars, $postParams);
+        }
+        $request = $request->withParsedBody($httpVars);
+
+        if($rest){
+            $serverData = $request->getServerParams();
+            $uri = $serverData["REQUEST_URI"];
+            $scriptUri = ltrim(Utils::safeDirname($serverData["SCRIPT_NAME"]),'/')."/api/";
+            $uri = substr($uri, strlen($scriptUri));
+            $uri = explode("/", trim($uri, "/"));
+            $repoID = array_shift($uri);
+            $action = array_shift($uri);
+            $path = "/".implode("/", $uri);
+            return $request->withAttribute("action", $action)
+                ->withAttribute("rest_path", $path)
+                ->withAttribute("rest_repository_id", $repoID);
+
+        }else{
+            return $request;
+        }
+
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return static
+     */
+    public static function requestHandlerDetectAction(ServerRequestInterface &$request){
+        $serverData = $request->getServerParams();
+        $params = $request->getParsedBody();
+        if(isSet($params["get_action"])){
+            $action = $params["get_action"];
+        }else if(isSet($params["action"])){
+            $action = $params["action"];
+        }else if (preg_match('/MSIE 7/',$serverData['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$serverData['HTTP_USER_AGENT'])) {
+            $action = "get_boot_gui";
+        } else {
+            $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+        }
+        $request = $request->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS));
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @throws PydioException
+     */
+    public static function requestHandlerSecureToken(ServerRequestInterface $request){
+
+        $pluginsUnSecureActions = ConfService::getDeclaredUnsecureActions();
+        $unSecureActions = array_merge($pluginsUnSecureActions, array("get_secure_token"));
+        if (!in_array($request->getAttribute("action"), $unSecureActions) && AuthService::getSecureToken()) {
+            $params = $request->getParsedBody();
+            if(array_key_exists("secure_token", $params)){
+                $token = $params["secure_token"];
+            }
+            if ( !isSet($token) || !AuthService::checkSecureToken($token)) {
+                throw new PydioException("You are not allowed to access this resource.");
+            }
+        }
+    }
+
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return \DOMElement|bool
+     */
+    public static function parseRestParameters(ServerRequestInterface &$request){
+        $actionName = $request->getAttribute("action");
+        $path = $request->getAttribute("rest_path");
+        $reqParameters = $request->getParsedBody();
+
         $xPath = self::initXPath(true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
@@ -109,10 +186,11 @@ class Controller
         if (count($paramValues) < count($paramNames)) {
             $paramNames = array_slice($paramNames, 0, count($paramValues));
         }
-        $paramValues = array_map(array("Pydio\Core\Utils\TextEncoder", "toUTF8"), $paramValues);
-        $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
-        return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
+        $paramValues = array_map(array("Pydio\\Core\\Utils\\TextEncoder", "toUTF8"), $paramValues);
 
+        $reqParameters = array_merge($reqParameters, array_combine($paramNames, $paramValues));
+        $request = $request->withParsedBody($reqParameters);
+        return $action;
     }
 
     /**
@@ -151,15 +229,14 @@ class Controller
      * Main method for querying the XML registry, find an action and all its associated processors,
      * and apply all the callbacks.
      * @static
-     * @param String $actionName
-     * @param array $httpVars
-     * @param array $fileVars
-     * @param \DOMNode $action
-     * @return mixed
+     * @param ServerRequestInterface $request
+     * @param \DOMNode $actionNode
+     * @return ResponseInterface
+     * @throws \Exception
      */
-    public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null)
+    public static function run(ServerRequestInterface $request, &$actionNode = null)
     {
-        $actionName = Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
+        $actionName = $request->getAttribute("action");
         if ($actionName == "cross_copy") {
             $pService = PluginsService::getInstance();
             $actives = $pService->getActivePlugins();
@@ -167,75 +244,72 @@ class Controller
             if (count($accessPlug)) {
                 foreach ($accessPlug as $key=>$objbect) {
                     if ($actives[$objbect->getId()] === true) {
-                        call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
+                        call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $request->getParsedBody());
                         break;
                     }
                 }
             }
-            self::$lastActionNeedsAuth = true;
-            return null;
+            throw new AuthRequiredException();
         }
         $xPath = self::initXPath(true);
-        if ($action == null) {
+        if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
             if (!$actions->length) {
-                self::$lastActionNeedsAuth = true;
-                return false;
+                throw new AuthRequiredException();
             }
-            $action = $actions->item(0);
+            $actionNode = $actions->item(0);
         }
         //Check Rights
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
-            if( $actionName != "logout" && Controller::actionNeedsRight($action, $xPath, "userLogged", "only") && $loggedUser == null){
-                    XMLWriter::header();
-                    XMLWriter::requireAuth();
-                    XMLWriter::close();
-                    exit(1);
+            if( $actionName != "logout" && Controller::actionNeedsRight($actionNode, $xPath, "userLogged", "only") && $loggedUser == null){
+                    throw new AuthRequiredException();
                 }
-            if( Controller::actionNeedsRight($action, $xPath, "adminOnly") &&
+            if( Controller::actionNeedsRight($actionNode, $xPath, "adminOnly") &&
                 ($loggedUser == null || !$loggedUser->isAdmin())){
-                    $mess = ConfService::getMessages();
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess[207]);
-                    XMLWriter::requireAuth();
-                    XMLWriter::close();
-                    exit(1);
+                    throw new AuthRequiredException("207");
                 }
-            if( Controller::actionNeedsRight($action, $xPath, "read") &&
+            if( Controller::actionNeedsRight($actionNode, $xPath, "read") &&
                 ($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRepositoryId().""))){
-                    XMLWriter::header();
                     if($actionName == "ls" & $loggedUser!=null
                         && $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
-                        XMLWriter::close();
-                        exit(1);
+                        // TODO : Set in Response object
+                        $response = new Response();
+                        $response->getBody()->write(XMLWriter::wrapDocument(""));
+                        return $response;
+                    }else{
+                        throw new AuthRequiredException("208");
                     }
-                    $mess = ConfService::getMessages();
-                    XMLWriter::sendMessage(null, $mess[208]);
-                    XMLWriter::requireAuth();
-                    XMLWriter::close();
-                    exit(1);
                 }
-            if( Controller::actionNeedsRight($action, $xPath, "write") &&
+            if( Controller::actionNeedsRight($actionNode, $xPath, "write") &&
                 ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId().""))){
-                    $mess = ConfService::getMessages();
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess[207]);
-                    XMLWriter::requireAuth();
-                    XMLWriter::close();
-                    exit(1);
+                    throw new AuthRequiredException("207");
                 }
         }
 
-        $preCalls = self::getCallbackNode($xPath, $action, 'pre_processing/serverCallback', $actionName, $httpVars, $fileVars, true);
-        $postCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[not(@capture="true")]', $actionName, $httpVars, $fileVars, true);
-        $captureCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[@capture="true"]', $actionName, $httpVars, $fileVars, true);
-        $mainCall = self::getCallbackNode($xPath, $action, "processing/serverCallback",$actionName, $httpVars, $fileVars, false);
-        if ($mainCall != null) {
-            self::checkParams($httpVars, $mainCall, $xPath);
+        $queries = [
+            'pre_processing/serverCallback' => true,
+            'processing/serverCallback' => false,
+            'post_processing/serverCallback[not(@capture="true")]' => true,
+            'post_processing/serverCallback[@capture="true"]' => true
+        ];
+
+        $response = new Response();
+
+        foreach ($queries as $cbQuery => $multiple){
+            $calls = self::getCallbackNode($xPath, $actionNode, $cbQuery, $actionName, $request->getParsedBody(), $_FILES, $multiple);
+            if(!$multiple && count($calls)){
+                self::checkParams($httpVars, $calls[0], $xPath);
+            }
+            foreach ($calls as $call){
+                self::handleRequest($call, $request, $response);
+            }
         }
 
+        return $response;
+
+        /*
         if ($captureCalls !== false) {
             // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
             // executed AFTER the end of this one.
@@ -277,6 +351,7 @@ class Controller
             if(isSet($result)) return $result;
         }
         return null;
+        */
     }
 
     /**
@@ -419,12 +494,12 @@ class Controller
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return \DOMElement|bool|\DOMElement[]
+     * @return \DOMElement[]
      */
     private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true)
     {
         $callbacks = $xPath->query($query, $actionNode);
-        if(!$callbacks->length) return false;
+        if(!$callbacks->length) return [];
         if ($multiple) {
             $cbArray = array();
             foreach ($callbacks as $callback) {
@@ -432,12 +507,12 @@ class Controller
                     $cbArray[] = $callback;
                 }
             }
-            if(!count($cbArray)) return  false;
+            if(!count($cbArray)) return [];
             return $cbArray;
         } else {
             $callback=$callbacks->item(0);
-            if(!self::appliesCondition($callback, $actionName, $httpVars, $fileVars)) return false;
-            return $callback;
+            if(!self::appliesCondition($callback, $actionName, $httpVars, $fileVars)) return [];
+            return [$callback];
         }
     }
 
@@ -470,10 +545,10 @@ class Controller
      * @param array $fileVars
      * @param null $variableArgs
      * @param bool $defer
-     * @throws PydioException* @internal param \DOMXPath $xPath
+     * @throws PydioException
      * @return mixed
      */
-    private static function applyCallback($callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
+    private static function applyCallback($callback, &$variableArgs, $defer = false)
     {
         //Processing
         if(is_array($callback)){
@@ -487,19 +562,74 @@ class Controller
         //return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
         // Do not use call_user_func, it cannot pass parameters by reference.
         if (method_exists($plugInstance, $methodName)) {
-            if ($variableArgs == null) {
-                return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
+            if ($defer == true) {
+                ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
             } else {
-                if ($defer == true) {
-                    ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
-                } else {
-                    call_user_func_array(array($plugInstance, $methodName), $variableArgs);
-                }
+                call_user_func_array(array($plugInstance, $methodName), $variableArgs);
             }
         } else {
             throw new PydioException("Cannot find method $methodName for plugin $plugId!");
         }
         return null;
+    }
+
+    /**
+     * @param $callback
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     */
+    private static function handleRequest($callback, ServerRequestInterface &$request, ResponseInterface &$response){
+
+        list($plugInstance, $methodName) = self::parseCallback($callback);
+
+        $reflectMethod = new \ReflectionMethod($plugInstance, $methodName);
+        $reflectParams = $reflectMethod->getParameters();
+        $supportPSR = false;
+        foreach ($reflectParams as $reflectParam){
+            if($reflectParam->getClass() !== null && $reflectParam->getClass()->getName() == "Psr\\Http\\Message\\ServerRequestInterface"){
+                $supportPSR = true;
+                break;
+            }
+        }
+        if($supportPSR){
+
+            $plugInstance->$methodName($request, $response);
+
+        }else{
+
+            $httpVars = $request->getParsedBody();
+            $result = $plugInstance->$methodName($request->getAttribute("action"), $httpVars, $_FILES);
+            // May have been modified
+            $request = $request->withParsedBody($httpVars);
+
+            if(!empty($result)){
+                error_log("Action has result " . $request->getAttribute("action").", wrapping in XML Doc");
+                $response->getBody()->write(XMLWriter::wrapDocument($result));
+                $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
+            }
+        }
+
+    }
+
+    /**
+     * @param \DOMElement|array $callback
+     * @throws PydioException
+     * @return array
+     */
+    private static function parseCallback($callback){
+        if(is_array($callback)){
+            $plugId = $callback["pluginId"];
+            $methodName = $callback["methodName"];
+        }else{
+            $plugId = $callback->getAttribute("pluginId");
+            $methodName = $callback->getAttribute("methodName");
+        }
+        $plugInstance = PluginsService::findPluginById($plugId);
+        if(empty($plugInstance) || !method_exists($plugInstance, $methodName)){
+            throw new PydioException("Cannot find method $methodName for plugin $plugId!");
+        }
+        return [$plugInstance, $methodName];
     }
 
     /**
@@ -522,7 +652,7 @@ class Controller
                 }
                 $defer = $hook["defer"];
                 if($defer && $forceNonDefer) $defer = false;
-                self::applyCallback($hook, $fake1, $fake2, $fake3, $args, $defer);
+                self::applyCallback($hook, $args, $defer);
             }
             return;
         }
@@ -555,12 +685,12 @@ class Controller
             if($defer && $forceNonDefer) $defer = false;
             if($dontBreakOnException){
                 try{
-                    self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
+                    self::applyCallback($hookCallback, $args, $defer);
                 }catch(\Exception $e){
                     AJXP_Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
                 }
             }else{
-                self::applyCallback($hookCallback, $fake1, $fake2, $fake3, $args, $defer);
+                self::applyCallback($hookCallback, $args, $defer);
             }
         }
     }

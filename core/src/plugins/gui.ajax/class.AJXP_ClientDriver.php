@@ -21,6 +21,8 @@
 namespace Pydio\Gui\Ajax;
 
 use DOMXPath;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -57,6 +59,129 @@ class AJXP_ClientDriver extends Plugin
         if (!isSet($configData["CLIENT_TIMEOUT_TIME"])) {
             $this->pluginConf["CLIENT_TIMEOUT_TIME"] = intval(ini_get("session.gc_maxlifetime"));
         }
+    }
+
+    public function getBootGui(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        if (!defined("AJXP_THEME_FOLDER")) {
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
+        }
+        $mess = ConfService::getMessages();
+
+        $httpVars = $request->getParsedBody();
+        HTMLWriter::internetExplorerMainDocumentHeader($response);
+
+        if (!is_file(TESTS_RESULT_FILE)) {
+            $outputArray = array();
+            $testedParams = array();
+            $passed = Utils::runTests($outputArray, $testedParams);
+            if (!$passed && !isset($httpVars["ignore_tests"])) {
+                Utils::testResultsToTable($outputArray, $testedParams);
+                die();
+            } else {
+                Utils::testResultsToFile($outputArray, $testedParams);
+            }
+        }
+
+        $root = parse_url($request->getServerParams()['REQUEST_URI'], PHP_URL_PATH);
+        $configUrl = ConfService::getCoreConf("SERVER_URL");
+        if(!empty($configUrl)){
+            $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
+            if(strlen($root) > 1) $root = rtrim($root, '/').'/';
+        }else{
+            preg_match ('/ws-(.)*\/|settings|dashboard|welcome|user/', $root, $matches, PREG_OFFSET_CAPTURE);
+            if(count($matches)){
+                $capture = $matches[0][1];
+                $root = substr($root, 0, $capture);
+            }
+        }
+        $START_PARAMETERS = array(
+            "BOOTER_URL"        =>"index.php?get_action=get_boot_conf",
+            "MAIN_ELEMENT"      => "ajxp_desktop",
+            "APPLICATION_ROOT"  => $root,
+            "REBASE"            => $root
+        );
+        if (AuthService::usersEnabled()) {
+            AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
+            AuthService::bootSequence($START_PARAMETERS);
+            if (AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1) {
+                if (AuthService::getDefaultRootId() == -1) {
+                    AuthService::disconnect();
+                } else {
+                    $loggedUser = AuthService::getLoggedUser();
+                    if(!$loggedUser->canRead(ConfService::getCurrentRepositoryId())
+                        && AuthService::getDefaultRootId() != ConfService::getCurrentRepositoryId())
+                    {
+                        ConfService::switchRootDir(AuthService::getDefaultRootId());
+                    }
+                }
+            }
+        }
+
+        Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
+
+        $confErrors = ConfService::getErrors();
+        if (count($confErrors)) {
+            $START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
+        }
+        // PRECOMPUTE BOOT CONF
+        $userAgent = $request->getServerParams()['HTTP_USER_AGENT'];
+        if (!preg_match('/MSIE 7/',$userAgent) && !preg_match('/MSIE 8/',$userAgent)) {
+            $preloadedBootConf = $this->computeBootConf();
+            Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
+            $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
+        }
+
+        // PRECOMPUTE REGISTRY
+        if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
+            $clone = ConfService::getFilteredXMLRegistry(true, true);
+            $clonePath = new DOMXPath($clone);
+            $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+            foreach ($serverCallbacks as $callback) {
+                $callback->parentNode->removeChild($callback);
+            }
+            $START_PARAMETERS["PRELOADED_REGISTRY"] = XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+        }
+
+        $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
+        $crtTheme = $this->pluginConf["GUI_THEME"];
+        $additionalFrameworks = $this->getFilteredOption("JS_RESOURCES_BEFORE");
+        $ADDITIONAL_FRAMEWORKS = "";
+        if( !empty($additionalFrameworks) ){
+            $frameworkList = explode(",", $additionalFrameworks);
+            foreach($frameworkList as $index => $framework){
+                $frameworkList[$index] = '<script language="javascript" type="text/javascript" src="'.$framework.'"></script>'."\n";
+            }
+            $ADDITIONAL_FRAMEWORKS = implode("", $frameworkList);
+        }
+        if (ConfService::getConf("JS_DEBUG")) {
+            if (!isSet($mess)) {
+                $mess = ConfService::getMessages();
+            }
+            if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html")) {
+                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html");
+            } else {
+                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html");
+            }
+        } else {
+            if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui.html")) {
+                $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui.html");
+            } else {
+                $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
+            }
+            if (preg_match('/MSIE 7/',$userAgent)){
+                $ADDITIONAL_FRAMEWORKS = "";
+            }
+            $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
+            $content = XMLWriter::replaceAjxpXmlKeywords($content, false);
+            $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
+            if ($JSON_START_PARAMETERS) {
+                $content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
+            }
+            $response->getBody()->write($content);
+        }
+
     }
 
     public function switchAction($action, $httpVars, $fileVars)

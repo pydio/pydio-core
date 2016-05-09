@@ -20,8 +20,7 @@
  */
 namespace Pydio\Core\Controller;
 
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Services\AuthService;
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -96,12 +95,23 @@ class HTMLWriter
      * Send a simple Content-type header
      * @static
      */
-    public static function internetExplorerMainDocumentHeader()
+    public static function internetExplorerMainDocumentHeader(ResponseInterface &$response = null)
     {
         if (strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.")) {
-            header("X-UA-Compatible: IE=9");
+            if(isSet($response)){
+                $response = $response->withHeader("X-UA-Compatible", "IE=9");
+            }else{
+                header("X-UA-Compatible: IE=9");
+            }
         } else if (strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")) {
-            header("X-UA-Compatible: IE=Edge,chrome=1");
+            if(isSet($response)){
+                $response = $response->withHeader("X-UA-Compatible", "IE=Edge, chrome=1");
+            }else{
+                header("X-UA-Compatible: IE=Edge,chrome=1");
+            }
+        }
+        if(isSet($response)){
+            $response = $response->withHeader("Content-type", "text/html; charset=utf-8");
         }
     }
 

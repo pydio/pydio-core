@@ -26,6 +26,9 @@ use DOMXPath;
 use finfo;
 use Normalizer;
 use PclZip;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\AJXP_Node;
@@ -249,6 +252,170 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $files;
     }
 
+    protected function writeUploadError(ServerRequestInterface &$request, $message, $code){
+        $request = $request->withAttribute("upload_process_result", ["ERROR" => ["CODE" => $code, "MESSAGE" => $message]]);
+    }
+
+    protected function writeUploadSuccess(ServerRequestInterface &$request, $nodeData){
+        $arr = array_merge(["SUCCESS" => true], $nodeData);
+        $request = $request->withAttribute("upload_process_result", $arr);
+    }
+
+    public function uploadAction(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $selection = new UserSelection($this->repository);
+        $httpVars = $request->getParsedBody();
+        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+            $dir = fsAccessWrapper::patchPathForBaseDir($dir);
+        }
+        $dir = Utils::securePath($dir);
+        $selection->initFromHttpVars($httpVars);
+        if (!$selection->isEmpty()) {
+            $this->filterUserSelectionToHidden($selection->getFiles());
+        }
+        $mess = ConfService::getMessages();
+
+        $repoData = array(
+            'base_url' => $this->urlBase,
+            'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
+            'recycle'     => $this->repository->getOption('RECYCLE_BIN')
+        );
+        $this->logDebug("Upload Files Data", $request->getUploadedFiles());
+
+        $destination=$this->urlBase.Utils::decodeSecureMagic($dir);
+        $this->logDebug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
+        if (!$this->isWriteable($destination)) {
+            $errorCode = 412;
+            $errorMessage = "$mess[38] ".TextEncoder::toUTF8($dir)." $mess[99].";
+            $this->logDebug("Upload error 412", array("destination"=>$this->addSlugToPath($destination)));
+            $this->writeUploadError($request, $errorMessage, $errorCode);
+            return;
+        }
+
+        $partialUpload = false;
+        $partialTargetSize = -1;
+        $originalAppendTo = "";
+        $createdNode = null;
+
+        /** @var UploadedFileInterface[] $uploadedFiles */
+        $uploadedFiles = $request->getUploadedFiles();
+        foreach ($uploadedFiles as $parameterName => $uploadedFile){
+            if(substr($parameterName, 0, 9) != "userfile_") continue;
+            
+            try{
+                // CHECK PHP UPLOAD ERRORS
+                Utils::parseFileDataErrors($uploadedFile, true);
+
+                // FIND PROPER FILE NAME
+                $userfile_name=Utils::sanitize(TextEncoder::fromPostedFileName($uploadedFile->getClientFileName()), AJXP_SANITIZE_FILENAME);
+                if (isSet($httpVars["urlencoded_filename"])) {
+                    $userfile_name = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
+                }
+                $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+                if (isSet($httpVars["auto_rename"])) {
+                    $userfile_name = self::autoRenameForDest($destination, $userfile_name);
+                }
+                $this->logDebug("User filename ".$userfile_name);
+                if(class_exists("Normalizer")){
+                    $userfile_name = Normalizer::normalize($userfile_name, Normalizer::FORM_C);
+                }
+
+                // CHECK IF THIS IS A FORBIDDEN FILENAME
+                $this->filterUserSelectionToHidden(array($userfile_name));
+
+                // APPLY PRE-UPLOAD HOOKS
+                $already_existed = false;
+                try {
+                    $newFileSize = $uploadedFile->getSize();
+                    $targetUrl = $destination."/".$userfile_name;
+                    $targetNode = new AJXP_Node($targetUrl);
+                    if (file_exists($targetUrl)) {
+                        $already_existed = true;
+                        Controller::applyHook("node.before_change", array($targetNode, $newFileSize));
+                    } else {
+                        Controller::applyHook("node.before_create", array($targetNode, $newFileSize));
+                    }
+                    Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
+                } catch (\Exception $e) {
+                    throw new \Exception($e->getMessage(), 507);
+                }
+
+                // PARTIAL UPLOAD CASE - PREPPEND .dlpart extension
+                if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true' && isSet($httpVars["partial_target_bytesize"])){
+                    $partialUpload = true;
+                    $partialTargetSize = intval($httpVars["partial_target_bytesize"]);
+                    if(!isSet($httpVars["appendto_urlencoded_part"])){
+                        $userfile_name .= ".dlpart";
+                    }
+                }
+
+                // NOW DO THE ACTUAL COPY
+                $this->copyUploadedData($uploadedFile, $destination, $userfile_name, $mess);
+
+                // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
+                if (isSet($httpVars["appendto_urlencoded_part"])) {
+                    $appendTo = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
+                    if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
+                        $originalAppendTo = $appendTo;
+                        $appendTo .= ".dlpart";
+                    }
+                    $this->logDebug("AppendTo FILE".$appendTo);
+                    $already_existed = $this->appendUploadedData($destination, $userfile_name, $appendTo);
+                    $userfile_name = $appendTo;
+                    if($partialUpload && $partialTargetSize == filesize($destination."/".$userfile_name)){
+                        // This was the last part. We can now rename to the original name.
+                        if(is_file($destination."/".$originalAppendTo)){
+                            unlink($destination."/".$originalAppendTo);
+                        }
+                        $result = @rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
+                        if($result === false){
+                            throw new \Exception("Error renaming ".$destination."/".$userfile_name." to ".$destination."/".$originalAppendTo);
+                        }
+                        $userfile_name = $originalAppendTo;
+                        $partialUpload = false;
+                        // Send a create event!
+                        $already_existed = false;
+                    }
+                }
+
+                // NOW PREPARE POST-UPLOAD EVENTS
+                $this->changeMode($destination."/".$userfile_name,$repoData);
+                $createdNode = new AJXP_Node($destination."/".$userfile_name);
+                clearstatcache(true, $createdNode->getUrl());
+                $createdNode->loadNodeInfo(true);
+                $logFile = $this->addSlugToPath(TextEncoder::fromUTF8($dir))."/".$userfile_name;
+                $this->logInfo("Upload File", array("file"=>$logFile, "files"=> $logFile ) );
+
+                if($partialUpload){
+                    $this->logDebug("Return Partial Upload: SUCESS but no event yet");
+                    if(isSet($already_existed) && $already_existed === true){
+                        $this->writeUploadSuccess($request, ["PARTIAL_NODE" => $createdNode]);
+                        return;
+                    }
+                } else {
+                    $this->logDebug("Return success");
+                    if(isSet($already_existed) && $already_existed === true){
+                        $this->writeUploadSuccess($request, ["UPDATED_NODE" => $createdNode]);
+                        return;
+                    }else{
+                        $this->writeUploadSuccess($request, ["CREATED_NODE" => $createdNode]);
+                        return;
+                    }
+                }
+
+            }catch(\Exception $e){
+                $errorCode = $e->getCode();
+                if(empty($errorCode)) $errorCode = 411;
+                $this->writeUploadError($request, $e->getMessage(), $errorCode);
+                return;
+            }
+
+        }
+        $this->writeUploadError($request, "Could not find any uploaded file", 411);
+
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         parent::accessPreprocess($action, $httpVars, $fileVars);
@@ -258,9 +425,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
         $dir = Utils::securePath($dir);
-        if ($action != "upload") {
-            $dir = Utils::decodeSecureMagic($dir);
-        }
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getFiles());
@@ -713,141 +877,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "files"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes());
-
-            break;
-
-            //------------------------------------
-            //	UPLOAD
-            //------------------------------------
-            case "upload":
-
-                $repoData = array(
-                    'base_url' => $this->urlBase,
-                    'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
-                    'recycle'     => $this->repository->getOption('RECYCLE_BIN')
-                );
-                $this->logDebug("Upload Files Data", $fileVars);
-                $destination=$this->urlBase.Utils::decodeSecureMagic($dir);
-                $this->logDebug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
-                if (!$this->isWriteable($destination)) {
-                    $errorCode = 412;
-                    $errorMessage = "$mess[38] ".TextEncoder::toUTF8($dir)." $mess[99].";
-                    $this->logDebug("Upload error 412", array("destination"=>$this->addSlugToPath($destination)));
-                    return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
-                }
-
-                $partialUpload = false;
-                $partialTargetSize = -1;
-                $originalAppendTo = "";
-                $createdNode = null;
-
-                foreach ($fileVars as $boxName => $boxData) {
-                    if(substr($boxName, 0, 9) != "userfile_") continue;
-
-                    try{
-                        // CHECK PHP UPLOAD ERRORS
-                        Utils::parseFileDataErrors($boxData, true);
-
-                        // FIND PROPER FILE NAME
-                        $userfile_name=Utils::sanitize(TextEncoder::fromPostedFileName($boxData["name"]), AJXP_SANITIZE_FILENAME);
-                        if (isSet($httpVars["urlencoded_filename"])) {
-                            $userfile_name = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
-                        }
-                        $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-                        if (isSet($httpVars["auto_rename"])) {
-                            $userfile_name = self::autoRenameForDest($destination, $userfile_name);
-                        }
-                        $this->logDebug("User filename ".$userfile_name);
-                        if(class_exists("Normalizer")){
-                            $userfile_name = Normalizer::normalize($userfile_name, Normalizer::FORM_C);
-                        }
-
-                        // CHECK IF THIS IS A FORBIDDEN FILENAME
-                        $this->filterUserSelectionToHidden(array($userfile_name));
-
-                        // APPLY PRE-UPLOAD HOOKS
-                        $already_existed = false;
-                        try {
-                            if (file_exists($destination."/".$userfile_name)) {
-                                $already_existed = true;
-                                Controller::applyHook("node.before_change", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
-                            } else {
-                                Controller::applyHook("node.before_create", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
-                            }
-                            Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
-                        } catch (\Exception $e) {
-                            throw new \Exception($e->getMessage(), 507);
-                        }
-
-                        // PARTIAL UPLOAD CASE - PREPPEND .dlpart extension
-                        if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true' && isSet($httpVars["partial_target_bytesize"])){
-                            $partialUpload = true;
-                            $partialTargetSize = intval($httpVars["partial_target_bytesize"]);
-                            if(!isSet($httpVars["appendto_urlencoded_part"])){
-                                $userfile_name .= ".dlpart";
-                            }
-                        }
-
-                        // NOW DO THE ACTUAL COPY
-                        $this->copyUploadedData($boxData, $destination, $userfile_name, $mess);
-
-                        // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
-                        if (isSet($httpVars["appendto_urlencoded_part"])) {
-                            $appendTo = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
-                            if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
-                                $originalAppendTo = $appendTo;
-                                $appendTo .= ".dlpart";
-                            }
-                            $this->logDebug("AppendTo FILE".$appendTo);
-                            $already_existed = $this->appendUploadedData($destination, $userfile_name, $appendTo);
-                            $userfile_name = $appendTo;
-                            if($partialUpload && $partialTargetSize == filesize($destination."/".$userfile_name)){
-                                // This was the last part. We can now rename to the original name.
-                                if(is_file($destination."/".$originalAppendTo)){
-                                    unlink($destination."/".$originalAppendTo);
-                                }
-                                $result = @rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
-                                if($result === false){
-                                    throw new \Exception("Error renaming ".$destination."/".$userfile_name." to ".$destination."/".$originalAppendTo);
-                                }
-                                $userfile_name = $originalAppendTo;
-                                $partialUpload = false;
-                                // Send a create event!
-                                $already_existed = false;
-                            }
-                        }
-
-                        // NOW PREPARE POST-UPLOAD EVENTS
-                        $this->changeMode($destination."/".$userfile_name,$repoData);
-                        $createdNode = new AJXP_Node($destination."/".$userfile_name);
-                        clearstatcache(true, $createdNode->getUrl());
-                        $createdNode->loadNodeInfo(true);
-                        $logMessage.="$mess[34] ".TextEncoder::toUTF8($userfile_name)." $mess[35] $dir";
-                        $logFile = $this->addSlugToPath(TextEncoder::fromUTF8($dir))."/".$userfile_name;
-                        $this->logInfo("Upload File", array("file"=>$logFile, "files"=> $logFile ) );
-
-                        if($partialUpload){
-                            $this->logDebug("Return Partial Upload: SUCESS but no event yet");
-                            if(isSet($already_existed) && $already_existed === true){
-                                return array("SUCCESS" => true, "PARTIAL_NODE" => $createdNode);
-                            }
-                        } else {
-                            $this->logDebug("Return success");
-                            if(isSet($already_existed) && $already_existed === true){
-                                return array("SUCCESS" => true, "UPDATED_NODE" => $createdNode);
-                            }else{
-                                return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
-                            }
-                        }
-
-                    }catch(\Exception $e){
-                        $errorCode = $e->getCode();
-                        if(empty($errorCode)) $errorCode = 411;
-                        return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $e->getMessage()));
-                    }
-
-                }
-
 
             break;
 
@@ -1316,7 +1345,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
     /**
-     * @param array $uploadData Php-upload array
+     * @param array|UploadedFileInterface $uploadData Php-upload array
      * @param String $destination Destination folder, including stream data
      * @param String $filename Destination filename
      * @param array $messages Application messages table
@@ -1324,13 +1353,25 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      * @throws \Exception
      */
     protected function copyUploadedData($uploadData, $destination, $filename, $messages){
-        if (isSet($uploadData["input_upload"])) {
+        if(is_array($uploadData)){
+            $isInputStream = isSet($uploadData["input_upload"]);
+            $newFileSize = $uploadData["size"];
+        }else{
+            $isInputStream = $uploadData->getStream() !== null;
+            $newFileSize = $uploadData->getSize();
+        }
+
+        if ($isInputStream) {
             try {
                 $this->logDebug("Begining reading INPUT stream");
-                $input = fopen("php://input", "r");
+                if(is_array($uploadData)){
+                    $input = fopen("php://input", "r");
+                }else{
+                    $input = $uploadData->getStream()->detach();
+                }
                 $output = fopen("$destination/".$filename, "w");
                 $sizeRead = 0;
-                while ($sizeRead < intval($uploadData["size"])) {
+                while ($sizeRead < intval($newFileSize)) {
                     $chunk = fread($input, 4096);
                     $sizeRead += strlen($chunk);
                     fwrite($output, $chunk, strlen($chunk));
@@ -1342,10 +1383,28 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 throw new \Exception($e->getMessage(), 411);
             }
         } else {
-            $result = @move_uploaded_file($uploadData["tmp_name"], "$destination/".$filename);
-            if (!$result) {
-                $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
-                $result = move_uploaded_file($uploadData["tmp_name"], $realPath);
+            if(is_array($uploadData)){
+                $result = @move_uploaded_file($uploadData["tmp_name"], "$destination/".$filename);
+                if (!$result) {
+                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
+                    $result = move_uploaded_file($uploadData["tmp_name"], $realPath);
+                }
+            }else{
+                $clone = clone $uploadData;
+                try{
+                    $uploadData->moveTo($destination."/".$filename);
+                    $result = true;
+                }catch(\Exception $e){
+                    // Can be blocked by open_basedir, try to perform the move again, with the
+                    // real FS reference.
+                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
+                    try{
+                        $clone->moveTo($realPath);
+                        $result = true;
+                    }catch(\Exception $e){
+                        $result = false;
+                    }
+                }
             }
             if (!$result) {
                 $errorMessage="$messages[33] ".$filename;

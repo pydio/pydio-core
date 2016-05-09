@@ -24,9 +24,7 @@ use DOMXPath;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Repository;
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Core\Services\AuthService;
 use Pydio\Cache\Core\AbstractCacheDriver;
-use Pydio\Core\Services\CacheService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\CoreConfLoader;
@@ -65,6 +63,13 @@ class ConfService
 
     private $contextRepositoryId;
     private $contextCharset;
+
+    public static function registerCatchAll(){
+        if (is_file(TESTS_RESULT_FILE)) {
+            set_error_handler(array("Pydio\\Core\\Controller\\XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+            set_exception_handler(array("Pydio\\Core\\Controller\\XMLWriter", "catchException"));
+        }
+    }
 
     /**
      * @return AbstractConfDriver
@@ -165,6 +170,8 @@ class ConfService
     {
         $inst = self::getInstance();
         $inst->startInst();
+        $confStorageDriver = self::getConfStorageImpl();
+        require_once($confStorageDriver->getUserClassFileName());
     }
     /**
      * Init CONF, AUTH drivers

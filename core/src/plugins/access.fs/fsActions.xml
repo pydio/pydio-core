@@ -178,7 +178,7 @@
 						modal.showDialogForm('Upload', uploader.formId, dialogOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
+				<serverCallback methodName="uploadAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
                     <input_param description="Target path in the workspace of the file to upload" name="node" type="string" mandatory="true"/>
                     <input_param description="Flag that the file content is passed via the php://input stream instead of standard $_FILES data" name="input_upload" type="boolean" default="false"/>
                     <input_param description="Automatically detect if there is an existing file with that name, and add a number suffix to the new file." name="auto_rename" type="boolean"/>

@@ -38,8 +38,6 @@ AuthService::$useSession = false;
 ConfService::init();
 ConfService::start();
 
-$confStorageDriver = ConfService::getConfStorageImpl();
-require_once($confStorageDriver->getUserClassFileName());
 $authDriver = ConfService::getAuthDriverImpl();
 ConfService::currentContextIsRestAPI("api");
 PluginsService::getInstance()->initActivePlugins();

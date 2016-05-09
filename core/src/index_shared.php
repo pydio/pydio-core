@@ -18,11 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-$OVERRIDE_SESSION = true;
+include_once("base.conf.php");
+//$OVERRIDE_SESSION = true;
 $h = '';
 if(isSet($_GET['minisite_session'])){
     $h = $_GET['minisite_session'];
 }
 
-session_name("AjaXplorer_Shared".str_replace(".","_",$h));
+//session_name("AjaXplorer_Shared".str_replace(".","_",$h));
+\Pydio\Core\Services\SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
 include("index.php");

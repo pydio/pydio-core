@@ -20,17 +20,12 @@
  */
 namespace Pydio\Core\Utils;
 
+use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\Repository;
-use Pydio\Core\dibi;
-use Pydio\Core\DibiException;
-use Pydio\Core\HttpClient;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\TextEncoder;
-use Pydio\Core\Utils\VarsFilter;
-use Pydio\Core\Utils\JSPacker;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -334,7 +329,7 @@ class Utils
     /**
      * Parse the $fileVars[] PHP errors
      * @static
-     * @param $boxData
+     * @param array|UploadedFileInterface $boxData
      * @param bool $throwException
      * @return array|null
      * @throws \Exception
@@ -342,9 +337,15 @@ class Utils
     public static function parseFileDataErrors($boxData, $throwException=false)
     {
         $mess = ConfService::getMessages();
-        $userfile_error = $boxData["error"];
-        $userfile_tmp_name = $boxData["tmp_name"];
-        $userfile_size = $boxData["size"];
+        if(is_array($boxData)){
+            $userfile_error = $boxData["error"];
+            $userfile_tmp_name = $boxData["tmp_name"];
+            $userfile_size = $boxData["size"];
+        }else{
+            $userfile_error = $boxData->getError();
+            $userfile_size = $boxData->getSize();
+            $userfile_tmp_name = "";
+        }
         if ($userfile_error != UPLOAD_ERR_OK) {
             $errorsArray = array();
             $errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409, str_replace("%i", ini_get("upload_max_filesize"), $mess["537"]));
@@ -1905,21 +1906,21 @@ class Utils
                 $allParts = array_merge($allParts, $parts);
             }
         }
-        dibi::connect($p);
-        dibi::begin();
+        \dibi::connect($p);
+        \dibi::begin();
         foreach ($allParts as $createPart) {
             $sqlPart = trim($createPart);
             if (empty($sqlPart)) continue;
             try {
-                dibi::nativeQuery($sqlPart);
+                \dibi::nativeQuery($sqlPart);
                 $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
                 $result[] = "OK: $resKey executed successfully";
-            } catch (DibiException $e) {
+            } catch (\DibiException $e) {
                 $result[] = "ERROR! $sqlPart failed";
             }
         }
-        dibi::commit();
-        dibi::disconnect();
+        \dibi::commit();
+        \dibi::disconnect();
         $message = implode("\n", $result);
         if (strpos($message, "ERROR!")) return $message;
         else return "SUCCESS:".$message;

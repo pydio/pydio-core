@@ -46,11 +46,6 @@ header("Pragma: no-cache");
 ConfService::init();
 ConfService::start();
 
-$confStorageDriver = ConfService::getConfStorageImpl();
-require_once($confStorageDriver->getUserClassFileName());
-//session_name("AjaXplorer");
-//session_start();
-
 
 $optArgs = array();
 $options = array();
@@ -231,7 +226,7 @@ if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {
     if (!empty($nextUsers)) {
         sleep(1);
         $process = Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
-        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
+        if ($process != null && is_a($process, "Pydio\\Core\\Utils\\UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
@@ -239,14 +234,14 @@ if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {
         sleep(1);
         //echo("Should go to next with $optUserQueue");
         $process = Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
-        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
+        if ($process != null && is_a($process, "Pydio\\Core\\Utils\\UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
     if (!empty($nextRepositories)) {
         sleep(1);
         $process = Controller::applyActionInBackground($nextRepositories, $optAction, $optArgs, $originalOptUser, $optStatusFile);
-        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
+        if ($process != null && is_a($process, "Pydio\\Core\\Utils\\UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }

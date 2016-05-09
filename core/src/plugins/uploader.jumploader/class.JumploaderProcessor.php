@@ -47,9 +47,13 @@ class JumploaderProcessor extends Plugin
     private static $wrapperIsRemote = false;
     private static $partitions = array();
 
-    public function preProcess($action, &$httpVars, &$fileVars)
+    public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
-        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
+        $httpVars = $request->getParsedBody();
+
+        if(isSet($httpVars["simple_uploader"]) || isset($httpVars["xhr_uploader"]) || isSet($httpVars["Filename"])){
+            return;
+        }
         $repository = ConfService::getRepository();
         $driver = ConfService::loadDriverForRepository($repository);
 
@@ -67,12 +71,14 @@ class JumploaderProcessor extends Plugin
             self::$wrapperIsRemote = call_user_func(array($wrapperName, "isRemote"));
         }
         $this->logDebug("Jumploader HttpVars", $httpVars);
-        $this->logDebug("Jumploader FileVars", $fileVars);
 
 
         $httpVars["dir"] = base64_decode(str_replace(" ","+",$httpVars["dir"]));
         $index = $httpVars["partitionIndex"];
-        $realName = $fileVars["userfile_0"]["name"];
+        /** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
+        $uploadedFile = $request->getUploadedFiles()["userfile_0"];
+        $realName = $uploadedFile->getClientFilename();
+        //$realName = $fileVars["userfile_0"]["name"];
 
         /* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
         if (!isSet($httpVars["fileId"])) {
@@ -133,7 +139,10 @@ class JumploaderProcessor extends Plugin
              * Now named after and md5() of the original file name.
              */
             $this->logDebug("Filename: " . $realName . ", File hash: " . $fileHash);
-            $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
+            //$fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
+            $newUp = new \Zend\Diactoros\UploadedFile($_FILES["userfile_0"]["tmp_name"], $uploadedFile->getSize(), $uploadedFile->getError(), "$fileHash.$fileId.$index");
+            $request = $request->withUploadedFiles(["userfile_0" => $newUp]);
+
             $httpVars["lastPartition"] = false;
         }else{
             /*
@@ -147,7 +156,10 @@ class JumploaderProcessor extends Plugin
              *
              */
             $file_tmp_md5 = md5($httpVars["relativePath"]);
-            $fileVars["userfile_0"]["name"] = $file_tmp_md5;
+            //$fileVars["userfile_0"]["name"] = $file_tmp_md5;
+            $newUp = new \Zend\Diactoros\UploadedFile($_FILES["userfile_0"]["tmp_name"], $uploadedFile->getSize(), $uploadedFile->getError(), $file_tmp_md5);
+            $request = $request->withUploadedFiles(["userfile_0" => $newUp]);
+
         }
 
 
@@ -157,19 +169,29 @@ class JumploaderProcessor extends Plugin
             $httpVars["lastPartition"] = true;
             $httpVars["partitionRealName"] = $realName;
         }
+
+        $request = $request->withParsedBody($httpVars);
+
     }
 
-    public function postProcess($action, $httpVars, $postProcessData)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @return void
+     * @throws Exception
+     */
+    public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
-        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
+        $httpVars = $request->getParsedBody();
+        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) {
+            return;
+        }
+        $response = $response->withHeader("Content-type", "text/plain");
 
         /* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
         if (isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
-            header("HTTP/1.1 200 OK");
-
-            print("fileId: " . $httpVars["resumeFileId"] . "\n");
-            print("partitionIndex: " . $httpVars["resumePartitionIndex"]);
-
+            $response->getBody()->write("fileId: " . $httpVars["resumeFileId"] . "\n");
+            $response->getBody()->write("partitionIndex: " . $httpVars["resumePartitionIndex"]);
             return;
         }
 
@@ -177,7 +199,9 @@ class JumploaderProcessor extends Plugin
 
         }*/
 
-        if (isset($postProcessData["processor_result"]["ERROR"])) {
+        $result = $request->getAttribute("upload_process_result");
+
+        if (isset($result["ERROR"])) {
             if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
                 $repository = ConfService::getRepository();
@@ -202,7 +226,7 @@ class JumploaderProcessor extends Plugin
                     unlink($destStreamURL.$fileName);
                 }
             }
-            echo "Error: ".$postProcessData["processor_result"]["ERROR"]["MESSAGE"];
+            $response->getBody()->write("Error: ".$result["ERROR"]["MESSAGE"]);
             return;
         }
 
@@ -214,7 +238,7 @@ class JumploaderProcessor extends Plugin
         $driver = ConfService::loadDriverForRepository($repository);
 
         if (!$repository->detectStreamWrapper(false)) {
-            return false;
+            return;
         }
 
         if ($httpVars["lastPartition"]) {

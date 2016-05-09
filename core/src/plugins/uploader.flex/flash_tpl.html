@@ -1,4 +1,8 @@
 <?php 
+use Pydio\Core\Utils\Utils as AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService as AJXP_PluginsService;
+
     $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
 	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
 	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
@@ -116,7 +120,7 @@ if(configs.get("ALLOWED_EXTENSIONS") && configs.get("ALLOWED_EXTENSIONS_READABLE
 	flashVarExt = '&fileTypes='+exts.join(";")+'&fileTypeDescription='+escape(configs.get("ALLOWED_EXTENSIONS_READABLE"));
 }
 
-var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&secure_token='+parent.Connexion.SECURE_TOKEN+'&ajxp_sessid=<?php echo session_id(); ?>';
+var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&secure_token='+parent.Connexion.SECURE_TOKEN+'&ajxp_sessid=<?php echo session_id(); ?>&XDEBUG_SESSION=xdebug_ajaxplorer';
 
 var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
 var FlashVarValue = "<?php echo $FlashVar; ?>" + flashVarExt + "&uploadPage=" + escape(url) + "<?php echo (!empty($pluginConfigs['HTTPS_POLICY_FILE']) ? "&policyFile=".$pluginConfigs['HTTPS_POLICY_FILE'] : ""); ?>";

@@ -23,8 +23,8 @@ namespace Pydio\Core\Controller;
 use Pydio\Access\Core\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Repository;
+use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioPromptException;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
@@ -78,6 +78,28 @@ class XMLWriter
     public static function close($docNode="tree")
     {
         print("</$docNode>");
+    }
+
+    public static function wrapDocument($content, $docNode = "tree", $attributes = array()){
+
+        if(self::$headerSent !== false && self::$headerSent == $docNode) {
+            return $content;
+        }
+        //header('Content-Type: text/xml; charset=UTF-8');
+        //header('Cache-Control: no-cache');
+        $buffer = '<?xml version="1.0" encoding="UTF-8"?>';
+        $attString = "";
+        if (count($attributes)) {
+            foreach ($attributes as $name=>$value) {
+                $attString.="$name=\"$value\" ";
+            }
+        }
+        self::$headerSent = $docNode;
+        $buffer .= "<$docNode $attString>";
+        $buffer .= $content;
+        $buffer .= "</$docNode>";
+        return $buffer;
+
     }
 
     /**
@@ -294,6 +316,16 @@ class XMLWriter
      */
     public static function catchException($exception)
     {
+        if($exception instanceof AuthRequiredException){
+            XMLWriter::header();
+            $message = $exception->getMessage();
+            if(!empty($message)){
+                XMLWriter::sendMessage(null, $message);
+            }
+            XMLWriter::requireAuth();
+            XMLWriter::close();
+            return;
+        }
         try {
             XMLWriter::catchError($exception->getCode(), TextEncoder::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
         } catch (\Exception $innerEx) {

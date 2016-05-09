@@ -40,9 +40,6 @@ if (!ConfService::getCoreConf("WEBDAV_ENABLE")) {
     die('You are not allowed to access this service');
 }
 
-$confStorageDriver = ConfService::getConfStorageImpl();
-require_once($confStorageDriver->getUserClassFileName());
-
 PluginsService::getInstance()->initActivePlugins();
 
 /**

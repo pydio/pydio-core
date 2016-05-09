@@ -33,39 +33,41 @@ class FlexUploadProcessor extends Plugin
 {
     private static $active = false;
 
-    public function preProcess($action, &$httpVars, &$fileVars)
+    public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
+        $fileVars = $request->getUploadedFiles();
         if (isSet($fileVars["Filedata"])) {
             self::$active = true;
+            $httpVars = $request->getParsedBody();
             $this->logDebug("Dir before base64", $httpVars);
             $httpVars["dir"] = base64_decode(urldecode($httpVars["dir"]));
-            $fileVars["userfile_0"] = $fileVars["Filedata"];
-            unset($fileVars["Filedata"]);
+            $request = $request->withParsedBody($httpVars);
+
+            $existingUp = $_FILES["Filedata"];
+            $filename = $httpVars["Filename"];
+            // Rebuild UploadedFile object
+            $request = $request->withUploadedFiles(["userfile_0" => new \Zend\Diactoros\UploadedFile($existingUp["tmp_name"], $existingUp["size"], $existingUp["error"], $filename)]);
             $this->logDebug("Setting FlexProc active");
         }
     }
 
-    public function postProcess($action, $httpVars, $postProcessData)
+    public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
         if (!self::$active) {
-            return false;
+            return;
         }
-        $this->logDebug("FlexProc is active=".self::$active, $postProcessData);
-        $result = $postProcessData["processor_result"];
+        $result = $request->getAttribute("upload_process_result");
         if (isSet($result["SUCCESS"]) && $result["SUCCESS"] === true) {
-            header('HTTP/1.0 200 OK');
+            $response = new \Zend\Diactoros\Response\EmptyResponse(200);
             if (iSset($result["UPDATED_NODE"])) {
                 Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
             } else {
                 Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
             }
-            //die("200 OK");
         } else if (isSet($result["ERROR"]) && is_array($result["ERROR"])) {
             $code = $result["ERROR"]["CODE"];
             $message = $result["ERROR"]["MESSAGE"];
-
-            //header("HTTP/1.0 $code $message");
-            die("Error $code $message");
+            $response = $response->withStatus($code, $message);
         }
     }
 }

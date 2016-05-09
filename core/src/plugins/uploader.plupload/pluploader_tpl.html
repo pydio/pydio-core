@@ -1,4 +1,8 @@
 <?php 
+use Pydio\Core\Utils\Utils as AJXP_Utils;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService as AJXP_PluginsService;
+
     $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
     $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
     if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;

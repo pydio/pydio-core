@@ -186,12 +186,12 @@
 		<actions>
 			<action name="get_boot_gui" skipSecureToken="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="getBootGui"/>
 				</processing>
 			</action>
 			<action name="get_boot_conf" skipSecureToken="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 		</actions>
