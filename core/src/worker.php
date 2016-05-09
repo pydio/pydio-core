@@ -39,7 +39,7 @@ ConfService::init();
 ConfService::start();
 
 $authDriver = ConfService::getAuthDriverImpl();
-ConfService::currentContextIsRestAPI("api");
+ConfService::currentContextIsRestAPI("/api");
 PluginsService::getInstance()->initActivePlugins();
 
 function applyTask($userId, $repoId, $actionName, $parameters){
@@ -67,14 +67,15 @@ function applyTask($userId, $repoId, $actionName, $parameters){
     print("Init plugins\n");
     PluginsService::getInstance()->initActivePlugins();
 
-    //print "Current repos are" . implode(", ", array_keys(ConfService::getAccessibleRepositories()))."\n";
-
-    print("Apply Action\n");
-    $xmlResult = Controller::findActionAndApply($actionName, $parameters, []);
-    if (!empty($xmlResult) && !headers_sent()) {
-        XMLWriter::header();
-        print($xmlResult);
-        XMLWriter::close();
+    $fakeRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals(array(), array(), $parameters)->withAttribute("action", $actionName);
+    try{
+        $response = Controller::run($fakeRequest);
+        if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse)) {
+            echo $response->getBody();
+        }
+    }catch (Exception $e){
+        echo "ERROR : ".$e->getMessage()."\n";
+        echo print_r($e->getTraceAsString())."\n";
     }
 
     print("Empty ShutdownScheduler!\n");

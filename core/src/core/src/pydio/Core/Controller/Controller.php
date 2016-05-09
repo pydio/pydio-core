@@ -25,7 +25,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -33,7 +32,6 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\AJXP_Logger;
 use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -78,7 +76,7 @@ class Controller
         self::$xPath = null;
         self::$hooksCache = array();
     }
-    
+
 
     /**
      * @param ServerRequestInterface $request

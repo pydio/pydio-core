@@ -36,16 +36,8 @@ if (php_sapi_name() !== "cli") {
 
 include_once("base.conf.php");
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-cache, must-revalidate");
-header("Pragma: no-cache");
-//set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
-//set_exception_handler(array("AJXP_XMLWriter", "catchException"));
-
 ConfService::init();
 ConfService::start();
-
 
 $optArgs = array();
 $options = array();
@@ -195,12 +187,9 @@ if (AuthService::usersEnabled() && !empty($optUser)) {
 
 //Set language
 $loggedUser = AuthService::getLoggedUser();
-if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLanguage($loggedUser->getPref("lang"));
-else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
 $mess = ConfService::getMessages();
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-//$ajxpDriver = PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
@@ -209,16 +198,18 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
     $Driver = ConfService::loadDriverForRepository($loadRepo);
 }
 PluginsService::getInstance()->initActivePlugins();
-$xmlResult = Controller::findActionAndApply($optAction, $optArgs, array());
-if ($xmlResult !== false && $xmlResult != "") {
-    XMLWriter::header();
-    print($xmlResult);
-    XMLWriter::close();
-} else if (isset($requireAuth) && Controller::$lastActionNeedsAuth) {
-    XMLWriter::header();
-    XMLWriter::requireAuth();
-    XMLWriter::close();
+
+$fakeRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals(array(), array(), $optArgs)->withAttribute("action", $optAction);
+try{
+    $response = Controller::run($fakeRequest);
+    if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse)) {
+        echo $response->getBody();
+    }
+}catch (Exception $e){
+    echo "ERROR : ".$e->getMessage()."\n";
+    echo print_r($e->getTraceAsString())."\n";
 }
+
 //echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
 //echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
 if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {

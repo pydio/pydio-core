@@ -900,7 +900,7 @@ class Utils
             $api = ConfService::currentContextIsRestAPI();
             if(!empty($api)){
                 // Keep only before api base
-                $explode = explode("/".$api."/", $uri);
+                $explode = explode($api."/", $uri);
                 $uri = array_shift($explode);
             }
             return "$protocol://$name$port".$uri;

@@ -91,9 +91,10 @@ class Server
 
         if($this->mode == PYDIO_SERVER_MODE_REST){
 
+            $restBase = ConfService::currentContextIsRestAPI();
             $serverData = $request->getServerParams();
             $uri = $serverData["REQUEST_URI"];
-            $scriptUri = ltrim(Utils::safeDirname($serverData["SCRIPT_NAME"]),'/')."/api/";
+            $scriptUri = ltrim(Utils::safeDirname($serverData["SCRIPT_NAME"]),'/').$restBase."/";
             $uri = substr($uri, strlen($scriptUri));
             $uri = explode("/", trim($uri, "/"));
             $repoID = array_shift($uri);

@@ -27,7 +27,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 
 include_once("base.conf.php");
 
-ConfService::currentContextIsRestAPI("api");
+ConfService::currentContextIsRestAPI("/api");
 
 ConfService::registerCatchAll();
 ConfService::init();

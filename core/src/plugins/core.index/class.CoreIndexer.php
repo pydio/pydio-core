@@ -183,7 +183,7 @@ class CoreIndexer extends Plugin {
     /**
      * @param Repository $repository
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return string
      */
     protected function buildIndexLockKey($repository, $user){
         $scope = $repository->securityScope();
@@ -215,7 +215,7 @@ class CoreIndexer extends Plugin {
     /**
      * @param Repository $repository
      * @param AbstractAjxpUser $user
-     * @return Array Array(STATUS, Message)
+     * @return array Array(STATUS, Message)
      */
     protected function getIndexStatus($repository, $user)
     {
