@@ -28,33 +28,6 @@ class multiShortener extends Plugin
         $shorten = $this->generateLink($url);
     }
 
-    /**
-     * @param $action
-     * @param $httpVars
-     * @param $params
-     */
-    public function postProcess($action, $httpVars, $params)
-    {
-        $type = $this->getFilteredOption("SHORTEN_TYPE");
-        if(empty($type)) return;
-        $jsonData = json_decode($params["ob_output"], true);
-        $elementId = -1;
-        if ($jsonData != false) {
-            $url = $jsonData["publiclet_link"] ;
-            $elementId = $jsonData["element_id"];
-        } else {
-            $url = $params["ob_output"];
-        }
-
-        $res =  $this->generateLink($url);
-        if(!empty($res)){
-            $this->updateMetaShort($httpVars["file"], $elementId, $res);
-            print($res);
-        }else{
-            print($url);
-        }
-    }
-
     protected function generateLink($url){
 
         $type = $this->getFilteredOption("SHORTEN_TYPE");
@@ -173,38 +146,5 @@ class multiShortener extends Plugin
         return null;
 
     }
-
-    protected function updateMetaShort($file, $elementId, $shortUrl)
-    {
-        $context = new UserSelection(ConfService::getRepository());
-        $baseUrl = $context->currentBaseUrl();
-        $node = new AJXP_Node($baseUrl.$file);
-        if ($node->hasMetaStore()) {
-            $metadata = $node->retrieveMetadata(
-                "ajxp_shared",
-                true,
-                AJXP_METADATA_SCOPE_REPOSITORY
-            );
-            if ($elementId != -1) {
-                if (!is_array($metadata["element"][$elementId])) {
-                    $metadata["element"][$elementId] = array();
-                }
-                $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
-            } else {
-                if(isSet($metadata["shares"])){
-                    $key = array_pop(array_keys($metadata["shares"]));
-                    $metadata["shares"][$key]["short_form_url"] = $shortUrl;
-                }else{
-                    $metadata['short_form_url'] = $shortUrl;
-                }
-            }
-            $node->setMetadata(
-                "ajxp_shared",
-                $metadata,
-                true,
-                AJXP_METADATA_SCOPE_REPOSITORY
-            );
-        }
-    }
-
+    
 }

@@ -1416,6 +1416,15 @@ class ShareCenter extends Plugin
         $this->getPublicAccessManager()->initFolder();
         $hash = $shareObject->save();
         $url = $this->getPublicAccessManager()->buildPublicLink($hash);
+        $existingShortForm = $shareObject->getShortFormUrl();
+        if(empty($existingShortForm)){
+            $shortForm = "";
+            Controller::applyHook("url.shorten", array($url, &$shortForm));
+            if(!empty($shortForm)){
+                $shareObject->setShortFormUrl($shortForm);
+                $shareObject->save();
+            }
+        }
 
         // LOG AND PUBLISH EVENT
         $update = isSet($httpVars["repository_id"]);
