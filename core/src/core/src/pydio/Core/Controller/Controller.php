@@ -254,49 +254,6 @@ class Controller
 
         return $response;
 
-        /*
-        if ($captureCalls !== false) {
-            // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
-            // executed AFTER the end of this one.
-            ShutdownScheduler::getInstance();
-            ob_start();
-            $params = array("pre_processor_results" => array(), "post_processor_results" => array());
-        }
-        if ($preCalls !== false) {
-            foreach ($preCalls as $preCall) {
-                // A Preprocessing callback can modify its input arguments (passed by ref)
-                $preResult = self::applyCallback($preCall, $actionName, $httpVars, $fileVars);
-                if (isSet($params)) {
-                    $params["pre_processor_results"][$preCall->getAttribute("pluginId")] = $preResult;
-                }
-            }
-        }
-        if ($mainCall) {
-            $result = self::applyCallback($mainCall, $actionName, $httpVars, $fileVars);
-            if (isSet($params)) {
-                $params["processor_result"] = $result;
-            }
-        }
-        if ($postCalls !== false) {
-            foreach ($postCalls as $postCall) {
-                // A Preprocessing callback can modify its input arguments (passed by ref)
-                $postResult = self::applyCallback($postCall, $actionName, $httpVars, $fileVars);
-                if (isSet($params)) {
-                    $params["post_processor_results"][$postCall->getAttribute("pluginId")] = $postResult;
-                }
-            }
-        }
-        if ($captureCalls !== false) {
-            $params["ob_output"] = ob_get_contents();
-            ob_end_clean();
-            foreach ($captureCalls as $captureCall) {
-                self::applyCallback($captureCall, $actionName, $httpVars, $params);
-            }
-        } else {
-            if(isSet($result)) return $result;
-        }
-        return null;
-        */
     }
 
     /**

@@ -12,7 +12,8 @@
     "guzzlehttp/command": "~0.7",
     "guzzlehttp/guzzle-services": "~0.5",
     "gimler/guzzle-description-loader" : "*",
-    "commerceguys/guzzle-oauth2-plugin": "~2.0"
+    "commerceguys/guzzle-oauth2-plugin": "~2.0",
+    "nikic/fast-route":"~1.0"
   }
 
 }
