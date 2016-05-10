@@ -27,6 +27,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Tests\AbstractTest;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -1270,7 +1271,7 @@ class Utils
             $ALL_ROWS[$result][$item["name"]] = $item["info"];
         }
 
-        include(AJXP_INSTALL_PATH."/core/tests/startup.phtml");
+        include(AJXP_TESTS_FOLDER . "/startup.phtml");
     }
 
     /**
@@ -1291,9 +1292,10 @@ class Utils
         foreach ($files as $file) {
             require_once($file);
             // Then create the test class
-            $testName = "Pydio\\Tests\\".str_replace(".php", "", substr($file, 5));
-            if(!class_exists($testName)) continue;
+            $testName = "Pydio\\Tests\\".str_replace(".php", "", $file);
+            if(!class_exists($testName) || $testName == "Pydio\\Tests\\AbstractTest") continue;
             $class = new $testName();
+            if(!($class instanceof AbstractTest)) continue;
 
             $result = $class->doTest();
             if (!$result && $class->failedLevel != "info") $passed = false;
@@ -1333,6 +1335,7 @@ class Utils
             $class = new $testName();
             foreach ($repoList as $repository) {
                 if($repository->isTemplate || $repository->getParentId() != null) continue;
+                if(!($class instanceof AbstractTest)) continue;
                 $result = $class->doRepositoryTest($repository);
                 if ($result === false || $result === true) {
                     if (!$result && $class->failedLevel != "info") {

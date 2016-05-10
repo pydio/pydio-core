@@ -20,8 +20,6 @@
  */
 namespace Pydio\Tests;
 
-use Pydio\Access\Core\Model\Repository;
-
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 global $MAIN_testsArray;
@@ -33,7 +31,7 @@ global $MAIN_testsArray;
  * @package Pydio
  * @subpackage Core
  */
-class AbstractTest
+abstract class AbstractTest
 {
     /** The test name */
     public $name;
