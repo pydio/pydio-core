@@ -20,8 +20,8 @@
  */
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
@@ -101,8 +101,8 @@ class ImagePreviewer extends Plugin
 
     /**
      *
-     * @param AJXP_Node $oldFile
-     * @param AJXP_Node $newFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newFile
      * @param Boolean $copy
      */
     public function removeThumbnail($oldFile, $newFile = null, $copy = false)
@@ -149,7 +149,7 @@ class ImagePreviewer extends Plugin
     //public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
     /**
      * Enrich node metadata
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      */
     public function extractImageMetadata(&$ajxpNode)
     {

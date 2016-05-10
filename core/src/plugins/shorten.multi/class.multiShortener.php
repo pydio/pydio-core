@@ -4,9 +4,6 @@
 *         based in bit.ly plugin
 */
 
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 

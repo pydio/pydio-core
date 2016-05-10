@@ -20,7 +20,7 @@
  */
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;

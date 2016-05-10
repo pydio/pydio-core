@@ -21,6 +21,7 @@
 
 namespace Pydio\Access\Core;
 
+use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 

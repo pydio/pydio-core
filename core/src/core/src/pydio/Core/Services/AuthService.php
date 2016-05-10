@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Core\Services;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Conf\Core\AbstractAjxpUser;

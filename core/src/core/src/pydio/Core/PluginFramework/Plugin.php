@@ -21,7 +21,7 @@
 namespace Pydio\Core\PluginFramework;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -159,7 +159,7 @@ class Plugin implements \Serializable
 
     /**
      * @param string $optionName
-     * @param string|\Pydio\Access\Core\Repository $repositoryScope
+     * @param string|\Pydio\Access\Core\Model\Repository $repositoryScope
      * @param null|\Pydio\Conf\Core\AbstractAjxpUser $userObject
      * @return mixed|null
      */

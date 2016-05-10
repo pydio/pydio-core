@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 
@@ -139,7 +139,7 @@ class ShareLink
     }
 
     /**
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      * @throws Exception
      */
     public function getRepository(){

@@ -20,7 +20,7 @@
  */
 namespace Pydio\Metastore\Core;
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 define('AJXP_METADATA_SHAREDUSER', 'AJXP_METADATA_SHAREDUSER');

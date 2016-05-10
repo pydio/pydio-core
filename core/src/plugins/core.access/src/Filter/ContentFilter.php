@@ -18,8 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Access\Core;
+namespace Pydio\Access\Core\Filter;
 
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\TextEncoder;
 

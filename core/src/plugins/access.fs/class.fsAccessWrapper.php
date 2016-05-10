@@ -24,7 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\FS;
 use PclZip;
 
 use Pydio\Access\Core\IAjxpWrapper;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;

@@ -20,9 +20,9 @@
  */
 namespace Pydio\Core\Controller;
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Exception\PydioPromptException;
@@ -183,7 +183,7 @@ class XMLWriter
 
     /**
      * @static
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @return void
      */
     public static function renderAjxpHeaderNode($ajxpNode)
@@ -236,7 +236,7 @@ class XMLWriter
 
     /**
      * @static
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @param bool $close
      * @param bool $print
      * @return void|string
@@ -430,7 +430,7 @@ class XMLWriter
     public static function writeNodesDiff($diffNodes, $print = false)
     {
         /**
-         * @var $ajxpNode AJXP_Node
+         * @var $ajxpNode \Pydio\Access\Core\Model\AJXP_Node
          */
         $mess = ConfService::getMessages();
         $buffer = "<nodes_diff>";
@@ -467,12 +467,6 @@ class XMLWriter
         }
         $buffer .= "</nodes_diff>";
         return XMLWriter::write($buffer, $print);
-
-        /*
-        $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
-        $pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
-        return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
-        */
     }
 
 
@@ -722,7 +716,7 @@ class XMLWriter
 
     /**
      * @param string $repoId
-     * @param Repository $repoObject
+     * @param \Pydio\Access\Core\Model\Repository $repoObject
      * @param array $exposed
      * @param array $streams
      * @param AbstractAjxpUser $loggedUser

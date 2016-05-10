@@ -20,8 +20,8 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Inbox;
 
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\ContentFilter;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;

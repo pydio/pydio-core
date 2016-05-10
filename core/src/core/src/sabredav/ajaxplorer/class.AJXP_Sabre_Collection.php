@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
 use Pydio\Log\Core\AJXP_Logger;
 

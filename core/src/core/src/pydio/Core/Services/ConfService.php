@@ -22,7 +22,7 @@ namespace Pydio\Core\Services;
 
 use DOMXPath;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -599,7 +599,7 @@ class ConfService
      * @static
      * @param String $scope "user" or "all"
      * @param bool $includeShared
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     public static function getRepositoriesList($scope = "user", $includeShared = true)
     {
@@ -620,7 +620,7 @@ class ConfService
     }
 
     /**
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     private function getLoadedRepositories()
     {
@@ -672,7 +672,7 @@ class ConfService
      * @param bool $details
      * @param bool $labelOnly
      * @param bool $includeShared
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $includeShared = true)
     {
@@ -823,9 +823,9 @@ class ConfService
     }
 
     /**
-     * @param Repository[] $repoList
+     * @param \Pydio\Access\Core\Model\Repository[] $repoList
      * @param array $criteria
-     * @return Repository[] array
+     * @return \Pydio\Access\Core\Model\Repository[] array
      */
     public static function filterRepositoryListWithCriteria($repoList, $criteria){
         $repositories = array();
@@ -875,7 +875,7 @@ class ConfService
     /**
      * @param array $criteria
      * @param $count
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     public static function listRepositoriesWithCriteria($criteria, &$count){
 
@@ -940,7 +940,7 @@ class ConfService
         }
         if (is_array($drvList)) {
             /**
-             * @var $drvList Repository[]
+             * @var $drvList \Pydio\Access\Core\Model\Repository[]
              */
             foreach ($drvList as $repoId=>$repoObject) {
                 $driver = PluginsService::getInstance()->getPluginByTypeName("access", $repoObject->getAccessType());
@@ -1038,7 +1038,7 @@ class ConfService
     /**
      * Add dynamically created repository
      *
-     * @param Repository $oRepository
+     * @param \Pydio\Access\Core\Model\Repository $oRepository
      * @return -1|null if error
      */
     public static function addRepository($oRepository)
@@ -1046,7 +1046,7 @@ class ConfService
         return self::getInstance()->addRepositoryInst($oRepository);
     }
     /**
-     * @param Repository $oRepository
+     * @param \Pydio\Access\Core\Model\Repository $oRepository
      * @return -1|null on error
      */
     public function addRepositoryInst($oRepository)
@@ -1066,7 +1066,7 @@ class ConfService
 
     /**
      * @param $idOrAlias
-     * @return null|Repository
+     * @return null|\Pydio\Access\Core\Model\Repository
      */
     public static function findRepositoryByIdOrAlias($idOrAlias)
     {
@@ -1178,7 +1178,7 @@ class ConfService
      * Replace a repository by an update one.
      *
      * @param String $oldId
-     * @param Repository $oRepositoryObject
+     * @param \Pydio\Access\Core\Model\Repository $oRepositoryObject
      * @return mixed
      */
     public static function replaceRepository($oldId, $oRepositoryObject)
@@ -1208,7 +1208,7 @@ class ConfService
     /**
      * Set a temp repository id but not in the session
      * @static
-     * @param Repository $repositoryObject
+     * @param \Pydio\Access\Core\Model\Repository $repositoryObject
      * @return void
      */
     public static function tmpReplaceRepository($repositoryObject)
@@ -1638,7 +1638,7 @@ class ConfService
     }
     /**
      * See static method
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function getRepositoryInst()
     {
@@ -1660,7 +1660,7 @@ class ConfService
 
     /**
      * @static
-     * @param Repository $repository
+     * @param \Pydio\Access\Core\Model\Repository $repository
      * @return AbstractAccessDriver
      */
     public static function loadDriverForRepository(&$repository)
@@ -1670,7 +1670,7 @@ class ConfService
 
     /**
      * See static method
-     * @param Repository|null $repository
+     * @param \Pydio\Access\Core\Model\Repository|null $repository
      * @throws PydioException|\Exception
      * @return AbstractAccessDriver
      */

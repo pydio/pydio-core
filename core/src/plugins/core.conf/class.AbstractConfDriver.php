@@ -20,9 +20,9 @@
  */
 namespace Pydio\Conf\Core;
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
@@ -248,7 +248,7 @@ abstract class AbstractConfDriver extends Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     abstract public function listRepositories($user = null);
 
@@ -261,7 +261,7 @@ abstract class AbstractConfDriver extends Plugin
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      * @param $count int fill this integer with a count
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     abstract public function listRepositoriesWithCriteria($criteria, &$count=null);
 
@@ -270,20 +270,20 @@ abstract class AbstractConfDriver extends Plugin
      * Retrieve a Repository given its unique ID.
      *
      * @param String $repositoryId
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     abstract public function getRepositoryById($repositoryId);
     /**
      * Retrieve a Repository given its alias.
      *
      * @param String $repositorySlug
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     abstract public function getRepositoryByAlias($repositorySlug);
     /**
      * Stores a repository, new or not.
      *
-     * @param Repository $repositoryObject
+     * @param \Pydio\Access\Core\Model\Repository $repositoryObject
      * @param Boolean $update
      * @return -1 if failed
      */
@@ -704,13 +704,13 @@ abstract class AbstractConfDriver extends Plugin
                         if($title == "" && $bmPath=="/") $title = ConfService::getCurrentRootDirDisplay();
                         $bmUser->addBookMark($bmPath, $title);
                         if ($driver) {
-                            $node = new AJXP_Node($driver->getResourceUrl($bmPath));
+                            $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "delete_bookmark") {
                         $bmUser->removeBookmark($bmPath);
                         if ($driver) {
-                            $node = new AJXP_Node($driver->getResourceUrl($bmPath));
+                            $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {

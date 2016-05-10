@@ -18,9 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\Repository;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
@@ -113,7 +113,7 @@ class CoreIndexer extends Plugin {
 
     /**
      *
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param int $depth
      * @throws Exception
      */
@@ -181,7 +181,7 @@ class CoreIndexer extends Plugin {
 
 
     /**
-     * @param Repository $repository
+     * @param \Pydio\Access\Core\Model\Repository $repository
      * @param AbstractAjxpUser $user
      * @return string
      */

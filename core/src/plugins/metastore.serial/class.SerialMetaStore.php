@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -190,7 +190,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @param String $scope
      * @param String $userId
      * @return void
@@ -345,8 +345,8 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
     }
 
     /**
-     * @param AJXP_Node|null $srcNode
-     * @param AJXP_Node|null $destNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node|null $srcNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node|null $destNode
      * @param bool|false $copy
      */
     public function nodeChangeHook($srcNode = null, $destNode = null, $copy = false){

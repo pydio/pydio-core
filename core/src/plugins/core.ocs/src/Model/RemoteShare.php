@@ -20,8 +20,8 @@
  */
 namespace Pydio\OCS\Model;
 
-use Pydio\Access\Core\ContentFilter;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\ConfService;
 use Sabre\DAV;
 use Sabre\DAV\Exception;
@@ -120,7 +120,7 @@ class RemoteShare
     }
 
     /**
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function buildVirtualRepository(){
         $repositoryId = "ocs_remote_share_".$this->getOcsToken();

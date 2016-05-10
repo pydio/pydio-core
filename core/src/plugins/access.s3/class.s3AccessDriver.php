@@ -22,9 +22,9 @@
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
 use DOMNode;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
@@ -39,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class s3AccessDriver extends fsAccessDriver
 {
     /**
-    * @var Repository
+    * @var \Pydio\Access\Core\Model\Repository
     */
     public $repository;
     public $driverConf;
@@ -147,7 +147,7 @@ class s3AccessDriver extends fsAccessDriver
 
     /**
      * @param String $directoryPath
-     * @param Repository $repositoryResolvedOptions
+     * @param \Pydio\Access\Core\Model\Repository $repositoryResolvedOptions
      * @return int
      */
     public function directoryUsage($directoryPath, $repositoryResolvedOptions){

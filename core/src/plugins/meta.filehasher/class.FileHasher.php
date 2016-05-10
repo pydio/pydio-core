@@ -20,8 +20,8 @@
  */
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -201,7 +201,7 @@ class FileHasher extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @return String md5
      */
     public function getFileHash($node)
@@ -244,7 +244,7 @@ class FileHasher extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param float $offset
      * @param float $length
      * @return String md5
@@ -266,8 +266,8 @@ class FileHasher extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param bool $copy
      */
     public function invalidateHash($oldNode = null, $newNode = null, $copy = false)

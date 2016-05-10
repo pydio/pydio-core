@@ -20,9 +20,9 @@
  */
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -118,7 +118,7 @@ class SvnManager extends AJXP_AbstractMetaSource
 
     /**
      * @param String $file URL of the file to commit (probably a metadata)
-     * @param AJXP_Node $ajxpNode Optionnal node to commit along.
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode Optionnal node to commit along.
      */
     public function commitFile($file, $ajxpNode = null)
     {

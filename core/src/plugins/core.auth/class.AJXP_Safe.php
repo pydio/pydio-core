@@ -20,7 +20,7 @@
  */
 namespace Pydio\Auth\Core;
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services\AuthService;
 
@@ -221,7 +221,7 @@ class AJXP_Safe
      * + Try to get them from the AJXP_Safe.
      *
      * @param array $parsedUrl
-     * @param Repository $repository
+     * @param \Pydio\Access\Core\Model\Repository $repository
      * @return array
      */
     public static function tryLoadingCredentialsFromSources($parsedUrl, $repository)

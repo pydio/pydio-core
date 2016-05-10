@@ -21,7 +21,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Dropbox;
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Auth\Core\AuthService;
 use Pydio\Core\Exception\PydioUserAlertException;

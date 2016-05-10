@@ -21,8 +21,8 @@
 namespace Pydio\Conf\Sql;
 
 use DibiResult;
-use Pydio\Access\Core\ContentFilter;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -191,7 +191,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * Convert a repository object to an array, which will be stored in the database.
      *
-     * @param $repository Repository
+     * @param $repository \Pydio\Access\Core\Model\Repository
      * @return array containing row values, and another array with the key "options" to be stored as repo options.
      */
     public function repoToArray($repository)
@@ -271,7 +271,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * @param AJXP_Role $role
-     * @return Repository[]
+     * @return \Pydio\Access\Core\Model\Repository[]
      */
     public function listRepositoriesForRole($role){
         $acls = $role->listAcls();
@@ -349,7 +349,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Get repository by Unique ID (a hash calculated from the serialised object).
      *
      * @param String $repositoryId hash uuid
-     * @return Repository object
+     * @return \Pydio\Access\Core\Model\Repository object
      */
     public function getRepositoryById($repositoryId)
     {
@@ -361,7 +361,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Retrieve a Repository given its alias.
      *
      * @param String $repositorySlug
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function getRepositoryByAlias($repositorySlug)
     {

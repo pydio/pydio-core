@@ -22,7 +22,7 @@
 namespace Pydio\Access\Driver\StreamProvider\SFTP;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\ConfService;

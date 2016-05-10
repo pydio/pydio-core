@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -67,7 +67,7 @@ class AJXP_Notification
     public $target;
 
     /**
-     * @var AJXP_Node
+     * @var \Pydio\Access\Core\Model\AJXP_Node
      */
     public $secondaryNode;
 
@@ -304,7 +304,7 @@ class AJXP_Notification
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function setNode($node)
     {

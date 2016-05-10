@@ -18,8 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Access\Core;
+namespace Pydio\Access\Core\Model;
 
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 

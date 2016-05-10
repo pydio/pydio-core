@@ -52,6 +52,7 @@ class Server
         $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
 
         $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array($this, "formatDetectionMiddleware"));
         $this->middleWares->push(array($this, "simpleEmitterMiddleware"));
 
     }
@@ -75,6 +76,18 @@ class Server
             $response = call_user_func($callable, $request, $response, function($req, $res){
                 return $this->nextCallable($req, $res);
             });
+        }
+        return $response;
+    }
+
+    public function formatDetectionMiddleware($request, $response, $next = null){
+        if($next !== null){
+            $response = call_user_func($next, $request, $response);
+        }
+        if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
+            // For the moment, use XML by default
+            $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
+            $response = $response->withHeader("Content-type", "application/xml; charset=UTF-8");
         }
         return $response;
     }

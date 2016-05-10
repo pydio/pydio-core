@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
@@ -154,7 +154,7 @@ class IMagickPreviewer extends Plugin
 
     /**
      *
-     * @param AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param Boolean $copy
      */

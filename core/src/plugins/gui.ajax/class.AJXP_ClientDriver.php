@@ -23,7 +23,7 @@ namespace Pydio\Gui\Ajax;
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -338,7 +338,7 @@ class AJXP_ClientDriver extends Plugin
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @return void
      */
     public function nodeBookmarkMetadata(&$ajxpNode)
@@ -370,8 +370,8 @@ class AJXP_ClientDriver extends Plugin
     }
 
     /**
-     * @param AJXP_Node $fromNode
-     * @param AJXP_Node $toNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $fromNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $toNode
      * @param bool $copy
      */
     public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){

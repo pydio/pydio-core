@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -222,7 +222,7 @@ class serialConfDriver extends AbstractConfDriver
      * Unique ID of the repositor
      *
      * @param String $repositoryId
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function getRepositoryById($repositoryId)
     {
@@ -250,7 +250,7 @@ class serialConfDriver extends AbstractConfDriver
     /**
      * Store a newly created repository
      *
-     * @param Repository $repositoryObject
+     * @param \Pydio\Access\Core\Model\Repository $repositoryObject
      * @param Boolean $update
      * @return -1 if failed
      */

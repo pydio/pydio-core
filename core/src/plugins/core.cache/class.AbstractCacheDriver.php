@@ -26,7 +26,7 @@ define('AJXP_CACHE_SERVICE_NS_SHARED', 'shared');
 define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 

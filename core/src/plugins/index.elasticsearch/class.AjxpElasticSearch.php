@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
@@ -109,7 +109,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function indexationIndexNode($node){
         $this->updateNodeIndex(null, $node, false, false);
@@ -117,14 +117,14 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
 
     /**
-     * @param AJXP_Node $parentNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $parentNode
      */
     public function indexationStarts($parentNode){
         $this->loadIndex($parentNode->getRepositoryId(), true, $parentNode->getUser());
     }
 
     /**
-     * @param AJXP_Node $parentNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $parentNode
      */
     public function indexationEnds($parentNode){
         if($this->currentIndex) {
@@ -382,7 +382,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      *
      * Hooked to node.meta_change, this will update the index
      *
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function updateNodeIndexMeta($node)
     {
@@ -414,8 +414,8 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      * if $newNode = null => delete node $oldNode
      * Else copy or move oldNode to newNode.
      *
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param Boolean $copy
      * @param bool $recursive
      */
@@ -496,7 +496,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @throws Exception
      */
     public function createIndexedDocument($ajxpNode)
@@ -605,7 +605,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @return Number
      */
     public function getIndexedDocumentId($ajxpNode)

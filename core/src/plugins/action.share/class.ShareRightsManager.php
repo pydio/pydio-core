@@ -19,10 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
-use Pydio\Access\Core\Repository;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
@@ -292,7 +292,7 @@ class ShareRightsManager
     /**
      * @param String $repoId
      * @param bool $mixUsersAndGroups
-     * @param AJXP_Node|null $watcherNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node|null $watcherNode
      * @return array
      */
     public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $watcherNode = null)
@@ -390,12 +390,12 @@ class ShareRightsManager
     }
 
     /**
-     * @param Repository $parentRepository
+     * @param \Pydio\Access\Core\Model\Repository $parentRepository
      * @param Repository $childRepository
      * @param bool $isUpdate
      * @param array $users
      * @param array $groups
-     * @param UserSelection $selection
+     * @param \Pydio\Access\Core\Model\UserSelection $selection
      * @param bool|false $disableDownload
      * @throws Exception
      */

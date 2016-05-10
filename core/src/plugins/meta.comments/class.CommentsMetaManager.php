@@ -18,8 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -60,7 +60,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
         }
     }
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      */
     public function mergeMeta($ajxpNode)
     {
@@ -72,8 +72,8 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
 
     /**
      *
-     * @param AJXP_Node $oldFile
-     * @param AJXP_Node $newFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newFile
      * @param Boolean $copy
      */
     public function moveMeta($oldFile, $newFile = null, $copy = false)

@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -41,7 +41,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @return array mixed
      */
     public function getNodeMeta($node){
@@ -51,7 +51,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param array $meta
      * @param bool $private
      */
@@ -66,7 +66,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function clearNodeMeta($node){
         // Try to remove both scopes
@@ -76,7 +76,7 @@ class ShareMetaManager
 
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param $shareType
      * @param $shareId
      * @param $publicScope
@@ -97,7 +97,7 @@ class ShareMetaManager
 
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param $shareId
      */
     public function removeShareFromMeta($node, $shareId){
@@ -115,7 +115,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param $metas
      */
     public function collectSharesInParent($node, &$metas){
@@ -131,7 +131,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param string $scope
      * @return CompositeShare[]
      */
@@ -180,7 +180,7 @@ class ShareMetaManager
 
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param bool $allUsersScope
      * @return CompositeShare|null
      */
@@ -205,7 +205,7 @@ class ShareMetaManager
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param array $shares
      * @param bool $clearIfEmpty
      */

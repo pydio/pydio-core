@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Core;
 
+use Pydio\Access\Core\Model\UserSelection;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Recycle bin actions manager. Utilitaries to check whether the current dir is the recycle bin,

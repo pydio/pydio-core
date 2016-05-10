@@ -72,8 +72,8 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         }
         try {
             $node = null;
-            if(is_object($data[1]) && $data[1] instanceof \Pydio\Access\Core\AJXP_Node) $node = $data[1];
-            else if(is_object($data[0]) && $data[0] instanceof \Pydio\Access\Core\AJXP_Node) $node = $data[0];
+            if(is_object($data[1]) && $data[1] instanceof \Pydio\Access\Core\Model\AJXP_Node) $node = $data[1];
+            else if(is_object($data[0]) && $data[0] instanceof \Pydio\Access\Core\Model\AJXP_Node) $node = $data[0];
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content],[index_path]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin,%s)",
                 time(),
                 "event",

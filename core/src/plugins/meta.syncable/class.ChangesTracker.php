@@ -19,9 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -495,7 +495,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     }
 
     /**
-     * @param AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param bool $copy
      */
@@ -598,7 +598,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @return bool
      */
     protected function excludeNode($node){
@@ -612,7 +612,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function indexNode($node){
         // Create

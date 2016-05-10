@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -64,7 +64,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @return string
      */
     protected function getUserId($node)
@@ -86,7 +86,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     }
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @param boolean $create
      * @return String
      */
@@ -193,7 +193,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 
 
     /**
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @return void
      */
     public function enrichNode(&$ajxpNode)

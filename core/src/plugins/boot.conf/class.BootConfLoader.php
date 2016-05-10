@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -578,7 +578,7 @@ class BootConfLoader extends AbstractConfDriver
      * Retrieve a Repository given its alias.
      *
      * @param String $repositorySlug
-     * @return Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function getRepositoryByAlias($repositorySlug) {
         return null;

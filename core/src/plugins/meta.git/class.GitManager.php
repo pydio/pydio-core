@@ -20,7 +20,7 @@
  */
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -261,8 +261,8 @@ class GitManager extends AJXP_AbstractMetaSource
 
 
     /**
-     * @param AJXP_Node $fromNode
-     * @param AJXP_Node$toNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $fromNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node$toNode
      * @param boolean $copy
      */
     public function changesHook($fromNode=null, $toNode=null, $copy=false)

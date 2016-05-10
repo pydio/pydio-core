@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
@@ -69,7 +69,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param string $userId
      * @param string $watchType
      * @param array $targetUsers Optional list of specific users to watch
@@ -122,7 +122,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param $userId
      * @param bool $clearUsers
      * @param bool $targetUserId
@@ -188,7 +188,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param $userId
      * @param string $ns Watch namespace
      * @param array $result
@@ -221,7 +221,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param String $watchType
      * @return array
      */
@@ -260,7 +260,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         return $result;
     }
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param String $watchType
      * @param String $userId
      * @return array
@@ -294,7 +294,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     /**
      * @param String $watchType
      * @param String $currentUserId
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param array|bool $watchMeta
      * @param array|bool $usersMeta
      * @return array
@@ -465,7 +465,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         foreach($all["ancestors"] as $pair){
             $parentNotification = new AJXP_Notification();
             /**
-             * @var AJXP_Node $parentNode
+             * @var \Pydio\Access\Core\Model\AJXP_Node $parentNode
              */
             $parentNode = $pair["node"];
             if($parentNode->isRoot() && $parentNode->getRepository() !== null && $parentNode->getRepository()->hasContentFilter()){
@@ -508,8 +508,8 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
 
     /**
      *
-     * @param AJXP_Node $oldFile
-     * @param AJXP_Node $newFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldFile
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newFile
      * @param Boolean $copy
      */
     public function updateMetaLocation($oldFile, $newFile = null, $copy = false)

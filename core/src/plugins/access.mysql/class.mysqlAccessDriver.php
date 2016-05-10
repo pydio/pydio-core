@@ -21,7 +21,7 @@
 namespace Pydio\Access\Driver\DataProvider;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;

@@ -18,12 +18,36 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core\Http;
+
+use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class_alias("Pydio\\Access\\Core\\Filter\\AJXP_Permission", "AJXP_Permission", true);
-class_alias("Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask", "AJXP_PermissionMask", true);
-class_alias("Pydio\\Access\\Core\\Model\\AJXP_Node", "AJXP_Node", true);
-class_alias("Pydio\\Conf\\Core\\AJXP_Role", "AJXP_Role", true);
-class_alias("Pydio\\Access\\Core\\Model\\Repository", "Repository", true);
-class_alias("Pydio\\Access\\Core\\Filter\\ContentFilter", "ContentFilter", true);
+class UserMessage implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
+{
+
+    private $level;
+    private $message;
+
+    public function __construct($message, $level=LOG_LEVEL_INFO)
+    {
+        $this->message = $message;
+        $this->level = $level;
+    }
+
+    public function toXML()
+    {
+        return XMLWriter::sendMessage($this->level == LOG_LEVEL_INFO?$this->message:null, $this->level == LOG_LEVEL_ERROR?$this->message:null, false);
+    }
+
+    public function jsonSerializableData()
+    {
+        return ['level'=>$this->level, 'message' => $this->message];
+    }
+
+    public function jsonSerializableKey()
+    {
+        return 'message';
+    }
+}

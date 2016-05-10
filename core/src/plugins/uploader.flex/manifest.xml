@@ -42,7 +42,7 @@
             var otherUploadersCount = XPathSelectNodes(ajaxplorer.getXmlRegistry(), 'plugins/uploader[@id!="uploader.flex"]').length;
             if(otherUploadersCount == 0) return true;
 			var xhrUpload = (typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) );
-			return true;// (getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && ! xhrUpload );
+			return (getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && ! xhrUpload );
 		]]></activeCondition>
 	</processing>
 </uploader>

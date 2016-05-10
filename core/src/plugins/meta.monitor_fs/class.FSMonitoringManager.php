@@ -20,7 +20,7 @@
  */
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 

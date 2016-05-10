@@ -24,7 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 
 use DOMNode;
 use PclZip;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Services\ConfService;
 
@@ -44,7 +44,7 @@ class sftpPSLAccessDriver extends fsAccessDriver
 {
 
     /**
-    * @var Repository
+    * @var \Pydio\Access\Core\Model\Repository
     */
     public $repository;
     public $driverConf;

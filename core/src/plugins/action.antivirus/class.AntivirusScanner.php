@@ -1,5 +1,5 @@
 <?php
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -17,8 +17,8 @@ class AntivirusScanner extends Plugin
     protected $file_size;
 
     /**
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * Main function, it is called by the hook.
      */
     public function scanFile ($oldNode = null, $newNode = null)
@@ -220,7 +220,7 @@ class AntivirusScanner extends Plugin
 
     /**
      * This function initializes the size of the file
-     * @param AJXP_Node $nodeObject
+     * @param \Pydio\Access\Core\Model\AJXP_Node $nodeObject
      */
     public function setFileSize ($nodeObject)
     {

@@ -23,8 +23,8 @@
  * Improved by cdujeu / Https Support now necessary for zoho API.
  */
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;

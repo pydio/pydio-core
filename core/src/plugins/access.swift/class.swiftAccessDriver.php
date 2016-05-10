@@ -24,9 +24,9 @@ namespace Pydio\Access\Driver\StreamProvider\Swift;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 use DOMNode;
 use \OpenStack\Bootstrap;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Services\ConfService;
 

@@ -26,7 +26,7 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -66,8 +66,8 @@ class CoreCacheLoader extends Plugin
     }
 
     /**
-     * @param AJXP_Node $node
-     * @param AJXP_Node $contextNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $contextNode
      * @param bool $details
      */
     public function cacheNodeInfo(&$node, $contextNode, $details){
@@ -80,7 +80,7 @@ class CoreCacheLoader extends Plugin
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param AJXP_Node $contextNode
      * @param bool $details
      */
@@ -100,8 +100,8 @@ class CoreCacheLoader extends Plugin
     }
 
     /**
-     * @param AJXP_Node|null $from
-     * @param AJXP_Node|null $to
+     * @param \Pydio\Access\Core\Model\AJXP_Node|null $from
+     * @param \Pydio\Access\Core\Model\AJXP_Node|null $to
      * @param bool $copy
      */
     public function clearNodeInfoCache($from=null, $to=null, $copy = false){
@@ -118,7 +118,7 @@ class CoreCacheLoader extends Plugin
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     protected function clearCacheForNode($node){
         if($node->isLeaf()){
@@ -145,7 +145,7 @@ class CoreCacheLoader extends Plugin
     }
 
     /**
-     * @param AJXP_Node $node
+     * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param bool $details
      * @return string
      */

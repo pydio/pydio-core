@@ -21,8 +21,10 @@
 namespace Pydio\Access\Driver\StreamProvider\Imap;
 
 use DOMNode;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\Repository;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Utils\Utils;
 
@@ -36,7 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class imapAccessDriver extends fsAccessDriver
 {
     /**
-    * @var Repository
+    * @var \Pydio\Access\Core\Model\Repository
     */
     public $repository;
     public $driverConf;
@@ -82,10 +84,10 @@ class imapAccessDriver extends fsAccessDriver
         return strcmp($st1, $st2);
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
-        if ($action == "ls") {
-            $dir = $httpVars["dir"];
+        if ($request->getAttribute("action") ==  "ls") {
+            $dir = $request->getParsedBody()["dir"];
             if ($dir == "/" || empty($dir)) {
                 // MAILBOXES CASE
                 $this->repository->addOption("PAGINATION_THRESHOLD", 500);
@@ -95,12 +97,12 @@ class imapAccessDriver extends fsAccessDriver
                 $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "inverseSort");
             }
         }
-        parent::switchAction($action, $httpVars, $fileVars);
+        parent::switchAction($request, $response);
     }
 
     /**
      *
-     * @param AJXP_Node $ajxpNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      */
     public function enrichMetadata(&$ajxpNode)//, &$metadata, $wrapperClassName, &$realFile)
     {

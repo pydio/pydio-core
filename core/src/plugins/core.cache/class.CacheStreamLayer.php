@@ -20,7 +20,7 @@
  */
 namespace Pydio\Cache\Core;
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Core\Services\CacheService;
 
@@ -51,7 +51,7 @@ class CacheStreamLayer extends AJXP_SchemeTranslatorWrapper
      */
     protected function computeCacheId($path, $type){
 
-        return AbstractCacheDriver::computeIdForNode(new AJXP_Node($path), $type);
+        return AbstractCacheDriver::computeIdForNode(new \Pydio\Access\Core\Model\AJXP_Node($path), $type);
         
     }
 

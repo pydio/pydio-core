@@ -18,12 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Core\Http;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class_alias("Pydio\\Access\\Core\\Filter\\AJXP_Permission", "AJXP_Permission", true);
-class_alias("Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask", "AJXP_PermissionMask", true);
-class_alias("Pydio\\Access\\Core\\Model\\AJXP_Node", "AJXP_Node", true);
-class_alias("Pydio\\Conf\\Core\\AJXP_Role", "AJXP_Role", true);
-class_alias("Pydio\\Access\\Core\\Model\\Repository", "Repository", true);
-class_alias("Pydio\\Access\\Core\\Filter\\ContentFilter", "ContentFilter", true);
+
+interface JSONSerializableResponseChunk extends SerializableResponseChunk
+{
+    /**
+     * @return mixed
+     */
+    public function jsonSerializableData();
+
+    /**
+     * @return string
+     */
+    public function jsonSerializableKey();
+}

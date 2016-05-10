@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\AJXP_Node;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -456,8 +456,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      * if $newNode = null => delete node $oldNode
      * Else copy or move oldNode to newNode.
      *
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param Boolean $copy
      * @param bool $recursive
      */

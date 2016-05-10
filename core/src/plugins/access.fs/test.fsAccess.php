@@ -20,7 +20,7 @@
  */
 namespace Pydio\Tests;
 
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ class fsAccessTest extends AbstractTest
     /**
      * Test Repository
      *
-     * @param Repository $repo
+     * @param \Pydio\Access\Core\Model\Repository $repo
      * @return Boolean
      */
     public function doRepositoryTest($repo)

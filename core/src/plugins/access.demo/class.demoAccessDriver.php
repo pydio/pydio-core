@@ -21,8 +21,11 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\FS;
 
-use Pydio\Access\Core\Repository;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -39,10 +42,10 @@ class demoAccessDriver extends fsAccessDriver
     */
     public $repository;
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         $errorMessage = "This is a demo, all 'write' actions are disabled!";
-        switch ($action) {
+        switch ($request->getAttribute("action")) {
             //------------------------------------
             //	WRITE ACTIONS
             //------------------------------------
@@ -55,7 +58,7 @@ class demoAccessDriver extends fsAccessDriver
             case "mkfile":
             case "chmod":
             case "compress":
-                return XMLWriter::sendMessage(null, $errorMessage, false);
+                throw new PydioException($errorMessage);
             break;
 
             //------------------------------------
@@ -71,7 +74,7 @@ class demoAccessDriver extends fsAccessDriver
             break;
         }
 
-        return parent::switchAction($action, $httpVars, $fileVars);
+        return parent::switchAction($request, $response);
 
     }
 

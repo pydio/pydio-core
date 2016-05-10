@@ -20,8 +20,8 @@
  */
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -506,7 +506,7 @@ class ShareStore {
     }
 
     /**
-     * @param AJXP_Node $baseNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $baseNode
      * @param bool $delete
      * @param string $oldPath
      * @param string $newPath
@@ -583,8 +583,8 @@ class ShareStore {
     /**
      * @param array $shares
      * @param String $operation
-     * @param AJXP_Node $oldNode
-     * @param AJXP_Node $newNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $oldNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param array $collectRepositories
      * @param string|null $parentRepositoryPath
      * @return array
@@ -817,7 +817,7 @@ class ShareStore {
     /**
      * @param array $data
      * @param AbstractAccessDriver $accessDriver
-     * @param Repository $repository
+     * @param \Pydio\Access\Core\Model\Repository $repository
      */
     public function storeSafeCredentialsIfNeeded(&$data, $accessDriver, $repository){
         $storeCreds = false;

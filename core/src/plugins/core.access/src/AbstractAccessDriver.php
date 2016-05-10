@@ -19,6 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Access\Core;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -58,8 +62,11 @@ class AbstractAccessDriver extends Plugin
     }
 
 
-    public function accessPreprocess($actionName, &$httpVars, &$filesVar)
+    public function accessPreprocess(ServerRequestInterface &$request)
     {
+        $actionName = $request->getAttribute("action");
+        $httpVars = $request->getParsedBody();
+
         if ($actionName == "apply_check_hook") {
             if (!in_array($httpVars["hook_name"], array("before_create", "before_path_change", "before_change"))) {
                 return;
@@ -74,6 +81,7 @@ class AbstractAccessDriver extends Plugin
                 else if($httpVars["options"] == "a") $httpVars["mode"] = "search";
                 else if($httpVars["options"] == "d") $httpVars["skipZip"] = "true";
                 // skip "complete" mode that was in fact quite the same as standard tree listing (dz)
+                $request = $request->withParsedBody($httpVars);
             }
         }
     }

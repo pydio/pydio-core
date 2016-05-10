@@ -21,7 +21,7 @@
 namespace Pydio\Core\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
-use Pydio\Access\Core\Repository;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;

@@ -20,10 +20,10 @@
  */
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_Node;
-use Pydio\Access\Core\ContentFilter;
-use Pydio\Access\Core\Repository;
-use Pydio\Access\Core\UserSelection;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -1078,7 +1078,7 @@ class ShareCenter extends Plugin
     }
 
     /**
-     * @param AJXP_Node $fromNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $fromNode
      * @param AJXP_Node $toNode
      * @param bool $copy
      * @param String $direction

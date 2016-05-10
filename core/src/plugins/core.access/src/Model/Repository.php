@@ -18,8 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Access\Core;
+namespace Pydio\Access\Core\Model;
 
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
