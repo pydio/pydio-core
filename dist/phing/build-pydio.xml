@@ -145,11 +145,10 @@
         <if>
             <available type="file" file="${INNER_DIRECTORY}/core/composer.json"/>
             <then>
-                <composer command="install" composer="/home/builder/composer.phar">
-                    <arg value="--optimize-autoloader" />
-                    <arg value="--working-dir" />
-                    <arg path="${INNER_DIRECTORY}" />
-                </composer>
+                <exec
+                        command="/home/builder/composer.phar install --optimze-autoloader"
+                        dir="${INNER_DIRECTORY}"
+                />
             </then>
         </if>
 
