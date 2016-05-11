@@ -48,6 +48,9 @@ class LegacyPubliclet
      */
     public static function render($data, $options, $shareStore){
 
+        self::renderError($data, "false", "Link is deprecated and should be migrated to the new format.");
+        
+        /*
         if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
             self::renderError($data, "false");
             return;
@@ -181,11 +184,14 @@ class LegacyPubliclet
                 }
             }
             Controller::findActionAndApply($data["ACTION"], $params, null);
-            register_shutdown_function(array("AuthService", "clearTemporaryUser"), $shortHash);
+            register_shutdown_function(function() use($shortHash){
+                AuthService::clearTemporaryUser($shortHash);
+            });
         } catch (Exception $e) {
             AuthService::clearTemporaryUser($shortHash);
             die($e->getMessage());
         }
+        */
 
     }
 

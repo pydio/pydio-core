@@ -196,6 +196,10 @@ class AJXP_NotificationCenter extends Plugin
             $oldNode = (isSet($args[0]) ? $args[0] : null);
             $newNode = (isSet($args[1]) ? $args[1] : null);
             $copy = (isSet($args[2]) && $args[2] === true ? true : null);
+            if( ($oldNode != null && !$oldNode instanceof AJXP_Node) || ($newNode != null && !$newNode instanceof AJXP_Node)){
+                error_log("Skipping notification as nodes are not excepted class, probably a deserialization issue");
+                continue;
+            }
             $notif = $this->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "unify");
             if ($notif !== false && $notif->getNode() !== false) {
                 $notif->setAuthor($object->author);
@@ -324,6 +328,10 @@ class AJXP_NotificationCenter extends Plugin
                 echo("</li>");
             } else {
                 $node = $notification->getNode();
+                if(!$node instanceof AJXP_Node){
+                    error_log("Skipping notification as nodes are not excepted class, probably a deserialization issue");
+                    continue;
+                }
                 $path = $node->getPath();
                 $nodeRepo = $node->getRepository();
 
