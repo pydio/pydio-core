@@ -169,7 +169,9 @@ class imapAccessWrapper implements IAjxpWrapper
                 throw new \Exception($e->getMessage()." - imap errors  : ".print_r(imap_errors(), true), $e->getCode());
             }
             self::$currentStream = $this->ih;
-            register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
+            register_shutdown_function(function(){
+                imapAccessWrapper::closeStreamFunc();
+            });
         }
         if ($this->ih) {
             if (! empty ( $this->path )) {

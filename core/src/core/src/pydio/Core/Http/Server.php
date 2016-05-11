@@ -73,16 +73,16 @@ class Server
         if($this->middleWares->valid()){
             $callable = $this->middleWares->current();
             $this->middleWares->next();
-            $response = call_user_func($callable, $request, $response, function($req, $res){
+            $response = call_user_func_array($callable, array(&$request, &$response, function($req, $res){
                 return $this->nextCallable($req, $res);
-            });
+            }));
         }
         return $response;
     }
 
     public function formatDetectionMiddleware(ServerRequestInterface $request, ResponseInterface $response, $next = null){
         if($next !== null){
-            $response = call_user_func($next, $request, $response);
+            $response = call_user_func_array($next, array(&$request, &$response));
         }
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
             // For the moment, use XML by default
@@ -106,7 +106,7 @@ class Server
     public function simpleEmitterMiddleware($request, $response, $next = null){
         try{
             if($next !== null){
-                $response = call_user_func($next, $request, $response);
+                $response = call_user_func_array($next, array(&$request, &$response));
             }
             if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse)) {
                 $emitter = new \Zend\Diactoros\Response\SapiEmitter();

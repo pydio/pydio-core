@@ -2,7 +2,7 @@
 <?php
 // Run from command prompt > php demo.php
 require_once("vendor/phpws/websocket.server.php");
-require_once("../../core/classes/class.HttpClient.php");
+require_once("../../core/src/lib/HttpClient.php");
 /**
  * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
  *
@@ -104,7 +104,6 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver
          */
         $c = WebSocketFunctions::cookie_parse($h["Cookie"]);
 
-        require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
         $client = new HttpClient($this->host);
         $client->cookies = $c;
         $client->get("/{$this->path}/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);

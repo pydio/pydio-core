@@ -27,6 +27,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
 
@@ -443,7 +444,10 @@ class AJXP_Node implements \JsonSerializable
         $this->realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($this->_url, true);
             $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
-                register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $this->realFilePointer);
+                register_shutdown_function(function(){
+                    Utils::silentUnlink($this->realFilePointer);
+                });
+
             }
         }
         return $this->realFilePointer;

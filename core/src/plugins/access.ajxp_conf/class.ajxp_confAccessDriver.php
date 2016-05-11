@@ -200,7 +200,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     public function listAllActions($action, $httpVars, $fileVars)
     {
-        parent::accessPreprocess($action, $httpVars, $fileVars);
+        //parent::accessPreprocess($action, $httpVars, $fileVars);
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         switch ($action) {
@@ -453,7 +453,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        parent::accessPreprocess($action, $httpVars, $fileVars);
+        //parent::accessPreprocess($action, $httpVars, $fileVars);
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         if (AuthService::usersEnabled()) {

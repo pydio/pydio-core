@@ -114,7 +114,10 @@ class fsAccessWrapper implements IAjxpWrapper
                        mkdir($tmpDir);
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");
-                       register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
+                       register_shutdown_function(function () use($tmpDir, $tmpFileName){
+                           if(is_file($tmpFileName)) unlink($tmpFileName);
+                           if(is_dir($tmpDir)) rmdir($tmpDir);
+                       });
                         $crtZip = new PclZip(Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
                         $content = $crtZip->listContent();
                         if(is_array($content)){

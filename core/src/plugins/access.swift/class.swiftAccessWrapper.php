@@ -233,7 +233,9 @@ class swiftAccessWrapper extends fsAccessWrapper
            self::copyFileInStream($path, $tmpHandle);
            fclose($tmpHandle);
            if (!$persistent) {
-               register_shutdown_function(array("Pydio\Core\Utils\Utils", "silentUnlink"), $tmpFile);
+               register_shutdown_function(function() use($tmpFile){
+                   Utils::silentUnlink($tmpFile);
+               });
            }
            return $tmpFile;
     }
