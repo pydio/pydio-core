@@ -1,0 +1,4 @@
+We pass the base.conf.php file as the PHPUnit "bootstrap" file. For example, running a given
+test suite, knowing AjaXplorer is installed at /var/www/ajaxplorer :
+
+> phpunit --bootstrap /var/www/ajaxplorer/base.conf.php AJXP_Suite_Atomics
