@@ -73,11 +73,16 @@ class XMLWriter
      * Outputs a closing root not (</tree>)
      * @static
      * @param string $docNode
-     * @return void
+     * @param bool $print
+     * @return void|string
      */
-    public static function close($docNode="tree")
+    public static function close($docNode="tree", $print = true)
     {
-        print("</$docNode>");
+        if($print){
+            print("</$docNode>");
+        }else{
+            return "</$docNode>";
+        }
     }
 
     public static function wrapDocument($content, $docNode = "tree", $attributes = array()){
@@ -126,15 +131,17 @@ class XMLWriter
      * @param integer $totalPages
      * @param integer $dirsCount
      * @param null $remoteSortAttributes
+     * @param bool $print
+     * @return void|string
      */
-    public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
+    public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null, $print = true)
     {
         $remoteSortString = "";
         if (is_array($remoteSortAttributes)) {
             foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
         }
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
-        XMLWriter::write($string, true);
+        return XMLWriter::write($string, $print);
     }
 
     /**

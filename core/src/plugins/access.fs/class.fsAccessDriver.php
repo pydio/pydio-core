@@ -34,6 +34,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\NodesDiff;
+use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
@@ -46,7 +47,6 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
@@ -641,25 +641,23 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
             case "stat" :
                 clearstatcache();
-                header("Content-type:application/json");
+                $jsonData = new \stdClass;
                 if($selection->isUnique()){
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
-                    if (!$stat || !is_readable($selection->getUniqueNode()->getUrl())) {
-                        print '{}';
-                    } else {
-                        print json_encode($stat);
+                    if ($stat !== false && is_readable($selection->getUniqueNode()->getUrl())) {
+                        $jsonData = $stat;
                     }
                 }else{
                     $files = $selection->getFiles();
-                    print '{';
                     foreach($files as $index => $path){
                         $stat = @stat($this->urlBase.$path);
-                        if(!$stat || !is_readable($this->urlBase.$path)) $stat = '{}';
-                        else $stat = json_encode($stat);
-                        print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
+                        if(!$stat || !is_readable($this->urlBase.$path)) {
+                            $stat = new \stdClass();
+                        }
+                        $jsonData->$path = $stat;
                     }
-                    print '}';
                 }
+                $response = new Response\JsonResponse($jsonData);
 
             break;
 
@@ -679,16 +677,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 } else {
                     $code=str_replace("&lt;","<",TextEncoder::magicDequote($code));
                 }
+                $response = $response->withHeader("Content-Type", "text/plain");
                 try {
                     Controller::applyHook("node.before_change", array(&$currentNode, strlen($code)));
                 } catch (\Exception $e) {
-                    header("Content-Type:text/plain");
-                    print $e->getMessage();
+                    $response->getBody()->write($e->getMessage());
                     break;
                 }
                 if (!is_file($fileName) || !$this->isWriteable($fileName, "file")) {
-                    header("Content-Type:text/plain");
-                    print((!$this->isWriteable($fileName, "file")?"1001":"1002"));
+                    $response->getBody()->write((!$this->isWriteable($fileName, "file")?"1001":"1002"));
                     break;
                 }
                 $fp=fopen($fileName,"w");
@@ -696,8 +693,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 fclose($fp);
                 clearstatcache(true, $fileName);
                 Controller::applyHook("node.change", array($currentNode, $currentNode, false));
-                header("Content-Type:text/plain");
-                print($mess[115]);
+                $response->getBody()->write($mess[115]);
 
             break;
 
@@ -943,6 +939,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             //------------------------------------
             case "ls":
 
+                $nodesList = new NodesList();
+
                 if(!isSet($dir) || $dir == "/") $dir = "";
                 $lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 
@@ -964,7 +962,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles(array($dir . "/" . $selection->getUniqueFile()));
                 }
-
+                
                 $orderField = $orderDirection = null;
                 $threshold = 500; $limitPerPage = 200;
                 $defaultOrder = $this->repository->getOption("REMOTE_SORTING_DEFAULT_COLUMN");
@@ -976,12 +974,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $orderField = $defaultOrder;
                     }
                 }
-                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
-                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
-                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
-                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
-                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
-                }else{
+                if(!isSet($httpVars["recursive"]) || $httpVars["recursive"] != "true"){
                     $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
                     if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
                     $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -992,11 +985,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $uniqueNodes = $selection->buildNodes();
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
                     Controller::applyHook("node.read", array(&$parentAjxpNode));
-                    if (XMLWriter::$headerSent == "tree") {
-                        XMLWriter::renderAjxpNode($parentAjxpNode, false);
-                    } else {
-                        XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
-                    }
+                    $nodesList->setParentNode($parentAjxpNode);
                     foreach($uniqueNodes as $node){
                         if(!file_exists($node->getUrl()) || (!is_readable($node->getUrl()) && !is_writable($node->getUrl()))) continue;
                         $nodeName = $node->getLabel();
@@ -1031,9 +1020,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                                 $node->mergeMetadata(array("page_position" => floor($index / $limitPerPage) +1));
                             }
                         }
-                        XMLWriter::renderAjxpNode($node);
+                        $nodesList->addBranch($node);
                     }
-                    XMLWriter::close();
                     break;
                 }
 
@@ -1047,9 +1035,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $countFiles = $this->countFiles($path, !$lsOptions["f"], false, $sharedHandle);
                 if(isSet($sharedHandle)){
                     rewind($handle);
-                }
-                if(isSet($crt_nodes)){
-                    $crt_nodes += $countFiles;
                 }
                 $totalPages = $crtPage = 1;
                 if (isSet($threshold) && isSet($limitPerPage) && $countFiles > $threshold) {
@@ -1071,11 +1056,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
                 Controller::applyHook("node.read", array(&$parentAjxpNode));
-                if (XMLWriter::$headerSent == "tree") {
-                    XMLWriter::renderAjxpNode($parentAjxpNode, false);
-                } else {
-                    XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
-                }
+                $nodesList->setParentNode($parentAjxpNode);
                 if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! Utils::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
                     if ($this->getFilteredOption("REMOTE_SORTING")) {
@@ -1089,15 +1070,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if(isSet($sharedHandle)) {
                         rewind($sharedHandle);
                     }
-                    XMLWriter::renderPaginationData(
-                        $countFiles,
-                        $crtPage,
-                        $totalPages,
-                        $foldersCounts,
-                        $remoteOptions
-                    );
-                    if (!$lsOptions["f"]) {
-                        XMLWriter::close();
+                    $nodesList->setPaginationData($countFiles, $crtPage, $totalPages, $foldersCounts, $remoteOptions);
+                    if ($totalPages > 1 && !$lsOptions["f"]) {
                         if(isSet($sharedHandle)) {
                             closedir($sharedHandle);
                         }
@@ -1181,6 +1155,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $cursor ++;
                 }
                 if (isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true") {
+
+                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
+                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
+                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
+                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
+                    $crt_nodes += $countFiles;
+
                     $breakNow = false;
                     if(isSet($max_depth) && $max_depth > 0 && $crt_depth >= $max_depth) $breakNow = true;
                     if(isSet($max_nodes) && $max_nodes > 0 && $crt_nodes >= $max_nodes) $breakNow = true;
@@ -1190,7 +1171,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     foreach ($fullList["d"] as &$nodeDir) {
                         if($breakNow){
                             $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
-                            XMLWriter::renderAjxpNode($nodeDir, true);
+                            $nodesList->addBranch($nodeDir);
                             continue;
                         }
                         $newBody = array(
@@ -1204,36 +1185,50 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         );
                         $fakeRequest = ServerRequestFactory::fromGlobals($request->getServerParams(), array(), $newBody, $request->getCookieParams());
                         $fakeRequest = $fakeRequest->withAttribute("action", "ls");
+                        $fakeRequest = $fakeRequest->withAttribute("parent_node_list", $nodesList);
                         $this->switchAction($fakeRequest, new Response());
                     }
+
                 } else {
-                    array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["d"]);
+
+                    array_map(array($nodesList, "addBranch"), $fullList["d"]);
+
                 }
-                array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["z"]);
-                array_map(array("\Pydio\Core\Controller\XMLWriter", "renderAjxpNode"), $fullList["f"]);
+                array_map(array($nodesList, "addBranch"), $fullList["z"]);
+                array_map(array($nodesList, "addBranch"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
-                if ($dir == ""  && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
+                if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     if (file_exists($this->urlBase.$recycleBinOption)) {
                         $recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
                         $recycleNode->loadNodeInfo();
-                        XMLWriter::renderAjxpNode($recycleNode);
+                        $nodesList->addBranch($recycleNode);
                     }
                 }
 
                 $this->logDebug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
 
-                XMLWriter::close();
+                $parentList = $request->getAttribute("parent_node_list", null);
+                if($parentList !== null){
+                    $parentList->addBranch($nodesList);
+                }
 
             break;
         }
 
 
-        if(isSet($logMessage) || !$nodesDiffs->isEmpty()){
+        if(isSet($logMessage) || !$nodesDiffs->isEmpty() || isSet($nodesList)){
             $body = new SerializableResponseStream();
-            if(isSet($logMessage)) $body->addChunk($logMessage);
-            if(!$nodesDiffs->isEmpty()) $body->addChunk($nodesDiffs);
+            if(isSet($logMessage)) {
+                $body->addChunk($logMessage);
+            }
+            if(!$nodesDiffs->isEmpty()) {
+                $body->addChunk($nodesDiffs);
+            }
+            if(isSet($nodesList)) {
+                $body->addChunk($nodesList);
+            }
             $response = $response->withBody($body);
         }
 
@@ -1615,22 +1610,22 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
-    if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
-        if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
-        $filePathOrData = str_replace("\\", "/", $filePathOrData);
-        $filePathOrData = TextEncoder::toUTF8($filePathOrData);
-        $mapping = explode('=',$_SERVER['X-Accel-Mapping']);
-        $replacecount = 0;
-        $accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
-        if ($replacecount == 1) {
-            header("X-Accel-Redirect: $accelfile");
-            header("Content-type: application/octet-stream");
-            header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
-            return;
-        } else {
-            $this->logError("X-Accel-Redirect","Problem with X-Accel-Mapping for file $filePathOrData");
-        }
-    }
+            if ($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)) {
+                if(!$realfileSystem) $filePathOrData = AJXP_MetaStreamWrapper::getRealFSReference($filePathOrData);
+                $filePathOrData = str_replace("\\", "/", $filePathOrData);
+                $filePathOrData = TextEncoder::toUTF8($filePathOrData);
+                $mapping = explode('=',$_SERVER['X-Accel-Mapping']);
+                $replacecount = 0;
+                $accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
+                if ($replacecount == 1) {
+                    header("X-Accel-Redirect: $accelfile");
+                    header("Content-type: application/octet-stream");
+                    header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
+                    return;
+                } else {
+                    $this->logError("X-Accel-Redirect","Problem with X-Accel-Mapping for file $filePathOrData");
+                }
+            }
             $stream = fopen("php://output", "a");
             if ($realfileSystem) {
                 $this->logDebug("realFS!", array("file"=>$filePathOrData));
