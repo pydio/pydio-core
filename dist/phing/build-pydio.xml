@@ -145,10 +145,9 @@
         <if>
             <available type="file" file="${INNER_DIRECTORY}/core/composer.json"/>
             <then>
-                <exec
-                        command="/home/builder/composer.phar install --optimze-autoloader"
-                        dir="${INNER_DIRECTORY}"
-                />
+                <copy todir="${INNER_DIRECTORY}/core/vendor">
+                    <fileset dir="/root/vendor/" defaultexcludes="false"><include name="*/**"/></fileset>
+                </copy>
             </then>
         </if>
 
