@@ -23,9 +23,9 @@ namespace Pydio\Access\Core\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Http\XMLSerializableResponseChunk;
+use Pydio\Core\Http\XMLDocSerializableResponseChunk;
 
-class NodesList implements XMLSerializableResponseChunk
+class NodesList implements XMLDocSerializableResponseChunk
 {
 
     /**

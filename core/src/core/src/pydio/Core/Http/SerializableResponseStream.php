@@ -86,14 +86,22 @@ class SerializableResponseStream implements StreamInterface
             }
             return json_encode($buffer);
         }else if($serializer == self::SERIALIZER_TYPE_XML){
+            $wrap = true;
             $buffer = "";
             foreach ($data as $serializableItem){
                 if(!$serializableItem instanceof XMLSerializableResponseChunk){
                     continue;
                 }
                 $buffer .= $serializableItem->toXML();
+                if($serializableItem instanceof XMLDocSerializableResponseChunk){
+                    $wrap = false;
+                }
             }
-            return XMLWriter::wrapDocument($buffer);
+            if($wrap){
+                return XMLWriter::wrapDocument($buffer);
+            }else{
+                return $buffer;
+            }
         }
         return "";
     }
