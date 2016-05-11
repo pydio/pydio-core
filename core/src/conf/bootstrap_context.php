@@ -60,7 +60,7 @@ define("AJXP_VENDOR_FOLDER", AJXP_INSTALL_PATH."/core/vendor");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
 define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
-define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
+define("AJXP_TESTS_FOLDER", AJXP_BIN_FOLDER."/pydio/Tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 // Startup admin password (used at first creation). Once
 // The admin password is created and his password is changed,
@@ -109,16 +109,6 @@ function AjaXplorer_autoload($className)
 
     if($className == "dibi"){
         require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");
-    }
-    $fileName = AJXP_BIN_FOLDER."/pydio/Core/"."class.".$className.".php";
-    if (file_exists($fileName)) {
-        require_once($fileName);
-        return;
-    }
-    $fileName = AJXP_BIN_FOLDER."/pydio/Core/"."interface.".$className.".php";
-    if (file_exists($fileName)) {
-        require_once($fileName);
-        return;
     }
     $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
     if ($corePlugClass !== false && count($corePlugClass)) {
