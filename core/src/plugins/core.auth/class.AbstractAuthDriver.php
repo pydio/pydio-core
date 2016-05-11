@@ -21,6 +21,7 @@
 namespace Pydio\Auth\Core;
 
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
@@ -50,7 +51,7 @@ class AbstractAuthDriver extends Plugin
 
             case "get_secure_token" :
                 \Pydio\Core\Controller\HTMLWriter::charsetHeader("text/plain");
-                print AuthService::generateSecureToken();
+                print SecureTokenMiddleware::generateSecureToken();
                 //exit(0);
                 break;
 

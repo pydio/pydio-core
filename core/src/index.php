@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -21,36 +21,14 @@
  * Description : main access point of the application, this script is called by any Ajax query.
  * Will dispatch the actions on the plugins.
  */
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\Controller;
-use Pydio\Core\Exception\PydioException;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\SessionService;
+use Pydio\Core\Http\Server;
 
 include_once("base.conf.php");
-
-/*
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-cache, must-revalidate");
-header("Pragma: no-cache");
-*/
 
 ConfService::registerCatchAll();
 ConfService::init();
 ConfService::start();
 
-$server = new \Pydio\Core\Http\Server();
-$request = $server->getRequest();
-
-SessionService::start($request);
-$server->bootSessionServer($request);
-try{
-    ConfService::reloadServicesAndActivePlugins();
-}catch(\Exception $e){}
-
-
+$server = new Server(Server::MODE_SESSION);
 $server->listen();
-
-SessionService::close();

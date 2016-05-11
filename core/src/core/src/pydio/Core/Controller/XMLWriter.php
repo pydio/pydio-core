@@ -819,9 +819,9 @@ class XMLWriter
      * @param string $rememberLogin
      * @param string $rememberPass
      * @param string $secureToken
-     * @return void
+     * @return void|string
      */
-    public static function loggingResult($result, $rememberLogin="", $rememberPass = "", $secureToken="")
+    public static function loggingResult($result, $rememberLogin="", $rememberPass = "", $secureToken="", $print = true)
     {
         $remString = "";
         if ($rememberPass != "" && $rememberLogin!= "") {
@@ -830,7 +830,9 @@ class XMLWriter
         if ($secureToken != "") {
             $remString .= " secure_token=\"$secureToken\"";
         }
-        print("<logging_result value=\"$result\"$remString/>");
+        $st = "<logging_result value=\"$result\"$remString/>";
+        if($print) print $st;
+        else return $st;
     }
 
     /**

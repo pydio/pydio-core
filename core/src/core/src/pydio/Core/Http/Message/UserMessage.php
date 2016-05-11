@@ -18,9 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Http;
+namespace Pydio\Core\Http\Message;
 
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\JSONSerializableResponseChunk;
+use Pydio\Core\Http\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

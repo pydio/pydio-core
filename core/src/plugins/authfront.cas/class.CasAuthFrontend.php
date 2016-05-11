@@ -57,8 +57,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_setFixedCallbackURL;
 
 
-    function tryToLogUser(&$httpVars, $isLast = false)
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
     {
+        $httpVars = $request->getParsedBody();
+
         if(isset($_SESSION["CURRENT_MINISITE"])){
             return false;
         }

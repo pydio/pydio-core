@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class MultiAuthFrontend extends AbstractAuthFrontend {
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
         return false;
     }
 

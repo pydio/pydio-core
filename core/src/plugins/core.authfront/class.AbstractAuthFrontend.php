@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Authfront\Core;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -29,10 +31,11 @@ abstract class AbstractAuthFrontend extends Plugin {
      * Try to authenticate the user based on various external parameters
      * Return true if user is now logged.
      *
-     * @param array $httpVars
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @param bool $isLast Whether this is is the last plugin called.
      * @return bool
      */
-    abstract function tryToLogUser(&$httpVars, $isLast = false);
+    abstract function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false);
 
 } 

@@ -78,51 +78,7 @@ class AuthService
         return $authDriver->getSeed(true);
     }
 
-    /**
-     * Put a secure token in the session
-     * @static
-     * @return string
-     */
-    public static function generateSecureToken()
-    {
-        if(!isSet($_SESSION["SECURE_TOKENS"])){
-            $_SESSION["SECURE_TOKENS"] = array();
-        }
-        if(isSet($_SESSION["FORCE_SECURE_TOKEN"])){
-            $_SESSION["SECURE_TOKENS"][] = $_SESSION["FORCE_SECURE_TOKEN"];
-            return $_SESSION["FORCE_SECURE_TOKEN"];
-        }
-        $newToken = Utils::generateRandomString(32); //md5(time());
-        $_SESSION["SECURE_TOKENS"][] = $newToken;
-        return $newToken;
-    }
-    /**
-     * Get the secure token from the session
-     * @static
-     * @return string|bool
-     */
-    public static function getSecureToken()
-    {
-        if(isSet($_SESSION["SECURE_TOKENS"]) && count($_SESSION["SECURE_TOKENS"])){
-            return true;
-        }
-        return false;
-        //return (isSet($_SESSION["SECURE_TOKENS"])?$_SESSION["SECURE_TOKEN"]:FALSE);
-    }
-    /**
-     * Verify a secure token value from the session
-     * @static
-     * @param string $token
-     * @return bool
-     */
-    public static function checkSecureToken($token)
-    {
-        if (isSet($_SESSION["SECURE_TOKENS"]) && in_array($token, $_SESSION["SECURE_TOKENS"])) {
-            return true;
-        }
-        return false;
-    }
-
+    
     /**
      * Get the currently logged user object
      * @return AbstractAjxpUser
@@ -139,6 +95,7 @@ class AuthService
         if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
         return null;
     }
+
     /**
      * Call tryToLogUser() functions on the registered authfront drivers
      * @static

@@ -26,10 +26,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ServerHttpAuthFrontend extends AbstractAuthFrontend {
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
-        $localHttpLogin = $_SERVER["REMOTE_USER"];
-        $localHttpPassw = isSet($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : "";
+        $serverData = $request->getServerParams();
+        $localHttpLogin = $serverData["REMOTE_USER"];
+        $localHttpPassw = isSet($serverData['PHP_AUTH_PW']) ? $serverData['PHP_AUTH_PW'] : "";
         if(!isSet($localHttpLogin)) return false;
 
         if(!AuthService::userExists($localHttpLogin) && $this->pluginConf["CREATE_USER"] === true){

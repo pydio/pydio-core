@@ -39,8 +39,9 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     private $yubikey1;
     private $yubikey2;
 
-    function tryToLogUser(&$httpVars, $isLast = false)
-    {
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+
+        $httpVars = $request->getParsedBody();
         $exceptionMsg = "Login information is not correct! Please try again with the one-time-password at the end of your password";
         if(empty($httpVars) || empty($httpVars["userid"])){
             return false;
@@ -80,6 +81,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                     //return false and cut off otp from password for next authfront.
                     if($cutPassword){
                         $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                        $request = $request->withParsedBody($httpVars);
                     }
                     return false;
                 }
@@ -103,6 +105,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 if($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)){
                     if($cutPassword){
                         $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                        $request = $request->withParsedBody($httpVars);
                     }
                     return false;
                 }
@@ -123,12 +126,15 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     protected function breakAndSendError($exceptionMsg){
 
+        throw new \Pydio\Core\Exception\AuthRequiredException($exceptionMsg);
+        /*
         XMLWriter::header();
         XMLWriter::loggingResult(-1, null, null, null);
         XMLWriter::sendMessage("ERROR", $exceptionMsg);
         XMLWriter::close();
         //throw new AJXP_Exception($exceptionMsg);
         exit();
+        */
 
     }
 

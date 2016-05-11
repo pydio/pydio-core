@@ -41,7 +41,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Http\AsyncResponseStream;
 use Pydio\Core\Http\SerializableResponseStream;
-use Pydio\Core\Http\UserMessage;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;

@@ -172,7 +172,7 @@
                             </div>
                         </form>
 					]]></clientForm>
-                    <serverCallback methodName="switchAction"></serverCallback>
+                    <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
             <action name="logout" expireDefault="true">

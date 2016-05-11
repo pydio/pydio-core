@@ -26,47 +26,51 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class BasicHttpAuthFrontend extends AbstractAuthFrontend {
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param bool $isLast
+     * @return bool
+     */
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
-        $localHttpLogin = $_SERVER["PHP_AUTH_USER"];
-        $localHttpPassw = $_SERVER['PHP_AUTH_PW'];
+        $serverData = $request->getServerParams();
+        $localHttpLogin = $serverData["PHP_AUTH_USER"];
+        $localHttpPassw = $serverData['PHP_AUTH_PW'];
 
         // mod_php
-        if (isset($_SERVER['PHP_AUTH_USER'])) {
-            $localHttpLogin = $_SERVER['PHP_AUTH_USER'];
-            $localHttpPassw = $_SERVER['PHP_AUTH_PW'];
+        if (isset($serverData['PHP_AUTH_USER'])) {
+            $localHttpLogin = $serverData['PHP_AUTH_USER'];
+            $localHttpPassw = $serverData['PHP_AUTH_PW'];
 
         // most other servers
-        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            if (strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']),'basic')===0){
-                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+        } elseif (isset($serverData['HTTP_AUTHORIZATION'])) {
+            if (strpos(strtolower($serverData['HTTP_AUTHORIZATION']),'basic')===0){
+                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($serverData['HTTP_AUTHORIZATION'], 6)));
             }
         // Sometimes prepend a REDIRECT
-        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        } elseif (isset($serverData['REDIRECT_HTTP_AUTHORIZATION'])) {
 
-            if (strpos(strtolower($_SERVER['REDIRECT_HTTP_AUTHORIZATION']),'basic')===0){
-                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($_SERVER['REDIRECT_HTTP_AUTHORIZATION'], 6)));
+            if (strpos(strtolower($serverData['REDIRECT_HTTP_AUTHORIZATION']),'basic')===0){
+                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($serverData['REDIRECT_HTTP_AUTHORIZATION'], 6)));
             }
 
         }
 
         if($isLast && empty($localHttpLogin)){
-            header('WWW-Authenticate: Basic realm="Pydio API"');
-            header('HTTP/1.0 401 Unauthorized');
-            echo 'You are not authorized to access this API.';
-            exit();
+            $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
+            return true;
         }
-        if(!isSet($localHttpLogin)) return false;
+        if(!isSet($localHttpLogin)) {
+            return false;
+        }
 
         $res = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false, "-1");
         if($res > 0) return true;
         if($isLast && $res != -4){
-            header('WWW-Authenticate: Basic realm="Pydio API"');
-            header('HTTP/1.0 401 Unauthorized');
-            echo 'You are not authorized to access this API.';
-            exit();
+            $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
+            return true;
         }
-
 
         return false;
 

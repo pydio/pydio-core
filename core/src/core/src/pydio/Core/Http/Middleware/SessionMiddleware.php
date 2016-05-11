@@ -18,36 +18,27 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Services;
+namespace Pydio\Core\Http\Middleware;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Http\Server;
+use Pydio\Core\Services\SessionService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-define('PYDIO_SESSION_NAME', 'AjaXplorer');
-define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
 
-class SessionService
+class SessionMiddleware
 {
-    private static $sessionName = PYDIO_SESSION_NAME;
 
-    public static function setSessionName($sessionName){
-        self::$sessionName = $sessionName;
-    }
+    public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
-    public static function getSessionName(){
-        return self::$sessionName;
-    }
+        $getParams = $requestInterface->getQueryParams();
+        $sessionName = SessionService::getSessionName();
 
-    public static function handleRequest(ServerRequestInterface &$request, ResponseInterface $response, callable $next = null){
-
-        $getParams = $request->getQueryParams();
         if (isSet($getParams[PYDIO_SESSION_QUERY_PARAM])) {
-            $cookies = $request->getCookieParams();
-            if (!isSet($cookies[self::$sessionName])) {
-                $cookies[self::$sessionName] = $getParams[PYDIO_SESSION_QUERY_PARAM];
-                $request = $request->withCookieParams($cookies);
+            $cookies = $requestInterface->getCookieParams();
+            if (!isSet($cookies[$sessionName])) {
+                $cookies[$sessionName] = $getParams[PYDIO_SESSION_QUERY_PARAM];
+                $requestInterface = $requestInterface->withCookieParams($cookies);
             }
         }
 
@@ -59,22 +50,14 @@ class SessionService
                 session_set_save_handler($sessionHandler, false);
             }
         }
-        session_name(self::$sessionName);
+        session_name($sessionName);
         session_start();
-
-        if($next !== null){
-            $response = call_user_func_array($next, array(&$request, &$response));
-        }
 
         register_shutdown_function(function(){
             SessionService::close();
         });
 
-        return $response;
+        return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
-    }
-
-    public static function close(){
-        session_write_close();
     }
 }

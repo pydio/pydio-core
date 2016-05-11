@@ -35,6 +35,19 @@ class FlexUploadProcessor extends Plugin
 
     public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
+        //------------------------------------------------------------
+        // SPECIAL HANDLING FOR FLEX UPLOADER RIGHTS FOR THIS ACTION
+        //------------------------------------------------------------
+        if (\Pydio\Core\Services\AuthService::usersEnabled()) {
+            $loggedUser = \Pydio\Core\Services\AuthService::getLoggedUser();
+            if ($request->getAttribute("action") == "upload" &&
+                ($loggedUser == null || !$loggedUser->canWrite(\Pydio\Core\Services\ConfService::getCurrentRepositoryId().""))
+                && isSet($request->getUploadedFiles()['Filedata'])) {
+                header('HTTP/1.0 ' . '410 Not authorized');
+                die('Error 410 Not authorized!');
+            }
+        }
+
         $fileVars = $request->getUploadedFiles();
         if (isSet($fileVars["Filedata"])) {
             self::$active = true;

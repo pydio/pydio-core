@@ -112,8 +112,9 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
 
 
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
+        $httpVars = $request->getParsedBody();
         $checkNonce = $this->pluginConf["CHECK_NONCE"] === true;
         $token = $this->detectVar($httpVars, "cyphered_token");
         $tokenInc = $this->detectVar($httpVars, "cyphered_token_inc");

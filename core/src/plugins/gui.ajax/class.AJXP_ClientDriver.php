@@ -23,7 +23,7 @@ namespace Pydio\Gui\Ajax;
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -122,6 +122,7 @@ class AJXP_ClientDriver extends Plugin
         if (AuthService::usersEnabled()) {
             //AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
             AuthService::bootSequence($START_PARAMETERS);
+            /*
             if (AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1) {
                 if (AuthService::getDefaultRootId() == -1) {
                     AuthService::disconnect();
@@ -134,6 +135,7 @@ class AJXP_ClientDriver extends Plugin
                     }
                 }
             }
+            */
         }
 
         Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
@@ -331,7 +333,7 @@ class AJXP_ClientDriver extends Plugin
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();
-        $config["SECURE_TOKEN"] = AuthService::generateSecureToken();
+        $config["SECURE_TOKEN"] = SecureTokenMiddleware::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];
         return $config;

@@ -22,6 +22,7 @@ namespace Pydio\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
@@ -80,7 +81,8 @@ class Controller
 
     /**
      * @param ServerRequestInterface $request
-     * @return \DOMElement|bool
+     * @return bool|\DOMElement
+     * @throws ActionNotFoundException
      */
     public static function parseRestParameters(ServerRequestInterface &$request){
         $actionName = $request->getAttribute("action");
@@ -90,14 +92,12 @@ class Controller
         $xPath = self::initXPath(true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
-            self::$lastActionNeedsAuth = true;
-            return false;
+            throw new ActionNotFoundException($actionName);
         }
         $action = $actions->item(0);
         $restPathList = $xPath->query("processing/serverCallback/@restParams", $action);
         if (!$restPathList->length) {
-            self::$lastActionNeedsAuth = true;
-            return false;
+            throw new ActionNotFoundException($actionName);
         }
         $restPath = $restPathList->item(0)->nodeValue;
         $paramNames = explode("/", trim($restPath, "/"));
@@ -134,7 +134,7 @@ class Controller
         }
         $response = Controller::run($request, $action);
         if($nextCallable != null){
-            $response = call_user_func($nextCallable, $request, $response);
+            $response = call_user_func_array($nextCallable, array(&$request, &$response));
         }
         return $response;
     }
@@ -195,13 +195,13 @@ class Controller
                     }
                 }
             }
-            throw new AuthRequiredException();
+            throw new ActionNotFoundException("cross_copy");
         }
         $xPath = self::initXPath(true);
         if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
             if (!$actions->length) {
-                throw new AuthRequiredException();
+                throw new AuthRequiredException($actionName);
             }
             $actionNode = $actions->item(0);
         }
@@ -642,7 +642,7 @@ class Controller
         $rightNode =  $rights->item(0);
         $rightAttr = $xPath->query("@".$right, $rightNode);
         if ($rightAttr->length && $rightAttr->item(0)->value == $expectedValue) {
-            self::$lastActionNeedsAuth = true;
+            //self::$lastActionNeedsAuth = true;
             return true;
         }
         return false;

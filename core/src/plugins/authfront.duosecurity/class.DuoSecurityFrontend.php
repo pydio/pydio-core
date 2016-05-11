@@ -30,10 +30,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class DuoSecurityFrontend extends AbstractAuthFrontend {
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
+        $httpVars = $request->getParsedBody();
         // CATCH THE STANDARD LOGIN OPERATION
-        if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
+        if($request->getAttribute("action") != "login"){
             return false;
         }
         if(Utils::userAgentIsNativePydioApp()){
@@ -70,7 +71,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             }
             if ($loggingResult == 1) {
                 session_regenerate_id(true);
-                $secureToken = AuthService::generateSecureToken();
+                $secureToken = \Pydio\Core\Http\Middleware\SecureTokenMiddleware::generateSecureToken();
             }
             if ($loggingResult < 1 && AuthService::suspectBruteForceLogin()) {
                 $loggingResult = -4; // Force captcha reload
@@ -95,9 +96,11 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
             AuthService::refreshRememberCookie($loggedUser);
         }
-        XMLWriter::header();
-        XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-        XMLWriter::close();
+        $response = $response->withHeader("Content-type", "application/xml");
+        $response->getBody()->write(XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken, false));
+        //XMLWriter::header();
+        //XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
+        //XMLWriter::close();
 
         if($loggingResult > 0 && $loggedUser != null){
 
@@ -113,8 +116,11 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $loggedUser->save("superuser");
         }
 
+
+        return true;
 //        if($loggingResult > 0 || $isLast){
-            exit();
+            //exit();
+
 //       }
 
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2016 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,10 +20,8 @@
  *
  * Description : Real RESTful API access
  */
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\Controller;
-use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Http\Server;
 
 include_once("base.conf.php");
 
@@ -33,9 +31,5 @@ ConfService::registerCatchAll();
 ConfService::init();
 ConfService::start();
 
-$server = new \Pydio\Core\Http\Server(PYDIO_SERVER_MODE_REST);
-$request = $server->getRequest();
-$server->bootRestServer($request);
-ConfService::reloadServicesAndActivePlugins();
-
+$server = new Server(Server::MODE_REST);
 $server->listen();

@@ -36,10 +36,44 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         return parent::isEnabled();
     }
 
-    function tryToLogUser(&$httpVars, $isLast = false){
+    protected function logUserFromSession(&$httpVars){
 
-        if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
-            return false;
+        if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) {
+            /**
+             * @var \Pydio\Conf\Core\AbstractAjxpUser $u
+             */
+            $u = $_SESSION["AJXP_USER"];
+            if($u->reloadRolesIfRequired()){
+                ConfService::getInstance()->invalidateLoadedRepositories();
+                AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
+                AuthService::updateUser($u);
+            }
+            return true;
+        }
+        if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
+            $authDriver = ConfService::getAuthDriverImpl();
+            if (!$authDriver->userExists("guest")) {
+                AuthService::createUser("guest", "");
+                $guest = ConfService::getConfStorageImpl()->createUserObject("guest");
+                $guest->save("superuser");
+            }
+            AuthService::logUser("guest", null);
+            return true;
+        }
+        return false;
+
+    }
+
+    protected function logUserFromLoginAction(&$httpVars){
+
+
+    }
+
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+
+        $httpVars = $request->getParsedBody();
+        if($request->getAttribute("action") != "login"){
+            return $this->logUserFromSession($httpVars);
         }
         $rememberLogin = "";
         $rememberPass = "";
@@ -59,7 +93,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             }
             if ($loggingResult == 1) {
                 session_regenerate_id(true);
-                $secureToken = AuthService::generateSecureToken();
+                $secureToken = \Pydio\Core\Http\Middleware\SecureTokenMiddleware::generateSecureToken();
             }
             if ($loggingResult < 1 && AuthService::suspectBruteForceLogin()) {
                 $loggingResult = -4; // Force captcha reload
@@ -84,19 +118,22 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
             AuthService::refreshRememberCookie($loggedUser);
         }
-        XMLWriter::header();
-        XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-        XMLWriter::close();
 
-        if($loggingResult > 0 || $isLast){
-            exit();
-        }
+        $stream = new \Pydio\Core\Http\SerializableResponseStream();
+        $stream->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
+        $response = $response->withBody($stream);
+        return true;
 
     }
 
     public function switchAction($action, $httpVars, $fileVars)
     {
         switch ($action) {
+
+            case "login":
+                
+                
+                break;
 
             case "logout" :
 
