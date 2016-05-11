@@ -80,14 +80,19 @@ class Server
         return $response;
     }
 
-    public function formatDetectionMiddleware($request, $response, $next = null){
+    public function formatDetectionMiddleware(ServerRequestInterface $request, ResponseInterface $response, $next = null){
         if($next !== null){
             $response = call_user_func($next, $request, $response);
         }
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
             // For the moment, use XML by default
-            $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
-            $response = $response->withHeader("Content-type", "application/xml; charset=UTF-8");
+            if($request->hasHeader("Accept") && $request->getHeader("Accept")[0] == "application/json"){
+                $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
+                $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
+            }else{
+                $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
+                $response = $response->withHeader("Content-type", "application/xml; charset=UTF-8");
+            }
         }
         return $response;
     }

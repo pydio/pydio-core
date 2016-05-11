@@ -84,7 +84,8 @@ class SerializableResponseStream implements StreamInterface
                     $buffer[] = $serializableItem;
                 }
             }
-            return json_encode($buffer);
+            if(count($buffer) == 1) return json_encode($buffer[0]);
+            else return json_encode($buffer);
         }else if($serializer == self::SERIALIZER_TYPE_XML){
             $wrap = true;
             $buffer = "";

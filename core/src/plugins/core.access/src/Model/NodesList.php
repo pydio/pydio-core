@@ -23,9 +23,10 @@ namespace Pydio\Access\Core\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\JSONSerializableResponseChunk;
 use Pydio\Core\Http\XMLDocSerializableResponseChunk;
 
-class NodesList implements XMLDocSerializableResponseChunk
+class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResponseChunk
 {
 
     /**
@@ -96,5 +97,36 @@ class NodesList implements XMLDocSerializableResponseChunk
         }
         $buffer .= XMLWriter::close("tree", false);
         return $buffer;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function jsonSerializableData()
+    {
+        $children = [];
+        foreach ($this->children as $child){
+            if($child instanceof NodesList){
+                $children[$child->jsonSerializableKey()] = $child->jsonSerializableData();
+            }else{
+                $children[$child->getPath()] = $child;
+            }
+        }
+        if(isSet($this->paginationData)){
+            return [
+                "pagination" => $this->paginationData,
+                "data"      => ["node" => $this->parentNode, "children" => $children]
+            ];
+        }else{
+            return [ "node" => $this->parentNode, "children" => $children];
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function jsonSerializableKey()
+    {
+        return $this->parentNode->getPath();
     }
 }

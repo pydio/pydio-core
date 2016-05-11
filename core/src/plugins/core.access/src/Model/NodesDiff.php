@@ -21,11 +21,14 @@
 namespace Pydio\Access\Core\Model;
 
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\JSONSerializableResponseChunk;
 use Pydio\Core\Http\XMLSerializableResponseChunk;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class NodesDiff implements XMLSerializableResponseChunk
+class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
     /**
      * @var AJXP_Node[] Array of new nodes added, indexes are numeric.
@@ -79,10 +82,86 @@ class NodesDiff implements XMLSerializableResponseChunk
     }
 
     /**
+     * @param AJXP_Node $ajxpNode
+     */
+    protected function forceLoadNodeInfo(&$ajxpNode){
+        $mess = ConfService::getMessages();
+        $ajxpNode->loadNodeInfo(false, false, "all");
+        if (!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)) {
+            $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
+        }
+    }
+
+    /**
      * @return string
      */
     public function toXML()
     {
-        return XMLWriter::writeNodesDiff(["ADD" => $this->added, "REMOVE" => $this->removed, "UPDATE" => $this->updated]);
+        $buffer = "<nodes_diff>";
+        if (count($this->removed)) {
+            $buffer .= "<remove>";
+            foreach ($this->removed as $nodePath) {
+                $nodePath = Utils::xmlEntities($nodePath, true);
+                $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
+            }
+            $buffer .= "</remove>";
+        }
+        if (count($this->added)) {
+            $buffer .= "<add>";
+            foreach ($this->added as $ajxpNode) {
+                $this->forceLoadNodeInfo($ajxpNode);
+                $buffer .=  XMLWriter::renderAjxpNode($ajxpNode, true, false);
+            }
+            $buffer .= "</add>";
+        }
+        if (count($this->updated)) {
+            $buffer .= "<update>";
+            foreach ($this->updated as $originalPath => $ajxpNode) {
+                $this->forceLoadNodeInfo($ajxpNode);
+                $ajxpNode->original_path = $originalPath;
+                $buffer .= XMLWriter::renderAjxpNode($ajxpNode, true, false);
+            }
+            $buffer .= "</update>";
+        }
+        $buffer .= "</nodes_diff>";
+        return $buffer;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function jsonSerializableData()
+    {
+        $output = [];
+        if (count($this->removed)) {
+            $output['remove'] = [];
+            foreach ($this->removed as $nodePath) {
+                $output['remove'][] = ["path"=>$nodePath, "ajxp_im_time"=>time()];
+            }
+        }
+        if (count($this->added)) {
+            $output['add'] = [];
+            foreach ($this->added as $ajxpNode) {
+                $this->forceLoadNodeInfo($ajxpNode);
+                $output['add'][] = $ajxpNode;
+            }
+        }
+        if (count($this->updated)) {
+            $output['update'] = [];
+            foreach ($this->updated as $originalPath => $ajxpNode) {
+                $this->forceLoadNodeInfo($ajxpNode);
+                $ajxpNode->original_path = $originalPath;
+                $output['update'][] = $ajxpNode;
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * @return string
+     */
+    public function jsonSerializableKey()
+    {
+        return "nodesDiff";
     }
 }

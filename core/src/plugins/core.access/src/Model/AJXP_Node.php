@@ -36,7 +36,7 @@ use Pydio\Metastore\Core\MetaStoreProvider;
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Node
+class AJXP_Node implements \JsonSerializable
 {
     /**
      * @var string URL of the node in the form ajxp.protocol://repository_id/path/to/node
@@ -612,4 +612,26 @@ class AJXP_Node
         }
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        $data = $this->_metadata;
+        unset($data["filename"]);
+        $data["path"] = $this->_metadata["filename"];
+        if(isSet($this->_metadata["is_file"])){
+            unset($data["is_file"]);
+            $data["type"] = $this->isLeaf() ? "leaf" : "collection";
+        }
+        if(isSet($this->_metadata["text"])){
+            unset($data["text"]);
+            $data["label"] = $this->getLabel();
+        }
+        return $data;
+    }
 }
