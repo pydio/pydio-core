@@ -141,12 +141,19 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
+        <!-- RUN COMPOSER IF NECESSARY -->
+        <if>
+            <available type="file" file="${INNER_DIRECTORY}/core/composer.json"/>
+            <then>
+                <composer command="install" composer="/home/builder/composer.phar">
+                    <arg value="--optimize-autoloader" />
+                    <arg value="--working-dir" />
+                    <arg path="${INNER_DIRECTORY}" />
+                </composer>
+            </then>
+        </if>
+
     	<!-- BUILD JAVASCRIPT -->
-        <!--
-    	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-        <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
-	    -->
         <phingcall target="iterate-plugins">
             <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
             <property name="target" value="grunt"/>
