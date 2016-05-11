@@ -77,8 +77,8 @@ class ShareStore {
         if(!is_file($this->downloadFolder."/share.php")){
             $loader_content = '<'.'?'.'php
                     define("AJXP_EXEC", true);
-                    require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/'.AJXP_BIN_FOLDER_REL.'/class.AJXP_Utils.php");
-                    $hash = Pydio\Core\Utils\AJXP_Utils::securePath(Pydio\Core\Utils\AJXP_Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
+                    require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/core/src/pydio/Core/Utils/Utils.php");
+                    $hash = Pydio\Core\Utils\Utils::securePath(Pydio\Core\Utils\Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
                     if(file_exists($hash.".php")){
                         require_once($hash.".php");
                     }else{
