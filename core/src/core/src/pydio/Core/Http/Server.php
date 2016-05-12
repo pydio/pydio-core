@@ -95,7 +95,7 @@ class Server
         if($this->middleWares->valid()){
             $callable = $this->middleWares->current();
             $this->middleWares->next();
-            $response = call_user_func_array($callable, array(&$request, &$response, function($req, $res){
+            $response = call_user_func_array($callable, array($request, $response, function($req, $res){
                 return $this->nextCallable($req, $res);
             }));
         }
@@ -111,9 +111,9 @@ class Server
      * @param callable|null $next
      * @return ResponseInterface
      */
-    public static function callNextMiddleWare(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null){
+    public static function callNextMiddleWare(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
         if($next !== null){
-            $responseInterface = call_user_func_array($next, array(&$requestInterface, &$responseInterface));
+            $responseInterface = call_user_func_array($next, array($requestInterface, $responseInterface));
         }
         return $responseInterface;
     }
@@ -125,9 +125,9 @@ class Server
      * @param callable|null $next
      * @return ResponseInterface
      */
-    public static function callNextMiddleWareAndRewind(callable $comparisonFunction, ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null){
+    public static function callNextMiddleWareAndRewind(callable $comparisonFunction, ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
         if($next !== null){
-            $responseInterface = call_user_func_array($next, array(&$requestInterface, &$responseInterface));
+            $responseInterface = call_user_func_array($next, array($requestInterface, $responseInterface));
         }
         self::$middleWareInstance->rewind();
         while(!$comparisonFunction(self::$middleWareInstance->current())){

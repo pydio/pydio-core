@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class SessionMiddleware
 {
 
-    public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
+    public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
         $getParams = $requestInterface->getQueryParams();
         $sessionName = SessionService::getSessionName();

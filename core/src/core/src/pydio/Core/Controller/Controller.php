@@ -127,7 +127,7 @@ class Controller
      * @return ResponseInterface
      * @throws AuthRequiredException
      */
-    public static function registryActionMiddleware(ServerRequestInterface &$request, ResponseInterface &$response, callable $nextCallable = null){
+    public static function registryActionMiddleware(ServerRequestInterface $request, ResponseInterface $response, callable $nextCallable = null){
         $action = null;
         if(ConfService::currentContextIsRestAPI()){
             $action = Controller::parseRestParameters($request);

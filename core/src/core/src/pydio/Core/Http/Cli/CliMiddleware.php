@@ -40,7 +40,7 @@ class CliMiddleware
      * @param callable|null $next
      * @throws WorkspaceNotFoundException
      */
-    public static function handleRequest(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null){
+    public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
         /**
          * @var OutputInterface

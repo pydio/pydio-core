@@ -33,7 +33,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class SapiMiddleware
 {
 
-    public static function handleRequest(ServerRequestInterface &$request, ResponseInterface &$response, callable $next = null){
+    public static function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
 
         $params = $request->getQueryParams();
         $postParams = $request->getParsedBody();

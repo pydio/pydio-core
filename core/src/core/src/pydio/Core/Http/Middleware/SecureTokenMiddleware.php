@@ -41,7 +41,7 @@ class SecureTokenMiddleware
      * @param callable|null $next
      * @throws PydioException
      */
-    public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
+    public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
         $pluginsUnSecureActions = ConfService::getDeclaredUnsecureActions();
         $pluginsUnSecureActions[] = "get_secure_token";

@@ -41,7 +41,7 @@ class AuthCliMiddleware
      * @return ResponseInterface
      * @throws AuthRequiredException
      */
-    public static function handleRequest(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null){
+    public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
 
         $options = $requestInterface->getAttribute("cli-options");
