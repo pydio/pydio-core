@@ -22,6 +22,8 @@ namespace Pydio\Core\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Http\Server;
@@ -41,7 +43,7 @@ class AuthMiddleware
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @return \Psr\Http\Message\ResponseInterface
      * @param callable|null $next
-     * @throws WorkspaceNotFoundException
+     * @throws PydioException
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
@@ -80,7 +82,16 @@ class AuthMiddleware
             self::bootRestServer($requestInterface);
         }
 
-        ConfService::reloadServicesAndActivePlugins();
+        try{
+            ConfService::reloadServicesAndActivePlugins();
+        }catch (NoActiveWorkspaceException $ex){
+            if(Server::$mode != Server::MODE_SESSION) throw $ex;
+            $logged = AuthService::getLoggedUser();
+            if($logged !== null) $lock = $logged->getLock();
+            if(empty($lock)){
+                throw new AuthRequiredException();
+            }
+        }
 
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 

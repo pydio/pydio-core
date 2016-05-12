@@ -29,6 +29,7 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\CoreConfLoader;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Utils\Utils;
@@ -1687,7 +1688,7 @@ class ConfService
             $this->switchRootDirInst();
             $repository = $this->getRepositoryInst();
             if($repository == null){
-                throw new \Exception("No active repository found for user!");
+                throw new NoActiveWorkspaceException();
             }
         }else{
             $rest = true;

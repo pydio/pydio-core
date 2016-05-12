@@ -30,7 +30,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PydioException extends \Exception
 {
-    public function __construct($messageString, $messageId = false)
+    private $errorCode;
+
+    public function __construct($messageString, $messageId = false, $errorCode = null)
     {
         if ($messageId !== false && class_exists("ConfService")) {
             $messages = ConfService::getMessages();
@@ -39,6 +41,9 @@ class PydioException extends \Exception
             } else {
                 $messageString = $messageId;
             }
+        }
+        if(isSet($errorCode)){
+            $this->errorCode = $errorCode;
         }
         parent::__construct($messageString);
     }
@@ -50,5 +55,13 @@ class PydioException extends \Exception
         } else {
             throw new PydioException($mixed);
         }
+    }
+
+    public function hasErrorCode(){
+        return isSet($this->errorCode);
+    }
+
+    public function getErrorCode(){
+        return $this->errorCode;
     }
 }
