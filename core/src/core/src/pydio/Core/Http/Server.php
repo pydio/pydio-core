@@ -53,14 +53,23 @@ class Server
         $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
 
         $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
-        $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\AuthMiddleware", "handleRequest"));
+
+        if($serverMode == Server::MODE_CLI){
+            $this->middleWares->push(array("Pydio\\Core\\Http\\Cli\\AuthCliMiddleware", "handleRequest"));
+        }else{
+            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\AuthMiddleware", "handleRequest"));
+        }
 
         if($serverMode == Server::MODE_SESSION){
             $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SecureTokenMiddleware", "handleRequest"));
             $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SessionMiddleware", "handleRequest"));
         }
 
-        $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SapiMiddleware", "handleRequest"));
+        if($serverMode == Server::MODE_CLI){
+            $this->middleWares->push(array("Pydio\\Core\\Http\\Cli\\CliMiddleware", "handleRequest"));
+        }else{
+            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SapiMiddleware", "handleRequest"));
+        }
 
     }
 
@@ -69,6 +78,10 @@ class Server
             $this->request = $this->initServerRequest();
         }
         return $this->request;
+    }
+
+    public function updateRequest(ServerRequestInterface $request){
+        $this->request = $request;
     }
 
     /**
