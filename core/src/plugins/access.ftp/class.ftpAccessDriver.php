@@ -22,9 +22,14 @@
 namespace Pydio\Access\Driver\StreamProvider\FTP;
 
 use DOMNode;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Http\Message\BgActionTrigger;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -85,17 +90,18 @@ class ftpAccessDriver extends fsAccessDriver
         //AJXP_PromptException::testOrPromptForCredentials("ftp_ws_credentials", $this->repository->getId());
     }
 
-    public function uploadActions($action, $httpVars, $filesVars)
+    public function uploadActions(ServerRequestInterface &$request, ResponseInterface &$response)
     {
-        switch ($action) {
+        switch ($request->getAttribute("action")) {
+
             case "trigger_remote_copy":
                 if(!$this->hasFilesToCopy()) break;
                 $toCopy = $this->getFileNameToCopy();
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to ftp server");
-                XMLWriter::close();
-                exit(1);
+                $x = new SerializableResponseStream();
+                $response = $response->withBody($x);
+                $x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".$toCopy." to ftp server"));
             break;
+
             case "next_to_remote":
                 if(!$this->hasFilesToCopy()) break;
                 $fData = $this->getNextFileToCopy();
@@ -130,101 +136,118 @@ class ftpAccessDriver extends fsAccessDriver
                     $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
                 }
                 $this->logDebug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
-                XMLWriter::header();
+                $x = new SerializableResponseStream();
+                $response = $response->withBody($x);
                 if ($nextFile!='') {
-                    XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server");
+                    $x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
                 } else {
-                    XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
+                    $x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
                 }
-                XMLWriter::close();
-                exit(1);
             break;
-            case "upload":
-                $rep_source = Utils::securePath("/".$httpVars['dir']);
-                $this->logDebug("Upload : rep_source ", array($rep_source));
-                $logMessage = "";
-                foreach ($filesVars as $boxName => $boxData) {
-                    if(substr($boxName, 0, 9) != "userfile_")     continue;
-                    $this->logDebug("Upload : rep_source ", array($rep_source));
-                    $err = Utils::parseFileDataErrors($boxData);
-                    if ($err != null) {
-                        $errorCode = $err[0];
-                        $errorMessage = $err[1];
-                        break;
-                    }
-                    if (isSet($httpVars["auto_rename"])) {
-                        $destination = $this->urlBase.$rep_source;
-                        $boxData["name"] = fsAccessDriver::autoRenameForDest($destination, $boxData["name"]);
-                    }
-                    $boxData["destination"] = base64_encode($rep_source);
-                    $destCopy = XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
-                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
-                    if (!is_dir($destCopy)) {
-                        if (! @mkdir($destCopy)) {
-                            $this->logDebug("Upload error : cannot create temporary folder", array($destCopy));
-                            $errorCode = 413;
-                            $errorMessage = "Warning, cannot create folder for temporary copy.";
-                            break;
-                        }
-                    }
-                    if (!$this->isWriteable($destCopy)) {
-                        $this->logDebug("Upload error: cannot write into temporary folder");
-                        $errorCode = 414;
-                        $errorMessage = "Warning, cannot write into temporary folder.";
-                        break;
-                    }
-                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
-                    if (isSet($boxData["input_upload"])) {
-                        try {
-                            $destName = tempnam($destCopy, "");
-                            $this->logDebug("Begining reading INPUT stream");
-                            $input = fopen("php://input", "r");
-                            $output = fopen($destName, "w");
-                            $sizeRead = 0;
-                            while ($sizeRead < intval($boxData["size"])) {
-                                $chunk = fread($input, 4096);
-                                $sizeRead += strlen($chunk);
-                                fwrite($output, $chunk, strlen($chunk));
-                            }
-                            fclose($input);
-                            fclose($output);
-                            $boxData["tmp_name"] = $destName;
-                            $this->storeFileToCopy($boxData);
-                            $this->logDebug("End reading INPUT stream");
-                        } catch (\Exception $e) {
-                            $errorCode=411;
-                            $errorMessage = $e->getMessage();
-                            break;
-                        }
-                    } else {
-                        $destName = $destCopy."/".basename($boxData["tmp_name"]);
-                        if ($destName == $boxData["tmp_name"]) $destName .= "1";
-                        if (move_uploaded_file($boxData["tmp_name"], $destName)) {
-                            $boxData["tmp_name"] = $destName;
-                            $this->storeFileToCopy($boxData);
-                        } else {
-                            $mess = ConfService::getMessages();
-                            $errorCode = 411;
-                            $errorMessage="$mess[33] ".$boxData["name"];
-                            break;
-                        }
-                    }
-                }
-                if (isSet($errorMessage)) {
-                    $this->logDebug("Return error $errorCode $errorMessage");
-                    return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
-                } else {
-                    $this->logDebug("Return success");
-                    return array("SUCCESS" => true, "PREVENT_NOTIF" => true);
-                }
 
+            case "upload":
+                $httpVars = $request->getParsedBody();
+                $destinationFolder = Utils::securePath("/".$httpVars['dir']);
+
+                /** @var UploadedFileInterface[] $uploadedFiles */
+                $uploadedFiles = $request->getUploadedFiles();
+                if(!count($uploadedFiles)){
+                    $this->writeUploadError($request, "Could not find any uploaded file", 411);
+                }
+                foreach ($uploadedFiles as $parameterName => $uploadedFile) {
+
+                    if (substr($parameterName, 0, 9) != "userfile_") continue;
+                    try {
+
+                        $this->logDebug("Upload : rep_source ", array($destinationFolder));
+                        $err = Utils::parseFileDataErrors($uploadedFile, true);
+                        if ($err != null) {
+                            $errorCode = $err[0];
+                            $errorMessage = $err[1];
+                            throw new \Exception($errorMessage, $errorCode);
+                        }
+                        $fileName = $uploadedFile->getClientFilename();
+
+                        if (isSet($httpVars["auto_rename"])) {
+                            $destination = $this->urlBase . $destinationFolder;
+                            $fileName = fsAccessDriver::autoRenameForDest($destination, $fileName);
+                        }
+                        $boxData = [
+                            "name" => $fileName,
+                            "destination" => base64_encode($destinationFolder)
+                        ];
+
+                        $destCopy = XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
+                        $this->logDebug("Upload : tmp upload folder", array($destCopy));
+                        if (!is_dir($destCopy)) {
+                            if (!@mkdir($destCopy)) {
+                                $this->logDebug("Upload error : cannot create temporary folder", array($destCopy));
+                                throw new PydioException("Warning, cannot create folder for temporary copy", false, 413);
+                            }
+                        }
+                        if (!$this->isWriteable($destCopy)) {
+                            $this->logDebug("Upload error: cannot write into temporary folder");
+                            throw new PydioException("Warning, cannot write into temporary folder", false, 414);
+                            break;
+                        }
+                        $this->logDebug("Upload : tmp upload folder", array($destCopy));
+
+                        $mess = ConfService::getMessages();
+                        $destName = tempnam($destCopy, "");
+                        $boxData["tmp_name"] = $destName;
+                        $this->copyUploadedData($uploadedFile, $destName, $mess);
+                        $this->storeFileToCopy($boxData);
+                        /*
+                        if (isSet($boxData["input_upload"])) {
+                            try {
+                                $destName = tempnam($destCopy, "");
+                                $this->logDebug("Begining reading INPUT stream");
+                                $input = fopen("php://input", "r");
+                                $output = fopen($destName, "w");
+                                $sizeRead = 0;
+                                while ($sizeRead < intval($boxData["size"])) {
+                                    $chunk = fread($input, 4096);
+                                    $sizeRead += strlen($chunk);
+                                    fwrite($output, $chunk, strlen($chunk));
+                                }
+                                fclose($input);
+                                fclose($output);
+                                $boxData["tmp_name"] = $destName;
+                                $this->storeFileToCopy($boxData);
+                                $this->logDebug("End reading INPUT stream");
+                            } catch (\Exception $e) {
+                                $errorCode=411;
+                                $errorMessage = $e->getMessage();
+                                break;
+                            }
+                        } else {
+                            $destName = $destCopy."/".basename($boxData["tmp_name"]);
+                            if ($destName == $boxData["tmp_name"]) $destName .= "1";
+                            if (move_uploaded_file($boxData["tmp_name"], $destName)) {
+                                $boxData["tmp_name"] = $destName;
+                                $this->storeFileToCopy($boxData);
+                            } else {
+                                $mess = ConfService::getMessages();
+                                $errorCode = 411;
+                                $errorMessage="$mess[33] ".$boxData["name"];
+                                break;
+                            }
+                        }
+                    }*/
+                        $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
+
+                    } catch (\Exception $e) {
+                        $errorCode = $e->getCode();
+                        if(empty($errorCode)) $errorCode = 411;
+                        $this->writeUploadError($request, $e->getMessage(), $errorCode);
+                    }
+                }
             break;
+
             default:
             break;
         }
-        session_write_close();
-        exit;
-
+        return null;
     }
 
     public function isWriteable($path, $type="dir")

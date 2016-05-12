@@ -357,7 +357,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
 
                 // NOW DO THE ACTUAL COPY
-                $this->copyUploadedData($uploadedFile, $destination, $userfile_name, $mess);
+                $this->copyUploadedData($uploadedFile, $destination, $mess);
 
                 // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
                 if (isSet($httpVars["appendto_urlencoded_part"])) {
@@ -1372,13 +1372,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     /**
      * @param array|UploadedFileInterface $uploadData Php-upload array
-     * @param String $destination Destination folder, including stream data
-     * @param String $filename Destination filename
+     * @param String $destination Full path to destination file, including stream data
      * @param array $messages Application messages table
      * @return bool
      * @throws \Exception
      */
-    protected function copyUploadedData($uploadData, $destination, $filename, $messages){
+    protected function copyUploadedData($uploadData, $destination, $messages){
         if(is_array($uploadData)){
             $isInputStream = isSet($uploadData["input_upload"]);
             $newFileSize = $uploadData["size"];
@@ -1395,7 +1394,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }else{
                     $input = $uploadData->getStream()->detach();
                 }
-                $output = fopen("$destination/".$filename, "w");
+                $output = fopen($destination, "w");
                 $sizeRead = 0;
                 while ($sizeRead < intval($newFileSize)) {
                     $chunk = fread($input, 4096);
@@ -1410,20 +1409,20 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
         } else {
             if(is_array($uploadData)){
-                $result = @move_uploaded_file($uploadData["tmp_name"], "$destination/".$filename);
+                $result = @move_uploaded_file($uploadData["tmp_name"], $destination);
                 if (!$result) {
-                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
+                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference($destination);
                     $result = move_uploaded_file($uploadData["tmp_name"], $realPath);
                 }
             }else{
                 $clone = clone $uploadData;
                 try{
-                    $uploadData->moveTo($destination."/".$filename);
+                    $uploadData->moveTo($destination);
                     $result = true;
                 }catch(\Exception $e){
                     // Can be blocked by open_basedir, try to perform the move again, with the
                     // real FS reference.
-                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference("$destination/".$filename);
+                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference($destination);
                     try{
                         $clone->moveTo($realPath);
                         $result = true;
@@ -1433,7 +1432,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
             }
             if (!$result) {
-                $errorMessage="$messages[33] ".$filename;
+                $errorMessage="$messages[33] ".Utils::safeBasename($destination);
                 throw new \Exception($errorMessage, 411);
             }
         }

@@ -32,12 +32,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AvatarProvider extends Plugin
 {
-    public function receiveAction($action, $httpVars, $filesVars)
+    public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $provider = $this->getFilteredOption("AVATAR_PROVIDER");
         $type = $this->getFilteredOption("GRAVATAR_TYPE");
-
-        if ($action == "get_avatar_url") {
+        $httpVars = $requestInterface->getParsedBody();
+        if ($requestInterface->getAttribute("action") == "get_avatar_url") {
             $url = "";
             $suffix = "";
             switch ($provider) {
@@ -76,7 +76,7 @@ class AvatarProvider extends Plugin
                 }
             }
             $url .= $suffix;
-            print($url);
+            $responseInterface->getBody()->write($url);
         }
     }
 }

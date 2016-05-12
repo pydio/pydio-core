@@ -26,9 +26,10 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\Message\BgActionTrigger;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Access\Core\Model\NodesDiff;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -45,9 +46,9 @@ class PluginCompression extends Plugin
      * @param array $fileVars
      * @throws Exception
      */
-    public function receiveAction($action, $httpVars, $fileVars)
+    public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        //VAR CREATION OUTSIDE OF ALL CONDITIONS, THEY ARE "MUST HAVE" VAR !!
+        $httpVars = $requestInterface->getParsedBody();
         $messages = ConfService::getMessages();
         $repository = ConfService::getRepository();
         $userSelection = new UserSelection($repository, $httpVars);
@@ -55,6 +56,7 @@ class PluginCompression extends Plugin
         $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
         $currentDirUrl = $userSelection->currentBaseUrl().$currentDirPath;
+
         if (empty($httpVars["compression_id"])) {
             $compressionId = sha1(rand());
             $httpVars["compression_id"] = $compressionId;
@@ -68,37 +70,45 @@ class PluginCompression extends Plugin
         } else {
             $extractId = $httpVars["extraction_id"];
         }
-            $progressExtractFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressExtractID-" . $extractId . ".txt";
-        if ($action == "compression") {
-            $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
-            $archiveFormat = $httpVars["type_archive"];
-            $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
-            $acceptedExtension = false;
-            foreach ($tabTypeArchive as $extensionArchive) {
-                if ($extensionArchive == $archiveFormat) {
-                    $acceptedExtension = true;
-                    break;
+        $progressExtractFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressExtractID-" . $extractId . ".txt";
+
+        $serializableStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($serializableStream);
+
+        switch ($requestInterface->getAttribute("action")){
+
+            case "compression":
+
+                $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archiveFormat = $httpVars["type_archive"];
+                $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
+                $acceptedExtension = false;
+                foreach ($tabTypeArchive as $extensionArchive) {
+                    if ($extensionArchive == $archiveFormat) {
+                        $acceptedExtension = true;
+                        break;
+                    }
                 }
-            }
-            if ($acceptedExtension == false) {
-                file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.16"]);
-                throw new PydioException($messages["compression.16"]);
-            }
-            $typeArchive = $httpVars["type_archive"];
-            //if we can run in background we do it
-            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                $archivePath = $currentDirPath.$archiveName;
-                file_put_contents($progressCompressionFileName, $messages["compression.5"]);
-                Controller::applyActionInBackground($repository->getId(), "compression", $httpVars);
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("check_compression_status", array(
-                    "repository_id" => $repository->getId(),
-                    "compression_id" => $compressionId,
-                    "archive_path" => TextEncoder::toUTF8($archivePath)
-                ), $messages["compression.5"], true, 2);
-                XMLWriter::close();
-                return null;
-            } else {
+                if (!$acceptedExtension) {
+                    file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.16"]);
+                    throw new PydioException($messages["compression.16"]);
+                }
+                $typeArchive = $httpVars["type_archive"];
+
+                // LAUNCH IN BACKGROUND AND EXIT
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                    $archivePath = $currentDirPath.$archiveName;
+                    file_put_contents($progressCompressionFileName, $messages["compression.5"]);
+                    Controller::applyActionInBackground($repository->getId(), "compression", $httpVars);
+                    $serializableStream->addChunk(new BgActionTrigger("check_compression_status", array(
+                        "repository_id" => $repository->getId(),
+                        "compression_id" => $compressionId,
+                        "archive_path" => TextEncoder::toUTF8($archivePath)
+                    ), $messages["compression.5"], 2));
+
+                    return null;
+                }
+
                 $maxAuthorizedSize = 4294967296;
                 $currentDirUrlLength = strlen($currentDirUrl);
                 $tabFolders = array();
@@ -172,151 +182,165 @@ class PluginCompression extends Plugin
                 $newNode = new AJXP_Node($currentDirUrl . $archiveName);
                 Controller::applyHook("node.change", array(null, $newNode, false));
                 file_put_contents($progressCompressionFileName, "SUCCESS");
-            }
-        }
-    elseif ($action == "check_compression_status") {
-        $archivePath = Utils::decodeSecureMagic($httpVars["archive_path"]);
-        $progressCompression = file_get_contents($progressCompressionFileName);
-        $substrProgressCompression = substr($progressCompression, 0, 5);
-        if ($progressCompression != "SUCCESS" && $substrProgressCompression != "Error") {
-            XMLWriter::header();
-                XMLWriter::triggerBgAction("check_compression_status", array(
-                    "repository_id" => $repository->getId(),
-                    "compression_id" => $compressionId,
-                    "archive_path" => TextEncoder::toUTF8($archivePath)
-                ), $progressCompression, true, 5);
-                XMLWriter::close();
-            } elseif ($progressCompression == "SUCCESS") {
-                $newNode = new AJXP_Node($userSelection->currentBaseUrl() . $archivePath);
-                $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
-                Controller::applyHook("node.change", array(null, $newNode, false));
-                XMLWriter::header();
-                XMLWriter::sendMessage($messages["compression.8"], null);
-                XMLWriter::writeNodesDiff($nodesDiffs, true);
-                XMLWriter::close();
-                if (file_exists($progressCompressionFileName)) {
-                    unlink($progressCompressionFileName);
-                }
-            } elseif ($substrProgressCompression == "Error") {
-                XMLWriter::header();
-                XMLWriter::sendMessage(null, $progressCompression);
-                XMLWriter::close();
-                if (file_exists($progressCompressionFileName)) {
-                    unlink($progressCompressionFileName);
-                }
-            }
-    }
-        elseif ($action == "extraction") {
-            $fileArchive = Utils::sanitize(Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
-            $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
-            $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
-            $acceptedArchive = false;
-            $extensionLength = 0;
-            $counterExtract = 0;
-            $currentAllPydioPath = $currentDirUrl . $fileArchive;
-            $pharCurrentAllPydioPath = "phar://" . AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath);
-            $pathInfoCurrentAllPydioPath = pathinfo($currentAllPydioPath, PATHINFO_EXTENSION);
-            //WE TAKE ONLY TAR, TAR.GZ AND TAR.BZ2 ARCHIVES
-            foreach ($authorizedExtension as $extension => $strlenExtension) {
-                if ($pathInfoCurrentAllPydioPath == $extension) {
-                    $acceptedArchive = true;
-                    $extensionLength = $strlenExtension;
-                    break;
-                }
-            }
-            if ($acceptedArchive == false) {
-                file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
-                throw new PydioException($messages["compression.15"]);
-            }
-            $onlyFileName = substr($fileArchive, 0, -$extensionLength);
-            $lastPosOnlyFileName =  strrpos($onlyFileName, "-");
-            $tmpOnlyFileName = substr($onlyFileName, 0, $lastPosOnlyFileName);
-            $counterDuplicate = substr($onlyFileName, $lastPosOnlyFileName + 1);
-            if (!is_int($lastPosOnlyFileName) || !is_int($counterDuplicate)) {
-                $tmpOnlyFileName = $onlyFileName;
-                $counterDuplicate = 1;
-            }
-            while (file_exists($currentDirUrl . $onlyFileName)) {
-                $onlyFileName = $tmpOnlyFileName . "-" . $counterDuplicate;
-                $counterDuplicate++;
-            }
-            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                file_put_contents($progressExtractFileName, $messages["compression.12"]);
-                Controller::applyActionInBackground($repository->getId(), "extraction", $httpVars);
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("check_extraction_status", array(
-                    "repository_id" => $repository->getId(),
-                    "extraction_id" => $extractId,
-                    "currentDirUrl" => $currentDirUrl,
-                    "onlyFileName" => $onlyFileName
-                ), $messages["compression.12"], true, 2);
-                XMLWriter::close();
-                return null;
-            }
-            mkdir($currentDirUrl . $onlyFileName, 0777, true);
-            chmod(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), 0777);
-            try {
-                $archive = new PharData(AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
-                $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
-                foreach ($fichiersArchive as $file) {
-                    $fileGetPathName = $file->getPathname();
-                    if($file->isDir()) {
-                        continue;
+
+                break;
+
+            case "check_compression_status":
+
+                $archivePath = Utils::decodeSecureMagic($httpVars["archive_path"]);
+                $progressCompression = file_get_contents($progressCompressionFileName);
+                $substrProgressCompression = substr($progressCompression, 0, 5);
+                if ($progressCompression != "SUCCESS" && $substrProgressCompression != "Error") {
+
+                    $serializableStream->addChunk(new BgActionTrigger("check_compression_status", array(
+                        "repository_id" => $repository->getId(),
+                        "compression_id" => $compressionId,
+                        "archive_path" => TextEncoder::toUTF8($archivePath)
+                    ), $progressCompression, 5));
+
+                } elseif ($progressCompression == "SUCCESS") {
+                    $newNode = new AJXP_Node($userSelection->currentBaseUrl() . $archivePath);
+                    $nodesDiffs = new NodesDiff();
+                    $nodesDiffs->add($newNode);
+                    Controller::applyHook("node.change", array(null, $newNode, false));
+                    $serializableStream->addChunk(new \Pydio\Core\Http\Message\UserMessage($messages["compression.8"]));
+                    $serializableStream->addChunk($nodesDiffs);
+                    if (file_exists($progressCompressionFileName)) {
+                        unlink($progressCompressionFileName);
                     }
-                    $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
-                    try {
-                        $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
-                    } catch (Exception $e) {
-                        file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
-                        throw new PydioException($e);
+                } elseif ($substrProgressCompression == "Error") {
+                    if (file_exists($progressCompressionFileName)) {
+                        unlink($progressCompressionFileName);
                     }
-                    $counterExtract++;
-                    file_put_contents($progressExtractFileName, sprintf($messages["compression.13"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
+                    throw new PydioException($progressCompression);
                 }
-            } catch (Exception $e) {
-                file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
-                throw new PydioException($e);
-            }
-            file_put_contents($progressExtractFileName, "SUCCESS");
-            $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
-            Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
-        }
-    elseif ($action == "check_extraction_status") {
-            $currentDirUrl = $httpVars["currentDirUrl"];
-            $onlyFileName = $httpVars["onlyFileName"];
-            $progressExtract = file_get_contents($progressExtractFileName);
-            $substrProgressExtract = substr($progressExtract, 0, 5);
-            if ($progressExtract != "SUCCESS" && $progressExtract != "INDEX" && $substrProgressExtract != "Error") {
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("check_extraction_status", array(
-                    "repository_id" => $repository->getId(),
-                    "extraction_id" => $extractId,
-                    "currentDirUrl" => $currentDirUrl,
-                    "onlyFileName" => $onlyFileName
-                ), $progressExtract, true, 4);
-                XMLWriter::close();
-            } elseif ($progressExtract == "SUCCESS") {
+                break;
+
+            case "extraction":
+
+                $fileArchive = Utils::sanitize(Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
+                $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
+                $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
+                $acceptedArchive = false;
+                $extensionLength = 0;
+                $counterExtract = 0;
+                $currentAllPydioPath = $currentDirUrl . $fileArchive;
+                $pharCurrentAllPydioPath = "phar://" . AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath);
+                $pathInfoCurrentAllPydioPath = pathinfo($currentAllPydioPath, PATHINFO_EXTENSION);
+                //WE TAKE ONLY TAR, TAR.GZ AND TAR.BZ2 ARCHIVES
+                foreach ($authorizedExtension as $extension => $strlenExtension) {
+                    if ($pathInfoCurrentAllPydioPath == $extension) {
+                        $acceptedArchive = true;
+                        $extensionLength = $strlenExtension;
+                        break;
+                    }
+                }
+                if ($acceptedArchive == false) {
+                    file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
+                    throw new PydioException($messages["compression.15"]);
+                }
+                $onlyFileName = substr($fileArchive, 0, -$extensionLength);
+                $lastPosOnlyFileName =  strrpos($onlyFileName, "-");
+                $tmpOnlyFileName = substr($onlyFileName, 0, $lastPosOnlyFileName);
+                $counterDuplicate = substr($onlyFileName, $lastPosOnlyFileName + 1);
+                if (!is_int($lastPosOnlyFileName) || !is_int($counterDuplicate)) {
+                    $tmpOnlyFileName = $onlyFileName;
+                    $counterDuplicate = 1;
+                }
+                while (file_exists($currentDirUrl . $onlyFileName)) {
+                    $onlyFileName = $tmpOnlyFileName . "-" . $counterDuplicate;
+                    $counterDuplicate++;
+                }
+
+                // LAUNCHME IN BACKGROUND
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+
+                    file_put_contents($progressExtractFileName, $messages["compression.12"]);
+                    Controller::applyActionInBackground($repository->getId(), "extraction", $httpVars);
+                    $serializableStream->addChunk(new BgActionTrigger("check_extraction_status", array(
+                        "repository_id" => $repository->getId(),
+                        "extraction_id" => $extractId,
+                        "currentDirUrl" => $currentDirUrl,
+                        "onlyFileName" => $onlyFileName
+                    ), $messages["compression.12"], 2));
+                    return null;
+
+                }
+
+                mkdir($currentDirUrl . $onlyFileName, 0777, true);
+                chmod(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), 0777);
+                try {
+                    $archive = new PharData(AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
+                    $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
+                    foreach ($fichiersArchive as $file) {
+                        $fileGetPathName = $file->getPathname();
+                        if($file->isDir()) {
+                            continue;
+                        }
+                        $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
+                        try {
+                            $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
+                        } catch (Exception $e) {
+                            file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
+                            throw new PydioException($e);
+                        }
+                        $counterExtract++;
+                        file_put_contents($progressExtractFileName, sprintf($messages["compression.13"], round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN) . " %"));
+                    }
+                } catch (Exception $e) {
+                    file_put_contents($progressExtractFileName, "Error : " . $e->getMessage());
+                    throw new PydioException($e);
+                }
+                file_put_contents($progressExtractFileName, "SUCCESS");
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
-                $nodesDiffs = array("ADD" => array($newNode), "REMOVE" => array(), "UPDATE" => array());
-                Controller::applyHook("node.change", array(null, $newNode, false));
-                XMLWriter::header();
-                XMLWriter::sendMessage(sprintf($messages["compression.14"], $onlyFileName), null);
-                XMLWriter::triggerBgAction("check_index_status", array(
-                    "repository_id" => $newNode->getRepositoryId()
-                ), "starting indexation", true, 5);
-                XMLWriter::writeNodesDiff($nodesDiffs, true);
-                XMLWriter::close();
-                if (file_exists($progressExtractFileName)) {
-                    unlink($progressExtractFileName);
+
+                $indexRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals()
+                    ->withParsedBody(["file" => $newNode->getPath()])
+                    ->withAttribute("action", "index");
+                Controller::run($indexRequest);
+                break;
+
+            case "check_extraction_status":
+
+                $currentDirUrl = $httpVars["currentDirUrl"];
+                $onlyFileName = $httpVars["onlyFileName"];
+                $progressExtract = file_get_contents($progressExtractFileName);
+                $substrProgressExtract = substr($progressExtract, 0, 5);
+                if ($progressExtract != "SUCCESS" && $progressExtract != "INDEX" && $substrProgressExtract != "Error") {
+
+                    $serializableStream->addChunk(new BgActionTrigger("check_extraction_status", array(
+                        "repository_id" => $repository->getId(),
+                        "extraction_id" => $extractId,
+                        "currentDirUrl" => $currentDirUrl,
+                        "onlyFileName" => $onlyFileName
+                    ), $progressExtract, 4));
+
+                } elseif ($progressExtract == "SUCCESS") {
+                    $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
+                    $nodesDiffs = new NodesDiff();
+                    $nodesDiffs->add($newNode);
+                    Controller::applyHook("node.change", array(null, $newNode, false));
+
+                    $serializableStream->addChunk(new \Pydio\Core\Http\Message\UserMessage(sprintf($messages["compression.14"], $onlyFileName)));
+                    $serializableStream->addChunk(new BgActionTrigger("check_index_status", array(
+                        "repository_id" => $newNode->getRepositoryId()
+                    ), "starting indexation", 5));
+                    $serializableStream->addChunk($nodesDiffs);
+
+                    if (file_exists($progressExtractFileName)) {
+                        unlink($progressExtractFileName);
+                    }
+
+                } elseif ($substrProgressExtract == "Error") {
+                    if (file_exists($progressExtractFileName)) {
+                        unlink($progressExtractFileName);
+                    }
+                    throw new PydioException($progressExtract);
                 }
-            } elseif ($substrProgressExtract == "Error") {
-                XMLWriter::header();
-                XMLWriter::sendMessage(null, $progressExtract);
-                XMLWriter::close();
-                if (file_exists($progressExtractFileName)) {
-                    unlink($progressExtractFileName);
-                }
-            }
+                break;
+            default:
+                break;
         }
+
     }
 }

@@ -91,10 +91,10 @@ class imapAccessDriver extends fsAccessDriver
             if ($dir == "/" || empty($dir)) {
                 // MAILBOXES CASE
                 $this->repository->addOption("PAGINATION_THRESHOLD", 500);
-                $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "sortInboxFirst");
+                $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("Pydio\\Access\\Driver\\StreamProvider\\Imap\\imapAccessDriver", "sortInboxFirst");
             } else {
                 // MAILS LISTING CASE
-                $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "inverseSort");
+                $this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("Pydio\\Access\\Driver\\StreamProvider\\Imap\\imapAccessDriver", "inverseSort");
             }
         }
         parent::switchAction($request, $response);

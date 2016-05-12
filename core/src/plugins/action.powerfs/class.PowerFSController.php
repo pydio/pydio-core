@@ -24,10 +24,12 @@ use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Http\Message\BgActionTrigger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -44,9 +46,11 @@ class PowerFSController extends Plugin
         }
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
+
         $selection = new UserSelection();
+        $httpVars = $request->getParsedBody();
         $dir = $httpVars["dir"] OR "";
         $dir = Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
@@ -56,7 +60,12 @@ class PowerFSController extends Plugin
         }
         $urlBase = "pydio://". ConfService::getRepository()->getId();
         $mess = ConfService::getMessages();
-        switch ($action) {
+        $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        if($request->getAttribute("action") != "postcompress_download"){
+            $response = $response->withBody($bodyStream);
+        }
+
+        switch ($request->getAttribute("action")) {
 
             case "monitor_compression" :
 
@@ -66,42 +75,41 @@ class PowerFSController extends Plugin
                     $percent = intval(file_get_contents($percentFile));
                 }
                 if ($percent < 100) {
-                    XMLWriter::header();
-                    XMLWriter::triggerBgAction(
+                    $bodyStream->addChunk(new BgActionTrigger(
                         "monitor_compression",
                         $httpVars,
                         $mess["powerfs.1"]." ($percent%)",
-                        true,
-                        1);
-                    XMLWriter::close();
+                        1));
                 } else {
                     @unlink($percentFile);
-                    XMLWriter::header();
                     if ($httpVars["on_end"] == "reload") {
-                        XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
+                        $bodyStream->addChunk(new BgActionTrigger("reload_node", [], "powerfs.2", 2));
                     } else {
                         $archiveName = Utils::sanitize($httpVars["archive_name"], AJXP_SANITIZE_FILENAME);
                         $archiveName = str_replace("'", "\'", $archiveName);
                         $jsCode = "
                             PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$httpVars["ope_id"]."',archive_name:'".$archiveName."'});
                         ";
-                        XMLWriter::triggerBgJsAction($jsCode, $mess["powerfs.3"], true);
-                        XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
+                        $bodyStream->addChunk(BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]));
+                        $bodyStream->addChunk(new BgActionTrigger("reload_node", array(), "powerfs.2", 2));
                     }
-                    XMLWriter::close();
                 }
-
                 break;
 
             case "postcompress_download":
 
                 $archive = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
-                    register_shutdown_function("unlink", $archive);
-                    $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
+                    $response = $response->withBody(new \Pydio\Core\Http\Response\AsyncResponseStream(function() use($fsDriver, $archive, $archiveName){
+                        register_shutdown_function("unlink", $archive);
+                        $fsDriver->readFile($archive, "force-download", $archiveName, false, null, true);
+                    }));
                 } else {
-                    echo("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");
+                    $response = $response->withHeader("Content-type", "text/html");
+                    $response->getBody()->write("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");
                 }
                 break;
 
@@ -112,27 +120,24 @@ class PowerFSController extends Plugin
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
                     $opeId = substr(md5(time()),0,10);
                     $httpVars["ope_id"] = $opeId;
-                    Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
-                    XMLWriter::header();
+                    Controller::applyActionInBackground(ConfService::getRepository()->getId(), $request->getAttribute("action"), $httpVars);
                     $bgParameters = array(
                         "dir" => TextEncoder::toUTF8($dir),
                         "archive_name"  => TextEncoder::toUTF8($archiveName),
                         "on_end" => (isSet($httpVars["on_end"])?$httpVars["on_end"]:"reload"),
                         "ope_id" => $opeId
                     );
-                    XMLWriter::triggerBgAction(
+                    $bodyStream->addChunk(new BgActionTrigger(
                         "monitor_compression",
                         $bgParameters,
-                        $mess["powerfs.1"]." (0%)",
-                        true);
-                    XMLWriter::close();
-                    session_write_close();
-                    exit();
+                        $mess["powerfs.1"]." (0%)")
+                    );
+                    return;
                 }
 
                 $rootDir = fsAccessWrapper::getRealFSReference($urlBase) . $dir;
                 $percentFile = $rootDir."/.zip_operation_".$httpVars["ope_id"];
-                $compressLocally = ($action == "compress" ? true : false);
+                $compressLocally = ($request->getAttribute("action") == "compress" ? true : false);
                 // List all files
                 $todo = array();
                 $args = array();
@@ -201,6 +206,7 @@ class PowerFSController extends Plugin
                 file_put_contents($percentFile, 100);
 
                 break;
+
             default:
                 break;
         }

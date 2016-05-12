@@ -25,27 +25,28 @@ use Pydio\Core\PluginFramework\PluginsService;
 
 class CartManager extends Plugin
 {
-    public function switchAction ($actionName, $httpVars, $fileVars)
+    public function switchAction (\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        if ($actionName == "search-cart-download") {
-
-            // Pipe SEARCH + DOWNLOAD actions.
-
-            $indexer = PluginsService::getInstance()->getUniqueActivePluginForType("index");
-            if($indexer == false) return;
-            $httpVars["return_selection"] = true;
-            unset($httpVars["get_action"]);
-            $res = Controller::findActionAndApply("search", $httpVars, $fileVars);
-            if (isSet($res) && is_array($res)) {
-                $newHttpVars = array(
-                    "selection_nodes"   => $res,
-                    "dir"               => "__AJXP_ZIP_FLAT__/",
-                    "archive_name"      => $httpVars["archive_name"]
-                );
-                Controller::findActionAndApply("download", $newHttpVars, array());
-            }
-
+        if($requestInterface->getAttribute("action") != "search-cart-download"){
+            return;
         }
+
+        // Pipe SEARCH + DOWNLOAD actions.
+
+        $indexer = PluginsService::getInstance()->getUniqueActivePluginForType("index");
+        if($indexer == false) return;
+        $httpVars["return_selection"] = true;
+        unset($httpVars["get_action"]);
+        $res = Controller::findActionAndApply("search", $httpVars, $fileVars);
+        if (isSet($res) && is_array($res)) {
+            $newHttpVars = array(
+                "selection_nodes"   => $res,
+                "dir"               => "__AJXP_ZIP_FLAT__/",
+                "archive_name"      => $httpVars["archive_name"]
+            );
+            Controller::findActionAndApply("download", $newHttpVars, array());
+        }
+
 
     }
 

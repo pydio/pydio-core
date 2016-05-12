@@ -23,6 +23,7 @@ namespace Pydio\Conf\Sql;
 use DibiResult;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -921,7 +922,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      *
      * @param String $userId
      * @param array $deletedSubUsers
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function deleteUser($userId, &$deletedSubUsers)
@@ -948,7 +949,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $deletedSubUsers[] = $childId;
             }
         } catch (DibiException $e) {
-            throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
+            throw new \Exception('Failed to delete user, Reason: '.$e->getMessage());
         }
     }
 
@@ -966,7 +967,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         } else if ($dataType == "binary") {
             $values["binary_data"] = $data;
         } else {
-            throw new Exception("Unsupported format type ".$dataType);
+            throw new \Exception("Unsupported format type ".$dataType);
         }
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
@@ -1248,10 +1249,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $userIds = $httpVars["user_ids"];
                 $teamLabel = Utils::sanitize($httpVars["team_label"], AJXP_SANITIZE_HTML_STRICT);
                 if(empty($teamLabel)){
-                    throw new Exception("Empty Team Label!");
+                    throw new \Exception("Empty Team Label!");
                 }
                 if(empty($userIds)){
-                    throw new Exception("Please select some users for this team.");
+                    throw new \Exception("Please select some users for this team.");
                 }
                 $teamId = Utils::slugify($teamLabel)."-".intval(rand(0,1000));
                 foreach ($userIds as $userId) {

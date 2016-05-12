@@ -183,7 +183,7 @@ class ftpAccessWrapper implements IAjxpWrapper
             if ($this->crtMode == 'write') {
                 rewind($this->fp);
                 AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Ftp_fput", array("target"=>$this->crtTarget));
-                set_error_handler(array("ftpAccessWrapper", "fput_quota_hack"), E_ALL & ~E_NOTICE );
+                set_error_handler(array("\\Pydio\\Access\\Driver\\StreamProvider\\FTP\\ftpAccessWrapper", "fput_quota_hack"), E_ALL & ~E_NOTICE );
                 ftp_fput($this->crtLink, $this->crtTarget, $this->fp, FTP_BINARY);
                 restore_error_handler();
                 AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Ftp_fput end", array("target"=>$this->crtTarget));

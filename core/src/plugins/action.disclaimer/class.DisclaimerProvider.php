@@ -21,8 +21,9 @@
 
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,7 +35,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class DisclaimerProvider extends Plugin
 {
 
-    public function toggleDisclaimer($actionName, $httpVars, $fileVars){
+    public function toggleDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $httpVars = $request->getParsedBody();
         $u = AuthService::getLoggedUser();
         $u->personalRole->setParameterValue(
             "action.disclaimer",
@@ -57,30 +60,28 @@ class DisclaimerProvider extends Plugin
             $res = ConfService::switchUserToActiveRepository($u, $passId);
             if (!$res) {
                 AuthService::disconnect();
-                XMLWriter::header();
-                XMLWriter::requireAuth(true);
-                XMLWriter::close();
+                throw new \Pydio\Core\Exception\AuthRequiredException();
             }
             ConfService::getInstance()->invalidateLoadedRepositories();
 
         }else{
+
             $u->setLock("validate_disclaimer");
             $u->save("superuser");
 
             AuthService::disconnect();
-            XMLWriter::header();
-            XMLWriter::requireAuth(true);
-            XMLWriter::close();
+            throw new \Pydio\Core\Exception\AuthRequiredException();
+
         }
     }
 
-    public function loadDisclaimer($actionName, $httpVars, $fileVars){
+    public function loadDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        header("Content-Type:text/plain");
+        $response = $response->withHeader("Content-Type", "text/plain");
         $content = $this->getFilteredOption("DISCLAIMER_CONTENT", AJXP_REPO_SCOPE_ALL);
         $state = $this->getFilteredOption("DISCLAIMER_ACCEPTED", AJXP_REPO_SCOPE_ALL);
         if($state == "true") $state = "yes";
-        echo($state .":" . nl2br($content));
+        $response->getBody()->write($state .":" . nl2br($content));
 
     }
 

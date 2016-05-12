@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Driver\DataProvider;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
@@ -35,48 +37,48 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class jsapiAccessDriver extends AbstractAccessDriver
 {
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
-        switch ($action) {
-            case "get_js_source" :
-                $jsName = Utils::decodeSecureMagic($httpVars["object_name"]);
-                $jsType = $httpVars["object_type"]; // class or interface?
-                $fName = "class.".strtolower($jsName).".js";
-                if ($jsName == "Splitter") {
-                    $fName = "splitter.js";
+        if($request->getAttribute("action") !== "get_js_source"){
+            return;
+        }
+
+        $jsName = Utils::decodeSecureMagic($request->getParsedBody()["object_name"]);
+        $jsType = $request->getParsedBody()["object_type"]; // class or interface?
+        $fName = "class.".strtolower($jsName).".js";
+        if ($jsName == "Splitter") {
+            $fName = "splitter.js";
+        }
+        if (!defined("CLIENT_RESOURCES_FOLDER")) {
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+        }
+        $searchLocations = [];
+        // Locate the file class.ClassName.js
+        if ($jsType == "class") {
+            $searchLocations = array(
+                CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",
+                CLIENT_RESOURCES_FOLDER."/js/lib",
+                AJXP_INSTALL_PATH."/plugins/"
+            );
+        } else if ($jsType == "interface") {
+            $searchLocations = array(
+                CLIENT_RESOURCES_FOLDER."/js/ajaxplorer/interfaces",
+            );
+        }
+        foreach ($searchLocations as $location) {
+            $dir_iterator = new RecursiveDirectoryIterator($location);
+            $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+            // could use CHILD_FIRST if you so wish
+            $break = false;
+            foreach ($iterator as $file) {
+                if (strtolower(basename($file->getPathname())) == $fName) {
+                    $response = $response->withHeader("Content-Type", "text/plain");
+                    $response->getBody()->write(file_get_contents($file->getPathname()));
+                    $break = true;
+                    break;
                 }
-                if (!defined("CLIENT_RESOURCES_FOLDER")) {
-                    define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-                }
-                $searchLocations = [];
-                // Locate the file class.ClassName.js
-                if ($jsType == "class") {
-                    $searchLocations = array(
-                        CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",
-                        CLIENT_RESOURCES_FOLDER."/js/lib",
-                        AJXP_INSTALL_PATH."/plugins/"
-                    );
-                } else if ($jsType == "interface") {
-                    $searchLocations = array(
-                        CLIENT_RESOURCES_FOLDER."/js/ajaxplorer/interfaces",
-                    );
-                }
-                foreach ($searchLocations as $location) {
-                    $dir_iterator = new RecursiveDirectoryIterator($location);
-                    $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-                    // could use CHILD_FIRST if you so wish
-                    $break = false;
-                    foreach ($iterator as $file) {
-                        if (strtolower(basename($file->getPathname())) == $fName) {
-                            HTMLWriter::charsetHeader("text/plain", "utf-8");
-                            echo(file_get_contents($file->getPathname()));
-                            $break = true;
-                            break;
-                        }
-                    }
-                    if($break) break;
-                }
-            break;
+            }
+            if($break) break;
         }
 
     }

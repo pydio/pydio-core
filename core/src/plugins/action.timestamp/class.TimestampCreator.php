@@ -16,7 +16,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class TimestampCreator extends Plugin
 {
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {
         $mess = ConfService::getMessages();
 
@@ -42,7 +42,7 @@ class TimestampCreator extends Plugin
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = new UserSelection($repository, $requestInterface->getParsedBody());
         $destStreamURL = $selection->currentBaseUrl();
 
         $fileName = $selection->getUniqueFile();
@@ -99,10 +99,12 @@ class TimestampCreator extends Plugin
 
                 //Send the succesful message
                 $this->logInfo("TimeStamp", array("files"=>$file, "destination"=>$file.'.ers'));
-                XMLWriter::header();
-                XMLWriter::reloadDataNode();
-                XMLWriter::sendMessage($mess["timestamp.3"].$fileName, null);
-                XMLWriter::close();
+
+                $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
+                $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
+                $nodesDiff->update($selection->getUniqueNode());
+                $bodyStream->addChunk($nodesDiff);
+                $bodyStream->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["timestamp.3"].$fileName));
             }
 
         } else {

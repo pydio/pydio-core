@@ -63,9 +63,9 @@ class PluginSkeleton extends Plugin
      * @param array $fileVars
      * @return void
      */
-    public function receiveAction($action, $httpVars, $fileVars)
+    public function receiveAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {
-        if ($action == "my_skeleton_button_frame") {
+        if ($requestInterface->getAttribute("action") == "my_skeleton_button_frame") {
             header("Content-type:text/html");
             print("<p>This is a <b>dynamically</b> generated content. It is sent back to the client by the server, thus it can be the result of what you want : a query to a remote API, a constant string (like it is now), or any specific data stored by the application...</p>");
             print("<p>Here the server sends back directly HTML that is displayed by the client, but other formats can be used when it comes to more structured data, allowing the server to stay focus on the data and the client to adapt the display : <ul><li>JSON : use <b>json_encode/json_decode</b> on the PHP side, and <b>transport.reponseJSON</b> on the client side</li><li>XML : print your own XML on the php side, and use <b>transport.responseXML</b> on the client side.</li><li>The advantage of HTML can also be used to send javascript instruction to the client.</li></ul></p>");

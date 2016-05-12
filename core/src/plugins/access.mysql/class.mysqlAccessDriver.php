@@ -75,7 +75,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        parent::accessPreprocess($action, $httpVars, $fileVars);
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = Utils::securePath($getValue);
