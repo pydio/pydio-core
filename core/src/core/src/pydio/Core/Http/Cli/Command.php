@@ -52,10 +52,15 @@ class Command extends Symfony\Component\Console\Command\Command
                 InputOption::VALUE_OPTIONAL,
                 'Encrypted Token used to replace password'
             )->addOption(
+                'cli_impersonate',
+                'i',
+                InputOption::VALUE_OPTIONAL,
+                'Comma separated list of users to impersonate. Only possible if authenticated user is ADMIN.'
+            )->addOption(
                 'cli_repository_id',
                 'r',
                 InputOption::VALUE_REQUIRED,
-                'Repository ID or alias'
+                'Repository ID or alias, can be a comma-separated list'
             )->addOption(
                 'cli_action_name',
                 'a',
@@ -86,14 +91,21 @@ class Command extends Symfony\Component\Console\Command\Command
             }
         }
 
-        $server = new Server(Server::MODE_CLI);
-        $request = $server->getRequest();
-        $request = $request
-            ->withParsedBody($actionParameters)
-            ->withAttribute("cli-options", $pydioCliOptions)
-            ->withAttribute("cli-output", $output);
-        $server->updateRequest($request);
-        $server->listen();
+        if(!is_array($pydioCliOptions["r"])){
+            $pydioCliOptions["r"] = [$pydioCliOptions["r"]];
+        }
+        foreach ($pydioCliOptions["r"] as $repoId){
+            $reqOptions = $pydioCliOptions;
+            $reqOptions["r"] = $repoId;
 
+            $server = new Server(Server::MODE_CLI);
+            $request = $server->getRequest();
+            $request = $request
+                ->withParsedBody($actionParameters)
+                ->withAttribute("cli-options", $reqOptions)
+                ->withAttribute("cli-output", $output);
+            $server->updateRequest($request);
+            $server->listen();
+        }
     }
 }

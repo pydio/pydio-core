@@ -44,6 +44,7 @@ class Server
     private $request;
     private $middleWares;
 
+    private static $middleWareInstance;
 
     public function __construct($serverMode = Server::MODE_SESSION){
 
@@ -70,6 +71,7 @@ class Server
         }else{
             $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SapiMiddleware", "handleRequest"));
         }
+        self::$middleWareInstance = &$this->middleWares;
 
     }
 
@@ -100,6 +102,8 @@ class Server
         return $response;
     }
 
+    
+
     /**
      * To be used by middlewares
      * @param ServerRequestInterface $requestInterface
@@ -114,9 +118,29 @@ class Server
         return $responseInterface;
     }
 
+    /**
+     * @param $rewindTo array
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @param callable|null $next
+     * @return ResponseInterface
+     */
+    public static function callNextMiddleWareAndRewind(callable $comparisonFunction, ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null){
+        if($next !== null){
+            $responseInterface = call_user_func_array($next, array(&$requestInterface, &$responseInterface));
+        }
+        self::$middleWareInstance->rewind();
+        while(!$comparisonFunction(self::$middleWareInstance->current())){
+            self::$middleWareInstance->next();
+        }
+        self::$middleWareInstance->next();
+        return $responseInterface;
+    }
+
 
     public function addMiddleware(callable $middleWareCallable){
         $this->middleWares->push($middleWareCallable);
+        self::$middleWareInstance = $this->middleWares;
     }
 
     public function listen(){

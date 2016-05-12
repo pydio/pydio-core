@@ -60,10 +60,10 @@ class CliMiddleware
                     $responseInterface->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
                 }
             }
-
-            $responseInterface->getBody()->write("toto");
-            $responseInterface->getBody()->rewind();
+            $output->writeln("Executing Action" . $requestInterface->getAttribute("action"));
+            $output->writeln("----------------");
             $output->writeln("" . $responseInterface->getBody());
+            $output->writeln("");
 
         } catch (AuthRequiredException $e){
 

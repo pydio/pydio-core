@@ -374,8 +374,11 @@ class ConfService
             ConfService::getConfStorageImpl();
             ConfService::loadRepositoryDriver();
         }
+        PluginsService::deferBuildingRegistry();
         PluginsService::getInstance()->initActivePlugins();
-        
+        PluginsService::flushDeferredRegistryBuilding();
+        Controller::registryReset();
+
     }
 
 
