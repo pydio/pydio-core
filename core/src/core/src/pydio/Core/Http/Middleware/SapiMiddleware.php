@@ -81,7 +81,7 @@ class SapiMiddleware
                 $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
             }else{
                 $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
-                $response = $response->withHeader("Content-type", "application/xml; charset=UTF-8");
+                $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
             }
         }
 

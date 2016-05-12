@@ -23,10 +23,6 @@ namespace Pydio\Core\Http\Response;
 
 use Psr\Http\Message\StreamInterface;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
-use Pydio\Core\Http\Response\SerializableResponseChunk;
-use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
-use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -105,7 +101,7 @@ class SerializableResponseStream implements StreamInterface
             if($wrap){
                 return XMLWriter::wrapDocument($buffer);
             }else{
-                return $buffer;
+                return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".$buffer;
             }
         }
         return "";

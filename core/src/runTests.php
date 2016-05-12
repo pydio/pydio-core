@@ -30,6 +30,7 @@ use Pydio\Core\Controller\HTMLWriter;
 
 die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("base.conf.php");
+require_once AJXP_BIN_FOLDER."/lib/HttpClient.php";
 
 function apiPost($baseData, $url, $parameters, $private){
 
