@@ -18,7 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Http;
+namespace Pydio\Core\Http\Response;
+
+use Pydio\Core\Http\Response\SerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

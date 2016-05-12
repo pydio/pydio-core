@@ -22,7 +22,7 @@ namespace Pydio\Core\Http\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Http\SerializableResponseStream;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;

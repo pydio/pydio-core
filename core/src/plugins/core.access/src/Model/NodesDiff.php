@@ -21,8 +21,8 @@
 namespace Pydio\Access\Core\Model;
 
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Http\JSONSerializableResponseChunk;
-use Pydio\Core\Http\XMLSerializableResponseChunk;
+use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
+use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 

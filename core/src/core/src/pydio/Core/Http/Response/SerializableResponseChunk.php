@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Http;
+namespace Pydio\Core\Http\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

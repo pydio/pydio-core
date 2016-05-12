@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Message;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-use Pydio\Core\Http\XMLSerializableResponseChunk;
+use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 class LoggingResult implements XMLSerializableResponseChunk
 {

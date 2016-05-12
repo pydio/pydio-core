@@ -119,7 +119,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             AuthService::refreshRememberCookie($loggedUser);
         }
 
-        $stream = new \Pydio\Core\Http\SerializableResponseStream();
+        $stream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $stream->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
         $response = $response->withBody($stream);
         return true;
