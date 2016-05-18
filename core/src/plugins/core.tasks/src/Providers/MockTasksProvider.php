@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace Pydio\Tasks\Tests;
+namespace Pydio\Tasks\Providers;
 
 use Pydio\Tasks\Task;
 use Pydio\Tasks\Schedule;

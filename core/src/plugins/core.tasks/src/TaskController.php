@@ -22,56 +22,77 @@ namespace Pydio\Tasks;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\Exception\PydioException;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Tasks\Tests\MockTasksProvider;
+use Pydio\Tasks\Providers\MockTasksProvider;
+use Pydio\Tasks\Providers\SqlTasksProvider;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 class TaskController extends Plugin
 {
-    private $resources = [
-        "resourceName" => "tasks",
-        "parameterName" => "task_id",
-        "crudCallbacks" => [
-            "CREATE" => 'createTask',
-            "RETRIEVE_MANY" => 'getTasks',
-            "RETRIEVE_ONE" => 'getTask',
-            "UPDATE" => 'updateTask',
-            "DELETE" => 'deleteTask'
-        ],
-        "linkedResources" => [
-            [
-                "parameterName" => "message_id",
-                "resourceName" => "messages",
-                "crudCallbacks" => [
-                    "RETRIEVE_MANY" => 'getMessagesforTask',
-                    "RETRIEVE_ONE" => 'getMessageforTask',
-                ],
-                "additionalRoutes" => [
-                    ["method" => "GET", "route" => "/messages/{message_id}/flag", "callback" => "flagMessageForTask"]
-                ]
-            ]
-        ],
-        "additionalRoutes" => [
-            ["method" => "GET", "route" => "/tasks/{task_id}/start", "callback" => "startTask"]
-        ]
-    ];
+
+    public function init($options)
+    {
+        parent::init($options);
+        //TaskService::getInstance()->setProvider(new MockTasksProvider());
+        TaskService::getInstance()->setProvider(new SqlTasksProvider());
+    }
 
     public function route(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        $router = new SimpleRestResourceRouter($this, $this->resources, [
-            "cacheFile" => $this->getPluginCacheDir(true, true) . '/route.cache',
-            "cacheDisabled" => false
-        ]);
-        $result = $router->route($request, $response);
-        if($result === false){
-            throw new PydioException("Could not find any route for ".$router->getURIForRequest($request));
+        $action = $request->getAttribute("action");
+        switch ($action){
+            case "tasks_list":
+                $tasks = TaskService::getInstance()->getPendingTasks();
+                $response = new JsonResponse($tasks);
+                break;
+            case "task_info":
+                $task = TaskService::getInstance()->getTaskById($request->getParsedBody()["taskId"]);
+                $response = new JsonResponse($task);
+                break;
+            case "task_create":
+                $taskData = json_decode($request->getParsedBody()["task"]);
+                $newTask = new Task();
+                $newTask->setId($request->getParsedBody()["taskId"]);
+                $newTask = SimpleRestResourceRouter::cast($newTask, $taskData);
+                TaskService::getInstance()->createTask($newTask, $newTask->getSchedule());
+                $response = new JsonResponse($newTask);
+                break;
+            case "task_update":
+                $taskData = $request->getParsedBody()["request_body"];
+                $newTask = TaskService::getInstance()->getTaskById($request->getParsedBody()["taskId"]);
+                $newTask = SimpleRestResourceRouter::cast($newTask, $taskData);
+                TaskService::getInstance()->updateTask($newTask);
+                $response = new JsonResponse($newTask);
+                break;
+            case "task_delete":
+                if(TaskService::getInstance()->deleteTask($request->getParsedBody()["taskId"])){
+                    $response = new JsonResponse(new UserMessage("Ok"));
+                }
+                break;
+            default:
+                break;
         }
 
     }
 
+    public function attachTasksToNode(AJXP_Node &$node, $isContextNode = false, $details = "all"){
+        if($details == "all"){
+            $t = TaskService::getInstance()->getTasksForNode($node);
+            if(count($t)){
+                $ids = array_map(function (Task $el) {
+                    return $el->getId();
+                }, $t);
+                $node->mergeMetadata(["tasks"=> implode(",",$ids)]);
+            }
+        }
+    }
+
+    /*
     public function getTasks(ServerRequestInterface &$request, ResponseInterface &$response){
         $mock = new MockTasksProvider();
         return $mock->getPendingTasks();
@@ -114,17 +135,6 @@ class TaskController extends Plugin
     public function startTask(ServerRequestInterface &$request, ResponseInterface &$response){
         return ["Task ".$request->getParsedBody()["task_id"]." started"];
     }
-
-    public function getMessagesForTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        return ["Messages for task ".$request->getParsedBody()["task_id"].""];
-    }
-
-    public function getMessageForTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        return ["Message ".$request->getParsedBody()["message_id"]." for task ".$request->getParsedBody()["task_id"].""];
-    }
-
-    public function flagMessageForTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        return ["Flag Message ".$request->getParsedBody()["message_id"]." for task ".$request->getParsedBody()["task_id"].""];
-    }
+    */
 
 }

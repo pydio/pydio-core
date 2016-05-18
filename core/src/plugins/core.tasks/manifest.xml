@@ -4,11 +4,34 @@
     <class_definition classname="Pydio\Tasks\TaskController" filename="plugins/core.tasks/src/TaskController.php"/>
     <registry_contributions>
         <actions>
-            <action name="tasks">
+            <action name="tasks_list">
                 <processing>
-                    <serverCallback methodName="route" restParams="/"/>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_info">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_create">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_update">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_delete">
+                <processing>
+                    <serverCallback methodName="route"/>
                 </processing>
             </action>
         </actions>
+        <hooks>
+            <serverCallback methodName="attachTasksToNode" hookName="node.info"/>
+        </hooks>
     </registry_contributions>
 </ajxp_plugin>

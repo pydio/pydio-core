@@ -43,11 +43,11 @@ class Task
     /**
      * @var string
      */
-    public $repositoryId;
+    public $wsId;
     /**
      * @var string
      */
-    public $repositoryIdentifier;
+    public $wsIdentifier;
 
     /**
      * @var int
@@ -65,6 +65,11 @@ class Task
      * @var array
      */
     public $parameters;
+
+    /**
+     * @var array
+     */
+    public $nodes = [];
 
     public function __construct()
     {
@@ -108,33 +113,33 @@ class Task
     /**
      * @return string
      */
-    public function getRepositoryId()
+    public function getWsId()
     {
-        return $this->repositoryId;
+        return $this->wsId;
     }
 
     /**
-     * @param string $repositoryId
+     * @param string $wsId
      */
-    public function setRepositoryId($repositoryId)
+    public function setWsId($wsId)
     {
-        $this->repositoryId = $repositoryId;
+        $this->wsId = $wsId;
     }
 
     /**
      * @return string
      */
-    public function getRepositoryIdentifier()
+    public function getWsIdentifier()
     {
-        return $this->repositoryIdentifier;
+        return $this->wsIdentifier;
     }
 
     /**
-     * @param string $repositoryIdentifier
+     * @param string $wsIdentifier
      */
-    public function setRepositoryIdentifier($repositoryIdentifier)
+    public function setWsIdentifier($wsIdentifier)
     {
-        $this->repositoryIdentifier = $repositoryIdentifier;
+        $this->wsIdentifier = $wsIdentifier;
     }
 
     /**
@@ -199,6 +204,10 @@ class Task
     public function setParameters($parameters)
     {
         $this->parameters = $parameters;
+    }
+
+    public function attachToNode($nodePath){
+        $this->nodes[] = $nodePath;
     }
 
 
