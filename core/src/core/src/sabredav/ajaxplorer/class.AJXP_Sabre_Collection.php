@@ -63,10 +63,12 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             $name = ltrim($name, "/");
             AJXP_Logger::debug("CREATE FILE $name");
 
-            Controller::findActionAndApply("mkfile", array(
+            $request = new \Zend\Diactoros\ServerRequest();
+            $request = $request->withParsedBody([
                 "dir" => $this->path,
                 "filename" => $name
-            ), array());
+            ])->withAttribute("action", "mkfile")->withAttribute("api", "session");
+            Controller::run($request);
 
             if ( $data != null && is_file($this->getUrl()."/".$name)) {
 
@@ -110,12 +112,13 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
         if (isSet($this->children)) {
             $this->children = null;
         }
-
-        Controller::findActionAndApply("mkdir", array(
+        $request = new \Zend\Diactoros\ServerRequest();
+        $request = $request->withParsedBody([
             "dir" => $this->path,
             "dirname" => $name
-        ), array());
-
+        ])->withAttribute("action", "mkdir")->withAttribute("api", "session");
+        Controller::run($request);
+        
     }
 
     /**

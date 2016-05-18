@@ -105,10 +105,12 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     {
         ob_start();
         try {
-            Controller::findActionAndApply("delete", array(
+            $request = new \Zend\Diactoros\ServerRequest();
+            $request = $request->withParsedBody([
                 "dir"       => dirname($this->path),
                 "file_0"    => $this->path
-            ), array());
+            ])->withAttribute("action", "delete")->withAttribute("api", "session");
+            Controller::run($request);
         } catch (Exception $e) {
 
         }
@@ -139,11 +141,13 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     {
         $data = $this->getResourceData();
         ob_start();
-        Controller::findActionAndApply("rename", array(
+        $request = new \Zend\Diactoros\ServerRequest();
+        $request = $request->withParsedBody([
             "filename_new"      => $name,
             "dir"               => dirname($this->path),
             "file"              => $this->path
-        ), array());
+        ])->withAttribute("action", "rename")->withAttribute("api", "session");
+        Controller::run($request);
         ob_get_flush();
         $this->putResourceData(array());
         $this->putResourceData($data, dirname($this->getUrl())."/".$name);
