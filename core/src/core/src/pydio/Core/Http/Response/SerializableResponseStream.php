@@ -23,6 +23,7 @@ namespace Pydio\Core\Http\Response;
 
 use Psr\Http\Message\StreamInterface;
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\Message\UserMessage;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -84,8 +85,19 @@ class SerializableResponseStream implements StreamInterface
                     $buffer[] = $serializableItem;
                 }
             }
-            if(count($buffer) == 1) return json_encode($buffer[0]);
-            else return json_encode($buffer);
+            if(count($buffer) == 1) {
+                $json = json_encode(array_shift($buffer));
+            }else {
+                $json = json_encode($buffer);
+            }
+            if($json === null){
+                $msg = json_last_error_msg();
+                $error = json_last_error();
+                $message = new UserMessage($msg. " ($error)", LOG_LEVEL_ERROR);
+                return json_encode($message->jsonSerializableData());
+            }else{
+                return $json;
+            }
         }else if($serializer == self::SERIALIZER_TYPE_XML){
             $wrap = true;
             $buffer = "";

@@ -22,9 +22,10 @@ namespace Pydio\Core\Http\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\ApiRouter;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -45,17 +46,10 @@ class SapiMiddleware
         $serverData = $request->getServerParams();
         if(Server::$mode == Server::MODE_REST){
 
-            $restBase = ConfService::currentContextIsRestAPI();
-            $uri = $serverData["REQUEST_URI"];
-            $scriptUri = ltrim(Utils::safeDirname($serverData["SCRIPT_NAME"]),'/').$restBase."/";
-            $uri = substr($uri, strlen($scriptUri));
-            $uri = explode("/", trim($uri, "/"));
-            $repoID = array_shift($uri);
-            $action = array_shift($uri);
-            $path = "/".implode("/", $uri);
-            $request = $request->withAttribute("action", $action)
-                ->withAttribute("rest_path", $path)
-                ->withAttribute("repository_id", $repoID);
+            $router = new ApiRouter([]);
+            if(!$router->route($request, $response)){
+                throw new PydioException("Could not find any endpoint for this URI");
+            }
 
         }else{
 
@@ -68,7 +62,10 @@ class SapiMiddleware
             } else {
                 $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
             }
-            $request = $request->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS));
+            $request = $request
+                ->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS))
+                ->withAttribute("api", "session")
+            ;
 
         }
 

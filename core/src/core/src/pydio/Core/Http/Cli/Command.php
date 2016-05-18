@@ -102,6 +102,7 @@ class Command extends Symfony\Component\Console\Command\Command
             $request = $server->getRequest();
             $request = $request
                 ->withParsedBody($actionParameters)
+                ->withAttribute("api", "cli")
                 ->withAttribute("cli-options", $reqOptions)
                 ->withAttribute("cli-output", $output);
             $server->updateRequest($request);

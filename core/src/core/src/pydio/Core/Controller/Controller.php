@@ -129,7 +129,7 @@ class Controller
      */
     public static function registryActionMiddleware(ServerRequestInterface $request, ResponseInterface $response, callable $nextCallable = null){
         $action = null;
-        if(ConfService::currentContextIsRestAPI()){
+        if($request->getAttribute("api") == "v1"){
             $action = Controller::parseRestParameters($request);
         }
         $response = Controller::run($request, $action);

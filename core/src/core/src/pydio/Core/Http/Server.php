@@ -22,13 +22,6 @@ namespace Pydio\Core\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Exception\WorkspaceNotFoundException;
-use Pydio\Core\Http\Middleware\AuthMiddleware;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
