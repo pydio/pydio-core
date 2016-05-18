@@ -21,6 +21,7 @@
 namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -79,6 +80,7 @@ class RecycleBinManager
     {
         return ($currentLocation == self::$rbmRelativeRecycle);
     }
+
     /**
      * Transform delete/restore actions into move actino
      * @static
@@ -86,27 +88,27 @@ class RecycleBinManager
      * @param UserSelection $selection
      * @param string $currentLocation
      * @param array $httpVars
-     * @return array
      */
-    public static function filterActions($action, $selection, $currentLocation, $httpVars = array())
+    public static function filterActions(&$action, $selection, &$httpVars)
     {
-        if(!self::recycleEnabled()) return array();
-        $newArgs = array();
+        if(!self::recycleEnabled() || $selection->isEmpty()) {
+            return;
+        }
+        $currentLocation = Utils::safeDirname($selection->getUniqueFile());
 
         // FILTER ACTION FOR DELETE
         if ($action == "delete" && !self::currentLocationIsRecycle($currentLocation) && !isSet($httpVars["force_deletion"])) {
-            $newArgs["action"] = "move";
-            $newArgs["dest"] = self::$rbmRelativeRecycle;
+            $action = "move";
+            $httpVars["dest"] = self::$rbmRelativeRecycle;
         }
         // FILTER ACTION FOR RESTORE
         if ($action == "restore" && self::currentLocationIsRecycle($currentLocation)) {
             $originalRep = self::getFileOrigin($selection->getUniqueFile());
             if ($originalRep != "") {
-                $newArgs["action"] = "move";
-                $newArgs["dest"] = $originalRep; // CHECK UTF8 HANDLING HERE
+                $action = "move";
+                $httpVars["dest"] = $originalRep; // CHECK UTF8 HANDLING HERE
             }
         }
-        return $newArgs;
 
     }
     /**

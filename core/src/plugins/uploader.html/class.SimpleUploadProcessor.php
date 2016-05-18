@@ -96,7 +96,7 @@ class SimpleUploadProcessor extends Plugin
     public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
         $httpVars = $request->getParsedBody();
-        if (!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"]) && !isSet($httpVars["force_post"])) {
+        if ($request->getAttribute("api")!="v2" && !isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"]) && !isSet($httpVars["force_post"])) {
             return;
         }
         $this->logDebug("SimpleUploadProc is active");

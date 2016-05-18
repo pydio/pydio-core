@@ -51,7 +51,7 @@ class JumploaderProcessor extends Plugin
     {
         $httpVars = $request->getParsedBody();
 
-        if(isSet($httpVars["simple_uploader"]) || isset($httpVars["xhr_uploader"]) || isSet($httpVars["Filename"])){
+        if(!count($request->getUploadedFiles()) || isSet($httpVars["simple_uploader"]) || isset($httpVars["xhr_uploader"]) || isSet($httpVars["Filename"])){
             return;
         }
         $repository = ConfService::getRepository();

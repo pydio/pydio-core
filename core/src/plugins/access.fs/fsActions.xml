@@ -46,6 +46,12 @@
 				</serverCallback>
 			</processing>
 		</action>
+        <action name="fs_create_resource">
+            <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
+            <processing>
+                <serverCallback methodName="createResourceAction"/>
+            </processing>
+        </action>
         <action name="mkdir">
             <gui text="154" title="155" src="folder_new.png" iconClass="mdi mdi-folder-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"

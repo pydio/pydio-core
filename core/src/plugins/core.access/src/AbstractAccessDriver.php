@@ -160,8 +160,9 @@ class AbstractAccessDriver extends Plugin
         $errorMessages = array();
         foreach ($files as $file) {
 
+            $destFile = Utils::decodeSecureMagic($httpVars["dest"]) ."/". Utils::safeBasename($file);
             $this->copyOrMoveFile(
-                \Pydio\Core\Utils\Utils::decodeSecureMagic($httpVars["dest"]),
+                $destFile,
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
                 $srcRepoData, $destRepoData);
 
@@ -183,18 +184,21 @@ class AbstractAccessDriver extends Plugin
      * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
      * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
      */
-    protected function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array())
+    protected function copyOrMoveFile($destFile, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array())
     {
         $srcUrlBase = $srcRepoData['base_url'];
         $srcRecycle = $srcRepoData['recycle'];
         $destUrlBase = $destRepoData['base_url'];
 
         $mess = ConfService::getMessages();
+        /*
         $bName = basename($srcFile);
         $localName = '';
         Controller::applyHook("dl.localname", array($srcFile, &$localName));
         if(!empty($localName)) $bName = $localName;
-        $destFile = $destUrlBase.$destDir."/".$bName;
+        */
+        $destDir = Utils:: safeDirname($destFile);
+        $destFile = $destUrlBase.$destFile;
         $realSrcFile = $srcUrlBase.$srcFile;
 
         if (is_dir(dirname($realSrcFile)) && (strpos($destFile, rtrim($realSrcFile, "/") . "/") === 0)) {
@@ -210,12 +214,13 @@ class AbstractAccessDriver extends Plugin
             $size = filesize($realSrcFile);
             \Pydio\Core\Controller\Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
         }
-        if (dirname($realSrcFile)==dirname($destFile)) {
+        if (dirname($realSrcFile) == dirname($destFile) && basename($realSrcFile) == basename($destFile)) {
             if ($move) {
                 $error[] = $mess[101];
                 return ;
             } else {
                 $base = basename($srcFile);
+                $ext = "";
                 if (is_file($realSrcFile)) {
                     $dotPos = strrpos($base, ".");
                     if ($dotPos>-1) {
@@ -224,15 +229,16 @@ class AbstractAccessDriver extends Plugin
                     }
                 }
                 // auto rename file
+                $destDir = Utils::safeDirname($destFile);
                 $i = 1;
                 $newName = $base;
-                while (file_exists($destUrlBase.$destDir."/".$newName)) {
+                while (file_exists($destDir."/".$newName)) {
                     $suffix = "-$i";
                     if(isSet($radic)) $newName = $radic . $suffix . $ext;
                     else $newName = $base.$suffix;
                     $i++;
                 }
-                $destFile = $destUrlBase.$destDir."/".$newName;
+                $destFile = $destDir."/".$newName;
             }
         }
         $srcNode = new AJXP_Node($realSrcFile);
@@ -295,9 +301,9 @@ class AbstractAccessDriver extends Plugin
                 RecycleBinManager::fileToRecycle($srcFile);
             }
             if (isSet($dirRes)) {
-                $success[] = $mess[117]." ".TextEncoder::toUTF8(basename($srcFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
+                $success[] = $mess[117]." ".TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
             } else {
-                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
+                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
             }
         }
 

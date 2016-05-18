@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Core;
 
+use Pydio\Access\Core\Model\AJXP_Node;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -47,10 +49,12 @@ interface IAjxpWrapperProvider
 
     /**
      * Creates an empty file
-     * @param String $path
-     * @param String $newDirName
+     * @param AJXP_Node $node
+     * @param string $content
+     * @param bool $forceCreation
+     * @return
      */
-    public function createEmptyFile($path, $newDirName);
+    public function createEmptyFile(AJXP_Node $node, $content = "", $forceCreation = false);
 
     /**
      * @param String $from

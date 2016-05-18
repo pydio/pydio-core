@@ -137,6 +137,17 @@ class UserSelection
             }
             //return ;
         }
+        if (isSet($array["path"])){
+            if(!is_array($array["path"])){
+                $array["path"] = [$array["path"]];
+            }
+            foreach ($array["path"] as $p){
+                $p = Utils::decodeSecureMagic($p);
+                // First part must be the repository ID
+                $p = "/".implode("/", array_slice(explode("/", trim($p, "/")), 1));
+                $this->files[] = $p;
+            }
+        }
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
             foreach($array["nodes"] as $value){

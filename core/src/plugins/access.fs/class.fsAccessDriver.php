@@ -197,6 +197,35 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
     /**
+     * @param ServerRequestInterface $request
+     */
+    protected function filterByApi(&$request){
+        if($request->getAttribute("api") !== "v2") return;
+        $params = $request->getParsedBody();
+        $action = $request->getAttribute("action");
+        switch($action){
+            case "ls":
+                $children = $params["children"] OR null;
+                $meta     = $params["meta"] OR "standard";
+                if(!empty($children)){
+                    $options = $children;
+                } else {
+                    $options = "dzf";
+                }
+                if($meta !== "minimal") $options .= "l";
+                $params["options"] = $options;
+                $request = $request->withParsedBody($params);
+                break;
+            case "download":
+
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
      * @param DOMNode $contribNode
      */
     public function disableArchiveBrowsingContributions(&$contribNode)
@@ -267,6 +296,61 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $request = $request->withAttribute("upload_process_result", $arr);
     }
 
+    /**
+     * API V2, will get POST / PUT actions, will reroute to mkdir, mkfile, copy, move actions
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Exception
+     */
+    public function createResourceAction(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $selection = new UserSelection($this->repository);
+        $selection->initFromHttpVars($request->getParsedBody());
+        if($selection->isEmpty()){
+            throw new PydioException("Empty resource");
+        }
+        $path = $selection->getUniqueFile();
+        $notDecodedPath = TextEncoder::toUTF8($path);
+        $params = $request->getParsedBody();
+        $newAction = null;
+        if(isSet($params["copy_source"])){
+            $newVars["dest"] = Utils::safeDirname($notDecodedPath);
+            $newVars["targetBaseName"] = Utils::safeBasename($notDecodedPath);
+            $newVars["file"] = "/".implode("/", array_slice(explode("/", trim($params["copy_source"], "/")), 1));
+            if(isSet($params["delete_source"]) && $params["delete_source"] == "true"){
+                $newAction = "move";
+            }else{
+                $newAction = "copy";
+            }
+        }else{
+            if(substr_compare($path, "/", strlen($path)-1, 1) === 0){
+                // Ends with slash => mkdir
+                $newAction = "mkdir";
+                $newVars["file"] = $notDecodedPath;
+                if(!empty($params["override"])) {
+                    $newVars["ignore_exists"] = $params["override"];
+                }
+            }else{
+                $newAction = "mkfile";
+                $newVars["node"] = $notDecodedPath;
+                if(!empty($params["content"])) {
+                    $newVars["content"] = $params["content"];
+                }
+                if(!empty($params["override"])) {
+                    $newVars["force"] = $params["override"];
+                }
+            }
+        }
+        $request = $request->withParsedBody($newVars)->withAttribute("action", $newAction);
+        $this->switchAction($request, $response);
+
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Exception
+     */
     public function uploadAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $selection = new UserSelection($this->repository);
@@ -279,6 +363,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getFiles());
+            if(empty($dir) && $selection->isUnique()){
+                $dir = Utils::safeDirname($selection->getUniqueFile());
+            }
         }
         $mess = ConfService::getMessages();
 
@@ -357,7 +444,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
 
                 // NOW DO THE ACTUAL COPY
-                $this->copyUploadedData($uploadedFile, $destination, $mess);
+                $this->copyUploadedData($uploadedFile, $targetUrl, $mess);
 
                 // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
                 if (isSet($httpVars["appendto_urlencoded_part"])) {
@@ -432,11 +519,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         $selection = new UserSelection($this->repository);
         $httpVars = $request->getParsedBody();
-        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
-        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
-            $dir = fsAccessWrapper::patchPathForBaseDir($dir);
-        }
-        $dir = Utils::securePath($dir);
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getFiles());
@@ -451,6 +533,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 @set_error_handler(array("Pydio\\Core\\Controller\\HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
                 @register_shutdown_function("restore_error_handler");
                 $zip = false;
+                $dir = "";
                 if ($selection->isUnique()) {
                     if (is_dir($this->urlBase.$selection->getUniqueFile())) {
                         $zip = true;
@@ -466,6 +549,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     }
                     $node = $selection->getUniqueNode();
                 } else {
+                    if(isset($httpVars["dir"])){
+                        $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
+                    }
                     $zip = true;
                 }
                 if ($zip) {
@@ -576,42 +662,35 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         parent::accessPreprocess($request);
+        $this->filterByApi($request);
 
         $action = $request->getAttribute("action");
         $httpVars = $request->getParsedBody();
 
         $selection = new UserSelection($this->repository);
-        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
-        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
-            $dir = fsAccessWrapper::patchPathForBaseDir($dir);
-        }
-        $dir = Utils::securePath($dir);
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getFiles());
+            RecycleBinManager::filterActions($action, $selection, $httpVars);
         }
         $mess = ConfService::getMessages();
-
-        $newArgs = RecycleBinManager::filterActions($action, $selection, $dir, $httpVars);
-        if(isSet($newArgs["action"])) $action = $newArgs["action"];
-        if(isSet($newArgs["dest"])) $httpVars["dest"] = TextEncoder::toUTF8($newArgs["dest"]);//Re-encode!
-         // FILTER DIR PAGINATION ANCHOR
-        $page = null;
-        if (isSet($dir) && strstr($dir, "%23")!==false) {
-            $parts = explode("%23", $dir);
-            $dir = $parts[0];
-            $page = $parts[1];
-        }
-
         $nodesDiffs = new NodesDiff();
 
         switch ($action) {
 
             case "compress" :
-                    // Make a temp zip and send it as download
+                
+                    $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
+                    // Make a temp zip
                     $loggedUser = AuthService::getLoggedUser();
                     if (isSet($httpVars["archive_name"])) {
                         $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
@@ -637,6 +716,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
                     $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
                     $nodesDiffs->add($newNode);
+                    
             break;
 
             case "stat" :
@@ -666,6 +746,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             //	ONLINE EDIT
             //------------------------------------
             case "put_content":
+
                 if(!isset($httpVars["content"])) break;
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
                 $code = $httpVars["content"];
@@ -698,6 +779,30 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             break;
 
             //------------------------------------
+            //	DELETE
+            //  Warning, must be kept BEFORE copy/move
+            //  as recyclebin filtering can transform
+            //  it move action.
+            //------------------------------------
+            case "delete":
+
+                if ($selection->isEmpty()) {
+                    throw new PydioException("", 113);
+                }
+                $logMessages = array();
+                $errorMessage = $this->delete($selection->getFiles(), $logMessages);
+                if (count($logMessages)) {
+                    $logMessage = new UserMessage(join("\n", $logMessages));
+                }
+                if($errorMessage) {
+                    throw new PydioException(TextEncoder::toUTF8($errorMessage));
+                }
+                $this->logInfo("Delete", array("files"=>$this->addSlugToPath($selection)));
+                $nodesDiffs->remove($selection->getFiles());
+
+            break;
+
+            //------------------------------------
             //	COPY / MOVE
             //------------------------------------
             case "copy":
@@ -712,6 +817,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $success = $error = array();
                 $dest = Utils::decodeSecureMagic($httpVars["dest"]);
+                $targetBaseName = null;
+                if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
+                    $targetBaseName = $httpVars["targetBaseName"];
+                }
                 $this->filterUserSelectionToHidden(array($httpVars["dest"]));
                 if ($selection->inZip()) {
                     // Set action to copy anycase (cannot move from the zip).
@@ -722,7 +831,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if ($move && isSet($httpVars["force_copy_delete"])) {
                         $move = false;
                     }
-                    $this->copyOrMove($dest, $selection->getFiles(), $error, $success, $move);
+                    $this->copyOrMove($dest, $selection->getFiles(), $error, $success, $move, $targetBaseName);
 
                 }
 
@@ -743,36 +852,16 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 // Assume new nodes are correctly created
                 $selectedItems = $selection->getFiles();
                 foreach ($selectedItems as $selectedPath) {
-                    $newPath = $this->urlBase.$dest ."/". basename($selectedPath);
+                    $newPath = $this->urlBase.$dest ."/". (isSet($targetBaseName)?$targetBaseName : basename($selectedPath));
                     $newNode = new AJXP_Node($newPath);
-                    $nodesDiffs->add($newNode);
-                    if($action == "move") {
-                        $nodesDiffs->remove($selectedPath);
+                    if($action == "move"){
+                        $nodesDiffs->update($newNode, $selectedPath);
+                    }else{
+                        $nodesDiffs->add($newNode);
                     }
                 }
 
-            break;
-
-            //------------------------------------
-            //	DELETE
-            //------------------------------------
-            case "delete":
-
-                if ($selection->isEmpty()) {
-                    throw new PydioException("", 113);
-                }
-                $logMessages = array();
-                $errorMessage = $this->delete($selection->getFiles(), $logMessages);
-                if (count($logMessages)) {
-                    $logMessage = new UserMessage(join("\n", $logMessages));
-                }
-                if($errorMessage) {
-                    throw new PydioException(TextEncoder::toUTF8($errorMessage));
-                }
-                $this->logInfo("Delete", array("files"=>$this->addSlugToPath($selection)));
-                $nodesDiffs->remove($selection->getFiles());
-
-            break;
+                break;
 
 
             case "purge" :
@@ -819,8 +908,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $messtmp="";
                 $files = $selection->getFiles();
-                if(isSet($httpVars["dirname"])){
-                    $files[] = $dir ."/". Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                if(isSet($httpVars["dir"]) && isSet($httpVars["dirname"])){
+                    $files[] =
+                        rtrim(Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME), "/")
+                        ."/".
+                        Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
                 }
                 $messages = array();
                 $errors = array();
@@ -865,14 +957,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             //------------------------------------
             case "mkfile":
 
-                $messtmp="";
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
-                    $filename=Utils::decodeSecureMagic($httpVars["node"]);
+                    $filename= Utils::decodeSecureMagic($httpVars["node"]);
                 }else{
-                    $filename=Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
+                    $parent = rtrim(Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME), "/");
+                    $filename = $parent ."/" . Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
                 }
                 $filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($filename));
+                $node = new AJXP_Node($this->urlBase."/".$filename);
                 $content = "";
                 if (isSet($httpVars["content"])) {
                     $content = $httpVars["content"];
@@ -881,16 +974,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if (isSet($httpVars["force"]) && $httpVars["force"] == "true"){
                     $forceCreation = true;
                 }
-                $error = $this->createEmptyFile($dir, $filename, $content, $forceCreation);
+                $error = $this->createEmptyFile($node, $content, $forceCreation);
                 if (isSet($error)) {
                     throw new PydioException($error);
                 }
-                $messtmp.="$mess[34] ".TextEncoder::toUTF8($filename)." $mess[39] ";
-                if ($dir=="") {$messtmp.="/";} else {$messtmp.=TextEncoder::toUTF8($dir);}
-                $logMessage = new UserMessage($messtmp);
-                $this->logInfo("Create File", array("files"=>$this->addSlugToPath($dir)."/".$filename));
-                $newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
-                $nodesDiffs->add($newNode);
+                $logMessage = new UserMessage($mess[34]." ".$node->getLabel()." ".$mess[39]." ". $node->getParent()->getPath());
+                $this->logInfo("Create File", array("files"=>$this->addSlugToPath($node->getPath())));
+                $node->loadNodeInfo();
+                $nodesDiffs->add($node);
 
             break;
 
@@ -908,7 +999,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $this->chmod($fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
                 }
                 $logMessage= new UserMessage("Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders");
-                $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "files"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
+                $this->logInfo("Chmod", array(
+                    "files"=> array_map(array($this, "addSlugToPath"), $files),
+                    "filesCount"=>count($changedFiles))
+                );
                 $nodesDiffs->update($selection->buildNodes());
 
             break;
@@ -941,11 +1035,29 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $nodesList = new NodesList();
 
+                if($selection->isUnique() && $request->getAttribute("api") == "v2" && !empty($httpVars["children"])){
+                    $dir = $selection->getUniqueFile();
+                    $selection->setFiles([]);
+                }else{
+                    $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+                }
+                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+                    $dir = fsAccessWrapper::patchPathForBaseDir($dir);
+                }
+                $dir = Utils::securePath($dir);
+
+                // FILTER DIR PAGINATION ANCHOR
+                $page = null;
+                if (isSet($dir) && strstr($dir, "%23")!==false) {
+                    $parts = explode("%23", $dir);
+                    $dir = $parts[0];
+                    $page = $parts[1];
+                }
+
                 if(!isSet($dir) || $dir == "/") $dir = "";
                 $lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 
                 $startTime = microtime();
-                $dir = Utils::securePath($dir);
                 $path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
                 if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
@@ -1780,7 +1892,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
-    public function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
+    public function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false, $targetBaseName = null)
     {
         $this->logDebug("CopyMove", array("dest"=>$this->addSlugToPath($destDir), "selection" => $this->addSlugToPath($selectedFiles)));
         $mess = ConfService::getMessages();
@@ -1799,7 +1911,16 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
                 continue;
             }
-            $this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move, $repoData, $repoData);
+            if( !empty ($targetBaseName)){
+                $destFile = $destDir ."/" . $targetBaseName;
+            }else{
+                $bName = basename($selectedFile);
+                $localName = '';
+                Controller::applyHook("dl.localname", array($selectedFile, &$localName));
+                if(!empty($localName)) $bName = $localName;
+                $destFile = $destDir ."/". $bName;
+            }
+            $this->copyOrMoveFile($destFile, $selectedFile, $error, $success, $move, $repoData, $repoData);
         }
     }
 
@@ -1886,36 +2007,40 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return null;
     }
 
-    public function createEmptyFile($crtDir, $newFileName, $content = "", $force = false)
+    /**
+     * @param AJXP_Node $node
+     * @param string $content
+     * @param bool $force
+     * @return null|string
+     * @throws \Exception
+     */
+    public function createEmptyFile(AJXP_Node $node, $content = "", $force = false)
     {
-        Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));
+        Controller::applyHook("node.before_change", array($node->getParent()));
         $mess = ConfService::getMessages();
-        if ($newFileName=="") {
-            return "$mess[37]";
+
+        if (!$force && file_exists($node->getUrl())) {
+            throw new PydioException($mess[71], 71);
         }
-        if (!$force && file_exists($this->urlBase."$crtDir/$newFileName")) {
-            return "$mess[71]";
-        }
-        if (!$this->isWriteable($this->urlBase."$crtDir")) {
-            return "$mess[38] $crtDir $mess[99]";
+        if (!$this->isWriteable($node->getParent()->getUrl())) {
+            throw new PydioException("$mess[38] ".$node->getParent()->getPath()." $mess[99]", 71);
         }
         $repoData = array(
             'base_url' => $this->urlBase,
             'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
-        $fp=fopen($this->urlBase."$crtDir/$newFileName","w");
+        $fp=fopen($node->getUrl(),"w");
         if ($fp) {
             if ($content != "") {
                 fputs($fp, $content);
             }
-            $this->changeMode($this->urlBase."$crtDir/$newFileName", $repoData);
+            $this->changeMode($node->getUrl(), $repoData);
             fclose($fp);
-            $newNode = new AJXP_Node($this->urlBase."$crtDir/$newFileName");
-            Controller::applyHook("node.change", array(null, $newNode, false));
-            return null;
+            $node->loadNodeInfo();
+            Controller::applyHook("node.change", array(null, $node, false));
         } else {
-            return "$mess[102] $crtDir/$newFileName (".$fp.")";
+            throw new PydioException("$mess[102] ".$node->getPath()." (".$fp.")");
         }
     }
 

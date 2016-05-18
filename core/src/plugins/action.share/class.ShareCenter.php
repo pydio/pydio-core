@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
@@ -372,14 +374,12 @@ class ShareCenter extends Plugin
     /**************************/
     /**
      * Added as preprocessor on Download action to handle download Counter.
-     * @param string $action
-     * @param array $httpVars
-     * @param array $fileVars
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @throws Exception
      */
-    public function preProcessDownload($action, &$httpVars, &$fileVars){
+    public function preProcessDownload(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
         if(isSet($_SESSION["CURRENT_MINISITE"])){
-            $this->logDebug(__FUNCTION__, "Do something here!");
             $hash = $_SESSION["CURRENT_MINISITE"];
             $share = $this->getShareStore()->loadShare($hash);
             if(!empty($share)){

@@ -71,7 +71,7 @@ class SvnManager extends AJXP_AbstractMetaSource
             $recycle = $repo->getOption("RECYCLE_BIN");
             if ($recycle != "") {
                 RecycleBinManager::init($urlBase, "/".$recycle);
-                $result["RECYCLE"] = RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars["dir"], $httpVars);
+                $result["RECYCLE"] = RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars);
                 // if necessary, check recycle was checked.
                 // We could use a hook instead here? Maybe the full recycle system
                 // could be turned into a plugin
