@@ -37,11 +37,6 @@ class ApiRouter
      *       "cacheOptions"  => ["cacheFile" => "path", "cacheDisabled" => true],
      */
     private $cacheOptions;
-    /**
-     * @var object Will be used as '$this' for triggering the callbacks
-     */
-    private $callbacksContext;
-
 
     private $v2Base = "/api/v2";
     private $v1Base = "/api";

@@ -43,6 +43,14 @@ class SapiMiddleware
         }
         $request = $request->withParsedBody($params);
 
+        if(in_array("application/json", $request->getHeader("Content-Type"))){
+            $body = "".$request->getBody();
+            $body = json_decode($body, true);
+            if(is_array($body)){
+                $request = $request->withParsedBody(array_merge($request->getParsedBody(), ["request_body" => $body]));
+            }
+        }
+
         $serverData = $request->getServerParams();
         if(Server::$mode == Server::MODE_REST){
 
