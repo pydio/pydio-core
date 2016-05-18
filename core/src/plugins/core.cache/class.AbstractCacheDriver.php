@@ -29,6 +29,7 @@ use Doctrine\Common\Cache;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
 
 /**
  * @package AjaXplorer_Plugins
@@ -92,7 +93,7 @@ abstract class AbstractCacheDriver extends Plugin
     public function supportsPatternDelete($namespace)
     {
         $cacheDriver = $this->getCacheDriver($namespace);
-        return $cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
+        return $cacheDriver instanceof PatternClearableCache;
     }
 
     /**
@@ -102,7 +103,7 @@ abstract class AbstractCacheDriver extends Plugin
      */
     public function deleteKeyStartingWith($namespace, $id){
         $cacheDriver = $this->getCacheDriver($namespace);
-        if(!($cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache)){
+        if(!($cacheDriver instanceof PatternClearableCache)){
             return false;
         }
         return $cacheDriver->deleteKeysStartingWith($id);
