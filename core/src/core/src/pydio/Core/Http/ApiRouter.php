@@ -51,9 +51,12 @@ class ApiRouter
      * @param array $config
      * @param array $cacheOptions
      */
-    public function __construct($config, $cacheOptions = ["cacheDisabled" => AJXP_SKIP_CACHE, "cacheFile" => AJXP_DATA_PATH."/cache/plugins_api2routes.php"]){
+    public function __construct($config, $cacheOptions = []){
         $this->config = $config;
-        $this->cacheOptions = $cacheOptions;
+        $this->cacheOptions = array_merge([
+            "cacheDisabled" => AJXP_SKIP_CACHE,
+            "cacheFile" => AJXP_DATA_PATH."/cache/plugins_api2routes.php"
+        ], $cacheOptions);
     }
 
 
