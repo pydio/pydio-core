@@ -25,9 +25,10 @@
                         if(!pydio.getUserSelection().isEmpty()){
                             crtDir = pydio.getUserSelection().getUniqueNode().getPath();
                         }
-						var bgManager = pydio.getController().getBackgroundTasksManager();
-						bgManager.queueAction("index", {file:crtDir}, MessageHash["index.lucene.8"].replace('%s', crtDir));
-						bgManager.next();
+						//var bgManager = pydio.getController().getBackgroundTasksManager();
+						//bgManager.queueAction("index", {file:crtDir}, MessageHash["index.lucene.8"].replace('%s', crtDir));
+						//bgManager.next();
+						PydioTasks.Store.enqueueActionTask("Indexation", "index", {file:crtDir}, [crtDir]);
 					]]></clientCallback>
                     <serverCallback methodName="applyAction" restParams="/file+" developerComment="Trigger re-indexation of a directory, recursively">
                         <input_param name="file" type="string" description="Folder to index (can be empty for root)"/>

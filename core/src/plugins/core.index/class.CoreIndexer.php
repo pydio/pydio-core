@@ -28,13 +28,15 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class CoreIndexer extends Plugin {
 
     private $verboseIndexation = false;
-
+    private $currentTaskId;
 
     public function debug($message = ""){
         $this->logDebug("core.indexer", $message);
@@ -43,9 +45,12 @@ class CoreIndexer extends Plugin {
         }
     }
 
-    public function applyAction($actionName, $httpVars, $fileVars)
+    public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {
         $messages = ConfService::getMessages();
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+        $this->currentTaskId = $requestInterface->getAttribute("pydio-task-id") OR null;
 
         if ($actionName == "index") {
 
@@ -62,15 +67,15 @@ class CoreIndexer extends Plugin {
             }
 
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                Controller::applyActionInBackground($repositoryId, "index", $httpVars);
+                $task = TaskService::getInstance()->enqueueActionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()]);
+                $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+                Controller::applyTaskInBackground($task);
                 XMLWriter::header();
-                XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repositoryId), sprintf($messages["core.index.8"], $nodes[0]->getPath()), true, 2);
                 if(!isSet($httpVars["inner_apply"])){
                     XMLWriter::close();
                 }
                 return null;
             }
-
             // GIVE BACK THE HAND TO USER
             session_write_close();
 
@@ -82,6 +87,9 @@ class CoreIndexer extends Plugin {
                     try{
                         $this->debug("Indexing - node.index ".$node->getUrl());
                         Controller::applyHook("node.index", array($node));
+                        if($this->currentTaskId){
+                            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
+                        }
                     }catch (Exception $e){
                         $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
                     }
@@ -172,7 +180,7 @@ class CoreIndexer extends Plugin {
         }
         if($depth == 0){
             $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
-            $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user);
+            $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user, false);
             Controller::applyHook("node.index.recursive.end", array($node));
             $this->releaseStatus($repository, $user);
             $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
@@ -202,9 +210,13 @@ class CoreIndexer extends Plugin {
      * @param String $message
      * @param Repository $repository
      * @param AbstractAjxpUser $user
+     * @param boolean $stoppable
      */
-    protected function setIndexStatus($status, $message, $repository, $user)
+    protected function setIndexStatus($status, $message, $repository, $user, $stoppable = true)
     {
+        if(isSet($this->currentTaskId)){
+            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_RUNNING, $message, $stoppable);
+        }
         $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
         if(!is_dir($iPath)) mkdir($iPath,0755, true);
         $f = $iPath."/.indexation_status-".$this->buildIndexLockKey($repository, $user);
@@ -233,6 +245,9 @@ class CoreIndexer extends Plugin {
      */
     protected function releaseStatus($repository, $user)
     {
+        if(isSet($this->currentTaskId)){
+            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
+        }
         $f = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.indexation_status-".$this->buildIndexLockKey($repository, $user);
         $this->debug("Removing file ".$f);
         @unlink($f);
@@ -255,6 +270,10 @@ class CoreIndexer extends Plugin {
      */
     protected function isInterruptRequired($repository, $user)
     {
+        if(isSet($this->currentTaskId)){
+            $task = TaskService::getInstance()->getTaskById($this->currentTaskId);
+            return ($task->getStatus() == Task::STATUS_PAUSED);
+        }
         list($status, $message) = $this->getIndexStatus($repository, $user);
         return ($status == "INTERRUPT");
     }

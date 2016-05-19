@@ -69,7 +69,12 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
      * @param string|null $originalPath
      */
     public function update($nodes, $originalPath = null){
-        if(!is_array($nodes)) $nodes = [$originalPath => $nodes];
+        if(!is_array($nodes)) {
+            if($originalPath === null){
+                $originalPath = $nodes->getPath();
+            }
+            $nodes = [$originalPath => $nodes];
+        }
         $this->updated = array_merge($this->updated, $nodes);
     }
 
