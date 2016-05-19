@@ -3409,7 +3409,8 @@ span.first-bread em {
   }
 }
 .rotating,
-.icon-spinner {
+.icon-spinner,
+.mdi.mdi-radar {
   -webkit-transform-origin: 50% 50%;
   -webkit-animation-name: rotate;
   -webkit-animation-duration: 1.0s;
@@ -3433,6 +3434,10 @@ span.first-bread em {
 }
 .icon-spinner {
   display: block !important;
+  text-align: center;
+}
+.mdi.mdi-radar {
+  display: inline-block;
   text-align: center;
 }
 .icon-spinner.spinner_large {
@@ -4537,6 +4542,51 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel.hidden {
   left: -255px;
+}
+div.pydio-tasks-panel {
+  position: absolute;
+  width: 356px;
+  height: 60px;
+  bottom: 20px;
+  right: 20px;
+  overflow-y: auto;
+  background-color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  z-index: 20001;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+div.pydio-tasks-panel.invisible {
+  right: -361px;
+}
+div.pydio-tasks-panel div.task {
+  padding: 10px;
+  border-bottom: 1px solid #f2f2f2;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+div.pydio-tasks-panel div.task .task_texts {
+  -webkit-flex: 5;
+      -ms-flex: 5;
+          flex: 5;
+  max-width: 314px;
+}
+div.pydio-tasks-panel div.task .task_texts div {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.pydio-tasks-panel div.task .task_actions {
+  cursor: pointer;
+}
+div.pydio-tasks-panel div.task .task_actions > span {
+  display: inline-block;
+  margin-top: 15px;
+  margin-right: 10px;
+  color: #009688;
 }
 /**********************/
 /* MASTER VARIABLES

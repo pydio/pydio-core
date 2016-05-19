@@ -67,3 +67,7 @@
 .mdi-close-circle-outline:before {
     content: "\f250";
 }
+
+.mdi-radar:before {
+    content: "\f526";
+}
