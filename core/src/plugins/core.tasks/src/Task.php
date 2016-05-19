@@ -31,10 +31,26 @@ class Task
     const STATUS_FAILED = 8;
     const STATUS_PAUSED = 16;
 
+    const FLAG_STOPPABLE    = 1;
+    const FLAG_RESUMABLE    = 2;
+    const FLAG_HAS_PROGRESS  = 4;
+
     /**
      * @var string
      */
     public $id;
+
+    /**
+     * A boolean combination
+     * of the FLAG_XXX constants
+     * @var integer
+     */
+    public $flags;
+
+    /**
+     * @var string
+     */
+    public $label;
 
     /**
      * @var string
@@ -52,7 +68,18 @@ class Task
     /**
      * @var int
      */
-    public $status;
+    public $status = 1;
+
+    /**
+     * @var string
+     */
+    public $statusMessage;
+
+    /**
+     * @var int
+     */
+    public $progress = -1;
+
     /**
      * @var Schedule
      */
@@ -93,6 +120,52 @@ class Task
     {
         $this->id = $id;
     }
+
+    /**
+     * @return int
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * @param int $flags
+     */
+    public function setFlags($flags)
+    {
+        $this->flags = $flags;
+    }
+
+    public function isStoppable(){
+        return $this->flags & Task::FLAG_STOPPABLE;
+    }
+
+    public function isResumable(){
+        return $this->flags & Task::FLAG_RESUMABLE;
+    }
+
+    public function hasProgress(){
+        return $this->flags & Task::FLAG_HAS_PROGRESS;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param string $label
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+
 
     /**
      * @return string
@@ -156,6 +229,38 @@ class Task
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusMessage()
+    {
+        return $this->statusMessage;
+    }
+
+    /**
+     * @param string $statusMessage
+     */
+    public function setStatusMessage($statusMessage)
+    {
+        $this->statusMessage = $statusMessage;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgress()
+    {
+        return $this->progress;
+    }
+
+    /**
+     * @param int $progress
+     */
+    public function setProgress($progress)
+    {
+        $this->progress = $progress;
     }
 
     /**

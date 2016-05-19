@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `ajxp_tasks` (
   `userId` varchar(255) NOT NULL,
   `wsId` varchar(32) NOT NULL,
   `status` int(11) NOT NULL,
+  `progress` int(11) NOT NULL,
   `schedule` text NOT NULL,
   `action` text NOT NULL,
   `parameters` mediumtext NOT NULL,

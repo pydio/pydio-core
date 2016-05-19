@@ -21,8 +21,14 @@
 namespace Pydio\Tasks;
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -53,6 +59,85 @@ class TaskService implements ITasksProvider
     }
 
 
+    public function enqueueTask(Task $task){
+        
+    }
+
+    protected function publishTaskUpdate(Task $task){
+
+        $json = Utils::xmlEntities(json_encode($task));
+        if(count($task->nodes)){
+            $nodesDiff = new NodesDiff();
+            foreach($task->nodes as $url){
+                $n = new AJXP_Node($url);
+                $n->loadNodeInfo(true, false, "all");
+                $nodesDiff->update($n);
+            }
+        }
+        $xmlString = "";
+        if(isSet($nodesDiff)){
+            $xmlString = $nodesDiff->toXML();
+        }
+        Controller::applyHook("msg.instant", array("<task id='".$task->getId()."' data='".$json."'/>".$xmlString, $task->getWsId(), $task->getUserId()));
+
+    }
+
+    public function enqueueActionAsTask($actionName, $parameters, $repoId = "", $user = "", $nodePathes = []){
+
+        if (empty($user)) {
+            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) {
+                $user = AuthService::getLoggedUser()->getId();
+            }else {
+                $user = "shared";
+            }
+        }
+        if(empty($repoId)){
+            $repoId = ConfService::getCurrentRepositoryId();
+        }
+        $task = new Task();
+        $task->setLabel("Launching action ".$actionName);
+        $task->setId(Utils::createGUID());
+        $task->setUserId($user);
+        $task->setWsId($repoId);
+        $task->setStatus(Task::STATUS_PENDING);
+        $task->setStatusMessage("Starting...");
+        $task->setAction($actionName);
+        $task->setParameters($parameters);
+        if(count($nodePathes)){
+            array_map(function ($node) use ($task){
+                $task->attachToNode($node);
+            }, $nodePathes);
+        }
+        TaskService::getInstance()->createTask($task, Schedule::scheduleNow());
+
+        return $task;
+
+    }
+
+    /**
+     * @param string $taskId
+     * @param integer $status
+     * @param string $message
+     * @param bool|null $stoppable
+     * @return Task
+     * @throws PydioException
+     */
+    public function updateTaskStatus($taskId, $status, $message, $stoppable = null){
+        $t = self::getTaskById($taskId);
+        if(empty($t)){
+            throw new PydioException("Cannot find task with this id");
+        }
+        $t->setStatus($status);
+        $t->setStatusMessage($message);
+        if($stoppable !== null){
+            $f = $t->isResumable() ? Task::FLAG_RESUMABLE : 0;
+            $f = $t->hasProgress() ? $f | Task::FLAG_HAS_PROGRESS : $f;
+            $f = $stoppable ? $f | Task::FLAG_STOPPABLE : $f;
+            $t->setFlags($f);
+        }
+        return self::updateTask($t);
+    }
+
     /**
      * @param Task $task
      * @param Schedule $when
@@ -60,7 +145,9 @@ class TaskService implements ITasksProvider
      */
     public function createTask(Task $task, Schedule $when)
     {
-        return $this->realProvider->createTask($task, $when);
+        $res = $this->realProvider->createTask($task, $when);
+        $this->publishTaskUpdate($task);
+        return $res;
     }
 
     /**
@@ -78,17 +165,9 @@ class TaskService implements ITasksProvider
      */
     public function updateTask(Task $task)
     {
-        return $this->realProvider->updateTask($task);
-    }
-
-    /**
-     * @param string $taskId
-     * @param int $status
-     * @return Task
-     */
-    public function updateTaskStatus($taskId, $status)
-    {
-        return $this->realProvider->updateTaskStatus($taskId, $status);
+        $res = $this->realProvider->updateTask($task);
+        $this->publishTaskUpdate($task);
+        return $res;
     }
 
     /**
@@ -112,9 +191,9 @@ class TaskService implements ITasksProvider
      * @param AJXP_Node $node
      * @return Task[]
      */
-    public function getTasksForNode(AJXP_Node $node)
+    public function getActiveTasksForNode(AJXP_Node $node)
     {
-        return $this->realProvider->getTasksForNode($node);
+        return $this->realProvider->getActiveTasksForNode($node);
     }
 
     /**

@@ -37,9 +37,13 @@ class SqlTasksProvider implements ITasksProvider
 
     protected function taskToDBValues(Task $task, $removeId = false){
         $values = [
+            "flags"     => $task->getFlags(),
+            "label"     => $task->getLabel(),
             "userId"    => $task->getUserId(),
             "wsId"      => $task->getWsId(),
             "status"    => $task->getStatus(),
+            "status_msg"=> $task->getStatusMessage(),
+            "progress"  => $task->getProgress(),
             "schedule"  => json_encode($task->getSchedule()),
             "action"    => $task->getAction(),
             "parameters"=> json_encode($task->getParameters()),
@@ -58,9 +62,13 @@ class SqlTasksProvider implements ITasksProvider
     protected function taskFromDBValues(\DibiRow $values){
         $task = new Task();
         $task->setId($values["uid"]);
+        $task->setFlags($values["flags"]);
+        $task->setLabel($values["label"]);
         $task->setUserId($values["userId"]);
         $task->setWsId($values["wsId"]);
         $task->setStatus($values["status"]);
+        $task->setStatusMessage($values["status_msg"]);
+        $task->setProgress($values["progress"]);
         $task->setSchedule(Schedule::fromJson($values["schedule"]));
         $task->setAction($values["action"]);
         $task->setParameters(json_decode($values["parameters"], true));
@@ -103,19 +111,7 @@ class SqlTasksProvider implements ITasksProvider
             $sql = $ex->getSql();
         }
     }
-
-    /**
-     * @param string $taskId
-     * @param int $status
-     * @return Task
-     */
-    public function updateTaskStatus($taskId, $status)
-    {
-        $task = $this->getTaskById($taskId);
-        $task->setStatus($status);
-        \dibi::query("UPDATE [ajxp_tasks] SET ", $this->taskToDBValues($task, true), " WHERE [uid] =%s", $taskId);
-    }
-
+    
     /**
      * @param string $taskId
      * @return bool
@@ -135,13 +131,14 @@ class SqlTasksProvider implements ITasksProvider
 
     /**
      * @param AJXP_Node $node
-     * @return Task[]
+     * @param $active
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getTasksForNode(AJXP_Node $node)
+    public function getActiveTasksForNode(AJXP_Node $node)
     {
         $tasks = [];
         try{
-            $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE [nodes] LIKE %s', "%|||".$node->getUrl()."|||%");
+            $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE [nodes] LIKE %s AND [status] NOT IN (1,4,8)', "%|||".$node->getUrl()."|||%");
             foreach ($res->fetchAll() as $row) {
                 $tasks[] = $this->taskFromDBValues($row);
             }

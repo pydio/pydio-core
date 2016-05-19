@@ -23,10 +23,13 @@ namespace Pydio\Tasks;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Controller\Controller;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Tasks\Providers\MockTasksProvider;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Tasks\Providers\SqlTasksProvider;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -38,39 +41,68 @@ class TaskController extends Plugin
     public function init($options)
     {
         parent::init($options);
-        //TaskService::getInstance()->setProvider(new MockTasksProvider());
         TaskService::getInstance()->setProvider(new SqlTasksProvider());
+    }
+
+    protected function initTaskFromApi(ServerRequestInterface $request, Task &$task){
+        $params = $request->getParsedBody();
+        $taskData = json_decode($params["task"], true);
+        $task = SimpleRestResourceRouter::cast($task, $taskData);
+        if(isSet($params["taskId"])) {
+            $task->setId($params["taskId"]);
+        } else {
+            $task->setId(Utils::createGUID());
+        }
+        $task->setUserId(AuthService::getLoggedUser()->getId());
+        $task->setWsId(ConfService::getCurrentRepositoryId());
+        if(count($task->nodes)){
+            foreach($task->nodes as $index => $path){
+                $task->nodes[$index] = "pydio://".$task->getWsId().$path;
+            }
+        }
     }
 
     public function route(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $action = $request->getAttribute("action");
+        $taskService = TaskService::getInstance();
         switch ($action){
             case "tasks_list":
-                $tasks = TaskService::getInstance()->getPendingTasks();
+                $tasks = $taskService->getPendingTasks();
                 $response = new JsonResponse($tasks);
                 break;
             case "task_info":
-                $task = TaskService::getInstance()->getTaskById($request->getParsedBody()["taskId"]);
+                $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 $response = new JsonResponse($task);
                 break;
             case "task_create":
-                $taskData = json_decode($request->getParsedBody()["task"]);
                 $newTask = new Task();
-                $newTask->setId($request->getParsedBody()["taskId"]);
-                $newTask = SimpleRestResourceRouter::cast($newTask, $taskData);
-                TaskService::getInstance()->createTask($newTask, $newTask->getSchedule());
+                $this->initTaskFromApi($request, $newTask);
+                $taskService->createTask($newTask, $newTask->getSchedule());
+                if($newTask->getSchedule()->shouldRunNow()){
+                    Controller::applyTaskInBackground($newTask);
+                }
                 $response = new JsonResponse($newTask);
                 break;
             case "task_update":
                 $taskData = $request->getParsedBody()["request_body"];
-                $newTask = TaskService::getInstance()->getTaskById($request->getParsedBody()["taskId"]);
+                $newTask = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 $newTask = SimpleRestResourceRouter::cast($newTask, $taskData);
-                TaskService::getInstance()->updateTask($newTask);
+                $taskService->updateTask($newTask);
                 $response = new JsonResponse($newTask);
                 break;
+            case "task_toggle_status":
+                $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
+                if(!empty($task)){
+                    $status = intval($request->getParsedBody()["status"]);
+                    if($status != $task->getStatus()){
+                        $task->setStatus($status);
+                        $taskService->updateTask($task);
+                    }
+                }
+                break;
             case "task_delete":
-                if(TaskService::getInstance()->deleteTask($request->getParsedBody()["taskId"])){
+                if($taskService->deleteTask($request->getParsedBody()["taskId"])){
                     $response = new JsonResponse(new UserMessage("Ok"));
                 }
                 break;
@@ -82,59 +114,18 @@ class TaskController extends Plugin
 
     public function attachTasksToNode(AJXP_Node &$node, $isContextNode = false, $details = "all"){
         if($details == "all"){
-            $t = TaskService::getInstance()->getTasksForNode($node);
+            $t = TaskService::getInstance()->getActiveTasksForNode($node);
             if(count($t)){
                 $ids = array_map(function (Task $el) {
                     return $el->getId();
                 }, $t);
-                $node->mergeMetadata(["tasks"=> implode(",",$ids)]);
+                $node->mergeMetadata([
+                    "tasks"=> implode(",",$ids),
+                    "overlay_icon" => "task-running.png",
+                    "overlay_class" => "mdi mdi-radar"
+                ], true);
             }
         }
     }
-
-    /*
-    public function getTasks(ServerRequestInterface &$request, ResponseInterface &$response){
-        $mock = new MockTasksProvider();
-        return $mock->getPendingTasks();
-    }
-
-    public function getTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        $mock = new MockTasksProvider();
-        return $mock->getTaskById($request->getParsedBody()["task_id"]);
-    }
-
-    public function createTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        $postedTask = $request->getParsedBody()["postedObject"];
-        $t = new Task();
-        $t = SimpleRestResourceRouter::cast($t, $postedTask);
-        $t->schedule = Schedule::fromJson($t->schedule);
-        return $t;
-    }
-
-    public function updateTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        $taskId = $request->getParsedBody()["task_id"];
-        $postedTask = $request->getParsedBody()["postedObject"];
-        $t = new Task();
-        $t = SimpleRestResourceRouter::cast($t, $postedTask);
-        $t->schedule = Schedule::fromJson($t->schedule);
-        $t->setId($taskId);
-        $mock = new MockTasksProvider();
-        return $mock->updateTask($t);
-    }
-
-    public function deleteTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        $taskId = $request->getParsedBody()["task_id"];
-        $mock = new MockTasksProvider();
-        if($mock->deleteTask($taskId)){
-            return ["success" => "Deleted object $taskId"];
-        }else{
-            return ["error" => "there was an error trying to delete object $taskId"];
-        }
-    }
-
-    public function startTask(ServerRequestInterface &$request, ResponseInterface &$response){
-        return ["Task ".$request->getParsedBody()["task_id"]." started"];
-    }
-    */
-
+    
 }

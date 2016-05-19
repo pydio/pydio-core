@@ -21,6 +21,7 @@
 
 namespace Pydio\Tasks\Providers;
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\Schedule;
 
@@ -62,19 +63,7 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     {
         return $task;
     }
-
-    /**
-     * @param string $taskId
-     * @param int $status
-     * @return Task
-     */
-    public function updateTaskStatus($taskId, $status)
-    {
-        $fakeTask = new Task();
-        $fakeTask->setId($taskId);
-        $fakeTask->setStatus($status);
-    }
-
+    
     /**
      * @param string $taskId
      * @return bool
@@ -97,9 +86,9 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
-     * @return Task[]
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getTasksForNode(\Pydio\Access\Core\Model\AJXP_Node $node)
+    public function getActiveTasksForNode(AJXP_Node $node)
     {
         $t1 = new Task();
         $t1->setAction("fake-task-action");

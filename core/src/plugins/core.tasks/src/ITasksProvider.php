@@ -47,14 +47,7 @@ interface ITasksProvider
      * @return Task
      */
     public function updateTask(Task $task);
-
-    /**
-     * @param string $taskId
-     * @param int $status
-     * @return Task
-     */
-    public function updateTaskStatus($taskId, $status);
-
+    
     /**
      * @param string $taskId
      * @return bool
@@ -70,9 +63,10 @@ interface ITasksProvider
 
     /**
      * @param AJXP_Node $node
+     * @param $active
      * @return Task[]
      */
-    public function getTasksForNode(AJXP_Node $node);
+    public function getActiveTasksForNode(AJXP_Node $node);
 
     /**
      * @param AbstractAjxpUser $user

@@ -49,6 +49,10 @@ class Schedule implements \JsonSerializable
         $this->value = $value;
     }
 
+    public function shouldRunNow(){
+        return $this->type === self::TYPE_ONCE_NOW;
+    }
+
     public static function scheduleNow(){
         return new Schedule(self::TYPE_ONCE_NOW);
     }
