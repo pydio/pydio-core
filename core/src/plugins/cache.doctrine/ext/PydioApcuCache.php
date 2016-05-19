@@ -48,7 +48,7 @@ class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements Pattern
     {
         $pattern = '/^'.$this->namespacedIdAsPattern($pattern).'/';
         //SAMPLE /^pydio-unique-id_nodes_\[list\:\/\/1/
-        $iterator = new APCIterator('user', $pattern);
+        $iterator = new \APCIterator('user', $pattern);
         foreach ($iterator as $data) {
             $this->doDelete($data['key']);
         }
