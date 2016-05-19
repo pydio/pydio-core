@@ -43,6 +43,14 @@ class RemoteNodeProvider{
             this.discrete = true;
             this.properties.delete('connexion_discrete');
         }
+        if(this.properties && this.properties.has('cache_service')){
+            this.cacheService = this.properties.get('cache_service');
+            this.properties.delete('cache_service');
+            MetaCacheService.getInstance().registerMetaStream(
+                this.cacheService['metaStreamName'],
+                this.cacheService['expirationPolicy']
+            );
+        }
     }
 
     /**
@@ -85,10 +93,22 @@ class RemoteNodeProvider{
         if(optionalParameters){
             params = LangUtils.objectMerge(params, optionalParameters);
         }
-        var complete = function (transport){
+        let parser = function (transport){
             this.parseNodes(node, transport, nodeCallback, childCallback);
+            return node;
         }.bind(this);
-        PydioApi.getClient().request(params,  complete, null, {discrete:this.discrete});
+        if(this.cacheService){
+            let loader = function(ajxpNode, cacheCallback){
+                PydioApi.getClient().request(params, cacheCallback, null, {discrete:this.discrete});
+            }.bind(this);
+            let cacheLoader = function(newNode){
+                node.replaceBy(newNode);
+                nodeCallback(node);
+            }.bind(this);
+            MetaCacheService.getInstance().metaForNode(this.cacheService['metaStreamName'], node, loader, parser, cacheLoader);
+        }else{
+            PydioApi.getClient().request(params, parser, null, {discrete:this.discrete});
+        }
     }
 
     /**
@@ -242,27 +262,36 @@ class RemoteNodeProvider{
     }
 
     parseAjxpNodesDiffs(xmlElement, targetDataModel, setContextChildrenSelected=false){
-        var removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
-        var adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
-        var updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
+        let removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
+        let adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
+        let updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
+        let notifyServerChange = [];
         if(removes && removes.length){
             removes.forEach(function(r){
                 var p = r.getAttribute("filename");
                 var imTime = parseInt(r.getAttribute("ajxp_im_time"));
                 targetDataModel.removeNodeByPath(p, imTime);
+                notifyServerChange.push(p);
             });
         }
         if(adds && adds.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             adds.forEach(function(tree){
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 targetDataModel.addNode(newNode, setContextChildrenSelected);
+                notifyServerChange.push(newNode.getPath());
             });
         }
         if(updates && updates.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             updates.forEach(function(tree){
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
+                let original = newNode.getMetadata().get("original_path");
                 targetDataModel.updateNode(newNode, setContextChildrenSelected);
+                notifyServerChange.push(newNode.getPath());
+                if(original) notifyServerChange.push(original);
             });
+        }
+        if(notifyServerChange.length){
+            targetDataModel.notify("server_update", notifyServerChange);
         }
     }
 

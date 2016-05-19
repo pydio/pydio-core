@@ -100,6 +100,12 @@
                     </serverCallback>
                     </processing>
             </action>
+            <action name="migrate_legacy_shares">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
+                <processing>
+                    <serverCallback methodName="migrateLegacyShares" restParams="/dry_run"/>
+                </processing>
+            </action>
             <!--
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">

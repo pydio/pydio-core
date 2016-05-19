@@ -638,7 +638,8 @@ class ShareStore {
                     $collectRepositories[$repo->getId()] = $path;
                 }
                 if($save){
-                    ConfService::getConfStorageImpl()->saveRepository($repo, true);
+                    //ConfService::getConfStorageImpl()->saveRepository($repo, true);
+                    ConfService::replaceRepository($repo->getId(), $repo);
                 }
                 $access = $repo->getOption("SHARE_ACCESS");
                 if(!empty($access) && $access == "PUBLIC"){
