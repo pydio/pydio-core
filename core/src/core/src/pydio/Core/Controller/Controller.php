@@ -32,6 +32,8 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -256,6 +258,13 @@ class Controller
 
     }
 
+    public static function applyTaskInBackground(Task $task){
+        $parameters = $task->getParameters();
+        $task->setStatus(Task::STATUS_RUNNING);
+        TaskService::getInstance()->updateTask($task);
+        self::applyActionInBackground($task->getWsId(), $task->getAction(), $parameters, $task->getUserId(), "", $task->getId());
+    }
+
     /**
      * Launch a command-line version of the framework by passing the actionName & parameters as arguments.
      * @static
@@ -264,9 +273,10 @@ class Controller
      * @param array $parameters
      * @param string $user
      * @param string $statusFile
+     * @param string $taskId
      * @return null|UnixProcess
      */
-    public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "")
+    public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "", $taskId = null)
     {
 /*
         if (empty($user)) {
@@ -292,8 +302,11 @@ class Controller
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
         if (empty($user)) {
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
-            else $user = "shared";
+            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) {
+                $user = AuthService::getLoggedUser()->getId();
+            }else {
+                $user = "shared";
+            }
         }
 /*
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.mq/vendor/autoload.php");
@@ -324,8 +337,11 @@ class Controller
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
             $cmd = ConfService::getCoreConf("CLI_PHP")." ".chr(34).$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php".chr(34)." -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
         }
-        if ($statusFile != "") {
+        if (!empty($statusFile)) {
             $cmd .= " -s=".$statusFile;
+        }
+        if (!empty($taskId)) {
+            $cmd .= " -k=".$taskId;
         }
         foreach ($parameters as $key=>$value) {
             if($key == "action" || $key == "get_action") continue;

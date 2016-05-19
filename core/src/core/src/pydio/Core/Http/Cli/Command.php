@@ -71,6 +71,11 @@ class Command extends Symfony\Component\Console\Command\Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'Path to a file to write status information about the running task'
+            )->addOption(
+                'cli_task_uuid',
+                'k',
+                InputOption::VALUE_OPTIONAL,
+                'Task Uuid'
             )
         ;
     }
@@ -94,6 +99,7 @@ class Command extends Symfony\Component\Console\Command\Command
         if(!is_array($pydioCliOptions["r"])){
             $pydioCliOptions["r"] = [$pydioCliOptions["r"]];
         }
+        $taskUid = $pydioCliOptions["k"];
         foreach ($pydioCliOptions["r"] as $repoId){
             $reqOptions = $pydioCliOptions;
             $reqOptions["r"] = $repoId;
@@ -105,6 +111,9 @@ class Command extends Symfony\Component\Console\Command\Command
                 ->withAttribute("api", "cli")
                 ->withAttribute("cli-options", $reqOptions)
                 ->withAttribute("cli-output", $output);
+            if(!empty($taskUid)){
+                $request = $request->withAttribute("pydio-task-id", $taskUid);
+            }
             $server->updateRequest($request);
             $server->listen();
         }
