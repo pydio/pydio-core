@@ -232,8 +232,9 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         return $result;
     }
 
-    public function editMeta($actionName, $httpVars, $fileVars)
+    public function editMeta(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
             throw new Exception("Write actions are disabled in demo mode!");
         }
@@ -245,7 +246,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $selection = new UserSelection($repo, $httpVars);
 
         $nodes = $selection->buildNodes();
-        $nodesDiffs = array();
+        $nodesDiffs = new \Pydio\Access\Core\Model\NodesDiff();
         $def = $this->getMetaDefinition();
         foreach($nodes as $ajxpNode){
 
@@ -271,13 +272,13 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             }
             $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
             Controller::applyHook("node.meta_change", array($ajxpNode));
-
-            $nodesDiffs[$ajxpNode->getPath()] = $ajxpNode;
+            $ajxpNode->loadNodeInfo(true, false, "all");
+            $nodesDiffs->update($ajxpNode);
 
         }
-        XMLWriter::header();
-        XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
-        XMLWriter::close();
+        $respStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($respStream);
+        $respStream->addChunk($nodesDiffs);
     }
 
     /**

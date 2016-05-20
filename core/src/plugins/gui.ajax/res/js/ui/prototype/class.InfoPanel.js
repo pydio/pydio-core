@@ -242,6 +242,11 @@ Class.create("InfoPanel", AjxpPane, {
         }else{
             uniqNode = passedNode;
         }
+        if(this._currentObservedNode){
+            this._currentObservedNode.stopObserving("node_replaced", this.updateHandler);
+        }
+        this._currentObservedNode = uniqNode;
+        this._currentObservedNode.observeOnce("node_replaced", this.updateHandler);
 
         this.updateTitle(uniqNode.getLabel());
 		var isFile = false;

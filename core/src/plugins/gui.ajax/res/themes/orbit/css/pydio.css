@@ -4102,7 +4102,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel .infopanel_loading,
 .form-ip_content_info_panel .infopanel_loading {
   opacity: 0;
-  transition: opacity ease 0.2s;
+  transition: opacity ease 0.1s;
 }
 #info_panel .infopanel_loading_finished,
 .form-ip_content_info_panel .infopanel_loading_finished {

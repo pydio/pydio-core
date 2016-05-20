@@ -71,6 +71,7 @@ class TaskService implements ITasksProvider
             foreach($task->nodes as $url){
                 $n = new AJXP_Node($url);
                 $n->loadNodeInfo(true, false, "all");
+                Controller::applyHook("node.meta_change", array(&$n));
                 $nodesDiff->update($n);
             }
         }
