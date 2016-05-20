@@ -20,9 +20,9 @@
  */
 namespace Pydio\Cache\Core;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -83,8 +83,13 @@ class CoreCacheLoader extends Plugin
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param AJXP_Node $contextNode
      * @param bool $details
+     * @param bool $forceRefresh
      */
-    public function loadNodeInfoFromCache(&$node, $contextNode, $details){
+    public function loadNodeInfoFromCache(&$node, $contextNode, $details, $forceRefresh = false){
+        if($forceRefresh) {
+            $this->clearNodeInfoCache($node);
+            return;
+        }
         $cDriver = ConfService::getCacheDriverImpl();
         if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
             return;

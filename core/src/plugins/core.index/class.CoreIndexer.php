@@ -55,7 +55,6 @@ class CoreIndexer extends Plugin {
         if ($actionName == "index") {
 
             $repository = ConfService::getRepository();
-            $repositoryId = $repository->getId();
             $userSelection = new UserSelection($repository, $httpVars);
             if($userSelection->isEmpty()){
                 $userSelection->addFile("/");

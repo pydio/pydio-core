@@ -423,12 +423,12 @@ class AJXP_Node implements \JsonSerializable
                 if(is_object($driver)) $driver->detectStreamWrapper(true);
             }
         }
-        Controller::applyHook("node.info.start", array(&$this, $contextNode, $details));
+        Controller::applyHook("node.info.start", array(&$this, $contextNode, $details, $forceRefresh));
         if($this->nodeInfoLoaded && !$forceRefresh){
             return;
         }
-        Controller::applyHook("node.info", array(&$this, $contextNode, $details));
-        Controller::applyHook("node.info.end", array(&$this, $contextNode, $details));
+        Controller::applyHook("node.info", array(&$this, $contextNode, $details, $forceRefresh));
+        Controller::applyHook("node.info.end", array(&$this, $contextNode, $details, $forceRefresh));
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $details;
     }
