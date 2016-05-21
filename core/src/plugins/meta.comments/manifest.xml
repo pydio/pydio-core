@@ -66,6 +66,6 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Wrapper type plugins only -->
-		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<pluginClass pluginName="access.fs|access.ftp|access.demo"/>
 	</dependencies>
 </meta>

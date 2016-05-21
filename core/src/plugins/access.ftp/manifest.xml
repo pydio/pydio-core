@@ -40,13 +40,16 @@
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
-		<external_file filename="plugins/access.remote_fs/additionalActions.xml" include="actions/*"/>
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+        <actions>
+            <action name="next_to_remote">
+                <processing><serverCallback methodName="uploadActions"/></processing>
+            </action>
+        </actions>
 	</registry_contributions>
 	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\FTP\ftpAccessDriver"/>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
-		<pluginClass pluginName="access.remote_fs"/>
 	</dependencies>
     <class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper" protocol="ajxp.ftp"/>
 </ajxpdriver>

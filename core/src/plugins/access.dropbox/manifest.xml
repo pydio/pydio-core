@@ -19,7 +19,6 @@
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
-		<pluginClass pluginName="access.remote_fs"/>
 	</dependencies>
     <class_stream_wrapper filename="plugins/access.dropbox/class.dropboxWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Dropbox\dropboxWrapper" protocol="ajxp.dropbox"/>
 </ajxpdriver>
