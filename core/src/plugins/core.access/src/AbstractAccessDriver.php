@@ -20,18 +20,20 @@
  */
 namespace Pydio\Access\Core;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -114,15 +116,24 @@ class AbstractAccessDriver extends Plugin
     /**
      * @param $directoryPath string
      * @param $repositoryResolvedOptions array
-     * @return integer
-     * @throw \Exception
+     * @return int
+     * @throws \Exception
      */
     public function directoryUsage($directoryPath, $repositoryResolvedOptions){
         throw new \Exception("Current driver does not support recursive directory usage!");
     }
 
-    public function crossRepositoryCopy($httpVars)
+    public function crossRepositoryCopy(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
+
+        $taskId = $requestInterface->getAttribute("pydio-task-id");
+        if(empty($taskId)){
+            $task = TaskService::actionAsTask("cross_copy", $httpVars);
+            TaskService::getInstance()->enqueueTask($task);
+            return;
+        }
+
         ConfService::detectRepositoryStreams(true);
         $mess = ConfService::getMessages();
         $selection = new UserSelection(ConfService::getRepository());
@@ -164,15 +175,17 @@ class AbstractAccessDriver extends Plugin
             $this->copyOrMoveFile(
                 $destFile,
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
-                $srcRepoData, $destRepoData);
+                $srcRepoData, $destRepoData, $taskId);
 
         }
-        XMLWriter::header();
-        if (count($errorMessages)) {
-            XMLWriter::sendMessage(null, join("\n", $errorMessages), true);
+
+        if(!empty($taskId)){
+            if (count($errorMessages)) {
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, implode("\n", $errorMessages));
+            }else{
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
+            }
         }
-        XMLWriter::sendMessage(join("\n", $messages), null, true);
-        XMLWriter::close();
     }
 
     /**
@@ -183,8 +196,9 @@ class AbstractAccessDriver extends Plugin
      * @param bool $move Whether to copy or move
      * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
      * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
+     * @param string $taskId Optional task UUID to update during operation
      */
-    protected function copyOrMoveFile($destFile, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array())
+    protected function copyOrMoveFile($destFile, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array(), $taskId = null)
     {
         $srcUrlBase = $srcRepoData['base_url'];
         $srcRecycle = $srcRepoData['recycle'];
@@ -197,17 +211,19 @@ class AbstractAccessDriver extends Plugin
         Controller::applyHook("dl.localname", array($srcFile, &$localName));
         if(!empty($localName)) $bName = $localName;
         */
-        $destDir = Utils:: safeDirname($destFile);
+        $destDir = Utils::safeDirname($destFile);
         $destFile = $destUrlBase.$destFile;
         $realSrcFile = $srcUrlBase.$srcFile;
 
         if (is_dir(dirname($realSrcFile)) && (strpos($destFile, rtrim($realSrcFile, "/") . "/") === 0)) {
             $error[] = $mess[101];
+            if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $mess[101]);
             return;
         }
 
         if (!file_exists($realSrcFile)) {
             $error[] = $mess[100].$srcFile;
+            if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $mess[100].$srcFile);
             return ;
         }
         if (!$move) {
@@ -216,6 +232,7 @@ class AbstractAccessDriver extends Plugin
         }
         if (dirname($realSrcFile) == dirname($destFile) && basename($realSrcFile) == basename($destFile)) {
             if ($move) {
+                if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $mess[101]);
                 $error[] = $mess[101];
                 return ;
             } else {
@@ -249,14 +266,19 @@ class AbstractAccessDriver extends Plugin
             $srcNode->setLeaf(false);
             if ($move) {
                 Controller::applyHook("node.before_path_change", array($srcNode));
-                if(file_exists($destFile)) $this->deldir($destFile, $destRepoData);
+                if(file_exists($destFile)) {
+                    $this->deldir($destFile, $destRepoData);
+                }
                 $res = rename($realSrcFile, $destFile);
+                if($res!==true){
+                    $errors[] = "Error while renaming $realSrcFile to $destFile";
+                }
             } else {
-                $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles, false, true, $srcRepoData, $destRepoData);
+                $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles, false, true, $srcRepoData, $destRepoData, $taskId);
             }
-            if (count($errors) || (isSet($res) && $res!==true)) {
-                $error[] = $mess[114];
-                return ;
+            if (count($errors)) {
+                if (!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, implode(" ", $errors));
+                return;
             } else {
                 $destNode->setLeaf(false);
                 Controller::applyHook("node.change", array($srcNode, $destNode, !$move));
@@ -278,11 +300,13 @@ class AbstractAccessDriver extends Plugin
                     \Pydio\Core\Controller\Controller::applyHook("node.change", array($srcNode, $destNode, true));
                 } catch (\Exception $e) {
                     $error[] = $e->getMessage();
+                    if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
                     return ;
                 }
             }
         }
 
+        $successMessage = "";
         if ($move) {
             // Now delete original
             // $this->deldir($realSrcFile); // both file and dir
@@ -292,19 +316,23 @@ class AbstractAccessDriver extends Plugin
                 $messagePart = $mess[123]." ".$mess[122];
             }
             if (is_dir($destFile)) {
-                $success[] = $mess[117]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[117]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             } else {
-                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             }
         } else {
             if (RecycleBinManager::recycleEnabled() && $destDir == "/".$srcRecycle) {
                 RecycleBinManager::fileToRecycle($srcFile);
             }
             if (isSet($dirRes)) {
-                $success[] = $mess[117]." ".TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
+                $successMessage = $mess[117]." ".TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
             } else {
-                $success[] = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
+                $successMessage = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
             }
+        }
+        $success[] = $successMessage;
+        if(!empty($taskId)){
+            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, $successMessage);
         }
 
     }
@@ -343,9 +371,10 @@ class AbstractAccessDriver extends Plugin
      * @param bool $convertSrcFile Boolean
      * @param array $srcRepoData Set of data concerning source repository: base_url, recycle option
      * @param array $destRepoData Set of data concerning destination repository: base_url, chmod option
+     * @param string $taskId Optional Task ID
      * @return int
      */
-    protected function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true, $srcRepoData = array(), $destRepoData = array())
+    protected function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true, $srcRepoData = array(), $destRepoData = array(), $taskId = null)
     {
         $num = 0;
         //$verbose = true;
@@ -375,12 +404,20 @@ class AbstractAccessDriver extends Plugin
                                 if($convertSrcFile) $tmpPath = AJXP_MetaStreamWrapper::getRealFSReference($srcfile);
                                 else $tmpPath = $srcfile;
                                 if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
+                                if(!empty($taskId)){
+                                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Copying ".$srcfile);
+                                }
                                 copy($tmpPath, $dstfile);
                                 $success[] = $srcfile;
                                 $num ++;
                                 $this->changeMode($dstfile, $destRepoData);
                             } catch (\Exception $e) {
-                                $errors[] = $srcfile;
+                                $errors[] = $e->getMessage()." - ".$srcfile;
+                            }
+                        }else{
+                            if($verbose) echo "Skipping file ".$srcfile.", already there.";
+                            if(!empty($taskId)){
+                                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Skipping file ".$srcfile.", already there.");
                             }
                         }
                     } else {
@@ -391,7 +428,7 @@ class AbstractAccessDriver extends Plugin
             closedir($curdir);
             foreach ($recurse as $rec) {
                 if($verbose) echo "Dircopy $srcfile";
-                $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile, $srcRepoData, $destRepoData);
+                $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile, $srcRepoData, $destRepoData, $taskId);
             }
         }
         return $num;

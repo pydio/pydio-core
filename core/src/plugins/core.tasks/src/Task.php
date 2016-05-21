@@ -102,6 +102,7 @@ class Task
     {
         $this->status = self::STATUS_PENDING;
         $this->parameters = [];
+        $this->flags = 0;
         $this->schedule = Schedule::scheduleNow();
     }
 

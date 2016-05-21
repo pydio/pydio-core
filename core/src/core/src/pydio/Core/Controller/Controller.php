@@ -185,20 +185,6 @@ class Controller
     public static function run(ServerRequestInterface $request, &$actionNode = null)
     {
         $actionName = $request->getAttribute("action");
-        if ($actionName == "cross_copy") {
-            $pService = PluginsService::getInstance();
-            $actives = $pService->getActivePlugins();
-            $accessPlug = $pService->getPluginsByType("access");
-            if (count($accessPlug)) {
-                foreach ($accessPlug as $key=>$objbect) {
-                    if ($actives[$objbect->getId()] === true) {
-                        call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $request->getParsedBody());
-                        break;
-                    }
-                }
-            }
-            throw new ActionNotFoundException("cross_copy");
-        }
         $xPath = self::initXPath(true);
         if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");

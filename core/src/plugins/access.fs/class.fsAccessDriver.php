@@ -50,6 +50,8 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 use ShareCenter;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
@@ -688,35 +690,50 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         switch ($action) {
 
             case "compress" :
-                
-                    $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
-                    // Make a temp zip
-                    $loggedUser = AuthService::getLoggedUser();
-                    if (isSet($httpVars["archive_name"])) {
-                        $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
-                        $this->filterUserSelectionToHidden(array($localName));
-                    } else {
-                        $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
-                    }
-                    $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
-                    if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
-                    else $baseDir = $dir;
-                    $zipFile = $this->makeZip($selection->getFiles(), $file, $baseDir);
-                    if(!$zipFile) throw new PydioException("Error while compressing file $localName");
-                    register_shutdown_function("unlink", $file);
-                    $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
-                    copy($file, $tmpFNAME);
-                    try {
-                        Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
-                    } catch (\Exception $e) {
-                        @unlink($tmpFNAME);
-                        throw $e;
-                    }
-                    @rename($tmpFNAME, $this->urlBase.$dir."/".$localName);
-                    Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
-                    $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
-                    $nodesDiffs->add($newNode);
-                    
+
+                if($request->getAttribute("pydio-task-id") === null){
+                    $task = TaskService::actionAsTask($action, $httpVars);
+                    $task->setFlags(Task::FLAG_STOPPABLE);
+                    TaskService::getInstance()->enqueueTask($task);
+                    return;
+                }
+
+                $taskId = $request->getAttribute("pydio-task-id");
+                if($taskId !== null){
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting compression in background");
+                }
+                $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
+                // Make a temp zip
+                $loggedUser = AuthService::getLoggedUser();
+                if (isSet($httpVars["archive_name"])) {
+                    $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
+                    $this->filterUserSelectionToHidden(array($localName));
+                } else {
+                    $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
+                }
+                $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
+                if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
+                else $baseDir = $dir;
+                $zipFile = $this->makeZip($selection->getFiles(), $file, $baseDir, $taskId);
+                if(!$zipFile) throw new PydioException("Error while compressing file $localName");
+                register_shutdown_function("unlink", $file);
+                $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);
+                copy($file, $tmpFNAME);
+                try {
+                    Controller::applyHook("node.before_create", array(new AJXP_Node($tmpFNAME), filesize($tmpFNAME)));
+                } catch (\Exception $e) {
+                    @unlink($tmpFNAME);
+                    throw $e;
+                }
+                @rename($tmpFNAME, $this->urlBase.$dir."/".$localName);
+                Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
+                $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
+                $nodesDiffs->add($newNode);
+                Controller::applyHook("msg.instant", array($nodesDiffs->toXML(), $this->repository->getId()));
+                if($taskId !== null){
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Finished compression in background");
+                }
+
             break;
 
             case "stat" :
@@ -811,6 +828,16 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($selection->isEmpty()) {
                     throw new PydioException("", 113);
                 }
+                $taskId = $request->getAttribute("pydio-task-id");
+                if($taskId === null && (!$selection->isUnique() || !is_file($selection->getUniqueNode()->getUrl()))){
+                    $task = TaskService::actionAsTask($action, $httpVars);
+                    $task->setFlags(Task::FLAG_STOPPABLE);
+                    TaskService::getInstance()->enqueueTask($task);
+                    return;
+                }
+                if(!empty($taskId)){
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting operation in background");
+                }
                 $loggedUser = AuthService::getLoggedUser();
                 if($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())){
                     throw new PydioException("You are not allowed to write", 207);
@@ -825,22 +852,24 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($selection->inZip()) {
                     // Set action to copy anycase (cannot move from the zip).
                     $action = "copy";
-                    $this->extractArchive($dest, $selection, $error, $success);
+                    $this->extractArchive($dest, $selection, $error, $success, $taskId);
                 } else {
                     $move = ($action == "move" ? true : false);
                     if ($move && isSet($httpVars["force_copy_delete"])) {
                         $move = false;
                     }
-                    $this->copyOrMove($dest, $selection->getFiles(), $error, $success, $move, $targetBaseName);
+                    $this->copyOrMove($dest, $selection->getFiles(), $error, $success, $move, $targetBaseName, $taskId);
 
                 }
 
                 if (count($error)) {
+                    if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while copy/move: ".TextEncoder::toUTF8(join("\n", $error)));
                     throw new PydioException(TextEncoder::toUTF8(join("\n", $error)));
                 } else {
                     if (isSet($httpVars["force_copy_delete"])) {
                         $errorMessage = $this->delete($selection->getFiles(), $logMessages);
                         if($errorMessage) {
+                            if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while deleting data: ".TextEncoder::toUTF8($errorMessage));
                             throw new PydioException(TextEncoder::toUTF8($errorMessage));
                         }
                         $this->logInfo("Copy/Delete", array("files"=>$this->addSlugToPath($selection), "destination" => $this->addSlugToPath($dest)));
@@ -859,6 +888,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     }else{
                         $nodesDiffs->add($newNode);
                     }
+                }
+
+                if(!empty($taskId)) {
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
+                    Controller::applyHook("msg.instant", array($nodesDiffs->toXML(), $this->repository->getId()));
                 }
 
                 break;
@@ -1813,7 +1847,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
-    public static $currentZipOperationHandler;
     public function extractArchiveItemPreCallback($status, $data){
         $fullname = $data['filename'];
         $size = $data['size'];
@@ -1831,10 +1864,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return 1;
     }
 
-    public function extractArchiveItemPostCallback($status, $data){
+    public function extractArchiveItemPostCallback($status, $data, $taskId = null){
         $fullname = $data['filename'];
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
         $repoName = str_replace($realBase, "", $fullname);
+        if($taskId !== null){
+            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Extracted file ".$repoName);
+        }
         $toNode = new AJXP_Node($this->urlBase.$repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
         Controller::applyHook("node.change", array(null, $toNode, false));
@@ -1848,8 +1884,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      * @param UserSelection $selection
      * @param array $error
      * @param array $success
+     * @param string $taskId
      */
-    public function extractArchive($destDir, $selection, &$error, &$success)
+    public function extractArchive($destDir, $selection, &$error, &$success, $taskId = null)
     {
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $zipPath = $selection->getZipPath(true);
@@ -1875,15 +1912,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $this->logDebug("Archive", $this->addSlugToPath($files));
         $realDestination = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase.$destDir);
         $this->logDebug("Extract", array($realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath));
-        self::$currentZipOperationHandler = &$this;
+
         $result = $archive->extract(PCLZIP_OPT_BY_NAME,     $files,
                                     PCLZIP_OPT_PATH,        $realDestination,
                                     PCLZIP_OPT_REMOVE_PATH, $zipLocalPath,
-                                    PCLZIP_CB_PRE_EXTRACT,  "staticExtractArchiveItemPreCallback",
-                                    PCLZIP_CB_POST_EXTRACT, "staticExtractArchiveItemPostCallback",
+                                    PCLZIP_CB_PRE_EXTRACT,  function($status, $data) use ($taskId) { return $this->extractArchiveItemPreCallback($status, $data, $taskId); },
+                                    PCLZIP_CB_POST_EXTRACT, function($status, $data) use ($taskId) { return $this->extractArchiveItemPostCallback($status, $data, $taskId); },
                                     PCLZIP_OPT_STOP_ON_ERROR
         );
-        self::$currentZipOperationHandler = null;
+
         if ($result <= 0) {
             $error[] = $archive->errorInfo(true);
         } else {
@@ -1892,7 +1929,17 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
-    public function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false, $targetBaseName = null)
+    /**
+     * @param string $destDir
+     * @param array $selectedFiles
+     * @param array $error
+     * @param array $success
+     * @param bool $move
+     * @param string|null $targetBaseName
+     * @param string|null $taskId
+     * @throws \Exception
+     */
+    public function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false, $targetBaseName = null, $taskId = null)
     {
         $this->logDebug("CopyMove", array("dest"=>$this->addSlugToPath($destDir), "selection" => $this->addSlugToPath($selectedFiles)));
         $mess = ConfService::getMessages();
@@ -1920,7 +1967,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if(!empty($localName)) $bName = $localName;
                 $destFile = $destDir ."/". $bName;
             }
-            $this->copyOrMoveFile($destFile, $selectedFile, $error, $success, $move, $repoData, $repoData);
+            $this->copyOrMoveFile($destFile, $selectedFile, $error, $success, $move, $repoData, $repoData, $taskId);
         }
     }
 
@@ -2151,18 +2198,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
 
     /**
-     * @var fsAccessDriver
-     */
-    public static $filteringDriverInstance;
-
-    /**
-     * @param $src
-     * @param $dest
-     * @param $basedir
+     * @param array $src
+     * @param string $dest
+     * @param string $basedir
+     * @param string $taskId
      * @throws \Exception
      * @return PclZip
      */
-    public function makeZip ($src, $dest, $basedir)
+    public function makeZip ($src, $dest, $basedir, $taskId = null)
     {
         $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
 
@@ -2185,21 +2228,38 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
         }
         $this->logDebug("Pathes", $filePaths);
-        self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
+        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+        $fsEncoding = TextEncoder::getEncoding();
+
+        $preAddCallback = function($value, &$header) use ($taskId, $zipEncoding, $fsEncoding){
+            if($taskId !== null){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Adding ".$header["stored_filename"]." to archive");
+            }
+            $search = $header["filename"];
+            if(!empty($zipEncoding)){
+                $test = iconv($fsEncoding, $zipEncoding, $header["stored_filename"]);
+                if($test !== false){
+                    $header["stored_filename"] = $test;
+                }
+            }
+            return !($this->filterFile($search, true) || $this->filterFolder($search, "contains"));
+        };
 
         if($basedir == "__AJXP_ZIP_FLAT__/"){
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'Pydio\Access\Driver\StreamProvider\FS\zipPreAddCallback');
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }else{
             $basedir = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase).trim($basedir);
             $this->logDebug("Basedir", array($basedir));
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'Pydio\Access\Driver\StreamProvider\FS\zipPreAddCallback');
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }
 
         if (!$vList) {
+            if($taskId !== null){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Zip creation error : ($dest) ".$archive->errorInfo(true));
+            }
             throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }
-        self::$filteringDriverInstance = null;
         return $vList;
     }
 
@@ -2307,28 +2367,4 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
 
-}
-
-function zipPreAddCallback($value, &$header)
-{
-    if(fsAccessDriver::$filteringDriverInstance == null) return true;
-    $search = $header["filename"];
-    $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
-    if(!empty($zipEncoding)){
-        $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $header["stored_filename"]);
-        if($test !== false){
-            $header["stored_filename"] = $test;
-        }
-    }
-    return !(fsAccessDriver::$filteringDriverInstance->filterFile($search, true)
-        || fsAccessDriver::$filteringDriverInstance->filterFolder($search, "contains"));
-}
-
-if (!function_exists('staticExtractArchiveItemCallback')){
-    function staticExtractArchiveItemPostCallback($status, $data){
-        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPostCallback($status, $data);
-    }
-    function staticExtractArchiveItemPreCallback($status, $data){
-        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPreCallback($status, $data);
-    }
 }

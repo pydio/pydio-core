@@ -60,7 +60,12 @@ class TaskService implements ITasksProvider
 
 
     public function enqueueTask(Task $task){
-        
+        if(ConfService::backgroundActionsSupported()){
+            Controller::applyTaskInBackground($task);
+        }else{
+            // TODO: Should Run now?
+            // $task->run();
+        }
     }
 
     protected function publishTaskUpdate(Task $task){
@@ -83,7 +88,7 @@ class TaskService implements ITasksProvider
 
     }
 
-    public function enqueueActionAsTask($actionName, $parameters, $repoId = "", $user = "", $nodePathes = []){
+    public static function actionAsTask($actionName, $parameters, $repoId = "", $user = "", $nodePathes = [], $flags = 0){
 
         if (empty($user)) {
             if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) {
@@ -104,6 +109,7 @@ class TaskService implements ITasksProvider
         $task->setStatusMessage("Starting...");
         $task->setAction($actionName);
         $task->setParameters($parameters);
+        $task->setFlags($flags);
         if(count($nodePathes)){
             array_map(function ($node) use ($task){
                 $task->attachToNode($node);
@@ -120,10 +126,11 @@ class TaskService implements ITasksProvider
      * @param integer $status
      * @param string $message
      * @param bool|null $stoppable
+     * @param integer|null $progress
      * @return Task
      * @throws PydioException
      */
-    public function updateTaskStatus($taskId, $status, $message, $stoppable = null){
+    public function updateTaskStatus($taskId, $status, $message, $stoppable = null, $progress = null){
         $t = self::getTaskById($taskId);
         if(empty($t)){
             throw new PydioException("Cannot find task with this id");
@@ -135,6 +142,9 @@ class TaskService implements ITasksProvider
             $f = $t->hasProgress() ? $f | Task::FLAG_HAS_PROGRESS : $f;
             $f = $stoppable ? $f | Task::FLAG_STOPPABLE : $f;
             $t->setFlags($f);
+        }
+        if($progress !== null){
+            $t->setProgress($progress);
         }
         return self::updateTask($t);
     }

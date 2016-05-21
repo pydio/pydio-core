@@ -38,6 +38,10 @@
             TaskAPI.updateTaskStatus(this, Task.STATUS_PAUSED);
         }
 
+        stop(){
+            TaskAPI.updateTaskStatus(this, Task.STATUS_COMPLETE);
+        }
+
     }
 
     Task.STATUS_PENDING = 1;
@@ -108,6 +112,12 @@
                     }
                 }
             }.bind(this));
+
+            global.pydio.observe("registry_loaded", function(){
+
+                this.getTasks(true);
+
+            }.bind(this));
         }
 
         static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE){
@@ -124,8 +134,8 @@
         }
 
 
-        getTasks(){
-            if(this._tasksList == undefined){
+        getTasks(forceRefresh = false){
+            if(this._tasksList == undefined || forceRefresh){
                 var taskMap = new Map();
                 TaskAPI.loadTasks(function(tasks){
                     tasks.map(function(t){taskMap.set(t.id, t)});
@@ -168,14 +178,18 @@
             this.state.tasks.forEach(function(t){
                 if(t.getStatus() == Task.STATUS_COMPLETE) return;
                 let actions;
-                if(t.isStoppable()){
-                    actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                if(t.getStatus() == Task.STATUS_RUNNING){
+                    if(t.isStoppable()){
+                        actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                    }
+                }else{
+                    actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
                 }
                 tasks.push(
                     <div className="task">
                         <div className="task_texts">
                             <div className="task_label">{t.getLabel()}</div>
-                            <div className="status_message">{t.getStatusMessage()}</div>
+                            <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
                         </div>
                         <div className="task_actions">{actions}</div>
                     </div>

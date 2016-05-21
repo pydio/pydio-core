@@ -613,6 +613,11 @@
                 </serverCallback>
 				</processing>
 		</action>
+        <action name="cross_copy">
+            <processing>
+                <serverCallback methodName="crossRepositoryCopy"/>
+            </processing>
+        </action>
 		<action name="copy" ctrlDragndropDefault="true">
 			<gui text="66" title="159" src="editcopy.png" iconClass="icon-copy" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
@@ -658,7 +663,7 @@
 							if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 							this.treeSelector.setFilterSelectedIndex(0);
 							this.treeSelector.setFilterChangeCallback(function(e){
-								externalRepo = this.filterSelector.getValue();
+								var externalRepo = this.filterSelector.getValue();
 								var nodeProvider = new RemoteNodeProvider();
 								nodeProvider.initProvider({tmp_repository_id:externalRepo});
 								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
