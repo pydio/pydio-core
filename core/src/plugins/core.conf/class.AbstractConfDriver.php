@@ -629,9 +629,11 @@ abstract class AbstractConfDriver extends Plugin
 
                 $clone = ConfService::getFilteredXMLRegistry(true, true);
                 $clonePath = new \DOMXPath($clone);
-                $serverCallbacks = $clonePath->query("//serverCallback|hooks");
-                foreach ($serverCallbacks as $callback) {
-                    $callback->parentNode->removeChild($callback);
+                if(!AJXP_SERVER_DEBUG){
+                    $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                    foreach ($serverCallbacks as $callback) {
+                        $callback->parentNode->removeChild($callback);
+                    }
                 }
                 $xPath = '';
                 if (isSet($httpVars["xPath"])) {

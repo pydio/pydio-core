@@ -58,15 +58,18 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
 
     /**
      * @param AJXP_Node|AJXP_Node[] $nodes
+     * @return NodesDiff
      */
     public function add($nodes){
         if(!is_array($nodes)) $nodes = [$nodes];
         $this->added = array_merge($this->added, $nodes);
+        return $this;
     }
 
     /**
      * @param AJXP_Node|AJXP_Node[] $nodes
      * @param string|null $originalPath
+     * @return NodesDiff
      */
     public function update($nodes, $originalPath = null){
         if(!is_array($nodes)) {
@@ -76,14 +79,17 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
             $nodes = [$originalPath => $nodes];
         }
         $this->updated = array_merge($this->updated, $nodes);
+        return $this;
     }
 
     /**
      * @param string|string[] $nodePathes
+     * @return NodesDiff
      */
     public function remove($nodePathes){
         if(!is_array($nodePathes)) $nodePathes = [$nodePathes];
         $this->removed = array_merge($this->removed, $nodePathes);
+        return $this;
     }
 
     /**

@@ -45,7 +45,7 @@ class CoreIndexer extends Plugin {
         }
     }
 
-    public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
+    public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $messages = ConfService::getMessages();
         $actionName = $requestInterface->getAttribute("action");
@@ -66,13 +66,9 @@ class CoreIndexer extends Plugin {
             }
 
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                $task = TaskService::getInstance()->enqueueActionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()]);
-                $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
-                Controller::applyTaskInBackground($task);
-                XMLWriter::header();
-                if(!isSet($httpVars["inner_apply"])){
-                    XMLWriter::close();
-                }
+                $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+                TaskService::getInstance()->enqueueTask($task);
+                $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
                 return null;
             }
             // GIVE BACK THE HAND TO USER

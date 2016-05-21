@@ -20,8 +20,8 @@
  */
 $mess = array(
     // will be replaced by the application title
-    "Power FS" => "Power FS",
-    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc.",
+    "Power FS" => "Zip Delegation",
+    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "This extension assumes you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, and to use the command line version of ZIP.",
     "Zip path" => "Zip path",
     "Path of the zip utilitary on the command line" => "Path of the zip utilitary on the command line",
 );

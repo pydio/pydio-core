@@ -486,10 +486,15 @@ class PydioApi{
                     var paramChild = childs[i].childNodes[j];
                     if(paramChild.tagName == 'param'){
                         parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
+                    }else if(paramChild.tagName == 'clientCallback'){
+                        var callbackCode = paramChild.firstChild.nodeValue;
+                        var callback = new Function(callbackCode);
                     }
                 }
-                var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
-                if(bgManager){
+                if(name == "javascript_instruction" && callback){
+                    callback();
+                }else{
+                    var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
                     bgManager.queueAction(name, parameters, messageId);
                     bgManager.next();
                 }

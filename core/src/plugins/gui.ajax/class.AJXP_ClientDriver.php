@@ -155,10 +155,12 @@ class AJXP_ClientDriver extends Plugin
         // PRECOMPUTE REGISTRY
         if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
             $clone = ConfService::getFilteredXMLRegistry(true, true);
-            $clonePath = new DOMXPath($clone);
-            $serverCallbacks = $clonePath->query("//serverCallback|hooks");
-            foreach ($serverCallbacks as $callback) {
-                $callback->parentNode->removeChild($callback);
+            if(!AJXP_SERVER_DEBUG){
+                $clonePath = new DOMXPath($clone);
+                $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                foreach ($serverCallbacks as $callback) {
+                    $callback->parentNode->removeChild($callback);
+                }
             }
             $START_PARAMETERS["PRELOADED_REGISTRY"] = XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
         }

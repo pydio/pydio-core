@@ -37,6 +37,8 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -94,16 +96,13 @@ class ftpAccessDriver extends fsAccessDriver
     {
         switch ($request->getAttribute("action")) {
 
-            case "trigger_remote_copy":
-                if(!$this->hasFilesToCopy()) break;
-                $toCopy = $this->getFileNameToCopy();
-                $x = new SerializableResponseStream();
-                $response = $response->withBody($x);
-                $x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".$toCopy." to ftp server"));
-            break;
-
             case "next_to_remote":
-                if(!$this->hasFilesToCopy()) break;
+                $taskId = $request->getAttribute("pydio-task-id");
+                if(!$this->hasFilesToCopy()) {
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
+                    break;
+                }
+
                 $fData = $this->getNextFileToCopy();
                 $nextFile = '';
                 if ($this->hasFilesToCopy()) {
@@ -116,6 +115,7 @@ class ftpAccessDriver extends fsAccessDriver
                 $destPath = TextEncoder::fromPostedFileName($destPath);
                 $node = new AJXP_Node($destPath);
                 $this->logDebug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Uploading file ".$fData["name"]);
                 try {
                     Controller::applyHook("node.before_create", array(&$node));
                     $fp = fopen($destPath, "w");
@@ -133,6 +133,7 @@ class ftpAccessDriver extends fsAccessDriver
                     Controller::applyHook("node.change", array(null, &$node));
 
                 } catch (\Exception $e) {
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "");
                     $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
                 }
                 $this->logDebug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
@@ -140,8 +141,11 @@ class ftpAccessDriver extends fsAccessDriver
                 $response = $response->withBody($x);
                 if ($nextFile!='') {
                     $x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
+                    $newTask = TaskService::actionAsTask("next_to_remote", []);
+                    TaskService::getInstance()->enqueueTask($newTask);
                 } else {
                     $x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
                 }
             break;
 
@@ -236,6 +240,9 @@ class ftpAccessDriver extends fsAccessDriver
                     }*/
                         $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
 
+                        $task = TaskService::actionAsTask("next_to_remote", []);
+                        TaskService::getInstance()->enqueueTask($task);
+
                     } catch (\Exception $e) {
                         $errorCode = $e->getCode();
                         if(empty($errorCode)) $errorCode = 411;
@@ -302,10 +309,12 @@ class ftpAccessDriver extends fsAccessDriver
         $this->logDebug("Saving user temporary data", array($fileData));
         $files[] = $fileData;
         $user->saveTemporaryData("tmp_upload", $files);
+        /*
         if(Utils::userAgentIsNativePydioApp()){
             $this->logInfo("Up from",$_SERVER["HTTP_USER_AGENT"]." - direct triger of next to remote");
             $this->uploadActions("next_to_remote", array(), array());
         }
+        */
     }
 
     public function getFileNameToCopy()

@@ -16,10 +16,7 @@
             <!-- Override access.fs compression -->
             <action name="compress">
                 <processing>
-                    <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress" developerComment="Compress one or many files into a Zip archive. May be disabled for remote-access workspaces (like FTP).">
-                        <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
-                        <input_param description="Force new archive name. If not set, the parent folder name is used" name="archive_name" type="string"/>
-                    </serverCallback>
+                    <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="compress"/>
                 </processing>
             </action>
             <action name="precompress">
@@ -30,11 +27,6 @@
             </action>
             <action name="postcompress_download">
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
-                <processing>
-                    <serverCallback methodName="switchAction"/>
-                </processing>
-            </action>
-            <action name="monitor_compression">
                 <processing>
                     <serverCallback methodName="switchAction"/>
                 </processing>
