@@ -28,10 +28,12 @@ class S3Client extends AwsS3Client
 {
     /**
      * Register a new stream wrapper who overwrite the Amazon S3 stream wrapper with this client instance.
+     * @param string $repositoryId
+     * @return $this|void
      */
-    public function registerStreamWrapper()
+    public function registerStreamWrapper($repositoryId)
     {
         /* S3Client + s3 protocol +  cacheInterface */
-        StreamWrapper::register($this, "s3", new s3CacheService());
+        StreamWrapper::register($this, "s3.".$repositoryId, new s3CacheService());
     }
 }
