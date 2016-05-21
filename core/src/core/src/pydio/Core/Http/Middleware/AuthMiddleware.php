@@ -100,8 +100,17 @@ class AuthMiddleware
     protected static function bootSessionServer(ServerRequestInterface $request){
 
         $parameters = $request->getParsedBody();
-        if (AuthService::usersEnabled()) {
+        if (isSet($parameters["tmp_repository_id"])) {
+            try{
+                ConfService::switchRootDir($parameters["tmp_repository_id"], true);
+            }catch(PydioException $e){}
+        } else if (isSet($_SESSION["SWITCH_BACK_REPO_ID"])) {
+            ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
+            unset($_SESSION["SWITCH_BACK_REPO_ID"]);
+        }
 
+
+        if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
             if ($loggedUser != null) {
                 $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($parameters["tmp_repository_id"])?$parameters["tmp_repository_id"]:"-1"));
@@ -109,18 +118,6 @@ class AuthMiddleware
                     AuthService::disconnect();
                 }
             }
-
-        }else{
-
-            if (isSet($parameters["tmp_repository_id"])) {
-                try{
-                    ConfService::switchRootDir($parameters["tmp_repository_id"], true);
-                }catch(PydioException $e){}
-            } else if (isSet($_SESSION["SWITCH_BACK_REPO_ID"])) {
-                ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
-                unset($_SESSION["SWITCH_BACK_REPO_ID"]);
-            }
-
         }
 
         //Set language
