@@ -9,6 +9,7 @@ div.pydio-tasks-panel{
   bottom: @pydio-task-panel-margin;
   right: @pydio-task-panel-margin;
   overflow-y: auto;
+  overflow-x: hidden;
   background-color: white;
   box-shadow: @reactBoxShadowDepth1;
   z-index: 20001;
@@ -23,7 +24,7 @@ div.pydio-tasks-panel{
     flex-direction: row;
     .task_texts{
       flex: 5;
-      max-width: @pydio-task-panel-width - 42px;
+      max-width: @pydio-task-panel-width - 60px;
       div{
         text-overflow: ellipsis;
         overflow: hidden;

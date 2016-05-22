@@ -5,7 +5,11 @@
         constructor(data){
             this._internal = data;
         }
-        
+
+        getId(){
+            return this._internal['id'];
+        }
+
         isStoppable(){
             return this._internal['flags'] & Task.FLAG_STOPPABLE;
         }
@@ -16,6 +20,10 @@
 
         hasProgress(){
             return this._internal['flags'] & Task.FLAG_HAS_PROGRESS;
+        }
+
+        getProgress(){
+            return this._internal['progress'];
         }
 
         getLabel(){
@@ -136,17 +144,85 @@
 
         getTasks(forceRefresh = false){
             if(this._tasksList == undefined || forceRefresh){
-                var taskMap = new Map();
+                this._tasksList = new Map();
                 TaskAPI.loadTasks(function(tasks){
-                    tasks.map(function(t){taskMap.set(t.id, t)});
-                });
-                this._tasksList = taskMap;
-                this.notify("tasks_updated");
+                    let taskMap = new Map();
+                    tasks.map(function(t){taskMap.set(t.getId(), t)});
+                    this._tasksList = taskMap;
+                    this.notify("tasks_updated");
+                }.bind(this));
             }
             return this._tasksList;
         }
 
     }
+
+    var TaskAction = React.createClass({
+
+        getInitialState: function(){
+            return {showProgress: true};
+        },
+
+        showAction: function(){
+            this.setState({showProgress: false});
+        },
+
+        showProgress: function(){
+            this.setState({showProgress: true});
+        },
+
+        render: function(){
+            let t = this.props.task;
+
+            let actions;
+            if(t.getStatus() == Task.STATUS_RUNNING){
+                if(t.isStoppable()){
+                    actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                }
+            }else{
+                actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
+            }
+            if(this.state.showProgress && t.hasProgress()){
+                actions = (
+                    <div className="radial-progress">
+                        <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
+                    </div>
+                );
+            }
+            return <div className="task_actions" onMouseOver={this.showAction} onMouseOut={this.showProgress}>{actions}</div>;
+        }
+
+    });
+
+    var TaskEntry = React.createClass({
+        render: function(){
+            let t = this.props.task;
+            let actions;
+            if(t.getStatus() == Task.STATUS_RUNNING){
+                if(t.isStoppable()){
+                    actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                }
+            }else{
+                actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
+            }
+            if(t.hasProgress()){
+                actions = (
+                    <div className="radial-progress">
+                        <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
+                    </div>
+                );
+            }
+            return (
+                <div className="task">
+                    <div className="task_texts">
+                        <div className="task_label">{t.getLabel()}</div>
+                        <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
+                    </div>
+                    <TaskAction task={t}/>
+                </div>
+            );
+        }
+    });
 
     var TasksPanel = React.createClass({
 
@@ -177,23 +253,7 @@
             let tasks = [];
             this.state.tasks.forEach(function(t){
                 if(t.getStatus() == Task.STATUS_COMPLETE) return;
-                let actions;
-                if(t.getStatus() == Task.STATUS_RUNNING){
-                    if(t.isStoppable()){
-                        actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
-                    }
-                }else{
-                    actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
-                }
-                tasks.push(
-                    <div className="task">
-                        <div className="task_texts">
-                            <div className="task_label">{t.getLabel()}</div>
-                            <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
-                        </div>
-                        <div className="task_actions">{actions}</div>
-                    </div>
-                );
+                tasks.push(<TaskEntry task={t}/>);
             });
             let className = "pydio-tasks-panel";
             let heightStyle;
