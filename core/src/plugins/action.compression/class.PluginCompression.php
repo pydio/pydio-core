@@ -184,10 +184,7 @@ class PluginCompression extends Plugin
                     unlink(substr($tmpArchiveName, 0, -4));
                 }
                 $newNode = new AJXP_Node($currentDirUrl . $archiveName);
-                Controller::applyHook("node.change", array(null, $newNode, false));
-                $nodesDiff = new NodesDiff();
-                $nodesDiff->add($newNode);
-                Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $repository->getId()));
+                Controller::applyHook("node.change", array(null, $newNode, false), true);
                 $postMessageStatus("Finished", Task::STATUS_COMPLETE);
 
                 break;

@@ -726,10 +726,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw $e;
                 }
                 @rename($tmpFNAME, $this->urlBase.$dir."/".$localName);
-                Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
-                $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
-                $nodesDiffs->add($newNode);
-                Controller::applyHook("msg.instant", array($nodesDiffs->toXML(), $this->repository->getId()));
+                Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false), true);
                 if($taskId !== null){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Finished compression in background");
                 }

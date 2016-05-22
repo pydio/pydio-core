@@ -27,6 +27,8 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\UnixProcess;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -37,10 +39,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class HttpDownloader extends Plugin
 {
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response)
     {
         //$this->logInfo("DL file", $httpVars);
-
+        $httpVars = $request->getParsedBody();
+        $action = $request->getAttribute("action");
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
             return false;
@@ -68,6 +71,14 @@ class HttpDownloader extends Plugin
 
         switch ($action) {
             case "external_download":
+
+                $taskId = $request->getAttribute("pydio-task-id");
+                if(empty($taskId)){
+                    $task = TaskService::actionAsTask("external_download", $httpVars, "", "", [], Task::FLAG_HAS_PROGRESS | Task::FLAG_STOPPABLE);
+                    TaskService::getInstance()->enqueueTask($task);
+                    break;
+                }
+                /*
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
 
                     $unixProcess = Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
@@ -78,8 +89,9 @@ class HttpDownloader extends Plugin
                     XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
                     XMLWriter::close();
                     session_write_close();
-                    exit();
+                    break;
                 }
+                */
 
                 require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
                 session_write_close();
@@ -145,12 +157,29 @@ class HttpDownloader extends Plugin
                 fclose($fpHid);
 
                 // NOW READ RESPONSE
+                $readBodySize = 0;
+                $currentPercent = 0;
+                $checkStopEvery = 1024*1024;
                 $destStream = fopen($tmpFilename, "w");
                 while (true) {
                     $body = "";
-                    $error = $httpClient->ReadReplyBody($body, 1000);
-                    if($error != "" || strlen($body) == 0) break;
+                    $error = $httpClient->ReadReplyBody($body, 4096);
+                    if($error != "" || strlen($body) == 0) {
+                        break;
+                    }
                     fwrite($destStream, $body, strlen($body));
+                    $readBodySize += strlen($body);
+                    if($totalSize > 0){
+                        $newPercent = round(100 * $readBodySize / $totalSize);
+                        if(!empty($taskId) && $newPercent > $currentPercent){
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Downloading ... " . $newPercent . " %", null, $newPercent);
+                        }
+                        $currentPercent = $newPercent;
+                    }
+                    if(!empty($taskId) && $readBodySize >= $checkStopEvery &&  $readBodySize % $checkStopEvery === 0
+                        && TaskService::getInstance()->getTaskById($taskId)->getStatus() === Task::STATUS_PAUSED){
+                        break;
+                    }
                 }
                 fclose($destStream);
                 rename($tmpFilename, $filename);
@@ -163,10 +192,8 @@ class HttpDownloader extends Plugin
                     Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                 }
                 $mess = ConfService::getMessages();
-                Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
-                XMLWriter::close();
+                Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false), true);
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, $mess["httpdownloader.8"]);
 
 
             break;
