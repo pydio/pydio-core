@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use nsqphp\nsqphp;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -178,8 +179,6 @@ class MqManager extends Plugin
             $this->msgExchanger->publishInstantMessage("nodes:$repositoryId", $message);
         }
 
-        // Publish to NSQ for WebSockets
-        $client = new GuzzleHttp\Client();
 
         // Publish for websockets
         $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
@@ -192,7 +191,11 @@ class MqManager extends Plugin
             $input["NODE_PATHES"] = $nodePathes;
         }
 
-        $client->post('http://127.0.0.1:4151/put?topic=im', ['json' => $input, 'future' => true]);
+
+        // Publish on NSQ
+        $nsq = new nsqphp;
+        $nsq->publishTo("127.0.0.1", 1);
+        $nsq->publish('im', new \nsqphp\Message\Message(json_encode($input)));
 
         $this->hasPendingMessage = true;
 
