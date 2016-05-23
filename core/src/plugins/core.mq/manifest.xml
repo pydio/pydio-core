@@ -81,6 +81,7 @@
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
             <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
+            <serverCallback methodName="appendRefreshInstruction" hookName="response.send" />
         </hooks>
     </registry_contributions>
     <dependencies>

@@ -72,7 +72,7 @@ class TaskService implements ITasksProvider
                 ->withAttribute("action", $action)
                 ->withAttribute("pydio-task-id", $id)
                 ->withParsedBody($params);
-            Controller::run($request);
+            $response = Controller::run($request);
         }
     }
 

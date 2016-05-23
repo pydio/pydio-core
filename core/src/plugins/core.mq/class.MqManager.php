@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\Controller;
@@ -61,6 +62,7 @@ class MqManager extends Plugin
      */
     private $msgExchanger = false;
     private $useQueue = false ;
+    private $hasPendingMessage = false;
 
 
     public function init($options)
@@ -206,6 +208,19 @@ class MqManager extends Plugin
             @$this->wsClient->sendMessage($msg);
         }
 
+        $this->hasPendingMessage = true;
+
+    }
+
+    public function appendRefreshInstruction(ResponseInterface &$responseInterface){
+        if(! $this->hasPendingMessage ){
+            return;
+        }
+        $respType = &$responseInterface->getBody();
+        if($respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
+            require_once("ConsumeChannelMessage.php");
+            $respType->addChunk(new ConsumeChannelMessage());
+        }
     }
 
     /**

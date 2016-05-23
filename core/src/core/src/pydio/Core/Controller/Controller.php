@@ -240,8 +240,9 @@ class Controller
             }
         }
 
-        return $response;
+        self::applyHook("response.send", array(&$response));
 
+        return $response;
     }
 
     public static function applyTaskInBackground(Task $task){
