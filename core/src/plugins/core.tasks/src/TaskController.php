@@ -112,6 +112,11 @@ class TaskController extends Plugin
 
     }
 
+    /**
+     * @param AJXP_Node $node
+     * @param bool $isContextNode
+     * @param string $details
+     */
     public function attachTasksToNode(AJXP_Node &$node, $isContextNode = false, $details = "all"){
         if($details == "all"){
             $t = TaskService::getInstance()->getActiveTasksForNode($node);
@@ -128,6 +133,10 @@ class TaskController extends Plugin
         }
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
     public function enrichConsumeChannel(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
         $respType = &$responseInterface->getBody();

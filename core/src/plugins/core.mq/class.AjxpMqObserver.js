@@ -221,9 +221,13 @@ Class.create("AjxpMqObserver", {
         this._pollingFreqObs = function(freq){
             var value = freq.value ? freq.value : this.defaultPollerFreq;
             if(value == this.pollingFrequency) return;
+            var lastPing = (value > this.pollingFrequency ? this.pollingFrequency: 0);
             this.pollingFrequency = value;
             this.pe.stop();
             this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), value);
+            if(lastPing){
+                window.setTimeout(this.consumeChannel.bind(this), lastPing * 1000);
+            }
         }.bind(this);
         pydio.observe("poller.frequency", this._pollingFreqObs);
 

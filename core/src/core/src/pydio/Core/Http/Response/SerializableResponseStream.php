@@ -37,6 +37,10 @@ class SerializableResponseStream implements StreamInterface
      * @var SerializableResponseChunk[]
      */
     protected $data = [];
+    /**
+     * @var string SerializedContent
+     */
+    protected $serializedContent;
 
     private $streamStatus = 'open';
 
@@ -59,6 +63,9 @@ class SerializableResponseStream implements StreamInterface
      */
     public function getContents()
     {
+        if(isSet($this->serializedContent)){
+            return $this->serializedContent;
+        }
         return $this->serializeData($this->data, $this->serializer);
     }
 
@@ -168,7 +175,8 @@ class SerializableResponseStream implements StreamInterface
     public function getSize()
     {
         if(!empty($this->data)){
-            return 1;
+            $this->serializedContent = $this->getContents();
+            return strlen($this->serializedContent);
         }else{
             return 0;
         }
