@@ -501,6 +501,7 @@ class PydioApi{
             }
 
         }
+        this._pydioObject.notify("response.xml", xmlResponse);
         if(reloadNodes.length){
             this._pydioObject.getContextHolder().multipleNodesReload(reloadNodes);
         }

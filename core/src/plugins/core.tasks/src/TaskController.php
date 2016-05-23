@@ -68,7 +68,7 @@ class TaskController extends Plugin
         $taskService = TaskService::getInstance();
         switch ($action){
             case "tasks_list":
-                $tasks = $taskService->getPendingTasks();
+                $tasks = $taskService->getCurrentRunningTasks(AuthService::getLoggedUser(), ConfService::getRepository());
                 $response = new JsonResponse($tasks);
                 break;
             case "task_info":
@@ -127,5 +127,20 @@ class TaskController extends Plugin
             }
         }
     }
+
+    public function enrichConsumeChannel(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
+
+        $respType = &$responseInterface->getBody();
+        if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
+            $respType = new \Pydio\Core\Http\Response\SerializableResponseStream();
+            $responseInterface = $responseInterface->withBody($respType);
+        }
+        if($respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
+            $taskList = TaskService::getInstance()->getCurrentRunningTasks(AuthService::getLoggedUser(), ConfService::getRepository());
+            $respType->addChunk(new TaskListMessage($taskList));
+        }
+
+    }
+
     
 }

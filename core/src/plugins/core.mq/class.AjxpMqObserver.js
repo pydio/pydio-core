@@ -36,7 +36,9 @@ Class.create("AjxpMqObserver", {
         if(window.ajxpMinisite) return;
 
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
-        this.configs = ajaxplorer.getPluginConfigs("mq");
+        this.configs = pydio.getPluginConfigs("mq");
+        this.defaultPollerFreq = this.configs.get('POLLER_FREQUENCY') || 15;
+        this.pollingFrequency = this.defaultPollerFreq;
 
         document.observe("ajaxplorer:repository_list_refreshed", function(event){
 
@@ -54,8 +56,8 @@ Class.create("AjxpMqObserver", {
 
         }.bind(this));
 
-        if(ajaxplorer.repositoryId){
-            this.initForRepoId(ajaxplorer.repositoryId);
+        if(pydio.repositoryId){
+            this.initForRepoId(pydio.repositoryId);
         }
 
     },
@@ -85,7 +87,7 @@ Class.create("AjxpMqObserver", {
                         var obj = parseXml(event.data);
                         if(obj){
                             PydioApi.getClient().parseXmlMessage(obj);
-                            ajaxplorer.notify("server_message", obj);
+                            pydio.notify("server_message", obj);
                         }
                     };
                     this.ws.onopen = function(){
@@ -183,6 +185,15 @@ Class.create("AjxpMqObserver", {
         }.bind(this);
         conn.sendAsync();
 
+        if(this._consumeTriggerObs) {
+            pydio.stopObserving("response.xml", this._consumeTriggerObs);
+            this._consumeTriggerObs = null;
+        }
+        if(this._pollingFreqObs){
+            pydio.stopObserving("poller.frequency", this._pollingFreqObs);
+            this._pollingFreqObs = null;
+        }
+
     },
 
     registerChannel : function(repoId){
@@ -197,7 +208,24 @@ Class.create("AjxpMqObserver", {
         conn.discrete = true;
         conn.sendAsync();
 
-        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), this.configs.get('POLLER_FREQUENCY') || 5);
+
+        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), this.pollingFrequency);
+
+        this._consumeTriggerObs = function(responseXML){
+            if(XMLUtils.XPathSelectSingleNode(responseXML, "//consume_channel")){
+                this.consumeChannel();
+            }
+        }.bind(this);
+        pydio.observe("response.xml", this._consumeTriggerObs);
+
+        this._pollingFreqObs = function(freq){
+            var value = freq.value ? freq.value : this.defaultPollerFreq;
+            if(value == this.pollingFrequency) return;
+            this.pollingFrequency = value;
+            this.pe.stop();
+            this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), value);
+        }.bind(this);
+        pydio.observe("poller.frequency", this._pollingFreqObs);
 
     },
 
@@ -205,6 +233,7 @@ Class.create("AjxpMqObserver", {
         if(this.channel_pending) {
             return;
         }
+        pydio.notify("poller.event");
         var conn = new Connexion();
         conn.setParameters($H({
             get_action:'client_consume_channel',
@@ -216,7 +245,7 @@ Class.create("AjxpMqObserver", {
             this.channel_pending = false;
             if(transport.responseXML){
                 PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                ajaxplorer.notify("server_message", transport.responseXML);
+                pydio.notify("server_message", transport.responseXML);
             }
         }.bind(this);
         this.channel_pending = true;

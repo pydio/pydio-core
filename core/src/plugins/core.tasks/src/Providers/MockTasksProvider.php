@@ -22,6 +22,8 @@
 namespace Pydio\Tasks\Providers;
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\Schedule;
 
@@ -108,5 +110,15 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
         $t1->setAction("fake-task-action");
         $t1->setId("fake-task-id");
         return [$t1];
+    }
+
+    /**
+     * @param AbstractAjxpUser $user
+     * @param Repository $repository
+     * @return Task[]
+     */
+    public function getCurrentRunningTasks($user, $repository)
+    {
+        // TODO: Implement getCurrentRunningTasks() method.
     }
 }

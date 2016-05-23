@@ -39,6 +39,11 @@
                     <serverCallback methodName="route"/>
                 </processing>
             </action>
+            <action name="client_consume_channel">
+                <post_processing>
+                    <serverCallback methodName="enrichConsumeChannel"/>
+                </post_processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="attachTasksToNode" hookName="node.info"/>

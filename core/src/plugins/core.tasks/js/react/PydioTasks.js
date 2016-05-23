@@ -117,6 +117,26 @@
                         let taskObject = new Task(t);
                         this._tasksList.set(t.id, taskObject);
                         this.notify("tasks_updated", taskObject);
+                        global.pydio.notify("poller.frequency", {value:2});
+                    }
+                }
+                var taskList = XMLUtils.XPathSelectSingleNode(xml, 'tree/taskList');
+                if(taskList){
+                    let jsonData = taskList.firstChild.nodeValue; // CDATA
+                    let tasks = JSON.parse(jsonData);
+                    if(tasks instanceof Object){
+                        let taskMap = new Map();
+                        tasks.map(function(t){
+                            let task = new Task(t);
+                            taskMap.set(task.getId(), task);
+                        });
+                        this._tasksList = taskMap;
+                        this.notify("tasks_updated");
+                        if(tasks.length){
+                            global.pydio.notify("poller.frequency", {value:2});
+                        }else{
+                            global.pydio.notify("poller.frequency", {});
+                        }
                     }
                 }
             }.bind(this));
@@ -150,6 +170,11 @@
                     tasks.map(function(t){taskMap.set(t.getId(), t)});
                     this._tasksList = taskMap;
                     this.notify("tasks_updated");
+                    if(tasks.length){
+                        global.pydio.notify("poller.frequency", {value:2});
+                    }else{
+                        global.pydio.notify("poller.frequency", {});
+                    }
                 }.bind(this));
             }
             return this._tasksList;

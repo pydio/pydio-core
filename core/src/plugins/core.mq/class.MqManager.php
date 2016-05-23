@@ -20,6 +20,7 @@
  */
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\Controller;
@@ -217,6 +218,10 @@ class MqManager extends Plugin
             return;
         }
         $respType = &$responseInterface->getBody();
+        if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
+            $respType = new \Pydio\Core\Http\Response\SerializableResponseStream();
+            $responseInterface = $responseInterface->withBody($respType);
+        }
         if($respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
             require_once("ConsumeChannelMessage.php");
             $respType->addChunk(new ConsumeChannelMessage());
@@ -224,14 +229,14 @@ class MqManager extends Plugin
     }
 
     /**
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     *
+     * @param $request
+     * @param $response
      */
-    public function clientChannelMethod($action, $httpVars, $fileVars)
+    public function clientChannelMethod(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if(!$this->msgExchanger) return;
+        $action = $request->getAttribute("action");
+        $httpVars = $request->getParsedBody();
         switch ($action) {
             case "client_register_channel":
                 $this->msgExchanger->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
@@ -243,10 +248,7 @@ class MqManager extends Plugin
                 if (AuthService::usersEnabled()) {
                     $user = AuthService::getLoggedUser();
                     if ($user == null) {
-                        XMLWriter::header();
-                        XMLWriter::requireAuth();
-                        XMLWriter::close();
-                        return;
+                        throw new \Pydio\Core\Exception\AuthRequiredException();
                     }
                     $GROUP_PATH = $user->getGroupPath();
                     if($GROUP_PATH == null) $GROUP_PATH = false;
@@ -266,16 +268,15 @@ class MqManager extends Plugin
                     $regexp = '/'.implode("|", $regexps).'/';
                 }
                 $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
+                $serialBody = new \Pydio\Core\Http\Response\SerializableResponseStream();
+                $response = $response->withBody($serialBody);
                 if($channelRepository != $currentRepository){
-                    XMLWriter::header();
-                    echo "<require_registry_reload repositoryId=\"$currentRepository\"/>";
-                    XMLWriter::close();
+                    $serialBody->addChunk(new \Pydio\Core\Http\Message\XMLMessage("<require_registry_reload repositoryId=\"$currentRepository\"/>"));
                     return;
                 }
 
                 $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
                 if (count($data)) {
-                   XMLWriter::header();
                    ksort($data);
                    foreach ($data as $messageObject) {
                        if(isSet($regexp) && isSet($messageObject->nodePathes)){
@@ -288,9 +289,8 @@ class MqManager extends Plugin
                            }
                            if(!$pathIncluded) continue;
                        }
-                       echo $messageObject->content;
+                       $serialBody->addChunk(new \Pydio\Core\Http\Message\XMLMessage($messageObject->content));
                    }
-                   XMLWriter::close();
                 }
 
                 break;

@@ -60,6 +60,12 @@ interface ITasksProvider
      */
     public function getPendingTasks();
 
+    /**
+     * @param AbstractAjxpUser $user
+     * @param Repository $repository
+     * @return Task[]
+     */
+    public function getCurrentRunningTasks($user, $repository);
 
     /**
      * @param AJXP_Node $node

@@ -23,6 +23,7 @@ namespace Pydio\Tasks\Providers;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Services\AuthService;
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
@@ -127,6 +128,25 @@ class SqlTasksProvider implements ITasksProvider
     public function getPendingTasks()
     {
         return $this->getTasks(null, null, Task::STATUS_PENDING);
+    }
+
+    /**
+     * @param AbstractAjxpUser $user
+     * @param Repository $repository
+     * @return Task[]
+     */
+    public function getCurrentRunningTasks($user, $repository)
+    {
+        $tasks = [];
+        $where = [];
+        $where[] = array("[userId] = %s", $user->getId());
+        $where[] = array("[wsId] = %s", $repository->getId());
+        $where[] = array("[status] IN (1,2,8,16)");
+        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
+        foreach ($res->fetchAll() as $row) {
+            $tasks[] = $this->taskFromDBValues($row);
+        }
+        return $tasks;
     }
 
     /**
