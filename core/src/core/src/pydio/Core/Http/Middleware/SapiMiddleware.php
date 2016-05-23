@@ -79,6 +79,9 @@ class SapiMiddleware
 
         $response = Server::callNextMiddleWare($request, $response, $next);
 
+        if(headers_sent()){
+            return;
+        }
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
             // For the moment, use XML by default
             if($request->hasHeader("Accept") && $request->getHeader("Accept")[0] == "application/json"){
