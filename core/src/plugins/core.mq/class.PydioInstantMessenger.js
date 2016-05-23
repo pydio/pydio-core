@@ -21,7 +21,7 @@
 /**
  * Use WebSocket or Poller
  */
-Class.create("AjxpMqObserver", {
+Class.create("PydioInstantMessenger", {
 
     pe:null,
     currentRepo:null,
@@ -40,10 +40,9 @@ Class.create("AjxpMqObserver", {
         this.defaultPollerFreq = this.configs.get('POLLER_FREQUENCY') || 15;
         this.pollingFrequency = this.defaultPollerFreq;
 
-        document.observe("ajaxplorer:repository_list_refreshed", function(event){
+        pydio.observe("repository_list_refreshed", function(data){
 
             var repoId;
-            var data = event.memo;
             if(data.active) {
                 repoId = data.active;
             } else if(pydio.repositoryId) {

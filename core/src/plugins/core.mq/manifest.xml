@@ -4,7 +4,7 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mq" path="plugins/core.mq/i18n"/>
-            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js"/>
+            <js className="PydioInstantMessenger" file="plugins/core.mq/class.PydioInstantMessenger.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -36,11 +36,11 @@
             <action name="client_register_channel">
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading && !window.ajxpMinisite){
-                            ajaxplorer.mqObserverLoading = true;
-                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
-                                ajaxplorer.mqObserver = new AjxpMqObserver();
+                    <clientListener name="init"><![CDATA[
+                        if(!pydio.mqObserver && !pydio.mqObserverLoading && !window.ajxpMinisite){
+                            pydio.mqObserverLoading = true;
+                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.PydioInstantMessenger.js', 'PydioInstantMessenger', function(){
+                                pydio.mqObserver = new PydioInstantMessenger();
                             }, true);
                         }
                     ]]></clientListener>
