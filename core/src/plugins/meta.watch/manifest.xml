@@ -104,7 +104,7 @@
         <hooks>
             <serverCallback hookName="node.read" methodName="processReadHook" defer="true"/>
             <serverCallback hookName="node.change" methodName="processChangeHook" defer="true"/>
-            <serverCallback hookName="node.info" methodName="enrichNode" />
+            <serverCallback hookName="node.info.nocache" methodName="enrichNode" />
         </hooks>
     </registry_contributions>
 </meta>

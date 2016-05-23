@@ -66,6 +66,9 @@ class TaskController extends Plugin
 
         $action = $request->getAttribute("action");
         $taskService = TaskService::getInstance();
+        if(AuthService::getLoggedUser() == null){
+            return;
+        }
         switch ($action){
             case "tasks_list":
                 $tasks = $taskService->getCurrentRunningTasks(AuthService::getLoggedUser(), ConfService::getRepository());
@@ -139,6 +142,9 @@ class TaskController extends Plugin
      */
     public function enrichConsumeChannel(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
+        if(AuthService::getLoggedUser() == null || ConfService::getRepository() == null){
+            return [];
+        }
         $respType = &$responseInterface->getBody();
         if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
             $respType = new \Pydio\Core\Http\Response\SerializableResponseStream();

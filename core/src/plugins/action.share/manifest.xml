@@ -361,7 +361,7 @@
             </component_config>
         </client_configs>
         <hooks>
-            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"/>
+            <serverCallback hookName="node.info.nocache" methodName="nodeSharedMetadata"/>
             <serverCallback hookName="node.change" methodName="updateNodeSharedData"/>
             <serverCallback hookName="user.after_delete" methodName="cleanUserShares" defer="true"/>
             <serverCallback methodName="forwardEventToShares" hookName="node.change" defer="true"/>

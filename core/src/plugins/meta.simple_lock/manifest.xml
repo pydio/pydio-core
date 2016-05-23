@@ -10,9 +10,9 @@
    	</client_settings>
    	<registry_contributions>
    		<hooks>
-   			<serverCallback hookName="node.info" methodName="processLockMeta"></serverCallback>
-   			<serverCallback hookName="node.before_change" methodName="checkFileLock"></serverCallback>
-   			<serverCallback hookName="node.before_path_change" methodName="checkFileLock"></serverCallback>
+   			<serverCallback hookName="node.info.nocache" methodName="processLockMeta"/>
+   			<serverCallback hookName="node.before_change" methodName="checkFileLock"/>
+   			<serverCallback hookName="node.before_path_change" methodName="checkFileLock"/>
    		</hooks>
         <actions>
             <action name="sl_lock">
