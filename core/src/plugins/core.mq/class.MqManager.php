@@ -303,9 +303,9 @@ class MqManager extends Plugin
     {
         $this->logDebug("Entering wsAuthenticate");
         $configs = $this->getConfigs();
-        if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
+        /*if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
-        }
+        }*/
         $user = AuthService::getLoggedUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");

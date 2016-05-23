@@ -39,7 +39,7 @@
             </component_config>
         </client_configs>
         <actions>
-            <action name="keystore_generate_auth_token">
+            <action name="keystore_generate_auth_token" skipSecureToken="true">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken" developerComment="Generate and store a authentication key that can be used by the currently logged user. Used by SDKs talking to REST API to avoid renegociating basic auth on each query.">
