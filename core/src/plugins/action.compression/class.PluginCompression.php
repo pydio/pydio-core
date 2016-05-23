@@ -103,7 +103,7 @@ class PluginCompression extends Plugin
                     $task = TaskService::actionAsTask("compression", $httpVars, $repository->getId(), "", [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.5"]);
                     file_put_contents($progressCompressionFileName, $messages["compression.5"]);
-                    TaskService::getInstance()->enqueueTask($task);
+                    TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     return;
                 }
 
@@ -262,7 +262,7 @@ class PluginCompression extends Plugin
                     $task = TaskService::actionAsTask("extraction", $httpVars, $repository->getId(), "", [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.12"]);
                     file_put_contents($progressExtractFileName, $messages["compression.12"]);
-                    TaskService::getInstance()->enqueueTask($task);
+                    TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     return;
                 }
                 $task = TaskService::getInstance()->getTaskById($taskId);

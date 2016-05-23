@@ -95,7 +95,7 @@ class PowerFSController extends Plugin
                 if($taskId === null){
                     $task = TaskService::actionAsTask($request->getAttribute("action"), $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
-                    TaskService::getInstance()->enqueueTask($task);
+                    TaskService::getInstance()->enqueueTask($task, $request, $response);
                     return;
                 }
 

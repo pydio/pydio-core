@@ -140,11 +140,11 @@ class ftpAccessDriver extends fsAccessDriver
                 $x = new SerializableResponseStream();
                 $response = $response->withBody($x);
                 if ($nextFile!='') {
-                    $x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
+                    //$x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
                     $newTask = TaskService::actionAsTask("next_to_remote", []);
-                    TaskService::getInstance()->enqueueTask($newTask);
+                    TaskService::getInstance()->enqueueTask($newTask, $request, $response);
                 } else {
-                    $x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
+                    //$x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
                 }
             break;
@@ -241,7 +241,7 @@ class ftpAccessDriver extends fsAccessDriver
                         $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
 
                         $task = TaskService::actionAsTask("next_to_remote", []);
-                        TaskService::getInstance()->enqueueTask($task);
+                        TaskService::getInstance()->enqueueTask($task, $request, $response);
 
                     } catch (\Exception $e) {
                         $errorCode = $e->getCode();

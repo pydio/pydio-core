@@ -67,7 +67,7 @@ class CoreIndexer extends Plugin {
 
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
-                TaskService::getInstance()->enqueueTask($task);
+                TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                 $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
                 return null;
             }

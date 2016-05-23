@@ -691,14 +691,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
             case "compress" :
 
+                $taskId = $request->getAttribute("pydio-task-id");
                 if($request->getAttribute("pydio-task-id") === null){
                     $task = TaskService::actionAsTask($action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
-                    TaskService::getInstance()->enqueueTask($task);
+                    TaskService::getInstance()->enqueueTask($task, $request, $response);
                     return;
                 }
 
-                $taskId = $request->getAttribute("pydio-task-id");
                 if($taskId !== null){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting compression in background");
                 }
@@ -829,7 +829,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($taskId === null && (!$selection->isUnique() || !is_file($selection->getUniqueNode()->getUrl()))){
                     $task = TaskService::actionAsTask($action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
-                    TaskService::getInstance()->enqueueTask($task);
+                    TaskService::getInstance()->enqueueTask($task, $request, $response);
                     return;
                 }
                 if(!empty($taskId)){

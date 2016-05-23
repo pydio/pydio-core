@@ -20,6 +20,8 @@
  */
 namespace Pydio\Tasks;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\Repository;
@@ -59,12 +61,18 @@ class TaskService implements ITasksProvider
     }
 
 
-    public function enqueueTask(Task $task){
+    public function enqueueTask(Task $task, ServerRequestInterface $request, ResponseInterface &$response){
         if(ConfService::backgroundActionsSupported()){
             Controller::applyTaskInBackground($task);
         }else{
-            // TODO: Should Run now?
-            // $task->run();
+            $params = $task->getParameters();
+            $action = $task->getAction();
+            $id = $task->getId();
+            $request = $request
+                ->withAttribute("action", $action)
+                ->withAttribute("pydio-task-id", $id)
+                ->withParsedBody($params);
+            Controller::run($request);
         }
     }
 
