@@ -23,8 +23,8 @@ namespace Pydio\Access\Driver\StreamProvider\Dropbox;
 
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Auth\Core\AuthService;
 use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
