@@ -38,51 +38,48 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class Server
 {
-    const MODE_REST = 'rest';
-    const MODE_SESSION = 'session';
-    const MODE_CLI = 'cli';
+    /**
+     * @var ServerRequestInterface
+     */
+    protected $request;
 
-    public static $mode;
-    private $request;
-    private $middleWares;
+    /**
+     * @var \SplStack
+     */
+    protected $middleWares;
 
     /**
      * @var ITopLevelMiddleware
      */
-    private $topMiddleware;
+    protected $topMiddleware;
 
-    private static $middleWareInstance;
+    /**
+     * @var \SplStack
+     */
+    protected static $middleWareInstance;
 
-    public function __construct($serverMode = Server::MODE_SESSION){
-
-        self::$mode = $serverMode;
+    public function __construct(){
 
         $this->middleWares = new \SplStack();
         $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
 
-        $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
-
-        if($serverMode == Server::MODE_CLI){
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Cli\\AuthCliMiddleware", "handleRequest"));
-        }else{
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\AuthMiddleware", "handleRequest"));
-        }
-
-        if($serverMode == Server::MODE_SESSION){
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SecureTokenMiddleware", "handleRequest"));
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SessionMiddleware", "handleRequest"));
-        }
-
-        if($serverMode == Server::MODE_CLI){
-            $topMiddleware = new CliMiddleware();
-        }else{
-            $topMiddleware = new SapiMiddleware();
-        }
-        $this->topMiddleware = $topMiddleware;
-        $this->middleWares->push(array($topMiddleware, "handleRequest"));
+        $this->stackMiddleWares();
 
         self::$middleWareInstance = &$this->middleWares;
         
+    }
+
+    protected function stackMiddleWares(){
+
+        $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\AuthMiddleware", "handleRequest"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SecureTokenMiddleware", "handleRequest"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SessionMiddleware", "handleRequest"));
+
+        $topMiddleware = new SapiMiddleware();
+        $this->topMiddleware = $topMiddleware;
+        $this->middleWares->push(array($topMiddleware, "handleRequest"));
+
     }
 
     public function registerCatchAll(){

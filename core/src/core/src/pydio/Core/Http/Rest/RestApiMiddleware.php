@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,18 +17,26 @@
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The latest code can be found at <http://pyd.io/>.
- *
- * Description : Real RESTful API access
  */
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Http\Rest\RestServer;
+namespace Pydio\Core\Http\Rest;
 
-include_once("base.conf.php");
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Exception\PydioException;
 
-$server = new RestServer("/api");
-$server->registerCatchAll();
+defined('AJXP_EXEC') or die('Access not allowed');
 
-ConfService::init();
-ConfService::start();
 
-$server->listen();
+class RestApiMiddleware extends \Pydio\Core\Http\Middleware\SapiMiddleware
+{
+
+    protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $router = new ApiRouter([]);
+        if(!$router->route($request, $response)){
+            throw new PydioException("Could not find any endpoint for this URI");
+        }
+
+    }
+
+}

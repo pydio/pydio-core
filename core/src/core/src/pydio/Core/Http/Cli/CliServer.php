@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,18 +17,20 @@
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The latest code can be found at <http://pyd.io/>.
- *
- * Description : Real RESTful API access
  */
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Http\Rest\RestServer;
 
-include_once("base.conf.php");
+namespace Pydio\Core\Http\Cli;
 
-$server = new RestServer("/api");
-$server->registerCatchAll();
+defined('AJXP_EXEC') or die('Access not allowed');
 
-ConfService::init();
-ConfService::start();
 
-$server->listen();
+class CliServer extends \Pydio\Core\Http\Server
+{
+    protected function stackMiddleWares()
+    {
+        $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Cli\\AuthCliMiddleware", "handleRequest"));
+        $this->topMiddleware = new CliMiddleware();
+        $this->middleWares->push(array($this->topMiddleware, "handleRequest"));
+    }
+}

@@ -22,6 +22,7 @@ namespace Pydio\Core\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Authfront\Core\FrontendsLoader;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
@@ -47,50 +48,25 @@ class AuthMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
-        if(AuthService::usersEnabled()){
-
-            PluginsService::getInstance()->initActivePlugins();
-            $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");
-            $index = 0;
-            /**
-             * @var AbstractAuthFrontend $frontendPlugin
-             */
-            foreach($frontends as $frontendPlugin){
-                if(!$frontendPlugin->isEnabled()) continue;
-                if(!method_exists($frontendPlugin, "tryToLogUser")){
-                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
-                    continue;
-                }
-                //$res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
-                $isLast = ($index == count($frontends)-1);
-                $res = $frontendPlugin->tryToLogUser($requestInterface, $responseInterface, $isLast);
-                $index ++;
-                if($res) {
-                    if($responseInterface->getBody()->getSize() > 0 || $responseInterface->getStatusCode() != 200){
-                        // Do not go to the other middleware, return directly.
-                        return $responseInterface;
-                    }
-                    break;
-                }
-            }
-
+        $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
+        if($response != null){
+            return $response;
         }
 
-        if(Server::$mode == Server::MODE_SESSION){
-            self::bootSessionServer($requestInterface);
-        }else{
-            self::bootRestServer($requestInterface);
-        }
+        self::bootSessionServer($requestInterface);
 
         try{
+
             ConfService::reloadServicesAndActivePlugins();
+
         }catch (NoActiveWorkspaceException $ex){
-            if(Server::$mode != Server::MODE_SESSION) throw $ex;
+
             $logged = AuthService::getLoggedUser();
             if($logged !== null) $lock = $logged->getLock();
             if(empty($lock)){
                 throw new AuthRequiredException();
             }
+
         }
 
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
@@ -108,8 +84,7 @@ class AuthMiddleware
             ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
             unset($_SESSION["SWITCH_BACK_REPO_ID"]);
         }
-
-
+        
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
             if ($loggedUser != null) {
@@ -126,33 +101,5 @@ class AuthMiddleware
         else if(isSet($request->getCookieParams()["AJXP_lang"])) ConfService::setLanguage($request->getCookieParams()["AJXP_lang"]);
 
     }
-
-    protected static function bootRestServer(ServerRequestInterface $request){
-
-        if(AuthService::getLoggedUser() == null){
-            header('HTTP/1.0 401 Unauthorized');
-            echo 'You are not authorized to access this API.';
-            exit;
-        }
-
-        $repoID = $request->getAttribute("repository_id");
-        if($repoID == 'pydio'){
-            ConfService::switchRootDir();
-            $repo = ConfService::getRepository();
-        }else{
-            $repo = ConfService::findRepositoryByIdOrAlias($repoID);
-            if ($repo == null) {
-                throw new WorkspaceNotFoundException($repoID);
-            }
-            if(!ConfService::repositoryIsAccessible($repo->getId(), $repo, AuthService::getLoggedUser(), false, true)){
-                header('HTTP/1.0 401 Unauthorized');
-                echo 'You are not authorized to access this workspace.';
-                exit;
-            }
-            ConfService::switchRootDir($repo->getId());
-        }
-
-    }
-
 
 }

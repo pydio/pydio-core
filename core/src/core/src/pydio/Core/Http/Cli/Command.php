@@ -21,7 +21,6 @@
 namespace Pydio\Core\Http\Cli;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-use Pydio\Core\Http\Server;
 use Symfony;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -82,7 +81,7 @@ class Command extends Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $server = new Server(Server::MODE_CLI);
+        $server = new CliServer();
         $server->registerCatchAll();
 
         $definitionsKeys = array_keys($this->getDefinition()->getOptions());

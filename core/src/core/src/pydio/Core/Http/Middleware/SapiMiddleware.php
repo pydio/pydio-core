@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Middleware;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Http\ApiRouter;
+use Pydio\Core\Http\Rest\ApiRouter;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Utils\Utils;
@@ -58,31 +58,7 @@ class SapiMiddleware implements ITopLevelMiddleware
             }
         }
 
-        $serverData = $request->getServerParams();
-        if(Server::$mode == Server::MODE_REST){
-
-            $router = new ApiRouter([]);
-            if(!$router->route($request, $response)){
-                throw new PydioException("Could not find any endpoint for this URI");
-            }
-
-        }else{
-
-            if(isSet($params["get_action"])){
-                $action = $params["get_action"];
-            }else if(isSet($params["action"])){
-                $action = $params["action"];
-            }else if (preg_match('/MSIE 7/',$serverData['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$serverData['HTTP_USER_AGENT'])) {
-                $action = "get_boot_gui";
-            } else {
-                $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
-            }
-            $request = $request
-                ->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS))
-                ->withAttribute("api", "session")
-            ;
-
-        }
+        $this->parseRequestRouteAndParams($request, $response);
 
         $response = Server::callNextMiddleWare($request, $response, $next);
 
@@ -90,6 +66,26 @@ class SapiMiddleware implements ITopLevelMiddleware
             return;
         }
         $this->emitResponse($request, $response);
+    }
+
+    protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$responseInterface){
+
+        $serverData = $request->getServerParams();
+        $params = $request->getParsedBody();
+        if(isSet($params["get_action"])){
+            $action = $params["get_action"];
+        }else if(isSet($params["action"])){
+            $action = $params["action"];
+        }else if (preg_match('/MSIE 7/',$serverData['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$serverData['HTTP_USER_AGENT'])) {
+            $action = "get_boot_gui";
+        } else {
+            $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+        }
+        $request = $request
+            ->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS))
+            ->withAttribute("api", "session")
+        ;
+
     }
 
     public function emitResponse(ServerRequestInterface $request, ResponseInterface $response){

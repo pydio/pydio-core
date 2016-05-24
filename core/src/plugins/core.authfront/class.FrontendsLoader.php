@@ -19,13 +19,56 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Authfront\Core;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class FrontendsLoader extends Plugin {
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return null|ResponseInterface
+     */
+    public static function frontendsAsAuthMiddlewares(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
+
+        if(AuthService::usersEnabled()){
+
+            PluginsService::getInstance()->initActivePlugins();
+            $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");
+            $index = 0;
+            /**
+             * @var AbstractAuthFrontend $frontendPlugin
+             */
+            foreach($frontends as $frontendPlugin){
+                if(!$frontendPlugin->isEnabled()) continue;
+                if(!method_exists($frontendPlugin, "tryToLogUser")){
+                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
+                    continue;
+                }
+                //$res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
+                $isLast = ($index == count($frontends)-1);
+                $res = $frontendPlugin->tryToLogUser($requestInterface, $responseInterface, $isLast);
+                $index ++;
+                if($res) {
+                    if($responseInterface->getBody()->getSize() > 0 || $responseInterface->getStatusCode() != 200){
+                        // Do not go to the other middleware, return directly.
+                        return $responseInterface;
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        return null;
+
+    }
 
     public function init($options){
 
