@@ -42,7 +42,10 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
 
     private $paginationData;
 
+    private $columnsDescription;
+
     public function __construct(){
+        $this->parentNode = new AJXP_Node("/");
     }
 
     public function setParentNode(AJXP_Node $parentNode){
@@ -97,6 +100,33 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         }
         $buffer .= XMLWriter::close("tree", false);
         return $buffer;
+    }
+
+    /**
+     * @param string $switchGridMode
+     * @param string $switchDisplayMode
+     * @param string $templateName
+     */
+    public function initColumnsData($switchGridMode='', $switchDisplayMode='', $templateName=''){
+        $this->columnsDescription = [
+            'description' => ['switchGridMode' => $switchGridMode, 'switchDisplayMode' => $switchDisplayMode, 'template_name' => $templateName],
+            'columns'     => []
+        ];
+    }
+
+    /**
+     * @param string $messageId
+     * @param string $attributeName
+     * @param string $sortType
+     * @param string $width
+     */
+    public function appendColumn($messageId, $attributeName, $sortType='String', $width=''){
+        $this->columnsDescription['columns'][] = [
+            'messageId'     => $messageId,
+            'attributeName' => $attributeName,
+            'sortType'      => $sortType,
+            'width'         => $width
+        ];
     }
 
     /**

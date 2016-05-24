@@ -22,17 +22,22 @@
 namespace Pydio\Access\Driver\DataProvider;
 
 use DOMXPath;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use PublicletCounter;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\TextEncoder;
 use ShareCenter;
+use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -61,10 +66,12 @@ class UserDashboardDriver extends AbstractAccessDriver
         parent::parseSpecificContributions($contribNode);
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        parent::accessPreprocess($action, $httpVars, $fileVars);
+        parent::accessPreprocess($requestInterface);
         if(!AuthService::usersEnabled()) return ;
+        $action     = $requestInterface->getAttribute("action");
+        $httpVars   = $requestInterface->getParsedBody();
 
         if ($action == "edit") {
             if (isSet($httpVars["sub_action"])) {
@@ -73,35 +80,26 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         $mess = ConfService::getMessages();
 
+        $x = new SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
+
         switch ($action) {
             //------------------------------------
             //	BASIC LISTING
             //------------------------------------
             case "ls":
                 $rootNodes = array(
-                    "users" => array(
-                        "LABEL" => $mess["user_dash.1"],
-                        "ICON" => "user_shared.png",
-                        "ICON-CLASS" => "icon-book",
-                        "DESCRIPTION" => $mess["user_dash.30"]
-                    ),
-                    "files" => array(
-                        "LABEL" => $mess["user_dash.34"],
-                        "ICON" => "user_shared.png",
-                        "ICON-CLASS" => "mdi mdi-share-variant",
-                        "DESCRIPTION" => $mess["user_dash.35"]
-                    ),
                     "settings" => array(
                         "LABEL" => $mess["user_dash.36"],
                         "ICON" => "user_shared.png",
                         "ICON-CLASS" => "icon-cog",
                         "DESCRIPTION" => $mess["user_dash.37"]
                     ),
-                    "repositories" => array(
-                        "LABEL" => $mess["user_dash.36"],
+                    "users" => array(
+                        "LABEL" => $mess["user_dash.1"],
                         "ICON" => "user_shared.png",
-                        "ICON-CLASS" => "icon-cog",
-                        "DESCRIPTION" => $mess["user_dash.37"]
+                        "ICON-CLASS" => "icon-book",
+                        "DESCRIPTION" => $mess["user_dash.30"]
                     ),
                     "teams" => array(
                         "LABEL" => "Teams",
@@ -118,27 +116,13 @@ class UserDashboardDriver extends AbstractAccessDriver
                     else $strippedDir = "";
                 }
                 if (!empty($strippedDir) && array_key_exists($strippedDir, $rootNodes)) {
-                    XMLWriter::header();
                     if ($strippedDir == "users") {
-                        $this->listUsers();
+                        $x->addChunk($this->listUsers());
                     } else if ($strippedDir == "teams") {
-                        $this->listTeams();
-                    } else if ($strippedDir == "repositories") {
-                        $this->listRepositories();
-                    } else if ($strippedDir == "files") {
-                        $this->listSharedFiles("files");
+                        $x->addChunk($this->listTeams());
                     }
-                    XMLWriter::close();
                 } else {
-                    XMLWriter::header();
-                    /*
-                    AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="user_dash.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.31" attributeName="description" sortType="String"/></columns>');
-                    foreach ($rootNodes as $key => $data) {
-                        $l = $data["LABEL"];
-                        print '<tree text="'.$l.'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" description="'.$data["DESCRIPTION"].'" />';
-                    }
-                    */
-                    XMLWriter::close();
+                    $responseInterface  = new EmptyResponse();
                 }
             break;
 
@@ -154,8 +138,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $selection = new UserSelection();
                 $selection->initFromHttpVars($httpVars);
                 $files = $selection->getFiles();
-                XMLWriter::header();
-                $minisites = $this->listSharedFiles("minisites");
+                $minisites = $this->listMinisites();
                 /**
                  * @var ShareCenter $shareCenter
                  */
@@ -169,13 +152,15 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $element = $minisites[$element];
                     }
                     $shareCenter->getShareStore()->deleteShare($mime, $element);
+                    $out = "";
                     if($mime == "repository" || $mime == "minisite") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
                     else if($mime == "file") $out = $mess["user_dash.13"];
+                    if(!empty($out)){
+                        $x->addChunk(new UserMessage($out, LOG_LEVEL_INFO));
+                    }
                 }
-                XMLWriter::sendMessage($out, null);
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
+                $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
             break;
 
             case "clear_expired" :
@@ -185,14 +170,12 @@ class UserDashboardDriver extends AbstractAccessDriver
                  */
                 $shareCenter = PluginsService::getInstance()->findPluginById("action.share");
                 $deleted = $shareCenter->getShareStore()->clearExpiredFiles(true);
-                XMLWriter::header();
                 if (count($deleted)) {
-                    XMLWriter::sendMessage(sprintf($mess["user_dash.23"], count($deleted).""), null);
-                    XMLWriter::reloadDataNode();
+                    $x->addChunk(new UserMessage(sprintf($mess["user_dash.23"], count($deleted)."")));
+                    $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
                 } else {
-                    XMLWriter::sendMessage($mess["user_dash.24"], null);
+                    $x->addChunk(new UserMessage($mess["user_dash.24"]));
                 }
-                XMLWriter::close();
 
             break;
 
@@ -204,11 +187,8 @@ class UserDashboardDriver extends AbstractAccessDriver
                 foreach ($elements as $element) {
                     PublicletCounter::reset(str_replace(".php", "", basename($element)));
                 }
-                XMLWriter::header();
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
-
-            break;
+                $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
+                break;
 
             default:
             break;
@@ -218,58 +198,21 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     /**
-     * @param string $mode
-     * @return array|void
+     * @return array
      */
-    public function listSharedFiles($mode = "files")
+    public function listMinisites()
     {
-        if($mode == "files"){
-            XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist">
-                <column messageId="user_dash.4" attributeName="ajxp_label" sortType="String" width="20%"/>
-                <column messageId="user_dash.17" attributeName="download_url" sortType="String" width="20%"/>
-                <column messageId="user_dash.20" attributeName="download_count" sortType="String" width="2%"/>
-                <column messageId="share_center.22" attributeName="download_limit" sortType="String" width="2%"/>
-                <column messageId="user_dash.6" attributeName="password" sortType="String" width="5%"/>
-                <column messageId="user_dash.7" attributeName="expiration" sortType="String" width="5%"/>
-            </columns>');
-        }
-
-        $mess = ConfService::getMessages();
-        $loggedUser = AuthService::getLoggedUser();
-        $userId = $loggedUser->getId();
-
+        /**
+         * @var ShareCenter $shareCenter
+         */
         $shareCenter = PluginsService::getInstance()->findPluginById("action.share");
-        $downloadBase = $shareCenter->getPublicAccessManager()->buildPublicDlURL();
         $publicLets = $shareCenter->listShares(true, null);
-
         $minisites = array();
         foreach ($publicLets as $hash => $publicletData) {
-            if($mode == "files"){
-                if(isSet($publicletData["AJXP_APPLICATION_BASE"]) || isSet($publicletData["TRAVEL_PATH_TO_ROOT"])
-                    ||  (isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId)
-                    || empty($publicletData["FILE_PATH"])
-                    ){
-                    continue;
-                }
-                $expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
-                if(!(is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] instanceof Repository)) continue;
-                XMLWriter::renderNode($hash, "".TextEncoder::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".TextEncoder::toUTF8($publicletData["FILE_PATH"]), true, array(
-                        "icon"		=> "html.png",
-                        "password" => ($publicletData["PASSWORD"]!=""?$this->metaIcon("key").$publicletData["PASSWORD"]:""),
-                        "expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?$this->metaIcon("time"):"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):""),
-                        "download_count" => !empty($publicletData["DOWNLOAD_COUNT"])?$this->metaIcon("download-alt").$publicletData["DOWNLOAD_COUNT"]:"",
-                        "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "" : $this->metaIcon("cloud-download").$publicletData["DOWNLOAD_LIMIT"] ),
-                        "download_url" => $this->metaIcon("link").$downloadBase . "/".$hash,
-                        "ajxp_mime" => "shared_file")
-                );
-            }else if($mode == "minisites"){
-                if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;
-                $minisites[$publicletData["REPOSITORY"]] = $hash;
-            }
+            if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;
+            $minisites[$publicletData["REPOSITORY"]] = $hash;
         }
-        if($mode == "minisites"){
-            return $minisites;
-        }
+        return $minisites;
     }
 
     private function metaIcon($metaIcon)
@@ -277,14 +220,21 @@ class UserDashboardDriver extends AbstractAccessDriver
         return "<span class='icon-".$metaIcon." meta-icon'></span> ";
     }
 
+    /**
+     * @return NodesList
+     */
     public function listTeams()
     {
         $conf = ConfService::getConfStorageImpl();
-        if(!method_exists($conf, "listUserTeams")) return;
-        XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" switchGridMode="filelist">
-            <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
-            <column messageId="user_dash.10" attributeName="users_labels" sortType="String"/>
-        </columns>');
+        $nodesList = new NodesList();
+        if(!method_exists($conf, "listUserTeams")) {
+            return $nodesList;
+        }
+
+        $nodesList->initColumnsData('fileList', 'detail');
+        $nodesList->appendColumn('ajxp_conf.6', 'ajxp_label');
+        $nodesList->appendColumn('user_dash.10', 'repo_accesses');
+
         $teams = $conf->listUserTeams();
         foreach ($teams as $teamId => $team) {
             if(empty($team["LABEL"])) continue;
@@ -292,19 +242,32 @@ class UserDashboardDriver extends AbstractAccessDriver
             foreach(array_values($team["USERS"]) as $userId){
                 $team["USERS_LABELS"][] = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userId, "core.conf", $userId);
             }
-            XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
-                    "icon"      => "users-folder.png",
-                    "ajxp_mime" => "ajxp_team",
-                    "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"])),
-                    "users_labels"     => "<span class='icon-groups'></span> ".implode(", ", $team["USERS_LABELS"])
-                ), true, true);
+            $metaData = [
+                "text" => $team["LABEL"],
+                "icon" => "users-folder.png",
+                "ajxp_mime" => "ajxp_team",
+                "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"])),
+                "users_labels"     => "<span class='icon-groups'></span> ".implode(", ", $team["USERS_LABELS"])
+            ];
+            $n = new AJXP_Node("/teams/".$teamId, $metaData);
+            $nodesList->addBranch($n);
         }
+        return $nodesList;
     }
 
+    /**
+     * @return NodesList
+     */
     public function listUsers()
     {
-        XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.10" attributeName="repo_accesses" sortType="String"/></columns>');
-        if(!AuthService::usersEnabled()) return ;
+        $nodesList = new NodesList();
+        $nodesList->initColumnsData('fileList');
+        $nodesList->appendColumn('ajxp_conf.6', 'ajxp_label');
+        $nodesList->appendColumn('user_dash.10', 'repo_accesses');
+
+        if(!AuthService::usersEnabled()) {
+            return $nodesList;
+        }
         $loggedUser = AuthService::getLoggedUser();
         $users = ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()); // AuthService::listUsers();
         $mess = ConfService::getMessages();
@@ -335,23 +298,31 @@ class UserDashboardDriver extends AbstractAccessDriver
             }
             if(!empty($label)) $label .= " ($userId)";
             else $label = $userId;
-            print '<tree
-                text="'.Utils::xmlEntities($label).'"
-                isAdmin="'.Utils::xmlEntities($mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")]).'"
-                icon="user_shared.png"
-                openicon="user_shared.png"
-                filename="/users/'.Utils::xmlEntities($userId).'"
-                repo_accesses="'.(count($repoAccesses) ? Utils::xmlEntities($this->metaIcon("share-sign"). implode(", ", $repoAccesses)):"").'"
-                parentname="/users"
-                is_file="1"
-                ajxp_mime="shared_user"
-                />';
+            $metaData = [
+                "text"      => $label,
+                "isAdmin"   => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
+                "icon"      => "user_shared.png",
+                "openicon"  => "user_shared.png",
+                "repo_accesses" => count($repoAccesses) ? $this->metaIcon("share-sign"). implode(", ", $repoAccesses):"",
+                "parentname"    => "/users",
+                "is_file"       => "1",
+                "ajxp_mime"     => "shared_user"
+            ];
+            $node = new AJXP_Node("/users/".$userId, $metaData);
+            $nodesList->addBranch($node);
         }
+        return $nodesList;
     }
 
+    /*
     public function listRepositories()
     {
-        XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.9" attributeName="parent_label" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
+        $nodesList = new NodesList();
+        $nodesList->initColumnsData('fileList');
+        $nodesList->appendColumn('ajxp_conf.8', 'ajxp_label');
+        $nodesList->appendColumn('user_dash.9', 'parent_label');
+        $nodesList->appendColumn('user_dash.9', 'repo_accesses');
+
         $repoArray = array();
         $loggedUser = AuthService::getLoggedUser();
         $count = 0;
@@ -399,16 +370,20 @@ class UserDashboardDriver extends AbstractAccessDriver
             $parentLabel .= " (".str_replace($parentPath, "", $repoPath).")";
 
             $metaData = array(
+                "text"          => $name,
                 "repository_id" => $repoIndex,
                 "icon"			=> "document_open_remote.png",
                 "openicon"		=> "document_open_remote.png",
                 "parentname"	=> "/repositories",
-                "parent_label"   => $parentLabel,
+                "parent_label"  => $parentLabel,
                 "repo_accesses" => count($repoAccesses) ?  $this->metaIcon("share-sign").implode(", ", $repoAccesses) : "",
                 "ajxp_mime" 	=> "shared_repository"
             );
-            XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
+            $nodesList->addBranch(new AJXP_Node("/repositories/$repoIndex", $metaData));
+            //XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
         }
+        return $nodesList;
     }
+    */
 
 }
