@@ -145,9 +145,8 @@
         <if>
             <available type="file" file="${INNER_DIRECTORY}/core/composer.json"/>
             <then>
-                <copy todir="${INNER_DIRECTORY}/core/vendor">
-                    <fileset dir="/root/vendor/" defaultexcludes="false"><include name="*/**"/></fileset>
-                </copy>
+		<exec command="composer install --optimize-autoloader"
+		      dir="${INNER_DIRECTORY}/core" />
             </then>
         </if>
 
