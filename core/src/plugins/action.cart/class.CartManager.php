@@ -37,14 +37,17 @@ class CartManager extends Plugin
         if($indexer == false) return;
         $httpVars["return_selection"] = true;
         unset($httpVars["get_action"]);
-        $res = Controller::findActionAndApply("search", $httpVars, $fileVars);
+        $requestInterface = $requestInterface->withAttribute("action", "search")->withParsedBody($httpVars);
+        $res = Controller::run($requestInterface);
+
         if (isSet($res) && is_array($res)) {
             $newHttpVars = array(
                 "selection_nodes"   => $res,
                 "dir"               => "__AJXP_ZIP_FLAT__/",
                 "archive_name"      => $httpVars["archive_name"]
             );
-            Controller::findActionAndApply("download", $newHttpVars, array());
+            $requestInterface = $requestInterface->withAttribute("action", "download")->withParsedBody($newHttpVars);
+            Controller::run($requestInterface);
         }
 
 

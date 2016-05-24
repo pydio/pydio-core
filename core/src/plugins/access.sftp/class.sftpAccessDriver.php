@@ -116,7 +116,7 @@ class sftpAccessDriver extends fsAccessDriver
      * @param $dest
      * @param $basedir
      * @throws \Exception
-     * @return zipfile
+     * @return PclZip Zip Archive
      */
     public function makeZip ($src, $dest, $basedir)
     {

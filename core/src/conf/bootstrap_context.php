@@ -105,7 +105,8 @@ if ($corePlugAutoloads !== false && count($corePlugAutoloads)) {
 function AjaXplorer_autoload($className)
 {
     // Temp : super dummy autoloader, take only class name
-    $className = array_pop(explode("\\", $className));
+    $parts = explode("\\", $className);
+    $className = array_pop($parts);
 
     if($className == "dibi"){
         require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");

@@ -20,8 +20,6 @@
  */
 namespace Pydio\Auth\Core;
 
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services\AuthService;
 
 

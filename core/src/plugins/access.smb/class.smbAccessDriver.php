@@ -64,7 +64,7 @@ class smbAccessDriver extends fsAccessDriver
 		
         require_once($this->getBaseDir()."/smb.php");
 
-        $create = $this->repository->getOption("CREATE");
+        //$create = $this->repository->getOption("CREATE");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
 
         $this->detectStreamWrapper(true);
@@ -101,45 +101,6 @@ class smbAccessDriver extends fsAccessDriver
             return ;
         }
         $this->disableArchiveBrowsingContributions($contribNode);
-    }
-
-    public function makeZip ($src, $dest, $basedir)
-    {
-        @set_time_limit(0);
-        require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
-        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
-
-        $filePaths = array();
-        foreach ($src as $item) {
-            $url = $this->urlBase.(($item[0] == "/")? "" : "/").Utils::securePath($item);
-            $realFile = AJXP_MetaStreamWrapper::getRealFSReference($url);
-            //$basedir = trim(dirname($realFile))."/";
-            if (basename($item) == "") {
-                $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
-            } else {
-                $shortName = basename($item);
-                if(!empty($zipEncoding)){
-                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
-                    if($test !== false) $shortName = $test;
-                }
-                $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
-                    PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName);
-            }
-        }
-        self::$filteringDriverInstance = $this;
-        $archive = new PclZip($dest);
-        if($basedir == "__AJXP_ZIP_FLAT__/"){
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
-        }else{
-            $basedir = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase).trim($basedir);
-            $this->logDebug("Basedir", array($basedir));
-            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
-        }
-        if (!$vList) {
-            throw new \Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
-        }
-        self::$filteringDriverInstance = null;
-        return $vList;
     }
 
     public function isWriteable($dir, $type="dir")

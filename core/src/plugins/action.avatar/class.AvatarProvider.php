@@ -38,7 +38,6 @@ class AvatarProvider extends Plugin
         $type = $this->getFilteredOption("GRAVATAR_TYPE");
         $httpVars = $requestInterface->getParsedBody();
         if ($requestInterface->getAttribute("action") == "get_avatar_url") {
-            $url = "";
             $suffix = "";
             switch ($provider) {
                 case "gravatar":
@@ -52,7 +51,6 @@ class AvatarProvider extends Plugin
                     $suffix .= "?s=80&r=g&d=".$type;
                     break;
                 case "libravatar":
-                    $url = "";
                     // Federated Servers are not supported here without libravatar.org. Should query DNS server first.
                     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
                         $url = "https://seccdn.libravatar.org";

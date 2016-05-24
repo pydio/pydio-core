@@ -22,8 +22,12 @@ namespace Pydio\Access\Driver\DataProvider;
 
 use DOMDocument;
 use DOMXPath;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesList;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,59 +38,72 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class WmsBrowser extends AbstractAccessDriver
 {
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        parent::accessPreprocess($action, $httpVars, $fileVars);
+        parent::accessPreprocess($requestInterface);
 
-        switch ($action) {
-            case "ls":
-                $doc = DOMDocument::load($this->repository->getOption("HOST") . "?request=GetCapabilities");
-                $xPath = new DOMXPath($doc);
-                $dir = $httpVars["dir"];
-                XMLWriter::header();
-                XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="wms.1" attributeName="ajxp_label" sortType="String"/><column messageId="wms.6" attributeName="srs" sortType="String"/><column messageId="wms.4" attributeName="style" sortType="String"/><column messageId="wms.5" attributeName="keywords" sortType="String"/></columns>');
-
-                $layers = $xPath->query("Capability/Layer/Layer");
-                // Detect "levels"
-                $levels = array();
-                $leafs = array();
-                $styleLevels = $prefixLevels = false;
-                foreach ($layers as $layer) {
-                    $name = $xPath->evaluate("Name", $layer)->item(0)->nodeValue;
-                    $stylesList = $xPath->query("Style/Name", $layer);
-                    if (strstr($name, ":")!==false) {
-                        $exp = explode(":", $name);
-                        if(!isSet($levels[$exp[0]]))$levels[$exp[0]] = array();
-                        $levels[$exp[0]][] = $layer;
-                        $prefixLevels = true;
-                    } else if ($stylesList->length > 1) {
-                        if(!isSet($levels[$name])) $levels[$name] = array();
-                        foreach ($stylesList as $style) {
-                            $levels[$name][$style->nodeValue] = $layer;
-                        }
-                        $styleLevels = true;
-                    } else {
-                        $leafs[] = $layer;
-                    }
-                }
-                if ($dir == "/" || $dir == "") {
-                    $this->listLevels($levels);
-                    $this->listLayers($leafs, $xPath);
-                } else if (isSet($levels[basename($dir)])) {
-                    $this->listLayers($levels[basename($dir)], $xPath, ($styleLevels?array($this,"replaceStyle"):null));
-                }
-                XMLWriter::close();
-            break;
-
-            default:
-            break;
+        if($requestInterface->getAttribute("action")){
+            return ;
         }
+
+        $doc = new DOMDocument();
+        $doc->load($this->repository->getOption("HOST") . "?request=GetCapabilities");
+        $xPath = new DOMXPath($doc);
+
+        $httpVars = $requestInterface->getParsedBody();
+        $dir = $httpVars["dir"];
+
+        $x = new SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
+        $nodesList = new NodesList();
+        $nodesList->initColumnsData("filelist");
+        $nodesList->appendColumn("wms.1", "ajxp_label");
+        $nodesList->appendColumn("wms.6", "srs");
+        $nodesList->appendColumn("wms.4", "style");
+        $nodesList->appendColumn("wms.5", "keyword");
+
+        $layers = $xPath->query("Capability/Layer/Layer");
+        // Detect "levels"
+        $levels = array();
+        $leafs = array();
+        $styleLevels = $prefixLevels = false;
+        foreach ($layers as $layer) {
+            $name = $xPath->evaluate("Name", $layer)->item(0)->nodeValue;
+            $stylesList = $xPath->query("Style/Name", $layer);
+            if (strstr($name, ":")!==false) {
+                $exp = explode(":", $name);
+                if(!isSet($levels[$exp[0]]))$levels[$exp[0]] = array();
+                $levels[$exp[0]][] = $layer;
+                $prefixLevels = true;
+            } else if ($stylesList->length > 1) {
+                if(!isSet($levels[$name])) $levels[$name] = array();
+                foreach ($stylesList as $style) {
+                    $levels[$name][$style->nodeValue] = $layer;
+                }
+                $styleLevels = true;
+            } else {
+                $leafs[] = $layer;
+            }
+        }
+        if ($dir == "/" || $dir == "") {
+            $this->listLevels($nodesList, $levels);
+            $this->listLayers($nodesList, $leafs, $xPath);
+        } else if (isSet($levels[basename($dir)])) {
+            $this->listLayers($nodesList, $levels[basename($dir)], $xPath, ($styleLevels?array($this,"replaceStyle"):null));
+        }
+
+        $x->addChunk($nodesList);
+
     }
 
-    public function listLevels($levels)
+    /**
+     * @param NodesList $NodesList
+     * @param $levels
+     */
+    public function listLevels(&$NodesList, $levels)
     {
         foreach ($levels as $key => $layers) {
-            XMLWriter::renderNode("/$key", $key, false, array(
+            $node = new AJXP_Node("/$key", array(
                 "icon"			=> "folder.png",
                 "openicon"		=> "openfolder.png",
                 "parentname"	=> "/",
@@ -94,6 +111,8 @@ class WmsBrowser extends AbstractAccessDriver
                 "keywords"		=> "-",
                 "style"			=> "-"
             ));
+            $node->setLeaf(false);
+            $NodesList->addBranch($node);
         }
 
     }
@@ -107,7 +126,14 @@ class WmsBrowser extends AbstractAccessDriver
         return $metaData;
     }
 
-    public function listLayers($nodeList, $xPath, $replaceCallback = null)
+    /**
+     * @param NodesList $NodesList
+     * @param array $nodeList
+     * @param DOMXPath $xPath
+     * @param callable|null $replaceCallback
+     * @throws \Exception
+     */
+    public function listLayers(&$NodesList, $nodeList, $xPath, $replaceCallback = null)
     {
         foreach ($nodeList as  $key => $node) {
             $name = $xPath->evaluate("Name", $node)->item(0)->nodeValue;
@@ -149,7 +175,9 @@ class WmsBrowser extends AbstractAccessDriver
                 $metaData = call_user_func($replaceCallback, $key, $metaData);
             }
 
-            XMLWriter::renderNode("/".$metaData["name"], $title, true, $metaData);
+            $newNode = new AJXP_Node("/".$metaData["name"], $metaData);
+            $newNode->setLeaf(true);
+            $NodesList->addBranch($newNode);
         }
     }
 

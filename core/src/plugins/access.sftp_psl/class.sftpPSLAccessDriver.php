@@ -24,7 +24,6 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 
 use DOMNode;
 use PclZip;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Services\ConfService;
 
@@ -93,10 +92,11 @@ class sftpPSLAccessDriver extends fsAccessDriver
     }
 
     /**
-     * @param $src
-     * @param $dest
-     * @param $basedir
-     * @return zipfile
+     * @param array $src
+     * @param string $dest
+     * @param string $basedir
+     * @return PclZip zipfile
+     * @throws \Exception
      */
     public function makeZip ($src, $dest, $basedir)
     {

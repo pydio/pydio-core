@@ -486,7 +486,7 @@ class PydioApi{
                     var paramChild = childs[i].childNodes[j];
                     if(paramChild.tagName == 'param'){
                         parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
-                    }else if(paramChild.tagName == 'clientCallback'){
+                    }else if(paramChild.tagName == 'clientCallback' && paramChild.firstChild && paramChild.firstChild.nodeValue){
                         var callbackCode = paramChild.firstChild.nodeValue;
                         var callback = new Function(callbackCode);
                     }

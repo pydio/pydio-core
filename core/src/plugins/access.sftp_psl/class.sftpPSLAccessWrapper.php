@@ -113,14 +113,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     }
 
     /**
-     * Opens the stream
-     * Diff with parent class : do not "securePath", as it removes double slash
-     *
-     * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile"
-     * @param String $mode
-     * @param unknown_type $options
-     * @param unknown_type $opened_path
-     * @return unknown
+     * @inheritdoc
      */
     public function stream_open($path, $mode, $options, &$context)
     {
@@ -212,12 +205,10 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
             $ssh2->disconnect();
 
             if (trim($output != "")) {
-                $res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
                 preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
                 if (count($matches[0]) == 3) {
                     $uid = $matches[2][0];
                     $gid = $matches[2][1];
-
                     return array($uid, $gid);
                 }
             }

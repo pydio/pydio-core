@@ -89,13 +89,7 @@ class smbAccessWrapper extends fsAccessWrapper
     }
 
     /**
-     * Opens the stream
-     * Diff with parent class : do not "securePath", as it removes double slash
-     *
-     * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile"
-     * @param String $mode
-     * @param mixed $options
-     * @return resource|bool
+     * @inheritdoc
      */
     public function stream_open($path, $mode, $options, &$context)
     {
@@ -189,9 +183,6 @@ class smbAccessWrapper extends fsAccessWrapper
         fclose($fp);
     }
 
-    public static function changeMode($path, $chmodValue)
-    {
-        //$realPath = self::initPath($path, "file");
-        //chmod($realPath, $chmodValue);
+    public static function changeMode($path, $chmodValue){
     }
 }

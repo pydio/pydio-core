@@ -210,9 +210,8 @@ class inboxAccessWrapper implements IAjxpWrapper
      * @param string $path
      * @param number $chmodValue
      */
-    public static function changeMode($path, $chmodValue)
-    {
-        // TODO: Implement changeMode() method.
+    public static function changeMode($path, $chmodValue){
+        
     }
 
     /**

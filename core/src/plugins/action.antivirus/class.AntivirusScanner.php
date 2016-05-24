@@ -152,7 +152,7 @@ class AntivirusScanner extends Plugin
 
     /**
      * This function initializes the file path
-     * @param $nodeObject
+     * @param AJXP_Node $nodeObject
      */
     public function setPath($nodeObject)
     {
@@ -164,7 +164,7 @@ class AntivirusScanner extends Plugin
 
     /**
      * This function initializes the file extension
-     * @param $nodeObject
+     * @param AJXP_Node $nodeObject
      */
     public function setFileExtension ($nodeObject)
     {

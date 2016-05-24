@@ -23,8 +23,6 @@ namespace Pydio\Access\Driver\StreamProvider\Imap;
 use DOMNode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Utils\Utils;
 
@@ -177,10 +175,14 @@ class imapAccessDriver extends fsAccessDriver
     public function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHandle = null)
     {
         if($foldersOnly) return 0;
-        // WILL USE IMAP FUNCTIONS TO COUNT;
-        $tmpHandle = opendir($dirName);
-        $this->logDebug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
-        return imapAccessWrapper::getCurrentDirCount();
+        $count = 0;
+        if($tmpHandle = opendir($dirName)){
+            // WILL USE IMAP FUNCTIONS TO COUNT;
+            $this->logDebug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
+            $count = imapAccessWrapper::getCurrentDirCount();
+            closedir($tmpHandle);
+        }
+        return $count;
     }
 
 }

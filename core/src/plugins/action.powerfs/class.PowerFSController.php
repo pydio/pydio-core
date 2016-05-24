@@ -176,10 +176,8 @@ class PowerFSController extends Plugin
                     $nodesDiff->add($newNode);
                     Controller::applyHook("msg.instant", array($nodesDiff->toXML(), ConfService::getCurrentRepositoryId()));
                 }else{
-                    $archiveName = str_replace("'", "\'", $archiveName);
-                    $jsCode = "
-                        PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$opeId."',archive_name:'".$originalArchiveParam."'});
-                    ";
+                    $archiveName = str_replace("'", "\'", $originalArchiveParam);
+                    $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$opeId."',archive_name:'".$archiveName."'}); ";
                     $actionTrigger = BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]);
                     Controller::applyHook("msg.instant", array($actionTrigger->toXML(), ConfService::getCurrentRepositoryId()));
 

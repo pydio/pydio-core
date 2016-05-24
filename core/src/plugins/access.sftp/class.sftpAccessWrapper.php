@@ -147,7 +147,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      * @param String $mode
      * @param array $options
      * @param array $context
-     * @return unknown
+     * @return resource
      */
     public function stream_open($path, $mode, $options, &$context)
     {
