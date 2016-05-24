@@ -20,7 +20,8 @@
  */
 namespace Pydio\Core\Exception;
 
-use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
+use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +36,8 @@ define('AJXP_PROMPT_EXCEPTION_ALERT', 'AJXP_PROMPT_EXCEPTION_ALERT');
  * @package Pydio
  * @subpackage Core
  */
-class PydioPromptException extends PydioException{
+class PydioPromptException extends PydioException implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
+{
 
     private $promptType = "prompt";
     /**
@@ -104,5 +106,34 @@ class PydioPromptException extends PydioException{
         }
 
     }
+
+    /**
+     * @return mixed
+     */
+    public function jsonSerializableData()
+    {
+        return [
+            "promptType" => $this->promptType,
+            "promptMessage" => $this->getMessage(),
+            "promptData" => $this->promptData
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function jsonSerializableKey()
+    {
+        return "userPrompt";
+    }
+
+    /**
+     * @return string
+     */
+    public function toXML()
+    {
+        return "<prompt type=\"".$this->promptType."\"><message>".$this->getMessage()."</message><data><![CDATA[".json_encode($this->promptData)."]]></data></prompt>";
+    }
+
 
 }

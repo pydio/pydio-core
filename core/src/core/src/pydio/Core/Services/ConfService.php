@@ -64,14 +64,7 @@ class ConfService
 
     private $contextRepositoryId;
     private $contextCharset;
-
-    public static function registerCatchAll(){
-        if (is_file(TESTS_RESULT_FILE)) {
-            set_error_handler(array("Pydio\\Core\\Controller\\XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-            set_exception_handler(array("Pydio\\Core\\Controller\\XMLWriter", "catchException"));
-        }
-    }
-
+    
     /**
      * @return AbstractConfDriver
      */

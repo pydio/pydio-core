@@ -174,7 +174,7 @@ class ftpAccessWrapper implements IAjxpWrapper
     {
       if (strpos($errstr, "Opening BINARY mode data connection") !== false)
         $errstr = "Transfer failed. Please check available disk space (quota)";
-      XMLWriter::catchError($errno, $errstr, $errfile, $errline, $errcontext);
+        throw new PydioException("$errno - $errstr");
     }
 
     public function stream_flush()

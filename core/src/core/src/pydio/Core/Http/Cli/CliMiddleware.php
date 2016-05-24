@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
+use Pydio\Core\Http\Middleware\ITopLevelMiddleware;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class CliMiddleware
+class CliMiddleware implements ITopLevelMiddleware
 {
     /**
      * @param ServerRequestInterface $requestInterface
@@ -40,7 +41,7 @@ class CliMiddleware
      * @param callable|null $next
      * @throws WorkspaceNotFoundException
      */
-    public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
+    public function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
         /**
          * @var OutputInterface
@@ -53,17 +54,7 @@ class CliMiddleware
 
             $responseInterface = Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
-            if($responseInterface !== false && $responseInterface->getBody() && $responseInterface->getBody() instanceof SerializableResponseStream){
-                // For the moment, use XML by default
-                // Todo: Create A CLI Serializer for pretty printing?
-                if($requestInterface->getParsedBody()["format"] == "json"){
-                    $responseInterface->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
-                }
-            }
-            $output->writeln("Executing Action" . $requestInterface->getAttribute("action"));
-            $output->writeln("----------------");
-            $output->writeln("" . $responseInterface->getBody());
-            $output->writeln("");
+            $this->emitResponse($requestInterface, $responseInterface);
 
         } catch (AuthRequiredException $e){
 
@@ -81,6 +72,28 @@ class CliMiddleware
 
         }
 
+    }
+
+    public function emitResponse(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
+
+        $output = $requestInterface->getAttribute("cli-output");
+        if($responseInterface !== false && $responseInterface->getBody() && $responseInterface->getBody() instanceof SerializableResponseStream){
+            // For the moment, use XML by default
+            // Todo: Create A CLI Serializer for pretty printing?
+            if($requestInterface->getParsedBody()["format"] == "json"){
+                $responseInterface->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
+            }
+        }
+        $body = "".$responseInterface->getBody();
+        $output->writeln("");
+        $output->writeln("-----------------------------------");
+        $output->writeln("Executing Action" . $requestInterface->getAttribute("action"));
+        $output->writeln("-----------------------------------");
+        if(!empty($body)){
+            $output->writeln("" . $responseInterface->getBody());
+        }else{
+            $output->writeln("No output");
+        }
 
     }
 }

@@ -82,6 +82,9 @@ class Command extends Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $server = new Server(Server::MODE_CLI);
+        $server->registerCatchAll();
+
         $definitionsKeys = array_keys($this->getDefinition()->getOptions());
         $actionParameters = [];
         $pydioCliOptions = [];
@@ -104,7 +107,6 @@ class Command extends Symfony\Component\Console\Command\Command
             $reqOptions = $pydioCliOptions;
             $reqOptions["r"] = $repoId;
 
-            $server = new Server(Server::MODE_CLI);
             $request = $server->getRequest();
             $request = $request
                 ->withParsedBody($actionParameters)

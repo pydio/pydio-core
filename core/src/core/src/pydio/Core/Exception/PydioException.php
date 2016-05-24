@@ -64,4 +64,36 @@ class PydioException extends \Exception
     public function getErrorCode(){
         return $this->errorCode;
     }
+
+    public static function buildDebugBackTrace(){
+
+        $message = "";
+
+        if (ConfService::getConf("SERVER_DEBUG")) {
+            $stack = debug_backtrace();
+            $stackLen = count($stack);
+            for ($i = 1; $i < $stackLen; $i++) {
+                $entry = $stack[$i];
+
+                $func = $entry['function'] . '(';
+                $argsLen = count($entry['args']);
+                for ($j = 0; $j < $argsLen; $j++) {
+                    $s = $entry['args'][$j];
+                    if(is_string($s)){
+                        $func .= $s;
+                    }else if (is_object($s)){
+                        $func .= get_class($s);
+                    }
+                    if ($j < $argsLen - 1) $func .= ', ';
+                }
+                $func .= ')';
+
+                $message .= "\n". str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' . $func . PHP_EOL;
+            }
+        }
+
+        return $message;
+
+    }
+
 }

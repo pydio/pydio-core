@@ -22,6 +22,15 @@ namespace Pydio\Core\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Cli\CliMiddleware;
+use Pydio\Core\Http\Message\PromptMessage;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Middleware\ITopLevelMiddleware;
+use Pydio\Core\Http\Middleware\SapiMiddleware;
+use Pydio\Core\Http\Response\SerializableResponseChunk;
+use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Log\Core\AJXP_Logger;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
@@ -36,6 +45,11 @@ class Server
     public static $mode;
     private $request;
     private $middleWares;
+
+    /**
+     * @var ITopLevelMiddleware
+     */
+    private $topMiddleware;
 
     private static $middleWareInstance;
 
@@ -60,12 +74,22 @@ class Server
         }
 
         if($serverMode == Server::MODE_CLI){
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Cli\\CliMiddleware", "handleRequest"));
+            $topMiddleware = new CliMiddleware();
         }else{
-            $this->middleWares->push(array("Pydio\\Core\\Http\\Middleware\\SapiMiddleware", "handleRequest"));
+            $topMiddleware = new SapiMiddleware();
         }
-        self::$middleWareInstance = &$this->middleWares;
+        $this->topMiddleware = $topMiddleware;
+        $this->middleWares->push(array($topMiddleware, "handleRequest"));
 
+        self::$middleWareInstance = &$this->middleWares;
+        
+    }
+
+    public function registerCatchAll(){
+        if (is_file(TESTS_RESULT_FILE)) {
+            set_error_handler(array($this, "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+            set_exception_handler(array($this, "catchException"));
+        }
     }
 
     public function getRequest(){
@@ -112,11 +136,12 @@ class Server
     }
 
     /**
-     * @param $rewindTo array
+     * @param callable $comparisonFunction
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @param callable|null $next
      * @return ResponseInterface
+     * @internal param array $rewindTo
      */
     public static function callNextMiddleWareAndRewind(callable $comparisonFunction, ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
         if($next !== null){
@@ -152,6 +177,59 @@ class Server
 
         return $request = ServerRequestFactory::fromGlobals();
 
+    }
+
+    /**
+     * Error Catcher for PHP errors. Depending on the SERVER_DEBUG config
+     * shows the file/line info or not.
+     * @static
+     * @param $code
+     * @param $message
+     * @param $fichier
+     * @param $ligne
+     * @param $context
+     */
+    public function catchError($code, $message, $fichier, $ligne, $context)
+    {
+        if(error_reporting() == 0) {
+            return ;
+        }
+        AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
+        $message .= PydioException::buildDebugBackTrace();
+        $req = $this->getRequest();
+        $resp = new Response();
+        $x = new SerializableResponseStream();
+        $resp = $resp->withBody($x);
+        $x->addChunk(new UserMessage($message, LOG_LEVEL_ERROR));
+        $this->topMiddleware->emitResponse($req, $resp);
+        
+    }
+
+    /**
+     * Catch exceptions, @see catchError
+     * @param \Exception $exception
+     */
+    public function catchException($exception)
+    {
+        if($exception instanceof SerializableResponseChunk){
+
+            $req = $this->getRequest();
+            $resp = new Response();
+            $x = new SerializableResponseStream();
+            $resp = $resp->withBody($x);
+            $x->addChunk($exception);
+            $this->topMiddleware->emitResponse($req, $resp);
+            return;
+        }
+
+        try {
+            $this->catchError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception);
+        } catch (\Exception $innerEx) {
+            error_log(get_class($innerEx)." thrown within the exception handler!");
+            error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
+            error_log("New exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString());
+            print("Error");
+        }
     }
 
 

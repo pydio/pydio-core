@@ -27,9 +27,10 @@ include_once("base.conf.php");
 
 ConfService::currentContextIsRestAPI("/api");
 
-ConfService::registerCatchAll();
+$server = new Server(Server::MODE_REST);
+$server->registerCatchAll();
+
 ConfService::init();
 ConfService::start();
 
-$server = new Server(Server::MODE_REST);
 $server->listen();

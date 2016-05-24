@@ -26,9 +26,10 @@ use Pydio\Core\Http\Server;
 
 include_once("base.conf.php");
 
-ConfService::registerCatchAll();
+$server = new Server(Server::MODE_SESSION);
+$server->registerCatchAll();
+
 ConfService::init();
 ConfService::start();
 
-$server = new Server(Server::MODE_SESSION);
 $server->listen();

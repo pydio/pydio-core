@@ -20,12 +20,15 @@
  */
 namespace Pydio\Core\Exception;
 
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
+use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class AuthRequiredException extends PydioException
+class AuthRequiredException extends PydioException implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
     public function __construct($messageId = "", $messageString = "")
     {
@@ -34,5 +37,34 @@ class AuthRequiredException extends PydioException
             if(isSet($mess[$messageId])) $messageString = $mess[$messageId];
         }
         parent::__construct($messageString, $messageId);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function jsonSerializableData()
+    {
+        return ["message" => $this->getMessage()];
+    }
+
+    /**
+     * @return string
+     */
+    public function jsonSerializableKey()
+    {
+        return "authRequired";
+    }
+
+    /**
+     * @return string
+     */
+    public function toXML()
+    {
+        $xml = "<require_auth/>";
+        if($this->getMessage()){
+            $error = new UserMessage($this->getMessage(), LOG_LEVEL_ERROR);
+            $xml.= $error->toXML();
+        }
+        return $xml;
     }
 }

@@ -31,10 +31,17 @@ use Pydio\Core\Utils\Utils;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class SapiMiddleware
+class SapiMiddleware implements ITopLevelMiddleware
 {
 
-    public static function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable|null $next
+     * @return ResponseInterface
+     * @throws PydioException
+     */
+    public function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
 
         $params = $request->getQueryParams();
         $postParams = $request->getParsedBody();
@@ -82,13 +89,20 @@ class SapiMiddleware
         if(headers_sent()){
             return;
         }
+        $this->emitResponse($request, $response);
+    }
+
+    public function emitResponse(ServerRequestInterface $request, ResponseInterface $response){
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
-            // For the moment, use XML by default
+            /**
+             * @var SerializableResponseStream $body;
+             */
+            $body = &$response->getBody();
             if($request->hasHeader("Accept") && $request->getHeader("Accept")[0] == "application/json"){
-                $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
+                $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
                 $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
             }else{
-                $response->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
+                $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML);
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
             }
         }
@@ -97,7 +111,6 @@ class SapiMiddleware
             $emitter = new \Zend\Diactoros\Response\SapiEmitter();
             $emitter->emit($response);
         }
-
     }
 
 }

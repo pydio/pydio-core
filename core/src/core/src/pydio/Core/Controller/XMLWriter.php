@@ -22,17 +22,13 @@ namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Exception\PydioPromptException;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -259,89 +255,6 @@ class XMLWriter
             $print);
     }
 
-    /**
-     * Render a node with arguments passed as array
-     * @static
-     * @param $array
-     * @return void
-     */
-    public static function renderNodeArray($array)
-    {
-        self::renderNode($array[0],$array[1],$array[2],$array[3]);
-    }
-
-    /**
-     * Error Catcher for PHP errors. Depending on the SERVER_DEBUG config
-     * shows the file/line info or not.
-     * @static
-     * @param $code
-     * @param $message
-     * @param $fichier
-     * @param $ligne
-     * @param $context
-     */
-    public static function catchError($code, $message, $fichier, $ligne, $context)
-    {
-        if(error_reporting() == 0) {
-            return ;
-        }
-        AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
-        if (ConfService::getConf("SERVER_DEBUG")) {
-            $stack = debug_backtrace();
-            $stackLen = count($stack);
-            for ($i = 1; $i < $stackLen; $i++) {
-                $entry = $stack[$i];
-
-                $func = $entry['function'] . '(';
-                $argsLen = count($entry['args']);
-                for ($j = 0; $j < $argsLen; $j++) {
-                    $s = $entry['args'][$j];
-                    if(is_string($s)){
-                        $func .= $s;
-                    }else if (is_object($s)){
-                        $func .= get_class($s);
-                    }
-                    if ($j < $argsLen - 1) $func .= ', ';
-                }
-                $func .= ')';
-
-                $message .= "\n". str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' . $func . PHP_EOL;
-            }
-        }
-        if(!headers_sent()) XMLWriter::header();
-        if(!empty($context) && is_object($context) && $context instanceof PydioPromptException){
-            XMLWriter::write("<prompt type=\"".$context->getPromptType()."\"><message>".$message."</message><data><![CDATA[".json_encode($context->getPromptData())."]]></data></prompt>", true);
-        }else{
-            XMLWriter::sendMessage(null, TextEncoder::toUTF8($message), true);
-        }
-        XMLWriter::close();
-    }
-
-    /**
-     * Catch exceptions, @see catchError
-     * @param \Exception $exception
-     */
-    public static function catchException($exception)
-    {
-        if($exception instanceof AuthRequiredException){
-            XMLWriter::header();
-            $message = $exception->getMessage();
-            if(!empty($message)){
-                XMLWriter::sendMessage(null, $message);
-            }
-            XMLWriter::requireAuth();
-            XMLWriter::close();
-            return;
-        }
-        try {
-            XMLWriter::catchError($exception->getCode(), TextEncoder::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
-        } catch (\Exception $innerEx) {
-            error_log(get_class($innerEx)." thrown within the exception handler!");
-            error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
-            error_log("New exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString());
-            print("Error");
-        }
-    }
     /**
      * Dynamically replace XML keywords with their live values.
      * AJXP_SERVER_ACCESS, AJXP_MIMES_*,AJXP_ALL_MESSAGES, etc.
