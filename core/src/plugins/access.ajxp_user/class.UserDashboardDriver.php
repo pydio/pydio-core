@@ -29,12 +29,11 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
-use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use ShareCenter;
 use Zend\Diactoros\Response\EmptyResponse;
@@ -160,7 +159,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $x->addChunk(new UserMessage($out, LOG_LEVEL_INFO));
                     }
                 }
-                $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
+                $x->addChunk(new ReloadMessage());
             break;
 
             case "clear_expired" :
@@ -172,7 +171,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $deleted = $shareCenter->getShareStore()->clearExpiredFiles(true);
                 if (count($deleted)) {
                     $x->addChunk(new UserMessage(sprintf($mess["user_dash.23"], count($deleted)."")));
-                    $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
+                    $x->addChunk(new ReloadMessage());
                 } else {
                     $x->addChunk(new UserMessage($mess["user_dash.24"]));
                 }
@@ -187,7 +186,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 foreach ($elements as $element) {
                     PublicletCounter::reset(str_replace(".php", "", basename($element)));
                 }
-                $x->addChunk(new XMLMessage(XMLWriter::reloadDataNode("", "", false)));
+                $x->addChunk(new ReloadMessage());
                 break;
 
             default:
