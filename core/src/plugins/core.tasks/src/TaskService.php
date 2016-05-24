@@ -28,6 +28,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;

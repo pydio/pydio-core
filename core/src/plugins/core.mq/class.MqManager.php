@@ -191,11 +191,13 @@ class MqManager extends Plugin
             $input["NODE_PATHES"] = $nodePathes;
         }
 
-
-        // Publish on NSQ
-        $nsq = new nsqphp;
-        $nsq->publishTo("127.0.0.1", 1);
-        $nsq->publish('im', new \nsqphp\Message\Message(json_encode($input)));
+        $host = $this->getFilteredOption("WS_SERVER_HOST");
+        if(!empty($host) && !empty($port)){
+            // Publish on NSQ
+            $nsq = new nsqphp;
+            $nsq->publishTo($host, 1);
+            $nsq->publish('im', new \nsqphp\Message\Message(json_encode($input)));
+        }
 
         $this->hasPendingMessage = true;
 
@@ -217,8 +219,9 @@ class MqManager extends Plugin
     }
 
     /**
-     * @param $request
-     * @param $response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Pydio\Core\Exception\AuthRequiredException
      */
     public function clientChannelMethod(ServerRequestInterface $request, ResponseInterface &$response)
     {

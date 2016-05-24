@@ -27,6 +27,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -35,7 +36,7 @@ use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class TaskController extends Plugin
+class TaskController extends Plugin implements SqlTableProvider
 {
 
     public function init($options)
@@ -143,7 +144,7 @@ class TaskController extends Plugin
     public function enrichConsumeChannel(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
         if(AuthService::getLoggedUser() == null || ConfService::getRepository() == null){
-            return [];
+            return;
         }
         $respType = &$responseInterface->getBody();
         if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
@@ -157,5 +158,15 @@ class TaskController extends Plugin
 
     }
 
-    
+    /**
+     * Install SQL table using a dibi driver data
+     * @param $param array("SQL_DRIVER" => $dibiDriverData)
+     * @return mixed
+     */
+    public function installSQLTables($param)
+    {
+        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
+
 }

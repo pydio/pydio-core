@@ -1,0 +1,19 @@
+CREATE TABLE ajxp_tasks (
+  uid text NOT NULL ,
+  flags integer NOT NULL,
+  label text NOT NULL,
+  userId text NOT NULL,
+  wsId text NOT NULL,
+  status INTEGER NOT NULL,
+  status_msg text NOT NULL,
+  progress INTEGER NOT NULL,
+  schedule text NOT NULL,
+  action text NOT NULL,
+  parameters text NOT NULL,
+  nodes text NOT NULL
+);
+
+CREATE INDEX ajxp_task_idx ON ajxp_tasks (uid);
+CREATE INDEX ajxp_task_usr_idx ON ajxp_tasks (userId);
+CREATE INDEX ajxp_task_status_idx ON ajxp_tasks (status);
+CREATE INDEX ajxp_task_nodes_idx ON ajxp_tasks (nodes);
