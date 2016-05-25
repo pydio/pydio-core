@@ -23,4 +23,5 @@ define('AJXP_EXEC', true);
 require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
 global $skipHtmlBase;
 $skipHtmlBase = true;
-ShareCenter::publicRoute("/proxy", ["hash" => $_GET["hash"]]);
+$base = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/");
+ShareCenter::publicRoute($base, "/proxy", ["hash" => $_GET["hash"]]);
