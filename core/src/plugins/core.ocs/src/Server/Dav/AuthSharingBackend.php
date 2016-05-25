@@ -22,6 +22,8 @@ namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
 use Sabre\DAV;
 use Sabre\HTTP;
 
@@ -60,9 +62,9 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
     protected function validateUserPass($username, $password)
     {
         if(isSet($this->shareData["PRESET_LOGIN"])){
-            $res = \AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
+            $res = AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
         }else{
-            $res = \AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
+            $res = AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
         }
         return $res === 1;
     }
@@ -93,7 +95,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+        $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;
@@ -107,9 +109,9 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
         }
 
         $repositoryId = $this->shareData["REPOSITORY"];
-        $repository = \ConfService::getRepositoryById($repositoryId);
+        $repository = ConfService::getRepositoryById($repositoryId);
         if ($repository == null) {
-            $repository = \ConfService::getRepositoryByAlias($repositoryId);
+            $repository = ConfService::getRepositoryByAlias($repositoryId);
         }
         if ($repository == null) {
             throw new DAV\Exception\NotAuthenticated('Username cannot access any repository');

@@ -53,7 +53,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'name' => $invitation->getDocumentName(),
             'remoteId' => $invitation->getId(),
             'owner' => $invitation->getOwner(),
-            'remote' => Utils::detectServerUrl(true)
+            'remote' => Utils::detectServerURL(true)
         ];
 
         $response = $client->post(ltrim($endpoints['share'], '/'), [
@@ -150,7 +150,9 @@ class OCSClient implements IFederated, IServiceDiscovery
     /**
      *
      * Retrieves the OCS Provider endpoints for the URL
+     * @param string $url
      *
+     * @return array
      */
     public static function findEndpointsForURL($url) {
         $client = self::getClient($url);

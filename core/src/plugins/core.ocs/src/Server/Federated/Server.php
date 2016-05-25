@@ -20,7 +20,7 @@
  */
 namespace Pydio\OCS\Server\Federated;
 
-use Pydio\Auth\Core\AuthService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\SQLStore;

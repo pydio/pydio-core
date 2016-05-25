@@ -63,7 +63,7 @@ class TopLevelRouter
      */
     public function configureRoutes($base, \FastRoute\RouteCollector &$r){
         
-        $allMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH'];
+        $allMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH', 'PROPFIND', 'PROPPATCH', 'MKCOL', 'COPY', 'MOVE', 'LOCK', 'UNLOCK'];
         $file = AJXP_DATA_PATH."/".AJXP_PLUGINS_FOLDER."/boot.conf/routes.json";
         if(!file_exists($file)){
             $file = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/routes.json";
@@ -120,7 +120,7 @@ class TopLevelRouter
                 break;
             case \FastRoute\Dispatcher::NOT_FOUND:
             default:
-                throw new PydioException("Oups, could not find any valid route for ".$uri);
+                throw new PydioException("Oups, could not find any valid route for ".$uri.", method was was ".$httpMethod);
                 break;
         }
 

@@ -24,6 +24,8 @@ namespace Pydio\OCS\Server\Dav;
 defined('AJXP_EXEC') or die('Access not allowed');
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
 
+use Pydio\Core\Services\ConfService;
+use Pydio\Log\Core\AJXP_Logger;
 use Sabre;
 
 class Server extends Sabre\DAV\Server
@@ -45,10 +47,10 @@ class Server extends Sabre\DAV\Server
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
             if(isSet($userPass[0])){
-                $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
-                    $repo = \ConfService::getRepositoryById($shareData["REPOSITORY"]);
+                    $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
                     if(!empty($repo) && $repo->hasContentFilter()){
                         return "/".$repo->getContentFilter()->getUniquePath();
                     }
@@ -72,7 +74,7 @@ class Server extends Sabre\DAV\Server
         $this->setBaseUri($baseUri);
 
         $authBackend = new AuthSharingBackend($this->rootCollection);
-        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, \ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
+        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
         $this->addPlugin($authPlugin);
 
         if (!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")) {
@@ -86,7 +88,7 @@ class Server extends Sabre\DAV\Server
         $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
         $this->addPlugin($lockPlugin);
 
-        if (\ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
+        if (ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
             $browerPlugin = new \AJXP_Sabre_BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
             $extPlugin = new Sabre\DAV\Browser\GuessContentType();
             $this->addPlugin($browerPlugin);
@@ -95,7 +97,7 @@ class Server extends Sabre\DAV\Server
         try {
             $this->exec();
         } catch ( \Exception $e ) {
-            \AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
+            AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
         }
     }
 
@@ -112,10 +114,10 @@ class Server extends Sabre\DAV\Server
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
             if(isSet($userPass[0])){
-                $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
-                    $repo = \ConfService::getRepositoryById($shareData["REPOSITORY"]);
+                    $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
                     if(!empty($repo) && !$repo->hasContentFilter()){
                         $baseDir = basename($repo->getOption("PATH"));
                     }

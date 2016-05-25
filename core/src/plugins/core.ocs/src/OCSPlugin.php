@@ -175,7 +175,7 @@ class OCSPlugin extends Plugin{
             }
 
             if(count($parts) < 2){
-                $d = new \Pydio\OCS\Server\Dummy();
+                $d = new Dummy();
                 $response = $d->buildResponse("fail", "400", "Wrong URI");
                 $d->sendResponse($response);
                 return;
@@ -183,7 +183,7 @@ class OCSPlugin extends Plugin{
 
             $version = array_shift($parts);
             if($version != "v2"){
-                $d = new \Pydio\OCS\Server\Dummy();
+                $d = new Dummy();
                 $response = $d->buildResponse("fail", "400", "Api version not supported - Please switch to v2.");
                 $d->sendResponse($response);
                 return;

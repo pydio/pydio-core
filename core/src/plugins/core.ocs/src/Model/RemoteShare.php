@@ -21,7 +21,6 @@
 namespace Pydio\OCS\Model;
 
 use Pydio\Access\Core\Filter\ContentFilter;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\ConfService;
 use Sabre\DAV;
 use Sabre\DAV\Exception;
