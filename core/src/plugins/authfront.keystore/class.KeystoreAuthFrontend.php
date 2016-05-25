@@ -79,7 +79,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         //$this->logDebug(__FUNCTION__, "Replay is ".$replay);
 
         if($replay == $hash){
-            $res = AuthService::logUser($userId, "", true);
+            $res = AuthService::logUser("admin", "", true);
             if($res > 0) return true;
         }
         return false;

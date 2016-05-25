@@ -126,13 +126,12 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        switch ($action) {
+        switch ($requestInterface->getAttribute("action")) {
 
             case "login":
-                
-                
+
                 break;
 
             case "logout" :
@@ -140,34 +139,32 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 AuthService::disconnect();
                 $loggingResult = 2;
                 session_destroy();
-                XMLWriter::header();
-                XMLWriter::loggingResult($loggingResult, null, null, null);
-                XMLWriter::close();
+                $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+                $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult));
+                $responseInterface = $responseInterface->withBody($x);
 
                 break;
 
             case "get_seed" :
                 $seed = AuthService::generateSeed();
                 if (AuthService::suspectBruteForceLogin()) {
-                    HTMLWriter::charsetHeader('application/json');
-                    print json_encode(array("seed" => $seed, "captcha" => true));
+                    $responseInterface = new \Zend\Diactoros\Response\JsonResponse(["seed" => $seed, "captcha" => true]);
                 } else {
-                    HTMLWriter::charsetHeader("text/plain");
-                    print $seed;
+                    $responseInterface = $responseInterface->withHeader("Content-Type", "text/plain");
+                    $responseInterface->getBody()->write($seed);
                 }
                 break;
 
             case "get_captcha":
-                CaptchaProvider::sendCaptcha();
-                //exit(0) ;
+                $x = new \Pydio\Core\Http\Response\AsyncResponseStream(function(){
+                    CaptchaProvider::sendCaptcha();
+                });
+                $responseInterface = $responseInterface->withBody($x);
                 break;
 
             case "back":
-                XMLWriter::header("url");
-                echo AuthService::getLogoutAddress(false);
-                XMLWriter::close("url");
-                //exit(1);
-
+                $responseInterface = $responseInterface->withHeader("Content-Type", "text/xml");
+                $responseInterface->getBody()->write("<url>".AuthService::getLogoutAddress(false)."</url>");
                 break;
 
             default;

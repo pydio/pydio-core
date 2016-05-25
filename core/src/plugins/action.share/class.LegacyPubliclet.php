@@ -216,7 +216,6 @@ class LegacyPubliclet
     public function writePubliclet(&$data, $accessDriver, $repository, $shareStore, $publicAccessManager)
     {
         $downloadFolder = $publicAccessManager->getPublicDownloadFolder();
-        $publicAccessManager->initFolder();
         if (!is_dir($downloadFolder)) {
             return "ERROR : Public URL folder does not exist!";
         }

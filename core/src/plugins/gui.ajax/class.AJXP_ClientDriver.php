@@ -288,7 +288,7 @@ class AJXP_ClientDriver extends Plugin
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
         if ($currentIsMinisite) {
-            $config["ajxpServerAccess"] = "index_shared.php";
+            $config["ajxpServerAccess"] = "public/";
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
         }

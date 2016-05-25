@@ -154,6 +154,44 @@ class ShareCenter extends Plugin
         }
     }
 
+
+    /**************************/
+    /* PUBLIC LINKS ROUTER
+    /**************************/
+    public static function publicRoute($route, $params){
+
+        if(isSet($params["hash"])){
+
+            $hash = $params["hash"];
+            if(strpos($hash, "--") !== false){
+                list($hash, $lang) = explode("--", $hash);
+            }
+
+            ConfService::init();
+            ConfService::start();
+            if(isSet($lang)){
+                $_GET["lang"] = $lang;
+            }
+            ConfService::getAuthDriverImpl();
+
+            ShareCenter::loadShareByHash($hash);
+
+        }else if(isSet($_GET['minisite_session'])){
+
+            $base = new \Pydio\Core\Http\Base();
+            $h = $_GET['minisite_session'];
+            \Pydio\Core\Services\SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
+
+            $base->handleRoute("/");
+
+        }else{
+
+            die("Invalid Arguments");
+
+        }
+    }
+
+
     /**************************/
     /* UTILS & ACCESSORS
     /**************************/
@@ -1418,7 +1456,6 @@ class ShareCenter extends Plugin
         $shareObject->setParentRepositoryId($this->repository->getId());
         $shareObject->attachToRepository($newRepo->getId());
         // STORE DATA & HASH IN SHARE STORE
-        $this->getPublicAccessManager()->initFolder();
         $hash = $shareObject->save();
         $url = $this->getPublicAccessManager()->buildPublicLink($hash);
         $existingShortForm = $shareObject->getShortFormUrl();
@@ -1631,7 +1668,6 @@ class ShareCenter extends Plugin
                     $ocsStore->storeInvitation($invitation);
                 }
             }else{
-                $this->getPublicAccessManager()->initFolder();
                 $url = $this->getPublicAccessManager()->buildPublicLink($shareObject->getHash());
                 $existingShortForm = $shareObject->getShortFormUrl();
                 if(empty($existingShortForm)){

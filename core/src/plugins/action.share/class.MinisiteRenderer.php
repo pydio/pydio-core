@@ -52,7 +52,7 @@ class MinisiteRenderer
             if (strpos($logoPath, "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$logoPath)) {
                 $minisiteLogo = $logoPath;
             }else{
-                $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
+                $minisiteLogo = "public/?get_action=get_global_binary_param&binary_id=". $logoPath;
             }
         }
         // Default value
@@ -189,8 +189,12 @@ class MinisiteRenderer
         if($registeredScheme != $currentScheme){
             $tPath = str_replace($registeredScheme."://", $currentScheme."://", $tPath);
         }
-
-        $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
+        global $skipHtmlBase;
+        if(!empty($skipHtmlBase)){
+            $html = str_replace("<base href=\"AJXP_PATH_TO_ROOT\"/>", "", $html);
+        }else{
+            $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
+        }
         HTMLWriter::internetExplorerMainDocumentHeader();
         HTMLWriter::charsetHeader();
         echo($html);

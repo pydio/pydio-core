@@ -70,29 +70,6 @@ class ShareStore {
     }
 
     /**
-     * Create a share.php file in the download folder.
-     * @throws Exception
-     */
-    private function createGenericLoader(){
-        if(!is_file($this->downloadFolder."/share.php")){
-            $loader_content = '<'.'?'.'php
-                    define("AJXP_EXEC", true);
-                    require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/core/src/pydio/Core/Utils/Utils.php");
-                    $hash = Pydio\Core\Utils\Utils::securePath(Pydio\Core\Utils\Utils::sanitize($_GET["hash"], AJXP_SANITIZE_ALPHANUM));
-                    if(file_exists($hash.".php")){
-                        require_once($hash.".php");
-                    }else{
-                        require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php");
-                        ShareCenter::loadShareByHash($hash);
-                    }
-                ';
-            if (@file_put_contents($this->downloadFolder."/share.php", $loader_content) === FALSE) {
-                throw new Exception("Can't write to PUBLIC URL");
-            }
-        }
-    }
-
-    /**
      * @param String $parentRepositoryId
      * @param array $shareData
      * @param string $type
@@ -103,44 +80,22 @@ class ShareStore {
      */
     public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
 
+        if(!$this->sqlSupported){
+            throw new \Pydio\Core\Exception\PydioException("Please setup an SQL connexion to use sharing features");
+        }
         $data = serialize($shareData);
         if($existingHash){
             $hash = $existingHash;
         }else{
             $hash = $this->computeHash($data, $this->downloadFolder);
         }
-        if($this->sqlSupported){
-            $this->createGenericLoader();
-            $shareData["SHARE_TYPE"] = $type;
-            if($updateHash != null){
-                $this->confStorage->simpleStoreClear("share", $existingHash);
-                $hash = $updateHash;
-            }
-            $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
-            return $hash;
+        
+        $shareData["SHARE_TYPE"] = $type;
+        if($updateHash != null){
+            $this->confStorage->simpleStoreClear("share", $existingHash);
+            $hash = $updateHash;
         }
-        if(!empty($existingHash)){
-            throw new Exception("Current storage method does not support parameters edition!");
-        }
-
-        $loader = 'ShareCenter::loadMinisite($data);';
-        if($type == "publiclet"){
-            $loader = 'ShareCenter::loadPubliclet($data);';
-        }
-
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, str_pad($hash, 16, "\0"), $data, MCRYPT_MODE_ECB));
-        $fileData = "<"."?"."php \n".
-            '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
-            '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
-            '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-            '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
-            '   // if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
-            '   // Ok extract the data '."\n".
-            '   $data = unserialize($inputData); '.$loader;
-        if (@file_put_contents($this->downloadFolder."/".$hash.".php", $fileData) === FALSE) {
-            throw new Exception("Can't write to PUBLIC URL");
-        }
-        @chmod($this->downloadFolder."/".$hash.".php", 0755);
+        $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
         return $hash;
 
     }

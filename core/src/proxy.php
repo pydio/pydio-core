@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -16,15 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com/>.
  */
 include_once("base.conf.php");
-//$OVERRIDE_SESSION = true;
-$h = '';
-if(isSet($_GET['minisite_session'])){
-    $h = $_GET['minisite_session'];
-}
-
-//session_name("AjaXplorer_Shared".str_replace(".","_",$h));
-\Pydio\Core\Services\SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
-include("index.php");
+define('AJXP_EXEC', true);
+require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
+global $skipHtmlBase;
+$skipHtmlBase = true;
+ShareCenter::publicRoute("/proxy", ["hash" => $_GET["hash"]]);

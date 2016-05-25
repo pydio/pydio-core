@@ -39,48 +39,7 @@ class PublicAccessManager
     public function __construct($options){
         $this->options = $options;
     }
-
-    /**
-     * Initialize download folder if not already done
-     */
-    public function initFolder()
-    {
-        $downloadFolder = $this->getPublicDownloadFolder();
-        $downloadUrl = $this->getPublicDownloadUrl();
-        if (is_file($downloadFolder."/grid_t.png")) {
-            return;
-        }
-        $pDir = dirname(__FILE__);
-        $messages = ConfService::getMessages();
-        $sTitle = sprintf($messages["action.share.1"], ConfService::getCoreConf("APPLICATION_TITLE"));
-        $sLegend = $messages["action.share.20"];
-
-        @copy($pDir."/res/dl.png", $downloadFolder."/dl.png");
-        @copy($pDir."/res/favi.png", $downloadFolder."/favi.png");
-        @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
-        @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
-        @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-        $htaccessContent = "Order Deny,Allow\nAllow from all\n";
-        $htaccessContent .= "\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
-        $path = parse_url($downloadUrl, PHP_URL_PATH);
-        $htaccessContent .= '
-        <IfModule mod_rewrite.c>
-        RewriteEngine on
-        RewriteBase '.$path.'
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^([.a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
-        RewriteRule ^([.a-zA-Z0-9_-]+)--([a-z-]+)$ share.php?hash=$1&lang=$2 [QSA]
-        RewriteRule ^([.a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
-        </IfModule>
-        ';
-        file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
-        $content404 = file_get_contents($pDir."/res/404.html");
-        $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
-        file_put_contents($downloadFolder."/404.html", $content404);
-
-    }
-
+    
     /**
      * Compute external link from the given hash
      * @param string $hash

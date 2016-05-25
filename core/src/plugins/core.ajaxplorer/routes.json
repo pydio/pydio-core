@@ -39,6 +39,16 @@
     "class": "Pydio\\OCS\\OCSPlugin",
     "method": "startServer"
   },
+  "/public":{
+    "methods": "*",
+    "routes": [
+      "/public/{hash}",
+      "/public[{optional:.+}]"
+    ],
+    "class": "ShareCenter",
+    "path" : "plugins/action.share/class.ShareCenter.php",
+    "method": "publicRoute"
+  },
   "/": {
     "methods": "*",
     "routes": [

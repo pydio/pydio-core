@@ -110,7 +110,10 @@ class TopLevelRouter
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::FOUND:
                 $data = $routeInfo[1];
-                call_user_func(array($data["class"], $data["method"]), $data["short"]);
+                if(isSet($data["path"])){
+                    require_once (AJXP_INSTALL_PATH."/".$data["path"]);
+                }
+                call_user_func(array($data["class"], $data["method"]), $data["short"], $routeInfo[2]);
                 break;
             case \FastRoute\Dispatcher::NOT_FOUND:
             default:
