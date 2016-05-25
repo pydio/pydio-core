@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,18 +17,36 @@
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The latest code can be found at <http://pyd.io/>.
- *
- * Description : Real RESTful API access
  */
+namespace Pydio\Core\Http;
+
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Http\Rest\RestServer;
 
-include_once("base.conf.php");
+defined('AJXP_EXEC') or die('Access not allowed');
 
-$server = new RestServer("/api");
-$server->registerCatchAll();
 
-ConfService::init();
-ConfService::start();
+class Base
+{
 
-$server->listen();
+    /**
+     * @param string $route
+     */
+    public static function handleRoute($route){
+
+        if($route === "/api") {
+            $server = new Rest\RestServer("/api");
+        }else if($route === "/user"){
+            $_GET["get_action"] = "user_access_point";
+            $server = new Server();
+        }else{
+            $server = new Server();
+        }
+        $server->registerCatchAll();
+
+        ConfService::init();
+        ConfService::start();
+        
+        $server->listen();
+    }
+
+}

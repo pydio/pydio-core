@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -63,8 +65,11 @@ class UserGuiController extends Plugin
     }
 
 
-    public function processUserAccessPoint($action, $httpVars, $fileVars)
+    public function processUserAccessPoint(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
+        $action = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+        
         switch ($action) {
             case "user_access_point":
                 $setUrl = ConfService::getCoreConf("SERVER_URL");
@@ -89,7 +94,8 @@ class UserGuiController extends Plugin
                         "ALERT" => $e->getMessage()
                     );
                 }
-                Controller::findActionAndApply("get_boot_gui", array(), array());
+                $req = $requestInterface->withAttribute("action", "get_boot_gui");
+                $responseInterface = Controller::run($req);
                 unset($_SESSION['OVERRIDE_GUI_START_PARAMETERS']);
 
                 break;

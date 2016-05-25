@@ -20,14 +20,14 @@
  */
 namespace Pydio\OCS;
 
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\ConfService;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
-require_once("vendor/autoload.php");
 
 class OCSPlugin extends Plugin{
 
@@ -45,7 +45,7 @@ class OCSPlugin extends Plugin{
 
     protected function getController(){
         if($this->controller == null){
-            require_once ("ActionsController.php");
+            require_once("ActionsController.php");
             $this->controller = new ActionsController();
         }
         return $this->controller;
@@ -139,6 +139,63 @@ class OCSPlugin extends Plugin{
                 $loggedUser->recomputeMergedRole();
                 AuthService::updateUser($loggedUser);
             }
+        }
+    }
+
+
+    public static function startServer($route){
+
+        $pServ = PluginsService::getInstance();
+        ConfService::$useSession = false;
+        AuthService::$useSession = false;
+
+        ConfService::init();
+        ConfService::start();
+
+        $pServ->initActivePlugins();
+
+        /**
+         * @var OCSPlugin $coreLoader
+         */
+        $coreLoader = $pServ->getPluginById("core.ocs");
+
+        if( $route == "/ocs-provider"){
+
+            $coreLoader->publishServices();
+
+        }else if($route == "/ocs"){
+
+            $uri = $_SERVER["REQUEST_URI"];
+            $parts = explode("/", trim(parse_url($uri, PHP_URL_PATH), "/"));
+            $baseUri = array();
+            $root = array_shift($parts);
+            while(!in_array($root, array("ocs-provider", "ocs")) && count($parts)){
+                $baseUri[] = $root;
+                $root = array_shift($parts);
+            }
+
+            if(count($parts) < 2){
+                $d = new \Pydio\OCS\Server\Dummy();
+                $response = $d->buildResponse("fail", "400", "Wrong URI");
+                $d->sendResponse($response);
+                return;
+            }
+
+            $version = array_shift($parts);
+            if($version != "v2"){
+                $d = new \Pydio\OCS\Server\Dummy();
+                $response = $d->buildResponse("fail", "400", "Api version not supported - Please switch to v2.");
+                $d->sendResponse($response);
+                return;
+            }
+            $endpoint = array_shift($parts);
+            if(count($baseUri)){
+                $baseUriStr = "/".implode("/", $baseUri);
+            }else{
+                $baseUriStr = "";
+            }
+            $coreLoader->route($baseUriStr, $endpoint, $parts, array_merge($_GET, $_POST));
+
         }
     }
 

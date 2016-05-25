@@ -149,7 +149,10 @@ class MinisiteRenderer
                     }
                 }
                 Controller::registryReset();
-                Controller::findActionAndApply($ACTION, $params, null);
+                $req = \Zend\Diactoros\ServerRequestFactory::fromGlobals()->withAttribute("action", $ACTION)->withParsedBody($params);
+                $response = Controller::run($req);
+                $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();
+                $emitter->emitResponse($req, $response);
             } catch (Exception $e) {
                 $errMessage = $e->getMessage();
             }

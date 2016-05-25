@@ -21,15 +21,10 @@
  * Description : main access point of the application, this script is called by any Ajax query.
  * Will dispatch the actions on the plugins.
  */
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Http\Server;
+
+use Pydio\Core\Http\TopLevelRouter;
 
 include_once("base.conf.php");
 
-$server = new Server();
-$server->registerCatchAll();
-
-ConfService::init();
-ConfService::start();
-
-$server->listen();
+$router = new TopLevelRouter();
+$router->route();

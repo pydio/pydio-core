@@ -24,7 +24,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Authfront\Core\FrontendsLoader;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
-use Pydio\Core\Http\Rest\RestServer;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 

@@ -1,0 +1,55 @@
+{
+  "/api": {
+    "methods": "*",
+    "routes": [
+      "/api[{optional:.+}]"
+    ],
+    "class": "Pydio\\Core\\Http\\Base",
+    "method": "handleRoute"
+  },
+  "/user":{
+    "methods": "*",
+    "routes": [
+      "/user[{optional:.+}]"
+    ],
+    "class": "Pydio\\Core\\Http\\Base",
+    "method": "handleRoute"
+  },
+  "/shares": {
+    "methods": "*",
+    "routes": [
+      "/shares[{optional:.+}]"
+    ],
+    "class": "Pydio\\Core\\Http\\DAVServer",
+    "method": "handleRoute"
+  },
+  "/ocs-provider":{
+    "methods": "*",
+    "routes": [
+      "/ocs-provider[{optional:.+}]"
+    ],
+    "class": "Pydio\\OCS\\OCSPlugin",
+    "method": "startServer"
+  },
+  "/ocs":{
+    "methods": "*",
+    "routes": [
+      "/ocs[{optional:.+}]"
+    ],
+    "class": "Pydio\\OCS\\OCSPlugin",
+    "method": "startServer"
+  },
+  "/": {
+    "methods": "*",
+    "routes": [
+      "/",
+      "/index[{optional:.+}]",
+      "/dashboard[{optional:.+}]",
+      "/settings[{optional:.+}]",
+      "/welcome[{optional:.+}]",
+      "/ws-[{optional:.+}]"
+    ],
+    "class": "Pydio\\Core\\Http\\Base",
+    "method": "handleRoute"
+  }
+}
