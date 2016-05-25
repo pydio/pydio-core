@@ -29,10 +29,16 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class RestApiMiddleware extends \Pydio\Core\Http\Middleware\SapiMiddleware
 {
+    protected $base;
+
+    public function __construct($base)
+    {
+        $this->base = $base;
+    }
 
     protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        $router = new ApiRouter([]);
+        $router = new ApiRouter($this->base);
         if(!$router->route($request, $response)){
             throw new PydioException("Could not find any endpoint for this URI");
         }

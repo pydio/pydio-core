@@ -29,17 +29,18 @@ class Base
 {
 
     /**
+     * @param string $base
      * @param string $route
      */
-    public static function handleRoute($route){
+    public static function handleRoute($base, $route){
 
         if($route === "/api") {
-            $server = new Rest\RestServer("/api");
+            $server = new Rest\RestServer($base.$route);
         }else if($route === "/user"){
             $_GET["get_action"] = "user_access_point";
-            $server = new Server();
+            $server = new Server($base);
         }else{
-            $server = new Server();
+            $server = new Server($base);
         }
         $server->registerCatchAll();
 

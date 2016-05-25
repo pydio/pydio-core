@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class DAVServer
 {
-    public static function handleRoute($baseURI){
+    public static function handleRoute($baseURI, $davRoute){
 
         ConfService::init();
         ConfService::start();
@@ -53,6 +53,7 @@ class DAVServer
         });
         include AJXP_BIN_FOLDER.'/sabredav/lib/Sabre/autoload.php';
 
+        $baseURI = $baseURI . $davRoute;
         $requestUri = $_SERVER["REQUEST_URI"];
         if (substr($requestUri, 0, strlen($baseURI)) != $baseURI)
         {

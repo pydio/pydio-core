@@ -143,7 +143,7 @@ class OCSPlugin extends Plugin{
     }
 
 
-    public static function startServer($route){
+    public static function startServer($base, $route){
 
         $pServ = PluginsService::getInstance();
         ConfService::$useSession = false;

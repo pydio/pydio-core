@@ -31,23 +31,23 @@ class ApiRouter
     /**
      * @var array
      */
-    private $config;
+    private $base;
     /**
      * @var array
      *       "cacheOptions"  => ["cacheFile" => "path", "cacheDisabled" => true],
      */
     private $cacheOptions;
 
-    private $v2Base = "/api/v2";
-    private $v1Base = "/api";
+    private $v2Base = "/v2";
+    private $v1Base = "";
 
     /**
-     * SimpleRestResourceRouter constructor.
-     * @param array $config
+     * ApiRouter constructor.
+     * @param string $base
      * @param array $cacheOptions
      */
-    public function __construct($config, $cacheOptions = []){
-        $this->config = $config;
+    public function __construct($base, $cacheOptions = []){
+        $this->base = $base;
         $this->cacheOptions = array_merge([
             "cacheDisabled" => AJXP_SKIP_CACHE,
             "cacheFile" => AJXP_DATA_PATH."/cache/plugins_api2routes.php"
@@ -56,21 +56,20 @@ class ApiRouter
 
 
     /**
-     * @param array $configObject
      * @param \FastRoute\RouteCollector $r
      */
-    public function configureRoutes($base, $configObject, \FastRoute\RouteCollector &$r){
+    public function configureRoutes(\FastRoute\RouteCollector &$r){
         
         $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_DOCS_FOLDER . "/api2.json"), true);
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){
                 $path = str_replace("{path}", "{path:.+}", $path);
-                $r->addRoute(strtoupper($method), $base . $path , $apiData);
+                $r->addRoute(strtoupper($method), $this->base . $this->v2Base . $path , $apiData);
             }
         }
         // Legacy V1 API
-        $r->addRoute("GET", $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
-        $r->addRoute("POST", $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
+        $r->addRoute("GET", $this->base . $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
+        $r->addRoute("POST", $this->base . $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
 
     }
 
@@ -88,7 +87,7 @@ class ApiRouter
 
         $dispatcher = \FastRoute\cachedDispatcher(function(\FastRoute\RouteCollector $r) {
 
-            $this->configureRoutes($this->v2Base, $this->config, $r);
+            $this->configureRoutes($r);
 
         }, $this->cacheOptions);
 
@@ -111,6 +110,7 @@ class ApiRouter
                     $request = $request
                         ->withAttribute("action", $vars["action"])
                         ->withAttribute("repository_id", $vars["repository_id"])
+                        ->withAttribute("rest_base", $this->base.$this->v1Base)
                         ->withAttribute("rest_path", $vars["optional"])
                         ->withAttribute("api", "v1");
                 }else{
@@ -118,6 +118,7 @@ class ApiRouter
                     $request = $request
                         ->withAttribute("action", $apiData["x-pydio-action"])
                         ->withAttribute("repository_id", $repoId)
+                        ->withAttribute("rest_base", $this->base.$this->v2Base)
                         ->withAttribute("api", "v2")
                         ->withParsedBody(array_merge($request->getParsedBody(), $vars));
                 }

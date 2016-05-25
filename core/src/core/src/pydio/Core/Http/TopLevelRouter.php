@@ -23,6 +23,7 @@ namespace Pydio\Core\Http;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -72,7 +73,7 @@ class TopLevelRouter
             $methods = $data["methods"] == "*" ? $allMethods : $data["methods"];
             foreach($data["routes"] as $route){
                 $data["short"] = $short;
-                $r->addRoute($methods, $route, $data);
+                $r->addRoute($methods, $this->base.$route, $data);
             }
         }
 
@@ -99,6 +100,8 @@ class TopLevelRouter
     public function route(){
 
         $request = ServerRequestFactory::fromGlobals();
+        $this->base = rtrim(dirname($request->getServerParams()["SCRIPT_NAME"]), "/");
+
         $dispatcher = \FastRoute\cachedDispatcher(function(\FastRoute\RouteCollector $r) {
             $this->configureRoutes($this->base, $r);
         }, $this->cacheOptions);
@@ -113,7 +116,7 @@ class TopLevelRouter
                 if(isSet($data["path"])){
                     require_once (AJXP_INSTALL_PATH."/".$data["path"]);
                 }
-                call_user_func(array($data["class"], $data["method"]), $data["short"], $routeInfo[2]);
+                call_user_func(array($data["class"], $data["method"]), $this->base, $data["short"], $routeInfo[2]);
                 break;
             case \FastRoute\Dispatcher::NOT_FOUND:
             default:

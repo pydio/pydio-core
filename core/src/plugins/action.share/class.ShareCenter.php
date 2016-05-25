@@ -158,7 +158,7 @@ class ShareCenter extends Plugin
     /**************************/
     /* PUBLIC LINKS ROUTER
     /**************************/
-    public static function publicRoute($route, $params){
+    public static function publicRoute($serverBase, $route, $params){
 
         if(isSet($params["hash"])){
 
@@ -182,7 +182,7 @@ class ShareCenter extends Plugin
             $h = $_GET['minisite_session'];
             \Pydio\Core\Services\SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
 
-            $base->handleRoute("/");
+            $base->handleRoute($serverBase, "/");
 
         }else{
 

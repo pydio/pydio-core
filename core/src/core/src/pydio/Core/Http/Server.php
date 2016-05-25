@@ -54,14 +54,21 @@ class Server
     protected $topMiddleware;
 
     /**
+     * @var string
+     */
+    protected $base;
+
+    /**
      * @var \SplStack
      */
     protected static $middleWareInstance;
 
-    public function __construct(){
+    public function __construct($base){
 
         $this->middleWares = new \SplStack();
         $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
+
+        $this->base = $base;
 
         $this->stackMiddleWares();
 

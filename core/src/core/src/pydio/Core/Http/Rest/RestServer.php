@@ -28,9 +28,10 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class RestServer extends \Pydio\Core\Http\Server
 {
+    
     public function __construct($base)
     {
-        parent::__construct();
+        parent::__construct($base);
         ConfService::currentContextIsRestAPI($base);
     }
 
@@ -38,7 +39,7 @@ class RestServer extends \Pydio\Core\Http\Server
     {
         $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
         $this->middleWares->push(array("Pydio\\Core\\Http\\Rest\\RestAuthMiddleware", "handleRequest"));
-        $this->topMiddleware = new RestApiMiddleware();
+        $this->topMiddleware = new RestApiMiddleware($this->base);
         $this->middleWares->push(array($this->topMiddleware, "handleRequest"));
     }
 }
