@@ -97,7 +97,7 @@ class UserSelection
         $this->files = array();
         $this->inZip = false;
         foreach ($nodes as $n) {
-            $this->files[] = $n->getPath();
+            $this->addFile($n->getPath());
         }
 
     }
@@ -117,7 +117,7 @@ class UserSelection
             if(strpos($v, "base64encoded:") === 0){
                 $v = base64_decode(array_pop(explode(':', $v, 2)));
             }
-            $this->files[] = Utils::decodeSecureMagic($v);
+            $this->addFile(Utils::decodeSecureMagic($v));
             $this->isUnique = true;
             //return ;
         }
@@ -128,7 +128,7 @@ class UserSelection
                 if(strpos($v, "base64encoded:") === 0){
                     $v = base64_decode(array_pop(explode(':', $v, 2)));
                 }
-                $this->files[] = Utils::decodeSecureMagic($v);
+                $this->addFile(Utils::decodeSecureMagic($v));
                 $index ++;
             }
             $this->isUnique = false;
@@ -145,13 +145,13 @@ class UserSelection
                 $p = Utils::decodeSecureMagic($p);
                 // First part must be the repository ID
                 $p = "/".implode("/", array_slice(explode("/", trim($p, "/")), 1));
-                $this->files[] = $p;
+                $this->addFile($p);
             }
         }
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
             foreach($array["nodes"] as $value){
-                $this->files[] = Utils::decodeSecureMagic($value);
+                $this->addFile(Utils::decodeSecureMagic($value));
             }
             $this->isUnique = count($this->files) == 1;
         }
@@ -170,6 +170,13 @@ class UserSelection
             }
         }
     }
+
+    public function addFile($filePath){
+        if(!in_array($filePath, $this->files)){
+            $this->files[] = $filePath;
+        }
+    }
+
     /**
      * Does the selection have one or more items
      * @return bool
@@ -336,9 +343,5 @@ class UserSelection
             $this->nodes = $newNodes;
         }
     }
-
-    public function addFile($file){
-        $this->files[] = $file;
-    }
-
+    
 }

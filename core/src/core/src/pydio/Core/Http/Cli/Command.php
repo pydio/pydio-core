@@ -81,7 +81,7 @@ class Command extends Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $server = new CliServer();
+        $server = new CliServer("/");
         $server->registerCatchAll();
 
         $definitionsKeys = array_keys($this->getDefinition()->getOptions());
