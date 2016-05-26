@@ -110,6 +110,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
                     url = document.location.origin + url;
                 }
             }
+            url = LangUtils.trimRight(url, "\/");
 
             var html5proxies = $H({});
 			var mime = ajxpNode.getAjxpMime();
