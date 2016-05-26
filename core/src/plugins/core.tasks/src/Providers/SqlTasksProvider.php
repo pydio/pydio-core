@@ -48,8 +48,11 @@ class SqlTasksProvider implements ITasksProvider
             "schedule"  => json_encode($task->getSchedule()),
             "action"    => $task->getAction(),
             "parameters"=> json_encode($task->getParameters()),
-            "nodes"     => "|||".implode("|||", $task->nodes)."|||"
+            "nodes"     => ""
         ];
+        if(count($task->nodes)){
+            $values["nodes"] = "|||".implode("|||", $task->nodes)."|||";
+        }
         if(!$removeId){
             $values = array_merge(["uid" => $task->getId()], $values);
         }
@@ -74,7 +77,9 @@ class SqlTasksProvider implements ITasksProvider
         $task->setAction($values["action"]);
         $task->setParameters(json_decode($values["parameters"], true));
         $nodes = explode("|||", trim($values["nodes"], "|||"));
-        foreach ($nodes as $node) $task->attachToNode($node);
+        foreach ($nodes as $node) {
+            if(!empty($node)) $task->attachToNode($node);
+        }
         return $task;
     }
 
