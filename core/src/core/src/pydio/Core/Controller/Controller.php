@@ -189,7 +189,7 @@ class Controller
         if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
             if (!$actions->length) {
-                throw new AuthRequiredException($actionName);
+                throw new ActionNotFoundException($actionName);
             }
             $actionNode = $actions->item(0);
         }

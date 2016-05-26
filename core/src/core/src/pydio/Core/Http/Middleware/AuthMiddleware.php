@@ -21,17 +21,15 @@
 namespace Pydio\Core\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Authfront\Core\FrontendsLoader;
+use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Http\Server;
-use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Log\Core\AJXP_Logger;
+use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -69,7 +67,18 @@ class AuthMiddleware
 
         }
 
-        return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+        try{
+
+            return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+
+        }catch(ActionNotFoundException $a){
+
+            if(AuthService::getLoggedUser() == null){
+                throw new AuthRequiredException();
+            }else{
+                return new EmptyResponse();
+            }
+        }
 
     }
 
