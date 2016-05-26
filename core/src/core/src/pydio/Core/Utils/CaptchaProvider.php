@@ -38,7 +38,7 @@ class CaptchaProvider
      */
     public static function sendCaptcha()
     {
-        $libPath = AJXP_BIN_FOLDER."/securimage";
+        $libPath = AJXP_BIN_FOLDER."/lib/securimage";
 
         $img = new \Securimage();
         $img->wordlist_file = $libPath."/words/words.txt";

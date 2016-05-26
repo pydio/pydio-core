@@ -209,6 +209,7 @@ class AsyncResponseStream implements StreamInterface
     {
         call_user_func($this->callback);
         $this->callbackExecuted = true;
+        return "";
     }
 
     /**
@@ -220,7 +221,7 @@ class AsyncResponseStream implements StreamInterface
      */
     public function getContents()
     {
-        $this->read(0);
+        return $this->read(0);
     }
 
     /**

@@ -1071,7 +1071,6 @@ class Securimage
         }
 
         imagedestroy($this->im);
-        exit;
     }
 
     /**

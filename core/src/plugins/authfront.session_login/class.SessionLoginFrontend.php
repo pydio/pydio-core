@@ -157,7 +157,14 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
             case "get_captcha":
                 $x = new \Pydio\Core\Http\Response\AsyncResponseStream(function(){
+                    restore_error_handler();
+                    restore_exception_handler();
+                    set_error_handler(function ($code, $message, $script) {
+                        if(error_reporting() == 0) return;
+                        \Pydio\Log\Core\AJXP_Logger::error("Captcha", "Error while loading captcha : ".$message, []);
+                    });
                     CaptchaProvider::sendCaptcha();
+                    return "";
                 });
                 $responseInterface = $responseInterface->withBody($x);
                 break;
