@@ -223,7 +223,7 @@ class User{
 		// filter repositories once for all
 		this.crossRepositories = new Map();
 		this.repositories.forEach(function(value, key){
-			if(value.allowCrossRepositoryCopy){
+			if(value.allowCrossRepositoryCopy && value.accessType != 'inbox'){
 				this.crossRepositories.set(key, value);
 			}
 		}.bind(this) );
