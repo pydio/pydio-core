@@ -192,6 +192,7 @@ class MqManager extends Plugin
         }
 
         $host = $this->getFilteredOption("WS_SERVER_HOST");
+        $port = $this->getFilteredOption("WS_SERVER_PORT");
         if(!empty($host) && !empty($port)){
             // Publish on NSQ
             $nsq = new nsqphp;

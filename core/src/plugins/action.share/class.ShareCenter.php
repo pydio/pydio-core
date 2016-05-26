@@ -104,11 +104,6 @@ class ShareCenter extends Plugin
     {
         parent::parseSpecificContributions($contribNode);
         $disableSharing = false;
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if ( empty($downloadFolder) || (!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-            $this->logError("Warning on public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
-        }
-
         $xpathesToRemove = array();
 
         if( strpos(ConfService::getRepository()->getAccessType(), "ajxp_") === 0){
