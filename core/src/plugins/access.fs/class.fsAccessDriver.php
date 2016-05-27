@@ -52,7 +52,6 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
-use ShareCenter;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
@@ -2265,8 +2264,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         $handle=opendir($dirName);
         $shareCenter = false;
-        if(class_exists("ShareCenter")){
-            $shareCenter = ShareCenter::getShareCenter();
+        if(class_exists("\\Pydio\\Share\\ShareCenter")){
+            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter();
         }
         if($handle === false){
             $this->logError(__FUNCTION__, "Cannot open folder ".$dirName);

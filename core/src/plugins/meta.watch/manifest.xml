@@ -12,7 +12,7 @@
             <action name="toggle_watch">
                 <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
                     <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
-                    <selectionContext dir="true" file="true" recycle="false" unique="true"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="true" enableRoot="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <subMenu>

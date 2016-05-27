@@ -20,10 +20,13 @@
  */
 
 namespace Pydio\OCS\Model;
+use Pydio\Share\Model\ShareLink;
+use Pydio\Share\View\PublicAccessManager;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareLink.php");
-class TargettedLink extends \ShareLink
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
+class TargettedLink extends ShareLink
 {
     /**
      * @var array
@@ -77,7 +80,7 @@ class TargettedLink extends \ShareLink
     }
 
     /**
-     * @param \PublicAccessManager $publicAccessManager
+     * @param PublicAccessManager $publicAccessManager
      * @param array $messages
      * @return mixed
      */

@@ -18,17 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Store;
 
+use MetaWatchRegister;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
+use Pydio\OCS\Model\TargettedLink;
+use Pydio\Share\Model\ShareLink;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -74,7 +77,7 @@ class ShareRightsManager
      * @param bool $update
      * @param null $guestUserPass
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public function prepareSharedUserEntry($httpVars, &$shareObject, $update, $guestUserPass = null){
         $userPass = null;
@@ -85,7 +88,7 @@ class ShareRightsManager
                 || (isSet($httpVars["guest_user_id"]) && isSet($guestUserPass) && strlen($guestUserPass) == 0)
             )){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["share_center.175"]);
+            throw new \Exception($mess["share_center.175"]);
         }
 
         if($update){
@@ -103,9 +106,9 @@ class ShareRightsManager
             }else if(!$shareObject->shouldRequirePassword() || ($guestUserPass !== null && $guestUserPass == "")){
                 $shareObject->setUniqueUser($uniqueUser, false);
             }
-            if($update && $forcePassword && !($shareObject instanceof \Pydio\OCS\Model\TargettedLink) && !$shareObject->shouldRequirePassword() && empty($guestUserPass)){
+            if($update && $forcePassword && !($shareObject instanceof TargettedLink) && !$shareObject->shouldRequirePassword() && empty($guestUserPass)){
                 $mess = ConfService::getMessages();
-                throw new Exception($mess["share_center.175"]);
+                throw new \Exception($mess["share_center.175"]);
             }
 
         } else {
@@ -126,10 +129,10 @@ class ShareRightsManager
         $hiddenUserEntry = $this->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
         if(empty($hiddenUserEntry["RIGHT"])){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["share_center.58"]);
+            throw new \Exception($mess["share_center.58"]);
         }
         $hiddenUserEntry["DISABLE_DOWNLOAD"] = $shareObject->disableDownload();
-        if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
+        if($shareObject instanceof TargettedLink){
             $hiddenUserEntry["REMOTE"] = true;
         }
         return $hiddenUserEntry;
@@ -169,7 +172,7 @@ class ShareRightsManager
      * @param $httpVars
      * @param array $users
      * @param array $groups
-     * @throws Exception
+     * @throws \Exception
      */
     public function createUsersFromParameters($httpVars, &$users = array(), &$groups = array()){
 
@@ -201,16 +204,16 @@ class ShareRightsManager
                     $index++;
                     continue;
                 } else if (AuthService::userExists($u, "w") && isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
-                    throw new Exception( str_replace("%s", $u, $mess["share_center.222"]));
+                    throw new \Exception( str_replace("%s", $u, $mess["share_center.222"]));
                 }
                 if($userExistsRead){
                     $userObject = $confDriver->createUserObject($u);
                     if ( $allowCrossUserSharing != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId() ) ) {
-                        throw new Exception($mess["share_center.221"]);
+                        throw new \Exception($mess["share_center.221"]);
                     }
                 }else{
                     if(!$allowSharedUsersCreation || AuthService::isReservedUserId($u)){
-                        throw new Exception($mess["share_center.220"]);
+                        throw new \Exception($mess["share_center.220"]);
                     }
                     if(!empty($this->options["SHARED_USERS_TMP_PREFIX"]) && strpos($u, $this->options["SHARED_USERS_TMP_PREFIX"])!==0 ){
                         $u = $this->options["SHARED_USERS_TMP_PREFIX"] . $u;
@@ -263,7 +266,7 @@ class ShareRightsManager
 
     /**
      * @param array $ocsData
-     * @param Pydio\OCS\Model\ShareInvitation[] $existingInvitations
+     * @param \Pydio\OCS\Model\ShareInvitation[] $existingInvitations
      * @param array $newOcsUsers
      * @param array $unshareInvitations
      * @return int
@@ -396,8 +399,7 @@ class ShareRightsManager
      * @param array $users
      * @param array $groups
      * @param \Pydio\Access\Core\Model\UserSelection $selection
-     * @param bool|false $disableDownload
-     * @throws Exception
+     * @throws \Exception
      */
     public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection){
 
@@ -512,7 +514,7 @@ class ShareRightsManager
      * @param bool $isHidden
      * @param string $display
      * @return AbstractAjxpUser
-     * @throws Exception
+     * @throws \Exception
      */
     public function createNewUser($parentUser, $userName, $password, $isHidden, $display){
 
@@ -530,7 +532,7 @@ class ShareRightsManager
                 $count = count($confDriver->getUserChildren($parentUser->getId()));
                 if ($count >= $limit) {
                     $mess = ConfService::getMessages();
-                    throw new Exception($mess['483']);
+                    throw new \Exception($mess['483']);
                 }
             }
         }
@@ -594,7 +596,7 @@ class ShareRightsManager
         if($replace){
             try{
                 AuthService::deleteRole("AJXP_SHARED-".$repositoryId);
-            }catch (Exception $e){}
+            }catch (\Exception $e){}
         }
         $newRole = new AJXP_Role("AJXP_SHARED-".$repositoryId);
         $r = AuthService::getRole("MINISITE");

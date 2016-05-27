@@ -18,12 +18,16 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Model;
+
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Share\Store\ShareRightsManager;
+use Pydio\Share\View\PublicAccessManager;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -108,7 +112,7 @@ class CompositeShare
     }
 
     /**
-     * @param MetaWatchRegister|false $watcher
+     * @param \MetaWatchRegister|false $watcher
      * @param ShareRightsManager $rightsManager
      * @param PublicAccessManager $publicAccessManager
      * @param array $messages
@@ -122,7 +126,7 @@ class CompositeShare
             $elementWatch = $watcher->hasWatchOnNode(
                 $repoRootNode,
                 AuthService::getLoggedUser()->getId(),
-                MetaWatchRegister::$META_WATCH_NAMESPACE
+                \MetaWatchRegister::$META_WATCH_NAMESPACE
             );
         }
         $sharedEntries = $rightsManager->computeSharedRepositoryAccessRights($this->getRepositoryId(), true, $repoRootNode);

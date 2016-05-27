@@ -22,7 +22,7 @@
 namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareStore.php");
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Log\Core\AJXP_Logger;

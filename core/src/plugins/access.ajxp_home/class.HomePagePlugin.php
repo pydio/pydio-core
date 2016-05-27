@@ -32,12 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class HomePagePlugin extends AbstractAccessDriver
 {
-
-    public function initRepository()
-    {
-        //require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
-    }
-
+    
     public function parseSpecificContributions(&$contribNode){
         parent::parseSpecificContributions($contribNode);
         if($contribNode->nodeName == "client_configs"){

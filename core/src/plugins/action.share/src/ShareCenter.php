@@ -18,7 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share;
 
+use DOMNode;
+use DOMXPath;
+use MetaWatchRegister;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
@@ -35,9 +39,18 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\OCS\Model\TargettedLink;
+use Pydio\Share\Legacy\LegacyPubliclet;
+use Pydio\Share\Model\CompositeShare;
+use Pydio\Share\Model\ShareLink;
+use Pydio\Share\Store\ShareRightsManager;
+use Pydio\Share\Store\ShareStore;
+use Pydio\Share\View\MinisiteRenderer;
+use Pydio\Share\View\PublicAccessManager;
+use Pydio\OCS as OCS;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once("class.CompositeShare.php");
+require_once("plugins/action.share/vendor/autoload.php");
 
 /**
  * @package AjaXplorer_Plugins
@@ -66,7 +79,7 @@ class ShareCenter extends Plugin
     private $publicAccessManager;
 
     /**
-     * @var MetaWatchRegister
+     * @var \MetaWatchRegister
      */
     private $watcher = false;
 
@@ -260,7 +273,6 @@ class ShareCenter extends Plugin
      */
     public function getShareStore(){
         if(!isSet($this->shareStore)){
-            require_once("class.ShareStore.php");
             $hMin = 32;
             if(isSet($this->repository)){
                 $hMin = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository);
@@ -274,12 +286,11 @@ class ShareCenter extends Plugin
     }
 
     /**
-     * @return PublicAccessManager
+     * @return View\PublicAccessManager
      */
     public function getPublicAccessManager(){
 
         if(!isSet($this->publicAccessManager)){
-            require_once("class.PublicAccessManager.php");
             $options = array(
                 "USE_REWRITE_RULE" => $this->getFilteredOption("USE_REWRITE_RULE", $this->repository) == true
             );
@@ -305,7 +316,6 @@ class ShareCenter extends Plugin
      */
     protected function getRightsManager(){
         if(!isSet($this->rightsManager)){
-            require_once("class.ShareRightsManager.php");
             $options = array(
                 "SHARED_USERS_TMP_PREFIX" => $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository),
                 "SHARE_FORCE_PASSWORD" => $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository)
@@ -409,25 +419,25 @@ class ShareCenter extends Plugin
      * Added as preprocessor on Download action to handle download Counter.
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
-     * @throws Exception
+     * @throws \Exception
      */
     public function preProcessDownload(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             $hash = $_SESSION["CURRENT_MINISITE"];
-            $share = $this->getShareStore()->loadShare($hash);
+            $share = $this->getShareStore()->loadShareObject($hash);
             if(!empty($share)){
-                if($this->getShareStore()->isShareExpired($hash, $share)){
-                    throw new Exception('Link is expired');
+                if($share->isExpired()){
+                    throw new \Exception('Link is expired');
                 }
-                if(!empty($share["DOWNLOAD_LIMIT"])){
-                    $this->getShareStore()->incrementDownloadCounter($hash);
+                if($share->hasDownloadLimit()){
+                    $share->incrementDownloadCount();
+                    $share->save();
                 }
             }
         }
     }
 
     public function migrateLegacyShares($action, $httpVars, $fileVars){
-        require_once("class.LegacyPubliclet.php");
         LegacyPubliclet::migrateLegacyMeta($this, $this->getShareStore(), $this->getRightsManager(), $httpVars["dry_run"] !== "run");
     }
     
@@ -437,12 +447,12 @@ class ShareCenter extends Plugin
      * @param array $httpVars
      * @param array $fileVars
      * @return null
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchAction($action, $httpVars, $fileVars)
     {
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
-            throw new Exception("Cannot find access driver!");
+            throw new \Exception("Cannot find access driver!");
         }
 
 
@@ -473,13 +483,13 @@ class ShareCenter extends Plugin
                     }
                     $httpVars["create_guest_user"] = "true";
                     if($httpVars["simple_share_type"] == "private" && !isSet($httpVars["guest_user_pass"])){
-                        throw new Exception("Please provide a guest_user_pass for private link");
+                        throw new \Exception("Please provide a guest_user_pass for private link");
                     }
                 }
                 $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
                 $ajxpNode = $userSelection->getUniqueNode();
                 if (!file_exists($ajxpNode->getUrl())) {
-                    throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
+                    throw new \Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
 
                 $this->updateToMaxAllowedValue($httpVars, "downloadlimit", "FILE_MAX_DOWNLOAD");
@@ -499,7 +509,7 @@ class ShareCenter extends Plugin
                     $auth = $this->getAuthorization("folder", "workspace");
                     if(!$auth){
                         $mess = ConfService::getMessages();
-                        throw new Exception($mess["351"]);
+                        throw new \Exception($mess["351"]);
                     }
 
                     $users = array(); $groups = array();
@@ -717,7 +727,7 @@ class ShareCenter extends Plugin
                     }
                     if(!file_exists($node->getUrl())){
                         $mess = ConfService::getMessages();
-                        throw new Exception(str_replace('%s', "Cannot find file ".$file, $mess["share_center.219"]));
+                        throw new \Exception(str_replace('%s', "Cannot find file ".$file, $mess["share_center.219"]));
                     }
                     if(isSet($httpVars["tmp_repository_id"]) && AuthService::getLoggedUser()->isAdmin()){
                         $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node, true);
@@ -726,7 +736,7 @@ class ShareCenter extends Plugin
                     }
                     if(empty($compositeShare)){
                         $mess = ConfService::getMessages();
-                        throw new Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
+                        throw new \Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
                     }
                     header("Content-type:application/json");
                     $json = $this->compositeShareToJson($compositeShare);
@@ -769,7 +779,7 @@ class ShareCenter extends Plugin
                             $t = isSet($share["type"]) ? $share["type"] : "file";
                             try{
                                 $result = $this->getShareStore()->deleteShare($t, $shareId, false, true);
-                            }catch(Exception $e){
+                            }catch(\Exception $e){
                                 if($e->getMessage() == "repo-not-found"){
                                     $result = true;
                                 }else{
@@ -804,7 +814,7 @@ class ShareCenter extends Plugin
                     $userId = AuthService::getLoggedUser()->getId();
                     if(isSet($httpVars["owner_id"]) && $httpVars["owner_id"] != $userId){
                         if(!AuthService::getLoggedUser()->isAdmin()){
-                            throw new Exception("You are not allowed to access this resource");
+                            throw new \Exception("You are not allowed to access this resource");
                         }
                         $userId = $httpVars["owner_id"];
                     }
@@ -1092,13 +1102,13 @@ class ShareCenter extends Plugin
                     unset($toMirrors[$repoId]);
                     try{
                         Controller::applyHook("node.change", array($fNode, $tNode, $copy, $fDirection), true);
-                    }catch(Exception $e){
+                    }catch(\Exception $e){
                         $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
                     }
                 }else{
                     try{
                     Controller::applyHook("node.change", array($fNode, null, $copy, $fDirection), true);
-                    }catch(Exception $e){
+                    }catch(\Exception $e){
                         $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
                     }
                 }
@@ -1107,7 +1117,7 @@ class ShareCenter extends Plugin
                 list($tNode, $tDirection) = $mirror;
                 try{
                 Controller::applyHook("node.change", array(null, $tNode, $copy, $tDirection), true);
-                }catch(Exception $e){
+                }catch(\Exception $e){
                     $this->logError(__FUNCTION__, "Error while applying node.change hook (".$e->getMessage().")");
                 }
             }
@@ -1200,7 +1210,6 @@ class ShareCenter extends Plugin
      */
     public static function loadMinisite($data, $hash = '', $error = null)
     {
-        include_once("class.MinisiteRenderer.php");
         MinisiteRenderer::loadMinisite($data, $hash, $error);
     }
 
@@ -1217,7 +1226,7 @@ class ShareCenter extends Plugin
         $shareCenter = self::getShareCenter();
         $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = ConfService::getMessages();
-        if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
+        if(ShareLink::isShareExpired($data)){
             AuthService::disconnect();
             self::loadMinisite($data, $hash, $mess["share_center.165"]);
             return;
@@ -1251,7 +1260,6 @@ class ShareCenter extends Plugin
      */
     public static function loadPubliclet($data)
     {
-        require_once("class.LegacyPubliclet.php");
         $shareCenter = self::getShareCenter();
         $options = $shareCenter->getConfigs();
         $shareStore = $shareCenter->getShareStore();
@@ -1267,7 +1275,7 @@ class ShareCenter extends Plugin
      * @param array $httpVars
      * @param UserSelection $userSelection
      * @return int
-     * @throws Exception
+     * @throws \Exception
      */
     public function filterHttpVarsForLeafPath(&$httpVars, $userSelection){
         // ANALYSE SELECTION
@@ -1294,7 +1302,7 @@ class ShareCenter extends Plugin
             else $hasDir = true;
         }
         if( ( $hasDir && !$this->getAuthorization("folder", "minisite") ) || ($hasFile && !$this->getAuthorization("file"))){
-            throw new Exception(103);
+            throw new \Exception(103);
         }
         if($setFilter){ // Either it's a file, or many nodes are shared
             $httpVars["filter_nodes"] = $nodes;
@@ -1327,13 +1335,13 @@ class ShareCenter extends Plugin
      * @param array $httpVars
      * @param bool $update
      * @return Repository
-     * @throws Exception
+     * @throws \Exception
      */
     protected function createOrLoadSharedRepository($httpVars, &$update){
 
         if (!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "") {
             $mess = ConfService::getMessages();
-            throw new Exception($mess["349"]);
+            throw new \Exception($mess["349"]);
         }
 
         if (isSet($httpVars["repository_id"])) {
@@ -1347,7 +1355,7 @@ class ShareCenter extends Plugin
         $exists = $this->checkRepoWithSameLabel($label, isSet($editingRepo)?$editingRepo:null);
         if($exists){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["share_center.352"]);
+            throw new \Exception($mess["share_center.352"]);
         }
 
         $loggedUser = AuthService::getLoggedUser();
@@ -1370,7 +1378,7 @@ class ShareCenter extends Plugin
             $currentOwner = $editingRepo->getOwner();
             if($newScope != $oldScope && $currentOwner != AuthService::getLoggedUser()->getId()){
                 $mess = ConfService::getMessages();
-                throw new Exception($mess["share_center.224"]);
+                throw new \Exception($mess["share_center.224"]);
             }
             if($newScope !== $oldScope){
                 $editingRepo->addOption("SHARE_ACCESS", $newScope);
@@ -1380,7 +1388,7 @@ class ShareCenter extends Plugin
                 $newOwner = $httpVars["transfer_owner"];
                 if($newOwner != $currentOwner && $currentOwner != AuthService::getLoggedUser()->getId()){
                     $mess = ConfService::getMessages();
-                    throw new Exception($mess["share_center.224"]);
+                    throw new \Exception($mess["share_center.224"]);
                 }
                 $editingRepo->setOwnerData($editingRepo->getParentId(), $newOwner, $editingRepo->getUniqueUser());
                 $replace = true;
@@ -1423,7 +1431,7 @@ class ShareCenter extends Plugin
      * @param array $httpVars
      * @param bool $update
      * @return mixed An array containing the hash (0) and the generated url (1)
-     * @throws Exception
+     * @throws \Exception
      */
     public function createSharedMinisite($httpVars, &$update)
     {
@@ -1492,7 +1500,7 @@ class ShareCenter extends Plugin
      * @param array $users
      * @param array $groups
      * @return Repository
-     * @throws Exception
+     * @throws \Exception
      */
     public function createSharedRepository($httpVars, &$update, $users=array(), $groups=array())
     {
@@ -1507,7 +1515,7 @@ class ShareCenter extends Plugin
         $actRights = $loggedUser->mergedRole->listActionsStatesFor($this->repository);
         if (isSet($actRights["share"]) && $actRights["share"] === false) {
             $mess = ConfService::getMessages();
-            throw new Exception($mess["351"]);
+            throw new \Exception($mess["351"]);
         }
 
         $newRepo = $this->createOrLoadSharedRepository($httpVars, $update);
@@ -1546,8 +1554,8 @@ class ShareCenter extends Plugin
      * @param array $shareObjects
      * @param string $type
      * @param string $invitationLabel
-     * @return ShareLink
-     * @throws Exception
+     * @return Model\ShareLink
+     * @throws \Exception
      */
     protected function shareObjectFromParameters($linkData, &$hiddenUserEntries, &$shareObjects,  $type = "public", $invitationLabel = ""){
         if(isSet($linkData["hash"])){
@@ -1556,7 +1564,7 @@ class ShareCenter extends Plugin
             if($type == "public"){
                 $link = $this->getShareStore()->createEmptyShareObject();
             }else{
-                $link = new Pydio\OCS\Model\TargettedLink($this->getShareStore());
+                $link = new TargettedLink($this->getShareStore());
                 if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
                 $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $invitationLabel);
             }
@@ -1576,14 +1584,14 @@ class ShareCenter extends Plugin
      * @param array $httpVars
      * @param bool $update
      * @return Repository[]|ShareLink[]
-     * @throws Exception
+     * @throws \Exception
      */
     public function shareNode($ajxpNode, $httpVars, &$update){
 
         $hiddenUserEntries = array();
         $originalHttpVars = $httpVars;
-        $ocsStore = new Pydio\OCS\Model\SQLStore();
-        $ocsClient = new Pydio\OCS\Client\OCSClient();
+        $ocsStore = new OCS\Model\SQLStore();
+        $ocsClient = new OCS\Client\OCSClient();
         $userSelection = new UserSelection($this->repository, $httpVars);
         $mess = ConfService::getMessages();
 
@@ -1595,7 +1603,7 @@ class ShareCenter extends Plugin
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
             if(!$this->getAuthorization($ajxpNode->isLeaf() ? "file":"folder", "minisite")){
-                throw new Exception($mess["share_center." . ($ajxpNode->isLeaf() ? "225" : "226")]);
+                throw new \Exception($mess["share_center." . ($ajxpNode->isLeaf() ? "225" : "226")]);
             }
             $this->shareObjectFromParameters($httpVars, $hiddenUserEntries, $shareObjects, "public");
         }else if(isSet($httpVars["disable_public_link"])){
@@ -1651,7 +1659,7 @@ class ShareCenter extends Plugin
                     $ocsStore->generateInvitationId($invitation);
                     try{
                         $ocsClient->sendInvitation($invitation);
-                    }catch (Exception $e){
+                    }catch (\Exception $e){
                         $this->getShareStore()->deleteShare("minisite", $shareObject->getHash(), true);
                         $shareUserId = $shareObject->getUniqueUser();
                         unset($users[$shareUserId]);
@@ -1846,7 +1854,7 @@ class ShareCenter extends Plugin
         }
         try{
             $this->getShareStore()->testUserCanEditShare($compositeShare->getOwner(), array("SHARE_ACCESS" => $compositeShare->getVisibilityScope()));
-        }catch(Exception $e){
+        }catch(\Exception $e){
             $notExistsData["label"] = $e->getMessage();
             return $notExistsData;
         }
@@ -1863,7 +1871,7 @@ class ShareCenter extends Plugin
      * @param String $shareId
      * @param array $shareMeta
      * @param AJXP_Node $node
-     * @throws Exception
+     * @throws \Exception
      * @return array|bool
      */
     public function shareToJson($shareId, $shareMeta, $node = null){
@@ -1873,7 +1881,6 @@ class ShareCenter extends Plugin
         $elementWatch = false;
         if($shareMeta["type"] == "file"){
 
-            require_once("class.LegacyPubliclet.php");
             $jsonData = LegacyPubliclet::publicletToJson(
                 $shareId,
                 $shareMeta,
@@ -1917,7 +1924,7 @@ class ShareCenter extends Plugin
             }
             try{
                 $this->getShareStore()->testUserCanEditShare($repo->getOwner(), $repo->options);
-            }catch(Exception $e){
+            }catch(\Exception $e){
                 $notExistsData["label"] = $e->getMessage();
                 return $notExistsData;
             }

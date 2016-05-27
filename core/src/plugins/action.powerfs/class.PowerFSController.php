@@ -43,7 +43,7 @@ class PowerFSController extends Plugin
 {
 
     public function performChecks(){
-        if(ShareCenter::currentContextIsLinkDownload()) {
+        if(class_exists("\\Pydio\\Share\\ShareCenter") && \Pydio\Share\ShareCenter::currentContextIsLinkDownload()) {
             throw new Exception("Disable during link download");
         }
     }

@@ -18,9 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Store;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
+use Pydio\Share\Model\CompositeShare;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 define('AJXP_SHARED_META_NAMESPACE', 'ajxp_shared');

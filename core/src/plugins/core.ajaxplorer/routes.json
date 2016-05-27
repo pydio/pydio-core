@@ -45,8 +45,8 @@
       "/public/{hash}",
       "/public[{optional:.+}]"
     ],
-    "class": "ShareCenter",
-    "path" : "plugins/action.share/class.ShareCenter.php",
+    "class": "Pydio\\Share\\ShareCenter",
+    "path" : "plugins/action.share/src/ShareCenter.php",
     "method": "publicRoute"
   },
   "/": {

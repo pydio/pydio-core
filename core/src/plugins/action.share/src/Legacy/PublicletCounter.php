@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Legacy;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 
@@ -73,7 +75,7 @@ class PublicletCounter
 
     private static function isActive()
     {
-        return (is_dir(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")) && is_writable(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")));
+        return true; //(is_dir(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")) && is_writable(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")));
     }
 
     private static function loadCounters()

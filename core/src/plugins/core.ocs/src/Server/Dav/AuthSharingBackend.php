@@ -27,7 +27,7 @@ use Pydio\Core\Services\ConfService;
 use Sabre\DAV;
 use Sabre\HTTP;
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareStore.php");
 
 class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {

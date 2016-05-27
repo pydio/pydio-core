@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Store;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -29,11 +30,11 @@ use Pydio\Conf\Sql\sqlConfDriver;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\OCS\Model\TargettedLink;
+use Pydio\Share\Model\ShareLink;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once("class.PublicletCounter.php");
-require_once("class.ShareLink.php");
 
 class ShareStore {
 
@@ -63,7 +64,6 @@ class ShareStore {
      */
     public function getMetaManager(){
         if(!isSet($this->shareMetaManager)){
-            require_once("class.ShareMetaManager.php");
             $this->shareMetaManager = new ShareMetaManager($this);
         }
         return $this->shareMetaManager;
@@ -75,7 +75,7 @@ class ShareStore {
      * @param string $type
      * @param String $existingHash
      * @param null $updateHash
-     * @throws Exception
+     * @throws \Exception
      * @return string $hash
      */
     public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
@@ -116,16 +116,16 @@ class ShareStore {
      * Initialize a ShareLink from persisted data.
      * @param string $hash
      * @return ShareLink
-     * @throws Exception
+     * @throws \Exception
      */
     public function loadShareObject($hash){
         $data = $this->loadShare($hash);
         if($data === false){
             $mess = ConfService::getMessages();
-            throw new Exception(str_replace('%s', 'Cannot find share with hash '.$hash, $mess["share_center.219"]));
+            throw new \Exception(str_replace('%s', 'Cannot find share with hash '.$hash, $mess["share_center.219"]));
         }
         if(isSet($data["TARGET"]) && $data["TARGET"] == "remote"){
-            $shareObject = new Pydio\OCS\Model\TargettedLink($this, $data);
+            $shareObject = new TargettedLink($this, $data);
         }else{
             $shareObject = new ShareLink($this, $data);
         }
@@ -146,7 +146,6 @@ class ShareStore {
             if($this->sqlSupported){
                 $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
                 if(!empty($data)){
-                    $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
                     $data["SECURITY_MODIFIED"] = false;
                     return $data;
                 }
@@ -169,9 +168,6 @@ class ShareStore {
         $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
         $publicletData = @unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
-        if (!isSet($publicletData["REPOSITORY"])) {
-            $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
-        }
         $publicletData["PUBLICLET_PATH"] = $file;
         /*
         if($this->sqlSupported){
@@ -205,7 +201,7 @@ class ShareStore {
      * @param string $pName
      * @param string $pValue
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     public function updateShareProperty($hash, $pName, $pValue){
         if(!$this->sqlSupported) return false;
@@ -330,7 +326,7 @@ class ShareStore {
      * @param string $userId Share OWNER user ID / Will be compared to the currently logged user ID
      * @param array|null $shareData Share Data
      * @return bool Wether currently logged user can view/edit this share or not.
-     * @throws Exception
+     * @throws \Exception
      */
     public function testUserCanEditShare($userId, $shareData){
 
@@ -339,7 +335,7 @@ class ShareStore {
         }
         if(empty($userId)){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["share_center.160"]);
+            throw new \Exception($mess["share_center.160"]);
         }
         $crtUser = AuthService::getLoggedUser();
         if($crtUser->getId() == $userId) return true;
@@ -349,7 +345,7 @@ class ShareStore {
             return true;
         }
         $mess = ConfService::getMessages();
-        throw new Exception($mess["share_center.160"]);
+        throw new \Exception($mess["share_center.160"]);
     }
 
     /**
@@ -359,7 +355,7 @@ class ShareStore {
      * @param bool $ignoreRepoNotFound
      * @param null $ajxpNode
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false, $ajxpNode = null)
     {
@@ -376,14 +372,14 @@ class ShareStore {
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
                 }
                 if($repo == null && !$ignoreRepoNotFound){
-                    throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
+                    throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
                 }
             }
             if($repo != null){
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
                 $res = ConfService::deleteRepository($element);
                 if ($res == -1) {
-                    throw new Exception($mess[427]);
+                    throw new \Exception($mess[427]);
                 }
             }
             if($ajxpNode != null){
@@ -409,7 +405,7 @@ class ShareStore {
             $repo = ConfService::getRepositoryById($repoId);
             if ($repo == null) {
                 if(!$ignoreRepoNotFound) {
-                    throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
+                    throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
                 }
             }else{
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
@@ -417,7 +413,7 @@ class ShareStore {
             if(!$keepRepository){
                 $res = ConfService::deleteRepository($repoId);
                 if ($res == -1) {
-                    throw new Exception($mess[427]);
+                    throw new \Exception($mess[427]);
                 }
             }
             // Silently delete corresponding role if it exists
@@ -447,14 +443,13 @@ class ShareStore {
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
             if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {
-                PublicletCounter::delete($element);
                 if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
                     unlink($publicletData["PUBLICLET_PATH"]);
                 }else if($this->sqlSupported){
                     $this->confStorage->simpleStoreClear("share", $element);
                 }
             } else {
-                throw new Exception($mess["share_center.160"]);
+                throw new \Exception($mess["share_center.160"]);
             }
         }
         return true;
@@ -474,7 +469,7 @@ class ShareStore {
         // Find shares in children
         try{
             $result = $this->getMetaManager()->collectSharesIncludingChildren($baseNode);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             // Error while loading node, ignore
             return $modifiedDifferentNodes;
         }
@@ -543,7 +538,7 @@ class ShareStore {
      * @param array $collectRepositories
      * @param string|null $parentRepositoryPath
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public function moveSharesFromMeta($shares, $operation="move", $oldNode, $newNode=null, &$collectRepositories = array(), $parentRepositoryPath = null){
 
@@ -644,38 +639,22 @@ class ShareStore {
 
 
     /**
-     * Get download counter
-     * @param string $hash
-     * @return int
-     */
-    public function getCurrentDownloadCounter($hash){
-        return PublicletCounter::getCount($hash);
-    }
-
-    /**
-     * Add a unit to the current download counter value.
-     * @param $hash
-     */
-    public function incrementDownloadCounter($hash){
-        PublicletCounter::increment($hash);
-    }
-
-    /**
      * Set the counter value to 0.
      * @param string $hash
      * @param string $userId
-     * @throws Exception
+     * @throws \Exception
      */
     public function resetDownloadCounter($hash, $userId){
-        $data = $this->loadShare($hash);
-        $repoId = $data["REPOSITORY"];
+        $share = $this->loadShareObject($hash);
+        $repoId = $share->getRepositoryId();
         $repo = ConfService::getRepositoryById($repoId);
         if ($repo == null) {
             $mess = ConfService::getMessages();
-            throw new Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
+            throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
         }
         $this->testUserCanEditShare($repo->getOwner(), $repo->options);
-        PublicletCounter::reset($hash);
+        $share->resetDownloadCount();
+        $share->save();
     }
 
     /**
@@ -686,7 +665,7 @@ class ShareStore {
      */
     public function isShareExpired($hash, $data){
         return ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
-        ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= $this->getCurrentDownloadCounter($hash));
+        ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
     }
 
     /**
@@ -714,7 +693,7 @@ class ShareStore {
                 continue;
             }
             if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($hash)) ) {
+                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && isSet($publicletData["DOWNLOAD_COUNT"]) && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
                 if(!$currentUser) $switchBackToOriginal = true;
                 $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
@@ -731,7 +710,7 @@ class ShareStore {
      * Find all expired legacy publiclets and remove them.
      * @param $elementId
      * @param $data
-     * @throws Exception
+     * @throws \Exception
      */
     private function deleteExpiredPubliclet($elementId, $data){
 
@@ -748,7 +727,7 @@ class ShareStore {
             try{
                 ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
                 $repoLoaded = true;
-            }catch (Exception $e){
+            }catch (\Exception $e){
                 // Cannot load this repository anymore.
             }
         }
@@ -760,7 +739,7 @@ class ShareStore {
         if(isSet($ajxpNode)){
             try{
                 $this->getMetaManager()->removeShareFromMeta($ajxpNode, $elementId);
-            }catch (Exception $e){
+            }catch (\Exception $e){
 
             }
             gc_collect_cycles();

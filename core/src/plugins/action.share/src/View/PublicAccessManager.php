@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\View;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;

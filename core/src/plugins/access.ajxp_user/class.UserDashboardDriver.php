@@ -24,7 +24,6 @@ namespace Pydio\Access\Driver\DataProvider;
 use DOMXPath;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use PublicletCounter;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
@@ -35,7 +34,7 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
-use ShareCenter;
+use Pydio\Share\ShareCenter;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -50,7 +49,7 @@ class UserDashboardDriver extends AbstractAccessDriver
 
     public function initRepository()
     {
-        require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
+        require_once AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php";
     }
 
     public function parseSpecificContributions(&$contribNode){
@@ -161,34 +160,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 }
                 $x->addChunk(new ReloadMessage());
             break;
-
-            case "clear_expired" :
-
-                /**
-                 * @var ShareCenter $shareCenter
-                 */
-                $shareCenter = PluginsService::getInstance()->findPluginById("action.share");
-                $deleted = $shareCenter->getShareStore()->clearExpiredFiles(true);
-                if (count($deleted)) {
-                    $x->addChunk(new UserMessage(sprintf($mess["user_dash.23"], count($deleted)."")));
-                    $x->addChunk(new ReloadMessage());
-                } else {
-                    $x->addChunk(new UserMessage($mess["user_dash.24"]));
-                }
-
-            break;
-
-            case "reset_download_counter" :
-
-                $selection = new UserSelection();
-                $selection->initFromHttpVars($httpVars);
-                $elements = $selection->getFiles();
-                foreach ($elements as $element) {
-                    PublicletCounter::reset(str_replace(".php", "", basename($element)));
-                }
-                $x->addChunk(new ReloadMessage());
-                break;
-
+            
             default:
             break;
         }

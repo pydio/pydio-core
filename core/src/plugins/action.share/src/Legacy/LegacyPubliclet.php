@@ -19,16 +19,26 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Share\Legacy;
+
+use MetaWatchRegister;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Share\Model\ShareLink;
+use Pydio\Share\ShareCenter;
+use Pydio\Share\Store\ShareRightsManager;
+use Pydio\Share\Store\ShareStore;
+use Pydio\Share\View\MinisiteRenderer;
+use Pydio\Share\View\PublicAccessManager;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -37,7 +47,6 @@ class LegacyPubliclet
 {
 
     private static function renderError($data, $hash, $message = null){
-        require_once("class.MinisiteRenderer.php");
         MinisiteRenderer::renderError($data, $hash, $message);
     }
 
@@ -238,7 +247,7 @@ class LegacyPubliclet
 
         try{
             $hash = $shareStore->storeShare($repository->getId(), $data, "publiclet");
-        }catch(Exception $e){
+        }catch(\Exception $e){
             return $e->getMessage();
         }
 
@@ -268,7 +277,7 @@ class LegacyPubliclet
      * @param PublicAccessManager $publicAccessManager
      * @param MetaWatchRegister|null $watcher
      * @return array|false
-     * @throws Exception
+     * @throws \Exception
      */
     public static function publicletToJson($shareId, $shareMeta, $shareStore, $publicAccessManager, $watcher, $node){
 
@@ -283,7 +292,7 @@ class LegacyPubliclet
             if(isSet($pData[$key])) $shareMeta[$key] = $pData[$key];
         }
         if ($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId() && !AuthService::getLoggedUser()->isAdmin()) {
-            throw new Exception($messages["share_center.48"]);
+            throw new \Exception($messages["share_center.48"]);
         }
         if (isSet($shareMeta["short_form_url"])) {
             $link = $shareMeta["short_form_url"];
@@ -305,12 +314,12 @@ class LegacyPubliclet
         $jsonData = array_merge(array(
             "element_id"       => $shareId,
             "publiclet_link"   => $link,
-            "download_counter" => $shareStore->getCurrentDownloadCounter($shareId),
+            "download_counter" => 0,
             "download_limit"   => $pData["DOWNLOAD_LIMIT"],
             "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
             "has_password"     => (!empty($pData["PASSWORD"])),
             "element_watch"    => $elementWatch,
-            "is_expired"       => $shareStore->isShareExpired($shareId, $pData)
+            "is_expired"       => ShareLink::isShareExpired($pData)
         ), $shareMeta);
 
         return $jsonData;
@@ -324,6 +333,8 @@ class LegacyPubliclet
     public static function migrateLegacyMeta($shareCenter, $shareStore, $shareRightManager, $dryRun = true){
         $metaStoreDir = AJXP_DATA_PATH."/plugins/metastore.serial";
         $publicFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        // TODO 1: Check all metastores of all repositories?
+        // TODO 2: load $publicFolder/.ajxp_publiclet_counters.ser and reassign download counts
         $metastores = glob($metaStoreDir."/ajxp_meta_0");
         if($dryRun){
             print("RUNNING A DRY RUN FOR META MIGRATION");
@@ -383,7 +394,7 @@ class LegacyPubliclet
                                         $shareLink->save();
                                     }
                                     $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "minisite"], $sharedRepoId => ["type" => "repository"]]];
-                                }catch(Exception $e){
+                                }catch(\Exception $e){
                                     print("\n-- Error ".$e->getMessage());
                                 }
 
@@ -397,9 +408,15 @@ class LegacyPubliclet
                                     if(isSet($publiclet["EXPIRE_TIME"])) $parameters["expiration"] = $publiclet["EXPIRE_TIME"];
                                     if(isSet($publiclet["DOWNLOAD_LIMIT"])) $parameters["downloadlimit"] = $publiclet["DOWNLOAD_LIMIT"];
                                     $link->parseHttpVars($parameters);
+                                    /**
+                                     * @var Repository $parentRepositoryObject
+                                     */
                                     $parentRepositoryObject = $publiclet["REPOSITORY"];
 
-                                    $driverInstance = AJXP_PluginsService::findPlugin("access", $parentRepositoryObject->getAccessType());
+                                    /**
+                                     * @var AbstractAccessDriver $driverInstance
+                                     */
+                                    $driverInstance = PluginsService::findPlugin("access", $parentRepositoryObject->getAccessType());
                                     if(empty($driverInstance)){
                                         print("\n-- ERROR: Cannot find driver instance!");
                                         continue;
@@ -419,7 +436,7 @@ class LegacyPubliclet
                                     }
                                     $newRepo->setDescription("");
                                     // Smells like dirty hack!
-                                    $newRepo->options["PATH"] = SystemTextEncoding::fromStorageEncoding($newRepo->options["PATH"]);
+                                    $newRepo->options["PATH"] = TextEncoder::fromStorageEncoding($newRepo->options["PATH"]);
 
                                     $newRepo->setContentFilter(new ContentFilter([new AJXP_Node("pydio://".$parentRepositoryObject->getId().$filePath)]));
                                     if(!$dryRun){
@@ -452,7 +469,7 @@ class LegacyPubliclet
                                     // UPDATE METADATA
                                     $meta["ajxp_shared"] = ["shares" => [$element => array("type" => "minisite")]];
 
-                                }catch(Exception $e){
+                                }catch(\Exception $e){
                                     print("\n-- ERROR: ".$e->getMessage());
                                 }
 

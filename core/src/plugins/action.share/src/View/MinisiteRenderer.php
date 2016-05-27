@@ -18,7 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\View;
 
+
+use DOMXPath;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -153,7 +156,7 @@ class MinisiteRenderer
                 $response = Controller::run($req);
                 $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();
                 $emitter->emitResponse($req, $response);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $errMessage = $e->getMessage();
             }
             if($errMessage == null) return;

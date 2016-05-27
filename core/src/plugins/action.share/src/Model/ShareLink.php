@@ -18,10 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Share\Model;
 
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Share\Store\ShareStore;
+use Pydio\Share\View\PublicAccessManager;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -86,7 +88,7 @@ class ShareLink
     /**
      * Persist the share to DB using the ShareStore
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function save(){
         $newHash = $this->store->storeShare(
@@ -140,21 +142,21 @@ class ShareLink
 
     /**
      * @return \Pydio\Access\Core\Model\Repository
-     * @throws Exception
+     * @throws \Exception
      */
     public function getRepository(){
         if(isSet($this->internal["REPOSITORY"])){
             return ConfService::getRepositoryById($this->internal["REPOSITORY"]);
         }else{
             $mess = ConfService::getMessages();
-            throw new Exception(str_replace('%s', 'No repository attached to link', $mess["share_center.219"]));
+            throw new \Exception(str_replace('%s', 'No repository attached to link', $mess["share_center.219"]));
         }
     }
 
     /**
      * Update some internal configs from httpVars
      * @param $httpVars
-     * @throws Exception
+     * @throws \Exception
      */
     public function parseHttpVars($httpVars){
 
@@ -186,12 +188,12 @@ class ShareLink
             $value = strtolower($value);
             if(strlen($value) < $this->store->hashMinLength){
                 $mess = ConfService::getMessages();
-                throw new Exception(str_replace("%s", $this->store->hashMinLength, $mess["share_center.223"]));
+                throw new \Exception(str_replace("%s", $this->store->hashMinLength, $mess["share_center.223"]));
             }
             $test = $this->store->loadShare($value);
             $mess = ConfService::getMessages();
             if(!empty($test)) {
-                throw new Exception($mess["share_center.172"]);
+                throw new \Exception($mess["share_center.172"]);
             }
             if(!isSet($this->hash)){
                 $this->hash = $value;
@@ -206,7 +208,7 @@ class ShareLink
      * @param PublicAccessManager $publicAccessManager
      * @param array $messages
      * @return mixed
-     * @throws Exception
+     * @throws \Exception
      */
     public function getJsonData($publicAccessManager, $messages){
 
@@ -216,7 +218,7 @@ class ShareLink
         $shareMeta = isSet($this->additionalMeta) ? $this->additionalMeta : array();
         $internalUserId = (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"]);
         if(empty($internalUserId)){
-            throw new Exception("Oups, link ".$this->getHash()." has no internal user id, this is not normal.");
+            throw new \Exception("Oups, link ".$this->getHash()." has no internal user id, this is not normal.");
         }
 
         $jsonData = array(
@@ -238,7 +240,7 @@ class ShareLink
         }
 
         if(!empty($storedData["DOWNLOAD_LIMIT"]) && !$dlDisabled){
-            $jsonData["download_counter"] = $this->store->getCurrentDownloadCounter($this->getHash());
+            $jsonData["download_counter"] = $this->getDownloadCount();
             $jsonData["download_limit"] = $storedData["DOWNLOAD_LIMIT"];
         }
         if(!empty($storedData["EXPIRE_TIME"])){
@@ -249,7 +251,7 @@ class ShareLink
         }else{
             $jsonData["expire_after"] = 0;
         }
-        $jsonData["is_expired"] = $this->store->isShareExpired($this->getHash(), $storedData);
+        $jsonData["is_expired"] = $this->isExpired();
         if(isSet($storedData["AJXP_TEMPLATE_NAME"])){
             $jsonData["minisite_layout"] = $storedData["AJXP_TEMPLATE_NAME"];
         }
@@ -362,6 +364,35 @@ class ShareLink
     public function getNewHash()
     {
         return $this->newHash;
+    }
+
+    public function isExpired(){
+        return self::isShareExpired($this->internal);
+    }
+
+    public function hasDownloadLimit(){
+        return isSet($this->internal["DOWNLOAD_LIMIT"]) && $this->internal["DOWNLOAD_LIMIT"] > 0;
+    }
+
+    public function getDownloadLimit(){
+        $this->internal["DOWNLOAD_LIMIT"];
+    }
+
+    public static function isShareExpired($data){
+        return ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
+            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
+    }
+
+    public function getDownloadCount(){
+        return isSet($this->internal["DOWNLOAD_COUNT"]) ? $this->internal["DOWNLOAD_COUNT"] : 0;
+    }
+
+    public function incrementDownloadCount(){
+        $this->internal["DOWNLOAD_COUNT"] = $this->getDownloadCount() + 1;
+    }
+
+    public function resetDownloadCount(){
+        $this->internal["DOWNLOAD_COUNT"] = 0;
     }
 
     /**

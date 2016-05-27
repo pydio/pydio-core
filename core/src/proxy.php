@@ -20,8 +20,8 @@
  */
 include_once("base.conf.php");
 define('AJXP_EXEC', true);
-require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
+require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/vendor/autoload.php";
 global $skipHtmlBase;
 $skipHtmlBase = true;
 $base = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/");
-ShareCenter::publicRoute($base, "/proxy", ["hash" => $_GET["hash"]]);
+\Pydio\Share\ShareCenter::publicRoute($base, "/proxy", ["hash" => $_GET["hash"]]);

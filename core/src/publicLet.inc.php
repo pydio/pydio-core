@@ -29,7 +29,7 @@ $pServ = PluginsService::getInstance();
 ConfService::init();
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php");
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/vendor/autoload.php");
 
 $fakes = '
 // Non working exception class

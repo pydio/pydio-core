@@ -148,9 +148,9 @@ class AJXP_Notification
      */
     public function getMainLink()
     {
-        if(isSet($_SESSION["CURRENT_MINISITE"])){
+        if(isSet($_SESSION["CURRENT_MINISITE"]) && class_exists("\\Pydio\\Share\\ShareCenter")){
             $hash = $_SESSION["CURRENT_MINISITE"];
-            $shareCenter = ShareCenter::getShareCenter();
+            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter();
             if(!empty($shareCenter)){
                 return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
             }
