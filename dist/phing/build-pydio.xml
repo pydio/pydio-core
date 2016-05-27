@@ -141,7 +141,12 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
-        <!-- RUN COMPOSER IF NECESSARY -->
+        <!-- RUN COMPOSER IF NECESSARY INSIDE CORE -->
+        <phingcall target="composer">
+            <property name="plugin_abs_dir" value="${INNER_DIRECTORY}/core"/>
+        </phingcall>
+
+        <!-- RUN COMPOSER IF NECESSARY INSIDE PLUGINS -->
         <phingcall target="iterate-plugins">
             <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
             <property name="target" value="composer"/>
