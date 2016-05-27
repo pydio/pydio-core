@@ -43,8 +43,7 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
                 dibi::connect($this->sqlDriver);
             }
         } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
+            throw new \Pydio\Core\Exception\DBConnectionException();
         }
     }
 

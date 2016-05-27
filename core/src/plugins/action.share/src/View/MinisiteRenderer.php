@@ -41,10 +41,6 @@ class MinisiteRenderer
 
     public static function loadMinisite($data, $hash = '', $error = null)
     {
-        if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-            $mess = ConfService::getMessages();
-            $error = $mess['share_center.164'];
-        }
         $repository = $data["REPOSITORY"];
         $confs = [];
         PluginsService::getInstance()->initActivePlugins();

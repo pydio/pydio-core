@@ -154,7 +154,6 @@ class ShareStore {
             if($this->sqlSupported){
                 $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
                 if(!empty($data)){
-                    $data["SECURITY_MODIFIED"] = false;
                     return $data;
                 }
             }
@@ -175,7 +174,6 @@ class ShareStore {
         if(empty($inputData)) return false;
         $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
         $publicletData = @unserialize($inputData);
-        $publicletData["SECURITY_MODIFIED"] = $dataModified;
         $publicletData["PUBLICLET_PATH"] = $file;
         /*
         if($this->sqlSupported){

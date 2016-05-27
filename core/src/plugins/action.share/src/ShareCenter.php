@@ -1240,10 +1240,6 @@ class ShareCenter extends Plugin
             return;
         }
         if(!empty($data) && is_array($data)){
-            if(isSet($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-                header("HTTP/1.0 401 Not allowed, script was modified");
-                exit();
-            }
             if($data["SHARE_TYPE"] == "minisite"){
                 self::loadMinisite($data, $hash);
             }else{

@@ -24,6 +24,8 @@ use DibiResult;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\Exception\DBConnectionException;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -90,9 +92,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 }
             }
         } catch (DibiException $e) {
-            //throw $e;
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
+            throw new DBConnectionException();
         }
     }
 
