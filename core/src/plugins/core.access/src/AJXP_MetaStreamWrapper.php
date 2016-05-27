@@ -366,6 +366,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         if($test === false || $test == "." || $test == ".."){
             return $test;
         }
+        $test = \Normalizer::normalize($test);
         if($this->currentUniquePath == $test) {
             return $test;
         }
