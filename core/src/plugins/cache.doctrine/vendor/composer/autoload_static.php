@@ -20,7 +20,7 @@ class ComposerStaticInit4bc137430010115d1364cb6bdd1d28d7
     public static $prefixDirsPsr4 = array (
         'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/../ext',
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Doctrine\\Common\\Cache\\' => 
         array (
@@ -55,9 +55,9 @@ class ComposerStaticInit4bc137430010115d1364cb6bdd1d28d7
         'Doctrine\\Common\\Cache\\WinCacheCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/WinCacheCache.php',
         'Doctrine\\Common\\Cache\\XcacheCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/XcacheCache.php',
         'Doctrine\\Common\\Cache\\ZendDataCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/ZendDataCache.php',
-        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PatternClearableCache' => __DIR__ . '/../..' . '/../ext/PatternClearableCache.php',
-        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioApcuCache' => __DIR__ . '/../..' . '/../ext/PydioApcuCache.php',
-        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioRedisCache' => __DIR__ . '/../..' . '/../ext/PydioRedisCache.php',
+        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PatternClearableCache' => __DIR__ . '/../..' . '/src/PatternClearableCache.php',
+        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioApcuCache' => __DIR__ . '/../..' . '/src/PydioApcuCache.php',
+        'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioRedisCache' => __DIR__ . '/../..' . '/src/PydioRedisCache.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

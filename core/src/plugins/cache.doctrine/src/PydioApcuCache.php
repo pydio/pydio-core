@@ -19,26 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Plugins\Cache\Doctrine\Ext;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
-require_once "PatternClearableCache.php";
-use Redis;
-
-
-class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements PatternClearableCache
+class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements PatternClearableCache
 {
-    /**
-     * @var Redis
-     */
-    protected $internalRedis;
     protected $internalNamespace;
     protected $internalNamespaceVersion;
-
-
-    public function setRedis($redis){
-        parent::setRedis($redis);
-        $this->internalRedis = $redis;
-    }
 
     /**
      * Prefixes the passed id with the configured namespace value.
@@ -49,11 +36,8 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
      */
     private function namespacedIdAsPattern($id)
     {
-        // Escape redis MATCH special characters
-        $id = str_replace(array("?", "*", "[", "]", "^", "-"), array("\?", "\*", "\[", "\]", "\^", "\-"), $id);
-        return sprintf('%s\['.$id.'*', $this->internalNamespace);
+        return sprintf('%s\['.preg_quote($id, "/"), $this->internalNamespace);
     }
-
 
     /**
      * @param string $pattern
@@ -61,13 +45,11 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
      */
     public function deleteKeysStartingWith($pattern)
     {
-        $pattern = $this->namespacedIdAsPattern($pattern);
-        $it = NULL; /* Initialize our iterator to NULL */
-        $this->internalRedis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY); /* retry when we get no keys back */
-        while($arr_keys = $this->internalRedis->scan($it, $pattern)) {
-            foreach($arr_keys as $str_key) {
-                $this->doDelete($str_key);
-            }
+        $pattern = '/^'.$this->namespacedIdAsPattern($pattern).'/';
+        //SAMPLE /^pydio-unique-id_nodes_\[list\:\/\/1/
+        $iterator = new \APCIterator('user', $pattern);
+        foreach ($iterator as $data) {
+            $this->doDelete($data['key']);
         }
     }
 

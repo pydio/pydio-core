@@ -32,7 +32,7 @@ return array(
     'Doctrine\\Common\\Cache\\WinCacheCache' => $vendorDir . '/doctrine/cache/lib/Doctrine/Common/Cache/WinCacheCache.php',
     'Doctrine\\Common\\Cache\\XcacheCache' => $vendorDir . '/doctrine/cache/lib/Doctrine/Common/Cache/XcacheCache.php',
     'Doctrine\\Common\\Cache\\ZendDataCache' => $vendorDir . '/doctrine/cache/lib/Doctrine/Common/Cache/ZendDataCache.php',
-    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PatternClearableCache' => $baseDir . '/../ext/PatternClearableCache.php',
-    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioApcuCache' => $baseDir . '/../ext/PydioApcuCache.php',
-    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioRedisCache' => $baseDir . '/../ext/PydioRedisCache.php',
+    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PatternClearableCache' => $baseDir . '/src/PatternClearableCache.php',
+    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioApcuCache' => $baseDir . '/src/PydioApcuCache.php',
+    'Pydio\\Plugins\\Cache\\Doctrine\\Ext\\PydioRedisCache' => $baseDir . '/src/PydioRedisCache.php',
 );

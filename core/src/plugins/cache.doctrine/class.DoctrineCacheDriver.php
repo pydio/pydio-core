@@ -21,7 +21,7 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require __DIR__ . "/doctrine/vendor/autoload.php";
+require __DIR__ . "/vendor/autoload.php";
 
 define('APC_EXTENSION_LOADED', extension_loaded('apc') || extension_loaded('apcu'));
 define('MEMCACHE_EXTENSION_LOADED', extension_loaded('memcache'));
@@ -152,7 +152,6 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
     public function _apc_init($options) {
         if (extension_loaded('apcu')) {
-            require_once ("ext/PydioApcuCache.php");
             $cacheDriver = new Ext\PydioApcuCache();
         } else {
             $cacheDriver = new Cache\ApcCache();
@@ -188,7 +187,6 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
         if (! $running) return null;
 
-        require_once "ext/PydioRedisCache.php";
         $cacheDriver = new Ext\PydioRedisCache();
         $cacheDriver->setRedis($redis);
         return $cacheDriver;

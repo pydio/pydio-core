@@ -73,7 +73,7 @@ class FileCacheTest extends \Doctrine\Tests\DoctrineTestCase
         $driver = $this->getMock(
             'Doctrine\Common\Cache\FileCache',
             array('doFetch', 'doContains', 'doSave'),
-            array(__DIR__ . '/../', DIRECTORY_SEPARATOR . basename(__FILE__))
+            array(__DIR__ . '/Common/', DIRECTORY_SEPARATOR . basename(__FILE__))
         );
 
         $doGetStats = new \ReflectionMethod($driver, 'doGetStats');
@@ -98,7 +98,7 @@ class FileCacheTest extends \Doctrine\Tests\DoctrineTestCase
 
     public function testGetDirectoryReturnsRealpathDirectoryString()
     {
-        $directory = __DIR__ . '/../';
+        $directory = __DIR__ . '/Common/';
         $driver = $this->getMock(
             'Doctrine\Common\Cache\FileCache',
             array('doFetch', 'doContains', 'doSave'),
@@ -115,7 +115,7 @@ class FileCacheTest extends \Doctrine\Tests\DoctrineTestCase
 
     public function testGetExtensionReturnsExtensionString()
     {
-        $directory = __DIR__ . '/../';
+        $directory = __DIR__ . '/Common/';
         $extension = DIRECTORY_SEPARATOR . basename(__FILE__);
         $driver = $this->getMock(
             'Doctrine\Common\Cache\FileCache',
