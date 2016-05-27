@@ -366,6 +366,10 @@ class LegacyPubliclet
                         if(file_exists($legacyLinkFile)){
                             // Load file, move it to DB and move the meta
                             $publiclet = $shareStore->loadShare($element);
+                            if($publiclet === false){
+                                print("\n--Could not load publiclet $element, skipping");
+                                continue;
+                            }
                             rename($legacyLinkFile, $legacyLinkFile.".migrated");
                             if(isSet($share["minisite"])){
                                 print("\n--Migrate legacy minisite to new minisite?");

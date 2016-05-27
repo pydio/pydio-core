@@ -40,7 +40,11 @@ class ShareStore {
 
     var $sqlSupported = false;
     var $downloadFolder;
-    var $hashMinLength;
+    /**
+     * @var int
+     */
+    private $hashMinLength;
+
     public $modifiableShareKeys = array("counter", "tags", "short_form_url");
     /**
      * @var sqlConfDriver
@@ -57,6 +61,10 @@ class ShareStore {
             $this->sqlSupported = true;
             $this->confStorage = $storage;
         }
+    }
+
+    public function getHashMinLength(){
+        return $this->hashMinLength;
     }
 
     /**
@@ -442,7 +450,7 @@ class ShareStore {
             AuthService::deleteUser($element);
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
-            if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {
+            if ($publicletData!== false && isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {
                 if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
                     unlink($publicletData["PUBLICLET_PATH"]);
                 }else if($this->sqlSupported){
@@ -656,18 +664,7 @@ class ShareStore {
         $share->resetDownloadCount();
         $share->save();
     }
-
-    /**
-     * Check if share is expired
-     * @param string $hash
-     * @param array $data
-     * @return bool
-     */
-    public function isShareExpired($hash, $data){
-        return ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
-        ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
-    }
-
+    
     /**
      * Find all expired shares and remove them.
      * @param bool|true $currentUser
@@ -692,8 +689,7 @@ class ShareStore {
             if ($currentUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId )) {
                 continue;
             }
-            if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && isSet($publicletData["DOWNLOAD_COUNT"]) && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
+            if (ShareLink::isShareExpired($publicletData)){
                 if(!$currentUser) $switchBackToOriginal = true;
                 $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];

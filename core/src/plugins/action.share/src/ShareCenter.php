@@ -1226,6 +1226,11 @@ class ShareCenter extends Plugin
         $shareCenter = self::getShareCenter();
         $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = ConfService::getMessages();
+        if($data === false){
+            AuthService::disconnect();
+            self::loadMinisite([], $hash, $mess["share_center.166"]);
+            return;
+        }
         if(ShareLink::isShareExpired($data)){
             AuthService::disconnect();
             self::loadMinisite($data, $hash, $mess["share_center.165"]);

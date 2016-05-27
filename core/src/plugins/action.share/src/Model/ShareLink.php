@@ -186,9 +186,9 @@ class ShareLink
             // Existing already
             $value = Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
-            if(strlen($value) < $this->store->hashMinLength){
+            if(strlen($value) < $this->store->getHashMinLength()){
                 $mess = ConfService::getMessages();
-                throw new \Exception(str_replace("%s", $this->store->hashMinLength, $mess["share_center.223"]));
+                throw new \Exception(str_replace("%s", $this->store->getHashMinLength(), $mess["share_center.223"]));
             }
             $test = $this->store->loadShare($value);
             $mess = ConfService::getMessages();
@@ -379,7 +379,7 @@ class ShareLink
     }
 
     public static function isShareExpired($data){
-        return ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
+        return (isSet($data["EXPIRE_TIME"]) && time() > $data["EXPIRE_TIME"]) ||
             ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
     }
 
