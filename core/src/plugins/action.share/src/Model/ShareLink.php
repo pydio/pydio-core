@@ -297,7 +297,7 @@ class ShareLink
      * @return string
      */
     public function createHiddenUserPassword(){
-        return $userPass = substr(md5(time()), 13, 24);
+        return substr(md5(time()), 13, 24);
     }
 
     /**

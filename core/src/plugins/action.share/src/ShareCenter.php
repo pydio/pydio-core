@@ -194,7 +194,10 @@ class ShareCenter extends Plugin
 
         }else{
 
-            die("Invalid Arguments");
+            ConfService::init();
+            ConfService::start();
+            $mess = ConfService::getMessages();
+            ShareCenter::loadMinisite([], null, $mess["share_center.166"]);
 
         }
     }

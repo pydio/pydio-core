@@ -46,9 +46,12 @@ class MinisiteRenderer
             $error = $mess['share_center.164'];
         }
         $repository = $data["REPOSITORY"];
+        $confs = [];
         PluginsService::getInstance()->initActivePlugins();
         $shareCenter = PluginsService::findPlugin("action", "share");
-        $confs = $shareCenter->getConfigs();
+        if($shareCenter !== false){
+            $confs = $shareCenter->getConfigs();
+        }
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
         if(!empty($confs["CUSTOM_MINISITE_LOGO"])){
             $logoPath = $confs["CUSTOM_MINISITE_LOGO"];
