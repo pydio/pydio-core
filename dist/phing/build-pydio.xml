@@ -142,13 +142,10 @@
         </phingcall>
 
         <!-- RUN COMPOSER IF NECESSARY -->
-        <if>
-            <available type="file" file="${INNER_DIRECTORY}/core/composer.json"/>
-            <then>
-		<exec command="composer install --optimize-autoloader"
-		      dir="${INNER_DIRECTORY}/core" />
-            </then>
-        </if>
+        <phingcall target="iterate-plugins">
+            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+            <property name="target" value="composer"/>
+        </phingcall>
 
     	<!-- BUILD JAVASCRIPT -->
         <phingcall target="iterate-plugins">
@@ -547,6 +544,18 @@
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
                 <exec command="grunt" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
+            </then>
+        </if>
+    </target>
+
+    <target name="composer">
+        <if>
+            <available type="file" file="${plugin_abs_dir}/composer.json"/>
+            <then>
+                <exec command="composer install --optimize-autoloader"
+                      dir="${plugin_abs_dir}"
+                      passthru="true"
+                />
             </then>
         </if>
     </target>
