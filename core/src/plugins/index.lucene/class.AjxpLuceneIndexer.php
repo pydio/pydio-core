@@ -20,11 +20,12 @@
  */
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesList;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -110,17 +111,29 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
     }
 
-    public function applyAction($actionName, $httpVars, $fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return array|null
+     * @throws Exception
+     */
+    public function applyAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $messages = ConfService::getMessages();
         $repoId = $this->accessDriver->repository->getId();
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars   = $requestInterface->getParsedBody();
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
 
         if ($actionName == "search") {
 
             // TMP
             if (strpos($httpVars["query"], "keyword:") === 0) {
                 $parts = explode(":", $httpVars["query"]);
-                $this->applyAction("search_by_keyword", array("field" => $parts[1]), array());
+                $requestInterface = $requestInterface->withAttribute("action", "search_by_keyword")->withParsedBody(["field" => $parts[1]]);
+                $this->applyAction($requestInterface, $responseInterface);
                 return null;
             }
 
@@ -128,18 +141,15 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                XMLWriter::header();
                 if ($this->seemsCurrentlyIndexing($repoId, 3)){
-                    XMLWriter::sendMessage($messages["index.lucene.11"], null);
+                    $x->addChunk(new UserMessage($messages["index.lucene.11"]));
                 }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                    Controller::applyActionInBackground($repoId, "index", array());
-                    sleep(2);
-                    XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 5);
-                    XMLWriter::sendMessage($messages["index.lucene.7"], null);
+                    $task = \Pydio\Tasks\TaskService::actionAsTask("index", []);
+                    $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+                    $x->addChunk(new UserMessage($messages["index.lucene.7"]));
                 }else{
-                    XMLWriter::sendMessage($messages["index.lucene.12"], null);
+                    $x->addChunk(new UserMessage($messages["index.lucene.12"]));
                 }
-                XMLWriter::close();
                 return null;
             }
             $textQuery = $httpVars["query"];
@@ -187,17 +197,15 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
             $commitIndex = false;
 
-            if (isSet($httpVars['return_selection'])) {
-                $returnNodes = array();
-            } else {
-                XMLWriter::header();
-            }
+            $nodesList = new NodesList();
+            $x->addChunk($nodesList);
+
             $cursor = 0;
             if(isSet($httpVars['limit'])){
                 $limit = intval($httpVars['limit']);
             }
-            if(!isSet($returnNodes) && !empty($limit) && count($hits) > $limit){
-                XMLWriter::renderPaginationData(count($hits), 1, 1);
+            if(!empty($limit) && count($hits) > $limit){
+                $nodesList->setPaginationData(count($hits), 1, 1);
             }
             foreach ($hits as $hit) {
                 // Backward compatibility
@@ -232,15 +240,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                if (isSet($returnNodes)) {
-                    $returnNodes[] = $tmpNode;
-                } else {
-                    XMLWriter::renderAjxpNode($tmpNode);
-                }
+                $nodesList->addBranch($tmpNode);
                 $cursor++;
                 if(isSet($limit) && $cursor >= $limit) break;
             }
-            if(!isSet($returnNodes)) XMLWriter::close();
+
             if ($commitIndex) {
                 $index->commit();
             }
@@ -251,13 +255,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try {
                 $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                XMLWriter::header();
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                    Controller::applyActionInBackground($repoId, "index", array());
-                    XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], "/"), true, 2);
+                    $task = \Pydio\Tasks\TaskService::actionAsTask("index", []);
+                    $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+                    $x->addChunk(new UserMessage($messages["index.lucene.7"]));
                 }
-                XMLWriter::sendMessage($messages["index.lucene.7"], null);
-                XMLWriter::close();
                 return null;
             }
             $sParts = array();
@@ -282,11 +284,8 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
             $commitIndex = false;
 
-            if (isSet($httpVars['return_selection'])) {
-                $returnNodes = array();
-            } else {
-                XMLWriter::header();
-            }
+            $nodesList = new NodesList();
+            $x->addChunk($nodesList);
             foreach ($hits as $hit) {
                 // Backward compat with old protocols
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
@@ -311,13 +310,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                if (isSet($returnNodes)) {
-                    $returnNodes[] = $tmpNode;
-                } else {
-                    XMLWriter::renderAjxpNode($tmpNode);
-                }
+                $nodesList->addBranch($tmpNode);
             }
-            if(!isSet($returnNodes)) XMLWriter::close();
+
             if ($commitIndex) {
                 $index->commit();
             }

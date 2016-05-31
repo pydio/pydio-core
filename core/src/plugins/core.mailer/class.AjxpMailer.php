@@ -355,7 +355,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
     }
 
-    public function sendMailAction($actionName, $httpVars, $fileVars)
+    public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $mess = ConfService::getMessages();
         $mailers = PluginsService::getInstance()->getActivePluginsForType("mailer");
@@ -363,6 +363,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             throw new Exception($mess["core.mailer.3"]);
         }
 
+        $httpVars = $requestInterface->getParsedBody();
         $mailer = array_pop($mailers);
 
         //$toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
@@ -375,16 +376,14 @@ class AjxpMailer extends Plugin implements SqlTableProvider
 
         $subject = $httpVars["subject"];
         $body = $httpVars["message"];
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
 
         if (count($emails)) {
             $mailer->sendMail($emails, $subject, $body, $from, $imageLink);
-            XMLWriter::header();
-            XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
-            XMLWriter::close();
+            $x->addChunk(new \Pydio\Core\Http\Message\UserMessage(str_replace("%s", count($emails), $mess["core.mailer.1"])));
         } else {
-            XMLWriter::header();
-            XMLWriter::sendMessage(null, $mess["core.mailer.2"]);
-            XMLWriter::close();
+            $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["core.mailer.2"], LOG_LEVEL_ERROR));
         }
     }
 

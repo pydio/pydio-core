@@ -35,10 +35,20 @@ class CartManager extends Plugin
 
         $indexer = PluginsService::getInstance()->getUniqueActivePluginForType("index");
         if($indexer == false) return;
-        $httpVars["return_selection"] = true;
+        $httpVars = $requestInterface->getParsedBody();
         unset($httpVars["get_action"]);
         $requestInterface = $requestInterface->withAttribute("action", "search")->withParsedBody($httpVars);
-        $res = Controller::run($requestInterface);
+        $response = Controller::run($requestInterface);
+        $body = $response->getBody();
+        if($body instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
+            $chunks = $body->getChunks();
+            foreach($chunks as $chunk){
+                if($chunk instanceof \Pydio\Access\Core\Model\NodesList){
+                    $res = $chunk->getChildren();
+                }
+            }
+        }
+        
 
         if (isSet($res) && is_array($res)) {
             $newHttpVars = array(
@@ -47,7 +57,7 @@ class CartManager extends Plugin
                 "archive_name"      => $httpVars["archive_name"]
             );
             $requestInterface = $requestInterface->withAttribute("action", "download")->withParsedBody($newHttpVars);
-            Controller::run($requestInterface);
+            $responseInterface = Controller::run($requestInterface);
         }
 
 

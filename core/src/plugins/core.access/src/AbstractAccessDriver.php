@@ -130,7 +130,7 @@ class AbstractAccessDriver extends Plugin
         $taskId = $requestInterface->getAttribute("pydio-task-id");
         if(empty($taskId)){
             $task = TaskService::actionAsTask("cross_copy", $httpVars);
-            TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+            $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             return;
         }
 

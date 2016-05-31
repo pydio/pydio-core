@@ -59,6 +59,13 @@ class SerializableResponseStream implements StreamInterface
     }
 
     /**
+     * @return SerializableResponseChunk[]
+     */
+    public function getChunks(){
+        return $this->data;
+    }
+
+    /**
      * @return string
      */
     public function getContents()

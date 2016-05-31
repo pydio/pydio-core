@@ -47,70 +47,57 @@ class CoreIndexer extends Plugin {
 
     public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $messages = ConfService::getMessages();
+
         $actionName = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
         $this->currentTaskId = $requestInterface->getAttribute("pydio-task-id") OR null;
 
-        if ($actionName == "index") {
+        if ($actionName !== "index") return null;
 
-            $repository = ConfService::getRepository();
-            $userSelection = new UserSelection($repository, $httpVars);
-            if($userSelection->isEmpty()){
-                $userSelection->addFile("/");
-            }
-            $nodes = $userSelection->buildNodes();
-
-            if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
-                $this->verboseIndexation = true;
-            }
-
-            if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
-                TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
-                $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
-                return null;
-            }
-            // GIVE BACK THE HAND TO USER
-            session_write_close();
-
-            foreach($nodes as $node){
-
-                $dir = $node->getPath() == "/" || is_dir($node->getUrl());
-                // SIMPLE FILE
-                if(!$dir){
-                    try{
-                        $this->debug("Indexing - node.index ".$node->getUrl());
-                        Controller::applyHook("node.index", array($node));
-                        if($this->currentTaskId){
-                            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
-                        }
-                    }catch (Exception $e){
-                        $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
-                    }
-                }else{
-                    try{
-                        $this->recursiveIndexation($node);
-                    }catch (Exception $e){
-                        $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
-                    }
-                }
-
-            }
-
-        } else if ($actionName == "check_index_status") {
-            $repoId = $httpVars["repository_id"];
-            list($status, $message) = $this->getIndexStatus(ConfService::getRepositoryById($repoId), AuthService::getLoggedUser());
-            if (!empty($status)) {
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repoId), $message, true, 3);
-                XMLWriter::close();
-            } else {
-                XMLWriter::header();
-                XMLWriter::triggerBgAction("info_message", array(), $messages["core.index.5"], true, 5);
-                XMLWriter::close();
-            }
+        $repository = ConfService::getRepository();
+        $userSelection = new UserSelection($repository, $httpVars);
+        if($userSelection->isEmpty()){
+            $userSelection->addFile("/");
         }
+        $nodes = $userSelection->buildNodes();
+
+        if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
+            $this->verboseIndexation = true;
+        }
+
+        if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+            $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+            TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+            $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
+            return null;
+        }
+        // GIVE BACK THE HAND TO USER
+        session_write_close();
+
+        foreach($nodes as $node){
+
+            $dir = $node->getPath() == "/" || is_dir($node->getUrl());
+            // SIMPLE FILE
+            if(!$dir){
+                try{
+                    $this->debug("Indexing - node.index ".$node->getUrl());
+                    Controller::applyHook("node.index", array($node));
+                    if($this->currentTaskId){
+                        TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
+                    }
+                }catch (Exception $e){
+                    $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
+                }
+            }else{
+                try{
+                    $this->recursiveIndexation($node);
+                }catch (Exception $e){
+                    $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
+                }
+            }
+
+        }
+
         return null;
     }
 

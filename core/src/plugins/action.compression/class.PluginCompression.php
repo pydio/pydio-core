@@ -60,22 +60,7 @@ class PluginCompression extends Plugin
         $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
         $currentDirUrl = $userSelection->currentBaseUrl().$currentDirPath;
-
-        if (empty($httpVars["compression_id"])) {
-            $compressionId = sha1(rand());
-            $httpVars["compression_id"] = $compressionId;
-        } else {
-            $compressionId = $httpVars["compression_id"];
-        }
-        $progressCompressionFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressCompressionID-" . $compressionId . ".txt";
-        if (empty($httpVars["extraction_id"])) {
-            $extractId = sha1(rand());
-            $httpVars["extraction_id"] = $extractId;
-        } else {
-            $extractId = $httpVars["extraction_id"];
-        }
-        $progressExtractFileName = $this->getPluginCacheDir(false, true) . DIRECTORY_SEPARATOR . "progressExtractID-" . $extractId . ".txt";
-
+        
         $serializableStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($serializableStream);
 
@@ -102,14 +87,13 @@ class PluginCompression extends Plugin
                 if(empty($taskId)){
                     $task = TaskService::actionAsTask("compression", $httpVars, $repository->getId(), "", [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.5"]);
-                    file_put_contents($progressCompressionFileName, $messages["compression.5"]);
-                    TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
-                    return;
+                    $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+                    break;
                 }
 
                 $task = TaskService::getInstance()->getTaskById($taskId);
-                $postMessageStatus = function($message, $taskStatus, $progress = null) use($progressCompressionFileName, $task){
-                    $this->operationStatus($progressCompressionFileName, $task, $message, $taskStatus, $progress);
+                $postMessageStatus = function($message, $taskStatus, $progress = null) use($task){
+                    $this->operationStatus($task, $message, $taskStatus, $progress);
                 };
 
                 $maxAuthorizedSize = 4294967296;
@@ -189,37 +173,6 @@ class PluginCompression extends Plugin
 
                 break;
 
-            case "check_compression_status":
-
-                $archivePath = Utils::decodeSecureMagic($httpVars["archive_path"]);
-                $progressCompression = file_get_contents($progressCompressionFileName);
-                $substrProgressCompression = substr($progressCompression, 0, 5);
-                if ($progressCompression != "SUCCESS" && $substrProgressCompression != "Error") {
-
-                    $serializableStream->addChunk(new BgActionTrigger("check_compression_status", array(
-                        "repository_id" => $repository->getId(),
-                        "compression_id" => $compressionId,
-                        "archive_path" => TextEncoder::toUTF8($archivePath)
-                    ), $progressCompression, 5));
-
-                } elseif ($progressCompression == "SUCCESS") {
-                    $newNode = new AJXP_Node($userSelection->currentBaseUrl() . $archivePath);
-                    $nodesDiffs = new NodesDiff();
-                    $nodesDiffs->add($newNode);
-                    Controller::applyHook("node.change", array(null, $newNode, false));
-                    $serializableStream->addChunk(new \Pydio\Core\Http\Message\UserMessage($messages["compression.8"]));
-                    $serializableStream->addChunk($nodesDiffs);
-                    if (file_exists($progressCompressionFileName)) {
-                        unlink($progressCompressionFileName);
-                    }
-                } elseif ($substrProgressCompression == "Error") {
-                    if (file_exists($progressCompressionFileName)) {
-                        unlink($progressCompressionFileName);
-                    }
-                    throw new PydioException($progressCompression);
-                }
-                break;
-
             case "extraction":
 
                 $fileArchive = Utils::sanitize(Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
@@ -261,13 +214,12 @@ class PluginCompression extends Plugin
                 if(empty($taskId)){
                     $task = TaskService::actionAsTask("extraction", $httpVars, $repository->getId(), "", [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.12"]);
-                    file_put_contents($progressExtractFileName, $messages["compression.12"]);
-                    TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
-                    return;
+                    $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+                    break;
                 }
                 $task = TaskService::getInstance()->getTaskById($taskId);
-                $postMessageStatus = function($message, $taskStatus, $progress = null) use($progressExtractFileName, $task){
-                    $this->operationStatus($progressExtractFileName, $task, $message, $taskStatus, $progress);
+                $postMessageStatus = function($message, $taskStatus, $progress = null) use($task){
+                    $this->operationStatus($task, $message, $taskStatus, $progress);
                 };
 
                 mkdir($currentDirUrl . $onlyFileName, 0777, true);
@@ -306,44 +258,6 @@ class PluginCompression extends Plugin
                 Controller::run($indexRequest);
                 break;
 
-            case "check_extraction_status":
-
-                $currentDirUrl = $httpVars["currentDirUrl"];
-                $onlyFileName = $httpVars["onlyFileName"];
-                $progressExtract = file_get_contents($progressExtractFileName);
-                $substrProgressExtract = substr($progressExtract, 0, 5);
-                if ($progressExtract != "SUCCESS" && $progressExtract != "INDEX" && $substrProgressExtract != "Error") {
-
-                    $serializableStream->addChunk(new BgActionTrigger("check_extraction_status", array(
-                        "repository_id" => $repository->getId(),
-                        "extraction_id" => $extractId,
-                        "currentDirUrl" => $currentDirUrl,
-                        "onlyFileName" => $onlyFileName
-                    ), $progressExtract, 4));
-
-                } elseif ($progressExtract == "SUCCESS") {
-                    $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
-                    $nodesDiffs = new NodesDiff();
-                    $nodesDiffs->add($newNode);
-                    Controller::applyHook("node.change", array(null, $newNode, false));
-
-                    $serializableStream->addChunk(new \Pydio\Core\Http\Message\UserMessage(sprintf($messages["compression.14"], $onlyFileName)));
-                    $serializableStream->addChunk(new BgActionTrigger("check_index_status", array(
-                        "repository_id" => $newNode->getRepositoryId()
-                    ), "starting indexation", 5));
-                    $serializableStream->addChunk($nodesDiffs);
-
-                    if (file_exists($progressExtractFileName)) {
-                        unlink($progressExtractFileName);
-                    }
-
-                } elseif ($substrProgressExtract == "Error") {
-                    if (file_exists($progressExtractFileName)) {
-                        unlink($progressExtractFileName);
-                    }
-                    throw new PydioException($progressExtract);
-                }
-                break;
             default:
                 break;
         }
@@ -351,21 +265,13 @@ class PluginCompression extends Plugin
     }
 
     /**
-     * @param string $progressCompressionFileName
      * @param Task $task
      * @param string $message
      * @param integer $taskStatus
      * @param null|integer $progress
      */
-    private function operationStatus($progressCompressionFileName, $task, $message, $taskStatus, $progress = null)
+    private function operationStatus($task, $message, $taskStatus, $progress = null)
     {
-        $fileMessage = $message;
-        if ($taskStatus == Task::STATUS_FAILED) {
-            $fileMessage = "Error : " . $message;
-        } else if ($taskStatus == Task::STATUS_COMPLETE) {
-            $fileMessage = "SUCCESS";
-        }
-        file_put_contents($progressCompressionFileName, $fileMessage);
         $task->setStatusMessage($message);
         $task->setStatus($taskStatus);
         if ($progress != null) {

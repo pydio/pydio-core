@@ -107,11 +107,6 @@
 				]]></clientForm>
                 </processing>
             </action>
-            <action name="check_compression_status">
-                <processing>
-                    <serverCallback methodName="receiveAction"/>
-                </processing>
-            </action>
             <action name="extraction">
                 <gui text="compression.9" title="compression.10" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
                     <context selection="true" dir="true" recycle="hidden"
@@ -136,11 +131,6 @@
                         }
                     ]]></clientCallback>
                     <serverCallback methodName="receiveAction" pluginId="action.compression" />
-                </processing>
-            </action>
-            <action name="check_extraction_status">
-                <processing>
-                    <serverCallback methodName="receiveAction"/>
                 </processing>
             </action>
         </actions>

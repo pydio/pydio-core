@@ -28,7 +28,6 @@ use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Core\Http\Message\BgActionTrigger;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -142,7 +141,7 @@ class ftpAccessDriver extends fsAccessDriver
                 if ($nextFile!='') {
                     //$x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
                     $newTask = TaskService::actionAsTask("next_to_remote", []);
-                    TaskService::getInstance()->enqueueTask($newTask, $request, $response);
+                    $response = TaskService::getInstance()->enqueueTask($newTask, $request, $response);
                 } else {
                     //$x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");

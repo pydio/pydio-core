@@ -36,14 +36,6 @@
                     </serverCallback>
                 </processing>
             </action>
-            <action name="check_index_status">
-                <rightsContext noUser="true" userLogged="only" read="true"
-                               write="false" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkIndexStatus" developerComment="Check the indexation process status."/>
-                </processing>
-            </action>
         </actions>
     </registry_contributions>
     <dependencies>

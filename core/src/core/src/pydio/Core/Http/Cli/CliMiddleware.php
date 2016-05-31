@@ -23,10 +23,13 @@ namespace Pydio\Core\Http\Cli;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Http\Middleware\ITopLevelMiddleware;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 use Symfony\Component\Console\Output\OutputInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -49,6 +52,7 @@ class CliMiddleware implements ITopLevelMiddleware
         $output = $requestInterface->getAttribute("cli-output");
         $options = $requestInterface->getAttribute("cli-options");
         $statusFile = (!empty($options["s"]) ? $options["s"] : false);
+        $taskId = $requestInterface->getAttribute("pydio-task-id");
 
         try {
 
@@ -62,12 +66,28 @@ class CliMiddleware implements ITopLevelMiddleware
             if($statusFile !== false){
                 file_put_contents($statusFile, "ERROR:Authentication Failed.");
             }
+            if(!empty($taskId)){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Authentication Failed");
+            }
 
-        }catch (\Exception $e){
+        } catch (PydioException $e){
 
             $output->writeln("ERROR:".$e->getMessage());
             if($statusFile !== false){
-                file_put_contents($statusFile, "ERROR:Authentication Failed.");
+                file_put_contents($statusFile, "ERROR:".$e->getMessage());
+            }
+            if(!empty($taskId)){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
+            }
+
+        } catch (\Exception $e){
+
+            $output->writeln("ERROR:".$e->getMessage());
+            if($statusFile !== false){
+                file_put_contents($statusFile, "ERROR:".$e->getMessage());
+            }
+            if(!empty($taskId)){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
             }
 
         }

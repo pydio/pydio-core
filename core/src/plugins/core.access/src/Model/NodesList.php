@@ -61,6 +61,13 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getChildren(){
+        return $this->children;
+    }
+
     public function setPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null){
         $this->paginationData = [
             'count' => $count,

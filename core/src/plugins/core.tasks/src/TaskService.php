@@ -28,7 +28,6 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -61,10 +60,18 @@ class TaskService implements ITasksProvider
         return self::$instance;
     }
 
-
-    public function enqueueTask(Task $task, ServerRequestInterface $request, ResponseInterface &$response){
+    /**
+     * @param Task $task
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Pydio\Core\Exception\ActionNotFoundException
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     * @return ResponseInterface
+     */
+    public function enqueueTask(Task $task, ServerRequestInterface $request, ResponseInterface $response){
         if(ConfService::backgroundActionsSupported()){
             Controller::applyTaskInBackground($task);
+            return $response;
         }else{
             $params = $task->getParameters();
             $action = $task->getAction();
@@ -73,7 +80,7 @@ class TaskService implements ITasksProvider
                 ->withAttribute("action", $action)
                 ->withAttribute("pydio-task-id", $id)
                 ->withParsedBody($params);
-            $response = Controller::run($request);
+            return Controller::run($request);
         }
     }
 
@@ -93,7 +100,7 @@ class TaskService implements ITasksProvider
         if(isSet($nodesDiff)){
             $xmlString = $nodesDiff->toXML();
         }
-        Controller::applyHook("msg.instant", array("<task id='".$task->getId()."' data='".$json."'/>".$xmlString, $task->getWsId(), $task->getUserId()));
+        Controller::applyHook("msg.instant", array("<task id='".$task->getId()."' data=\"".$json."\"/>".$xmlString, $task->getWsId(), $task->getUserId()));
 
     }
 

@@ -291,7 +291,7 @@ class MqManager extends Plugin
         }
     }
 
-    public function wsAuthenticate($action, $httpVars, $fileVars)
+    public function wsAuthenticate(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $this->logDebug("Entering wsAuthenticate");
         $configs = $this->getConfigs();
@@ -310,9 +310,9 @@ class MqManager extends Plugin
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
         $this->logDebug("Authenticating user ".$user->id." through WebSocket");
-        XMLWriter::header();
-        echo $xml;
-        XMLWriter::close();
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk(new \Pydio\Core\Http\Message\XMLMessage($xml));
+        $responseInterface = $responseInterface->withBody($x);
 
     }
 

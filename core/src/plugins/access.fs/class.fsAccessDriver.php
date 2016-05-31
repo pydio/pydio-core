@@ -694,8 +694,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($request->getAttribute("pydio-task-id") === null){
                     $task = TaskService::actionAsTask($action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
-                    TaskService::getInstance()->enqueueTask($task, $request, $response);
-                    return;
+                    $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
+                    break;
                 }
 
                 if($taskId !== null){
@@ -828,8 +828,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($taskId === null && (!$selection->isUnique() || !is_file($selection->getUniqueNode()->getUrl()))){
                     $task = TaskService::actionAsTask($action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
-                    TaskService::getInstance()->enqueueTask($task, $request, $response);
-                    return;
+                    $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
+                    break;
                 }
                 if(!empty($taskId)){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting operation in background");

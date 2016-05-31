@@ -521,7 +521,6 @@ class XMLWriter
      * Extract all the user data and put it in XML
      * @static
      * @param AbstractAjxpUser|null $userObject
-     * @internal param bool $details
      * @return string
      */
     public static function getUserXML($userObject = null)
