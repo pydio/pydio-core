@@ -20,9 +20,18 @@
  */
 namespace Pydio\Conf\Core;
 
-use Pydio\Access\Core\Model\AJXP_Node;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\IAjxpWrapperProvider;
-use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Message\RegistryMessage;
+use Pydio\Core\Http\Message\ReloadMessage;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLDocMessage;
+use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\AsyncResponseStream;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
@@ -581,13 +590,14 @@ abstract class AbstractConfDriver extends Plugin
         return $prefs;
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $xmlBuffer = "";
+        $httpVars = $requestInterface->getParsedBody();
+        $action = $requestInterface->getAttribute("action");
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = \Pydio\Core\Utils\Utils::securePath($getValue);
+            $$getName = Utils::securePath($getValue);
         }
-        if(isSet($dir) && $action != "upload") $dir = TextEncoder::fromUTF8($dir);
+
         $mess = ConfService::getMessages();
 
         switch ($action) {
@@ -602,8 +612,7 @@ abstract class AbstractConfDriver extends Plugin
                 $dirList = ConfService::getRepositoriesList();
                 /** @var $repository_id string */
                 if (!isSet($dirList[$repository_id])) {
-                    $errorMessage = "Trying to switch to an unkown repository!";
-                    break;
+                    throw new PydioException("Trying to switch to an unkown repository!");
                 }
                 ConfService::switchRootDir($repository_id);
                 // Load try to init the driver now, to trigger an exception
@@ -616,7 +625,7 @@ abstract class AbstractConfDriver extends Plugin
                     $user->setArrayPref("repository_last_connected", $activeRepId, time());
                     $user->save("user");
                 }
-                //$logMessage = "Successfully Switched!";
+
                 $this->logInfo("Switch Repository", array("rep. id"=>$repository_id));
 
             break;
@@ -635,43 +644,30 @@ abstract class AbstractConfDriver extends Plugin
                         $callback->parentNode->removeChild($callback);
                     }
                 }
-                $xPath = '';
+                $xPath = null;
                 if (isSet($httpVars["xPath"])) {
                     $xPath = ltrim(Utils::securePath($httpVars["xPath"]), "/");
                 }
-                if (!empty($xPath)) {
-                    $nodes = $clonePath->query($xPath);
-                    if($httpVars["format"] == "json"){
-                        $data = XMLWriter::xmlToArray($nodes->item(0));
-                        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
-                        echo json_encode($data);
+                $json = (isSet($httpVars["format"]) && $httpVars["format"] == "json");
+                $message = new RegistryMessage($clone, $xPath, $clonePath);
+                if(empty($xPath) && !$json){
+                    $string = $message->toXML();
+                    $etag = md5($string);
+                    $match = isSet($requestInterface->getServerParams()["HTTP_IF_NONE_MATCH"])?$requestInterface->getServerParams()["HTTP_IF_NONE_MATCH"]:'';
+                    if($match == $etag){
+                        header('HTTP/1.1 304 Not Modified');
+                        $responseInterface = $responseInterface->withStatus(304);
+                        break;
                     }else{
-                        \Pydio\Core\Controller\XMLWriter::header("ajxp_registry_part", array("xPath"=>$xPath));
-                        if ($nodes->length) {
-                            print(XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
-                        }
-                        \Pydio\Core\Controller\XMLWriter::close("ajxp_registry_part");
-                    }
-                } else {
-                    Utils::safeIniSet("zlib.output_compression", "4096");
-                    if($httpVars["format"] == "json"){
-                        $data = \Pydio\Core\Controller\XMLWriter::xmlToArray($clone);
-                        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
-                        echo json_encode($data);
-                    }else{
-                        header('Content-Type: application/xml; charset=UTF-8');
-                        $string = \Pydio\Core\Controller\XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
-                        $etag = md5($string);
-                        $match = isSet($_SERVER["HTTP_IF_NONE_MATCH"])?$_SERVER["HTTP_IF_NONE_MATCH"]:'';
-                        if($match == $etag){
-                            header('HTTP/1.1 304 Not Modified');
-                        }else{
-                            header('Cache-Control:public, max-age=31536000');
-                            header('ETag: '.$etag);
-                            print($string);
-                        }
+                        $responseInterface = $responseInterface
+                            ->withHeader("Cache-Control", "public, max-age=31536000")
+                            ->withHeader("ETag", $etag);
                     }
                 }
+                Utils::safeIniSet("zlib.output_compression", "4096");
+                $x = new SerializableResponseStream();
+                $responseInterface = $responseInterface->withBody($x);
+                $x->addChunk($message);
 
             break;
 
@@ -687,9 +683,10 @@ abstract class AbstractConfDriver extends Plugin
                     $confStorage = ConfService::getConfStorageImpl();
                     $bmUser = $confStorage->createUserObject("shared");
                 }
+                $x = new SerializableResponseStream();
+                $responseInterface = $responseInterface->withBody($x);
                 if ($bmUser == null) {
-                    XMLWriter::header();
-                    XMLWriter::close();
+                    break;
                 }
                 $driver = ConfService::loadRepositoryDriver();
                 if (!($driver instanceof IAjxpWrapperProvider)) {
@@ -731,9 +728,9 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->save("user");
                     }
                 }
-                XMLWriter::header();
-                XMLWriter::writeBookmarks($bmUser->getBookmarks(), true, isset($httpVars["format"])?$httpVars["format"]:"legacy");
-                XMLWriter::close();
+                $doc = new XMLDocMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks(), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $x = new SerializableResponseStream([$doc]);
+                $responseInterface = $responseInterface->withBody($x);
 
             break;
 
@@ -755,11 +752,11 @@ abstract class AbstractConfDriver extends Plugin
                     $userObject->setPref($prefName, $prefValue);
                     $userObject->save("user");
                     AuthService::updateUser($userObject);
-                    //setcookie("AJXP_$prefName", $prefValue);
                     $i++;
                 }
-                header("Content-Type:text/plain");
-                print "SUCCESS";
+
+                $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+                $responseInterface->getBody()->write("SUCCESS");
 
             break;
 
@@ -867,11 +864,15 @@ abstract class AbstractConfDriver extends Plugin
                         }
                     }
 
-                    echo "SUCCESS";
+                    $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+                    $responseInterface->getBody()->write("SUCCESS");
+
                 } else {
-                    \Pydio\Core\Controller\XMLWriter::header();
-                    XMLWriter::sendMessage($mess["241"], null);
-                    \Pydio\Core\Controller\XMLWriter::close();
+
+                    $x = new SerializableResponseStream();
+                    $responseInterface = $responseInterface->withBody($x);
+                    $x->addChunk(new UserMessage($mess["241"]));
+
                 }
 
             break;
@@ -895,8 +896,9 @@ abstract class AbstractConfDriver extends Plugin
                 foreach($params as $p){
                     $result[$p] = $userObject->personalRole->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
                 }
-                \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
-                echo json_encode($result);
+
+                $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
+                $responseInterface->getBody()->write(json_encode($result));
 
             break;
 
@@ -960,8 +962,9 @@ abstract class AbstractConfDriver extends Plugin
                     "webdav_base_url"  => $webdavBaseUrl,
                     "webdav_repositories" => $davRepos
                 );
-                HTMLWriter::charsetHeader("application/json");
-                print(json_encode($prefs));
+
+                $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
+                $responseInterface->getBody()->write(json_encode($prefs));
 
             break;
 
@@ -971,30 +974,34 @@ abstract class AbstractConfDriver extends Plugin
                 $iconFormat = $httpVars["icon_format"];
                 $repo = ConfService::getRepositoryById($tplId);
                 $logo = $repo->getOption("TPL_ICON_".strtoupper($iconFormat));
-                if (isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)) {
-                    header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
-                    header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
-                    header('Pragma:');
-                    header('Cache-Control: public');
-                    header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
-                    header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
-                    readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
-                } else {
-                    $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
-                    header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
-                    header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
-                    header('Pragma:');
-                    header('Cache-Control: public');
-                    header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
-                    header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
-                    readfile(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo);
-                }
+
+                $async = new AsyncResponseStream(function() use($logo, $iconFormat){
+                    if (isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)) {
+                        header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                        header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
+                        header('Pragma:');
+                        header('Cache-Control: public');
+                        header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                        header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+                        readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
+                    } else {
+                        $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
+                        header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                        header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
+                        header('Pragma:');
+                        header('Cache-Control: public');
+                        header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                        header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+                        readfile(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo);
+                    }
+                });
+                $responseInterface = $responseInterface->withBody($async);
 
             break;
 
             case  "get_user_templates_definition":
 
-                \Pydio\Core\Controller\XMLWriter::header("repository_templates");
+                $xml = "<repository_templates>";
                 $count = 0;
                 $repositories = ConfService::listRepositoriesWithCriteria(array(
                     "isTemplate" => 1
@@ -1006,7 +1013,7 @@ abstract class AbstractConfDriver extends Plugin
                     $repoId = $repo->getId();
                     $repoLabel = $repo->getDisplay();
                     $repoType = $repo->getAccessType();
-                    print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
+                    $xml .= "<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">";
                     $driverPlug = $pServ->getPluginByTypeName("access", $repoType);
                     $params = $driverPlug->getManifestRawContent("//param", "node");
                     $tplDefined = $repo->getOptionsDefined();
@@ -1021,13 +1028,17 @@ abstract class AbstractConfDriver extends Plugin
                         }
                         if( in_array($paramNode->getAttribute("name"), $tplDefined) ) continue;
                         if($paramNode->getAttribute('no_templates') == 'true') continue;
-                        print(XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode)));
+                        $xml.= XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode));
                     }
                     // ADD LABEL
-                    echo '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';
-                    print("</template>");
+                    $xml .= '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';
+                    $xml .= "</template>";
                 }
-                \Pydio\Core\Controller\XMLWriter::close("repository_templates");
+
+                $xml.= "</repository_templates>";
+                $doc = new XMLDocMessage($xml);
+                $x = new SerializableResponseStream([$doc]);
+                $responseInterface = $responseInterface->withBody($x);
 
 
             break;
@@ -1045,22 +1056,22 @@ abstract class AbstractConfDriver extends Plugin
                     $newRep->setGroupPath($gPath);
                 }
                 $res = ConfService::addRepository($newRep);
-                XMLWriter::header();
                 if ($res == -1) {
-                    XMLWriter::sendMessage(null, $mess[426]);
-                } else {
-                    // Make sure we do not overwrite otherwise loaded rights.
-                    $loggedUser->load();
-                    $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
-                    $loggedUser->save("superuser");
-                    $loggedUser->recomputeMergedRole();
-                    AuthService::updateUser($loggedUser);
-
-                    \Pydio\Core\Controller\XMLWriter::sendMessage($mess[425], null);
-                    XMLWriter::reloadDataNode("", $newRep->getUniqueId());
-                    \Pydio\Core\Controller\XMLWriter::reloadRepositoryList();
+                    throw new PydioException($mess[426], 426);
                 }
-                \Pydio\Core\Controller\XMLWriter::close();
+
+                // Make sure we do not overwrite otherwise loaded rights.
+                $loggedUser->load();
+                $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
+                $loggedUser->save("superuser");
+                $loggedUser->recomputeMergedRole();
+                AuthService::updateUser($loggedUser);
+
+                $x = new SerializableResponseStream();
+                $responseInterface = $responseInterface->withBody($x);
+                $x->addChunk(new UserMessage($mess[425]));
+                $x->addChunk(new ReloadMessage("", $newRep->getUniqueId()));
+                $x->addChunk(new XMLMessage("<reload_instruction object=\"repository_list\"/>"));
 
             break;
 
@@ -1072,21 +1083,22 @@ abstract class AbstractConfDriver extends Plugin
                     throw new \Exception("You are not allowed to perform this operation!");
                 }
                 $res = ConfService::deleteRepository($repoId);
-                XMLWriter::header();
-                if ($res == -1) {
-                    \Pydio\Core\Controller\XMLWriter::sendMessage(null, $mess[427]);
-                } else {
-                    $loggedUser = AuthService::getLoggedUser();
-                    // Make sure we do not override remotely set rights
-                    $loggedUser->load();
-                    $loggedUser->personalRole->setAcl($repoId, "");
-                    $loggedUser->save("superuser");
-                    AuthService::updateUser($loggedUser);
 
-                    \Pydio\Core\Controller\XMLWriter::sendMessage($mess[428], null);
-                    \Pydio\Core\Controller\XMLWriter::reloadRepositoryList();
+                if ($res == -1) {
+                    throw new PydioException($mess[427]);
                 }
-                XMLWriter::close();
+
+                $loggedUser = AuthService::getLoggedUser();
+                // Make sure we do not override remotely set rights
+                $loggedUser->load();
+                $loggedUser->personalRole->setAcl($repoId, "");
+                $loggedUser->save("superuser");
+                AuthService::updateUser($loggedUser);
+
+                $x = new SerializableResponseStream();
+                $responseInterface = $responseInterface->withBody($x);
+                $x->addChunk(new UserMessage($mess[428]));
+                $x->addChunk(new XMLMessage("<reload_instruction object=\"repository_list\"/>"));
 
             break;
 
@@ -1098,9 +1110,10 @@ abstract class AbstractConfDriver extends Plugin
                     throw new \Exception("You are not allowed to edit this user");
                 }
                 AuthService::deleteUser($userId);
-                echo "SUCCESS";
+                $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+                $responseInterface->getBody()->write("SUCCESS");
 
-            break;
+                break;
 
             case "user_list_authorized_users" :
 
@@ -1262,9 +1275,9 @@ abstract class AbstractConfDriver extends Plugin
                         Controller::applyHook("repository.load_info", array(&$data));
                     }
                 }
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode($data);
 
+                $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
+                $responseInterface->getBody()->write(json_encode($data));
                 break;
 
             case "get_binary_param" :
@@ -1306,16 +1319,19 @@ abstract class AbstractConfDriver extends Plugin
 
             case "store_binary_temp" :
 
-                if (count($fileVars)) {
-                    $keys = array_keys($fileVars);
-                    $boxData = $fileVars[$keys[0]];
+                $uploadedFiles = $requestInterface->getUploadedFiles();
+                if (count($uploadedFiles)) {
+                    /**
+                     * @var UploadedFileInterface $boxData
+                     */
+                    $boxData = array_shift($uploadedFiles);
                     $err = Utils::parseFileDataErrors($boxData);
                     if ($err != null) {
 
                     } else {
                         $rand = substr(md5(time()), 0, 6);
-                        $tmp = $rand."-". $boxData["name"];
-                        @move_uploaded_file($boxData["tmp_name"], Utils::getAjxpTmpDir()."/". $tmp);
+                        $tmp = $rand."-". $boxData->getClientFilename();
+                        $boxData->moveTo(Utils::getAjxpTmpDir() . "/" . $tmp);
                     }
                 }
                 if (isSet($tmp) && file_exists(Utils::getAjxpTmpDir()."/".$tmp)) {
@@ -1328,15 +1344,7 @@ abstract class AbstractConfDriver extends Plugin
             default;
             break;
         }
-        if (isset($logMessage) || isset($errorMessage)) {
-            $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
-        }
 
-        if (isset($requireAuth)) {
-            $xmlBuffer .= \Pydio\Core\Controller\XMLWriter::requireAuth(false);
-        }
-
-        return $xmlBuffer;
     }
 
     /**

@@ -91,9 +91,13 @@ class BootConfLoader extends AbstractConfDriver
         return file_get_contents($this->getPluginWorkDir().DIRECTORY_SEPARATOR."server_uuid");
     }
 
+    /**
+     * @param $fullManifest
+     * @return string
+     */
     public function printFormFromServerSettings($fullManifest){
 
-        XMLWriter::header("admin_data");
+        $xmlString = "<admin_data>";
         $xPath = new DOMXPath($fullManifest->ownerDocument);
         $addParams = "";
         $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
@@ -133,24 +137,28 @@ class BootConfLoader extends AbstractConfDriver
         $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
         $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
 
-        echo($allParams);
-        XMLWriter::close("admin_data");
+        $xmlString .= $allParams;
+        $xmlString .= "</admin_data>";
+        return $xmlString;
 
     }
 
     /**
      * Transmit to the ajxp_conf load_plugin_manifest action
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
      */
-    public function loadInstallerForm($action, $httpVars, $fileVars)
+    public function loadInstallerForm(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
         if(isSet($httpVars["lang"])){
             ConfService::setLanguage($httpVars["lang"]);
         }
         $fullManifest = $this->getManifestRawContent("", "xml");
-        $this->printFormFromServerSettings($fullManifest);
+        $xmlString = $this->printFormFromServerSettings($fullManifest);
+        $doc = new \Pydio\Core\Http\Message\XMLDocMessage($xmlString);
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream([$doc]);
+        $responseInterface = $responseInterface->withBody($x);
     }
 
     /**

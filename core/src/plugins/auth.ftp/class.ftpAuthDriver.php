@@ -71,7 +71,11 @@ class ftpAuthDriver extends AbstractAuthDriver
         return true ;
     }
 
-    public function logoutCallback($actionName, $httpVars, $fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
+    public function logoutCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $safeCredentials = AJXP_Safe::loadCredentials();
         $crtUser = $safeCredentials["user"];
@@ -90,15 +94,17 @@ class ftpAuthDriver extends AbstractAuthDriver
         AuthService::disconnect();
         session_destroy();
         session_write_close();
-        XMLWriter::header();
-        XMLWriter::loggingResult(2);
-        XMLWriter::close();
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult(2));
+        $responseInterface = $responseInterface->withBody($x);
     }
 
-    public function setFtpDataCallback($actionName, $httpVars, $fileVars)
+    public function setFtpDataCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $options = array("CHARSET", "FTP_DIRECT", "FTP_HOST", "FTP_PORT", "FTP_SECURE", "PATH");
         $ftpOptions = array();
+        $httpVars = $requestInterface->getParsedBody();
         foreach ($options as $option) {
             if (isSet($httpVars[$option])) {
                 $ftpOptions[$option] = $httpVars[$option];

@@ -22,7 +22,6 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\CaptchaProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -96,8 +95,10 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
             AuthService::refreshRememberCookie($loggedUser);
         }
-        $response = $response->withHeader("Content-type", "application/xml");
-        $response->getBody()->write(XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken, false));
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $response = $response->withBody($x);
+        $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
 
         if($loggingResult > 0 && $loggedUser != null){
 
@@ -113,19 +114,24 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $loggedUser->save("superuser");
         }
 
-
         return true;
-//        if($loggingResult > 0 || $isLast){
-            //exit();
-
-//       }
 
     }
 
-    public function postVerificationCode($action, $httpVars, $fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
+    public function postVerificationCode(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        if($action!="duo_post_verification_code") return;
 
+        if($requestInterface->getAttribute("action") !== "duo_post_verification_code") {
+            return;
+        }
+
+        $httpVars = $requestInterface->getParsedBody();
         $u = AuthService::getLoggedUser();
         if($u == null) return;
         $sigResponse = $httpVars["sig_response"];
@@ -150,16 +156,12 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $res = ConfService::switchUserToActiveRepository($u, $passId);
             if (!$res) {
                 AuthService::disconnect();
-                XMLWriter::header();
-                XMLWriter::requireAuth(true);
-                XMLWriter::close();
+                throw new \Pydio\Core\Exception\AuthRequiredException();
             }
             ConfService::getInstance()->invalidateLoadedRepositories();
         }else{
             AuthService::disconnect();
-            XMLWriter::header();
-            XMLWriter::requireAuth(true);
-            XMLWriter::close();
+            throw new \Pydio\Core\Exception\AuthRequiredException();
         }
 
     }

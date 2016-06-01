@@ -89,10 +89,17 @@ class EncfsMounter extends Plugin
         }
     }
 
-    public function switchAction($actionName, $httpVars, $fileVars)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         //var_dump($httpVars);
         $xmlTemplate = $this->getFilteredOption("ENCFS_XML_TEMPLATE");
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+        $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
+        if($userSelection->isEmpty()){
+            throw new Exception("Please select a folder");
+        }
+        $node = $userSelection->getUniqueNode();
 
         switch ($actionName) {
             case "encfs.cypher_folder" :
@@ -102,9 +109,9 @@ class EncfsMounter extends Plugin
 
                 //$repo = ConfService::getRepository();
                 $workingP = rtrim($this->getWorkingPath(), "/");
-                $dir = $workingP.Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = $workingP.$node->getPath();
 
-                if (dirname($dir) != $workingP) {
+                if ($node->isRoot() || !$node->getParent()->isRoot()) {
                     throw new Exception("Please cypher only folders at the root of your repository");
                 }
 
@@ -135,7 +142,7 @@ class EncfsMounter extends Plugin
                 }
                 break;
             case "encfs.uncypher_folder":
-                $dir = $this->getWorkingPath().Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = $this->getWorkingPath().$node->getPath();
                 $raw = str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", $dir);
                 $pass = $httpVars["pass"];
                 $uid = $this->getFilteredOption("ENCFS_UID");
@@ -144,9 +151,12 @@ class EncfsMounter extends Plugin
                 }
                 break;
         }
-        XMLWriter::header();
-        XMLWriter::reloadDataNode();
-        XMLWriter::close();
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $diff = new \Pydio\Access\Core\Model\NodesDiff();
+        $diff->update($node);
+        $x->addChunk($diff);
+        $responseInterface = $responseInterface->withBody($x);
 
     }
 

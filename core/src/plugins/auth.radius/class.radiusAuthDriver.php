@@ -2,7 +2,6 @@
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -70,16 +69,19 @@ class radiusAuthDriver extends AbstractAuthDriver
     {
         return true;
     }
-    public function logoutCallback($actionName, $httpVars, $fileVars)
+
+
+    public function logoutCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         AJXP_Safe::clearCredentials();
-        $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
         AuthService::disconnect();
         session_write_close();
-        XMLWriter::header();
-        XMLWriter::loggingResult(2);
-        XMLWriter::close();
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult(2));
+        $responseInterface = $responseInterface->withBody($x);
     }
+
     public function prepareRequest($res, $login, $pass, $seed)
     {
         if (!radius_add_server($res, $this->radiusServer, $this->radiusPort, $this->radiusSecret, 3, 3)) {

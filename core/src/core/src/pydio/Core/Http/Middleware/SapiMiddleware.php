@@ -94,7 +94,12 @@ class SapiMiddleware implements ITopLevelMiddleware
              * @var SerializableResponseStream $body;
              */
             $body = &$response->getBody();
-            if($request->hasHeader("Accept") && $request->getHeader("Accept")[0] == "application/json"){
+            $params = $request->getParsedBody();
+            $forceJson = false;
+            if(isSet($params["format"]) && $params["format"] == "json"){
+                $forceJson = true;
+            }
+            if(($request->hasHeader("Accept") && $request->getHeader("Accept")[0] == "application/json") || $forceJson){
                 $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
                 $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
             }else{

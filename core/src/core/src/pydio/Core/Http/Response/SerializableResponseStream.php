@@ -44,6 +44,13 @@ class SerializableResponseStream implements StreamInterface
 
     private $streamStatus = 'open';
 
+    public function __construct($chunks = [])
+    {
+        if(count($chunks)){
+            $this->data = $chunks;
+        }
+    }
+
     /**
      * @param string $serializer SERIALIZER_TYPE_XML|SERIALIZER_TYPE_JSON
      */
@@ -129,7 +136,10 @@ class SerializableResponseStream implements StreamInterface
             if($wrap){
                 return XMLWriter::wrapDocument($buffer);
             }else{
-                return "<?xml version=\"1.0\" encoding=\"".$charset."\"?>".$buffer;
+                if(substr($buffer, 0, 5) !== "<?xml"){
+                    $buffer = "<?xml version=\"1.0\" encoding=\"".$charset."\"?>".$buffer;
+                }
+                return $buffer;
             }
         }
         return "";

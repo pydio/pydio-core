@@ -24,7 +24,6 @@ use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -249,39 +248,36 @@ class CasAuthFrontend extends AbstractAuthFrontend
         return false;
     }
 
-    function logOutCAS($action, $httpVars, $fileVars)
+    function logOutCAS(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        switch ($action) {
-            case "logout":
-                if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
-                    AuthService::disconnect();
+        $action = $requestInterface->getAttribute("action");
+        if($action !== "logout") return;
 
-                    $this->loadConfig();
-                    if (!empty($this->pluginConf["LOGOUT_URL"])) {
-                        $this->cas_logoutUrl = trim($this->pluginConf["LOGOUT_URL"]);
-                    } else {
-                        empty($this->pluginConf["CAS_URI"]) ? $logout_default = 'logout' : $logout_default = '/logout';
-                        $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
-                    }
+        require_once "LogoutUrlMessage.php";
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
 
-                    XMLWriter::header("url");
-                    echo $this->cas_logoutUrl;
-                    XMLWriter::close("url");
-                    session_unset();
-                    session_destroy();
-                }else{
-                    AuthService::disconnect();
-                    XMLWriter::header("url");
-                    echo "#";
-                    XMLWriter::close("url");
-                    session_unset();
-                    session_destroy();
-                }
-                break;
-            default:
+        if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
+            AuthService::disconnect();
 
-                break;
+            $this->loadConfig();
+            if (!empty($this->pluginConf["LOGOUT_URL"])) {
+                $this->cas_logoutUrl = trim($this->pluginConf["LOGOUT_URL"]);
+            } else {
+                empty($this->pluginConf["CAS_URI"]) ? $logout_default = 'logout' : $logout_default = '/logout';
+                $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
+            }
+
+            $x->addChunk(new LogoutUrlMessage($this->cas_logoutUrl));
+            session_unset();
+            session_destroy();
+        }else{
+            AuthService::disconnect();
+            $x->addChunk(new LogoutUrlMessage("#"));
+            session_unset();
+            session_destroy();
         }
+
     }
 
     function loadConfig()

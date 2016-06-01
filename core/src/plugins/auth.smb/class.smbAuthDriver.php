@@ -22,7 +22,6 @@ use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -46,11 +45,9 @@ class smbAuthDriver extends AbstractAuthDriver
         return true;
     }
 
-    public function logoutCallback($actionName, $httpVars, $fileVars)
+    public function logoutCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         AJXP_Safe::clearCredentials();
-        $adminUser = $this->options["ADMIN_USER"];
-        $subUsers = array();
         foreach($_SESSION as $key => $val){
             if((substr($key,-4) === "disk") && (substr($key,0,4) == "smb_")){
                 unset($_SESSION[$key]);
@@ -58,9 +55,9 @@ class smbAuthDriver extends AbstractAuthDriver
         }
         AuthService::disconnect();
         session_write_close();
-        XMLWriter::header();
-        XMLWriter::loggingResult(2);
-        XMLWriter::close();
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult(2));
+        $responseInterface = $responseInterface->withBody($x);
     }
 
     public function checkPassword($login, $pass, $seed)

@@ -28,7 +28,6 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -50,11 +49,23 @@ class EmlParser extends Plugin
         }
     }
 
-    public function switchAction($action, $httpVars, $filesVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
+        $action = $requestInterface->getAttribute("action");
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
+
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(true)) {
-            return false;
+            return;
         }
 
         $selection = new UserSelection($repository, $httpVars);
@@ -75,12 +86,11 @@ class EmlParser extends Plugin
                 );
                 $decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
                 $xml = $decoder->getXML($decoder->decode($params));
+                $doc = new \Pydio\Core\Http\Message\XMLDocMessage($xml);
                 if (function_exists("imap_mime_header_decode")) {
-                    $doc = new DOMDocument();
-                    $doc->loadXML($xml);
                     $xPath = new DOMXPath($doc);
                     $headers = $xPath->query("//headername");
-                    $changes = false;
+                    $charset = "UTF-8";
                     foreach ($headers as $headerNode) {
                         if ($headerNode->firstChild->nodeValue == "Subject") {
                             $headerValueNode = $headerNode->nextSibling->nextSibling;
@@ -94,14 +104,12 @@ class EmlParser extends Plugin
                             if ($decoded != $value) {
                                 $value = TextEncoder::changeCharset($charset, "UTF-8", $decoded);
                                 $node = $doc->createElement("headervalue", $value);
-                                $res = $headerNode->parentNode->replaceChild($node, $headerValueNode);
-                                $changes = true;
+                                $headerNode->parentNode->replaceChild($node, $headerValueNode);
                             }
                         }
                     }
-                    if($changes) $xml = $doc->saveXML();
                 }
-                print $xml;
+                $x->addChunk($doc);
             break;
             case "eml_get_bodies":
                 require_once("Mail/mimeDecode.php");
@@ -121,32 +129,17 @@ class EmlParser extends Plugin
                 $structure = $decoder->decode($params);
                 $html = $this->_findPartByCType($structure, "text", "html");
                 $text = $this->_findPartByCType($structure, "text", "plain");
+                $charset = 'UTF-8';
                 if ($html != false && isSet($html->ctype_parameters) && isSet($html->ctype_parameters["charset"])) {
                     $charset = $html->ctype_parameters["charset"];
                 }
-                if (isSet($charset)) {
-                    header('Content-Type: text/xml; charset='.$charset);
-                    header('Cache-Control: no-cache');
-                    print('<?xml version="1.0" encoding="'.$charset.'"?>');
-                    print('<email_body>');
-                } else {
-                    XMLWriter::header("email_body");
-                }
-                if ($html!==false) {
-                    print('<mimepart type="html"><![CDATA[');
-                    $text = $html->body;
-                    print($text);
-                    print("]]></mimepart>");
-                }
-                if ($text!==false) {
-                    print('<mimepart type="plain"><![CDATA[');
-                    print($text->body);
-                    print("]]></mimepart>");
-                }
-                XMLWriter::close("email_body");
+                require_once "EmlXmlMessage.php";
+                $x->addChunk(new EmlXmlMessage($charset, $html, $text));
 
             break;
+
             case "eml_dl_attachment":
+
                 $attachId = $httpVars["attachment_id"];
                 if(!isset($attachId)) break;
 
@@ -165,21 +158,23 @@ class EmlParser extends Plugin
                 $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
-                if ($part !== false) {
-                    $fake = new fsAccessDriver("fake", "");
-                    $fake->repository = $repository;
-                    $fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
-                    exit();
-                } else {
-                    //var_dump($structure);
-                }
+                $async = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use($part, $repository){
+                    if ($part !== false) {
+                        $fake = new fsAccessDriver("fake", "");
+                        $fake->repository = $repository;
+                        $fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
+                    }
+                });
+                $responseInterface = $responseInterface->withBody($async);
+
             break;
+
             case "eml_cp_attachment":
+
                 $attachId = $httpVars["attachment_id"];
                 $destRep = Utils::decodeSecureMagic($httpVars["destination"]);
                 if (!isset($attachId)) {
-                    XMLWriter::sendMessage(null, "Wrong Parameters");
-                    break;
+                    throw new \Pydio\Core\Exception\PydioException("Wrong Parameters");
                 }
 
                 require_once("Mail/mimeDecode.php");
@@ -198,7 +193,6 @@ class EmlParser extends Plugin
                 $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
-                XMLWriter::header();
                 if ($part !== false) {
                     $destStreamURL = $selection->currentBaseUrl();
                     if (isSet($httpVars["dest_repository_id"])) {
@@ -216,14 +210,13 @@ class EmlParser extends Plugin
                     if ($fp !== false) {
                         fwrite($fp, $part->body, strlen($part->body));
                         fclose($fp);
-                        XMLWriter::sendMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep), NULL);
+                        $x->addChunk(new \Pydio\Core\Http\Message\UserMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep)));
                     } else {
-                        XMLWriter::sendMessage(null, $mess["editor.eml.8"]);
+                        $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["editor.eml.8"], LOG_LEVEL_ERROR));
                     }
                 } else {
-                    XMLWriter::sendMessage(null, $mess["editor.eml.9"]);
+                    $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["editor.eml.9"], LOG_LEVEL_ERROR));
                 }
-                XMLWriter::close();
             break;
 
             default:
