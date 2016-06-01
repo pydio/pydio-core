@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
@@ -132,24 +133,38 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         }
     }
 
-    public function applyAction($actionName, $httpVars, $fileVars)
+    public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+
         $messages = ConfService::getMessages();
         $repoId = $this->accessDriver->repository->getId();
+
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $nodesList = new \Pydio\Access\Core\Model\NodesList();
+        $responseInterface = $responseInterface->withBody($x);
+        $x->addChunk($nodesList);
 
         if ($actionName == "search") {
             // TMP
             if (strpos($httpVars["query"], "keyword:") === 0) {
                 $parts = explode(":", $httpVars["query"]);
-                $this->applyAction("search_by_keyword", array("field" => $parts[1]), array());
-                return;
+                $requestInterface = $requestInterface->withAttribute("action", "search_by_keyword")->withParsedBody(["field" => $parts[1]]);
+                $this->applyAction($requestInterface, $responseInterface);
+                return null;
             }
 
             try {
                 $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
-                $this->applyAction("index", array(), array());
-                throw new Exception($messages["index.lucene.7"]);
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                    $task = \Pydio\Tasks\TaskService::actionAsTask("index", []);
+                    $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
+                    $x->addChunk(new UserMessage($messages["index.lucene.7"]));
+                }else{
+                    $x->addChunk(new UserMessage($messages["index.lucene.12"]));
+                }
             }
 
             $textQuery = $httpVars["query"];
@@ -244,7 +259,6 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
 
-            XMLWriter::header();
             foreach ($hits as $hit) {
                 $source = $hit->getSource();
 
@@ -262,10 +276,8 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 }
 
                 $tmpNode->search_score = sprintf("%0.2f", $hit->getScore());
-                XMLWriter::renderAjxpNode($tmpNode);
+                $nodesList->addBranch($tmpNode);
             }
-
-            XMLWriter::close();
 
         } else if ($actionName == "search_by_keyword") {
 
@@ -330,8 +342,8 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
 
-            XMLWriter::header();
             foreach ($hits as $hit) {
+
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
@@ -344,9 +356,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                XMLWriter::renderAjxpNode($tmpNode);
+                $nodesList->addBranch($tmpNode);
+
             }
-            XMLWriter::close();
         }
 
     }

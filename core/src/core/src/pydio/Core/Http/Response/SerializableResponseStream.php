@@ -115,6 +115,7 @@ class SerializableResponseStream implements StreamInterface
         }else if($serializer == self::SERIALIZER_TYPE_XML){
             $wrap = true;
             $buffer = "";
+            $charset = null;
             foreach ($data as $serializableItem){
                 if(!$serializableItem instanceof XMLSerializableResponseChunk){
                     continue;
@@ -122,12 +123,13 @@ class SerializableResponseStream implements StreamInterface
                 $buffer .= $serializableItem->toXML();
                 if($serializableItem instanceof XMLDocSerializableResponseChunk){
                     $wrap = false;
+                    $charset = $serializableItem->getCharset();
                 }
             }
             if($wrap){
                 return XMLWriter::wrapDocument($buffer);
             }else{
-                return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".$buffer;
+                return "<?xml version=\"1.0\" encoding=\"".$charset."\"?>".$buffer;
             }
         }
         return "";

@@ -67,15 +67,24 @@ class GitManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function applyActions($actionName, $httpVars, $fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
+    public function applyActions(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
+
         $git = new VersionControl_Git($this->repoBase);
         switch ($actionName) {
             case "git_history":
+                $nodesList = new \Pydio\Access\Core\Model\NodesList();
                 $file = Utils::decodeSecureMagic($httpVars["file"]);
                 $file = ltrim($file, "/");
                 $res = $this->gitHistory($git, $file);
-                XMLWriter::header();
                 $ic = Utils::mimetype($file, "image", false);
                 $index = count($res);
                 $mess = ConfService::getMessages();
@@ -84,10 +93,13 @@ class GitManager extends AJXP_AbstractMetaSource
                     $commit["icon"] = $ic;
                     $commit["index"] = $index;
                     $commit["EVENT"] = $mess["meta.git.".$commit["EVENT"]];
+                    $commit["text"] = basename($commit["FILE"]);
                     $index --;
-                    XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
+                    $n = new AJXP_Node("/".$commit["ID"], $commit);
+                    $n->setLeaf(true);
+                    $nodesList->addBranch($n);
                 }
-                XMLWriter::close();
+                $x->addChunk($nodesList);
                 break;
             break;
 
@@ -109,9 +121,9 @@ class GitManager extends AJXP_AbstractMetaSource
                 $this->executeCommandInStreams($git, $commandLine, $outputStream);
                 fclose($outputStream);
                 $this->commitChanges();
-                XMLWriter::header();
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
+                $diff = new \Pydio\Access\Core\Model\NodesDiff();
+                $diff->update(new AJXP_Node("pydio://".$this->accessDriver->repository->getId().$file));
+                $x->addChunk($diff);
 
 
             break;
@@ -131,30 +143,36 @@ class GitManager extends AJXP_AbstractMetaSource
                 $command->addArgument($commitId.":".$file);
                 $commandLine = $command->createCommandString();
 
-                if ($attach == "inline") {
-                    $fileExt = substr(strrchr(basename($file), '.'), 1);
-                    if (empty($fileExt)) {
-                        $fileMime = "application/octet-stream";
-                    } else {
-                        $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                        $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
-                        foreach ($lines as $line) {
-                            if(substr($line, 0, 1) == '#')
-                                continue; // skip comments
-                            $line = rtrim($line) . " ";
-                            if(!preg_match($regex, $line, $matches))
-                                continue; // no match to the extension
-                            $fileMime = $matches[1];
+                $reader = function() use ($git, $commandLine, $attach, $file, $size){
+                    if ($attach == "inline") {
+                        $fileExt = substr(strrchr(basename($file), '.'), 1);
+                        if (empty($fileExt)) {
+                            $fileMime = "application/octet-stream";
+                        } else {
+                            $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
+                            $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
+                            foreach ($lines as $line) {
+                                if(substr($line, 0, 1) == '#')
+                                    continue; // skip comments
+                                $line = rtrim($line) . " ";
+                                if(!preg_match($regex, $line, $matches))
+                                    continue; // no match to the extension
+                                $fileMime = $matches[1];
+                            }
                         }
+                        if(empty($fileMime)) $fileMime = "application/octet-stream";
+                        HTMLWriter::generateInlineHeaders(basename($file), $size, $fileMime);
+                    } else {
+                        HTMLWriter::generateAttachmentsHeader(basename($file), $size, false, false);
                     }
-                    if(empty($fileMime)) $fileMime = "application/octet-stream";
-                    HTMLWriter::generateInlineHeaders(basename($file), $size, $fileMime);
-                } else {
-                    HTMLWriter::generateAttachmentsHeader(basename($file), $size, false, false);
-                }
-                $outputStream = fopen("php://output", "a");
-                $this->executeCommandInStreams($git, $commandLine, $outputStream);
-                fclose($outputStream);
+                    $outputStream = fopen("php://output", "a");
+                    $this->executeCommandInStreams($git, $commandLine, $outputStream);
+                    fclose($outputStream);
+                };
+
+                $async = new \Pydio\Core\Http\Response\AsyncResponseStream($reader);
+                $responseInterface = $responseInterface->withBody($async);
+
                 break;
 
             break;

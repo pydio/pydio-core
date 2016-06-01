@@ -127,14 +127,6 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     protected function breakAndSendError($exceptionMsg){
 
         throw new \Pydio\Core\Exception\AuthRequiredException($exceptionMsg);
-        /*
-        XMLWriter::header();
-        XMLWriter::loggingResult(-1, null, null, null);
-        XMLWriter::sendMessage("ERROR", $exceptionMsg);
-        XMLWriter::close();
-        //throw new AJXP_Exception($exceptionMsg);
-        exit();
-        */
 
     }
 

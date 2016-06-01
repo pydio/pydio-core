@@ -37,32 +37,32 @@
 		<actions>
 			<action name="eml_get_xml_structure">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_get_bodies">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_dl_attachment">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_cp_attachment">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="ls" dirDefault="true">
 				<post_processing>
-					<serverCallback methodName="lsPostProcess" capture="true"></serverCallback>
+					<serverCallback methodName="lsPostProcess" capture="true"/>
 				</post_processing>
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMimeHeaders"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMimeHeaders"/>
 		</hooks>
 	</registry_contributions>
 	<dependencies>

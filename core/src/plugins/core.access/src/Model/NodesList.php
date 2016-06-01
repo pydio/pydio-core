@@ -166,4 +166,9 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     {
         return $this->parentNode->getPath();
     }
+
+    public function getCharset()
+    {
+        return "UTF-8";
+    }
 }

@@ -23,7 +23,6 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -365,63 +364,59 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         return $IDS;
     }
 
-    public function switchActions($actionName, $httpVars, $fileVars)
+    public function switchActions(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        switch ($actionName) {
+        $actionName = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+        if($actionName !== "toggle_watch") return;
 
-            case "toggle_watch":
+        $us = new UserSelection($this->accessDriver->repository, $httpVars);
+        $node = $us->getUniqueNode();
+        $node->loadNodeInfo();
+        $cmd = $httpVars["watch_action"];
 
-                $us = new UserSelection($this->accessDriver->repository, $httpVars);
-                $node = $us->getUniqueNode();
-                $node->loadNodeInfo();
-                $cmd = $httpVars["watch_action"];
+        $meta = $this->metaStore->retrieveMetadata(
+            $node,
+            self::$META_WATCH_NAMESPACE,
+            false,
+            AJXP_METADATA_SCOPE_REPOSITORY
+        );
+        $userId = AuthService::getLoggedUser()!= null ? AuthService::getLoggedUser()->getId() : "shared";
 
-                $meta = $this->metaStore->retrieveMetadata(
-                    $node,
-                    self::$META_WATCH_NAMESPACE,
-                    false,
-                    AJXP_METADATA_SCOPE_REPOSITORY
-                );
-                $userId = AuthService::getLoggedUser()!= null ? AuthService::getLoggedUser()->getId() : "shared";
-
-                if ($cmd == "watch_stop" && isSet($meta) && isSet($meta[$userId])) {
-                    unset($meta[$userId]);
-                    $this->metaStore->removeMetadata(
-                        $node,
-                        self::$META_WATCH_NAMESPACE,
-                        false,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
-                } else {
-                    switch ($cmd) {
-                        case "watch_change": $type = self::$META_WATCH_CHANGE;break;
-                        case "watch_read": $type = self::$META_WATCH_READ; break;
-                        case "watch_both": $type = self::$META_WATCH_BOTH; break;
-                        default: break;
-                    }
-                    $meta[$userId] = $type;
-                    $this->metaStore->setMetadata(
-                        $node,
-                        self::$META_WATCH_NAMESPACE,
-                        $meta,
-                        false,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
-                }
-
-                XMLWriter::header();
-                $node->metadata = array();
-                $node->loadNodeInfo(true, false, "all");
-                $this->enrichNode($node);
-                XMLWriter::writeNodesDiff(array("UPDATE" => array( $node->getPath() => $node )), true);
-                XMLWriter::close();
-
-                break;
-
-            default:
-            break;
-
+        if ($cmd == "watch_stop" && isSet($meta) && isSet($meta[$userId])) {
+            unset($meta[$userId]);
+            $this->metaStore->removeMetadata(
+                $node,
+                self::$META_WATCH_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+        } else {
+            switch ($cmd) {
+                case "watch_change": $type = self::$META_WATCH_CHANGE;break;
+                case "watch_read": $type = self::$META_WATCH_READ; break;
+                case "watch_both": $type = self::$META_WATCH_BOTH; break;
+                default: $type = self::$META_WATCH_BOTH; break;
+            }
+            $meta[$userId] = $type;
+            $this->metaStore->setMetadata(
+                $node,
+                self::$META_WATCH_NAMESPACE,
+                $meta,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
         }
+
+        $node->metadata = array();
+        $node->loadNodeInfo(true, false, "all");
+        $this->enrichNode($node);
+        $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
+        $nodesDiff->update($node);
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk($nodesDiff);
+        $responseInterface = $responseInterface->withBody($x);
+
     }
 
 

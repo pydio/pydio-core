@@ -78,20 +78,6 @@ class HttpDownloader extends Plugin
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
                 }
-                /*
-                if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
-
-                    $unixProcess = Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
-                    if ($unixProcess !== null) {
-                        @file_put_contents($currentDirUrl.".".$basename.".pid", $unixProcess->getPid());
-                    }
-                    XMLWriter::header();
-                    XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
-                    XMLWriter::close();
-                    session_write_close();
-                    break;
-                }
-                */
 
                 require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
                 session_write_close();

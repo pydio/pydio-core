@@ -55,12 +55,14 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param string $action
-     * @param array $httpVars
-     * @param array $fileVars
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws Exception
      */
-    public function applyChangeLock($actionName, $httpVars, $fileVars)
+    public function applyChangeLock(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
+        
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
             throw new Exception("Write actions are disabled in demo mode!");
         }
@@ -83,9 +85,11 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
                 AJXP_METADATA_SCOPE_GLOBAL
             );
         }
-        XMLWriter::header();
-        XMLWriter::reloadDataNode();
-        XMLWriter::close();
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $diff = new \Pydio\Access\Core\Model\NodesDiff();
+        $diff->update($selection->getUniqueNode());
+        $x->addChunk($diff);
+        $responseInterface = $responseInterface->withBody($x);
     }
 
     /**

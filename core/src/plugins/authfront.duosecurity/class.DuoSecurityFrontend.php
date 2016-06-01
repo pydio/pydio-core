@@ -98,9 +98,6 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         }
         $response = $response->withHeader("Content-type", "application/xml");
         $response->getBody()->write(XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken, false));
-        //XMLWriter::header();
-        //XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-        //XMLWriter::close();
 
         if($loggingResult > 0 && $loggedUser != null){
 
