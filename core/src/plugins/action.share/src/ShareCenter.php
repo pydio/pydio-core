@@ -28,8 +28,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -48,6 +51,10 @@ use Pydio\Share\Store\ShareStore;
 use Pydio\Share\View\MinisiteRenderer;
 use Pydio\Share\View\PublicAccessManager;
 use Pydio\OCS as OCS;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\EmptyResponse;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once("plugins/action.share/vendor/autoload.php");
@@ -443,17 +450,19 @@ class ShareCenter extends Plugin
     public function migrateLegacyShares($action, $httpVars, $fileVars){
         LegacyPubliclet::migrateLegacyMeta($this, $this->getShareStore(), $this->getRightsManager(), $httpVars["dry_run"] !== "run");
     }
-    
+
     /**
-     * Main callback for all share- actions.
-     * @param string $action
-     * @param array $httpVars
-     * @param array $fileVars
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @return null
      * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
      */
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
+        $action = $requestInterface->getAttribute("action");
+        $httpVars = $requestInterface->getParsedBody();
+
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
             throw new \Exception("Cannot find access driver!");
         }
@@ -627,19 +636,20 @@ class ShareCenter extends Plugin
                 }
 
                 if(!isSet($httpVars["return_json"])){
-                    header("Content-Type: text/plain");
-                    print($plainResult);
+
+                    $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+                    $responseInterface->getBody()->write($plainResult);
+
                 }else{
+
                     $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
-                    header("Content-type:application/json");
                     if(!empty($compositeShare)){
-                        echo json_encode($this->compositeShareToJson($compositeShare));
+                        $responseInterface = new JsonResponse($this->compositeShareToJson($compositeShare));
                     }else{
-                        echo json_encode(array());
+                        $responseInterface = new JsonResponse([]);
                     }
+
                 }
-                // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
-                flush();
 
                 break;
 
@@ -698,9 +708,8 @@ class ShareCenter extends Plugin
                     }
                 }
                 $mess = ConfService::getMessages();
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["share_center.47"], null);
-                XMLWriter::close();
+                $x = new SerializableResponseStream([new UserMessage($mess["share_center.47"])]);
+                $responseInterface = $responseInterface->withBody($x);
 
             break;
 
@@ -715,8 +724,7 @@ class ShareCenter extends Plugin
                     foreach($parsedMeta as $shareId => $shareMeta){
                         $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
                     }
-                    header("Content-type:application/json");
-                    echo json_encode($jsonData);
+                    $responseInterface = new JsonResponse($jsonData);
 
                 }else{
 
@@ -741,9 +749,7 @@ class ShareCenter extends Plugin
                         $mess = ConfService::getMessages();
                         throw new \Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
                     }
-                    header("Content-type:application/json");
-                    $json = $this->compositeShareToJson($compositeShare);
-                    echo json_encode($json);
+                    $responseInterface = new JsonResponse($this->compositeShareToJson($compositeShare));
 
                 }
 
@@ -759,9 +765,8 @@ class ShareCenter extends Plugin
                     $ajxpNode = ($userSelection->isEmpty() ? null : $userSelection->getUniqueNode());
                     $result = $this->getShareStore()->deleteShare($httpVars["element_type"], $sanitizedHash, false, false, $ajxpNode);
                     if($result !== false){
-                        XMLWriter::header();
-                        XMLWriter::sendMessage($mess["share_center.216"], null);
-                        XMLWriter::close();
+                        $x = new SerializableResponseStream([new UserMessage($mess["share_center.216"])]);
+                        $responseInterface = $responseInterface->withBody($x);
                     }
 
                 }else{
@@ -793,9 +798,10 @@ class ShareCenter extends Plugin
                             $res = $result && $res;
                         }
                         if($res !== false){
-                            XMLWriter::header();
-                            XMLWriter::sendMessage($mess["share_center.216"], null);
-                            XMLWriter::close();
+
+                            $x = new SerializableResponseStream([new UserMessage($mess["share_center.216"])]);
+                            $responseInterface = $responseInterface->withBody($x);
+
                             Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
 
                             if(isSet($httpVars["share_scope"]) &&  $httpVars["share_scope"] == "public"){
@@ -883,26 +889,24 @@ class ShareCenter extends Plugin
                 }
                 $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
-                XMLWriter::header();
+                $nodesList = new NodesList();
                 if($userContext == "current"){
-                    XMLWriter::sendFilesListComponentConfig('<columns template_name="ajxp_user.shares">
-                    <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                    <column messageId="share_center.132" attributeName="shared_element_parent_repository_label" sortType="String"/>
-                    <column messageId="3" attributeName="share_type_readable" sortType="String"/>
-                    </columns>');
+                    $nodesList->initColumnsData("", "", "ajxp_user.shares");
+                    $nodesList->appendColumn("ajxp_conf.8", "ajxp_label");
+                    $nodesList->appendColumn("share_center.132", "shared_element_parent_repository_label");
+                    $nodesList->appendColumn("3", "share_type_readable");
                 }else{
-                    XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
-                    <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                    <column messageId="share_center.159" attributeName="owner" sortType="String"/>
-                    <column messageId="3" attributeName="share_type_readable" sortType="String"/>
-                    <column messageId="share_center.52" attributeName="share_data" sortType="String"/>
-                    </columns>');
+                    $nodesList->initColumnsData("filelist", "list", "ajxp_conf.repositories");
+                    $nodesList->appendColumn("ajxp_conf.8", "ajxp_label");
+                    $nodesList->appendColumn("share_center.159", "owner");
+                    $nodesList->appendColumn("3", "share_type_readable");
+                    $nodesList->appendColumn("share_center.52", "share_data");
                 }
-
                 foreach($nodes as $node){
-                    XMLWriter::renderAjxpNode($node);
+                    $nodesList->addBranch($node);
                 }
-                XMLWriter::close();
+                $x = new SerializableResponseStream([$nodesList]);
+                $responseInterface = $responseInterface->withBody($x);
 
             break;
 
@@ -911,13 +915,14 @@ class ShareCenter extends Plugin
                 $accessType = ConfService::getRepository()->getAccessType();
                 $currentUser  = ($accessType != "ajxp_conf" && $accessType != "ajxp_admin");
                 $count = $this->getShareStore()->clearExpiredFiles($currentUser);
-                XMLWriter::header();
                 if($count){
-                    XMLWriter::sendMessage("Removed ".count($count)." expired links", null);
+                    $message = "Removed ".count($count)." expired links";
                 }else{
-                    XMLWriter::sendMessage("Nothing to do", null);
+                    $message = "Nothing to do";
                 }
-                XMLWriter::close();
+                $x = new SerializableResponseStream([new UserMessage($message)]);
+                $responseInterface = $responseInterface->withBody($x);
+
 
             break;
 
@@ -1642,10 +1647,14 @@ class ShareCenter extends Plugin
         foreach($hiddenUserEntries as $entry){
             $users[$entry["ID"]] = $entry;
         }
+
         if(!count($users) && !count($groups)){
             ob_start();
             unset($originalHttpVars["hash"]);
-            $this->switchAction("unshare", $originalHttpVars, array());
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request->withParsedBody($originalHttpVars);
+            $request = $request->withAttribute("action", "unshare");
+            $this->switchAction($request, new Response());
             ob_end_clean();
             return null;
         }
