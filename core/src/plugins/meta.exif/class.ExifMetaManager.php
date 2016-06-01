@@ -107,8 +107,9 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         return $result;
     }
 
-    public function extractExif($actionName, $httpVars, $fileVars)
+    public function extractExif(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        $httpVars = $requestInterface->getParsedBody();
         $repo = $this->accessDriver->repository;
         $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
         $repo->detectStreamWrapper(true);
@@ -145,24 +146,10 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             }
         }
 
-        if($format == "xml"){
-
-            XMLWriter::header("metadata", array("file" => $selectedNode->getPath(), "type" => "EXIF"));
-            foreach ($filteredData as $section => $data) {
-                print("<exifSection name='$section'>");
-                foreach ($data as $key => $value) {
-                    print("<exifTag name=\"$key\">". Utils::xmlEntities($value)."</exifTag>");
-                }
-                print("</exifSection>");
-            }
-            XMLWriter::close("metadata");
-
-        }else{
-
-            HTMLWriter::charsetHeader("application/json");
-            echo json_encode($filteredData);
-
-        }
+        require_once "ExifXmlMessage.php";
+        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $x->addChunk(new ExifXmlMessage($filteredData));
+        $responseInterface = $responseInterface->withBody($x);
 
     }
 
