@@ -390,8 +390,12 @@ class AJXP_NotificationCenter extends Plugin
                 $cumulated[$path] = $node;
             }
         }
+        if ($format == "html") {
+            $responseInterface->getBody()->write("</ul>");
+            return;
+        }
         $index = 1;
-        foreach ($cumulated as $nodeToSend) {
+        foreach ($cumulated as $path => $nodeToSend) {
             $nodeOcc = $nodeToSend->event_occurence > 1 ? " (".$nodeToSend->event_occurence.")" : "";
             if(isSet($httpVars["merge_description"]) && $httpVars["merge_description"] == "true"){
                 if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
@@ -419,9 +423,6 @@ class AJXP_NotificationCenter extends Plugin
 
         }
 
-        if ($format == "html") {
-            $responseInterface->getBody()->write("</ul>");
-        }
 
     }
     /**
