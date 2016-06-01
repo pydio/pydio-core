@@ -23,8 +23,6 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -129,27 +127,54 @@ class AJXP_NotificationCenter extends Plugin
     }
 
     public function loadRepositoryInfo(&$data){
-        $f = $this->loadUserFeed("get_my_feed", array(
-                'format' => 'array',
-                'current_repository'=>true,
-                'feed_type'=>'notif',
-                'limit' => 1,
-                'path'=>'/',
-                'merge_description'=>true,
-                'description_as_label'=>false
-        ), array());
-        $data["core.notifications"] = $f;
+        $req = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
+        $req = $req->withParsedBody([
+            'format' => 'array',
+            'current_repository'=>true,
+            'feed_type'=>'notif',
+            'limit' => 1,
+            'path'=>'/',
+            'merge_description'=>true,
+            'description_as_label'=>false
+        ])->withAttribute("action", "get_my_feed");
+        $this->loadUserFeed($req, new \Zend\Diactoros\Response\EmptyResponse(), $returnData);
+        $data["core.notifications"] = $returnData;
     }
 
-    public function loadUserFeed($actionName, $httpVars, $fileVars)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @param array $returnData
+     */
+    public function loadUserFeed(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, &$returnData = [])
     {
-        if(!$this->eventStore) return array();
+        $httpVars = $requestInterface->getParsedBody();
+        if(!$this->eventStore) {
+            return;
+        }
         $u = AuthService::getLoggedUser();
+
+        $mess = ConfService::getMessages();
+        $nodesList = new \Pydio\Access\Core\Model\NodesList();
+        $format = "html";
+        if (isSet($httpVars["format"])) {
+            $format = $httpVars["format"];
+        }
+        if ($format == "html") {
+            $responseInterface = $responseInterface->withHeader("Content-Type", "text/html");
+            $responseInterface->getBody()->write("<h2>".$mess["notification_center.4"]."</h2>");
+            $responseInterface->getBody()->write("<ul class='notification_list'>");
+        } else {
+            $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+            $responseInterface = $responseInterface->withBody($x);
+            $x->addChunk($nodesList);
+        }
+
         if ($u == null) {
-            if($httpVars["format"] == "html" || $httpVars["format"] == "array") return array();
-            XMLWriter::header();
-            XMLWriter::close();
-            return array();
+            if($format == "html"){
+                $responseInterface->getBody()->write("</ul>");
+            }
+            return;
         }
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
@@ -171,23 +196,9 @@ class AJXP_NotificationCenter extends Plugin
             $res = array();
         }
 
-        $mess = ConfService::getMessages();
-        $format = "html";
-        if (isSet($httpVars["format"])) {
-            $format = $httpVars["format"];
-        }
-        if ($format == "html") {
-            echo("<h2>".$mess["notification_center.4"]."</h2>");
-            echo("<ul class='notification_list'>");
-        } else if($format == "json"){
-            $jsonNodes = array();
-        } else if($format != 'array') {
-            XMLWriter::header();
-        }
-
         // APPEND USER ALERT IN THE SAME QUERY FOR NOW
         if(!isSet($httpVars["feed_type"]) || $httpVars["feed_type"] == "alert" || $httpVars["feed_type"] == "all"){
-            $this->loadUserAlerts("", array_merge($httpVars, array("skip_container_tags" => "true")), $fileVars);
+            $this->loadUserAlerts($requestInterface, $responseInterface, $nodesList);
         }
         restore_error_handler();
         $index = 1;
@@ -206,9 +217,7 @@ class AJXP_NotificationCenter extends Plugin
                 $notif->setDate(intval($object->date));
                 if ($format == "html") {
                     $p = $notif->getNode()->getPath();
-                    echo("<li data-ajxpNode='$p'>");
-                    echo($notif->getDescriptionShort(true));
-                    echo("</li>");
+                    $responseInterface->getBody()->write("<li data-ajxpNode='$p'>".$notif->getDescriptionShort()."</li>");
                 } else {
                     $node = $notif->getNode();
                     if ($node == null) {
@@ -248,32 +257,22 @@ class AJXP_NotificationCenter extends Plugin
                     $url = parse_url($node->getUrl());
                     $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
                     $index ++;
-                    if($format == "json" || $format == "array"){
+                    if($format == "array"){
                         $keys = $node->listMetaKeys();
                         $data = array();
                         foreach($keys as $k){
                             $data[$k] = $node->$k;
                         }
-                        if($format == "json"){
-                            $jsonNodes[] = json_encode($data);
-                        }else{
-                            $jsonNodes[] = $data;
-                        }
+                        $returnData[] = $data;
                     }else{
-                        XMLWriter::renderAjxpNode($node);
+                        $nodesList->addBranch($node);
                     }
                 }
             }
         }
         if ($format == "html") {
             echo("</ul>");
-        } else if($format == "json"){
-            HTMLWriter::charsetHeader("application/json");
-            echo('[' . implode(",", $jsonNodes). ']');
-        } else if($format == "array"){
-            return $jsonNodes;
-        } else {
-            XMLWriter::close();
+            $responseInterface->getBody()->write("</ul>");
         }
 
     }
@@ -289,12 +288,14 @@ class AJXP_NotificationCenter extends Plugin
     }
 
 
-    public function loadUserAlerts($actionName, $httpVars, $fileVars)
+    public function loadUserAlerts(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, \Pydio\Access\Core\Model\NodesList &$nodesList = null)
     {
         if(!$this->eventStore) return;
         $u = AuthService::getLoggedUser();
         $userId = $u->getId();
         $repositoryFilter = null;
+        $httpVars = $requestInterface->getParsedBody();
+
         if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
             $repositoryFilter = $httpVars["repository_id"];
         }
@@ -308,14 +309,18 @@ class AJXP_NotificationCenter extends Plugin
 
 
         $format = $httpVars["format"];
-        $skipContainingTags = (isSet($httpVars["skip_container_tags"]));
+        $fillList = ($nodesList !== null);
         $mess = ConfService::getMessages();
-        if (!$skipContainingTags) {
+        if (!$fillList) {
             if ($format == "html") {
-                echo("<h2>".$mess["notification_center.3"]."</h2>");
-                echo("<ul class='notification_list'>");
+                $responseInterface = $responseInterface->withHeader("Content-Type", "text/html");
+                $responseInterface->getBody()->write("<h2>".$mess["notification_center.3"]."</h2>");
+                $responseInterface->getBody()->write("<ul class='notification_list'>");
             } else {
-                XMLWriter::header();
+                $nodesList = new \Pydio\Access\Core\Model\NodesList();
+                $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
+                $responseInterface = $responseInterface->withBody($x);
+                $x->addChunk($nodesList);
             }
         }
         $parentRepository = ConfService::getRepositoryById($repositoryFilter);
@@ -323,9 +328,7 @@ class AJXP_NotificationCenter extends Plugin
         $cumulated = array();
         foreach ($res as $notification) {
             if ($format == "html") {
-                echo("<li>");
-                echo($notification->getDescriptionLong(true));
-                echo("</li>");
+                $responseInterface->getBody()->write("<li>".$notification->getDescriptionLong(true)."</li>");
             } else {
                 $node = $notification->getNode();
                 if(!$node instanceof AJXP_Node){
@@ -412,15 +415,12 @@ class AJXP_NotificationCenter extends Plugin
             //$url = parse_url($nodeToSend->getUrl());
             //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
             $index ++;
-            XMLWriter::renderAjxpNode($nodeToSend);
+            $nodesList->addBranch($nodeToSend);
 
         }
-        if (!$skipContainingTags) {
-            if ($format == "html") {
-                echo("</ul>");
-            } else {
-                XMLWriter::close();
-            }
+
+        if ($format == "html") {
+            $responseInterface->getBody()->write("</ul>");
         }
 
     }
