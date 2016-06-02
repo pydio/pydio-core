@@ -126,9 +126,10 @@ class MinisiteRenderer
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             ConfService::switchRootDir($repository);
             ConfService::loadRepositoryDriver();
-            PluginsService::deferBuildingRegistry();
-            PluginsService::getInstance()->initActivePlugins();
-            PluginsService::flushDeferredRegistryBuilding();
+            $pService = PluginsService::getInstance();
+            $pService->deferBuildingRegistry();
+            $pService->initActivePlugins();
+            $pService->flushDeferredRegistryBuilding();
             $errMessage = null;
             try {
                 $params = $_GET;

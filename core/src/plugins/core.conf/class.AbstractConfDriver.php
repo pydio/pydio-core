@@ -119,22 +119,13 @@ abstract class AbstractConfDriver extends Plugin
                 $publicUrlNode = $publicUrlNodeList->item(0);
                 $contribNode->removeChild($publicUrlNode);
             }
-        }
+        } 
 
-        // PERSONAL INFORMATIONS
-        $hasExposed = false;
-        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
-        if ($cacheHasExposed !== null) {
-            $hasExposed = $cacheHasExposed;
-        } else {
-            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
-            if (is_array($paramNodes) && count($paramNodes)) {
-                $hasExposed = true;
-            }
-            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
-        }
-        //$hasExposed = true;
-
+        $hasExposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'user') and @expose='true']", function ($nodes) {
+            return (is_array($nodes) && count($nodes));
+        }, function($test){
+            return ($test !== null);
+        });
 
         if (!$hasExposed) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
@@ -563,24 +554,19 @@ abstract class AbstractConfDriver extends Plugin
             $prefs[$pref] = array("value" => $userObject->getPref($pref), "type" => "json" );
         }
 
-
-        $exposed = array();
-        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
-        if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
-            $exposed = $cacheHasExposed;
-        } else {
-            $exposed_props = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
-            foreach($exposed_props as $exposed_prop){
+        $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'user') and @expose='true']", function($nodes){
+            $result = [];
+            foreach($nodes as $exposed_prop){
                 $parentNode = $exposed_prop->parentNode->parentNode;
                 $pluginId = $parentNode->getAttribute("id");
                 if (empty($pluginId)) {
                     $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
                 }
                 $paramName = $exposed_prop->getAttribute("name");
-                $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName);
+                $result[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName);
             }
-            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $exposed);
-        }
+            return $result;
+        });
 
         foreach ($exposed as $exposedProp) {
             $value = $userObject->mergedRole->filterParameterValue($exposedProp["PLUGIN_ID"], $exposedProp["NAME"], AJXP_REPO_SCOPE_ALL, "");

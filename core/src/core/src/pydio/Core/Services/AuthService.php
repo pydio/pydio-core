@@ -1161,23 +1161,18 @@ class AuthService
         $parentRole = self::getRole("AJXP_USR_/".$parentUserId);
         if($parentRole === false) return null;
 
-        // Inherit actions
-        $inheritActions = array();
-        $cacheInherit = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[@inherit='true']");
-        if ($cacheInherit !== null && is_array($cacheInherit)) {
-            $inheritActions = $cacheInherit;
-        } else {
-            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[@inherit='true']", "node", false, false, true);
-            if (is_array($paramNodes) && count($paramNodes)) {
-                foreach ($paramNodes as $node) {
+        $inheritActions = PluginsService::searchManifestsWithCache("//server_settings/param[@inherit='true']", function ($nodes) {
+            $result = [];
+            if (is_array($nodes) && count($nodes)) {
+                foreach ($nodes as $node) {
                     $paramName = $node->getAttribute("name");
                     $pluginId = $node->parentNode->parentNode->getAttribute("id");
-                    if(isSet($inheritActions[$pluginId])) $inheritActions[$pluginId] = array();
-                    $inheritActions[$pluginId][] = $paramName;
+                    if(isSet($result[$pluginId])) $result[$pluginId] = array();
+                    $result[$pluginId][] = $paramName;
                 }
             }
-            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[@inherit='true']", $inheritActions);
-        }
+            return $result;
+        });
 
         // Clear ACL, Keep disabled actions, keep 'inherit' parameters.
         $childRole =  new AJXP_Role("AJXP_PARENT_USR_/");

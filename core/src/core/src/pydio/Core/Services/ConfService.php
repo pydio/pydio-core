@@ -368,9 +368,10 @@ class ConfService
             ConfService::getConfStorageImpl();
             ConfService::loadRepositoryDriver();
         }
-        PluginsService::deferBuildingRegistry();
-        PluginsService::getInstance()->initActivePlugins();
-        PluginsService::flushDeferredRegistryBuilding();
+        $pServ = PluginsService::getInstance();
+        $pServ->deferBuildingRegistry();
+        $pServ->initActivePlugins();
+        $pServ->flushDeferredRegistryBuilding();
         Controller::registryReset();
 
     }
@@ -1432,19 +1433,13 @@ class ConfService
      */
     public static function getDeclaredUnsecureActions()
     {
-        $test = PluginsService::getInstance()->loadFromPluginQueriesCache("//action[@skipSecureToken]");
-        if (!empty($test) && is_array($test)) {
-            return $test;
-        } else {
-            $nodes = PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes", false, false, true);
+        return PluginsService::searchManifestsWithCache("//action[@skipSecureToken]", function($nodes){
             $res = array();
             foreach ($nodes as $node) {
                 $res[] = $node->getAttribute("name");
             }
-            PluginsService::getInstance()->storeToPluginQueriesCache("//action[@skipSecureToken]", $res);
             return $res;
-        }
-
+        });
     }
     /**
      * Detect available languages from the core i18n library
@@ -1739,7 +1734,7 @@ class ConfService
             throw $e;
         }
 
-        PluginsService::deferBuildingRegistry();
+        $pServ->deferBuildingRegistry();
         $pServ->setPluginUniqueActiveForType("access", $accessType);
 
         // TRIGGER INIT META
@@ -1766,7 +1761,7 @@ class ConfService
                 $pServ->setPluginActive($split[0], $split[1]);
             }
         }
-        PluginsService::flushDeferredRegistryBuilding();
+        $pServ->flushDeferredRegistryBuilding();
         if (count($this->errors)>0) {
             $e = new PydioException("Error while loading repository feature : ".implode(",",$this->errors));
             if(!$rest){

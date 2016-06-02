@@ -54,56 +54,188 @@ class PluginsService
     private $mixinsDoc;
     private $mixinsXPath;
 
+    /*********************************/
+    /*         STATIC FUNCTIONS      */
+    /*********************************/
 
     /**
-     * @return bool
+     * Build the XML Registry if not already built, and return it.
+     * @static
+     * @param bool $extendedVersion
+     * @return \DOMDocument The registry
      */
-    private function _loadRegistryFromCache(){
+    public static function getXmlRegistry($extendedVersion = true)
+    {
+        $self = self::getInstance();
+        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
+            $self->buildXmlRegistry( $extendedVersion );
+            $self->registryVersion = ($extendedVersion ? "extended":"light");
+        }
+        return $self->xmlRegistry;
+    }
 
-        if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
-            $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
-            if (count($reqs)) {
-                foreach ($reqs as $fileName) {
-                    if (!is_file($fileName)) {
-                        // Cache is out of sync
-                        return false;
+    /**
+     * Replace the current xml registry
+     * @static
+     * @param $registry
+     * @param bool $extendedVersion
+     */
+    public static function updateXmlRegistry($registry, $extendedVersion = true)
+    {
+        $self = self::getInstance();
+        $self->xmlRegistry = $registry;
+        $self->registryVersion = ($extendedVersion? "extended" : "light");
+    }
+
+    /**
+     * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
+     * @param string $query
+     * @param string $stringOrNodeFormat
+     * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
+     * @param bool $limitToEnabledPlugins
+     * @param bool $loadExternalFiles
+     * @return \DOMNode[]
+     */
+    public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
+    {
+        $buffer = "";
+        $nodes = array();
+        $self = self::getInstance();
+        foreach ($self->registry as $plugType) {
+            foreach ($plugType as $plugName => $plugObject) {
+                if ($limitToActivePlugins) {
+                    $plugId = $plugObject->getId();
+                    if ($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)) {
+                        continue;
                     }
-                    require_once($fileName);
                 }
-
-                $res = null;
-
-                // Retrieving Registry from Server Cache
-                if ($this->cacheStorage) {
-                    $res = $this->cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
-
-                    $this->registry=$res;
+                if ($limitToEnabledPlugins) {
+                    if(!$plugObject->isEnabled()) continue;
                 }
-
-                // Retrieving Registry from files cache
-                if (empty($res)) {
-                    $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                    $this->registry=$res;
-                    $this->savePluginsRegistryToCache();
-                }
-
-                // Refresh streamWrapperPlugins
-                foreach ($this->registry as $plugs) {
-                    foreach ($plugs as $plugin) {
-                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
-                            $this->streamWrapperPlugins[] = $plugin->getId();
-                        }
+                $res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
+                if ($stringOrNodeFormat == "string") {
+                    $buffer .= $res;
+                } else {
+                    foreach ($res as $node) {
+                        $nodes[] = $node;
                     }
                 }
-
-                return true;
-            }else{
-                return false;
             }
-        }else{
+        }
+        if($stringOrNodeFormat == "string") return $buffer;
+        else return $nodes;
+    }
+
+    /**
+     * Clear the cached files with the plugins
+     */
+    public static function clearPluginsCache(){
+        @unlink(AJXP_PLUGINS_CACHE_FILE);
+        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        @unlink(AJXP_PLUGINS_QUERIES_CACHE);
+        @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+        if(@unlink(AJXP_PLUGINS_REPOSITORIES_CACHE)){
+            $content = "<?php \n";
+            $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/repositories.php");
+            if($boots !== false){
+                foreach($boots as $b){
+                    $content .= 'require_once("'.$b.'");'."\n";
+                }
+            }
+            @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
+        }
+    }
+
+    /**
+     * Add a plugin to the list of active plugins
+     * @static
+     * @param string $type
+     * @param string $name
+     * @param bool $active
+     * @param Plugin $updateInstance
+     * @return void
+     */
+    public static function setPluginActive($type, $name, $active=true, $updateInstance = null)
+    {
+        self::getInstance()->setPluginActiveInst($type, $name, $active, $updateInstance);
+    }
+
+    /**
+     *
+     * @param string $type
+     * @param string $name
+     * @return Plugin
+     */
+    public static function findPlugin($type, $name)
+    {
+        $instance = self::getInstance();
+        return $instance->getPluginByTypeName($type, $name);
+    }
+
+    /**
+     * Simply find a plugin by its id (type.name)
+     * @static
+     * @param $id
+     * @return Plugin
+     */
+    public static function findPluginById($id)
+    {
+        return self::getInstance()->getPluginById($id);
+    }
+
+    /**
+     * Singleton method
+     *
+     * @return PluginsService the service instance
+     */
+    public static function getInstance()
+    {
+        if (!isSet(self::$instance)) {
+            $c = __CLASS__;
+            self::$instance = new $c;
+        }
+        return self::$instance;
+    }
+
+    /**
+     * Search in all plugins (enabled / active or not) and store result in cache
+     * @param string $query
+     * @param callable $typeChecker
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function searchManifestsWithCache($query, $callback, $typeChecker = null){
+        $result = self::loadFromPluginQueriesCache($query);
+        if(empty($typeChecker)){
+            $typeChecker = function($test){
+                return ($test !== null && is_array($test));
+            };
+        }
+        if($typeChecker($result)){
+            return $result;
+        }
+        $nodes = self::searchAllManifests($query, "node", false, false, true);
+        $result = $callback($nodes);
+        self::storeToPluginQueriesCache($query, $result);
+        return $result;
+    }
+
+    /*********************************/
+    /*        PUBLIC FUNCTIONS       */
+    /*********************************/
+
+    /**
+     * @param string $plugType
+     * @param string $plugName
+     * @return Plugin
+     */
+    public function getPluginByTypeName($plugType, $plugName)
+    {
+        if (isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])) {
+            return $this->registry[$plugType][$plugName];
+        } else {
             return false;
         }
-
     }
 
     /**
@@ -119,16 +251,6 @@ class PluginsService
         }
         if($this->_loadRegistryFromCache()){
             return true;
-        }
-    }
-
-    /**
-     * Save plugin registry to cache
-     *
-     */
-    public function savePluginsRegistryToCache() {
-        if (!empty ($this->cacheStorage)) {
-            $this->cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
         }
     }
 
@@ -187,6 +309,366 @@ class PluginsService
     }
 
     /**
+     * Simply load a plugin class, without the whole dependencies et.all
+     * @param string $pluginId
+     * @param array $pluginOptions
+     * @return Plugin
+     */
+    public function softLoad($pluginId, $pluginOptions)
+    {
+        // Try to get from cache
+        list($type, $name) = explode(".", $pluginId);
+        if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+            /**
+             * @var Plugin $plugin
+             */
+            $plugin = $this->registry[$type][$name];
+            $plugin->init($pluginOptions);
+            return clone $plugin;
+        }
+
+
+        $plugin = new Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
+        $plugin->loadManifest();
+        $plugin = $this->instanciatePluginClass($plugin);
+        $plugin->loadConfigs(array()); // Load default
+        $plugin->init($pluginOptions);
+        return $plugin;
+    }
+
+    /**
+     * All the plugins of a given type
+     * @param string $type
+     * @return Plugin[]
+     */
+    public function getPluginsByType($type)
+    {
+        if(isSet($this->registry[$type])) return $this->registry[$type];
+        else return array();
+    }
+
+    /**
+     * Get a plugin instance
+     *
+     * @param string $pluginId
+     * @return Plugin
+     */
+    public function getPluginById($pluginId)
+    {
+        $split = explode(".", $pluginId);
+        return $this->getPluginByTypeName($split[0], $split[1]);
+    }
+
+    /**
+     * Load data from cache
+     * @param $key
+     * @return mixed|null
+     */
+    public function loadFromPluginQueriesCache($key)
+    {
+        if(AJXP_SKIP_CACHE) return null;
+        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        if (!empty($test) && is_array($test) && isset($test[$key])) {
+            return $test[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Copy data to cache
+     * @param $key
+     * @param $value
+     * @throws \Exception
+     */
+    public function storeToPluginQueriesCache($key, $value)
+    {
+        if(AJXP_SKIP_CACHE) return;
+        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        if(!is_array($test)) $test = array();
+        $test[$key] = $value;
+        Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
+    }
+
+    /*********************************/
+    /*    PUBLIC: ACTIVE PLUGINS     */
+    /*********************************/
+    /**
+     * Load the plugins list, and set active the plugins automatically,
+     * except for the specific types that declare a "core.*" plugin. In that case,
+     * either the core class has an AUTO_LOAD_TYPE property and all plugins are activated,
+     * or it's the task of the core class to load the necessary plugin(s) of this type.
+     * @return void
+     */
+    public function initActivePlugins()
+    {
+        /**
+         * @var Plugin $pObject
+         */
+        $detected = $this->getDetectedPlugins();
+        $toActivate = array();
+        foreach ($detected as $pType => $pObjects) {
+            $coreP = $this->findPlugin("core", $pType);
+            if($coreP !== false && !isSet($coreP->AUTO_LOAD_TYPE)) continue;
+            foreach ($pObjects as $pName => $pObject) {
+                $toActivate[$pObject->getId()] = $pObject ;
+            }
+        }
+        $o = $this->getOrderByDependency($toActivate, false);
+        foreach ($o as $id) {
+            $pObject = $toActivate[$id];
+            $pObject->init(array());
+            try {
+                $pObject->performChecks();
+                if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
+                $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
+            } catch (\Exception $e) {
+                //$this->errors[$pName] = "[$pName] ".$e->getMessage();
+            }
+
+        }
+    }
+
+    /**
+     * Instance implementation of the setPluginActive
+     * @param $type
+     * @param $name
+     * @param bool $active
+     * @param Plugin $updateInstance
+     * @return void
+     */
+    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null)
+    {
+        if ($active) {
+            // Check active plugin dependencies
+            $plug = $this->getPluginById($type.".".$name);
+            if(!$plug || !$plug->isEnabled()) return;
+            $deps = $plug->getActiveDependencies($this);
+            if (count($deps)) {
+                $found = false;
+                foreach ($deps as $dep) {
+                    if (isSet($this->activePlugins[$dep]) && $this->activePlugins[$dep] !== false) {
+                        $found = true; break;
+                    }
+                }
+                if (!$found) {
+                    $this->activePlugins[$type.".".$name] = false;
+                    return ;
+                }
+            }
+        }
+        if(isSet($this->activePlugins[$type.".".$name])){
+            unset($this->activePlugins[$type.".".$name]);
+        }
+        $this->activePlugins[$type.".".$name] = $active;
+        if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
+            $this->registry[$type][$name] = $updateInstance;
+        }
+        if (isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild) {
+            $this->buildXmlRegistry(($this->registryVersion == "extended"));
+        }
+    }
+
+    /**
+     * Set the service in defer mode : do not rebuild
+     * registry on each plugin activation
+     */
+    public function deferBuildingRegistry(){
+        $this->tmpDeferRegistryBuild = true;
+    }
+
+    /**
+     * If service was in defer mode, now build the registry
+     */
+    public function flushDeferredRegistryBuilding(){
+        $this->tmpDeferRegistryBuild = false;
+        if (isSet($this->xmlRegistry)) {
+            $this->buildXmlRegistry(($this->registryVersion == "extended"));
+        }
+    }
+
+    /**
+     * Some type require only one active plugin at a time
+     * @param $type
+     * @param $name
+     * @param Plugin $updateInstance
+     * @return void
+     */
+    public function setPluginUniqueActiveForType($type, $name, $updateInstance = null)
+    {
+        $typePlugs = $this->getPluginsByType($type);
+        $originalValue = $this->tmpDeferRegistryBuild;
+        $this->tmpDeferRegistryBuild = true;
+        foreach ($typePlugs as $plugName => $plugObject) {
+            $this->setPluginActiveInst($type, $plugName, false);
+        }
+        $this->tmpDeferRegistryBuild = $originalValue;
+        $this->setPluginActiveInst($type, $name, true, $updateInstance);
+    }
+
+    /**
+     * Retrieve the whole active plugins list
+     * @return array
+     */
+    public function getActivePlugins()
+    {
+        return $this->activePlugins;
+    }
+
+    /**
+     * Retrieve an array of active plugins for type
+     * @param string $type
+     * @param bool $unique
+     * @return Plugin[]
+     */
+    public function getActivePluginsForType($type, $unique = false)
+    {
+        $acts = array();
+        foreach ($this->activePlugins as $plugId => $active) {
+            if(!$active) continue;
+            list($pT,$pN) = explode(".", $plugId);
+            if ($pT == $type && isset($this->registry[$pT][$pN])) {
+                if ($unique) {
+                    return $this->registry[$pT][$pN];
+                    break;
+                }
+                $acts[$pN] = $this->registry[$pT][$pN];
+            }
+        }
+        if($unique && !count($acts)) return false;
+        return $acts;
+    }
+
+    /**
+     * Return only one of getActivePluginsForType
+     * @param $type
+     * @return array|bool
+     */
+    public function getUniqueActivePluginForType($type)
+    {
+        return $this->getActivePluginsForType($type, true);
+    }
+
+    /**
+     * All the plugins registry, active or not
+     * @return array
+     */
+    public function getDetectedPlugins()
+    {
+        return $this->registry;
+    }
+
+    /*********************************/
+    /*    PUBLIC: WRAPPERS METHODS   */
+    /*********************************/
+    /**
+     * All the plugins that declare a stream wrapper
+     * @return array
+     */
+    public function getStreamWrapperPlugins()
+    {
+        return $this->streamWrapperPlugins;
+    }
+
+    /**
+     * Add the $protocol/$wrapper to an internal cache
+     * @param string $protocol
+     * @param string $wrapperClassName
+     * @return void
+     */
+    public function registerWrapperClass($protocol, $wrapperClassName)
+    {
+        $this->registeredWrappers[$protocol] = $wrapperClassName;
+    }
+
+    /**
+     * Find a classname for a given protocol
+     * @param $protocol
+     * @return
+     */
+    public function getWrapperClassName($protocol)
+    {
+        return $this->registeredWrappers[$protocol];
+    }
+
+    /**
+     * The protocol/classnames table
+     * @return array
+     */
+    public function getRegisteredWrappers()
+    {
+        return $this->registeredWrappers;
+    }
+
+    /**
+     * Append some predefined XML to a plugin instance
+     * @param Plugin $plugin
+     * @param \DOMDocument $manifestDoc
+     * @param String $mixinName
+     */
+    public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName)
+    {
+        // Load behaviours if not already
+        if (!isSet($this->mixinsDoc)) {
+            $this->mixinsDoc = new \DOMDocument();
+            $this->mixinsDoc->load(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
+            $this->mixinsXPath = new \DOMXPath($this->mixinsDoc);
+        }
+        // Merge into manifestDoc
+        $nodeList = $this->mixinsXPath->query($mixinName);
+        if(!$nodeList->length) return;
+        $mixinNode = $nodeList->item(0);
+        foreach ($mixinNode->childNodes as $child) {
+            if($child->nodeType != XML_ELEMENT_NODE) continue;
+            $uuidAttr = $child->getAttribute("uuidAttr") OR "name";
+            $this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes, true);
+        }
+
+        // Reload plugin XPath
+        $plugin->reloadXPath();
+    }
+
+
+    /*********************************/
+    /*         PRIVATE FUNCTIONS     */
+    /*********************************/
+    /**
+     * Save plugin registry to cache
+     *
+     */
+    private function savePluginsRegistryToCache() {
+        if (!empty ($this->cacheStorage)) {
+            $this->cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
+        }
+    }
+
+    /**
+     * Go through all plugins and call their getRegistryContributions() method.
+     * Add all these contributions to the main XML ajxp_registry document.
+     * @param bool $extendedVersion Will be passed to the plugin, for optimization purpose.
+     * @return void
+     */
+    private function buildXmlRegistry($extendedVersion = true)
+    {
+        $actives = $this->getActivePlugins();
+        $reg = new \DOMDocument();
+        $reg->loadXML("<ajxp_registry></ajxp_registry>");
+        foreach ($actives as $activeName=>$status) {
+            if($status === false) continue;
+            $plug = $this->getPluginById($activeName);
+            $contribs = $plug->getRegistryContributions($extendedVersion);
+            foreach ($contribs as $contrib) {
+                $parent = $contrib->nodeName;
+                $nodes = $contrib->childNodes;
+                if(!$nodes->length) continue;
+                $uuidAttr = $contrib->getAttribute("uuidAttr");
+                if($uuidAttr == "") $uuidAttr = "name";
+                $this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
+            }
+        }
+        $this->xmlRegistry = $reg;
+    }
+
+    /**
      * Load plugin class with dependencies first
      *
      * @param Plugin $plugin
@@ -223,68 +705,55 @@ class PluginsService
         $plugin->loadingState = "loaded";
     }
 
-    public function loadFromPluginQueriesCache($key)
-    {
-        if(AJXP_SKIP_CACHE) return null;
-        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
-        if (!empty($test) && is_array($test) && isset($test[$key])) {
-            return $test[$key];
-        }
-        return null;
-    }
-
-    public function storeToPluginQueriesCache($key, $value)
-    {
-        if(AJXP_SKIP_CACHE) return;
-        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
-        if(!is_array($test)) $test = array();
-        $test[$key] = $value;
-        Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
-    }
-
-    public static function clearPluginsCache(){
-        @unlink(AJXP_PLUGINS_CACHE_FILE);
-        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
-        @unlink(AJXP_PLUGINS_QUERIES_CACHE);
-        @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
-        if(@unlink(AJXP_PLUGINS_REPOSITORIES_CACHE)){
-            $content = "<?php \n";
-            $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/repositories.php");
-            if($boots !== false){
-                foreach($boots as $b){
-                    $content .= 'require_once("'.$b.'");'."\n";
-                }
-            }
-            @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
-        }
-    }
-
     /**
-     * Simply load a plugin class, without the whole dependencies et.all
-     * @param string $pluginId
-     * @param array $pluginOptions
-     * @return Plugin
+     * @return bool
      */
-    public function softLoad($pluginId, $pluginOptions)
-    {
-        // Try to get from cache
-        list($type, $name) = explode(".", $pluginId);
-        if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
-            /**
-             * @var Plugin $plugin
-             */
-            $plugin = $this->registry[$type][$name];
-            $plugin->init($pluginOptions);
-            return clone $plugin;
+    private function _loadRegistryFromCache(){
+
+        if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
+            $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
+            if (count($reqs)) {
+                foreach ($reqs as $fileName) {
+                    if (!is_file($fileName)) {
+                        // Cache is out of sync
+                        return false;
+                    }
+                    require_once($fileName);
+                }
+
+                $res = null;
+
+                // Retrieving Registry from Server Cache
+                if ($this->cacheStorage) {
+                    $res = $this->cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
+
+                    $this->registry=$res;
+                }
+
+                // Retrieving Registry from files cache
+                if (empty($res)) {
+                    $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $this->registry=$res;
+                    $this->savePluginsRegistryToCache();
+                }
+
+                // Refresh streamWrapperPlugins
+                foreach ($this->registry as $plugs) {
+                    foreach ($plugs as $plugin) {
+                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
+                            $this->streamWrapperPlugins[] = $plugin->getId();
+                        }
+                    }
+                }
+
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
         }
 
-
-        $plugin = new Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
-        $plugin->loadManifest();
-        $plugin = $this->instanciatePluginClass($plugin);
-        $plugin->loadConfigs(array()); // Load default
-        $plugin->init($pluginOptions);
-        return $plugin;
     }
 
     /**
@@ -340,31 +809,7 @@ class PluginsService
         }
     }
 
-    /**
-     * User function for sorting
-     *
-     * @param $pluginIdA
-     * @param $pluginIdB
-     * @internal param String $pluginA
-     * @internal param String $pluginB
-     * @return integer
-     */
-    public static function sortByDependencyIds($pluginIdA, $pluginIdB)
-    {
-        if($pluginIdA == $pluginIdB) return 0;
-        $pluginA = self::findPluginById($pluginIdA);
-        $pluginB = self::findPluginById($pluginIdB);
-        if($pluginA == null || $pluginB == null) return 0;
-        if ($pluginA->dependsOn($pluginIdB)) {
-            return 1;
-        }
-        if ($pluginB->dependsOn($pluginIdA)) {
-            return -1;
-        }
-        return 0;
-    }
-
-    public function getOrderByDependency($plugins, $withStatus = true)
+    private function getOrderByDependency($plugins, $withStatus = true)
     {
         $keys = array();
         $unkowns = array();
@@ -408,372 +853,6 @@ class PluginsService
         return array_merge($result, $unkowns);
     }
 
-
-
-
-    /**
-     * All the plugins of a given type
-     * @param string $type
-     * @return Plugin[]
-     */
-    public function getPluginsByType($type)
-    {
-        if(isSet($this->registry[$type])) return $this->registry[$type];
-        else return array();
-    }
-
-    /**
-     * Get a plugin instance
-     *
-     * @param string $pluginId
-     * @return Plugin
-     */
-    public function getPluginById($pluginId)
-    {
-        $split = explode(".", $pluginId);
-        return $this->getPluginByTypeName($split[0], $split[1]);
-    }
-
-    /**
-     * Remove a plugin
-     * @param string $pluginId
-     * @return void
-     */
-    public function removePluginById($pluginId)
-    {
-        $split = explode(".", $pluginId);
-        if (isSet($this->registry[$split[0]]) && isSet($this->registry[$split[0]][$split[1]])) {
-            unset($this->registry[$split[0]][$split[1]]);
-        }
-    }
-
-    /**
-     * Load the plugins list, and set active the plugins automatically,
-     * except for the specific types that declare a "core.*" plugin. In that case,
-     * either the core class has an AUTO_LOAD_TYPE property and all plugins are activated,
-     * or it's the task of the core class to load the necessary plugin(s) of this type.
-     * @return void
-     */
-    public function initActivePlugins()
-    {
-        /**
-         * @var Plugin $pObject
-         */
-        $detected = $this->getDetectedPlugins();
-        $toActivate = array();
-        foreach ($detected as $pType => $pObjects) {
-            $coreP = $this->findPlugin("core", $pType);
-            if($coreP !== false && !isSet($coreP->AUTO_LOAD_TYPE)) continue;
-            foreach ($pObjects as $pName => $pObject) {
-                $toActivate[$pObject->getId()] = $pObject ;
-            }
-        }
-        $o = $this->getOrderByDependency($toActivate, false);
-        foreach ($o as $id) {
-            $pObject = $toActivate[$id];
-            $pObject->init(array());
-            try {
-                $pObject->performChecks();
-                if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
-                $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
-            } catch (\Exception $e) {
-                //$this->errors[$pName] = "[$pName] ".$e->getMessage();
-            }
-
-        }
-    }
-
-    /**
-     * Add a plugin to the list of active plugins
-     * @static
-     * @param string $type
-     * @param string $name
-     * @param bool $active
-     * @param Plugin $updateInstance
-     * @return void
-     */
-    public static function setPluginActive($type, $name, $active=true, $updateInstance = null)
-    {
-        self::getInstance()->setPluginActiveInst($type, $name, $active, $updateInstance);
-    }
-    /**
-     * Instance implementation of the setPluginActive
-     * @param $type
-     * @param $name
-     * @param bool $active
-     * @param Plugin $updateInstance
-     * @return void
-     */
-    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null)
-    {
-        if ($active) {
-            // Check active plugin dependencies
-            $plug = $this->getPluginById($type.".".$name);
-            if(!$plug || !$plug->isEnabled()) return;
-            $deps = $plug->getActiveDependencies($this);
-            if (count($deps)) {
-                $found = false;
-                foreach ($deps as $dep) {
-                    if (isSet($this->activePlugins[$dep]) && $this->activePlugins[$dep] !== false) {
-                        $found = true; break;
-                    }
-                }
-                if (!$found) {
-                    $this->activePlugins[$type.".".$name] = false;
-                    return ;
-                }
-            }
-        }
-        if(isSet($this->activePlugins[$type.".".$name])){
-            unset($this->activePlugins[$type.".".$name]);
-        }
-        $this->activePlugins[$type.".".$name] = $active;
-        if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
-            $this->registry[$type][$name] = $updateInstance;
-        }
-        if (isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild) {
-            $this->buildXmlRegistry(($this->registryVersion == "extended"));
-        }
-    }
-
-    public static function deferBuildingRegistry(){
-        self::getInstance()->tmpDeferRegistryBuild = true;
-    }
-
-    public static function flushDeferredRegistryBuilding(){
-        $t = self::getInstance();
-        $t->tmpDeferRegistryBuild = false;
-        if (isSet($t->xmlRegistry)) {
-            $t->buildXmlRegistry(($t->registryVersion == "extended"));
-        }
-    }
-
-    /**
-     * Some type require only one active plugin at a time
-     * @param $type
-     * @param $name
-     * @param Plugin $updateInstance
-     * @return void
-     */
-    public function setPluginUniqueActiveForType($type, $name, $updateInstance = null)
-    {
-        $typePlugs = $this->getPluginsByType($type);
-        $originalValue = $this->tmpDeferRegistryBuild;
-        $this->tmpDeferRegistryBuild = true;
-        foreach ($typePlugs as $plugName => $plugObject) {
-            $this->setPluginActiveInst($type, $plugName, false);
-        }
-        $this->tmpDeferRegistryBuild = $originalValue;
-        $this->setPluginActiveInst($type, $name, true, $updateInstance);
-    }
-    /**
-     * Retrieve the whole active plugins list
-     * @return array
-     */
-    public function getActivePlugins()
-    {
-        return $this->activePlugins;
-    }
-    /**
-     * Retrieve an array of active plugins for type
-     * @param string $type
-     * @param bool $unique
-     * @return Plugin[]
-     */
-    public function getActivePluginsForType($type, $unique = false)
-    {
-        $acts = array();
-        foreach ($this->activePlugins as $plugId => $active) {
-            if(!$active) continue;
-            list($pT,$pN) = explode(".", $plugId);
-            if ($pT == $type && isset($this->registry[$pT][$pN])) {
-                if ($unique) {
-                    return $this->registry[$pT][$pN];
-                    break;
-                }
-                $acts[$pN] = $this->registry[$pT][$pN];
-            }
-        }
-        if($unique && !count($acts)) return false;
-        return $acts;
-    }
-
-    /**
-     * Return only one of getActivePluginsForType
-     * @param $type
-     * @return array|bool
-     */
-    public function getUniqueActivePluginForType($type)
-    {
-        return $this->getActivePluginsForType($type, true);
-    }
-    /**
-     * All the plugins registry, active or not
-     * @return array
-     */
-    public function getDetectedPlugins()
-    {
-        return $this->registry;
-    }
-    /**
-     * All the plugins that declare a stream wrapper
-     * @return array
-     */
-    public function getStreamWrapperPlugins()
-    {
-        return $this->streamWrapperPlugins;
-    }
-    /**
-     * Add the $protocol/$wrapper to an internal cache
-     * @param string $protocol
-     * @param string $wrapperClassName
-     * @return void
-     */
-    public function registerWrapperClass($protocol, $wrapperClassName)
-    {
-        $this->registeredWrappers[$protocol] = $wrapperClassName;
-    }
-
-    /**
-     * Find a classname for a given protocol
-     * @param $protocol
-     * @return
-     */
-    public function getWrapperClassName($protocol)
-    {
-        return $this->registeredWrappers[$protocol];
-    }
-    /**
-     * The protocol/classnames table
-     * @return array
-     */
-    public function getRegisteredWrappers()
-    {
-        return $this->registeredWrappers;
-    }
-    /**
-     * Go through all plugins and call their getRegistryContributions() method.
-     * Add all these contributions to the main XML ajxp_registry document.
-     * @param bool $extendedVersion Will be passed to the plugin, for optimization purpose.
-     * @return void
-     */
-    public function buildXmlRegistry($extendedVersion = true)
-    {
-        $actives = $this->getActivePlugins();
-        $reg = new \DOMDocument();
-        $reg->loadXML("<ajxp_registry></ajxp_registry>");
-        foreach ($actives as $activeName=>$status) {
-            if($status === false) continue;
-            $plug = $this->getPluginById($activeName);
-            $contribs = $plug->getRegistryContributions($extendedVersion);
-            foreach ($contribs as $contrib) {
-                $parent = $contrib->nodeName;
-                $nodes = $contrib->childNodes;
-                if(!$nodes->length) continue;
-                $uuidAttr = $contrib->getAttribute("uuidAttr");
-                if($uuidAttr == "") $uuidAttr = "name";
-                $this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
-            }
-        }
-        $this->xmlRegistry = $reg;
-    }
-
-    /**
-     * Build the XML Registry if not already built, and return it.
-     * @static
-     * @param bool $extendedVersion
-     * @return \DOMDocument The registry
-     */
-    public static function getXmlRegistry($extendedVersion = true)
-    {
-        $self = self::getInstance();
-        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
-            $self->buildXmlRegistry( $extendedVersion );
-            $self->registryVersion = ($extendedVersion ? "extended":"light");
-        }
-        return $self->xmlRegistry;
-    }
-
-    /**
-     * Replace the current xml registry
-     * @static
-     * @param $registry
-     * @param bool $extendedVersion
-     */
-    public static function updateXmlRegistry($registry, $extendedVersion = true)
-    {
-        $self = self::getInstance();
-        $self->xmlRegistry = $registry;
-        $self->registryVersion = ($extendedVersion? "extended" : "light");
-    }
-
-    /**
-     * Append some predefined XML to a plugin instance
-     * @param Plugin $plugin
-     * @param \DOMDocument $manifestDoc
-     * @param String $mixinName
-     */
-    public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName)
-    {
-        // Load behaviours if not already
-        if (!isSet($this->mixinsDoc)) {
-            $this->mixinsDoc = new \DOMDocument();
-            $this->mixinsDoc->load(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
-            $this->mixinsXPath = new \DOMXPath($this->mixinsDoc);
-        }
-        // Merge into manifestDoc
-        $nodeList = $this->mixinsXPath->query($mixinName);
-        if(!$nodeList->length) return;
-        $mixinNode = $nodeList->item(0);
-        foreach ($mixinNode->childNodes as $child) {
-            if($child->nodeType != XML_ELEMENT_NODE) continue;
-            $uuidAttr = $child->getAttribute("uuidAttr") OR "name";
-            $this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes, true);
-        }
-
-        // Reload plugin XPath
-        $plugin->reloadXPath();
-    }
-
-    /**
-     * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
-     * @param string $query
-     * @param string $stringOrNodeFormat
-     * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
-     * @param bool $limitToEnabledPlugins
-     * @param bool $loadExternalFiles
-     * @return \DOMNode[]
-     */
-    public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
-    {
-        $buffer = "";
-        $nodes = array();
-        $self = self::getInstance();
-        foreach ($self->registry as $plugType) {
-            foreach ($plugType as $plugName => $plugObject) {
-                if ($limitToActivePlugins) {
-                    $plugId = $plugObject->getId();
-                    if ($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)) {
-                        continue;
-                    }
-                }
-                if ($limitToEnabledPlugins) {
-                    if(!$plugObject->isEnabled()) continue;
-                }
-                $res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
-                if ($stringOrNodeFormat == "string") {
-                    $buffer .= $res;
-                } else {
-                    foreach ($res as $node) {
-                        $nodes[] = $node;
-                    }
-                }
-            }
-        }
-        if($stringOrNodeFormat == "string") return $buffer;
-        else return $nodes;
-    }
-
     /**
      * Central function of the registry construction, merges some nodes into the existing registry.
      * @param \DOMDocument $original
@@ -783,7 +862,7 @@ class PluginsService
      * @param bool $doNotOverrideChildren
      * @return void
      */
-    protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false)
+    private function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false)
     {
         // find or create parent
         $parentSelection = $original->getElementsByTagName($parentName);
@@ -830,7 +909,7 @@ class PluginsService
      * @param \DOMNode $new
      * @param \DOMNode $old
      */
-    protected function mergeChildByTagName($new, &$old)
+    private function mergeChildByTagName($new, &$old)
     {
         if (!$this->hasElementChild($new) || !$this->hasElementChild($old)) {
             $old->parentNode->replaceChild($new, $old);
@@ -876,61 +955,10 @@ class PluginsService
         return false;
     }
 
-    /**
-     * @param string $plugType
-     * @param string $plugName
-     * @return Plugin
-     */
-    public function getPluginByTypeName($plugType, $plugName)
-    {
-        if (isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])) {
-            return $this->registry[$plugType][$plugName];
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     *
-     * @param string $type
-     * @param string $name
-     * @return Plugin
-     */
-    public static function findPlugin($type, $name)
-    {
-        $instance = self::getInstance();
-        return $instance->getPluginByTypeName($type, $name);
-    }
-
-    /**
-     * Simply find a plugin by its id (type.name)
-     * @static
-     * @param $id
-     * @return Plugin
-     */
-    public static function findPluginById($id)
-    {
-        return self::getInstance()->getPluginById($id);
-    }
-
     private function __construct()
     {
     }
-    
-    /**
-     * Singleton method
-     *
-     * @return PluginsService the service instance
-     */
-    public static function getInstance()
-    {
-        if (!isSet(self::$instance)) {
-            $c = __CLASS__;
-            self::$instance = new $c;
-        }
-        return self::$instance;
-    }
-    
+
     public function __clone()
     {
         trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);

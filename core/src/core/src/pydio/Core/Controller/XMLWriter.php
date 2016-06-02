@@ -139,7 +139,7 @@ class XMLWriter
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
         return XMLWriter::write($string, $print);
     }
-    
+
     /**
      * Prints out the XML headers and preamble, then an open node
      * @static
@@ -558,21 +558,17 @@ class XMLWriter
     {
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
-
-        $exposed = array();
-        $cacheHasExposed = PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
-        if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
-            $exposed = $cacheHasExposed;
-        } else {
-            $exposed_props = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
-            foreach($exposed_props as $exposed_prop){
+        
+        $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", function($nodes){
+            $exposedNodes = [];
+            foreach($nodes as $exposed_prop){
                 $pluginId = $exposed_prop->parentNode->parentNode->getAttribute("id");
                 $paramName = $exposed_prop->getAttribute("name");
                 $paramDefault = $exposed_prop->getAttribute("default");
-                $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName, "DEFAULT" => $paramDefault);
+                $exposedNodes[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName, "DEFAULT" => $paramDefault);
             }
-            PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
-        }
+            return $exposedNodes;
+        });
 
         $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
 
