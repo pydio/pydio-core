@@ -44,8 +44,15 @@ class SerializableResponseStream implements StreamInterface
 
     private $streamStatus = 'open';
 
+    /**
+     * SerializableResponseStream constructor.
+     * @param SerializableResponseChunk[]|SerializableResponseChunk $chunks
+     */
     public function __construct($chunks = [])
     {
+        if(is_object($chunks) && $chunks instanceof SerializableResponseChunk){
+            $chunks = [$chunks];
+        }
         if(count($chunks)){
             $this->data = $chunks;
         }

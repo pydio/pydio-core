@@ -139,31 +139,7 @@ class XMLWriter
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
         return XMLWriter::write($string, $print);
     }
-
-    /**
-     * Convert an arbitrary list of data (array of associative array) as standard XML list.
-     * @param $data
-     * @param $rootPath
-     * @param $idKey
-     * @param $labelKey
-     */
-    public static function renderSimpleListAsNodes($data, $rootPath, $idKey, $labelKey){
-
-        self::header();
-
-        foreach($data as $item){
-
-            $nodeName = rtrim($rootPath, "/")."/".$item[$idKey];
-            $nodeLabel = $item[$labelKey];
-            $isLeaf = true;
-            $metaData = $item;
-            self::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData);
-
-        }
-
-        self::close();
-    }
-
+    
     /**
      * Prints out the XML headers and preamble, then an open node
      * @static
