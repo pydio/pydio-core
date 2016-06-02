@@ -694,27 +694,27 @@ abstract class AbstractConfDriver extends Plugin
                 }
 
 
+                $repositoryId = ConfService::getCurrentRepositoryId();
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
                     $bmPath = Utils::decodeSecureMagic($httpVars["bm_path"]);
-
                     if ($httpVars["bm_action"] == "add_bookmark") {
                         $title = "";
                         if(isSet($httpVars["bm_title"])) $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
                         if($title == "" && $bmPath=="/") $title = ConfService::getCurrentRootDirDisplay();
-                        $bmUser->addBookMark($bmPath, $title);
+                        $bmUser->addBookmark($repositoryId, $bmPath, $title);
                         if ($driver) {
                             $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "delete_bookmark") {
-                        $bmUser->removeBookmark($bmPath);
+                        $bmUser->removeBookmark($repositoryId, $bmPath);
                         if ($driver) {
                             $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {
                         $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
-                        $bmUser->renameBookmark($bmPath, $title);
+                        $bmUser->renameBookmark($repositoryId, $bmPath, $title);
                     }
                     Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
                             ConfService::getRepository()->getId(),
@@ -728,7 +728,7 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->save("user");
                     }
                 }
-                $doc = new XMLDocMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks(), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $doc = new XMLDocMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
                 $x = new SerializableResponseStream([$doc]);
                 $responseInterface = $responseInterface->withBody($x);
 

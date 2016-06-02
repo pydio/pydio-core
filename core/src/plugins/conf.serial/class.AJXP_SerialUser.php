@@ -204,7 +204,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         if (isSet($this->registerForSave["rights"]) || $this->create) {
             $filteredRights = $this->rights;
-            if(isSet($filteredRights["ajxp.roles"])) $filteredRights["ajxp.roles"] = $this->filterRolesForSaving($filteredRights["ajxp.roles"]);
+            if(isSet($filteredRights["ajxp.roles"])) $filteredRights["ajxp.roles"] = $this->filterRolesForSaving($filteredRights["ajxp.roles"], false);
             Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
             Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
         }
@@ -237,6 +237,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
      */
     public function setParent($parentId)
     {
+        /** @var AJXP_SerialUser $u */
         $u = ConfService::getConfStorageImpl()->createUserObject($parentId);
         $p = $u->getChildrenPointer();
         if($p == null) $p = array();
@@ -250,7 +251,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
     }
 
     /**
-     * @return null|Array
+     * @return null|array
      */
     public function getChildrenPointer()
     {
@@ -258,7 +259,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
     }
 
     /**
-     * @param Array $array
+     * @param array $array
      */
     public function setChildrenPointer($array)
     {

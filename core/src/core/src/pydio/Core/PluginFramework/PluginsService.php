@@ -916,6 +916,7 @@ class PluginsService
     private function __construct()
     {
     }
+    
     /**
      * Singleton method
      *
@@ -929,6 +930,7 @@ class PluginsService
         }
         return self::$instance;
     }
+    
     public function __clone()
     {
         trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);

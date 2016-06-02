@@ -20,22 +20,18 @@
  */
 namespace Pydio\Conf\Core;
 
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-/**
- * @package AjaXplorer_Plugins
- * @subpackage Core
- * @class AbstractAjxpUser
- * @abstract
- * User abstraction, the "conf" driver must provides its own implementation
- */
-abstract class AbstractAjxpUser implements AjxpGroupPathProvider
+abstract class AbstractAjxpUser implements AjxpGroupPathProvider, UserInterface
 {
+    /**
+     * @var string
+     */
     public $id;
     public $hasAdmin = false;
     public $rights;
@@ -59,17 +55,11 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
      */
     protected $hidden;
 
-    /**
-     * @param bool $hidden
-     */
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
     }
 
-    /**
-     * @return bool
-     */
     public function isHidden()
     {
         return $this->hidden;
@@ -107,38 +97,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         $this->storage = $storage;
         $this->load();
     }
-
-    public function checkCookieString($cookieString)
-    {
-        if($this->getPref("cookie_hash") == "") return false;
-        $hashes = explode(",", $this->getPref("cookie_hash"));
-        return in_array($cookieString, $hashes);
-    }
-
-    public function invalidateCookieString($cookieString = "")
-    {
-        if($this->getPref("cookie_hash") == "") return false;
-        $hashes = explode(",", $this->getPref("cookie_hash"));
-        if(in_array($cookieString, $hashes)) $hashes = array_diff($hashes, array($cookieString));
-        $this->setPref("cookie_hash", implode(",", $hashes));
-        $this->save("user");
-    }
-
-    public function getCookieString()
-    {
-        $hashes = $this->getPref("cookie_hash");
-        if ($hashes == "") {
-            $hashes = array();
-        } else {
-            $hashes = explode(",", $hashes);
-        }
-        $newHash = md5($this->id.":".Utils::generateRandomString());
-        array_push($hashes, $newHash);
-        $this->setPref("cookie_hash", implode(",",$hashes));
-        $this->save("user");
-        return $newHash;
-    }
-
+    
     public function getId()
     {
         return $this->id;
@@ -148,27 +107,11 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     {
         $this->id = $id ;
     }
-    /**
-     * @return bool
-     */
+
     public function storageExists()
     {
     }
 
-    public function getVersion()
-    {
-        if(!isSet($this->version)) return "";
-        return $this->version;
-    }
-
-    public function setVersion($v)
-    {
-        $this->version = $v;
-    }
-
-    /**
-     * @param AJXP_Role $roleObject
-     */
     public function addRole($roleObject)
     {
         if (isSet($this->roles[$roleObject->getId()])) {
@@ -218,9 +161,6 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         $this->recomputeMergedRole();
     }
 
-    /**
-     * @param $orderedRolesIds Ordered array of roles ids
-     */
     public function updateRolesOrder($orderedRolesIds){
         // check content
         $saveRoleOrders = array();
@@ -291,48 +231,33 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         $this->hasAdmin = $boolean;
     }
 
-    /**
-     * @return bool Whether the user has a parent or not
-     */
     public function hasParent()
     {
         return isSet($this->parentUser);
     }
 
-    /**
-     * @param string $user A user ID
-     */
     public function setParent($user)
     {
         $this->parentUser = $user;
     }
 
-    /**
-     * @return string Returns the ID of the parent user
-     */
     public function getParent()
     {
         return $this->parentUser;
     }
 
-    public function canRead($rootDirId)
+    public function canRead($repositoryId)
     {
         if($this->getLock() != false) return false;
-        return $this->mergedRole->canRead($rootDirId);
+        return $this->mergedRole->canRead($repositoryId);
     }
 
-    public function canWrite($rootDirId)
+    public function canWrite($repositoryId)
     {
         if($this->getLock() != false) return false;
-        return $this->mergedRole->canWrite($rootDirId);
+        return $this->mergedRole->canWrite($repositoryId);
     }
 
-    /**
-     * Test if user can switch to this repository
-     *
-     * @param integer $repositoryId
-     * @return boolean
-     */
     public function canSwitchTo($repositoryId)
     {
         $repositoryObject = ConfService::getRepositoryById($repositoryId);
@@ -343,11 +268,6 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
         return ($this->mergedRole->canRead($repositoryId) || $this->mergedRole->canWrite($repositoryId)) ;
         */
-    }
-
-    public function getRight($rootDirId)
-    {
-        return $this->mergedRole->getAcl($rootDirId);
     }
 
     public function getPref($prefName)
@@ -385,60 +305,56 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         return $prefArray[$prefPath];
     }
 
-    public function addBookmark($path, $title="", $repId = -1)
+    public function addBookmark($repositoryId, $path, $title)
     {
         if(!isSet($this->bookmarks)) $this->bookmarks = array();
-        if($repId == -1) $repId = ConfService::getCurrentRepositoryId();
-        if($title == "") $title = basename($path);
-        if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
-        foreach ($this->bookmarks[$repId] as $v) {
+        if(!isSet($this->bookmarks[$repositoryId])) $this->bookmarks[$repositoryId] = array();
+        foreach ($this->bookmarks[$repositoryId] as $v) {
             $toCompare = "";
             if(is_string($v)) $toCompare = $v;
             else if(is_array($v)) $toCompare = $v["PATH"];
             if($toCompare == trim($path)) return ; // RETURN IF ALREADY HERE!
         }
-        $this->bookmarks[$repId][] = array("PATH"=>trim($path), "TITLE"=>$title);
+        $this->bookmarks[$repositoryId][] = array("PATH"=>trim($path), "TITLE"=>$title);
     }
 
-    public function removeBookmark($path)
+    public function removeBookmark($repositoryId, $path)
     {
-        $repId = ConfService::getCurrentRepositoryId();
         if(isSet($this->bookmarks)
-            && isSet($this->bookmarks[$repId])
-            && is_array($this->bookmarks[$repId]))
+            && isSet($this->bookmarks[$repositoryId])
+            && is_array($this->bookmarks[$repositoryId]))
             {
-                foreach ($this->bookmarks[$repId] as $k => $v) {
+                foreach ($this->bookmarks[$repositoryId] as $k => $v) {
                     $toCompare = "";
                     if(is_string($v)) $toCompare = $v;
                     else if(is_array($v)) $toCompare = $v["PATH"];
-                    if($toCompare == trim($path)) unset($this->bookmarks[$repId][$k]);
+                    if($toCompare == trim($path)) unset($this->bookmarks[$repositoryId][$k]);
                 }
             }
     }
 
-    public function renameBookmark($path, $title)
+    public function renameBookmark($repositoryId, $path, $title)
     {
-        $repId = ConfService::getCurrentRepositoryId();
         if(isSet($this->bookmarks)
-            && isSet($this->bookmarks[$repId])
-            && is_array($this->bookmarks[$repId]))
+            && isSet($this->bookmarks[$repositoryId])
+            && is_array($this->bookmarks[$repositoryId]))
             {
-                foreach ($this->bookmarks[$repId] as $k => $v) {
+                foreach ($this->bookmarks[$repositoryId] as $k => $v) {
                     $toCompare = "";
                     if(is_string($v)) $toCompare = $v;
                     else if(is_array($v)) $toCompare = $v["PATH"];
                     if ($toCompare == trim($path)) {
-                         $this->bookmarks[$repId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
+                         $this->bookmarks[$repositoryId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
                     }
                 }
             }
     }
 
-    public function getBookmarks()
+    public function getBookmarks($repositoryId)
     {
         if(isSet($this->bookmarks)
-            && isSet($this->bookmarks[ConfService::getCurrentRepositoryId()]))
-            return $this->bookmarks[ConfService::getCurrentRepositoryId()];
+            && isSet($this->bookmarks[$repositoryId]))
+            return $this->bookmarks[$repositoryId];
         return array();
     }
 
@@ -446,9 +362,13 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function save($context = "superuser"){
         $this->_save($context);
-        \Pydio\Core\Services\CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
+        CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
     }
 
+    /**
+     * @param string $context
+     * @return mixed
+     */
     abstract protected function _save($context = "superuser");
 
     abstract public function getTemporaryData($key);
@@ -470,7 +390,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public function recomputeMergedRole()
     {
         if (!count($this->roles)) {
-            throw new Exception("Empty role, this is not normal");
+            throw new \Exception("Empty role, this is not normal");
         }
         uksort($this->roles, array($this, "orderRoles"));
         $keys = array_keys($this->roles);
@@ -490,7 +410,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             // It's a shared user, we don't want it to inherit the rights...
             $this->parentRole->clearAcls();
             //... but we want the parent user's role, filtered with inheritable properties only.
-            $stretchedParentUserRole = \Pydio\Core\Services\AuthService::limitedRoleFromParent($this->parentUser);
+            $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
                 // REAPPLY SPECIFIC "SHARED" ROLES
@@ -619,7 +539,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public function __wakeup(){
         $this->storage = ConfService::getConfStorageImpl();
         if(!is_object($this->personalRole)){
-            $this->personalRole = \Pydio\Core\Services\AuthService::getRole("AJXP_USR_/".$this->getId());
+            $this->personalRole = AuthService::getRole("AJXP_USR_/".$this->getId());
         }
         $this->recomputeMergedRole();
     }
@@ -628,7 +548,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         if($this->lastSessionSerialization && count($this->roles)
             && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
 
-            $newRoles = \Pydio\Core\Services\AuthService::getRolesList(array_keys($this->roles));
+            $newRoles = AuthService::getRolesList(array_keys($this->roles));
             foreach($newRoles as $rId => $newRole){
                 if(strpos($rId, "AJXP_USR_/") === 0){
                     $this->personalRole = $newRole;

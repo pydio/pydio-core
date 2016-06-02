@@ -448,9 +448,6 @@ class Controller
      * Applies a callback node
      * @static
      * @param \DOMElement|array $callback The DOM Node or directly an array of attributes
-     * @param String $actionName
-     * @param array $httpVars
-     * @param array $fileVars
      * @param null $variableArgs
      * @param bool $defer
      * @throws PydioException

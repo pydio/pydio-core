@@ -149,15 +149,15 @@ class AJXP_SqlUser extends AbstractAjxpUser
     /**
      * Log a message if the logQueries property is true.
      *
-     * @param $textMessage String text of the message to log
-     * @param $severityLevel Integer constant of the logging severity
+     * @param string $textMessage String text of the message to log
+     * @param string $severityLevel Integer constant of the logging severity
      * @return null
      */
     public function log($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
     {
         if ($this->debugEnabled) {
             $logger = AJXP_Logger::getInstance();
-            $logger->write($textMessage, $severityLevel);
+            $logger->logDebug("AJXP_SQLUSER", $textMessage);
         }
     }
 
@@ -238,20 +238,15 @@ class AJXP_SqlUser extends AbstractAjxpUser
 
     /**
      * Add a user bookmark.
-     *
-     * @param $path String Relative path to bookmarked location.
-     * @param $title String Title of the bookmark
-     * @param $repId String Repository Unique ID
-     * @return null or -1 on error.
-     * @see AbstractAjxpUser#addBookmark($path, $title, $repId)
+     * @inheritdoc
      */
-    public function addBookmark($path, $title="", $repId = -1)
+    public function addBookmark($repositoryId, $path, $title)
     {
         if(!isSet($this->bookmarks)) $this->bookmarks = array();
-        if($repId == -1) $repId = ConfService::getCurrentRepositoryId();
+        if($repositoryId == -1) $repositoryId = ConfService::getCurrentRepositoryId();
         if($title == "") $title = basename($path);
-        if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
-        foreach ($this->bookmarks[$repId] as $v) {
+        if(!isSet($this->bookmarks[$repositoryId])) $this->bookmarks[$repositoryId] = array();
+        foreach ($this->bookmarks[$repositoryId] as $v) {
             $toCompare = "";
             if(is_string($v)) $toCompare = $v;
             else if(is_array($v)) $toCompare = $v["PATH"];
@@ -261,7 +256,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
         try {
             dibi::query('INSERT INTO [ajxp_user_bookmarks]', Array(
                 'login' => $this->getId(),
-                'repo_uuid' => $repId,
+                'repo_uuid' => $repositoryId,
                 'path' => $path,
                 'title' => $title
             ));
@@ -270,37 +265,32 @@ class AJXP_SqlUser extends AbstractAjxpUser
             $this->log('BOOKMARK ADD FAILED: Reason: '.$e->getMessage());
             return -1;
         }
-        $this->bookmarks[$repId][] = array("PATH"=>trim($path), "TITLE"=>$title);
+        $this->bookmarks[$repositoryId][] = array("PATH"=>trim($path), "TITLE"=>$title);
         return null;
     }
 
     /**
-     * Remove a user bookmark.
-     *
-     * @param $path String String of the path of the bookmark to remove.
-     * @return null or -1 on error.
-     * @see AbstractAjxpUser#removeBookmark($path)
+     * @inheritdoc
      */
-    public function removeBookmark($path)
+    public function removeBookmark($repositoryId, $path)
     {
-        $repId = ConfService::getCurrentRepositoryId();
         if(isSet($this->bookmarks)
-            && isSet($this->bookmarks[$repId])
-            && is_array($this->bookmarks[$repId]))
+            && isSet($this->bookmarks[$repositoryId])
+            && is_array($this->bookmarks[$repositoryId]))
             {
-                foreach ($this->bookmarks[$repId] as $k => $v) {
+                foreach ($this->bookmarks[$repositoryId] as $k => $v) {
                     $toCompare = "";
                     if(is_string($v)) $toCompare = $v;
                     else if(is_array($v)) $toCompare = $v["PATH"];
                     if ($toCompare == trim($path)) {
                         try {
-                            dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s AND [repo_uuid] = %s AND [title] = %s', $this->getId(), $repId, $v["TITLE"]);
+                            dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s AND [repo_uuid] = %s AND [title] = %s', $this->getId(), $repositoryId, $v["TITLE"]);
                         } catch (DibiException $e) {
                             $this->log('BOOKMARK REMOVE FAILED: Reason: '.$e->getMessage());
                             return -1;
                         }
 
-                        unset($this->bookmarks[$repId][$k]);
+                        unset($this->bookmarks[$repositoryId][$k]);
                     }
                 }
             }
@@ -315,14 +305,13 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * @return null or -1 on error.
      * @see AbstractAjxpUser#renameBookmark($path, $title)
      */
-    public function renameBookmark($path, $title)
+    public function renameBookmark($repositoryId, $path, $title)
     {
-        $repId = ConfService::getCurrentRepositoryId();
         if(isSet($this->bookmarks)
-            && isSet($this->bookmarks[$repId])
-            && is_array($this->bookmarks[$repId]))
+            && isSet($this->bookmarks[$repositoryId])
+            && is_array($this->bookmarks[$repositoryId]))
             {
-                foreach ($this->bookmarks[$repId] as $k => $v) {
+                foreach ($this->bookmarks[$repositoryId] as $k => $v) {
                     $toCompare = "";
                     if(is_string($v)) $toCompare = $v;
                     else if(is_array($v)) $toCompare = $v["PATH"];
@@ -331,14 +320,14 @@ class AJXP_SqlUser extends AbstractAjxpUser
                              dibi::query('UPDATE [ajxp_user_bookmarks] SET ',
                                          Array('path'=>trim($path), 'title'=>$title),
                                          'WHERE [login] = %s AND [repo_uuid] = %s AND [title] = %s',
-                                         $this->getId(), $repId, $v["TITLE"]
+                                         $this->getId(), $repositoryId, $v["TITLE"]
                              );
 
                          } catch (DibiException $e) {
                              $this->log('BOOKMARK RENAME FAILED: Reason: '.$e->getMessage());
                              return -1;
                          }
-                         $this->bookmarks[$repId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
+                         $this->bookmarks[$repositoryId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
                     }
                 }
             }

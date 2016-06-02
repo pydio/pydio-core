@@ -28,6 +28,7 @@ use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Conf\Core\AjxpRole;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Controller\XMLWriter;
@@ -96,33 +97,6 @@ class AuthService
         return null;
     }
 
-    /**
-     * Call tryToLogUser() functions on the registered authfront drivers
-     * @static
-     * @param array $httpVars
-     * @return void
-     */
-    public static function preLogUser($httpVars)
-    {
-        if(self::getLoggedUser() != null && self::getLoggedUser()->getId() != "guest") return ;
-
-        $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");
-        $index = 0;
-        /**
-         * @var AbstractAuthFrontend $frontendPlugin
-         */
-        foreach($frontends as $frontendPlugin){
-            if(!$frontendPlugin->isEnabled()) continue;
-            if(!method_exists($frontendPlugin, "tryToLogUser")){
-                AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
-                continue;
-            }
-            $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
-            $index ++;
-            if($res) break;
-        }
-
-    }
     /**
      * The array is located in the AjxpTmpDir/failedAJXP.log
      * @static
@@ -219,9 +193,9 @@ class AuthService
     {
         $current = $_COOKIE["AjaXplorer-remember"];
         if (!empty($current)) {
-            $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
+            CookiesHelper::invalidateCookieString($user, substr($current, strpos($current, ":")+1));
         }
-        $rememberPass = $user->getCookieString();
+        $rememberPass = CookiesHelper::getCookieString($user);
         if(self::$useSession) {
             setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
         }
@@ -245,7 +219,7 @@ class AuthService
         $current = $_COOKIE["AjaXplorer-remember"];
         $user = self::getLoggedUser();
         if (!empty($current) && $user != null) {
-            $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
+            CookiesHelper::invalidateCookieString($user, substr($current, strpos($current, ":")+1));
         }
         if(self::$useSession) {
             setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
@@ -710,7 +684,7 @@ class AuthService
         if ($cookieString) {
             $confDriver = ConfService::getConfStorageImpl();
             $userObject = $confDriver->createUserObject($userId);
-            $res = $userObject->checkCookieString($userPass);
+            $res = CookiesHelper::checkCookieString($userObject, $userPass);
             return $res;
         }
         if(!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")){

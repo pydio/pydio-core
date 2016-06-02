@@ -118,7 +118,7 @@ class fsAccessWrapper implements IAjxpWrapper
                            if(is_file($tmpFileName)) unlink($tmpFileName);
                            if(is_dir($tmpDir)) rmdir($tmpDir);
                        });
-                        $crtZip = new PclZip(Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
+                        $crtZip = new PclZip(Utils::securePath($resolvedPath.$zipPath));
                         $content = $crtZip->listContent();
                         if(is_array($content)){
                             foreach ($content as $item) {
@@ -143,7 +143,7 @@ class fsAccessWrapper implements IAjxpWrapper
                        }
                    }
                } else {
-                $crtZip = new PclZip(Utils::securePath($resolvedPath.$repoObject->resolveVirtualRoots($zipPath)));
+                $crtZip = new PclZip(Utils::securePath($resolvedPath.$zipPath));
                 $liste = $crtZip->listContent();
                    if(!is_array($liste)) $liste = array();
                 if($storeOpenContext) self::$crtZip = $crtZip;
@@ -192,21 +192,7 @@ class fsAccessWrapper implements IAjxpWrapper
                 return -1;
                }
         } else {
-            if ($atRoot) {
-                $virtual = $repoObject->listVirtualRoots();
-                if (count($virtual)) {
-                    self::$currentListing = array();
-                    foreach ($virtual as $rootKey => $rootValue) {
-                        $statValue = array();
-                        $statValue[2] = $statValue["mode"] = 00040000;//($rootValue["right"] == "rw" ? "00040000" : "00070000");
-                        self::$currentListing[$rootKey] = $statValue;
-                    }
-                    self::$currentListingKeys = array_keys(self::$currentListing);
-                    self::$currentListingIndex = 0;
-                    return -1;
-                }
-            }
-            return $resolvedPath.$repoObject->resolveVirtualRoots($url["path"]);
+            return $resolvedPath.$url["path"];
         }
     }
 

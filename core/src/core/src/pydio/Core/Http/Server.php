@@ -145,7 +145,6 @@ class Server
      * @param ResponseInterface $responseInterface
      * @param callable|null $next
      * @return ResponseInterface
-     * @internal param array $rewindTo
      */
     public static function callNextMiddleWareAndRewind(callable $comparisonFunction, ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
         if($next !== null){

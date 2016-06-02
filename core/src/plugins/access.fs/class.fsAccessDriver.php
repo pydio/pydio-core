@@ -1493,20 +1493,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         $metaData["file_group"] = @filegroup($ajxpNode->getUrl()) || "unknown";
         $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
-        $crtPath = $ajxpNode->getPath();
-        $vRoots = $this->repository->listVirtualRoots();
         $metaData["ajxp_readonly"] = "false";
         if (!@$this->isWriteable($ajxpNode->getUrl())) {
            $metaData["ajxp_readonly"] = "true";
-        }
-        if (!empty($crtPath)) {
-            if (isSet($vRoots[ltrim($crtPath, "/")])) {
-                $metaData["ajxp_readonly"] = $vRoots[ltrim($crtPath, "/")]["right"] == "r" ? "true" : "false";
-            }
-        } else {
-            if (count($vRoots)) {
-                $metaData["ajxp_readonly"] = "true";
-            }
         }
         $fPerms = @fileperms($ajxpNode->getUrl());
         if ($fPerms !== false) {

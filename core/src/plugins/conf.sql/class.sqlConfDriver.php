@@ -209,7 +209,6 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 'recycle'                   => $repository->recycle,
                 'bcreate'                   => $repository->getCreate(),
                 'writeable'                 => $repository->isWriteable(),
-                'enabled'                   => $repository->isEnabled(),
                 'options'                   => $repository->options,
                 'groupPath'                 => $repository->getGroupPath(),
                 'slug'		                => $repository->getSlug(),

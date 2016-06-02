@@ -340,7 +340,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $httpVars = $request->getParsedBody();
         if (isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && AuthService::usersEnabled()) {
             $bmUser = AuthService::getLoggedUser();
-            $bookmarks = $bmUser->getBookmarks();
+            $repositoryId = ConfService::getCurrentRepositoryId();
+            $bookmarks = $bmUser->getBookmarks($repositoryId);
             foreach ($bookmarks as $bm) {
                 if ($bm["PATH"] == $httpVars["bm_path"]) {
                     $httpVars["bm_action"] = "delete_bookmark";
@@ -457,7 +458,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         if (AuthService::usersEnabled()) {
-            $currentBookmarks = AuthService::getLoggedUser()->getBookmarks();
+            $currentBookmarks = AuthService::getLoggedUser()->getBookmarks(ConfService::getCurrentRepositoryId());
             // FLATTEN
             foreach ($currentBookmarks as $bm) {
                 $this->currentBookmarks[] = $bm["PATH"];

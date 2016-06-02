@@ -22,25 +22,23 @@ namespace Pydio\Access\Core\Model;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\AuthService;
-use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
+
 /**
- * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
- * different source, like the application configurations, a mailbox, etc.
- * @package Pydio
- * @subpackage Core
+ * Class Repository
+ * @package Pydio\Access\Core\Model
  */
-class Repository implements AjxpGroupPathProvider
+class Repository implements AjxpGroupPathProvider, RepositoryInterface
 {
     /**
      * @var string
@@ -151,9 +149,6 @@ class Repository implements AjxpGroupPathProvider
      */
     private $contentFilterData;
 
-    /**
-     * @param ContentFilter $contentFilter
-     */
     public function setContentFilter($contentFilter)
     {
         $this->contentFilter = $contentFilter;
@@ -171,18 +166,11 @@ class Repository implements AjxpGroupPathProvider
         }
     }
 
-    /**
-     * Check if a ContentFilter is set or not
-     * @return bool
-     */
     public function hasContentFilter(){
         $this->checkCFilterData();
         return isSet($this->contentFilter);
     }
 
-    /**
-     * @return ContentFilter
-     */
     public function getContentFilter()
     {
         $this->checkCFilterData();
@@ -208,15 +196,6 @@ class Repository implements AjxpGroupPathProvider
         }
     }
 
-    /**
-     * Create a shared version of this repository
-     * @param string $newLabel
-     * @param array $newOptions
-     * @param string $parentId
-     * @param string $owner
-     * @param string $uniqueUser
-     * @return Repository
-     */
     public function createSharedChild($newLabel, $newOptions, $parentId = null, $owner = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
@@ -233,14 +212,7 @@ class Repository implements AjxpGroupPathProvider
         $repo->setOwnerData($parentId, $owner, $uniqueUser);
         return $repo;
     }
-    /**
-     * Create a child from this repository if it's a template
-     * @param string $newLabel
-     * @param array $newOptions
-     * @param string $owner
-     * @param string $uniqueUser
-     * @return Repository
-     */
+
     public function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
@@ -253,10 +225,7 @@ class Repository implements AjxpGroupPathProvider
         $repo->setInferOptionsFromParent(true);
         return $repo;
     }
-    /**
-     * Recompute uuid
-     * @return bool
-     */
+
     public function upgradeId()
     {
         if (!isSet($this->uuid)) {
@@ -266,11 +235,7 @@ class Repository implements AjxpGroupPathProvider
         }
         return false;
     }
-    /**
-     * Get a uuid
-     * @param bool $serial
-     * @return string
-     */
+
     public function getUniqueId($serial=false)
     {
         if ($serial) {
@@ -278,19 +243,12 @@ class Repository implements AjxpGroupPathProvider
         }
         return $this->uuid;
     }
-    /**
-     * Alias for this repository
-     * @return string
-     */
+
     public function getSlug()
     {
         return $this->slug;
     }
-    /**
-     * Use the slugify function to generate an alias from the label
-     * @param string $slug
-     * @return void
-     */
+
     public function setSlug($slug = null)
     {
         if ($slug === null) {
@@ -299,10 +257,7 @@ class Repository implements AjxpGroupPathProvider
             $this->slug = $slug;
         }
     }
-    /**
-     * Get the <client_settings> content of the manifest.xml
-     * @return \DOMElement|\DOMNodeList|string
-     */
+
     public function getClientSettings()
     {
         $plugin = PluginsService::findPlugin("access", $this->accessType);
@@ -322,12 +277,7 @@ class Repository implements AjxpGroupPathProvider
         }
         return $plugin->getManifestRawContent("//client_settings", "string");
     }
-    /**
-     * Find the streamWrapper declared by the access driver
-     * @param bool $register
-     * @param array $streams
-     * @return bool
-     */
+
     public function detectStreamWrapper($register = false, &$streams=null)
     {
         if(isSet($this->driverInstance) && $this->driverInstance instanceof Plugin){
@@ -345,12 +295,6 @@ class Repository implements AjxpGroupPathProvider
         return ($streamData !== false);
     }
 
-    /**
-     * Add options
-     * @param $oName
-     * @param $oValue
-     * @return void
-     */
     public function addOption($oName, $oValue)
     {
         if (strpos($oName, "PATH") !== false) {
@@ -359,14 +303,6 @@ class Repository implements AjxpGroupPathProvider
         $this->options[$oName] = $oValue;
     }
 
-    /**
-     * Get the repository options, filtered in various maners
-     * @param string $oName
-     * @param bool $safe Do not filter
-     * @param AbstractAjxpUser $resolveUser
-     * @return mixed|string
-     * @throws \Exception
-     */
     public function getOption($oName, $safe=false, $resolveUser = null)
     {
         if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
@@ -412,40 +348,6 @@ class Repository implements AjxpGroupPathProvider
         return "";
     }
 
-    public function resolveVirtualRoots($path)
-    {
-        // Gathered from the current role
-        $roots = $this->listVirtualRoots();
-        if(!count($roots)) return $path;
-        foreach ($roots as $rootKey => $rootValue) {
-            if (strpos($path, "/".ltrim($rootKey, "/")) === 0) {
-                return preg_replace("/^\/{$rootKey}/", $rootValue["path"], $path, 1);
-            }
-        }
-        return $path;
-
-    }
-
-    public function listVirtualRoots()
-    {
-        return array();
-        /* TEST STUB
-        $roots = array(
-            "root1" => array(
-                "right" => "rw",
-                "path" => "/Test"),
-            "root2" => array(
-                "right" => "r",
-                "path" => "/Retoto/sub"
-            ));
-        return $roots;
-        */
-    }
-
-    /**
-     * Get the options that already have a value
-     * @return array
-     */
     public function getOptionsDefined()
     {
         //return array_keys($this->options);
@@ -457,10 +359,6 @@ class Repository implements AjxpGroupPathProvider
         return $keys;
     }
 
-    /**
-     * Get the DEFAULT_RIGHTS option
-     * @return string
-     */
     public function getDefaultRight()
     {
         $opt = $this->getOption("DEFAULT_RIGHTS");
@@ -468,19 +366,11 @@ class Repository implements AjxpGroupPathProvider
     }
 
 
-    /**
-     * The the access driver type
-     * @return String
-     */
     public function getAccessType()
     {
         return $this->accessType;
     }
 
-    /**
-     * The label of this repository
-     * @return String
-     */
     public function getDisplay()
     {
         if (isSet($this->displayStringId)) {
@@ -492,51 +382,33 @@ class Repository implements AjxpGroupPathProvider
         return VarsFilter::filter($this->display);
     }
 
-    /**
-     * @return string
-     */
     public function getId()
     {
         if($this->isWriteable() || $this->id === null) return $this->getUniqueId();
         return $this->id;
     }
 
-    /**
-     * @return boolean
-     */
     public function getCreate()
     {
         return (bool) $this->getOption("CREATE");
     }
 
-    /**
-     * @param boolean $create
-     */
     public function setCreate($create)
     {
         $this->options["CREATE"] = (bool) $create;
     }
 
 
-    /**
-     * @param String $accessType
-     */
     public function setAccessType($accessType)
     {
         $this->accessType = $accessType;
     }
 
-    /**
-     * @param String $display
-     */
     public function setDisplay($display)
     {
         $this->display = $display;
     }
 
-    /**
-     * @param int $id
-     */
     public function setId($id)
     {
         $this->id = $id;
@@ -550,16 +422,6 @@ class Repository implements AjxpGroupPathProvider
     public function setWriteable($w)
     {
         $this->writeable = (bool) $w;
-    }
-
-    public function isEnabled()
-    {
-        return (bool) $this->enabled;
-    }
-
-    public function setEnabled($e)
-    {
-        $this->enabled = (bool) $e;
     }
 
     public function setDisplayStringId($id)
@@ -626,51 +488,31 @@ class Repository implements AjxpGroupPathProvider
         return $this->groupPath;
     }
 
-    /**
-     * @param String $descriptionText
-     */
     public function setDescription( $descriptionText )
     {
         $this->options["USER_DESCRIPTION"] = $descriptionText;
     }
 
-    /**
-     * @return string
-     */
     public function getAccessStatus()
     {
         return $this->accessStatus;
     }
 
-    /**
-     * @param string $accessStatus
-     */
     public function setAccessStatus($accessStatus)
     {
         $this->accessStatus = $accessStatus;
     }
 
-    /**
-     * @return string
-     */
     public function getRepositoryType()
     {
         return $this->repositoryType;
     }
 
-    /**
-     * @param string $repositoryType
-     */
     public function setRepositoryType($repositoryType)
     {
         $this->repositoryType = $repositoryType;
     }
 
-    /**
-     * @param bool $public
-     * @param null $ownerLabel
-     * @return String
-     */
     public function getDescription( $public = false, $ownerLabel = null )
     {
         $m = ConfService::getMessages();
@@ -707,11 +549,6 @@ class Repository implements AjxpGroupPathProvider
         }
     }
 
-    /**
-     * Infer a security scope for this repository. Will determine to whome the messages
-     * will be broadcasted.
-     * @return bool|string
-     */
     public function securityScope()
     {
         if($this->hasParent()){

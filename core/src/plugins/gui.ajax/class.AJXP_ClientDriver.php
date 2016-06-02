@@ -359,7 +359,7 @@ class AJXP_ClientDriver extends Plugin
             return;
         }
         if (!isSet(self::$loadedBookmarks)) {
-            self::$loadedBookmarks = $user->getBookmarks();
+            self::$loadedBookmarks = $user->getBookmarks($ajxpNode->getRepositoryId());
         }
         foreach (self::$loadedBookmarks as $bm) {
             if ($bm["PATH"] == $ajxpNode->getPath()) {
@@ -383,7 +383,7 @@ class AJXP_ClientDriver extends Plugin
         $user = AuthService::getLoggedUser();
         if($user == null) return;
         if (!isSet(self::$loadedBookmarks)) {
-            self::$loadedBookmarks = $user->getBookmarks();
+            self::$loadedBookmarks = $user->getBookmarks($fromNode->getRepositoryId());
         }
         if($toNode == null) {
             $fromNode->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
