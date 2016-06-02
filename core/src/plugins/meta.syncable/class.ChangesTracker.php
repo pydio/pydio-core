@@ -31,6 +31,8 @@ use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Tasks\Schedule;
+use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -228,11 +230,8 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             }
         }
         if($this->options["REQUIRES_INDEXATION"]){
-            if (ConfService::backgroundActionsSupported()){
-                Controller::applyActionInBackground(ConfService::getRepository()->getId(), "index", array());
-            }else{
-                Controller::findActionAndApply("index", array(), array());
-            }
+            $task = TaskService::actionAsTask("index", []);
+            TaskService::getInstance()->enqueueTask($task);
             // Unset the REQUIRES_INDEXATION FLAG
             $meta =  $currentRepo->getOption("META_SOURCES");
             unset($meta["meta.syncable"]["REQUIRES_INDEXATION"]);
@@ -534,8 +533,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
                 ));
                 if($copy && !$newNode->isLeaf()){
-                    // Make sure to index the content of this file
-                    Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
+                    // Make sure to index the content of this folder
+                    $this->logInfo("Core.index", "Should reindex folder ".$newNode->getPath());
+                    $task = TaskService::actionAsTask("index", ["file" => $newNode->getPath()]);
+                    $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
+                    TaskService::getInstance()->enqueueTask($task);
                 }
             } else {
                 $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
@@ -583,7 +585,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
                                 $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".$newNode->getPath()."), relaunching a recursive indexation!");
-                                Controller::findActionAndApply("index", array("file" => $newNode->getPath()), array());
+                                $task = TaskService::actionAsTask("index", ["file" => $newNode->getPath()]);
+                                $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
+                                TaskService::getInstance()->enqueueTask($task);
+
                             }
                         }catch (Exception $e){}
                     }
@@ -594,6 +599,18 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             AJXP_Logger::error("[meta.syncable]", "Exception", $e->getTraceAsString());
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
+
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param integer $result
+     */
+    public function computeSizeRecursive(&$node, &$result){
+        
+        $id = $this->computeIdentifier($node->getRepository());
+        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s AND ([node_path] = %s OR [node_path] LIKE %s)", $id, $node->getPath(), $node->getPath()."/%");
+        $result = floatval($res->fetchSingle());
 
     }
 
