@@ -58,9 +58,6 @@ class IMagickPreviewer extends Plugin
     public function switchAction($action, $httpVars, $filesVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
         $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
         if (empty($convert)) {
             return false;

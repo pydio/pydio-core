@@ -42,9 +42,6 @@ class ImagePreviewer extends Plugin
     public function switchAction($action, $httpVars, $filesVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return;
-        }
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }

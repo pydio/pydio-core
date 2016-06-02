@@ -105,7 +105,7 @@ function applyTask($task, $logger){
     ConfService::getInstance()->invalidateLoadedRepositories();
     $logger->debug("Disconnecting");
     AuthService::disconnect();
-    PluginsService::updateXmlRegistry(null, true);
+    $pServ->updateXmlRegistry(null, true);
 
     restore_error_handler();
 

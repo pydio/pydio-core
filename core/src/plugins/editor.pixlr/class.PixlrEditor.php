@@ -41,10 +41,6 @@ class PixlrEditor extends Plugin
   public function switchAction($action, $httpVars, $filesVars)
   {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-          return false;
-        }
-
         $selection = new UserSelection($repository, $httpVars);
         $selectedNode = $selection->getUniqueNode();
         $selectedNodeUrl = $selectedNode->getUrl();

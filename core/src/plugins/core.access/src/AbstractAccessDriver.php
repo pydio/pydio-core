@@ -141,12 +141,12 @@ class AbstractAccessDriver extends Plugin
         $files = $selection->getFiles();
 
         $repositoryId = $this->repository->getId();
-        $this->repository->detectStreamWrapper(true);
+        AJXP_MetaStreamWrapper::detectWrapperForRepository($this->repository, true);
         $origStreamURL = "pydio://$repositoryId";
 
         $destRepoId = $httpVars["dest_repository_id"];
         $destRepoObject = ConfService::getRepositoryById($destRepoId);
-        $destRepoObject->detectStreamWrapper(true);
+        AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
         $destStreamURL = "pydio://$destRepoId";
 
         // Check rights

@@ -22,6 +22,7 @@ namespace Pydio\Core\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 
 
@@ -33,6 +34,17 @@ use Pydio\Access\Core\Filter\ContentFilter;
  */
 interface RepositoryInterface
 {
+
+    /**
+     * @return AbstractAccessDriver
+     */
+    public function getDriverInstance();
+
+    /**
+     * @param AbstractAccessDriver $driverInstance
+     */
+    public function setDriverInstance($driverInstance);
+
     /**
      * @param ContentFilter $contentFilter
      */
@@ -101,15 +113,7 @@ interface RepositoryInterface
      * @return \DOMElement|\DOMNodeList|string
      */
     public function getClientSettings();
-
-    /**
-     * Find the streamWrapper declared by the access driver
-     * @param bool $register
-     * @param array $streams
-     * @return bool
-     */
-    public function detectStreamWrapper($register = false, &$streams = null);
-
+    
     /**
      * Add options
      * @param $oName

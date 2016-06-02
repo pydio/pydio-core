@@ -20,6 +20,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Inbox;
 
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
@@ -87,7 +88,7 @@ class inboxAccessDriver extends fsAccessDriver
                 $node->getRepository()->driverInstance = null;
                 try{
                     ConfService::loadDriverForRepository($node->getRepository());
-                    $node->getRepository()->detectStreamWrapper(true);
+                    AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
                     if($node->getRepository()->hasContentFilter()){
                         $node->setLeaf(true);
                     }
@@ -166,8 +167,7 @@ class inboxAccessDriver extends fsAccessDriver
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                 }
-                $node->getRepository()->detectStreamWrapper(true);
-
+                AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
                 $stat = @stat($url);
                 if($stat === false){
                     $ext = "error";

@@ -23,12 +23,10 @@ namespace Pydio\Access\Core\Model;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -119,14 +117,6 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
      * @var bool
      */
     private $inferOptionsFromParent;
-    /**
-     * @var Repository
-     */
-    private $parentTemplateObject;
-    /**
-     * @var array
-     */
-    public $streamData;
 
     /**
      * @var String the groupPath of the administrator who created that repository.
@@ -175,6 +165,22 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
     {
         $this->checkCFilterData();
         return $this->contentFilter;
+    }
+
+    /**
+     * @return AbstractAccessDriver
+     */
+    public function getDriverInstance()
+    {
+        return $this->driverInstance;
+    }
+
+    /**
+     * @param AbstractAccessDriver $driverInstance
+     */
+    public function setDriverInstance($driverInstance)
+    {
+        $this->driverInstance = $driverInstance;
     }
 
     /**
@@ -260,7 +266,7 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
 
     public function getClientSettings()
     {
-        $plugin = PluginsService::findPlugin("access", $this->accessType);
+        $plugin = $this->driverInstance;
         if(!$plugin) return "";
         if (isSet($this->parentId)) {
             $parentObject = ConfService::getRepositoryById($this->parentId);
@@ -276,23 +282,6 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
             }
         }
         return $plugin->getManifestRawContent("//client_settings", "string");
-    }
-
-    public function detectStreamWrapper($register = false, &$streams=null)
-    {
-        if(isSet($this->driverInstance) && $this->driverInstance instanceof Plugin){
-            $plugin = $this->driverInstance;
-        }else{
-            $plugin = PluginsService::findPlugin("access", $this->accessType);
-            $this->driverInstance = $plugin;
-        }
-        if(!$plugin) return(false);
-        $streamData = $plugin->detectStreamWrapper($register);
-        if (!$register && $streamData !== false && is_array($streams)) {
-            $streams[$this->accessType] = $this->accessType;
-        }
-        if($streamData !== false) $this->streamData = $streamData;
-        return ($streamData !== false);
     }
 
     public function addOption($oName, $oValue)

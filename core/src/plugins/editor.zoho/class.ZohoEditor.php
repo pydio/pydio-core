@@ -104,9 +104,6 @@ class ZohoEditor extends Plugin
     public function switchAction($action, $httpVars, $filesVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
         if(AuthService::getLoggedUser() != null){
             $repoWriteable = AuthService::getLoggedUser()->canWrite($repository->getId());
         }else{

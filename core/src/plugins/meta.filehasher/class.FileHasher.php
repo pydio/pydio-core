@@ -105,9 +105,6 @@ class FileHasher extends AJXP_AbstractMetaSource
     public function switchActions($actionName, $httpVars, $fileVars)
     {
         $repository = $this->accessDriver->repository;
-        if (!$repository->detectStreamWrapper(true)) {
-            return;
-        }
         $selection = new UserSelection($repository, $httpVars);
         switch ($actionName) {
             case "filehasher_signature":

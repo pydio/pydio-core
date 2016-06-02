@@ -64,10 +64,6 @@ class EmlParser extends Plugin
         $responseInterface = $responseInterface->withBody($x);
 
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return;
-        }
-
         $selection = new UserSelection($repository, $httpVars);
         if($selection->isEmpty()) return;
         $node = $selection->getUniqueNode();
@@ -202,7 +198,7 @@ class EmlParser extends Plugin
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }
                         $destRepoObject = ConfService::getRepositoryById($destRepoId);
-                        $destRepoObject->detectStreamWrapper(true);
+                        AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
                         $destStreamURL = "pydio://$destRepoId";
                     }
                     $destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];

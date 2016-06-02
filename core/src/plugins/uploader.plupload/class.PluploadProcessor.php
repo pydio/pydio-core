@@ -64,9 +64,6 @@ class PluploadProcessor extends Plugin
             //error_log("currentChunk:".$chunk."  chunks: ".$chunks);
 
             $repository = ConfService::getRepository();
-            if (!$repository->detectStreamWrapper(true)) {
-                return false;
-            }
             $userSelection = new UserSelection($repository);
             $dir = Utils::securePath($httpVars["dir"]);
             $destStreamURL = $userSelection->currentBaseUrl().$dir."/";

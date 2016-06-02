@@ -45,9 +45,6 @@ class HttpDownloader extends Plugin
         $httpVars = $request->getParsedBody();
         $action = $request->getAttribute("action");
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
         $userSelection = new UserSelection($repository);
         $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";

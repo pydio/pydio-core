@@ -59,35 +59,6 @@ class PluginsService
     /*********************************/
 
     /**
-     * Build the XML Registry if not already built, and return it.
-     * @static
-     * @param bool $extendedVersion
-     * @return \DOMDocument The registry
-     */
-    public static function getXmlRegistry($extendedVersion = true)
-    {
-        $self = self::getInstance();
-        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
-            $self->buildXmlRegistry( $extendedVersion );
-            $self->registryVersion = ($extendedVersion ? "extended":"light");
-        }
-        return $self->xmlRegistry;
-    }
-
-    /**
-     * Replace the current xml registry
-     * @static
-     * @param $registry
-     * @param bool $extendedVersion
-     */
-    public static function updateXmlRegistry($registry, $extendedVersion = true)
-    {
-        $self = self::getInstance();
-        $self->xmlRegistry = $registry;
-        $self->registryVersion = ($extendedVersion? "extended" : "light");
-    }
-
-    /**
      * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
      * @param string $query
      * @param string $stringOrNodeFormat
@@ -147,21 +118,7 @@ class PluginsService
     }
 
     /**
-     * Add a plugin to the list of active plugins
-     * @static
-     * @param string $type
-     * @param string $name
-     * @param bool $active
-     * @param Plugin $updateInstance
-     * @return void
-     */
-    public static function setPluginActive($type, $name, $active=true, $updateInstance = null)
-    {
-        self::getInstance()->setPluginActiveInst($type, $name, $active, $updateInstance);
-    }
-
-    /**
-     *
+     * Find a plugin by its type/name
      * @param string $type
      * @param string $name
      * @return Plugin
@@ -224,6 +181,36 @@ class PluginsService
     /*        PUBLIC FUNCTIONS       */
     /*********************************/
 
+
+    /**
+     * Build the XML Registry if not already built, and return it.
+     * @static
+     * @param bool $extendedVersion
+     * @return \DOMDocument The registry
+     */
+    public function getXmlRegistry($extendedVersion = true)
+    {
+        $self = self::getInstance();
+        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
+            $self->buildXmlRegistry( $extendedVersion );
+            $self->registryVersion = ($extendedVersion ? "extended":"light");
+        }
+        return $self->xmlRegistry;
+    }
+
+    /**
+     * Replace the current xml registry
+     * @static
+     * @param $registry
+     * @param bool $extendedVersion
+     */
+    public function updateXmlRegistry($registry, $extendedVersion = true)
+    {
+        $self = self::getInstance();
+        $self->xmlRegistry = $registry;
+        $self->registryVersion = ($extendedVersion? "extended" : "light");
+    }
+
     /**
      * @param string $plugType
      * @param string $plugName
@@ -240,7 +227,8 @@ class PluginsService
 
     /**
      * Loads the full registry, from the cache only
-     *
+     * @param AbstractCacheDriver
+     * @return bool
      */
     public function loadPluginsRegistryFromCache($cacheStorage = null) {
 
@@ -252,6 +240,8 @@ class PluginsService
         if($this->_loadRegistryFromCache()){
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -392,6 +382,25 @@ class PluginsService
     /*********************************/
     /*    PUBLIC: ACTIVE PLUGINS     */
     /*********************************/
+
+    /**
+     * Set the service in defer mode : do not rebuild
+     * registry on each plugin activation
+     */
+    public function deferBuildingRegistry(){
+        $this->tmpDeferRegistryBuild = true;
+    }
+
+    /**
+     * If service was in defer mode, now build the registry
+     */
+    public function flushDeferredRegistryBuilding(){
+        $this->tmpDeferRegistryBuild = false;
+        if (isSet($this->xmlRegistry)) {
+            $this->buildXmlRegistry(($this->registryVersion == "extended"));
+        }
+    }
+
     /**
      * Load the plugins list, and set active the plugins automatically,
      * except for the specific types that declare a "core.*" plugin. In that case,
@@ -420,7 +429,7 @@ class PluginsService
             try {
                 $pObject->performChecks();
                 if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
-                $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
+                $this->setPluginActive($pObject->getType(), $pObject->getName(), true);
             } catch (\Exception $e) {
                 //$this->errors[$pName] = "[$pName] ".$e->getMessage();
             }
@@ -429,14 +438,14 @@ class PluginsService
     }
 
     /**
-     * Instance implementation of the setPluginActive
+     * Add a plugin to the list of active plugins
      * @param $type
      * @param $name
      * @param bool $active
      * @param Plugin $updateInstance
      * @return void
      */
-    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null)
+    public function setPluginActive($type, $name, $active=true, $updateInstance = null)
     {
         if ($active) {
             // Check active plugin dependencies
@@ -469,24 +478,6 @@ class PluginsService
     }
 
     /**
-     * Set the service in defer mode : do not rebuild
-     * registry on each plugin activation
-     */
-    public function deferBuildingRegistry(){
-        $this->tmpDeferRegistryBuild = true;
-    }
-
-    /**
-     * If service was in defer mode, now build the registry
-     */
-    public function flushDeferredRegistryBuilding(){
-        $this->tmpDeferRegistryBuild = false;
-        if (isSet($this->xmlRegistry)) {
-            $this->buildXmlRegistry(($this->registryVersion == "extended"));
-        }
-    }
-
-    /**
      * Some type require only one active plugin at a time
      * @param $type
      * @param $name
@@ -499,10 +490,10 @@ class PluginsService
         $originalValue = $this->tmpDeferRegistryBuild;
         $this->tmpDeferRegistryBuild = true;
         foreach ($typePlugs as $plugName => $plugObject) {
-            $this->setPluginActiveInst($type, $plugName, false);
+            $this->setPluginActive($type, $plugName, false);
         }
         $this->tmpDeferRegistryBuild = $originalValue;
-        $this->setPluginActiveInst($type, $name, true, $updateInstance);
+        $this->setPluginActive($type, $name, true, $updateInstance);
     }
 
     /**

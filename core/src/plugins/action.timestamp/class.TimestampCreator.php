@@ -39,9 +39,6 @@ class TimestampCreator extends Plugin
 
         //Get active repository
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
         $selection = new UserSelection($repository, $requestInterface->getParsedBody());
         $destStreamURL = $selection->currentBaseUrl();
 

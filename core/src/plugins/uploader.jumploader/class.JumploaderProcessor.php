@@ -61,15 +61,14 @@ class JumploaderProcessor extends Plugin
             self::$remote = true;
         }
 
-        if ($repository->detectStreamWrapper(true)) {
-            $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
-            if ($wrapperName == "ajxp.ftp" || $wrapperName == "ajxp.remotefs") {
-                $this->logDebug("Skip decoding");
-                self::$skipDecoding = true;
-            }
-            $this->logDebug("Stream is",$wrapperName);
-            self::$wrapperIsRemote = call_user_func(array($wrapperName, "isRemote"));
+        $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
+        if ($wrapperName == "ajxp.ftp" || $wrapperName == "ajxp.remotefs") {
+            $this->logDebug("Skip decoding");
+            self::$skipDecoding = true;
         }
+        $this->logDebug("Stream is",$wrapperName);
+        self::$wrapperIsRemote = call_user_func(array($wrapperName, "isRemote"));
+        
         $this->logDebug("Jumploader HttpVars", $httpVars);
 
 
@@ -85,7 +84,6 @@ class JumploaderProcessor extends Plugin
             $this->logDebug("Trying Cross-Session Resume request");
 
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-            $repository->detectStreamWrapper(true);
             $context = new UserSelection($repository);
             $destStreamURL = $context->currentBaseUrl().$dir;
             $fileHash = md5($httpVars["fileName"]);
@@ -206,7 +204,6 @@ class JumploaderProcessor extends Plugin
                 /* we get the stream url (where all the partitions have been uploaded so far) */
                 $repository = ConfService::getRepository();
                 $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-                $repository->detectStreamWrapper(true);
                 $context = new UserSelection($repository);
                 $destStreamURL = $context->currentBaseUrl().$dir."/";
 
@@ -237,13 +234,8 @@ class JumploaderProcessor extends Plugin
         $repository = ConfService::getRepository();
         $driver = ConfService::loadDriverForRepository($repository);
 
-        if (!$repository->detectStreamWrapper(false)) {
-            return;
-        }
-
         if ($httpVars["lastPartition"]) {
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-            $repository->detectStreamWrapper(true);
             $context = new UserSelection($repository);
             $destStreamURL = $context->currentBaseUrl().$dir."/";
 

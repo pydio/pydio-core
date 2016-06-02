@@ -62,7 +62,6 @@ class SvnManager extends AJXP_AbstractMetaSource
     protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
         $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper(true);
         $userSelection = new UserSelection($repo, $httpVars);
         $urlBase = $userSelection->currentBaseUrl();
         $result = array();
@@ -122,8 +121,6 @@ class SvnManager extends AJXP_AbstractMetaSource
      */
     public function commitFile($file, $ajxpNode = null)
     {
-        $repo = $this->accessDriver->repository;
-        $repo->detectStreamWrapper();
         $realFile = AJXP_MetaStreamWrapper::getRealFSReference($file);
 
         $res = ExecSvnCmd("svn status ", $realFile);

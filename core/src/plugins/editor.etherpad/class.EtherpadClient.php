@@ -44,10 +44,6 @@ class EtherpadClient extends Plugin
         if ($userSelection->isEmpty()){
             throw new Exception("Empty selection");
         }
-        $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(false)) {
-            return false;
-        }
         $selectedNode = $userSelection->getUniqueNode();
         $selectedNode->loadNodeInfo();
         if(!$selectedNode->isLeaf()){

@@ -40,10 +40,6 @@ class VideoReader extends Plugin
     public function switchAction($action, $httpVars, $filesVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
-
         $selection = new UserSelection($repository, $httpVars);
         $node = $selection->getUniqueNode();
 

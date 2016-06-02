@@ -83,7 +83,7 @@ class FrontendsLoader extends Plugin {
                 $protocol = $configs["PROTOCOL_TYPE"];
                 if($protocol == "session_only" && !AuthService::$useSession) continue;
                 if($protocol == "no_session" && AuthService::$useSession) continue;
-                PluginsService::setPluginActive($front->getType(), $front->getName(), true);
+                PluginsService::getInstance()->setPluginActive($front->getType(), $front->getName(), true);
             }
         }
 

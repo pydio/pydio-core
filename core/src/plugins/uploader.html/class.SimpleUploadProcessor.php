@@ -158,9 +158,6 @@ class SimpleUploadProcessor extends Plugin
     public function unifyChunks($action, $httpVars, $fileVars)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(true)) {
-            return false;
-        }
         $selection = new UserSelection($repository);
         $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $destStreamURL = $selection->currentBaseUrl().$dir."/";

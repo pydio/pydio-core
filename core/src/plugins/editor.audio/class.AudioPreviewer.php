@@ -49,9 +49,6 @@ class AudioPreviewer extends Plugin
     public function switchAction($action, $httpVars, $postProcessData)
     {
         $repository = ConfService::getRepository();
-        if (!$repository->detectStreamWrapper(false)) {
-            return false;
-        }
 
         if ($action == "audio_proxy") {
 
@@ -72,7 +69,7 @@ class AudioPreviewer extends Plugin
             if(!is_readable($node->getUrl())){
                 throw new Exception("Cannot find file!");
             }
-
+            
             $fileUrl = $node->getUrl();
             $localName = basename($fileUrl);
             $cType = "audio/".array_pop(explode(".", $localName));

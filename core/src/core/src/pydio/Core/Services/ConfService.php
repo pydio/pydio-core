@@ -22,6 +22,7 @@ namespace Pydio\Core\Services;
 
 use DOMXPath;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
@@ -233,6 +234,7 @@ class ConfService
     public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "")
     {
         $plugin = false;
+        $pService = PluginsService::getInstance();
 
         if (is_string($globalsArray)) {
             $globalsArray = array("instance_name" => $globalsArray);
@@ -242,7 +244,7 @@ class ConfService
             $pName = $globalsArray["instance_name"];
             unset($globalsArray["instance_name"]);
 
-            $plugin = PluginsService::getInstance()->softLoad($pName, $globalsArray);
+            $plugin = $pService->softLoad($pName, $globalsArray);
             $plugin->performChecks();
         }
 
@@ -252,7 +254,7 @@ class ConfService
             }
         }
         if ($plugin !== false) {
-            PluginsService::getInstance()->setPluginActive($plugin->getType(), $plugin->getName(), true, $plugin);
+            $pService->setPluginActive($plugin->getType(), $plugin->getName(), true, $plugin);
         }
         return $plugin;
 
@@ -379,13 +381,15 @@ class ConfService
 
     public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
 
+        $pluginService = PluginsService::getInstance();
+
         if($useCache){
             $cacheKey = self::getRegistryCacheKey($extendedVersion);
             $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
             if($cachedXml !== false){
                 $registry = new \DOMDocument("1.0", "utf-8");
                 $registry->loadXML($cachedXml);
-                PluginsService::updateXmlRegistry($registry, $extendedVersion);
+                $pluginService->updateXmlRegistry($registry, $extendedVersion);
                 if($clone){
                     return $registry->cloneNode(true);
                 }else{
@@ -394,10 +398,10 @@ class ConfService
             }
         }
 
-        $registry = PluginsService::getXmlRegistry($extendedVersion);
+        $registry = $pluginService->getXmlRegistry($extendedVersion);
         $changes = self::filterRegistryFromRole($registry);
         if($changes){
-            PluginsService::updateXmlRegistry($registry, $extendedVersion);
+            $pluginService->updateXmlRegistry($registry, $extendedVersion);
         }
 
         if($useCache && isSet($cacheKey)){
@@ -981,7 +985,7 @@ class ConfService
         $streams = array();
         $currentRepos = $this->getLoadedRepositories();
         foreach ($currentRepos as $repository) {
-            $repository->detectStreamWrapper($register, $streams);
+            AJXP_MetaStreamWrapper::detectWrapperForRepository($repository,$register, $streams);
         }
         return $streams;
     }

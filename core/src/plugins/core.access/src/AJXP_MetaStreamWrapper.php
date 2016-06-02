@@ -22,6 +22,7 @@
 namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 
@@ -74,6 +75,39 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
                 stream_wrapper_register($protocol, $className);
             }
         }
+    }
+
+    /**
+     * Check if a repository accessDriver declares a streamWrapper, and eventually register it.
+     * @param RepositoryInterface $repository
+     * @param bool $register
+     * @param array|null $streams
+     * @param array|false $streamData
+     * @return bool
+     */
+    public static function detectWrapperForRepository(RepositoryInterface $repository, $register = false, &$streams = null, &$streamData = false){
+
+        $driverInstance = $repository->getDriverInstance();
+        $accessType = $repository->getAccessType();
+
+        if(!empty($driverInstance) && $driverInstance instanceof AbstractAccessDriver){
+            $plugin = $driverInstance;
+        }else{
+            $plugin = PluginsService::findPlugin("access", $accessType);
+            if(!empty($plugin) && $plugin instanceof AbstractAccessDriver){
+                $repository->setDriverInstance($plugin);
+            }
+        }
+        if(empty($plugin)) {
+            return false;
+        }
+
+        $streamData = $plugin->detectStreamWrapper($register);
+        if (!$register && $streamData !== false && is_array($streams)) {
+            $streams[$accessType] = $accessType;
+        }
+        return ($streamData !== false);
+
     }
 
     /**
@@ -177,9 +211,9 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         if(!is_a($repository, "Repository")){
             throw new \Exception("Cannot find repository with this id!");
         }
-        if($repository->detectStreamWrapper(false)){
-            self::$cachedRepositoriesWrappers[$repositoryId] = $repository->streamData;
-            return $repository->streamData;
+        if(self::detectWrapperForRepository($repository, false, $streams, $streamData)){
+            self::$cachedRepositoriesWrappers[$repositoryId] = $streamData;
+            return $streamData;
         }else{
             throw new \Exception("Repository does not provide a stream wrapper!");
         }

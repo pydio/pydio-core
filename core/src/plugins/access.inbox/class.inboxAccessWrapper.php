@@ -149,7 +149,7 @@ class inboxAccessWrapper implements IAjxpWrapper
             }catch (\Exception $e){
 
             }
-            $node->getRepository()->detectStreamWrapper(true);
+            AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
         }
         return $url;
     }

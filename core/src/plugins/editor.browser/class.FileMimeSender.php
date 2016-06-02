@@ -39,11 +39,7 @@ class FileMimeSender extends Plugin
     public function switchAction($action, $httpVars, $filesVars)
     {
         $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
-
-        if(!$repository->detectStreamWrapper(true)){
-            return false;
-        }
-
+        
         if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
             if ($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
