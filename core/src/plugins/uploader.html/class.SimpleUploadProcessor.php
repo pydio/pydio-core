@@ -57,36 +57,46 @@ class SimpleUploadProcessor extends Plugin
     {
         $httpVars = $request->getParsedBody();
         $serverData = $request->getServerParams();
+
         if (!isSet($httpVars["input_stream"]) || isSet($httpVars["force_post"])) {
+            // Nothing to do
             return;
         }
 
-        $headersCheck = isset(
-                $serverData['CONTENT_LENGTH'],
-                $serverData['HTTP_X_FILE_NAME']
-            ) ;
+        // Mandatory headers
+        if (!isset($serverData['CONTENT_LENGTH'], $serverData['HTTP_X_FILE_NAME'])) {
+            throw new \Pydio\Core\Exception\PydioException("Warning, missing headers!");
+        }
+
         if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
             if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
                 exit('Warning, wrong headers');
             }
         }
-        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
-        $fileSizeH = $serverData['CONTENT_LENGTH'];
 
+        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+        $fileSizeH = (int)$serverData['CONTENT_LENGTH'];
+
+        // Clean up dir name
         if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
             $httpVars["dir"] = "/";
         }
+
         $this->logDebug("SimpleUpload::preProcess", $httpVars);
 
-        if ($headersCheck) {
-            /** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
-            $uploadedFile = array_shift($request->getUploadedFiles());
-            // Update UploadedFile object built on input stream with file name and size
-            $uploadedFile = new \Zend\Diactoros\UploadedFile($uploadedFile->getStream(), $fileNameH, $uploadedFile->getError(), TextEncoder::fromUTF8(basename($fileNameH)));
-            $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
+        if (isSet($serverData['HTTP_X_FILE_TMP_LOCATION'])) {
+            // The file has already been uploaded to a tmp location
+            $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
+            $errorStatus = UPLOAD_ERR_OK;
         } else {
-            throw new \Pydio\Core\Exception\PydioException("Warning, missing headers!");
+            $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
+            $errorStatus = $streamOrFile->getError();
         }
+
+        // Update UploadedFile object built on input stream with file name and size
+        $uploadedFile = new \Zend\Diactoros\UploadedFile($streamOrFile, $fileSizeH, $errorStatus, TextEncoder::fromUTF8(basename($fileNameH)));
+        
+        $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
     }
 
     /**
