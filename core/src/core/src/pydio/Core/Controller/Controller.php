@@ -344,6 +344,9 @@ class Controller
         }
 
         $repoObject = ConfService::getRepository();
+        if(empty($repoObject)){
+            $repoObject = ConfService::getRepositoryById($currentRepositoryId);
+        }
         $clearEnv = false;
         if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
             $encodedCreds = AJXP_Safe::getEncodedCredentialString();
