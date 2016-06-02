@@ -158,7 +158,10 @@ class PluploadProcessor extends Plugin
                         $fileVars["file"]["tmp_name"] = $target;
                         $fileVars["file"]["name"] = $filename;
                         $driver->storeFileToCopy($fileVars["file"]);
-                        Controller::findActionAndApply("next_to_remote", array(), array());
+                        $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
+                        $request = $request->withAttribute("action", "next_to_remote")->withParsedBody([]);
+                        Controller::run($request);
+
                     }else{
                         // Remote Driver case: copy temp file to destination
                         $node = new AJXP_Node($destStreamURL.$filename);
