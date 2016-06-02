@@ -31,6 +31,8 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Log\Core\AJXP_Logger;
+use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -62,26 +64,41 @@ class TaskService implements ITasksProvider
 
     /**
      * @param Task $task
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
+     * @param ServerRequestInterface|null $request
+     * @param ResponseInterface|null $response
      * @throws \Pydio\Core\Exception\ActionNotFoundException
      * @throws \Pydio\Core\Exception\AuthRequiredException
-     * @return ResponseInterface
+     * @return ResponseInterface|null
      */
-    public function enqueueTask(Task $task, ServerRequestInterface $request, ResponseInterface $response){
-        if(ConfService::backgroundActionsSupported()){
+    public function enqueueTask(Task $task, ServerRequestInterface $request = null, ResponseInterface $response = null){
+        
+        $workers = ConfService::getCoreConf("MQ_USE_WORKERS", "mq");
+        if($workers && !$task->getSchedule()->shouldRunNow()){
+            AJXP_Logger::getInstance()->logInfo("TaskService", "Enqueuing Task ".$task->getId());
+            $msg = ["pending_task" => $task->getId()];
+            Controller::applyHook("msg.task", [$msg]);
+            return $response;
+        }
+
+        if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+
             Controller::applyTaskInBackground($task);
             return $response;
+
         }else{
             $params = $task->getParameters();
             $action = $task->getAction();
             $id = $task->getId();
+            if(empty($request)){
+                $request = ServerRequestFactory::fromGlobals();
+            }
             $request = $request
                 ->withAttribute("action", $action)
                 ->withAttribute("pydio-task-id", $id)
                 ->withParsedBody($params);
             return Controller::run($request);
         }
+
     }
 
     protected function publishTaskUpdate(Task $task){

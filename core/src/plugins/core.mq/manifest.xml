@@ -23,6 +23,10 @@
         <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[WebSocket Server]" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
+        <global_param group="CONF_MESSAGE[Workers]" type="boolean" name="MQ_USE_WORKERS" label="CONF_MESSAGE[Use Workers]" description="CONF_MESSAGE[Send commands in background to workers waiting to execute them]" mandatory="false" default="false"/>
+        <global_param group="CONF_MESSAGE[Workers]" type="monitor" name="MQ_WORKER_STATUS" choices="run_plugin_action:core.mq:getWorkerStatus" label="CONF_MESSAGE[Worker Status]" description="CONF_MESSAGE[Try to detect if the worker is responding]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Workers]" type="button" name="MQ_WORKER_SWITCH_ON" choices="run_plugin_action:core.mq:switchWorkerOn" label="CONF_MESSAGE[Start Worker]" description="CONF_MESSAGE[Switch a worker ON]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Workers]" type="button" name="MQ_WORKER_SWITCH_OFF" choices="run_plugin_action:core.mq:switchWorkerOff" label="CONF_MESSAGE[Stop Worker]" description="CONF_MESSAGE[Switch a worker OFF]" mandatory="false"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>
@@ -80,6 +84,7 @@
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
+            <serverCallback methodName="sendTaskMessage" hookName="msg.task" defer="true"/>
             <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
             <serverCallback methodName="appendRefreshInstruction" hookName="response.send" />
         </hooks>

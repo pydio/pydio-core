@@ -204,6 +204,28 @@ class MqManager extends Plugin
 
     }
 
+    public function sendTaskMessage($content){
+
+        $this->logInfo("Core.mq", "Should now publish a message to NSQ :". json_encode($content));
+        $host = $this->getFilteredOption("WS_SERVER_HOST");
+        $port = $this->getFilteredOption("WS_SERVER_PORT");
+        if(!empty($host) && !empty($port)){
+            // Publish on NSQ
+            try{
+                $nsq = new nsqphp;
+                $nsq->publishTo($host, 1);
+                $nsq->publish('task', new \nsqphp\Message\Message(json_encode($content)));
+                $this->logInfo("Core.mq", "Published a message to NSQ :". json_encode($content));
+            }catch (Exception $e){
+                $this->logError("Core.mq", "sendTaskMessage", $e->getMessage());
+                if(ConfService::currentContextIsCommandLine()){
+                    print("Error while trying to send a task message ".json_encode($content)." : ".$e->getMessage());
+                }
+            }
+        }
+
+    }
+
     public function appendRefreshInstruction(ResponseInterface &$responseInterface){
         if(! $this->hasPendingMessage ){
             return;
@@ -316,6 +338,39 @@ class MqManager extends Plugin
 
     }
 
+    public function switchWorkerOn($params)
+    {
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."worker-pid";
+        if (file_exists($pidFile)) {
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $status = $unixProcess->status();
+            if ($status) {
+                throw new Exception("Worker seems to already be running!");
+            }
+        }
+        $cmd = ConfService::getCoreConf("CLI_PHP")." worker.php";
+        chdir(AJXP_INSTALL_PATH);
+        $process = Controller::runCommandInBackground($cmd, AJXP_CACHE_DIR."/cmd_outputs/worker.log");
+        if ($process != null) {
+            $pId = $process->getPid();
+            $wDir = $this->getPluginWorkDir(true);
+            file_put_contents($wDir.DIRECTORY_SEPARATOR."worker-pid", $pId);
+            return "SUCCESS: Started worker with process ID $pId";
+        }
+        return "SUCCESS: Started worker Server";
+    }
+
+    public function switchWorkerOff($params){
+        return $this->switchWebSocketOff($params, "worker");
+    }
+
+    public function getWorkerStatus($params){
+        return $this->getWebSocketStatus($params, "worker");
+    }
+
     public function switchWebSocketOn($params)
     {
         $wDir = $this->getPluginWorkDir(true);
@@ -344,12 +399,12 @@ class MqManager extends Plugin
         return "SUCCESS: Started WebSocket Server";
     }
 
-    public function switchWebSocketOff($params)
+    public function switchWebSocketOff($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
         if (!file_exists($pidFile)) {
-            throw new Exception("No information found about WebSocket server");
+            throw new Exception("No information found about $type server");
         } else {
             $pId = file_get_contents($pidFile);
             $unixProcess = new UnixProcess();
@@ -357,13 +412,13 @@ class MqManager extends Plugin
             $unixProcess->stop();
             unlink($pidFile);
         }
-        return "SUCCESS: Killed WebSocket Server";
+        return "SUCCESS: Killed $type Server";
     }
 
-    public function getWebSocketStatus()
+    public function getWebSocketStatus($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
         if (!file_exists($pidFile)) {
             return "OFF";
         } else {

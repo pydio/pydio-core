@@ -25,9 +25,9 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 
@@ -64,9 +64,10 @@ class CoreIndexer extends Plugin {
         if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
             $this->verboseIndexation = true;
         }
-
-        if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+        $taskId = $requestInterface->getAttribute("pydio-task-id");
+        if (empty($taskId)) {
             $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+            $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
             TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
             return null;
