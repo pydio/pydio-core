@@ -72,7 +72,7 @@ class AJXP_Node implements \JsonSerializable
      */
     private $_repository;
     /**
-     * @var .\AbstractAccessDriver
+     * @var AbstractAccessDriver
      */
     private $_accessDriver;
     /**
@@ -557,6 +557,32 @@ class AJXP_Node implements \JsonSerializable
     public function setInfoLoaded($level){
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $level;
+    }
+
+    /**
+     * Try the size of collection recursively.
+     * Will trigger the node.size.recursive hook, allowing certain plugins
+     * to perform the operation if they have the information (e.g. meta.syncable).
+     * Otherwise will use the directoryUsage() method of the accessDriver.
+     * @return int|mixed
+     */
+    public function getSizeRecursive(){
+        $this->loadNodeInfo();
+        if($this->isLeaf()){
+            return $this->_metadata["bytesize"];
+        }else{
+            $result = -1;
+            Controller::applyHook("node.size.recursive", array(&$this, &$result));
+            if($result == -1){
+                try{
+                    return $this->_accessDriver->directoryUsage($this->getPath(), []);
+                }catch(\Exception $e){
+                    return -1;
+                }
+            }else{
+                return $result;
+            }
+        }
     }
 
     /**

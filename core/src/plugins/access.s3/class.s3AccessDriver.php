@@ -148,10 +148,10 @@ class s3AccessDriver extends fsAccessDriver
 
     /**
      * @param String $directoryPath
-     * @param \Pydio\Access\Core\Model\Repository $repositoryResolvedOptions
+     * @param array $repositoryResolvedOptions
      * @return int
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
         $client = $this->getS3Service();
         $bucket = (isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
         $path   = (isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");

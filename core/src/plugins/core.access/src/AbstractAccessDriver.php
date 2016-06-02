@@ -27,10 +27,10 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\VarsFilter;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
@@ -74,7 +74,7 @@ class AbstractAccessDriver extends Plugin
                 return;
             }
             $selection = new UserSelection($this->repository, $httpVars);
-            \Pydio\Core\Controller\Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
+            Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
         }
         if ($actionName == "ls") {
             // UPWARD COMPATIBILTY
@@ -119,7 +119,7 @@ class AbstractAccessDriver extends Plugin
      * @return int
      * @throws \Exception
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
         throw new \Exception("Current driver does not support recursive directory usage!");
     }
 
@@ -189,7 +189,7 @@ class AbstractAccessDriver extends Plugin
     }
 
     /**
-     * @param String $destDir url of destination dir
+     * @param String $destFile url of destination file
      * @param String $srcFile url of source file
      * @param array $error accumulator for error messages
      * @param array $success accumulator for success messages
@@ -228,7 +228,7 @@ class AbstractAccessDriver extends Plugin
         }
         if (!$move) {
             $size = filesize($realSrcFile);
-            \Pydio\Core\Controller\Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
+            Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), $size));
         }
         if (dirname($realSrcFile) == dirname($destFile) && basename($realSrcFile) == basename($destFile)) {
             if ($move) {
@@ -285,7 +285,7 @@ class AbstractAccessDriver extends Plugin
             }
         } else {
             if ($move) {
-                \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array($srcNode));
+                Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
                 if(AJXP_MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
                     rename($realSrcFile, $destFile);
@@ -297,7 +297,7 @@ class AbstractAccessDriver extends Plugin
                 try {
                     $this->filecopy($realSrcFile, $destFile);
                     $this->changeMode($destFile, $destRepoData);
-                    \Pydio\Core\Controller\Controller::applyHook("node.change", array($srcNode, $destNode, true));
+                    Controller::applyHook("node.change", array($srcNode, $destNode, true));
                 } catch (\Exception $e) {
                     $error[] = $e->getMessage();
                     if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
@@ -306,7 +306,6 @@ class AbstractAccessDriver extends Plugin
             }
         }
 
-        $successMessage = "";
         if ($move) {
             // Now delete original
             // $this->deldir($realSrcFile); // both file and dir
@@ -316,9 +315,9 @@ class AbstractAccessDriver extends Plugin
                 $messagePart = $mess[123]." ".$mess[122];
             }
             if (is_dir($destFile)) {
-                $successMessage = $mess[117]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[117]." ". TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             } else {
-                $successMessage = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[34]." ". TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
             }
         } else {
             if (RecycleBinManager::recycleEnabled() && $destDir == "/".$srcRecycle) {
@@ -327,7 +326,7 @@ class AbstractAccessDriver extends Plugin
             if (isSet($dirRes)) {
                 $successMessage = $mess[117]." ".TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
             } else {
-                $successMessage = $mess[34]." ". \Pydio\Core\Utils\TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". \Pydio\Core\Utils\TextEncoder::toUTF8($destDir);
+                $successMessage = $mess[34]." ". TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". TextEncoder::toUTF8($destDir);
             }
         }
         $success[] = $successMessage;
@@ -427,7 +426,7 @@ class AbstractAccessDriver extends Plugin
             }
             closedir($curdir);
             foreach ($recurse as $rec) {
-                if($verbose) echo "Dircopy $srcfile";
+                if($verbose && isSet($srcfile)) echo "Dircopy $srcfile";
                 $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile, $srcRepoData, $destRepoData, $taskId);
             }
         }
@@ -455,27 +454,27 @@ class AbstractAccessDriver extends Plugin
     protected function deldir($location, $repoData)
     {
         if (is_dir($location)) {
-            \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+            Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
             $all=opendir($location);
             while (($file=readdir($all)) !== FALSE) {
                 if (is_dir("$location/$file") && $file !=".." && $file!=".") {
                     $this->deldir("$location/$file", $repoData);
                     if (file_exists("$location/$file")) {
-                        rmdir("$location/$file");
+                        @rmdir("$location/$file");
                     }
                     unset($file);
                 } elseif (!is_dir("$location/$file")) {
                     if (file_exists("$location/$file")) {
-                        unlink("$location/$file");
+                        @unlink("$location/$file");
                     }
                     unset($file);
                 }
             }
             closedir($all);
-            rmdir($location);
+            @rmdir($location);
         } else {
             if (file_exists("$location")) {
-                \Pydio\Core\Controller\Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+                Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
                 $test = @unlink("$location");
                 if(!$test) throw new \Exception("Cannot delete file ".$location);
             }
@@ -493,7 +492,7 @@ class AbstractAccessDriver extends Plugin
      * @param array $stat
      * @param Repository $repoObject
      * @param callable $remoteDetectionCallback
-     * @var oct $mode
+     * @var integer $mode
      */
     public static function fixPermissions(&$stat, $repoObject, $remoteDetectionCallback = null)
     {
@@ -513,7 +512,7 @@ class AbstractAccessDriver extends Plugin
                 }
 
             } else if (substr($fixPermPolicy, 0, strlen("file:")) == "file:") {
-                $filePath = \Pydio\Core\Utils\VarsFilter::filter(substr($fixPermPolicy, strlen("file:")));
+                $filePath = VarsFilter::filter(substr($fixPermPolicy, strlen("file:")));
                 if (file_exists($filePath)) {
                     // GET A GID/UID FROM FILE
                     $lines = file($filePath);
@@ -601,9 +600,9 @@ class AbstractAccessDriver extends Plugin
     {
         $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
         if($isLeaf === ""){
-            $isLeaf = (is_file($nodePath."/".$nodeName) || \Pydio\Core\Utils\Utils::isBrowsableArchive($nodeName));
+            $isLeaf = (is_file($nodePath."/".$nodeName) || Utils::isBrowsableArchive($nodeName));
         }
-        if (\Pydio\Core\Utils\Utils::isHidden($nodeName) && !$showHiddenFiles) {
+        if (Utils::isHidden($nodeName) && !$showHiddenFiles) {
             return false;
         }
         $nodeType = "d";

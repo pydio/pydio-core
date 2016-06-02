@@ -50,6 +50,7 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use Zend\Diactoros\Response;
@@ -134,12 +135,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     /**
      * @param String $directoryPath
-     * @param Repository $repositoryResolvedOptions
+     * @param array $repositoryResolvedOptions
      * @return int
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
 
-        $dir = $repositoryResolvedOptions["PATH"].$directoryPath;
+        $dir = (isSet($repositoryResolvedOptions["PATH"]) ? $repositoryResolvedOptions["PATH"] : $this->repository->getOption("PATH")).$directoryPath;
         $size = -1;
         if ( ( PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") && class_exists("COM") ) {
             $obj = new COM ( 'scripting.filesystemobject' );
@@ -825,9 +826,20 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw new PydioException("", 113);
                 }
                 $taskId = $request->getAttribute("pydio-task-id");
-                if($taskId === null && (!$selection->isUnique() || !is_file($selection->getUniqueNode()->getUrl()))){
+                // Compute copy size
+                $size = 0;
+                $nodes = $selection->buildNodes();
+                $bgSizeThreshold = 10*1024*1024;
+                $bgWorkerThreshold = 80*1024*1024;
+                foreach($nodes as $node){
+                    $size += $node->getSizeRecursive();
+                }
+                if($taskId === null && ($size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
+                    if($size > $bgWorkerThreshold){
+                        $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
+                    }
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
                 }
