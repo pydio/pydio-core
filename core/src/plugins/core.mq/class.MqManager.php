@@ -59,7 +59,10 @@ websocket.onmessage = function(event){console.log(event.data);};
 class MqManager extends Plugin
 {
 
-    private $wsClient;
+    /**
+     * @var nsqphp
+     */
+    private $nsqClient;
 
     /**
      * @var AJXP_MessageExchanger;
@@ -194,10 +197,12 @@ class MqManager extends Plugin
         $host = $this->getFilteredOption("WS_SERVER_HOST");
         $port = $this->getFilteredOption("WS_SERVER_PORT");
         if(!empty($host) && !empty($port)){
-            // Publish on NSQ
-            $nsq = new nsqphp;
-            $nsq->publishTo($host, 1);
-            $nsq->publish('im', new \nsqphp\Message\Message(json_encode($input)));
+            if(empty($this->nsqClient)){
+                // Publish on NSQ
+                $this->nsqClient = new nsqphp;
+                $this->nsqClient->publishTo($host, 1);
+            }
+            $this->nsqClient->publish('im', new \nsqphp\Message\Message(json_encode($input)));
         }
 
         $this->hasPendingMessage = true;

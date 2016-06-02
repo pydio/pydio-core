@@ -447,31 +447,35 @@ class AbstractAccessDriver extends Plugin
     }
 
     /**
-     * @param $location
-     * @param $repoData
+     * @param string $location
+     * @param array $repoData
+     * @param string $taskId
      * @throws \Exception
      */
-    protected function deldir($location, $repoData)
+    protected function deldir($location, $repoData, $taskId = null)
     {
         if (is_dir($location)) {
             Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
             $all=opendir($location);
             while (($file=readdir($all)) !== FALSE) {
                 if (is_dir("$location/$file") && $file !=".." && $file!=".") {
-                    $this->deldir("$location/$file", $repoData);
+                    $this->deldir("$location/$file", $repoData, $taskId);
                     if (file_exists("$location/$file")) {
                         @rmdir("$location/$file");
+                        if($taskId != null) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Deleting $file");
                     }
                     unset($file);
                 } elseif (!is_dir("$location/$file")) {
                     if (file_exists("$location/$file")) {
                         @unlink("$location/$file");
+                        if($taskId != null) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Deleting $file");
                     }
                     unset($file);
                 }
             }
             closedir($all);
             @rmdir($location);
+            if($taskId != null) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Deleting ".Utils::safeBasename($location));
         } else {
             if (file_exists("$location")) {
                 Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));

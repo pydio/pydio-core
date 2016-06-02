@@ -803,8 +803,25 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($selection->isEmpty()) {
                     throw new PydioException("", 113);
                 }
+                $size = 0;
+                $nodes = $selection->buildNodes();
+                $bgSizeThreshold = 1*1024*1024;
+                $bgWorkerThreshold = 80*1024*1024;
+                foreach($nodes as $node){
+                    $size += $node->getSizeRecursive();
+                }
+                $taskId = $request->getAttribute("pydio-task-id");
+                if($taskId === null && ($size > $bgSizeThreshold)){
+                    $task = TaskService::actionAsTask($action, $httpVars);
+                    if($size > $bgWorkerThreshold){
+                        $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
+                    }
+                    $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
+                    break;
+                }
+
                 $logMessages = array();
-                $errorMessage = $this->delete($selection->getFiles(), $logMessages);
+                $errorMessage = $this->delete($selection->getFiles(), $logMessages, $taskId);
                 if (count($logMessages)) {
                     $logMessage = new UserMessage(join("\n", $logMessages));
                 }
@@ -875,7 +892,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw new PydioException(TextEncoder::toUTF8(join("\n", $error)));
                 } else {
                     if (isSet($httpVars["force_copy_delete"])) {
-                        $errorMessage = $this->delete($selection->getFiles(), $logMessages);
+                        $errorMessage = $this->delete($selection->getFiles(), $logMessages, $taskId);
                         if($errorMessage) {
                             if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while deleting data: ".TextEncoder::toUTF8($errorMessage));
                             throw new PydioException(TextEncoder::toUTF8($errorMessage));
@@ -2100,7 +2117,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
 
-    public function delete($selectedFiles, &$logMessages)
+    public function delete($selectedFiles, &$logMessages, $taskId = null)
     {
         $repoData = array(
             'base_url' => $this->urlBase,
@@ -2117,13 +2134,19 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $logMessages[]=$mess[100]." ".TextEncoder::toUTF8($selectedFile);
                 continue;
             }
-            $this->deldir($fileToDelete, $repoData);
+            $this->deldir($fileToDelete, $repoData, $taskId);
             if (is_dir($fileToDelete)) {
                 $logMessages[]="$mess[38] ".TextEncoder::toUTF8($selectedFile)." $mess[44].";
             } else {
                 $logMessages[]="$mess[34] ".TextEncoder::toUTF8($selectedFile)." $mess[44].";
             }
             Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
+        }
+        if($taskId != null){
+            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Done");
+            $nodesDiff = new NodesDiff();
+            $nodesDiff->remove($selectedFiles);
+            Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $this->repository->getId()));
         }
         return null;
     }

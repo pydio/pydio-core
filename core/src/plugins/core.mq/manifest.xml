@@ -84,7 +84,7 @@
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
-            <serverCallback methodName="sendTaskMessage" hookName="msg.task" defer="true"/>
+            <serverCallback methodName="sendTaskMessage" hookName="msg.task" defer="true" dontBreakOnException="true"/>
             <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
             <serverCallback methodName="appendRefreshInstruction" hookName="response.send" />
         </hooks>
