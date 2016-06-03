@@ -1556,7 +1556,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $output = fopen($destination, "w");
                 $sizeRead = 0;
-                while ($sizeRead > 0 && $sizeRead < intval($newFileSize)) {
+                while ($sizeRead < intval($newFileSize)) {
                     $chunk = fread($input, 4096);
                     $sizeRead += strlen($chunk);
                     fwrite($output, $chunk, strlen($chunk));
