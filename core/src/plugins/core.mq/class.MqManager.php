@@ -194,13 +194,13 @@ class MqManager extends Plugin
             $input["NODE_PATHES"] = $nodePathes;
         }
 
-        $host = $this->getFilteredOption("WS_SERVER_HOST");
-        $port = $this->getFilteredOption("WS_SERVER_PORT");
+        $host = $this->getFilteredOption("NSQ_HOST");
+        $port = $this->getFilteredOption("NSQ_PORT");
         if(!empty($host) && !empty($port)){
             if(empty($this->nsqClient)){
                 // Publish on NSQ
                 $this->nsqClient = new nsqphp;
-                $this->nsqClient->publishTo($host, 1);
+                $this->nsqClient->publishTo(join(":", [$host, $port]), 1);
             }
             $this->nsqClient->publish('im', new \nsqphp\Message\Message(json_encode($input)));
         }
@@ -212,13 +212,13 @@ class MqManager extends Plugin
     public function sendTaskMessage($content){
 
         $this->logInfo("Core.mq", "Should now publish a message to NSQ :". json_encode($content));
-        $host = $this->getFilteredOption("WS_SERVER_HOST");
-        $port = $this->getFilteredOption("WS_SERVER_PORT");
+        $host = $this->getFilteredOption("NSQ_HOST");
+        $port = $this->getFilteredOption("NSQ_PORT");
         if(!empty($host) && !empty($port)){
             // Publish on NSQ
             try{
                 $nsq = new nsqphp;
-                $nsq->publishTo($host, 1);
+                $nsq->publishTo(join(":", [$host, $port]), 1);
                 $nsq->publish('task', new \nsqphp\Message\Message(json_encode($content)));
                 $this->logInfo("Core.mq", "Published a message to NSQ :". json_encode($content));
             }catch (Exception $e){
@@ -362,49 +362,149 @@ class MqManager extends Plugin
         if ($process != null) {
             $pId = $process->getPid();
             $wDir = $this->getPluginWorkDir(true);
-            file_put_contents($wDir.DIRECTORY_SEPARATOR."worker-pid", $pId);
+            file_put_contents($pidFile, $pId);
             return "SUCCESS: Started worker with process ID $pId";
         }
         return "SUCCESS: Started worker Server";
     }
 
     public function switchWorkerOff($params){
-        return $this->switchWebSocketOff($params, "worker");
+        return $this->switchOff($params, "worker");
     }
 
     public function getWorkerStatus($params){
-        return $this->getWebSocketStatus($params, "worker");
+        return $this->getStatus($params, "worker");
     }
 
-    public function switchWebSocketOn($params)
-    {
+    // Handler testing the generation of the caddy file to spot any error
+    public function getCaddyFile($params) {
+        $error = "OK";
+
+        set_error_handler(function ($e) use (&$error) {
+            $error = $e;
+        }, E_WARNING);
+
+        $data = $this->generateCaddyFile($params);
+
+        // Generate the caddyfile
+        file_put_contents("/tmp/testcaddy", $data);
+
+        restore_error_handler();
+
+        return $error;
+    }
+
+    public function generateCaddyFile($params) {
+        $data = "";
+
+        $hosts = [];
+
+            // Getting URLs of the Pydio system
+        $serverURL = Utils::detectServerURL();
+        $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
+        $authURL = $serverURL . "/api/pydio/ws_authenticate";
+
+            // Websocket
+        $host = $params["WS_HOST"];
+        $port = $params["WS_PORT"];
+        $secure = $params["WS_SECURE"];
+        $path = "/" . trim($params["WS_PATH"], "/");
+
+        $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
+        $hosts[$key] = array_merge(
+            (array) $hosts[$key],
+            [
+                "pydioauth" => [$path, $authURL, $tokenURL. "&device=websocket"],
+                "pydiows" => [$path]
+            ]
+        );
+
+            // Upload
+        $host = $params["UPLOAD_HOST"];
+        $port = $params["UPLOAD_PORT"];
+        $secure = $params["UPLOAD_SECURE"];
+        $path = "/" . trim($params["UPLOAD_PATH"], "/");
+
+        $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
+        $hosts[$key] = array_merge(
+            (array) $hosts[$key],
+            [
+                "header" => [$path, "{\n" .
+                    "\tAccess-Control-Allow-Origin ". $serverURL ."\n" .
+                    "\tAccess-Control-Request-Headers *\n" .
+                    "\tAccess-Control-Allow-Methods POST\n" .
+                    "\tAccess-Control-Allow-Headers Range\n" .
+                    "\tAccess-Control-Allow-Credentials true\n" .
+                    "}"
+                ],
+                "pydioupload" => [$path, $tokenURL . "&device=upload"]
+            ]
+        );
+
+        foreach ($hosts as $host => $config) {
+            $data .= $host . " {\n";
+
+            foreach ($config as $key => $value) {
+                $data .= "\t" . $key . " " . join($value, " ") . "\n";
+            }
+
+            $data .= "}\n";
+        }
+
+        return $data;
+    }
+
+    public function saveCaddyFile($params) {
+        $data = $this->generateCaddyFile($params);
+
         $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        $caddyFile = $wDir.DIRECTORY_SEPARATOR."pydiocaddy";
+
+        // Generate the caddyfile
+        file_put_contents($caddyFile, $data);
+
+        return $caddyFile;
+    }
+
+    public function switchCaddyOn($params) {
+
+        $caddyFile = $this->saveCaddyFile($params);
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."caddy-pid";
         if (file_exists($pidFile)) {
             $pId = file_get_contents($pidFile);
             $unixProcess = new UnixProcess();
             $unixProcess->setPid($pId);
             $status = $unixProcess->status();
             if ($status) {
-                throw new Exception("Web Socket server seems to already be running!");
+                throw new Exception("Caddy server seems to already be running!");
             }
         }
-        $host = escapeshellarg($params["WS_SERVER_BIND_HOST"]);
-        $port = escapeshellarg($params["WS_SERVER_BIND_PORT"]);
-        $path = escapeshellarg($params["WS_SERVER_PATH"]);
-        $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$host." -port=".$port." -path=".$path;
-        chdir(AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER.DIRECTORY_SEPARATOR."core.mq");
+
+        chdir($wDir);
+
+        $cmd = "env TMPDIR=/tmp ". ConfService::getCoreConf("CLI_PYDIO")." -conf ".$caddyFile . " 2>&1 | tee pydio.out";
+
         $process = Controller::runCommandInBackground($cmd, null);
         if ($process != null) {
             $pId = $process->getPid();
             $wDir = $this->getPluginWorkDir(true);
-            file_put_contents($wDir.DIRECTORY_SEPARATOR."ws-pid", $pId);
+            file_put_contents($pidFile, $pId);
             return "SUCCESS: Started WebSocket Server with process ID $pId";
         }
         return "SUCCESS: Started WebSocket Server";
     }
 
-    public function switchWebSocketOff($params, $type = "ws")
+    public function switchCaddyOff($params){
+        return $this->switchOff($params, "caddy");
+    }
+
+    public function getCaddyStatus($params){
+        return $this->getStatus($params, "caddy");
+    }
+
+    public function switchOff($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
         $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
@@ -420,7 +520,7 @@ class MqManager extends Plugin
         return "SUCCESS: Killed $type Server";
     }
 
-    public function getWebSocketStatus($params, $type = "ws")
+    public function getStatus($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
         $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
@@ -434,7 +534,5 @@ class MqManager extends Plugin
             if($status) return "ON";
             else return "OFF";
         }
-
     }
-
 }
