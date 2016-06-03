@@ -20,6 +20,7 @@
  */
 
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -31,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreAuthLoader extends Plugin
+class CoreAuthLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractAuthDriver
@@ -51,8 +52,12 @@ class CoreAuthLoader extends Plugin
         }
         return $configs;
     }
-
-    public function getAuthImpl()
+    
+    /**
+     * @return null|AbstractAuthDriver|Plugin
+     * @throws Exception
+     */
+    public function getImplementation()
     {
         if (!isSet(self::$authStorageImpl)) {
             if (!isSet($this->pluginConf["MASTER_INSTANCE_CONFIG"])) {

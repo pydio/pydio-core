@@ -804,7 +804,7 @@ abstract class AbstractConfDriver extends Plugin
                     Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
 
-                $paramNodes = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+                $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
                 if (is_array($paramNodes) && count($paramNodes)) {
                     foreach ($paramNodes as $xmlNode) {

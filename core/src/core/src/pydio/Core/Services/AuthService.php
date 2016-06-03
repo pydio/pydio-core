@@ -426,7 +426,7 @@ class AuthService
                 }
             }
             //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
-            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
+            $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
                     $default = $xmlNode->getAttribute("default");

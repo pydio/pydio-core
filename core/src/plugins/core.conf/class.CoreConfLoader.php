@@ -21,7 +21,7 @@
 
 namespace Pydio\Conf\Core;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreConfLoader extends Plugin
+class CoreConfLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractConfDriver
@@ -41,7 +41,7 @@ class CoreConfLoader extends Plugin
     /**
      * @return AbstractConfDriver
      */
-    public function getConfImpl()
+    public function getImplementation()
     {
         if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {

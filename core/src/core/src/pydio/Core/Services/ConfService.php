@@ -28,11 +28,11 @@ use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
-use Pydio\Conf\Core\CoreConfLoader;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -65,31 +65,7 @@ class ConfService
 
     private $contextRepositoryId;
     private $contextCharset;
-    
-    /**
-     * @return AbstractConfDriver
-     */
-    public function confPluginSoftLoad()
-    {
-        $this->booter = PluginsService::getInstance()->softLoad("boot.conf", array());
-        $coreConfigs = $this->booter->loadPluginConfig("core", "conf");
-        $corePlug = PluginsService::getInstance()->softLoad("core.conf", array());
-        $corePlug->loadConfigs($coreConfigs);
-        return $corePlug->getConfImpl();
 
-    }
-
-    /**
-     * @return AbstractCacheDriver
-     */
-    public function cachePluginSoftLoad()
-    {
-        $coreConfigs = array();
-        $corePlug = PluginsService::getInstance()->softLoad("core.cache", array());
-        CoreConfLoader::loadBootstrapConfForPlugin("core.cache", $coreConfigs);
-        if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
-        return $corePlug->getCacheImpl();
-    }
 
     /**
      * @return AbstractConfDriver
@@ -106,7 +82,8 @@ class ConfService
     /**
      * Initialize singleton
      * @static
-     * @return void
+     * @param string $installPath
+     * @param string $pluginDir
      */
     public static function init($installPath=AJXP_INSTALL_PATH, $pluginDir="plugins")
     {
@@ -139,21 +116,7 @@ class ConfService
             $this->configs["DEFAULT_REPOSITORIES"] = array();
         }
 
-        // Try to load instance from cache first
-        $this->cachePlugin = $this->cachePluginSoftLoad();
-        if (PluginsService::getInstance()->loadPluginsRegistryFromCache($this->cachePlugin)) {
-            return;
-        }
-
-        $this->booter = PluginsService::getInstance()->softLoad("boot.conf", array());
-        $this->confPlugin = $this->confPluginSoftLoad();
-
-        // Loading the registry
-        try {
-            PluginsService::getInstance()->loadPluginsRegistry($pluginDirPath, $this->confPlugin);
-        } catch (\Exception $e) {
-            die("Severe error while loading plugins registry : ".$e->getMessage());
-        }
+        PluginsService::initCoreRegistry($pluginDirPath);
     }
 
     /**
@@ -333,7 +296,9 @@ class ConfService
     public static function getConfStorageImpl()
     {
         if(isSet(self::$tmpConfStorageImpl)) return self::$tmpConfStorageImpl;
-        return PluginsService::getInstance()->getPluginById("core.conf")->getConfImpl();
+        /** @var CoreInstanceProvider $p */
+        $p = PluginsService::getInstance()->getPluginById("core.conf");
+        return $p->getImplementation();
     }
 
     /**
@@ -344,7 +309,9 @@ class ConfService
     public static function getAuthDriverImpl()
     {
         if(isSet(self::$tmpAuthStorageImpl)) return self::$tmpAuthStorageImpl;
-        return PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
+        /** @var CoreInstanceProvider $p */
+        $p = PluginsService::getInstance()->getPluginById("core.auth");
+        return $p->getImplementation();
     }
 
     /**
@@ -355,7 +322,9 @@ class ConfService
     public static function getCacheDriverImpl()
     {
         if(isSet(self::$tmpCacheStorageImpl)) return self::$tmpCacheStorageImpl;
-        return PluginsService::getInstance()->getPluginById("core.cache")->getCacheImpl();
+        /** @var CoreInstanceProvider $p */
+        $p = PluginsService::getInstance()->getPluginById("core.cache");
+        return $p->getImplementation();
     }
 
     /**
@@ -1801,7 +1770,7 @@ class ConfService
      */
     public static function availableDriversToXML($filterByTagName = "", $filterByDriverName="", $limitToEnabledPlugins = false)
     {
-        $nodeList = PluginsService::searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
+        $nodeList = PluginsService::getInstance()->searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
         $xmlBuffer = "";
         foreach ($nodeList as $node) {
             $dName = $node->getAttribute("name");

@@ -67,5 +67,13 @@ interface ContextInterface
      */
     public function setRepositoryObject($repository);
 
+    /**
+     * @return mixed
+     */
     public function resetRepository();
+
+    /**
+     * @return string
+     */
+    public function getStringIdentifier();
 }

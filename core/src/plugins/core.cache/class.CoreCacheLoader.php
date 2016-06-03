@@ -21,6 +21,7 @@
 namespace Pydio\Cache\Core;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\HTMLWriter;
@@ -36,14 +37,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @static
  * Provides access to the cache via the Doctrine interface
  */
-class CoreCacheLoader extends Plugin
+class CoreCacheLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractCacheDriver
      */
     protected static $cacheInstance;
 
-    public function getCacheImpl()
+    /**
+     * @return null|AbstractCacheDriver|Plugin
+     */
+    public function getImplementation()
     {
 
         $pluginInstance = null;
@@ -173,7 +177,7 @@ class CoreCacheLoader extends Plugin
 
     public function exposeCacheStats($actionName, $httpVars, $fileVars){
 
-        $cImpl = $this->getCacheImpl();
+        $cImpl = $this->getImplementation();
         $result = [];
         if($cImpl != null){
             $nspaces = $cImpl->listNamespaces();

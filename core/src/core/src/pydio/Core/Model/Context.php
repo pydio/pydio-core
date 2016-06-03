@@ -146,4 +146,17 @@ class Context implements ContextInterface
     {
         $this->repositoryId = $this->repositoryObject = null;
     }
+
+    public function getStringIdentifier()
+    {
+        $logged = $this->getUser();
+        $u = $logged == null ? "shared" : $logged->getId();
+        $a = "norepository";
+        $r = $this->getRepository();
+        if($r !== null){
+            $a = $r->getSlug();
+        }
+        return $u.":".$a;
+
+    }
 }

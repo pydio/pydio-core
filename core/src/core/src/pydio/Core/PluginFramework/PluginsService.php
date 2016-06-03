@@ -22,8 +22,11 @@ namespace Pydio\Core\PluginFramework;
 
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractConfDriver;
+use Pydio\Conf\Core\CoreConfLoader;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,23 +37,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PluginsService
 {
-    private static $instance;
-    private $registry = array();
-    private $required_files = array();
-    private $activePlugins = array();
-    private $streamWrapperPlugins = array();
-    private $registeredWrappers = array();
+    private static $instances = [];
+
+    private $registry = [];
+
+    private $required_files = [];
+    private $activePlugins = [];
+    private $streamWrapperPlugins = [];
+    private $registeredWrappers = [];
     private $xmlRegistry;
     private $registryVersion;
     private $tmpDeferRegistryBuild = false;
-    /**
-     * @var AbstractConfDriver
-     */
-    private $confStorage;
-    /**
-     * @var AbstractCacheDriver
-     */
-    private $cacheStorage;
+
     private $mixinsDoc;
     private $mixinsXPath;
 
@@ -59,42 +57,26 @@ class PluginsService
     /*********************************/
 
     /**
-     * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
-     * @param string $query
-     * @param string $stringOrNodeFormat
-     * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
-     * @param bool $limitToEnabledPlugins
-     * @param bool $loadExternalFiles
-     * @return \DOMNode[]
+     * Load registry either from cache or from plugins folder.
+     * @param string $pluginsDirectory Path to the folder containing all plugins
+     * @throws PydioException
      */
-    public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
-    {
-        $buffer = "";
-        $nodes = array();
-        $self = self::getInstance();
-        foreach ($self->registry as $plugType) {
-            foreach ($plugType as $plugName => $plugObject) {
-                if ($limitToActivePlugins) {
-                    $plugId = $plugObject->getId();
-                    if ($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)) {
-                        continue;
-                    }
-                }
-                if ($limitToEnabledPlugins) {
-                    if(!$plugObject->isEnabled()) continue;
-                }
-                $res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
-                if ($stringOrNodeFormat == "string") {
-                    $buffer .= $res;
-                } else {
-                    foreach ($res as $node) {
-                        $nodes[] = $node;
-                    }
-                }
-            }
+    public static function initCoreRegistry($pluginsDirectory){
+
+        $coreInstance = self::getInstance();
+        // Try to load instance from cache first
+        $cachePlugin = self::cachePluginSoftLoad();
+        if ($coreInstance->loadPluginsRegistryFromCache($cachePlugin)) {
+            return;
         }
-        if($stringOrNodeFormat == "string") return $buffer;
-        else return $nodes;
+        // Load from conf
+        try {
+            $confPlugin = self::confPluginSoftLoad();
+            $coreInstance->loadPluginsRegistry($pluginsDirectory, $confPlugin, $cachePlugin);
+        } catch (\Exception $e) {
+            throw new PydioException("Severe error while loading plugins registry : ".$e->getMessage());
+        }
+
     }
 
     /**
@@ -118,6 +100,34 @@ class PluginsService
     }
 
     /**
+     * @return AbstractConfDriver
+     */
+    public static function confPluginSoftLoad()
+    {
+        /** @var AbstractConfDriver $booter */
+        $booter = PluginsService::getInstance()->softLoad("boot.conf", array());
+        $coreConfigs = $booter->loadPluginConfig("core", "conf");
+        $corePlug = PluginsService::getInstance()->softLoad("core.conf", array());
+        $corePlug->loadConfigs($coreConfigs);
+        return $corePlug->getImplementation();
+
+    }
+
+    /**
+     * @return AbstractCacheDriver
+     */
+    public static function cachePluginSoftLoad()
+    {
+        $coreConfigs = array();
+        $corePlug = PluginsService::getInstance()->softLoad("core.cache", array());
+        /** @var CoreConfLoader $coreConf */
+        $coreConf = PluginsService::getInstance()->softLoad("core.conf", array());
+        $coreConf->loadBootstrapConfForPlugin("core.cache", $coreConfigs);
+        if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
+        return $corePlug->getImplementation();
+    }
+
+    /**
      * Find a plugin by its type/name
      * @param string $type
      * @param string $name
@@ -125,8 +135,7 @@ class PluginsService
      */
     public static function findPlugin($type, $name)
     {
-        $instance = self::getInstance();
-        return $instance->getPluginByTypeName($type, $name);
+        return self::getInstance()->getPluginByTypeName($type, $name);
     }
 
     /**
@@ -142,16 +151,20 @@ class PluginsService
 
     /**
      * Singleton method
-     *
+     * @param ContextInterface|null $ctx
      * @return PluginsService the service instance
      */
-    public static function getInstance()
+    public static function getInstance($ctx = null)
     {
-        if (!isSet(self::$instance)) {
-            $c = __CLASS__;
-            self::$instance = new $c;
+        if(empty($ctx)){
+            $ctx = new Context();
         }
-        return self::$instance;
+        $identifier = $ctx->getStringIdentifier();
+        if (!isSet(self::$instances[$identifier])) {
+            $c = __CLASS__;
+            self::$instances[$identifier] = new $c;
+        }
+        return self::$instances[$identifier];
     }
 
     /**
@@ -162,7 +175,8 @@ class PluginsService
      * @return mixed
      */
     public static function searchManifestsWithCache($query, $callback, $typeChecker = null){
-        $result = self::loadFromPluginQueriesCache($query);
+        $coreInstance = self::getInstance();
+        $result = $coreInstance->loadFromPluginQueriesCache($query);
         if(empty($typeChecker)){
             $typeChecker = function($test){
                 return ($test !== null && is_array($test));
@@ -171,11 +185,50 @@ class PluginsService
         if($typeChecker($result)){
             return $result;
         }
-        $nodes = self::searchAllManifests($query, "node", false, false, true);
+        $nodes = $coreInstance->searchAllManifests($query, "node", false, false, true);
         $result = $callback($nodes);
-        self::storeToPluginQueriesCache($query, $result);
+        $coreInstance->storeToPluginQueriesCache($query, $result);
         return $result;
     }
+
+    /**
+     * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
+     * @param string $query
+     * @param string $stringOrNodeFormat
+     * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
+     * @param bool $limitToEnabledPlugins
+     * @param bool $loadExternalFiles
+     * @return \DOMNode[]
+     */
+    public function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
+    {
+        $buffer = "";
+        $nodes = array();
+        foreach ($this->registry as $plugType) {
+            foreach ($plugType as $plugName => $plugObject) {
+                if ($limitToActivePlugins) {
+                    $plugId = $plugObject->getId();
+                    if ($limitToActivePlugins && (!isSet($this->activePlugins[$plugId]) || $this->activePlugins[$plugId] === false)) {
+                        continue;
+                    }
+                }
+                if ($limitToEnabledPlugins) {
+                    if(!$plugObject->isEnabled()) continue;
+                }
+                $res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
+                if ($stringOrNodeFormat == "string") {
+                    $buffer .= $res;
+                } else {
+                    foreach ($res as $node) {
+                        $nodes[] = $node;
+                    }
+                }
+            }
+        }
+        if($stringOrNodeFormat == "string") return $buffer;
+        else return $nodes;
+    }
+
 
     /*********************************/
     /*        PUBLIC FUNCTIONS       */
@@ -230,14 +283,12 @@ class PluginsService
      * @param AbstractCacheDriver
      * @return bool
      */
-    public function loadPluginsRegistryFromCache($cacheStorage = null) {
-
-        $this->cacheStorage = $cacheStorage;
+    public function loadPluginsRegistryFromCache($cacheStorage) {
 
         if(!empty($this->registry)){
             return true;
         }
-        if($this->_loadRegistryFromCache()){
+        if(!empty($cacheStorage) && $this->_loadRegistryFromCache($cacheStorage)){
             return true;
         }
 
@@ -248,21 +299,19 @@ class PluginsService
      * Loads the full registry, from the cache or not
      * @param String $pluginFolder
      * @param AbstractConfDriver $confStorage
-     * @param bool $rewriteCache Force a cache rewriting
+     * @param AbstractCacheDriver|null $cacheStorage
      */
-    public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false)
+    public function loadPluginsRegistry($pluginFolder, $confStorage, $cacheStorage)
     {
-        if(!$rewriteCache){
-            if ($this->loadPluginsRegistryFromCache()) return;
+        if (!empty($cacheStorage) && $this->loadPluginsRegistryFromCache($cacheStorage)) {
+            return;
         }
 
         if (is_string($pluginFolder)) {
             $pluginFolder = array($pluginFolder);
         }
 
-        $this->confStorage = $confStorage;
         $pluginsPool = array();
-
         foreach ($pluginFolder as $sourceFolder) {
             $handler = @opendir($sourceFolder);
             if ($handler) {
@@ -283,7 +332,7 @@ class PluginsService
         if (count($pluginsPool)) {
             $this->checkDependencies($pluginsPool);
             foreach ($pluginsPool as $plugin) {
-                $this->recursiveLoadPlugin($plugin, $pluginsPool);
+                $this->recursiveLoadPlugin($confStorage, $plugin, $pluginsPool);
             }
         }
 
@@ -294,7 +343,7 @@ class PluginsService
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
 
-            $this->savePluginsRegistryToCache();
+            $this->savePluginsRegistryToCache($cacheStorage);
         }
     }
 
@@ -302,7 +351,7 @@ class PluginsService
      * Simply load a plugin class, without the whole dependencies et.all
      * @param string $pluginId
      * @param array $pluginOptions
-     * @return Plugin
+     * @return Plugin|CoreInstanceProvider
      */
     public function softLoad($pluginId, $pluginOptions)
     {
@@ -624,11 +673,11 @@ class PluginsService
     /*********************************/
     /**
      * Save plugin registry to cache
-     *
+     * @param AbstractCacheDriver $cacheStorage
      */
-    private function savePluginsRegistryToCache() {
-        if (!empty ($this->cacheStorage)) {
-            $this->cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
+    private function savePluginsRegistryToCache($cacheStorage) {
+        if (!empty ($cacheStorage)) {
+            $cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
         }
     }
 
@@ -662,10 +711,11 @@ class PluginsService
     /**
      * Load plugin class with dependencies first
      *
+     * @param AbstractConfDriver $confStorage
      * @param Plugin $plugin
      * @param array $pluginsPool
      */
-    private function recursiveLoadPlugin($plugin, $pluginsPool)
+    private function recursiveLoadPlugin(AbstractConfDriver $confStorage, $plugin, $pluginsPool)
     {
         if ($plugin->loadingState!="") {
             return ;
@@ -674,11 +724,11 @@ class PluginsService
         $plugin->loadingState = "lock";
         foreach ($dependencies as $dependencyId) {
             if (isSet($pluginsPool[$dependencyId])) {
-                $this->recursiveLoadPlugin($pluginsPool[$dependencyId], $pluginsPool);
+                $this->recursiveLoadPlugin($confStorage, $pluginsPool[$dependencyId], $pluginsPool);
             } else if (strpos($dependencyId, "+") !== false) {
                 foreach (array_keys($pluginsPool) as $pId) {
                     if (strpos($pId, str_replace("+", "", $dependencyId)) === 0) {
-                        $this->recursiveLoadPlugin($pluginsPool[$pId], $pluginsPool);
+                        $this->recursiveLoadPlugin($confStorage, $pluginsPool[$pId], $pluginsPool);
                     }
                 }
             }
@@ -687,7 +737,7 @@ class PluginsService
         if (!isSet($this->registry[$plugType])) {
             $this->registry[$plugType] = array();
         }
-        $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+        $options = $confStorage->loadPluginConfig($plugType, $plugin->getName());
         if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
             $plugin = $this->instanciatePluginClass($plugin);
         }
@@ -697,9 +747,10 @@ class PluginsService
     }
 
     /**
+     * @param AbstractCacheDriver $cacheStorage
      * @return bool
      */
-    private function _loadRegistryFromCache(){
+    private function _loadRegistryFromCache($cacheStorage){
 
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
             $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
@@ -715,8 +766,8 @@ class PluginsService
                 $res = null;
 
                 // Retrieving Registry from Server Cache
-                if ($this->cacheStorage) {
-                    $res = $this->cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
+                if (!empty($cacheStorage)) {
+                    $res = $cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
 
                     $this->registry=$res;
                 }
@@ -725,7 +776,7 @@ class PluginsService
                 if (empty($res)) {
                     $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                     $this->registry=$res;
-                    $this->savePluginsRegistryToCache();
+                    $this->savePluginsRegistryToCache($cacheStorage);
                 }
 
                 // Refresh streamWrapperPlugins

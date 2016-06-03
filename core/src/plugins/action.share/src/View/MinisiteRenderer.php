@@ -136,7 +136,7 @@ class MinisiteRenderer
                 $ACTION = "download";
                 if(isset($_GET["ct"])){
                     $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                    $editors = PluginsService::getInstance()->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
                     if (count($editors)) {
                         foreach ($editors as $editor) {
                             $xPath = new DOMXPath($editor->ownerDocument);
