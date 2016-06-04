@@ -25,6 +25,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 use DOMNode;
 use PclZip;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed' );
@@ -81,12 +82,11 @@ class sftpPSLAccessDriver extends fsAccessDriver
     }
 
     /**
-     * Parse
-     * @param DOMNode $contribNode
+     * @inheritdoc
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
         $this->disableArchiveBrowsingContributions($contribNode);
     }

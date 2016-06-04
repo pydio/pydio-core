@@ -160,14 +160,7 @@ class AJXP_SerialMessageExchanger extends Plugin implements AJXP_MessageExchange
             $this->suscribeToChannel($channelName, $clientId);
         }
         $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
-
-        //$user = AuthService::getLoggedUser();
-       // if ($user == null) {
-       //     throw new Exception("You must be logged in");
-       // }
-        //$GROUP_PATH = $user->getGroupPath();
-       // if($GROUP_PATH == null) $GROUP_PATH = false;
-
+        
         $result = array();
         foreach ($this->channels[$channelName]["MESSAGES"] as $index => $object) {
             if (!isSet($object->messageRC[$clientId])) {

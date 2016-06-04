@@ -22,6 +22,7 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -69,9 +70,9 @@ class FileHasher extends AJXP_AbstractMetaSource
     }
 
 
-    public function parseSpecificContributions(&$contribNode)
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if (!self::rsyncEnabled() && $contribNode->nodeName == "actions") {
             // REMOVE rsync actions, this will advertise the fact that
             // rsync is not enabled.
@@ -81,7 +82,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                 $contribNode->removeChild($child);
             }
         }
-        if ($this->getFilteredOption("CACHE_XML_TREE") !== true && $contribNode->nodeName == "actions") {
+        if ($this->getContextualOption($ctx, "CACHE_XML_TREE") !== true && $contribNode->nodeName == "actions") {
             // REMOVE pre and post process on LS action
             $xp = new DOMXPath($contribNode->ownerDocument);
             $children = $xp->query("action[@name='ls']", $contribNode);

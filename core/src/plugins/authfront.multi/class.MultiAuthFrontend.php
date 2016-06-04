@@ -29,9 +29,9 @@ class MultiAuthFrontend extends AbstractAuthFrontend {
         return false;
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
         $sources = array();
 

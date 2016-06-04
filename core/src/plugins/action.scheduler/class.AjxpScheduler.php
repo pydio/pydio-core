@@ -78,9 +78,13 @@ class AjxpScheduler extends Plugin
         }
     }
 
-    public function parseSpecificContributions(&$contribNode)
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param DOMNode $contribNode
+     */
+    public function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="repository_id"]', $contribNode);
@@ -94,7 +98,7 @@ class AjxpScheduler extends Plugin
         $sVals[] = "*|All Repositories";
         $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
 
-        if(!AuthService::usersEnabled() || AuthService::getLoggedUser() == null) return;
+        if(!AuthService::usersEnabled() || !$ctx->hasUser()) return;
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="user_id"]', $contribNode);
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);

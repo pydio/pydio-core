@@ -107,12 +107,12 @@ class AbstractAuthDriver extends Plugin
     }
 
 
-    public function getRegistryContributions( $extendedVersion = true )
+    public function getRegistryContributions(ContextInterface $ctx, $extendedVersion = true )
     {
-        $this->loadRegistryContributions();
+        $this->loadRegistryContributions($ctx);
         if(!$extendedVersion) return $this->registryContributions;
 
-        $logged = AuthService::getLoggedUser();
+        $logged = $ctx->getUser();
         if (AuthService::usersEnabled()) {
             if ($logged == null) {
                 return $this->registryContributions;
@@ -128,9 +128,9 @@ class AbstractAuthDriver extends Plugin
         return $this->registryContributions;
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
 
         if(AuthService::usersEnabled() && $this->passwordsEditable()) return ;

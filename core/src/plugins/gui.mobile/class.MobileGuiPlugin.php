@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -38,7 +39,8 @@ class MobileGuiPlugin extends Plugin
         if(!Utils::userAgentIsMobile()) throw new Exception("no");
     }
 
-    public function parseSpecificContributions(&$contribNode){
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
+    {
 
         if($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive()){
             // remove template_part for orbit_content

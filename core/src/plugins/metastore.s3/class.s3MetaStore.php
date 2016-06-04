@@ -44,7 +44,6 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     public function init($options)
     {
         $this->options = $options;
-        $this->loadRegistryContributions();
         $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
     }
 

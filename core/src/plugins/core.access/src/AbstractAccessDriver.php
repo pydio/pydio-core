@@ -88,12 +88,7 @@ class AbstractAccessDriver extends Plugin
             }
         }
     }
-
-    protected function parseSpecificContributions(&$contribNode)
-    {
-        parent::parseSpecificContributions($contribNode);
-    }
-
+    
 
     /**
      * Populate publiclet options

@@ -80,8 +80,8 @@ class DisclaimerProvider extends Plugin
     public function loadDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $response = $response->withHeader("Content-Type", "text/plain");
-        $content = $this->getFilteredOption("DISCLAIMER_CONTENT", AJXP_REPO_SCOPE_ALL);
-        $state = $this->getFilteredOption("DISCLAIMER_ACCEPTED", AJXP_REPO_SCOPE_ALL);
+        $content = $this->getContextualOption($request->getAttribute("ctx"), "DISCLAIMER_CONTENT");
+        $state = $this->getContextualOption($request->getAttribute("ctx"), "DISCLAIMER_ACCEPTED");
         if($state == "true") $state = "yes";
         $response->getBody()->write($state .":" . nl2br($content));
 

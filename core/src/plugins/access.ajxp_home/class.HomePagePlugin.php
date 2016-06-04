@@ -22,6 +22,7 @@
 namespace Pydio\Access\Driver\DataProvider;
 use DOMXPath;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -33,19 +34,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class HomePagePlugin extends AbstractAccessDriver
 {
     
-    public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName == "client_configs"){
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $gettingStartedList = $actionXpath->query('template[@name="tutorial_pane"]', $contribNode);
             if(!$gettingStartedList->length) return ;
-            if($this->getFilteredOption("ENABLE_GETTING_STARTED") === false){
+            if($this->getContextualOption($ctx, "ENABLE_GETTING_STARTED") === false){
                 $contribNode->removeChild($gettingStartedList->item(0));
             }else{
                 $cdata = $gettingStartedList->item(0)->firstChild;
                 $keys = array("URL_APP_IOSAPPSTORE", "URL_APP_ANDROID", "URL_APP_SYNC_WIN", "URL_APP_SYNC_MAC");
                 $values = array();
-                foreach($keys as $k) $values[] = $this->getFilteredOption($k);
+                foreach($keys as $k) $values[] = $this->getContextualOption($ctx, $k);
                 $newData = str_replace($keys, $values, $cdata->nodeValue);
                 $newCData = $contribNode->ownerDocument->createCDATASection($newData);
                 $gettingStartedList->item(0)->appendChild($newCData);

@@ -35,7 +35,7 @@ class PluginSkeleton extends Plugin
      * @param DOMNode $contribNode
      * @return void
      */
-    public function parseSpecificContributions(&$contribNode)
+    public function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
         if($contribNode->nodeName != "client_configs") return;
         // This demonstrate how the tight integration of XML, PHP and JS Client make plugins programming
@@ -45,10 +45,10 @@ class PluginSkeleton extends Plugin
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $footerTplNodeList = $actionXpath->query('template[@name="bottom"]', $contribNode);
         $footerTplNode = $footerTplNodeList->item(0);
-        if (!$this->getFilteredOption("SHOW_CUSTOM_FOOTER")) {
+        if (!$this->getContextualOption($ctx, "SHOW_CUSTOM_FOOTER")) {
             $contribNode->removeChild($footerTplNode);
         } else {
-            $content = $this->getFilteredOption("CUSTOM_FOOTER_CONTENT");
+            $content = $this->getContextualOption($ctx, "CUSTOM_FOOTER_CONTENT");
             $content = str_replace("\\n", "<br>", $content);
             $cdata = '<div id="optional_bottom_div" style="font-family:arial;padding:10px;">'.$content.'</div>';
             $cdataSection = $contribNode->ownerDocument->createCDATASection($cdata);

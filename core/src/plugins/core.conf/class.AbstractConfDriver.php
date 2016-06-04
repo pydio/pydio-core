@@ -85,9 +85,9 @@ abstract class AbstractConfDriver extends Plugin
 
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if ($contribNode->nodeName == 'client_configs' && !ConfService::getCoreConf("WEBDAV_ENABLE")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $webdavCompNodeList = $actionXpath->query('component_config/additional_tab[@id="webdav_pane"]', $contribNode);
@@ -109,11 +109,11 @@ abstract class AbstractConfDriver extends Plugin
         }
 
         // SWITCH TO DASHBOARD ACTION
-        $u = AuthService::getLoggedUser();
+        $u = $ctx->getUser();
         $access = true;
         if($u == null) $access = false;
         else {
-            $acl = $u->mergedRole->getAcl("ajxp_user");
+            $acl = $u->getMergedRole()->getAcl("ajxp_user");
             if(empty($acl)) $access = false;
         }
         if(!$access){

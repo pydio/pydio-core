@@ -329,11 +329,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
-    public function parseSpecificContributions(&$contribNode)
+    /**
+     * @inheritdoc
+     */
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return;
-        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
         if(!$currentUserIsGroupAdmin) return;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $publicUrlNodeList = $actionXpath->query('action[@name="create_repository"]/subMenu', $contribNode);

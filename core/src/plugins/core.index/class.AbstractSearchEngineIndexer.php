@@ -1,5 +1,6 @@
 <?php
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -16,9 +17,9 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
     /**
      * @param DOMNode $contribNode
      */
-    public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
-        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
+        parent::parseSpecificContributions($ctx, $contribNode);
+        if($this->getContextualOption($ctx, "HIDE_MYSHARES_SECTION") !== true) return;
         if($contribNode->nodeName != "client_configs") return ;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);

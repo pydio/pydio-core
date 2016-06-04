@@ -121,13 +121,13 @@ class ShareCenter extends Plugin
      * Extend parent
      * @param DOMNode $contribNode
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         $disableSharing = false;
         $xpathesToRemove = array();
 
-        if( strpos(ConfService::getRepository()->getAccessType(), "ajxp_") === 0){
+        if( strpos($ctx->getRepository()->getAccessType(), "ajxp_") === 0){
 
             $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
             $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
@@ -135,7 +135,7 @@ class ShareCenter extends Plugin
 
         }else if (AuthService::usersEnabled()) {
 
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $ctx->getUser();
             if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
                 $disableSharing = true;
             }

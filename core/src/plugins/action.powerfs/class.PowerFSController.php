@@ -134,7 +134,7 @@ class PowerFSController extends Plugin
                     $archiveName = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$opeId."_".$archiveName;
                 }
                 chdir($rootDir);
-                $cmd = $this->getFilteredOption("ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
+                $cmd = $this->getContextualOption($ctx, "ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();

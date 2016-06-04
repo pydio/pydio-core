@@ -884,7 +884,7 @@ class PluginsService
         foreach ($actives as $activeName=>$status) {
             if($status === false) continue;
             $plug = $this->getPluginById($activeName);
-            $contribs = $plug->getRegistryContributions($extendedVersion);
+            $contribs = $plug->getRegistryContributions($this->context, $extendedVersion);
             foreach ($contribs as $contrib) {
                 $parent = $contrib->nodeName;
                 $nodes = $contrib->childNodes;

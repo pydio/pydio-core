@@ -54,8 +54,8 @@ class UserDashboardDriver extends AbstractAccessDriver
         require_once AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php";
     }
 
-    public function parseSpecificContributions(&$contribNode){
-        $disableAddressBook = $this->getFilteredOption("DASH_DISABLE_ADDRESS_BOOK") === true;
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
+        $disableAddressBook = $this->getContextualOption($ctx, "DASH_DISABLE_ADDRESS_BOOK") === true;
         if($contribNode->nodeName == "client_configs" && $disableAddressBook){
             // remove template_part for orbit_content
             $xPath=new DOMXPath($contribNode->ownerDocument);
@@ -63,7 +63,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             if(!$tplNodeList->length) return ;
             $contribNode->removeChild($tplNodeList->item(0));
         }
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
     }
 
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)

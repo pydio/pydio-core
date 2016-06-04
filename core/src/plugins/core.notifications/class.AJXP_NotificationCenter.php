@@ -62,9 +62,9 @@ class AJXP_NotificationCenter extends Plugin
         }
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-           parent::parseSpecificContributions($contribNode);
+           parent::parseSpecificContributions($ctx, $contribNode);
 
            // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {

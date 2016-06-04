@@ -45,7 +45,6 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
     public function init($options)
     {
         $this->options = $options;
-        $this->loadRegistryContributions();
         $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
     }
 

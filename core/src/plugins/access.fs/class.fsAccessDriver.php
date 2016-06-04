@@ -567,8 +567,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new PydioException("Error while compressing");
-                    if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
-                        && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
+                    if(!$this->getContextualOption($ctx, "USE_XSENDFILE")
+                        && !$this->getContextualOption($ctx, "USE_XACCELREDIRECT")){
                         register_shutdown_function("unlink", $file);
                     }
                     $localName = (empty($base)?"Files":$base).".zip";
@@ -1375,7 +1375,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 array_map(array($nodesList, "addBranch"), $fullList["f"]);
 
                 // ADD RECYCLE BIN TO THE LIST
-                if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getFilteredOption("HIDE_RECYCLE", $this->repository) !== true) {
+                if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getContextualOption($ctx, "HIDE_RECYCLE") !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     if (file_exists($this->urlBase.$recycleBinOption)) {
                         $recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);

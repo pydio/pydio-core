@@ -46,9 +46,9 @@ class UpdateController extends Plugin
      * Parse
      * @param DOMNode $contribNode
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($this->pluginConf["ENABLE_324_IMPORT"] == true) return;
 
         if($contribNode->nodeName != "actions") return ;

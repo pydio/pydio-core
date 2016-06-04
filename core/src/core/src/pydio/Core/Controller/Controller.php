@@ -289,24 +289,6 @@ class Controller
      */
     public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "", $taskId = null)
     {
-/*
-        if (empty($user)) {
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
-            else $user = "shared";
-        }
-        $fName = AJXP_DATA_PATH."/plugins/mq.serial/worker-queue";
-        $fData = file_get_contents($fName);
-        $data = json_decode($fData, true);
-        $data[] = array(
-            "userId" => $user,
-            "repoId" => $currentRepositoryId,
-            "actionName" => $actionName,
-            "parameters" => $parameters
-        );
-        file_put_contents($fName, json_encode($data));
-        return ;
-*/
-
 
         $token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
@@ -319,22 +301,7 @@ class Controller
                 $user = "shared";
             }
         }
-/*
-        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.mq/vendor/autoload.php");
-        $nsq = new nsqphp\nsqphp;
-        $nsq->publishTo("localhost", 1);
-        $payload = array(
-            'msg' => 'bg',
-            'data' => [
-                'repository_id' => $currentRepositoryId,
-                'user_id'       => $user,
-                'action'        => $actionName,
-                'parameters'    => $parameters
-            ]);
-        $nsq->publish('pydio', new nsqphp\Message\Message(json_encode($payload)));
-
-        return;
-*/
+        
         if (Services\AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){
