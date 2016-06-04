@@ -55,6 +55,8 @@ class AJXP_NotificationCenter extends Plugin
         }
         if ($this->eventStore === false) {
             $this->pluginConf["USER_EVENTS"] = false;
+        }else{
+            \Pydio\Core\PluginFramework\PluginsService::getInstance()->setPluginActive($this->eventStore->getType(), $this->eventStore->getName(), true, $this->eventStore);
         }
     }
 
@@ -145,12 +147,13 @@ class AJXP_NotificationCenter extends Plugin
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @param array $returnData
+     * @throws \Pydio\Core\Exception\PydioException
      */
     public function loadUserFeed(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, &$returnData = [])
     {
         $httpVars = $requestInterface->getParsedBody();
         if(!$this->eventStore) {
-            return;
+            throw new \Pydio\Core\Exception\PydioException("Cannot find eventStore for notification plugin");
         }
         $u = AuthService::getLoggedUser();
 

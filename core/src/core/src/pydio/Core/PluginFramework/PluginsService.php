@@ -20,13 +20,23 @@
  */
 namespace Pydio\Core\PluginFramework;
 
+use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\CoreConfLoader;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\CacheService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -37,9 +47,26 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PluginsService
 {
+    /**
+     * @var PluginsService[]
+     */
     private static $instances = [];
 
-    private $registry = [];
+    /**
+     * All detected plugins
+     * @var array
+     */
+    private $detectedPlugins = [];
+
+    /**
+     * @var ContextInterface
+     */
+    private $context;
+
+    /**
+     * @var string
+     */
+    private $pluginsDir;
 
     private $required_files = [];
     private $activePlugins = [];
@@ -58,24 +85,12 @@ class PluginsService
 
     /**
      * Load registry either from cache or from plugins folder.
-     * @param string $pluginsDirectory Path to the folder containing all plugins
      * @throws PydioException
      */
-    public static function initCoreRegistry($pluginsDirectory){
+    public static function initCoreRegistry(){
 
         $coreInstance = self::getInstance();
-        // Try to load instance from cache first
-        $cachePlugin = self::cachePluginSoftLoad();
-        if ($coreInstance->loadPluginsRegistryFromCache($cachePlugin)) {
-            return;
-        }
-        // Load from conf
-        try {
-            $confPlugin = self::confPluginSoftLoad();
-            $coreInstance->loadPluginsRegistry($pluginsDirectory, $confPlugin, $cachePlugin);
-        } catch (\Exception $e) {
-            throw new PydioException("Severe error while loading plugins registry : ".$e->getMessage());
-        }
+        $coreInstance->getDetectedPlugins();
 
     }
 
@@ -96,6 +111,16 @@ class PluginsService
                 }
             }
             @file_put_contents(AJXP_PLUGINS_REPOSITORIES_CACHE, $content);
+        }
+    }
+
+    /**
+     * Clear the cached registries
+     */
+    public static function clearRegistryCaches(){
+        foreach(self::$instances as $instance){
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $instance->getRegistryCacheKey(true));
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $instance->getRegistryCacheKey(false));
         }
     }
 
@@ -157,14 +182,140 @@ class PluginsService
     public static function getInstance($ctx = null)
     {
         if(empty($ctx)){
-            $ctx = new Context();
+            $ctx = Context::fromGlobalServices();
         }
         $identifier = $ctx->getStringIdentifier();
         if (!isSet(self::$instances[$identifier])) {
             $c = __CLASS__;
-            self::$instances[$identifier] = new $c;
+            /**
+             * @var PluginsService $pServ
+             */
+            self::$instances[$identifier] = $pServ = new $c($ctx);
+            if(!$ctx->isEmpty()) {
+                $emptyInstance = self::getInstance(Context::contextWithObjects(null, null));
+                $pServ->getDetectedPlugins();
+                $pServ->copyCorePluginFromService($emptyInstance, "conf");
+                $pServ->copyCorePluginFromService($emptyInstance, "cache");
+                $pServ->copyCorePluginFromService($emptyInstance, "auth");
+                if($ctx->hasRepository()){
+                    $pServ->initRepositoryPlugins($ctx);
+                }
+                $pServ->initActivePlugins();
+            }else{
+                $pServ->getDetectedPlugins();
+            }
         }
         return self::$instances[$identifier];
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     */
+    public static function clearInstance($ctx){
+        $identifier = $ctx->getStringIdentifier();
+        if(isSet(self::$instances[$identifier])){
+            unset(self::$instances[$identifier]);
+            gc_collect_cycles();
+        }
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @throws RepositoryLoadException
+     * @throws PydioUserAlertException
+     */
+    private function initRepositoryPlugins($ctx){
+
+        $errors = [];
+        $repository = $ctx->getRepository();
+        $accessType = $repository->getAccessType();
+        /** @var AbstractAccessDriver $plugInstance */
+        $plugInstance = $this->getPluginByTypeName("access", $accessType);
+
+        // TRIGGER BEFORE INIT META
+        $metaSources = $repository->getOption("META_SOURCES");
+        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
+            $keys = array_keys($metaSources);
+            foreach ($keys as $plugId) {
+                if($plugId == "") continue;
+                $instance = $this->getPluginById($plugId);
+                if (!is_object($instance)) {
+                    continue;
+                }
+                if (!method_exists($instance, "beforeInitMeta")) {
+                    continue;
+                }
+                try {
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    $instance->beforeInitMeta($plugInstance, $repository);
+                } catch (\Exception $e) {
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $errors[] = $e->getMessage();
+                }
+            }
+        }
+
+        // INIT MAIN DRIVER
+        try {
+            $plugInstance->init($repository);
+            $plugInstance->initRepository();
+        }catch (PydioUserAlertException $ua){
+            throw $ua;
+        }catch (\Exception $e){
+            new RepositoryLoadException($repository, [$e->getMessage()]);
+        }
+        $repository->driverInstance = $plugInstance;
+
+        $this->deferBuildingRegistry();
+        $this->setPluginUniqueActiveForType("access", $accessType);
+
+        // TRIGGER INIT META
+        $metaSources = $repository->getOption("META_SOURCES");
+        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
+            $keys = array_keys($metaSources);
+            foreach ($keys as $plugId) {
+                if($plugId == "") continue;
+                $split = explode(".", $plugId);
+                $instance = $this->getPluginById($plugId);
+                if (!is_object($instance)) {
+                    continue;
+                }
+                try {
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    if(!method_exists($instance, "initMeta")) {
+                        throw new \Exception("Meta Source $plugId does not implement the initMeta method.");
+                    }
+                    $instance->initMeta($plugInstance);
+                } catch (\Exception $e) {
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $errors[] = $e->getMessage();
+                }
+                $this->setPluginActive($split[0], $split[1]);
+            }
+        }
+        $this->flushDeferredRegistryBuilding();
+        if(count($errors)){
+            throw new RepositoryLoadException($repository, $errors);
+        }
+
+    }
+
+    /**
+     * @param PluginsService $source
+     * @param string $type
+     */
+    private function copyCorePluginFromService($source, $type){
+
+        /**
+         * @var CoreInstanceProvider $corePlugin
+         */
+        $corePlugin = $source->getPluginByTypeName("core", $type);
+        $this->setPluginActive("core", $corePlugin->getName(), true, $corePlugin);
+        $implementation = $corePlugin->getImplementation();
+        if(!empty($implementation)){
+            $this->setPluginUniqueActiveForType($type, $implementation->getName(), $implementation);
+        }
+
     }
 
     /**
@@ -204,7 +355,8 @@ class PluginsService
     {
         $buffer = "";
         $nodes = array();
-        foreach ($this->registry as $plugType) {
+        $detectedPlugins = $this->getDetectedPlugins();
+        foreach ($detectedPlugins as $plugType) {
             foreach ($plugType as $plugName => $plugObject) {
                 if ($limitToActivePlugins) {
                     $plugId = $plugObject->getId();
@@ -234,34 +386,48 @@ class PluginsService
     /*        PUBLIC FUNCTIONS       */
     /*********************************/
 
-
     /**
-     * Build the XML Registry if not already built, and return it.
-     * @static
+     * Get publicable XML Registry, filtered by roles
      * @param bool $extendedVersion
-     * @return \DOMDocument The registry
+     * @param bool $clone
+     * @param bool $useCache
+     * @return \DOMDocument|\DOMNode
      */
-    public function getXmlRegistry($extendedVersion = true)
+    public function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false)
     {
-        $self = self::getInstance();
-        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
-            $self->buildXmlRegistry( $extendedVersion );
-            $self->registryVersion = ($extendedVersion ? "extended":"light");
+        if ($useCache) {
+            $cacheKey = $this->getRegistryCacheKey($extendedVersion);
+            $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
+            if ($cachedXml !== false) {
+                $registry = new \DOMDocument("1.0", "utf-8");
+                $registry->loadXML($cachedXml);
+                $this->updateXmlRegistry($registry, $extendedVersion);
+                if ($clone) {
+                    return $registry->cloneNode(true);
+                } else {
+                    return $registry;
+                }
+            }
         }
-        return $self->xmlRegistry;
-    }
 
-    /**
-     * Replace the current xml registry
-     * @static
-     * @param $registry
-     * @param bool $extendedVersion
-     */
-    public function updateXmlRegistry($registry, $extendedVersion = true)
-    {
-        $self = self::getInstance();
-        $self->xmlRegistry = $registry;
-        $self->registryVersion = ($extendedVersion? "extended" : "light");
+        $registry = $this->getXmlRegistry($extendedVersion);
+        if(AuthService::usersEnabled()){
+            $changes = $this->filterRegistryFromRole($registry, $this->context);
+            if ($changes) {
+                $this->updateXmlRegistry($registry, $extendedVersion);
+            }
+        }
+
+        if ($useCache && isSet($cacheKey)) {
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $registry->saveXML());
+        }
+
+        if ($clone) {
+            $cloneDoc = $registry->cloneNode(true);
+            $registry = $cloneDoc;
+        }
+        return $registry;
+
     }
 
     /**
@@ -271,8 +437,8 @@ class PluginsService
      */
     public function getPluginByTypeName($plugType, $plugName)
     {
-        if (isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])) {
-            return $this->registry[$plugType][$plugName];
+        if (isSet($this->detectedPlugins[$plugType]) && isSet($this->detectedPlugins[$plugType][$plugName])) {
+            return $this->detectedPlugins[$plugType][$plugName];
         } else {
             return false;
         }
@@ -283,12 +449,12 @@ class PluginsService
      * @param AbstractCacheDriver
      * @return bool
      */
-    public function loadPluginsRegistryFromCache($cacheStorage) {
+    private function loadPluginsFromCache($cacheStorage) {
 
-        if(!empty($this->registry)){
+        if(!empty($this->detectedPlugins)){
             return true;
         }
-        if(!empty($cacheStorage) && $this->_loadRegistryFromCache($cacheStorage)){
+        if(!empty($cacheStorage) && $this->_loadDetectedPluginsFromCache($cacheStorage)){
             return true;
         }
 
@@ -301,9 +467,9 @@ class PluginsService
      * @param AbstractConfDriver $confStorage
      * @param AbstractCacheDriver|null $cacheStorage
      */
-    public function loadPluginsRegistry($pluginFolder, $confStorage, $cacheStorage)
+    private function loadPlugins($pluginFolder, $confStorage, $cacheStorage)
     {
-        if (!empty($cacheStorage) && $this->loadPluginsRegistryFromCache($cacheStorage)) {
+        if (!empty($cacheStorage) && $this->loadPluginsFromCache($cacheStorage)) {
             return;
         }
 
@@ -338,7 +504,7 @@ class PluginsService
 
         if (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false) {
             Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
-            Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
+            Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->detectedPlugins, false, false);
             if (is_file(AJXP_PLUGINS_QUERIES_CACHE)) {
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
@@ -357,11 +523,11 @@ class PluginsService
     {
         // Try to get from cache
         list($type, $name) = explode(".", $pluginId);
-        if(!empty($this->registry) && isSet($this->registry[$type][$name])) {
+        if(!empty($this->detectedPlugins) && isSet($this->detectedPlugins[$type][$name])) {
             /**
              * @var Plugin $plugin
              */
-            $plugin = $this->registry[$type][$name];
+            $plugin = $this->detectedPlugins[$type][$name];
             $plugin->init($pluginOptions);
             return clone $plugin;
         }
@@ -382,7 +548,7 @@ class PluginsService
      */
     public function getPluginsByType($type)
     {
-        if(isSet($this->registry[$type])) return $this->registry[$type];
+        if(isSet($this->detectedPlugins[$type])) return $this->detectedPlugins[$type];
         else return array();
     }
 
@@ -459,10 +625,11 @@ class PluginsService
      */
     public function initActivePlugins()
     {
+        $detected = $this->getDetectedPlugins();
+        $this->deferBuildingRegistry();
         /**
          * @var Plugin $pObject
          */
-        $detected = $this->getDetectedPlugins();
         $toActivate = array();
         foreach ($detected as $pType => $pObjects) {
             $coreP = $this->findPlugin("core", $pType);
@@ -484,6 +651,7 @@ class PluginsService
             }
 
         }
+        $this->flushDeferredRegistryBuilding();
     }
 
     /**
@@ -518,8 +686,8 @@ class PluginsService
             unset($this->activePlugins[$type.".".$name]);
         }
         $this->activePlugins[$type.".".$name] = $active;
-        if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
-            $this->registry[$type][$name] = $updateInstance;
+        if (isSet($updateInstance) && isSet($this->detectedPlugins[$type][$name])) {
+            $this->detectedPlugins[$type][$name] = $updateInstance;
         }
         if (isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild) {
             $this->buildXmlRegistry(($this->registryVersion == "extended"));
@@ -562,16 +730,17 @@ class PluginsService
      */
     public function getActivePluginsForType($type, $unique = false)
     {
+        $detectedPlugins = $this->getDetectedPlugins();
         $acts = array();
         foreach ($this->activePlugins as $plugId => $active) {
             if(!$active) continue;
             list($pT,$pN) = explode(".", $plugId);
-            if ($pT == $type && isset($this->registry[$pT][$pN])) {
+            if ($pT == $type && isset($detectedPlugins[$pT][$pN])) {
                 if ($unique) {
-                    return $this->registry[$pT][$pN];
+                    return $detectedPlugins[$pT][$pN];
                     break;
                 }
-                $acts[$pN] = $this->registry[$pT][$pN];
+                $acts[$pN] = $detectedPlugins[$pT][$pN];
             }
         }
         if($unique && !count($acts)) return false;
@@ -581,7 +750,7 @@ class PluginsService
     /**
      * Return only one of getActivePluginsForType
      * @param $type
-     * @return array|bool
+     * @return Plugin
      */
     public function getUniqueActivePluginForType($type)
     {
@@ -590,11 +759,31 @@ class PluginsService
 
     /**
      * All the plugins registry, active or not
+     * @param AbstractConfDriver $confPlugin
+     * @param AbstractCacheDriver $cachePlugin
      * @return array
+     * @throws PydioException
      */
-    public function getDetectedPlugins()
+    public function getDetectedPlugins($confPlugin = null, $cachePlugin = null)
     {
-        return $this->registry;
+        if(empty($this->detectedPlugins)){
+
+            if($cachePlugin === null){
+                $cachePlugin = self::cachePluginSoftLoad();
+            }
+            if (!$this->loadPluginsFromCache($cachePlugin)) {
+                // Load from conf
+                try {
+                    if($confPlugin === null){
+                        $confPlugin = self::confPluginSoftLoad();
+                    }
+                    $this->loadPlugins($this->pluginsDir, $confPlugin, $cachePlugin);
+                } catch (\Exception $e) {
+                    throw new PydioException("Severe error while loading plugins registry : ".$e->getMessage());
+                }
+            }
+        }
+        return $this->detectedPlugins;
     }
 
     /*********************************/
@@ -623,7 +812,7 @@ class PluginsService
     /**
      * Find a classname for a given protocol
      * @param $protocol
-     * @return
+     * @return string
      */
     public function getWrapperClassName($protocol)
     {
@@ -677,7 +866,7 @@ class PluginsService
      */
     private function savePluginsRegistryToCache($cacheStorage) {
         if (!empty ($cacheStorage)) {
-            $cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->registry);
+            $cacheStorage->save(AJXP_CACHE_SERVICE_NS_SHARED, "plugins_registry", $this->detectedPlugins);
         }
     }
 
@@ -734,15 +923,15 @@ class PluginsService
             }
         }
         $plugType = $plugin->getType();
-        if (!isSet($this->registry[$plugType])) {
-            $this->registry[$plugType] = array();
+        if (!isSet($this->detectedPlugins[$plugType])) {
+            $this->detectedPlugins[$plugType] = array();
         }
         $options = $confStorage->loadPluginConfig($plugType, $plugin->getName());
         if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
             $plugin = $this->instanciatePluginClass($plugin);
         }
         $plugin->loadConfigs($options);
-        $this->registry[$plugType][$plugin->getName()] = $plugin;
+        $this->detectedPlugins[$plugType][$plugin->getName()] = $plugin;
         $plugin->loadingState = "loaded";
     }
 
@@ -750,7 +939,7 @@ class PluginsService
      * @param AbstractCacheDriver $cacheStorage
      * @return bool
      */
-    private function _loadRegistryFromCache($cacheStorage){
+    private function _loadDetectedPluginsFromCache($cacheStorage){
 
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
             $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
@@ -769,18 +958,18 @@ class PluginsService
                 if (!empty($cacheStorage)) {
                     $res = $cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
 
-                    $this->registry=$res;
+                    $this->detectedPlugins=$res;
                 }
 
                 // Retrieving Registry from files cache
                 if (empty($res)) {
                     $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
-                    $this->registry=$res;
+                    $this->detectedPlugins=$res;
                     $this->savePluginsRegistryToCache($cacheStorage);
                 }
 
                 // Refresh streamWrapperPlugins
-                foreach ($this->registry as $plugs) {
+                foreach ($this->detectedPlugins as $plugs) {
                     foreach ($plugs as $plugin) {
                         if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
                             $this->streamWrapperPlugins[] = $plugin->getId();
@@ -896,6 +1085,94 @@ class PluginsService
     }
 
     /**
+     * Check the current user "specificActionsRights" and filter the full registry actions with these.
+     * @static
+     * @param \DOMDocument $registry
+     * @param ContextInterface $ctx
+     * @return bool
+     */
+    private function filterRegistryFromRole(&$registry, ContextInterface $ctx)
+    {
+        $loggedUser = $ctx->getUser();
+        if ($loggedUser == null) return false;
+        $crtRepo = $ctx->getRepository();
+        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
+        if ($crtRepo != null && $crtRepo instanceof Repository) {
+            $crtRepoId = $crtRepo->getId();
+        }
+        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
+        $changes = false;
+        $xPath = new DOMXPath($registry);
+        foreach ($actionRights as $pluginName => $actions) {
+            foreach ($actions as $actionName => $enabled) {
+                if ($enabled !== false) continue;
+                $actions = $xPath->query("actions/action[@name='$actionName']");
+                if (!$actions->length) {
+                    continue;
+                }
+                $action = $actions->item(0);
+                $action->parentNode->removeChild($action);
+                $changes = true;
+            }
+        }
+        $parameters = $loggedUser->mergedRole->listParameters();
+        foreach ($parameters as $scope => $paramsPlugs) {
+            if ($scope === AJXP_REPO_SCOPE_ALL || $scope === $crtRepoId || ($crtRepo != null && $crtRepo->hasParent() && $scope === AJXP_REPO_SCOPE_SHARED)) {
+                foreach ($paramsPlugs as $plugId => $params) {
+                    foreach ($params as $name => $value) {
+                        // Search exposed plugin_configs, replace if necessary.
+                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
+                        if (!$searchparams->length) continue;
+                        $param = $searchparams->item(0);
+                        $newCdata = $registry->createCDATASection(json_encode($value));
+                        $param->removeChild($param->firstChild);
+                        $param->appendChild($newCdata);
+                    }
+                }
+            }
+        }
+        return $changes;
+    }
+
+    /**
+     * Build the XML Registry if not already built, and return it.
+     * @static
+     * @param bool $extendedVersion
+     * @return \DOMDocument The registry
+     */
+    private function getXmlRegistry($extendedVersion = true)
+    {
+        if (!isSet($this->xmlRegistry) || ($this->registryVersion == "light" && $extendedVersion)) {
+            $this->buildXmlRegistry( $extendedVersion );
+            $this->registryVersion = ($extendedVersion ? "extended":"light");
+        }
+        return $this->xmlRegistry;
+    }
+
+    /**
+     * Replace the current xml registry
+     * @static
+     * @param $registry
+     * @param bool $extendedVersion
+     */
+    private function updateXmlRegistry($registry, $extendedVersion = true)
+    {
+        $this->xmlRegistry = $registry;
+        $this->registryVersion = ($extendedVersion? "extended" : "light");
+    }
+
+    /**
+     * Get a unique string identifier for caching purpose
+     * @param bool $extendedVersion
+     * @return string
+     */
+    private function getRegistryCacheKey($extendedVersion = true)
+    {
+        $v = $extendedVersion ? "extended" : "light";
+        return "xml_registry:" . $v . ":" . $this->context->getStringIdentifier();
+    }
+
+    /**
      * Central function of the registry construction, merges some nodes into the existing registry.
      * @param \DOMDocument $original
      * @param $parentName
@@ -997,8 +1274,18 @@ class PluginsService
         return false;
     }
 
-    private function __construct()
+    /**
+     * PluginsService constructor.
+     * @param ContextInterface|null $ctx
+     * @param string|null $pluginsDir
+     */
+    private function __construct($ctx = null, $pluginsDir = null)
     {
+        $this->context = $ctx;
+        if(empty($pluginsDir)){
+            $pluginsDir = AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER;
+        }
+        $this->pluginsDir = $pluginsDir;
     }
 
     public function __clone()

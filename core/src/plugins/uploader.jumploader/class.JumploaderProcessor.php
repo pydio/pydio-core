@@ -54,8 +54,11 @@ class JumploaderProcessor extends Plugin
         if(!count($request->getUploadedFiles()) || isSet($httpVars["simple_uploader"]) || isset($httpVars["xhr_uploader"]) || isSet($httpVars["Filename"])){
             return;
         }
-        $repository = ConfService::getRepository();
-        $driver = ConfService::loadDriverForRepository($repository);
+        
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $repository = $ctx->getRepository();
+        $driver = $repository->getDriverInstance();
 
         if (method_exists($driver, "storeFileToCopy")) {
             self::$remote = true;
@@ -231,8 +234,10 @@ class JumploaderProcessor extends Plugin
             return ;
         }
 
-        $repository = ConfService::getRepository();
-        $driver = ConfService::loadDriverForRepository($repository);
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $repository = $ctx->getRepository();
+        $driver = $repository->getDriverInstance();
 
         if ($httpVars["lastPartition"]) {
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);

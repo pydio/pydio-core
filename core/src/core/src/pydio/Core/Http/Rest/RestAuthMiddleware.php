@@ -24,6 +24,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Authfront\Core\FrontendsLoader;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
+use Pydio\Core\Model\Context;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 
@@ -42,35 +44,39 @@ class RestAuthMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
+        $driverImpl = ConfService::getAuthDriverImpl();
+        PluginsService::getInstance()->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
+
         $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
         if($response != null){
             return $response;
         }
 
         if(AuthService::getLoggedUser() == null){
-            header('HTTP/1.0 401 Unauthorized');
-            echo 'You are not authorized to access this API.';
-            exit;
+            $responseInterface = $responseInterface->withStatus(401);
+            $responseInterface->getBody()->write('You are not authorized to access this API.');
+            return $responseInterface;
         }
 
         $repoID = $requestInterface->getAttribute("repository_id");
         if($repoID == 'pydio'){
             ConfService::switchRootDir();
-            ConfService::getRepository();
+            $repo = ConfService::getRepository();
         }else{
             $repo = ConfService::findRepositoryByIdOrAlias($repoID);
             if ($repo == null) {
                 throw new WorkspaceNotFoundException($repoID);
             }
             if(!ConfService::repositoryIsAccessible($repo->getId(), $repo, AuthService::getLoggedUser(), false, true)){
-                header('HTTP/1.0 401 Unauthorized');
-                echo 'You are not authorized to access this workspace.';
-                exit;
+                $responseInterface = $responseInterface->withStatus(401);
+                $responseInterface->getBody()->write('You are not authorized to access this API.');
+                return $responseInterface;
             }
             ConfService::switchRootDir($repo->getId());
         }
 
-        ConfService::reloadServicesAndActivePlugins();
+        $context = Context::contextWithObjects(AuthService::getLoggedUser(), $repo);
+        $requestInterface = $requestInterface->withAttribute("ctx", $context);
 
         return RestServer::callNextMiddleWare($requestInterface, $responseInterface, $next);
 

@@ -24,6 +24,7 @@ use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -154,7 +155,7 @@ class AJXP_ClientDriver extends Plugin
 
         // PRECOMPUTE REGISTRY
         if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
-            $clone = ConfService::getFilteredXMLRegistry(true, true);
+            $clone = $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
             if(!AJXP_SERVER_DEBUG){
                 $clonePath = new DOMXPath($clone);
                 $serverCallbacks = $clonePath->query("//serverCallback|hooks");

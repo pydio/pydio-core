@@ -423,6 +423,11 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider, UserInterface
         }
     }
 
+    public function getMergedRole()
+    {
+        return $this->mergedRole;
+    }
+
     protected function migrateRightsToPersonalRole()
     {
         $changes = 0;

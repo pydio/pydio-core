@@ -86,7 +86,7 @@
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
             <serverCallback methodName="sendTaskMessage" hookName="msg.task" defer="true" dontBreakOnException="true"/>
             <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
-            <serverCallback methodName="appendRefreshInstruction" hookName="response.send" />
+            <serverCallback methodName="appendRefreshInstruction" hookName="response.send" dontBreakOnException="true"/>
         </hooks>
     </registry_contributions>
     <dependencies>

@@ -78,6 +78,9 @@ class MqManager extends Plugin
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try {
             $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
+            if(!empty($this->msgExchanger)){
+                \Pydio\Core\PluginFramework\PluginsService::getInstance()->setPluginActive($this->msgExchanger->getType(), $this->msgExchanger->getName(), true, $this->msgExchanger);
+            }
             if(AuthService::$bufferedMessage != null && AuthService::getLoggedUser() != null){
                 $this->sendInstantMessage(AuthService::$bufferedMessage, ConfService::getCurrentRepositoryId(), AuthService::getLoggedUser()->getId());
                 AuthService::$bufferedMessage = null;

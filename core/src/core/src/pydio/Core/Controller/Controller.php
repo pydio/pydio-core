@@ -26,6 +26,7 @@ use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -69,7 +70,8 @@ class Controller
     private static function initXPath($useCache = false)
     {
         if (!isSet(self::$xPath)) {
-            $registry = ConfService::getFilteredXMLRegistry(false, false, $useCache);
+            $ctx = Context::fromGlobalServices();
+            $registry = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(false, false, $useCache);
             self::$xPath = new \DOMXPath($registry);
         }
         return self::$xPath;

@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Model;
 
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -59,6 +60,28 @@ class Context implements ContextInterface
     }
 
     /**
+     * @param $userObject
+     * @param $repositoryObject
+     * @return Context
+     */
+    public static function contextWithObjects($userObject, $repositoryObject){
+        $ctx = new Context();
+        $ctx->setUserObject($userObject);
+        $ctx->setRepositoryObject($repositoryObject);
+        return $ctx;
+    }
+
+    /**
+     * @return ContextInterface
+     */
+    public static function fromGlobalServices(){
+        $ctx = new Context();
+        $ctx->setUserObject(AuthService::getLoggedUser());
+        $ctx->setRepositoryObject(ConfService::getRepository());
+        return $ctx;
+    }
+
+    /**
      * @return boolean
      */
     public function hasUser()
@@ -95,7 +118,9 @@ class Context implements ContextInterface
     public function setUserObject($user)
     {
         $this->userObject = $user;
-        $this->userId = $user->getId();
+        if($user !== null){
+            $this->userId = $user->getId();
+        }
     }
 
     public function resetUser(){
@@ -108,7 +133,7 @@ class Context implements ContextInterface
      */
     public function hasRepository()
     {
-        return (!empty($this->repositoryId));
+        return ($this->repositoryId !== null);
     }
 
     /**
@@ -134,12 +159,22 @@ class Context implements ContextInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getRepositoryId()
+    {
+        return $this->repositoryId;
+    }
+
+    /**
      * @param RepositoryInterface $repository
      */
     public function setRepositoryObject($repository)
     {
         $this->repositoryObject = $repository;
-        $this->repositoryId = $repository->getId();
+        if($repository !== null){
+            $this->repositoryId = $repository->getId();
+        }
     }
 
     public function resetRepository()
@@ -158,5 +193,13 @@ class Context implements ContextInterface
         }
         return $u.":".$a;
 
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return !$this->hasRepository() && !$this->hasUser();
     }
 }

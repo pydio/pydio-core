@@ -32,6 +32,8 @@ use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
@@ -603,7 +605,8 @@ abstract class AbstractConfDriver extends Plugin
                 ConfService::switchRootDir($repository_id);
                 // Load try to init the driver now, to trigger an exception
                 // if it's not loading right.
-                ConfService::loadRepositoryDriver();
+                //ConfService::loadRepositoryDriver();
+                PluginsService::getInstance();
                 if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
                     $user = AuthService::getLoggedUser();
                     $activeRepId = ConfService::getCurrentRepositoryId();
@@ -621,8 +624,9 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "get_xml_registry" :
             case "state" :
-
-                $clone = ConfService::getFilteredXMLRegistry(true, true);
+                
+                
+                $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
                 $clonePath = new \DOMXPath($clone);
                 if(!AJXP_SERVER_DEBUG){
                     $serverCallbacks = $clonePath->query("//serverCallback|hooks");
@@ -674,13 +678,15 @@ abstract class AbstractConfDriver extends Plugin
                 if ($bmUser == null) {
                     break;
                 }
-                $driver = ConfService::loadRepositoryDriver();
+                /** @var ContextInterface $ctx */
+                $ctx = $requestInterface->getAttribute("ctx");
+                $driver = $ctx->getRepository()->getDriverInstance();
                 if (!($driver instanceof IAjxpWrapperProvider)) {
                     $driver = false;
                 }
 
 
-                $repositoryId = ConfService::getCurrentRepositoryId();
+                $repositoryId = $ctx->getRepositoryId();
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
                     $bmPath = Utils::decodeSecureMagic($httpVars["bm_path"]);
                     if ($httpVars["bm_action"] == "add_bookmark") {
@@ -714,7 +720,7 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->save("user");
                     }
                 }
-                $doc = new XMLDocMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $doc = new XMLMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx->getRepository(), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
                 $x = new SerializableResponseStream([$doc]);
                 $responseInterface = $responseInterface->withBody($x);
 

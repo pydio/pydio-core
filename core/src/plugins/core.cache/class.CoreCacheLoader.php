@@ -45,20 +45,20 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
     protected static $cacheInstance;
 
     /**
+     * @param PluginsService|null $pluginsService
      * @return null|AbstractCacheDriver|Plugin
      */
-    public function getImplementation()
+    public function getImplementation($pluginsService = null)
     {
 
         $pluginInstance = null;
 
         if (!isSet(self::$cacheInstance) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$cacheInstance->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver");
-
-                if ($pluginInstance != false) {
-                    PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
+                if($pluginsService === null){
+                    $pluginsService = PluginsService::getInstance();
                 }
+                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver", $pluginsService);
             }
             self::$cacheInstance = $pluginInstance;
             if($pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){

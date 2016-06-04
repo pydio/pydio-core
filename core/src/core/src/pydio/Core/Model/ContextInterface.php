@@ -26,6 +26,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 interface ContextInterface
 {
     /**
+     * @return bool
+     */
+    public function isEmpty();
+
+    /**
      * @return boolean
      */
     public function hasUser();
@@ -61,6 +66,11 @@ interface ContextInterface
      * @param string $repositoryId
      */
     public function setRepositoryId($repositoryId);
+
+    /**
+     * @return string|null
+     */
+    public function getRepositoryId();
 
     /**
      * @param RepositoryInterface $repository

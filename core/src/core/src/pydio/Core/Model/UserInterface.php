@@ -230,6 +230,11 @@ interface UserInterface
     public function recomputeMergedRole();
 
     /**
+     * @return AJXP_Role
+     */
+    public function getMergedRole();
+
+    /**
      * @param bool $resolveAsParent
      */
     public function setResolveAsParent($resolveAsParent);

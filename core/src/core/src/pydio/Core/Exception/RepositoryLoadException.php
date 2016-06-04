@@ -18,16 +18,32 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Core\PluginFramework;
+namespace Pydio\Core\Exception;
+
+use Pydio\Core\Model\RepositoryInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-interface CoreInstanceProvider
+class RepositoryLoadException extends PydioException
 {
     /**
-     * @param PluginsService|null $pluginServiceInstance
-     * @return Plugin
+     * @var RepositoryInterface
      */
-    public function getImplementation($pluginServiceInstance = null);
+    private $repository;
+    /**
+     * RepositoryLoadException constructor.
+     * @param RepositoryInterface $repository
+     * @param array $errors
+     */
+    public function __construct($repository, $errors)
+    {
+        $message = "Error while loading workspace ".$repository->getDisplay()." : ".implode("\n-", $errors);
+        $this->repository = $repository;
+        parent::__construct($message, null, 5000);
+    }
+
+    public function getRepository(){
+        return $this->repository;
+    }
 }

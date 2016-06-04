@@ -32,6 +32,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -116,7 +118,7 @@ class ConfService
             $this->configs["DEFAULT_REPOSITORIES"] = array();
         }
 
-        PluginsService::initCoreRegistry($pluginDirPath);
+        //PluginsService::initCoreRegistry();
     }
 
     /**
@@ -192,12 +194,15 @@ class ConfService
      * @static
      * @param $globalsArray
      * @param string $interfaceCheck
+     * @param PluginsService|null $pService
      * @return Plugin|null
      */
-    public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "")
+    public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "", $pService = null)
     {
         $plugin = false;
-        $pService = PluginsService::getInstance();
+        if($pService === null){
+            $pService = PluginsService::getInstance();
+        }
 
         if (is_string($globalsArray)) {
             $globalsArray = array("instance_name" => $globalsArray);
@@ -215,9 +220,6 @@ class ConfService
             if (!is_a($plugin, $interfaceCheck)) {
                 $plugin = false;
             }
-        }
-        if ($plugin !== false) {
-            $pService->setPluginActive($plugin->getType(), $plugin->getName(), true, $plugin);
         }
         return $plugin;
 
@@ -297,7 +299,7 @@ class ConfService
     {
         if(isSet(self::$tmpConfStorageImpl)) return self::$tmpConfStorageImpl;
         /** @var CoreInstanceProvider $p */
-        $p = PluginsService::getInstance()->getPluginById("core.conf");
+        $p = PluginsService::getInstance(Context::contextWithObjects(null, null))->getPluginById("core.conf");
         return $p->getImplementation();
     }
 
@@ -322,8 +324,11 @@ class ConfService
     public static function getCacheDriverImpl()
     {
         if(isSet(self::$tmpCacheStorageImpl)) return self::$tmpCacheStorageImpl;
-        /** @var CoreInstanceProvider $p */
-        $p = PluginsService::getInstance()->getPluginById("core.cache");
+        /**
+         * Get CacheService implementation, directly from the "empty" plugin registry
+         * @var CoreInstanceProvider $p
+         */
+        $p = PluginsService::getInstance(Context::contextWithObjects(null, null))->getPluginById("core.cache");
         return $p->getImplementation();
     }
 
@@ -333,120 +338,14 @@ class ConfService
     public static function reloadServicesAndActivePlugins(){
 
         // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-        ConfService::getAuthDriverImpl();
         // DRIVERS BELOW NEED IDENTIFICATION CHECK
-        if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
-            ConfService::getConfStorageImpl();
-            ConfService::loadRepositoryDriver();
-        }
-        $pServ = PluginsService::getInstance();
-        $pServ->deferBuildingRegistry();
-        $pServ->initActivePlugins();
-        $pServ->flushDeferredRegistryBuilding();
-        Controller::registryReset();
+        // Now context has user and repo
+       // $ctx = Context::fromGlobalServices();
+        //$pServ = PluginsService::getInstance($ctx);
+        //ConfService::getAuthDriverImpl();
+        //$pServ->initActivePlugins();
+        //Controller::registryReset();
 
-    }
-
-
-    public static function getFilteredXMLRegistry($extendedVersion = true, $clone = false, $useCache = false){
-
-        $pluginService = PluginsService::getInstance();
-
-        if($useCache){
-            $cacheKey = self::getRegistryCacheKey($extendedVersion);
-            $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
-            if($cachedXml !== false){
-                $registry = new \DOMDocument("1.0", "utf-8");
-                $registry->loadXML($cachedXml);
-                $pluginService->updateXmlRegistry($registry, $extendedVersion);
-                if($clone){
-                    return $registry->cloneNode(true);
-                }else{
-                    return $registry;
-                }
-            }
-        }
-
-        $registry = $pluginService->getXmlRegistry($extendedVersion);
-        $changes = self::filterRegistryFromRole($registry);
-        if($changes){
-            $pluginService->updateXmlRegistry($registry, $extendedVersion);
-        }
-
-        if($useCache && isSet($cacheKey)){
-            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $registry->saveXML());
-        }
-
-        if($clone){
-            $cloneDoc = $registry->cloneNode(true);
-            $registry = $cloneDoc;
-        }
-        return $registry;
-
-    }
-
-    private static function getRegistryCacheKey($extendedVersion = true){
-
-        $logged = AuthService::getLoggedUser();
-        $u = $logged == null ? "shared" : $logged->getId();
-        $a = "norepository";
-        $r = ConfService::getRepository();
-        if($r !== null){
-            $a = $r->getSlug();
-        }
-        $v = $extendedVersion ? "extended":"light";
-        return "xml_registry:".$v.":".$u.":".$a;
-
-    }
-
-    /**
-     * Check the current user "specificActionsRights" and filter the full registry actions with these.
-     * @static
-     * @param \DOMDocument $registry
-     * @return bool
-     */
-    public static function filterRegistryFromRole(&$registry)
-    {
-        if(!AuthService::usersEnabled()) return false ;
-        $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null) return false;
-        $crtRepo = ConfService::getRepository();
-        $crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
-        if ($crtRepo != null && $crtRepo instanceof Repository) {
-            $crtRepoId = $crtRepo->getId();
-        }
-        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
-        $changes = false;
-        $xPath = new DOMXPath($registry);
-        foreach ($actionRights as $pluginName => $actions) {
-            foreach ($actions as $actionName => $enabled) {
-                if($enabled !== false) continue;
-                $actions = $xPath->query("actions/action[@name='$actionName']");
-                if (!$actions->length) {
-                    continue;
-                }
-                $action = $actions->item(0);
-                $action->parentNode->removeChild($action);
-                $changes = true;
-            }
-        }
-        $parameters = $loggedUser->mergedRole->listParameters();
-        foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope === AJXP_REPO_SCOPE_ALL || $scope === $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope === AJXP_REPO_SCOPE_SHARED)) {
-                foreach ($paramsPlugs as $plugId => $params) {
-                    foreach ($params as $name => $value) {
-                        // Search exposed plugin_configs, replace if necessary.
-                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
-                        if(!$searchparams->length) continue;
-                        $param = $searchparams->item(0);
-                        $newCdata = $registry->createCDATASection(json_encode($value));
-                        $param->removeChild($param->firstChild);
-                        $param->appendChild($newCdata);
-                    }
-                }
-            }
-        }
-        return $changes;
     }
 
 
@@ -621,8 +520,7 @@ class ConfService
     {
         if(isSet($_SESSION["REPOSITORIES"])) unset($_SESSION["REPOSITORIES"]);
         $this->configs["REPOSITORIES"] = null;
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $this->getRegistryCacheKey(true));
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, $this->getRegistryCacheKey(false));
+        PluginsService::clearRegistryCaches();
     }
 
     private function cacheRepository($repoId, $repository){
@@ -1503,7 +1401,7 @@ class ConfService
         $coreP = PluginsService::getInstance()->findPlugin("core", $coreType);
         if($coreP === false) return null;
         $confs = $coreP->getConfigs();
-        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs);
+        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs, Context::fromGlobalServices());
         return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName]) : null);
     }
 
@@ -1615,17 +1513,8 @@ class ConfService
     }
 
     /**
-     * Returns the repository access driver
-     * @return Plugin
-     */
-    public static function loadRepositoryDriver()
-    {
-        return self::getInstance()->loadRepositoryDriverInst();
-    }
-
-    /**
      * @static
-     * @param \Pydio\Access\Core\Model\Repository $repository
+     * @param RepositoryInterface $repository
      * @return AbstractAccessDriver
      */
     public static function loadDriverForRepository(&$repository)
@@ -1635,130 +1524,42 @@ class ConfService
 
     /**
      * See static method
-     * @param \Pydio\Access\Core\Model\Repository|null $repository
+     * @param RepositoryInterface $repository
      * @throws PydioException|\Exception
      * @return AbstractAccessDriver
      */
-    private function loadRepositoryDriverInst(&$repository = null)
+    private function loadRepositoryDriverInst(&$repository)
     {
-        $rest = false;
-        if($repository == null){
-            if (isSet($this->configs["ACCESS_DRIVER"]) && $this->configs["ACCESS_DRIVER"] instanceof AbstractAccessDriver) {
-                return $this->configs["ACCESS_DRIVER"];
-            }
-            $this->switchRootDirInst();
-            $repository = $this->getRepositoryInst();
-            if($repository == null){
-                throw new NoActiveWorkspaceException();
-            }
-        }else{
-            $rest = true;
-            if (isset($repository->driverInstance)) {
-                return $repository->driverInstance;
-            }
+        $instance = $repository->getDriverInstance();
+        if (!empty($instance)) {
+            return $instance;
         }
-        /**
-         * @var AbstractAccessDriver $plugInstance
-         */
+
+        /** @var AbstractAccessDriver $plugInstance */
         $accessType = $repository->getAccessType();
         $pServ = PluginsService::getInstance();
         $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
 
-        // TRIGGER BEFORE INIT META
-        $metaSources = $repository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                if (!method_exists($instance, "beforeInitMeta")) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
-                    $instance->beforeInitMeta($plugInstance, $repository);
-                } catch (\Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-            }
-        }
-
-        // INIT MAIN DRIVER
-        $plugInstance->init($repository);
-        try {
-            $plugInstance->initRepository();
-            $repository->driverInstance = $plugInstance;
-        } catch (\Exception $e) {
-            if(!$rest){
-                // Remove repositories from the lists
-                if(!($e instanceof PydioUserAlertException)){
-                    $this->removeRepositoryFromCache($repository->getId());
-                }
-                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
-                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-                } else {
-                    $this->switchRootDir();
-                }
-            }
-            throw $e;
-        }
-
-        $pServ->deferBuildingRegistry();
-        $pServ->setPluginUniqueActiveForType("access", $accessType);
-
-        // TRIGGER INIT META
-        $metaSources = $repository->getOption("META_SOURCES");
-        if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
-            $keys = array_keys($metaSources);
-            foreach ($keys as $plugId) {
-                if($plugId == "") continue;
-                $split = explode(".", $plugId);
-                $instance = $pServ->getPluginById($plugId);
-                if (!is_object($instance)) {
-                    continue;
-                }
-                try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
-                    if(!method_exists($instance, "initMeta")) {
-                        throw new \Exception("Meta Source $plugId does not implement the initMeta method.");
-                    }
-                    $instance->initMeta($plugInstance);
-                } catch (\Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
-                    $this->errors[] = $e->getMessage();
-                }
-                $pServ->setPluginActive($split[0], $split[1]);
-            }
-        }
-        $pServ->flushDeferredRegistryBuilding();
-        if (count($this->errors)>0) {
-            $e = new PydioException("Error while loading repository feature : ".implode(",",$this->errors));
-            if(!$rest){
-                // Remove repositories from the lists
-                $this->removeRepositoryFromCache($repository->getId());
-                if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
-                    $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
-                } else {
-                    $this->switchRootDir();
-                }
-            }
-            throw $e;
-        }
-        if($rest){
-            $ctxId = $this->getContextRepositoryId();
-            if ( (!empty($ctxId) || $ctxId === 0) && $ctxId == $repository->getId()) {
-                $this->configs["REPOSITORY"] = $repository;
-                $this->cacheRepository($ctxId, $repository);
-            }
-        } else {
-            $this->configs["ACCESS_DRIVER"] = $plugInstance;
+        $ctxId = $this->getContextRepositoryId();
+        if ( (!empty($ctxId) || $ctxId === 0) && $ctxId == $repository->getId()) {
+            $this->configs["REPOSITORY"] = $repository;
+            $this->cacheRepository($ctxId, $repository);
         }
         return $plugInstance;
     }
+
+    /**
+     * @param Repository $repository
+     */
+    public static function switchBackAfterRepositoryError($repository){
+        self::getInstance()->removeRepositoryFromCache($repository->getId());
+        if (isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$repository->getId()) {
+            self::getInstance()->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+        } else {
+            self::getInstance()->switchRootDir();
+        }
+    }
+
 
     /**
      * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
