@@ -11,18 +11,30 @@
         <global_param group="CONF_MESSAGE[Inner Messaging]" type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
         <global_param group="CONF_MESSAGE[Inner Messaging]" description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
 
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server is running]" label="CONF_MESSAGE[WebSocket]" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect address]" label="CONF_MESSAGE[WS Client Address]" name="WS_SERVER_HOST" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect port]" label="CONF_MESSAGE[WS Client Port]" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client secure connection]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind address]" label="CONF_MESSAGE[WS Server Host]" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind port]" label="CONF_MESSAGE[WS Server Port]" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket handler path]" label="CONF_MESSAGE[WS Path]" name="WS_SERVER_PATH" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket admin key]" label="CONF_MESSAGE[WS Key]" name="WS_SERVER_ADMIN" type="string"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
+        <global_param group="CONF_MESSAGE[Caddy]" type="monitor" name="CADDYFILE_VALID" choices="run_plugin_action:core.mq:getCaddyFile" label="CONF_MESSAGE[Caddyfile Format]" description="CONF_MESSAGE[Caddyfile format is valid ?]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Caddy]" type="monitor" name="CADDY_STATUS" choices="run_plugin_action:core.mq:getCaddyStatus" label="CONF_MESSAGE[Caddy Status]" description="CONF_MESSAGE[Caddyfile is running ?]" mandatory="false"/>
+
+        <global_param group="CONF_MESSAGE[Caddy]" type="button" name="CADDY_SWITCH_ON" choices="run_plugin_action:core.mq:switchCaddyOn" label="CONF_MESSAGE[Start Caddy]" description="CONF_MESSAGE[Switch Caddy ON]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Caddy]" type="button" name="CADDY_SWITCH_OFF" choices="run_plugin_action:core.mq:switchCaddyOff" label="CONF_MESSAGE[Stop Caddy]" description="CONF_MESSAGE[Switch Caddy OFF]" mandatory="false"/>
+
+        <global_param group="CONF_MESSAGE[WebSocket]" description="CONF_MESSAGE[WebSocket server is running]" label="CONF_MESSAGE[WebSocket]" name="WS_ACTIVE" type="boolean" expose="true"/>
+
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket host]" label="CONF_MESSAGE[WS Hostname]" name="WS_HOST" type="string" expose="true" default="localhost"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket port]" label="CONF_MESSAGE[WS Port]" name="WS_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket secure]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SECURE" type="boolean" expose="true" default="false"/>
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket path]" label="CONF_MESSAGE[WS Path]" name="WS_PATH" type="string" expose="true" default="ws"/>
+
+
+        <global_param group="CONF_MESSAGE[Upload]" description="CONF_MESSAGE[Upload server is running]" label="CONF_MESSAGE[Upload]" name="UPLOAD_ACTIVE" type="boolean" expose="true"/>
+
+        <global_param group="CONF_MESSAGE[Upload Server]" description="CONF_MESSAGE[Upload Server host]" label="CONF_MESSAGE[Upload Server host]" name="UPLOAD_HOST" type="string" expose="true" default="localhost"/>
+        <global_param group="CONF_MESSAGE[Upload Server]" description="CONF_MESSAGE[Upload Server port]" label="CONF_MESSAGE[Upload Server port]" name="UPLOAD_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[Upload Server]" description="CONF_MESSAGE[Upload Server secure]" label="CONF_MESSAGE[Upload Server secure]" name="UPLOAD_SECURE" type="boolean" expose="true" default="false"/>
+        <global_param group="CONF_MESSAGE[Upload Server]" description="CONF_MESSAGE[Upload Server path]" label="CONF_MESSAGE[Upload Server path]" name="UPLOAD_PATH" type="string" expose="true" default="io"/>
+
+        <global_param group="CONF_MESSAGE[NSQ Messaging]" description="CONF_MESSAGE[NSQ Host]" label="CONF_MESSAGE[NSQ Host]" name="NSQ_HOST" type="string" expose="true" default="localhost" />
+        <global_param group="CONF_MESSAGE[NSQ Messaging]" description="CONF_MESSAGE[NSQ Port]" label="CONF_MESSAGE[NSQ Port]" name="NSQ_PORT" type="string" expose="true" default="4150"/>
+
         <global_param group="CONF_MESSAGE[Workers]" type="boolean" name="MQ_USE_WORKERS" label="CONF_MESSAGE[Use Workers]" description="CONF_MESSAGE[Send commands in background to workers waiting to execute them]" mandatory="false" default="false"/>
         <global_param group="CONF_MESSAGE[Workers]" type="monitor" name="MQ_WORKER_STATUS" choices="run_plugin_action:core.mq:getWorkerStatus" label="CONF_MESSAGE[Worker Status]" description="CONF_MESSAGE[Try to detect if the worker is responding]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Workers]" type="button" name="MQ_WORKER_SWITCH_ON" choices="run_plugin_action:core.mq:switchWorkerOn" label="CONF_MESSAGE[Start Worker]" description="CONF_MESSAGE[Switch a worker ON]" mandatory="false"/>

@@ -31,11 +31,14 @@ Class.create("XHRUploader", {
     // Copy get/setUserPrefs from AjxpPane
     getUserPreference: AjxpPane.prototype.getUserPreference,
     setUserPreference: AjxpPane.prototype.setUserPreference,
+    configs: null,
 
 
 	initialize : function( formObject, mask ){
 
         window.UploaderInstanceRunning = true;
+
+        this.configs = pydio.getPluginConfigs("mq");
 
 		formObject = $(formObject);
 		// Main form
@@ -747,12 +750,20 @@ Class.create("XHRUploader", {
         var currentDir = this.contextNode.getPath();
         if(forceDir) currentDir = forceDir;
 
+        console.log(currentDir);
+
 		var xhr = new XMLHttpRequest();
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(currentDir);
+        xhr.withCredentials = true;
+		/* var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(currentDir);
 		if(queryStringParam){
 			uri += '&' + queryStringParam;
 		}
 
+        */uri = 'http://localhost:5000/io/' + pydio.user.activeRepository + currentDir;
+
+        var uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;;
+
+        //console.log(queryStringParam);
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
 			if (!e.lengthComputable) return;
@@ -783,7 +794,6 @@ Class.create("XHRUploader", {
 		xhr.open("POST", uri, true);
         try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
         return xhr;
-		
 	},
 	
 	sendFileMultipart : function(item){

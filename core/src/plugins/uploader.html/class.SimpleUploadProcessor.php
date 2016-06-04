@@ -68,14 +68,35 @@ class SimpleUploadProcessor extends Plugin
             throw new \Pydio\Core\Exception\PydioException("Warning, missing headers!");
         }
 
-        if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
-            if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
+        // Setting the stream data
+        if (isset($serverData['HTTP_X_FILE_TMP_LOCATION'])) {
+            // The file has already been transferred
+
+            // Checking headers
+            if (!isset($serverData['HTTP_X_FILE_SIZE'])) {
                 exit('Warning, wrong headers');
             }
+
+            // Setting the stream to point to the file location
+            $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
+            $errorStatus = UPLOAD_ERR_OK;
+        } else {
+            // The file is the post data stream
+
+            // Checking headers
+            if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
+                if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
+                    exit('Warning, wrong headers');
+                }
+            }
+
+            // Setting the stream to point to the post data
+            $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
+            $errorStatus = $streamOrFile->getError();
         }
 
         $fileNameH = $serverData['HTTP_X_FILE_NAME'];
-        $fileSizeH = (int)$serverData['CONTENT_LENGTH'];
+        $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
 
         // Clean up dir name
         if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
@@ -83,15 +104,6 @@ class SimpleUploadProcessor extends Plugin
         }
 
         $this->logDebug("SimpleUpload::preProcess", $httpVars);
-
-        if (isSet($serverData['HTTP_X_FILE_TMP_LOCATION'])) {
-            // The file has already been uploaded to a tmp location
-            $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
-            $errorStatus = UPLOAD_ERR_OK;
-        } else {
-            $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
-            $errorStatus = $streamOrFile->getError();
-        }
 
         // Update UploadedFile object built on input stream with file name and size
         $uploadedFile = new \Zend\Diactoros\UploadedFile($streamOrFile, $fileSizeH, $errorStatus, TextEncoder::fromUTF8(basename($fileNameH)));

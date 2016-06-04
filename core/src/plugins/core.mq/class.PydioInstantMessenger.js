@@ -62,7 +62,7 @@ Class.create("PydioInstantMessenger", {
     },
 
     initForRepoId:function(repoId){
-        if(window.WebSocket && this.configs.get("WS_SERVER_ACTIVE")){
+        if(window.WebSocket && this.configs.get("WS_ACTIVE")){
 
             if(this.ws) {
                 if(!repoId){
@@ -80,7 +80,7 @@ Class.create("PydioInstantMessenger", {
                 }
             }else{
                 if(repoId){
-                    var url = "ws"+(this.configs.get("WS_SERVER_SECURE")?"s":"")+"://"+this.configs.get("WS_SERVER_HOST")+":"+this.configs.get("WS_SERVER_PORT")+this.configs.get("WS_SERVER_PATH");
+                    var url = "ws"+(this.configs.get("WS_SECURE")?"s":"")+"://"+this.configs.get("WS_HOST")+":"+this.configs.get("WS_PORT")+"/"+this.configs.get("WS_PATH");
                     this.ws = new WebSocket(url);
                     this.ws.onmessage = function(event){
                         var obj = parseXml(event.data);
@@ -128,7 +128,7 @@ Class.create("PydioInstantMessenger", {
                             console.error("Switching back to polling");
                         }
                         delete this.ws;
-                        this.configs.set("WS_SERVER_ACTIVE", false);
+                        this.configs.set("WS_ACTIVE", false);
                         this.initForRepoId(repoId);
 
                     }.bind(this);
@@ -137,7 +137,7 @@ Class.create("PydioInstantMessenger", {
                             console.error("Cannot login to websocket server, switching back to polling");
                         }
                         delete this.ws;
-                        this.configs.set("WS_SERVER_ACTIVE", false);
+                        this.configs.set("WS_ACTIVE", false);
                         this.initForRepoId(repoId);
                     }.bind(this);
                 }
