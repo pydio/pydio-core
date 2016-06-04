@@ -64,10 +64,12 @@ class UpdateController extends Plugin
         $contribNode->removeChild($compressNode);
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $loggedUser = AuthService::getLoggedUser();
-        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
+        $loggedUser = $contextInterface->getUser();
+        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) {
+            throw new \Pydio\Core\Exception\AuthRequiredException();
+        }
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
         if (!empty($this->pluginConf["PROXY_HOST"]) || !empty($this->pluginConf["UPDATE_SITE_USER"])) {
             AjaXplorerUpgrader::configureProxy(
@@ -110,9 +112,7 @@ class UpdateController extends Plugin
 
             case "test_upgrade_scripts":
 
-                if(!AJXP_SERVER_DEBUG
-                    || AuthService::getLoggedUser() == null
-                    || !AuthService::getLoggedUser()->isAdmin()){
+                if(!AJXP_SERVER_DEBUG){
                     break;
                 }
                 $upgrader = new AjaXplorerUpgrader("", "", "");

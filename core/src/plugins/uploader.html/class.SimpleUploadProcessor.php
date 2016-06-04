@@ -155,10 +155,9 @@ class SimpleUploadProcessor extends Plugin
         }
     }
 
-    public function unifyChunks($action, $httpVars, $fileVars)
+    public function unifyChunks($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository);
+        $selection = UserSelection::fromContext($contextInterface, []);
         $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $destStreamURL = $selection->currentBaseUrl().$dir."/";
         $filename = Utils::decodeSecureMagic($httpVars["file_name"]);

@@ -38,8 +38,8 @@ class TimestampCreator extends Plugin
         }
 
         //Get active repository
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository, $requestInterface->getParsedBody());
+        $ctx = $requestInterface->getAttribute("ctx");
+        $selection = UserSelection::fromContext($ctx, $requestInterface->getParsedBody());
         $destStreamURL = $selection->currentBaseUrl();
 
         $fileName = $selection->getUniqueFile();

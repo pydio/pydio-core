@@ -281,28 +281,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         return $groups;
     }
-
-    /*
-    public function preLogUser($remoteSessionId)
-    {
-        if ($this->masterSlaveMode) {
-            $this->drivers[$this->slaveName]->preLogUser($remoteSessionId);
-            if (AuthService::getLoggedUser() == null) {
-                $this->drivers[$this->masterName]->preLogUser($remoteSessionId);
-                return;
-            }
-            return;
-        }
-
-        if ($this->getCurrentDriver()) {
-            $this->getCurrentDriver()->preLogUser($remoteSessionId);
-            return;
-        } else {
-            throw new Exception("No driver instanciated in multi driver!");
-        }
-    }
-    */
-
+    
     public function userExistsWrite($login)
     {
         if ($this->masterSlaveMode) {

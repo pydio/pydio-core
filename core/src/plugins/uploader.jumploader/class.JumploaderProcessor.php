@@ -205,9 +205,9 @@ class JumploaderProcessor extends Plugin
         if (isset($result["ERROR"])) {
             if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
-                $repository = ConfService::getRepository();
+
                 $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-                $context = new UserSelection($repository);
+                $context = UserSelection::fromContext($request->getAttribute("ctx"), []);
                 $destStreamURL = $context->currentBaseUrl().$dir."/";
 
                 if ($httpVars["partitionCount"] > 1) {

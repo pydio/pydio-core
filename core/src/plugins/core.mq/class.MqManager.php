@@ -32,8 +32,6 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\UnixProcess;
 
-use GuzzleHttp\Command\Guzzle\GuzzleClient;
-
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 // DL and install install vendor (composer?) https://github.com/Devristo/phpws
@@ -259,16 +257,23 @@ class MqManager extends Plugin
         if(!$this->msgExchanger) return;
         $action = $request->getAttribute("action");
         $httpVars = $request->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         switch ($action) {
             case "client_register_channel":
+                
                 $this->msgExchanger->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
                 break;
+            
             case "client_unregister_channel":
+                
                 $this->msgExchanger->unsuscribeFromChannel($httpVars["channel"], $httpVars["client_id"]);
                 break;
+            
             case "client_consume_channel":
+
                 if (AuthService::usersEnabled()) {
-                    $user = AuthService::getLoggedUser();
+                    $user = $ctx->getUser();
                     if ($user == null) {
                         throw new \Pydio\Core\Exception\AuthRequiredException();
                     }
@@ -279,7 +284,7 @@ class MqManager extends Plugin
                     $GROUP_PATH = '/';
                     $uId = 'shared';
                 }
-                $currentRepository = ConfService::getCurrentRepositoryId();
+                $currentRepository = $ctx->getRepositoryId();
                 $currentRepoMasks = array(); $regexp = null;
                 Controller::applyHook("role.masks", array($currentRepository, &$currentRepoMasks, AJXP_Permission::READ));
                 if(count($currentRepoMasks)){
@@ -324,11 +329,13 @@ class MqManager extends Plugin
     public function wsAuthenticate(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $this->logDebug("Entering wsAuthenticate");
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
         $configs = $this->getConfigs();
         /*if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
         }*/
-        $user = AuthService::getLoggedUser();
+        $user = $ctx->getUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
@@ -339,7 +346,7 @@ class MqManager extends Plugin
             $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
-        $this->logDebug("Authenticating user ".$user->id." through WebSocket");
+        $this->logDebug("Authenticating user ".$user->getId()." through WebSocket");
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $x->addChunk(new \Pydio\Core\Http\Message\XMLMessage($xml));
         $responseInterface = $responseInterface->withBody($x);

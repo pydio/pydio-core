@@ -52,7 +52,7 @@ class PluploadProcessor extends Plugin
 // Uncomment this one to fake upload time
 // usleep(5000);
 
-    public function unifyChunks($action, &$httpVars, &$fileVars)
+    public function unifyChunks($action, &$httpVars, &$fileVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
 
             $filename = Utils::decodeSecureMagic($httpVars["name"]);
@@ -63,8 +63,8 @@ class PluploadProcessor extends Plugin
 
             //error_log("currentChunk:".$chunk."  chunks: ".$chunks);
 
-            $repository = ConfService::getRepository();
-            $userSelection = new UserSelection($repository);
+            $repository = $ctx->getRepository();
+            $userSelection = UserSelection::fromContext($ctx, []);
             $dir = Utils::securePath($httpVars["dir"]);
             $destStreamURL = $userSelection->currentBaseUrl().$dir."/";
 

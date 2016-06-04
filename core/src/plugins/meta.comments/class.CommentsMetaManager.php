@@ -20,6 +20,7 @@
  */
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -104,10 +105,11 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
 
     /**
      * @param String $actionName
-     * @param Array $httpVars
-     * @param Array $fileVars
+     * @param array $httpVars
+     * @param array $fileVars
+     * @param ContextInterface $ctx
      */
-    public function switchActions($actionName, $httpVars, $fileVars)
+    public function switchActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
         $uniqNode = $userSelection->getUniqueNode();
@@ -121,7 +123,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
 
             case "post_comment":
 
-                $uId = AuthService::getLoggedUser()->getId();
+                $uId = $ctx->getUser()->getId();
                 $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
                     $content = substr(Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
@@ -141,8 +143,8 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                         $uniqNode->getRepositoryId(),
                         $uniqNode->getRepository()->securityScope(),
                         $uniqNode->getRepository()->getOwner(),
-                        AuthService::getLoggedUser()->getId(),
-                        AuthService::getLoggedUser()->getGroupPath());
+                        $ctx->getUser()->getId(),
+                        $ctx->getUser()->getGroupPath());
                 } else {
                     $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                     $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
@@ -166,8 +168,8 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     $data = $feedStore->findMetaObjectsByIndexPath(
                         $this->accessDriver->repository->getId(),
                         $uniqNode->getPath(),
-                        AuthService::getLoggedUser()->getId(),
-                        AuthService::getLoggedUser()->getGroupPath(),
+                        $ctx->getUser()->getId(),
+                        $ctx->getUser()->getGroupPath(),
                         $offset,
                         $limit,
                         $sortBy,
@@ -211,7 +213,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                 $data = json_decode($httpVars["comment_data"], true);
                 if ($feedStore === false) {
                     $reFeed = array();
-                    if($data["author"] != AuthService::getLoggedUser()->getId()) break;
+                    if($data["author"] != $ctx->getUser()->getId()) break;
                     foreach ($existingFeed as $fElement) {
                         if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
                             continue;
@@ -224,7 +226,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     HTMLWriter::charsetHeader("application/json");
                     echo json_encode($reFeed);
                 } else {
-                    $feedStore->dismissAlertById($data["uuid"], 1);
+                    $feedStore->dismissAlertById($ctx, $data["uuid"], 1);
                 }
 
                 break;

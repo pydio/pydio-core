@@ -22,6 +22,7 @@ namespace Pydio\Share\View;
 
 
 use DOMXPath;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -125,9 +126,7 @@ class MinisiteRenderer
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             ConfService::switchRootDir($repository);
-            //ConfService::loadRepositoryDriver();
-            $pService = PluginsService::getInstance();
-            //$pService->initActivePlugins();
+            PluginsService::getInstance();
             $errMessage = null;
             try {
                 $params = $_GET;
@@ -150,7 +149,8 @@ class MinisiteRenderer
                     }
                 }
                 Controller::registryReset();
-                $req = \Zend\Diactoros\ServerRequestFactory::fromGlobals()->withAttribute("action", $ACTION)->withParsedBody($params);
+                $ctx = Context::fromGlobalServices();
+                $req =  Controller::executableRequest($ctx, $ACTION, $params);
                 $response = Controller::run($req);
                 $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();
                 $emitter->emitResponse($req, $response);

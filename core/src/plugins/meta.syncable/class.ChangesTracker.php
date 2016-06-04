@@ -180,27 +180,27 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
     }
 
-    protected function getResyncTimestampFile($check = false){
-        $repo = ConfService::getRepository();
+    protected function getResyncTimestampFile(\Pydio\Core\Model\ContextInterface $ctx, $check = false){
+        $repo = $ctx->getRepository();
         $sScope = $repo->securityScope();
         $suffix = "-".$repo->getId();
-        if(!empty($sScope)) $suffix = "-".AuthService::getLoggedUser()->getId();
+        if(!empty($sScope)) $suffix = "-".$ctx->getUser()->getId();
         $file = $this->getPluginCacheDir(true, $check)."/storage_changes_time".$suffix;
         return $file;
     }
 
-    public function resyncAction($actionName, $httpVars, $fileVars)
+    public function resyncAction($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-            Controller::applyActionInBackground(ConfService::getRepository()->getId(), "resync_storage", $httpVars);
+            Controller::applyActionInBackground($contextInterface->getRepositoryId(), "resync_storage", $httpVars);
         }else{
-            $file = $this->getResyncTimestampFile(true);
+            $file = $this->getResyncTimestampFile($contextInterface, true);
             file_put_contents($file, time());
             $this->indexIsSync();
         }
     }
 
-    public function switchActions($actionName, $httpVars, $fileVars)
+    public function switchActions($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
         if(!dibi::isConnected()) {
@@ -222,11 +222,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             if(isSet($this->options["OBSERVE_STORAGE_EVERY"])){
                 $minutes = intval($this->options["OBSERVE_STORAGE_EVERY"]);
             }
-            $file = $this->getResyncTimestampFile();
+            $file = $this->getResyncTimestampFile($contextInterface);
             $last = 0;
             if(is_file($file)) $last = intval(file_get_contents($file));
             if(time() - $last >  $minutes * 60){
-                $this->resyncAction("resync_storage", array(), array());
+                $this->resyncAction("resync_storage", array(), array(), $contextInterface);
             }
         }
         if($this->options["REQUIRES_INDEXATION"]){

@@ -23,13 +23,14 @@ namespace Pydio\Core\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Conf\Core\AjxpGroupPathProvider;
 
 /**
  * @class AbstractAjxpUser
  * @abstract
  * User abstraction, the "conf" driver must provides its own implementation
  */
-interface UserInterface
+interface UserInterface extends AjxpGroupPathProvider
 {
     /**
      * @param bool $hidden
@@ -233,6 +234,11 @@ interface UserInterface
      * @return AJXP_Role
      */
     public function getMergedRole();
+
+    /**
+     * @return AJXP_Role
+     */
+    public function getPersonalRole();
 
     /**
      * @param bool $resolveAsParent

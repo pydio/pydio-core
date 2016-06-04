@@ -27,7 +27,7 @@ use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-abstract class AbstractAjxpUser implements AjxpGroupPathProvider, UserInterface
+abstract class AbstractAjxpUser implements UserInterface
 {
     /**
      * @var string
@@ -375,12 +375,19 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider, UserInterface
 
     abstract public function saveTemporaryData($key, $value);
 
+    /**
+     * @param String $groupPath
+     * @param bool $update
+     */
     public function setGroupPath($groupPath, $update = false)
     {
         if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;
     }
 
+    /**
+     * @return null|string
+     */
     public function getGroupPath()
     {
         if(!isSet($this->groupPath)) return null;
@@ -426,6 +433,11 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider, UserInterface
     public function getMergedRole()
     {
         return $this->mergedRole;
+    }
+
+    public function getPersonalRole()
+    {
+        return $this->personalRole;
     }
 
     protected function migrateRightsToPersonalRole()

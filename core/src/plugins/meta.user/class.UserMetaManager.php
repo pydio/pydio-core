@@ -21,12 +21,11 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -79,7 +78,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
         }
         $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
+                        <div class="panelHeader infoPanelGroup">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
                      ';
         $cdataFoot = '</div>';
         $cdataParts = "";
@@ -238,8 +237,11 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
             throw new Exception("Write actions are disabled in demo mode!");
         }
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $user = $ctx->getUser();
         $repo = $this->accessDriver->repository;
-        $user = AuthService::getLoggedUser();
+        
         if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
@@ -259,7 +261,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
                 if (isSet($httpVars[$key])) {
                     $newValues[$key] = Utils::decodeSecureMagic($httpVars[$key]);
                     if($data["type"] == "tags"){
-                        $this->updateTags(Utils::decodeSecureMagic($httpVars[$key]));
+                        $this->updateTags($ctx, Utils::decodeSecureMagic($httpVars[$key]));
                     }
                 } else {
                     if (!isset($original)) {
@@ -341,30 +343,34 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function listTags($actionName, &$httpVars, &$fileVars){
+    public function listTags(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface){
 
-        HTMLWriter::charsetHeader("application/json");
-        $tags = $this->loadTags();
+        $tags = $this->loadTags($requestInterface->getAttribute("ctx"));
         if(empty($tags)) $tags = array();
-        echo json_encode($tags);
+        $responseInterface = new \Zend\Diactoros\Response\JsonResponse($tags);
+        return $responseInterface;
 
     }
 
-    protected function loadTags(){
+    protected function loadTags(ContextInterface $ctx){
+
         $store = ConfService::getConfStorageImpl();
         if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return array();
         $data = array();
-        $store->simpleStoreGet("meta_user_tags", ConfService::getRepository()->getId(), "serial", $data);
+        $store->simpleStoreGet("meta_user_tags", $ctx->getRepositoryId(), "serial", $data);
         return $data;
+
     }
 
-    protected function updateTags($tagString){
+    protected function updateTags(ContextInterface $ctx, $tagString){
+
         $store = ConfService::getConfStorageImpl();
         if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return;
-        $tags = $this->loadTags();
+        $tags = $this->loadTags($ctx);
         $tags = array_merge($tags, array_map("trim", explode(",", $tagString)));
         $tags = array_unique($tags);
-        $store->simpleStoreSet("meta_user_tags", ConfService::getRepository()->getId(), array_values($tags), "serial");
+        $store->simpleStoreSet("meta_user_tags", $ctx->getRepositoryId(), array_values($tags), "serial");
+
     }
 
 }

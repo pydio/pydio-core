@@ -62,7 +62,8 @@ class dropboxWrapper implements IAjxpWrapper
 
     public function initPath($ajxpPath)
     {
-        $repo = ConfService::getRepository();
+        $parts = Utils::safeParseUrl($ajxpPath);
+        $repo = ConfService::getRepositoryById($parts["host"]);
         if (empty(self::$dropbox)) {
             $consumerKey = $repo->getOption('CONSUMER_KEY');
             $consumerSecret = $repo->getOption('CONSUMER_SECRET');
@@ -73,7 +74,6 @@ class dropboxWrapper implements IAjxpWrapper
         }
         $basePath = $repo->getOption("PATH");
         if(empty($basePath)) $basePath = "";
-        $parts = Utils::safeParseUrl($ajxpPath);
         $path = $basePath."/".ltrim($parts["path"], "/");
 
         if($path == "") return "/";

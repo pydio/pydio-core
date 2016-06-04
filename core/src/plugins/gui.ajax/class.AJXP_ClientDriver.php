@@ -25,6 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -68,9 +69,11 @@ class AJXP_ClientDriver extends Plugin
      */
     public function getBootConf(ServerRequestInterface &$request, ResponseInterface &$response){
 
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $out = array();
         Utils::parseApplicationGetParameters($request->getQueryParams(), $out, $_SESSION);
-        $config = $this->computeBootConf();
+        $config = $this->computeBootConf($ctx);
         $response = $response->withHeader("Content-type", "application/json;charset=UTF-8");
         $response->getBody()->write(json_encode($config));
 
@@ -86,6 +89,8 @@ class AJXP_ClientDriver extends Plugin
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
         $mess = ConfService::getMessages();
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
 
         $httpVars = $request->getParsedBody();
         HTMLWriter::internetExplorerMainDocumentHeader($response);
@@ -148,7 +153,7 @@ class AJXP_ClientDriver extends Plugin
         // PRECOMPUTE BOOT CONF
         $userAgent = $request->getServerParams()['HTTP_USER_AGENT'];
         if (!preg_match('/MSIE 7/',$userAgent) && !preg_match('/MSIE 8/',$userAgent)) {
-            $preloadedBootConf = $this->computeBootConf();
+            $preloadedBootConf = $this->computeBootConf($ctx);
             Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
             $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
         }
@@ -280,7 +285,11 @@ class AJXP_ClientDriver extends Plugin
         return false;
     }
 
-    public function computeBootConf()
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     */
+    public function computeBootConf(ContextInterface $ctx)
     {
         if (isSet($_GET["server_prefix_uri"])) {
             $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
@@ -311,7 +320,7 @@ class AJXP_ClientDriver extends Plugin
             $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
         }
         $config["usersEnabled"] = AuthService::usersEnabled();
-        $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
+        $config["loggedUser"] = ($ctx->hasUser());
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
         $timeoutTime = $this->getFilteredOption("CLIENT_TIMEOUT_TIME");

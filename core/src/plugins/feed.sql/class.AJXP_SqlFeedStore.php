@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -245,19 +246,21 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
     }
 
     /**
-     * @param $occurrences
-     * @param $alertId
+     * @inheritdoc
      */
-    public function dismissAlertById($alertId, $occurrences = 1)
+    public function dismissAlertById(ContextInterface $contextInterface, $alertId, $occurrences = 1)
     {
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
-        $userId = AuthService::getLoggedUser()->getId();
+        $userId = $contextInterface->getUser()->getId();
         if ($occurrences == 1) {
             dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
         } else {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+            if(!count($res)){
+                return;
+            }
             foreach ($res as $n => $row) {
                 $startEventRow = $row;
                 break;

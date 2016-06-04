@@ -20,8 +20,11 @@
  */
 namespace Pydio\Auth\Core;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
@@ -45,8 +48,13 @@ class AbstractAuthDriver extends Plugin
     public $driverName = "abstract";
     public $driverType = "auth";
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $action     = $requestInterface->getAttribute("action");
+        $httpVars   = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx        = $requestInterface->getAttribute("ctx");
+        
         switch ($action) {
 
             case "get_secure_token" :
@@ -60,7 +68,7 @@ class AbstractAuthDriver extends Plugin
             //------------------------------------
             case "pass_change":
 
-                $userObject = AuthService::getLoggedUser();
+                $userObject = $ctx->getUser();
                 if ($userObject == null || $userObject->getId() == "guest") {
                     header("Content-Type:text/plain");
                     print "SUCCESS";
@@ -109,10 +117,10 @@ class AbstractAuthDriver extends Plugin
             if ($logged == null) {
                 return $this->registryContributions;
             } else {
-                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXml($logged);
+                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($logged);
             }
         } else {
-            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXml(null);
+            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML(null);
         }
         $dom = new \DOMDocument();
         $dom->loadXML($xmlString);

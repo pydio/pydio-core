@@ -37,10 +37,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class VideoReader extends Plugin
 {
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $node = $selection->getUniqueNode();
 
         if ($action == "read_video_data") {

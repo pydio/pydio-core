@@ -42,6 +42,7 @@ use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -355,6 +356,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function uploadAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $selection = new UserSelection($this->repository);
         $httpVars = $request->getParsedBody();
         $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
@@ -519,6 +522,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function downloadAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $selection = new UserSelection($this->repository);
         $httpVars = $request->getParsedBody();
         $selection->initFromHttpVars($httpVars);
@@ -558,7 +563,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 if ($zip) {
                     // Make a temp zip and send it as download
-                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser = $ctx->getUser();
                     $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new PydioException("Error while compressing");
@@ -675,6 +680,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         parent::accessPreprocess($request);
         $this->filterByApi($request);
 
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $action = $request->getAttribute("action");
         $httpVars = $request->getParsedBody();
 
@@ -704,7 +711,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
                 // Make a temp zip
-                $loggedUser = AuthService::getLoggedUser();
+                $loggedUser = $ctx->getUser();
                 if (isSet($httpVars["archive_name"])) {
                     $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
                     $this->filterUserSelectionToHidden(array($localName));
@@ -863,8 +870,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if(!empty($taskId)){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting operation in background");
                 }
-                $loggedUser = AuthService::getLoggedUser();
-                if($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())){
+                $loggedUser = $ctx->getUser();
+                if($loggedUser != null && !$loggedUser->canWrite($ctx->getRepositoryId())){
                     throw new PydioException("You are not allowed to write", 207);
                 }
                 $success = $error = array();
@@ -1354,8 +1361,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                             "crt_depth"=> $crt_depth,
                             "crt_nodes"=> $crt_nodes,
                         );
-                        $fakeRequest = ServerRequestFactory::fromGlobals($request->getServerParams(), array(), $newBody, $request->getCookieParams());
-                        $fakeRequest = $fakeRequest->withAttribute("action", "ls");
+                        $fakeRequest = Controller::executableRequest($request->getAttribute("ctx"), "ls", $newBody);
                         $fakeRequest = $fakeRequest->withAttribute("parent_node_list", $nodesList);
                         $this->switchAction($fakeRequest, new Response());
                     }

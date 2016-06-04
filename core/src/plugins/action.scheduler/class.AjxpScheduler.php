@@ -247,7 +247,7 @@ class AjxpScheduler extends Plugin
         return 0;
     }
 
-    public function switchAction($action, $httpVars, $postProcessData)
+    public function switchAction($action, $httpVars, $postProcessData, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         switch ($action) {
 
@@ -302,7 +302,7 @@ class AjxpScheduler extends Plugin
                 $logFile = AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cmd_outputs".DIRECTORY_SEPARATOR."cron_commands.log";
                 $cronTiming = "*/5 * * * *";
                 HTMLWriter::charsetHeader("text/plain", "UTF-8");
-                print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=".AuthService::getLoggedUser()->getId()." -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
+                print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=".$contextInterface->getUser()->getId()." -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
 
                 break;
 
@@ -538,10 +538,10 @@ class AjxpScheduler extends Plugin
 
     }
 
-    public function fakeLongTask($action, $httpVars, $fileVars)
+    public function fakeLongTask($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $context)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        $this->logInfo(__FUNCTION__, "Running Fake task on ".AuthService::getLoggedUser()->getId());
+        $this->logInfo(__FUNCTION__, "Running Fake task on ".$context->getId());
         print('STARTING FAKE TASK');
         sleep($minutes * 30);
         print('ENDIND FAKE TASK');

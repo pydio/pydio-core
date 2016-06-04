@@ -39,13 +39,12 @@ class ImagePreviewer extends Plugin
 {
     private $currentDimension;
 
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "preview_data_proxy") {
@@ -56,7 +55,7 @@ class ImagePreviewer extends Plugin
                 return;
             }
             $this->logInfo('Preview', 'Preview content of '.$file, array("files" =>$selection->getUniqueFile()));
-            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository)) {
+            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $contextInterface->getRepository())) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;

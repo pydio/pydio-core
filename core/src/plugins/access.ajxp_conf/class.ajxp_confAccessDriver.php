@@ -28,6 +28,8 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
@@ -54,6 +56,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     protected $listSpecialRoles = AJXP_SERVER_DEBUG;
     protected $currentBookmarks = array();
+
+    /**
+     * @var ContextInterface
+     */
+    protected $currentContext;
 
     protected $rootNodes = array(
         "data" => array(
@@ -148,8 +155,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
     }
 
-    protected function getEditableParameters($withLabel = false){
-        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+    protected function getEditableParameters($currentUserIsGroupAdmin, $withLabel = false){
+
         $query = "//param|//global_param";
         if($currentUserIsGroupAdmin){
             $query = "//param[@scope]|//global_param[@scope]";
@@ -198,10 +205,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $actions;
     }
 
-    public function listAllActions($action, $httpVars, $fileVars)
+    public function listAllActions($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
-        //parent::accessPreprocess($action, $httpVars, $fileVars);
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $ctx->getUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         switch ($action) {
             //------------------------------------
@@ -222,7 +228,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "list_all_plugins_actions":
 
-                $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+                $currentUserIsGroupAdmin = ($loggedUser != null && $loggedUser->getGroupPath() != "/");
                 if($currentUserIsGroupAdmin){
                     // Group admin : do not allow actions edition
                     HTMLWriter::charsetHeader("application/json");
@@ -277,7 +283,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(isSet($_SESSION["ALL_PARAMS_CACHE"])){
                     $actions = $_SESSION["ALL_PARAMS_CACHE"];
                 }else{
-                    $actions = $this->getEditableParameters(true);
+                    $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
+                    $actions = $this->getEditableParameters($currentUserIsGroupAdmin, true);
                     $_SESSION["ALL_PARAMS_CACHE"] = $actions;
                 }
                 HTMLWriter::charsetHeader("application/json");
@@ -336,11 +343,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
-    public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response){
+    public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response)
+    {
+
         $httpVars = $request->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         if (isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && AuthService::usersEnabled()) {
-            $bmUser = AuthService::getLoggedUser();
-            $repositoryId = ConfService::getCurrentRepositoryId();
+            $bmUser = $ctx->getUser();
+            $repositoryId = $ctx->getRepositoryId();
             $bookmarks = $bmUser->getBookmarks($repositoryId);
             foreach ($bookmarks as $bm) {
                 if ($bm["PATH"] == $httpVars["bm_path"]) {
@@ -353,7 +364,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
-    public function recursiveSearchGroups($baseGroup, $term, $offset=-1, $limit=-1)
+    /**
+     * @param ContextInterface $ctx
+     * @param $baseGroup
+     * @param $term
+     * @param int $offset
+     * @param int $limit
+     */
+    public function recursiveSearchGroups(ContextInterface $ctx, $baseGroup, $term, $offset=-1, $limit=-1)
     {
         $groups = AuthService::listChildrenGroups($baseGroup);
         foreach ($groups as $groupId => $groupLabel) {
@@ -369,14 +387,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                 echo XMLWriter::renderNode($nodeKey, $groupLabel, false, $meta, true, false);
             }
-            $this->recursiveSearchGroups(rtrim($baseGroup, "/")."/".ltrim($groupId, "/"), $term);
+            $this->recursiveSearchGroups($ctx, rtrim($baseGroup, "/")."/".ltrim($groupId, "/"), $term);
 
         }
 
         $users = AuthService::listUsers($baseGroup, $term, $offset, $limit);
         foreach ($users as $userId => $userObject) {
             $gPath = $userObject->getGroupPath();
-            $realGroup = AuthService::filterBaseGroup(AuthService::getLoggedUser()->getGroupPath());
+            $realGroup = AuthService::filterBaseGroup($ctx->getUser()->getGroupPath());
             if(strlen($realGroup) > 1 && strpos($gPath, $realGroup) === 0){
                 $gPath = substr($gPath, strlen($realGroup));
             }
@@ -396,7 +414,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 
-    public function searchAction($action, $httpVars, $fileVars)
+    public function searchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         if(! Utils::decodeSecureMagic($httpVars["dir"]) == "/data/users") return;
         $query = Utils::decodeSecureMagic($httpVars["query"]);
@@ -404,14 +422,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(isSet($httpVars["limit"])) $limit = intval(Utils::sanitize($httpVars["limit"], AJXP_SANITIZE_ALPHANUM));
         if(isSet($httpVars["offset"])) $offset = intval(Utils::sanitize($httpVars["offset"], AJXP_SANITIZE_ALPHANUM));
         XMLWriter::header();
-        $this->recursiveSearchGroups("/", $query, $offset, $limit);
+        $this->recursiveSearchGroups($ctx, "/", $query, $offset, $limit);
         XMLWriter::close();
 
     }
 
-    protected function getMainTree(){
+    protected function getMainTree(ContextInterface $ctx){
         $rootNodes = $this->rootNodes;
-        if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/") {
+        $user = $ctx->getUser();
+        if ($user != null && $user->getGroupPath() != "/") {
             // Group Admin
             unset($rootNodes["config"]);
             unset($rootNodes["admin"]);
@@ -452,13 +471,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         XMLWriter::close();
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         //parent::accessPreprocess($action, $httpVars, $fileVars);
-        $loggedUser = AuthService::getLoggedUser();
-        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
+        $loggedUser = $ctx->getUser();
+        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) {
+            return ;
+        }
         if (AuthService::usersEnabled()) {
-            $currentBookmarks = AuthService::getLoggedUser()->getBookmarks(ConfService::getCurrentRepositoryId());
+            $currentBookmarks = $loggedUser->getBookmarks($ctx->getRepositoryId());
             // FLATTEN
             foreach ($currentBookmarks as $bm) {
                 $this->currentBookmarks[] = $bm["PATH"];
@@ -471,13 +492,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             }
         }
         $mess = ConfService::getMessages();
-        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
-        if ($currentUserIsGroupAdmin && ConfService::getAuthDriverImpl()->isAjxpAdmin(AuthService::getLoggedUser()->getId())) {
+        $currentUserIsGroupAdmin = ($loggedUser != null && $loggedUser->getGroupPath() != "/");
+        if ($currentUserIsGroupAdmin && ConfService::getAuthDriverImpl()->isAjxpAdmin($loggedUser->getId())) {
             $currentUserIsGroupAdmin = false;
         }
         $currentAdminBasePath = "/";
-        if (AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null) {
-            $currentAdminBasePath = AuthService::getLoggedUser()->getGroupPath();
+        if ($loggedUser!=null && $loggedUser->getGroupPath()!=null) {
+            $currentAdminBasePath = $loggedUser->getGroupPath();
         }
 
 
@@ -486,8 +507,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //	BASIC LISTING
             //------------------------------------
             case "ls":
-
-                $rootNodes = $this->getMainTree();
+                $this->currentContext = $ctx;
+                $rootNodes = $this->getMainTree($ctx);
                 $rootAttributes = array();
                 if(isSet($rootNodes["__metadata__"])){
                     $rootAttributes = $rootNodes["__metadata__"];
@@ -611,8 +632,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new \Exception($mess["ajxp_conf.65"]);
                 }
                 $r = new AJXP_Role($roleId);
-                if (AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null) {
-                    $r->setGroupPath(AuthService::getLoggedUser()->getGroupPath());
+                $user = $ctx->getUser();
+                if ($user !=null && $user->getGroupPath()!=null) {
+                    $r->setGroupPath($user->getGroupPath());
                 }
                 AuthService::updateRole($r);
                 XMLWriter::header();
@@ -886,7 +908,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 if($currentUserIsGroupAdmin){
                     // FILTER DATA FOR GROUP ADMINS
-                    $params = $this->getEditableParameters(false);
+                    $params = $this->getEditableParameters(true, false);
                     foreach($roleData["PARAMETERS"] as $scope => &$plugsParameters){
                         foreach($plugsParameters as $paramPlugin => &$parameters){
                             foreach($parameters as $pName => $pValue){
@@ -1059,7 +1081,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $user->personalRole->setAcl(Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
                 $user->save();
-                $loggedUser = AuthService::getLoggedUser();
+                $loggedUser = $ctx->getUser();
                 if ($loggedUser->getId() == $user->getId()) {
                     AuthService::updateUser($user);
                 }
@@ -1135,7 +1157,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $act = "remove";
                     $messId = "74";
                 }
-                $this->updateUserRole(Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS), $httpVars["role_id"], $act);
+                $this->updateUserRole($ctx->getUser(), Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS), $httpVars["role_id"], $act);
                 XMLWriter::header();
                 XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"], null);
                 XMLWriter::close();
@@ -1156,7 +1178,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $user->updateRolesOrder($roles);
                 $user->save("superuser");
-                $loggedUser = AuthService::getLoggedUser();
+                $loggedUser = $ctx->getUser();
                 if ($loggedUser->getId() == $user->getId()) {
                     AuthService::updateUser($user);
                 }
@@ -1194,7 +1216,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                     }
                     $userObject->save("superuser");
-                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser = $ctx->getUser();
                     if ($loggedUser->getId() == $userObject->getId()) {
                         AuthService::updateUser($userObject);
                     }
@@ -1224,7 +1246,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 foreach ($files as $index => $file) {
                     $userId = basename($file);
                     if (isSet($update)) {
-                        $userObject = $this->updateUserRole($userId, $roleId, $update);
+                        $userObject = $this->updateUserRole($ctx->getUser(), $userId, $roleId, $update);
                     } else {
                         $userObject = $confStorage->createUserObject($userId);
                         if(!AuthService::canAdministrate($userObject)){
@@ -1436,7 +1458,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (strstr($repDef["DRIVER"], "ajxp_template_") !== false) {
                     $templateId = substr($repDef["DRIVER"], 14);
                     $templateRepo = ConfService::getRepositoryById($templateId);
-                    $newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
+                    $newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"], $loggedUser->getId());
                     if(isSet($repDef["AJXP_SLUG"])){
                         $newRep->setSlug($repDef["AJXP_SLUG"]);
                     }
@@ -1494,7 +1516,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $newRep->isTemplate = true;
                 }
                 if ($currentUserIsGroupAdmin) {
-                    $newRep->setGroupPath(AuthService::getLoggedUser()->getGroupPath());
+                    $newRep->setGroupPath($ctx->getUser()->getGroupPath());
                 } else if (!empty($options["AJXP_GROUP_PATH_PARAMETER"])) {
                     $value =  Utils::securePath(rtrim($currentAdminBasePath, "/")."/".ltrim($options["AJXP_GROUP_PATH_PARAMETER"], "/"));
                     $newRep->setGroupPath($value);
@@ -1510,7 +1532,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $groupRole = AuthService::getRole("AJXP_GRP_".$currentAdminBasePath, true);
                         $groupRole->setAcl($newRep->getId(), $defaultRights);
                     }
-                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser = $ctx->getUser();
                     $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
                     $loggedUser->recomputeMergedRole();
                     $loggedUser->save("superuser");
@@ -1546,10 +1568,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repository->setSlug();
                     ConfService::replaceRepository($repId, $repository);
                 }
-                if (AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath() != null) {
+                $ctxUser = $ctx->getUser();
+                if ($ctxUser!=null && $ctxUser->getGroupPath() != null) {
                     $rgp = $repository->getGroupPath();
                     if($rgp == null) $rgp = "/";
-                    if (strlen($rgp) < strlen(AuthService::getLoggedUser()->getGroupPath())) {
+                    if (strlen($rgp) < strlen($ctxUser->getGroupPath())) {
                         $repository->setWriteable(false);
                     }
                 }
@@ -2318,7 +2341,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
-        $groupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        $groupAdmin = ($this->currentContext->hasUser() && $this->currentContext->getUser()->getGroupPath() != "/");
         if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1 && !$groupAdmin){
             $nodeKey = "/data/".$root."/";
             $meta = array(
@@ -2350,7 +2373,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         }
         $mess = ConfService::getMessages();
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $this->currentContext->getUser();
         $userArray = array();
         $logger = AJXP_Logger::getInstance();
         if(method_exists($logger, "usersLastConnection")){
@@ -2433,7 +2456,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
             </columns>');
         if(!AuthService::usersEnabled()) return array();
-        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        $ctxUser = $this->currentContext->getUser();
+        $currentUserIsGroupAdmin = ($ctxUser != null && $ctxUser->getGroupPath() != "/");
         $roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
         ksort($roles);
         $mess = ConfService::getMessages();
@@ -2526,11 +2550,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
             "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
         );
-        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        $ctxUser = $this->currentContext->getUser();
+        $currentUserIsGroupAdmin = ($ctxUser != null && $ctxUser->getGroupPath() != "/");
         if($currentUserIsGroupAdmin){
             $criteria = array_merge($criteria, array(
                     "owner_user_id" => AJXP_FILTER_EMPTY,
-                    "groupPath"     => "regexp:/^".str_replace("/", "\/", AuthService::getLoggedUser()->getGroupPath()).'/',
+                    "groupPath"     => "regexp:/^".str_replace("/", "\/", $ctxUser->getGroupPath()).'/',
                 ));
         }else{
             $criteria["parent_uuid"] = AJXP_FILTER_EMPTY;
@@ -2560,7 +2585,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $editable = $repoObject->isWriteable();
             if ($repoObject->isTemplate) {
                 $icon = "hdd_external_mount.png";
-                if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/") {
+                if ($ctxUser != null && $ctxUser->getGroupPath() != "/") {
                     $editable = false;
                 }
             }
@@ -2862,7 +2887,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return strcmp($key1, $key2);
     }
 
-    public function updateUserRole($userId, $roleId, $addOrRemove, $updateSubUsers = false)
+    public function updateUserRole(UserInterface $ctxUser, $userId, $roleId, $addOrRemove, $updateSubUsers = false)
     {
         $confStorage = ConfService::getConfStorageImpl();
         $user = $confStorage->createUserObject($userId);
@@ -2876,8 +2901,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $user->removeRole($roleId);
         }
         $user->save("superuser");
-        $loggedUser = AuthService::getLoggedUser();
-        if ($loggedUser->getId() == $user->getId()) {
+        if ($ctxUser->getId() == $user->getId()) {
             AuthService::updateUser($user);
         }
         return $user;

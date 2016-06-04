@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\FTP;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
@@ -485,11 +486,12 @@ class ftpAccessWrapper implements IAjxpWrapper
     }
 
     /**
+     * @param RepositoryInterface $repository
      * @return array Array(UID, GID) to be used to compute permission
      */
-    public function getRemoteUserId()
+    public function getRemoteUserId($repository)
     {
-        $repoUid = ConfService::getRepository()->getOption("UID");
+        $repoUid = $repository->getOption("UID");
         if (!empty($repoUid)) {
             return array($repoUid, "-1");
         }

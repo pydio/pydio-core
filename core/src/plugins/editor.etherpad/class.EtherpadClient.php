@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -35,12 +36,12 @@ class EtherpadClient extends Plugin
     public $baseURL = "http://localhost:9001";
     public $apiKey = "";
 
-    public function switchAction($actionName, $httpVars, $fileVars)
+    public function switchAction($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $this->baseURL = rtrim($this->getFilteredOption("ETHERPAD_SERVER"), "/");
         $this->apiKey =  $this->getFilteredOption("ETHERPAD_APIKEY");
 
-        $userSelection = new UserSelection(ConfService::getRepository(), $httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if ($userSelection->isEmpty()){
             throw new Exception("Empty selection");
         }
@@ -67,9 +68,9 @@ class EtherpadClient extends Plugin
 
         require_once("etherpad-client/etherpad-lite-client.php");
         $client = new EtherpadLiteClient($this->apiKey,$this->baseURL."/api");
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $ctx->getUser();
         $userName = $loggedUser->getId();
-        $userLabel = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userName);
+        $userLabel = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userName);
         $res = $client->createAuthorIfNotExistsFor($userName, $userLabel);
         $authorID = $res->authorID;
         $res2 = $client->createGroupIfNotExistsFor($loggedUser->getGroupPath());

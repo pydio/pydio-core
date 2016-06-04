@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -136,8 +137,9 @@ class AbstractAccessDriver extends Plugin
 
         ConfService::detectRepositoryStreams(true);
         $mess = ConfService::getMessages();
-        $selection = new UserSelection(ConfService::getRepository());
-        $selection->initFromHttpVars($httpVars);
+
+        $ctx = $requestInterface->getAttribute("ctx");
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
 
         $repositoryId = $this->repository->getId();
@@ -151,7 +153,9 @@ class AbstractAccessDriver extends Plugin
 
         // Check rights
         if (AuthService::usersEnabled()) {
-            $loggedUser = AuthService::getLoggedUser();
+            /** @var ContextInterface $ctx */
+            $ctx = $requestInterface->getAttribute("ctx");
+            $loggedUser = $ctx->getUser();
             if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)
                 || (isSet($httpVars["moving_files"]) && !$loggedUser->canWrite($repositoryId))
             ){

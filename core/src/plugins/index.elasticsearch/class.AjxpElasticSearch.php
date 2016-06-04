@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
@@ -137,6 +138,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     {
         $actionName = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $ctxUser = $ctx->getUser();
 
         $messages = ConfService::getMessages();
         $repoId = $this->accessDriver->repository->getId();
@@ -291,11 +295,11 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $searchField = $httpVars["field"];
 
             if ($scope == "user") {
-                if (AuthService::usersEnabled() && AuthService::getLoggedUser() == null) {
+                if (AuthService::usersEnabled() && $ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
-                $sParts[] = "ajxp_user:".AuthService::getLoggedUser()->getId();
+                $sParts[] = "ajxp_user:".$ctxUser->getId();
             } else {
                 $sParts[] = "ajxp_scope:shared";
             }
@@ -334,7 +338,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     $fieldQuery,
                     $qb->filter()->bool()
                         ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "user")))
-                        ->addMust(new Elastica\Filter\Term(array("user" => AuthService::getLoggedUser()->getId())))
+                        ->addMust(new Elastica\Filter\Term(array("user" => $ctxUser->getId())))
                 )
             );
 

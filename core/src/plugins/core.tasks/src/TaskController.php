@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Services\AuthService;
@@ -54,8 +55,10 @@ class TaskController extends Plugin implements SqlTableProvider
         } else {
             $task->setId(Utils::createGUID());
         }
-        $task->setUserId(AuthService::getLoggedUser()->getId());
-        $task->setWsId(ConfService::getCurrentRepositoryId());
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $task->setUserId($ctx->getUser()->getId());
+        $task->setWsId($ctx->getRepositoryId());
         if(count($task->nodes)){
             foreach($task->nodes as $index => $path){
                 $task->nodes[$index] = "pydio://".$task->getWsId().$path;
@@ -67,18 +70,24 @@ class TaskController extends Plugin implements SqlTableProvider
 
         $action = $request->getAttribute("action");
         $taskService = TaskService::getInstance();
-        if(AuthService::getLoggedUser() == null){
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        if(!$ctx->hasUser()){
             return;
         }
         switch ($action){
+
             case "tasks_list":
-                $tasks = $taskService->getCurrentRunningTasks(AuthService::getLoggedUser(), ConfService::getRepository());
+
+                $tasks = $taskService->getCurrentRunningTasks($ctx->getUser(), $ctx->getRepository());
                 $response = new JsonResponse($tasks);
                 break;
+
             case "task_info":
                 $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 $response = new JsonResponse($task);
                 break;
+
             case "task_create":
                 $newTask = new Task();
                 $this->initTaskFromApi($request, $newTask);
@@ -88,6 +97,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 }
                 $response = new JsonResponse($newTask);
                 break;
+
             case "task_update":
                 $taskData = $request->getParsedBody()["request_body"];
                 $newTask = $taskService->getTaskById($request->getParsedBody()["taskId"]);
@@ -95,6 +105,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 $taskService->updateTask($newTask);
                 $response = new JsonResponse($newTask);
                 break;
+
             case "task_toggle_status":
                 $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 if(!empty($task)){
@@ -105,6 +116,7 @@ class TaskController extends Plugin implements SqlTableProvider
                     }
                 }
                 break;
+
             case "task_delete":
                 if($taskService->deleteTask($request->getParsedBody()["taskId"])){
                     $response = new JsonResponse(new UserMessage("Ok"));
@@ -122,6 +134,7 @@ class TaskController extends Plugin implements SqlTableProvider
      * @param string $details
      */
     public function attachTasksToNode(AJXP_Node &$node, $isContextNode = false, $details = "all"){
+
         if($details == "all"){
             $t = TaskService::getInstance()->getActiveTasksForNode($node);
             if(count($t)){
@@ -135,6 +148,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 ], true);
             }
         }
+
     }
 
     /**
@@ -143,16 +157,17 @@ class TaskController extends Plugin implements SqlTableProvider
      */
     public function enrichConsumeChannel(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
-        if(AuthService::getLoggedUser() == null || ConfService::getRepository() == null){
-            return;
-        }
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        if(!$ctx->hasUser() || !$ctx->hasRepository()) return;
+
         $respType = &$responseInterface->getBody();
         if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
             $respType = new \Pydio\Core\Http\Response\SerializableResponseStream();
             $responseInterface = $responseInterface->withBody($respType);
         }
         if($respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
-            $taskList = TaskService::getInstance()->getCurrentRunningTasks(AuthService::getLoggedUser(), ConfService::getRepository());
+            $taskList = TaskService::getInstance()->getCurrentRunningTasks($ctx->getUser(), $ctx->getRepository());
             $respType->addChunk(new TaskListMessage($taskList));
         }
 

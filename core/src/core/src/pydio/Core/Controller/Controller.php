@@ -27,6 +27,7 @@ use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -36,6 +37,7 @@ use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -247,11 +249,31 @@ class Controller
         return $response;
     }
 
+    /**
+     * @param Task $task
+     */
     public static function applyTaskInBackground(Task $task){
+
         $parameters = $task->getParameters();
         $task->setStatus(Task::STATUS_RUNNING);
         TaskService::getInstance()->updateTask($task);
         self::applyActionInBackground($task->getWsId(), $task->getAction(), $parameters, $task->getUserId(), "", $task->getId());
+
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param string $action
+     * @param array $parameters
+     * @return ServerRequestInterface
+     */
+    public static function executableRequest(ContextInterface $context, $action, $parameters = []){
+        $request = ServerRequestFactory::fromGlobals();
+        $request = $request
+            ->withAttribute("ctx", $context)
+            ->withAttribute("action", $action)
+            ->withParsedBody($parameters);
+        return $request;
     }
 
     /**
@@ -345,10 +367,7 @@ class Controller
             }
         }
 
-        $repoObject = ConfService::getRepository();
-        if(empty($repoObject)){
-            $repoObject = ConfService::getRepositoryById($currentRepositoryId);
-        }
+        $repoObject = ConfService::getRepositoryById($currentRepositoryId);
         $clearEnv = false;
         if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
             $encodedCreds = AJXP_Safe::getEncodedCredentialString();
@@ -506,7 +525,7 @@ class Controller
         }else{
 
             $httpVars = $request->getParsedBody();
-            $result = $plugInstance->$methodName($request->getAttribute("action"), $httpVars, $_FILES);
+            $result = $plugInstance->$methodName($request->getAttribute("action"), $httpVars, $_FILES, $request->getAttribute("ctx"));
             // May have been modified
             $request = $request->withParsedBody($httpVars);
 

@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -369,6 +370,9 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         $actionName = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
         if($actionName !== "toggle_watch") return;
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $ctxUser = $ctx->getUser();
 
         $us = new UserSelection($this->accessDriver->repository, $httpVars);
         $node = $us->getUniqueNode();
@@ -381,7 +385,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        $userId = AuthService::getLoggedUser()!= null ? AuthService::getLoggedUser()->getId() : "shared";
+        $userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
 
         if ($cmd == "watch_stop" && isSet($meta) && isSet($meta[$userId])) {
             unset($meta[$userId]);

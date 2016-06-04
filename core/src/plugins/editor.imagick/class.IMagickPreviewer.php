@@ -55,15 +55,14 @@ class IMagickPreviewer extends Plugin
         }
     }
 
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
         $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
         if (empty($convert)) {
             return false;
         }
-        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository));
-        $selection = new UserSelection($repository, $httpVars);
+        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $contextInterface->getRepository()));
+        $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "imagick_data_proxy") {
@@ -121,8 +120,8 @@ class IMagickPreviewer extends Plugin
             $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = Utils::decodeSecureMagic($httpVars["src_file"]);
-                if($repository->hasContentFilter()){
-                    $contentFilter = $repository->getContentFilter();
+                if($contextInterface->getRepository()->hasContentFilter()){
+                    $contentFilter = $contextInterface->getRepository()->getContentFilter();
                     $srcfile = $contentFilter->filterExternalPath($srcfile);
                 }
                 $size = filesize($destStreamURL."/".$srcfile);

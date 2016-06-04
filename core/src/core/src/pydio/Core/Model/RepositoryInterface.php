@@ -70,17 +70,17 @@ interface RepositoryInterface
      * @param string $uniqueUser
      * @return RepositoryInterface
      */
-    public function createSharedChild($newLabel, $newOptions, $parentId = null, $owner = null, $uniqueUser = null);
+    public function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser = null);
 
     /**
      * Create a child from this repository if it's a template
      * @param string $newLabel
      * @param array $newOptions
-     * @param string $owner
+     * @param string $creator
      * @param string $uniqueUser
      * @return RepositoryInterface
      */
-    public function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null);
+    public function createTemplateChild($newLabel, $newOptions, $creator = null, $uniqueUser = null);
 
     /**
      * Recompute uuid

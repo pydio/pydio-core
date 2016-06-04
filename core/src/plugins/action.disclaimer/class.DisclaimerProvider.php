@@ -38,8 +38,10 @@ class DisclaimerProvider extends Plugin
     public function toggleDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $httpVars = $request->getParsedBody();
-        $u = AuthService::getLoggedUser();
-        $u->personalRole->setParameterValue(
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $u = $ctx->getUser();
+        $u->getPersonalRole()->setParameterValue(
             "action.disclaimer",
             "DISCLAIMER_ACCEPTED",
             $httpVars["validate"] == "true"  ? "yes" : "no",
@@ -52,7 +54,7 @@ class DisclaimerProvider extends Plugin
             $u->save("superuser");
             AuthService::updateUser($u);
             ConfService::switchUserToActiveRepository($u);
-            $force = $u->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+            $force = $u->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if ($force != "" && $u->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
                 $passId = $force;

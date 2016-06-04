@@ -20,7 +20,9 @@
  */
 
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\AuthService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,13 +37,16 @@ class FlexUploadProcessor extends Plugin
 
     public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+
         //------------------------------------------------------------
         // SPECIAL HANDLING FOR FLEX UPLOADER RIGHTS FOR THIS ACTION
         //------------------------------------------------------------
-        if (\Pydio\Core\Services\AuthService::usersEnabled()) {
-            $loggedUser = \Pydio\Core\Services\AuthService::getLoggedUser();
+        if (AuthService::usersEnabled()) {
+            $loggedUser = $ctx->getUser();
             if ($request->getAttribute("action") == "upload" &&
-                ($loggedUser == null || !$loggedUser->canWrite(\Pydio\Core\Services\ConfService::getCurrentRepositoryId().""))
+                ($loggedUser == null || !$loggedUser->canWrite($ctx->getRepositoryId().""))
                 && isSet($request->getUploadedFiles()['Filedata'])) {
                 header('HTTP/1.0 ' . '410 Not authorized');
                 die('Error 410 Not authorized!');

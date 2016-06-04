@@ -22,6 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -123,6 +124,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         $repoId = $this->accessDriver->repository->getId();
         $actionName = $requestInterface->getAttribute("action");
         $httpVars   = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $ctxUser = $ctx->getUser();
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
@@ -270,11 +274,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $sParts[] = "$searchField:true";
             }
             if ($scope == "user" && AuthService::usersEnabled()) {
-                if (AuthService::getLoggedUser() == null) {
+                if ($ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
-                $sParts[] = "ajxp_user:".AuthService::getLoggedUser()->getId();
+                $sParts[] = "ajxp_user:".$ctxUser->getId();
             } else {
                 $sParts[] = "ajxp_scope:shared";
             }

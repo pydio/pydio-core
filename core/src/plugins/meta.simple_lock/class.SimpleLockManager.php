@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
@@ -62,12 +63,14 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
     public function applyChangeLock(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
-        
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
             throw new Exception("Write actions are disabled in demo mode!");
         }
         $repo = $this->accessDriver->repository;
-        $user = AuthService::getLoggedUser();
+        $user = $ctx->getUser();
         if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
@@ -80,7 +83,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
             $this->metaStore->setMetadata(
                 $selection->getUniqueNode(),
                 SimpleLockManager::METADATA_LOCK_NAMESPACE,
-                array("lock_user" => AuthService::getLoggedUser()->getId()),
+                array("lock_user" => $ctx->getUser()->getId()),
                 false,
                 AJXP_METADATA_SCOPE_GLOBAL
             );

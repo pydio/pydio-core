@@ -29,11 +29,10 @@ use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -350,7 +349,7 @@ class ConfService
 
 
     /**
-     * @param AbstractAjxpUser $loggedUser
+     * @param UserInterface $loggedUser
      * @param String|int $parameterId
      * @return bool
      */

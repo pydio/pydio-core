@@ -101,11 +101,12 @@ class ZohoEditor extends Plugin
     }
 
 
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
-        $repository = ConfService::getRepository();
-        if(AuthService::getLoggedUser() != null){
-            $repoWriteable = AuthService::getLoggedUser()->canWrite($repository->getId());
+        $repository = $ctx->getRepository();
+        $loggedUser = $ctx->getUser();
+        if($loggedUser != null){
+            $repoWriteable = $loggedUser->canWrite($repository->getId());
         }else{
             $repoWriteable = false;
         }

@@ -22,6 +22,10 @@ namespace Pydio\Access\Core\Model;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 
@@ -53,16 +57,32 @@ class UserSelection
     private $repository;
 
     /**
-     * Construction selector
-     * @param Repository|null $repository
-     * @param array|null $httpVars
+     * @var ContextInterface
      */
-    public function __construct($repository = null, $httpVars = null)
+    private $context;
+    
+    
+
+    /**
+     * @param ContextInterface $ctx
+     * @param array $parsedBody
+     * @return UserSelection
+     */
+    public static function fromContext(ContextInterface $ctx, $parsedBody){
+        $selection = new UserSelection($ctx->getRepository(), $parsedBody, $ctx->getUser());
+        return $selection;
+    }
+
+    /**
+     * Construction selector
+     * @param RepositoryInterface|null $repository
+     * @param array|null $httpVars
+     * @param UserInterface $user
+     */
+    public function __construct($repository = null, $httpVars = null, $user = null)
     {
         $this->files = array();
-        if(isSet($repository)){
-            $this->repository = $repository;
-        }
+        $this->context = Context::contextWithObjects($user, $repository);
         if(iSset($httpVars)){
             $this->initFromHttpVars($httpVars);
         }
@@ -101,6 +121,24 @@ class UserSelection
         }
 
     }
+
+    /**
+     * @return ContextInterface
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param ContextInterface $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+
 
     /**
      *
@@ -248,17 +286,15 @@ class UserSelection
         if (isSet($this->nodes) && is_array($this->nodes)) {
             return $this->nodes[0];
         }
-        if(!isSet($this->repository)){
+        if(!$this->context->hasRepository()){
             throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
         }
-        $user = AuthService::getLoggedUser();
-        if (!\Pydio\Core\Services\AuthService::usersEnabled() && $user!=null && !$user->canWrite($this->repository->getId())) {
-            throw new \Exception("You have no right on this action.");
-        }
-
         $currentFile = $this->getUniqueFile();
-        $urlBase = "pydio://".$this->repository->getId();
+        $urlBase = "pydio://".$this->context->getRepositoryId();
         $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        if($this->context->hasUser()){
+            $ajxpNode->setUser($this->context->getUser()->getId());
+        }
         return $ajxpNode;
 
     }
@@ -272,23 +308,27 @@ class UserSelection
         if (isSet($this->nodes)) {
             return $this->nodes;
         }
-        if(!isSet($this->repository)){
+        if(!$this->context->hasRepository()){
             throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
         }
-        $urlBase = "pydio://".$this->repository->getId();
+        $urlBase = "pydio://".$this->context->getRepositoryId();
         $nodes = array();
         foreach ($this->files as $file) {
-            $nodes[] = new AJXP_Node($urlBase.$file);
+            $node = new AJXP_Node($urlBase.$file);
+            if($this->context->hasUser()){
+                $node->setUser($this->context->getUser()->getId());
+            }
+            $nodes[] = $node;
         }
         return $nodes;
 
     }
 
     public function currentBaseUrl(){
-        if(!isSet($this->repository)){
+        if(!$this->context->hasRepository()){
             throw new \Exception("UserSelection::currentBaseUrl: cannot build nodes URL without a proper repository");
         }
-        return "pydio://".$this->repository->getId();
+        return "pydio://".$this->context->getRepositoryId();
     }
 
     /**

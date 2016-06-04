@@ -31,6 +31,8 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -70,6 +72,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return ;
         $action     = $requestInterface->getAttribute("action");
         $httpVars   = $requestInterface->getParsedBody();
+        $ctx        = $requestInterface->getAttribute("ctx");
 
         if ($action == "edit") {
             if (isSet($httpVars["sub_action"])) {
@@ -115,9 +118,9 @@ class UserDashboardDriver extends AbstractAccessDriver
                 }
                 if (!empty($strippedDir) && array_key_exists($strippedDir, $rootNodes)) {
                     if ($strippedDir == "users") {
-                        $x->addChunk($this->listUsers());
+                        $x->addChunk($this->listUsers($ctx));
                     } else if ($strippedDir == "teams") {
-                        $x->addChunk($this->listTeams());
+                        $x->addChunk($this->listTeams($ctx));
                     }
                 } else {
                     $responseInterface  = new EmptyResponse();
@@ -192,9 +195,10 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     /**
+     * @param ContextInterface $ctx
      * @return NodesList
      */
-    public function listTeams()
+    public function listTeams(ContextInterface $ctx)
     {
         $conf = ConfService::getConfStorageImpl();
         $nodesList = new NodesList();
@@ -227,9 +231,10 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     /**
+     * @param ContextInterface $ctx
      * @return NodesList
      */
-    public function listUsers()
+    public function listUsers(ContextInterface $ctx)
     {
         $nodesList = new NodesList();
         $nodesList->initColumnsData('fileList');
@@ -239,7 +244,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) {
             return $nodesList;
         }
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $ctx->getUser();
         $users = ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()); // AuthService::listUsers();
         $mess = ConfService::getMessages();
         $count = 0;
@@ -284,77 +289,5 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         return $nodesList;
     }
-
-    /*
-    public function listRepositories()
-    {
-        $nodesList = new NodesList();
-        $nodesList->initColumnsData('fileList');
-        $nodesList->appendColumn('ajxp_conf.8', 'ajxp_label');
-        $nodesList->appendColumn('user_dash.9', 'parent_label');
-        $nodesList->appendColumn('user_dash.9', 'repo_accesses');
-
-        $repoArray = array();
-        $loggedUser = AuthService::getLoggedUser();
-        $count = 0;
-        $repos = ConfService::listRepositoriesWithCriteria(array(
-            "owner_user_id" => $loggedUser->getId()
-        ), $count);
-
-        $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
-        $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-        if($searchAll || $displayAll){
-            $baseGroup = "/";
-        }else{
-            $baseGroup = AuthService::filterBaseGroup("/");
-        }
-        AuthService::setGroupFiltering(false);
-        $users = AuthService::listUsers($baseGroup);
-
-        $minisites = $this->listSharedFiles("minisites");
-
-        foreach ($repos as $repoIndex => $repoObject) {
-            if($repoObject->getAccessType() == "ajxp_conf") continue;
-            if (!$repoObject->hasOwner() || $repoObject->getOwner() != $loggedUser->getId()) {
-                continue;
-            }
-            if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
-            $name = (isSet($minisites[$repoIndex]) ? "[Minisite] ":""). Utils::xmlEntities(TextEncoder::toUTF8($repoObject->getDisplay()));
-            $repoArray[$name] = $repoIndex;
-        }
-        // Sort the list now by name
-        ksort($repoArray);
-        foreach ($repoArray as $name => $repoIndex) {
-            $repoObject =& $repos[$repoIndex];
-            $repoAccesses = array();
-            foreach ($users as $userId => $userObject) {
-                if($userObject->getId() == $loggedUser->getId()) continue;
-                $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-                $acl = $userObject->mergedRole->getAcl($repoObject->getId());
-                if(!empty($acl)) $repoAccesses[] = $label. " (".$acl.")";
-            }
-            $parent = $repoObject->getParentId();
-            $parentRepo =& $repos[$parent];
-            $parentLabel = $this->metaIcon("folder-open").$parentRepo->getDisplay();
-            $repoPath = $repoObject->getOption("PATH");
-            $parentPath = $parentRepo->getOption("PATH");
-            $parentLabel .= " (".str_replace($parentPath, "", $repoPath).")";
-
-            $metaData = array(
-                "text"          => $name,
-                "repository_id" => $repoIndex,
-                "icon"			=> "document_open_remote.png",
-                "openicon"		=> "document_open_remote.png",
-                "parentname"	=> "/repositories",
-                "parent_label"  => $parentLabel,
-                "repo_accesses" => count($repoAccesses) ?  $this->metaIcon("share-sign").implode(", ", $repoAccesses) : "",
-                "ajxp_mime" 	=> "shared_repository"
-            );
-            $nodesList->addBranch(new AJXP_Node("/repositories/$repoIndex", $metaData));
-            //XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
-        }
-        return $nodesList;
-    }
-    */
-
+    
 }

@@ -33,6 +33,11 @@
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
+use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+
 global $AJXP_GLUE_GLOBALS;
 if (!isSet($AJXP_GLUE_GLOBALS)) {
     $AJXP_GLUE_GLOBALS = array();

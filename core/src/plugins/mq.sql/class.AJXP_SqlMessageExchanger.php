@@ -95,6 +95,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param $channelName
      * @param $clientId
      * @return mixed
+     * @throws Exception
      */
     public function suscribeToChannel($channelName, $clientId)
     {

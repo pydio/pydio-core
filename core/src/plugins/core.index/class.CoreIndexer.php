@@ -21,6 +21,8 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
@@ -49,13 +51,14 @@ class CoreIndexer extends Plugin {
     {
 
         $actionName = $requestInterface->getAttribute("action");
-        $httpVars = $requestInterface->getParsedBody();
+        $httpVars   = $requestInterface->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx        = $requestInterface->getAttribute("ctx");
         $this->currentTaskId = $requestInterface->getAttribute("pydio-task-id") OR null;
 
         if ($actionName !== "index") return null;
 
-        $repository = ConfService::getRepository();
-        $userSelection = new UserSelection($repository, $httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if($userSelection->isEmpty()){
             $userSelection->addFile("/");
         }
@@ -91,7 +94,7 @@ class CoreIndexer extends Plugin {
                 }
             }else{
                 try{
-                    $this->recursiveIndexation($node);
+                    $this->recursiveIndexation($ctx, $node);
                 }catch (Exception $e){
                     $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
                 }
@@ -108,12 +111,11 @@ class CoreIndexer extends Plugin {
      * @param int $depth
      * @throws Exception
      */
-    public function recursiveIndexation($node, $depth = 0)
+    public function recursiveIndexation(ContextInterface $ctx, $node, $depth = 0)
     {
         $repository = $node->getRepository();
-        $user = $node->getUser();
         $messages = ConfService::getMessages();
-        if($user == null && AuthService::usersEnabled()) $user = AuthService::getLoggedUser();
+        $user = $ctx->getUser();
         if($depth == 0){
             $this->debug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());
             $this->setIndexStatus("RUNNING", str_replace("%s", TextEncoder::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
@@ -147,7 +149,7 @@ class CoreIndexer extends Plugin {
                 $childUrl = $childNode->getUrl();
                 if(is_dir($childUrl)){
                     $this->debug("Entering recursive indexation for ".$childUrl);
-                    $this->recursiveIndexation($childNode, $depth + 1);
+                    $this->recursiveIndexation($ctx, $childNode, $depth + 1);
                 }else{
                     try {
                         $this->debug("Indexing Node ".$childUrl);
@@ -173,7 +175,7 @@ class CoreIndexer extends Plugin {
 
     /**
      * @param \Pydio\Access\Core\Model\Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      * @return string
      */
     protected function buildIndexLockKey($repository, $user){
@@ -192,7 +194,7 @@ class CoreIndexer extends Plugin {
      * @param String $status
      * @param String $message
      * @param Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      * @param boolean $stoppable
      */
     protected function setIndexStatus($status, $message, $repository, $user, $stoppable = true)
@@ -209,7 +211,7 @@ class CoreIndexer extends Plugin {
 
     /**
      * @param Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      * @return array Array(STATUS, Message)
      */
     protected function getIndexStatus($repository, $user)
@@ -224,7 +226,7 @@ class CoreIndexer extends Plugin {
 
     /**
      * @param Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      */
     protected function releaseStatus($repository, $user)
     {
@@ -239,7 +241,7 @@ class CoreIndexer extends Plugin {
 
     /**
      * @param Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      */
     protected function requireInterrupt($repository, $user)
     {
@@ -248,7 +250,7 @@ class CoreIndexer extends Plugin {
 
     /**
      * @param Repository $repository
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      * @return boolean
      */
     protected function isInterruptRequired($repository, $user)
