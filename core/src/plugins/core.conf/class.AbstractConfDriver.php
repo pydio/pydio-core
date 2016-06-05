@@ -611,9 +611,7 @@ abstract class AbstractConfDriver extends Plugin
                 ConfService::switchRootDir($repository_id);
                 PluginsService::getInstance();
                 if (AuthService::usersEnabled() && $loggedUser !== null) {
-                    $activeRepId = $ctx->getRepositoryId();
-                    $loggedUser->setArrayPref("history", "last_repository", $activeRepId);
-                    $loggedUser->setArrayPref("repository_last_connected", $activeRepId, time());
+                    $loggedUser->setArrayPref("repository_last_connected", $repository_id, time());
                     $loggedUser->save("user");
                 }
 
