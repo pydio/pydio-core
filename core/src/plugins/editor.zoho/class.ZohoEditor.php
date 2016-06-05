@@ -152,8 +152,8 @@ class ZohoEditor extends Plugin
             $_SESSION["ZOHO_CURRENT_EDITED"] = $nodeUrl;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
 
-            if ($this->getFilteredOption("USE_ZOHO_AGENT", $repository)) {
-                $saveUrl = $this->getFilteredOption("ZOHO_AGENT_URL", $repository);
+            if ($this->getContextualOption($ctx, "USE_ZOHO_AGENT")) {
+                $saveUrl = $this->getContextualOption($ctx, "ZOHO_AGENT_URL");
             } else {
                 $saveUrl = $target."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/save_zoho.php";
             }
@@ -161,15 +161,15 @@ class ZohoEditor extends Plugin
             $b64Sig = $this->signID($_SESSION["ZOHO_CURRENT_UUID"]);
 
             $params = array(
-                'id' => $_SESSION["ZOHO_CURRENT_UUID"],
-                'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository),
-                'output' => 'url',
-                'lang' => $this->getFilteredOption("ZOHO_LANGUAGE"),
-                'filename' => TextEncoder::toUTF8(basename($file)),
-                'persistence' => 'false',
-                'format' => $extension,
-                'mode' => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
-                'saveurl'   => $saveUrl."?signature=".$b64Sig
+                'id'            => $_SESSION["ZOHO_CURRENT_UUID"],
+                'apikey'        => $this->getContextualOption($ctx, "ZOHO_API_KEY"),
+                'output'        => 'url',
+                'lang'          => $this->getContextualOption($ctx, "ZOHO_LANGUAGE"),
+                'filename'      => TextEncoder::toUTF8(basename($file)),
+                'persistence'   => 'false',
+                'format'        => $extension,
+                'mode'          => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
+                'saveurl'       => $saveUrl."?signature=".$b64Sig
             );
 
             $service = "exportwriter";
@@ -215,6 +215,7 @@ class ZohoEditor extends Plugin
             }
 
         } else if ($action == "retrieve_from_zohoagent") {
+
             $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
             $id = $_SESSION["ZOHO_CURRENT_UUID"];
             $ext = pathinfo($targetFile, PATHINFO_EXTENSION);
@@ -230,8 +231,10 @@ class ZohoEditor extends Plugin
 
             $b64Sig = $this->signID($id);
 
-            if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository) ) {
-                $url =  $this->getFilteredOption("ZOHO_AGENT_URL",$repository)."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
+            if ($this->getContextualOption($ctx, "USE_ZOHO_AGENT") ) {
+
+                $url =  $this->getContextualOption($ctx, "ZOHO_AGENT_URL")."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
+
                 $data = Utils::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);

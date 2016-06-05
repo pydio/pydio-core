@@ -173,7 +173,7 @@ class AJXP_ClientDriver extends Plugin
 
         $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
         $crtTheme = $this->pluginConf["GUI_THEME"];
-        $additionalFrameworks = $this->getFilteredOption("JS_RESOURCES_BEFORE");
+        $additionalFrameworks = $this->getContextualOption($ctx, "JS_RESOURCES_BEFORE");
         $ADDITIONAL_FRAMEWORKS = "";
         if( !empty($additionalFrameworks) ){
             $frameworkList = explode(",", $additionalFrameworks);
@@ -304,18 +304,18 @@ class AJXP_ClientDriver extends Plugin
         }
         $config["zipEnabled"] = ConfService::zipBrowsingEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::zipCreationEnabled();
-        $customIcon = $this->getFilteredOption("CUSTOM_ICON");
+        $customIcon = $this->getContextualOption($ctx, "CUSTOM_ICON");
         self::filterXml($customIcon);
         $config["customWording"] = array(
-            "welcomeMessage" => $this->getFilteredOption("CUSTOM_WELCOME_MESSAGE"),
+            "welcomeMessage" => $this->getContextualOption($ctx, "CUSTOM_WELCOME_MESSAGE"),
             "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
             "icon"			 => $customIcon,
-            "iconWidth"		 => $this->getFilteredOption("CUSTOM_ICON_WIDTH"),
-            "iconHeight"     => $this->getFilteredOption("CUSTOM_ICON_HEIGHT"),
-            "iconOnly"       => $this->getFilteredOption("CUSTOM_ICON_ONLY"),
-            "titleFontSize"	 => $this->getFilteredOption("CUSTOM_FONT_SIZE")
+            "iconWidth"		 => $this->getContextualOption($ctx, "CUSTOM_ICON_WIDTH"),
+            "iconHeight"     => $this->getContextualOption($ctx, "CUSTOM_ICON_HEIGHT"),
+            "iconOnly"       => $this->getContextualOption($ctx, "CUSTOM_ICON_ONLY"),
+            "titleFontSize"	 => $this->getContextualOption($ctx, "CUSTOM_FONT_SIZE")
         );
-        $cIcBin = $this->getFilteredOption("CUSTOM_ICON_BINARY");
+        $cIcBin = $this->getContextualOption($ctx, "CUSTOM_ICON_BINARY");
         if (!empty($cIcBin)) {
             $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
         }
@@ -323,7 +323,7 @@ class AJXP_ClientDriver extends Plugin
         $config["loggedUser"] = ($ctx->hasUser());
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
-        $timeoutTime = $this->getFilteredOption("CLIENT_TIMEOUT_TIME");
+        $timeoutTime = $this->getContextualOption($ctx, "CLIENT_TIMEOUT_TIME");
         if (empty($timeoutTime)) {
             $to = $config["session_timeout"];
         } else {
@@ -331,17 +331,17 @@ class AJXP_ClientDriver extends Plugin
         }
         if($currentIsMinisite) $to = -1;
         $config["client_timeout"] = intval($to);
-        $config["client_timeout_warning"] = floatval($this->getFilteredOption("CLIENT_TIMEOUT_WARN"));
+        $config["client_timeout_warning"] = floatval($this->getContextualOption($ctx, "CLIENT_TIMEOUT_WARN"));
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-        $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
+        $analytic = $this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
                 "id"=> 		$analytic,
-                "domain" => $this->getFilteredOption('GOOGLE_ANALYTICS_DOMAIN'),
-                "event" => 	$this->getFilteredOption('GOOGLE_ANALYTICS_EVENT')
+                "domain" => $this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_DOMAIN'),
+                "event" => 	$this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_EVENT')
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();

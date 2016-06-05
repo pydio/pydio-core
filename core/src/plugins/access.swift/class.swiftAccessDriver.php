@@ -127,9 +127,15 @@ class swiftAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function makeSharedRepositoryOptions($httpVars, $repository)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $httpVars
+     * @return array
+     * @throws \Exception
+     */
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
         $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
         return $newOptions;
     }

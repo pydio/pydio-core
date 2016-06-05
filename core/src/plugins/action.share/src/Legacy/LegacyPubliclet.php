@@ -27,6 +27,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -326,11 +327,12 @@ class LegacyPubliclet
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param ShareCenter $shareCenter
      * @param ShareStore $shareStore
      * @param ShareRightsManager $shareRightManager
      */
-    public static function migrateLegacyMeta($shareCenter, $shareStore, $shareRightManager, $dryRun = true){
+    public static function migrateLegacyMeta(ContextInterface $ctx, $shareCenter, $shareStore, $shareRightManager, $dryRun = true){
         $metaStoreDir = AJXP_DATA_PATH."/plugins/metastore.serial";
         $publicFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         // TODO 1: Check all metastores of all repositories?

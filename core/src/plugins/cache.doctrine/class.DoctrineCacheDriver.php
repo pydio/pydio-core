@@ -62,7 +62,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
      * @param ContextInterface $ctx
      * @param array $options array of options specific to the cache driver.
      */
-    public function init(ContextInterface $ctx, $options)
+    public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
 

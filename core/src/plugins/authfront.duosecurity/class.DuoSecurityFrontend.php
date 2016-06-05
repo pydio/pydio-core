@@ -102,10 +102,12 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
 
         if($loggingResult > 0 && $loggedUser != null){
 
+            // Create an updated context
+            $ctx = \Pydio\Core\Model\Context::fromGlobalServices();
             require_once($this->getBaseDir()."/duo_php/duo_web.php");
-            $appUnique = $this->getFilteredOption("DUO_AUTH_AKEY");
-            $iKey = $this->getFilteredOption("DUO_AUTH_IKEY");
-            $sKey = $this->getFilteredOption("DUO_AUTH_SKEY");
+            $appUnique  = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
+            $iKey       = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
+            $sKey       = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
             $res = Duo::signRequest($iKey, $sKey, $appUnique, $loggedUser->getId());
 
@@ -131,14 +133,17 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             return;
         }
 
-        $httpVars = $requestInterface->getParsedBody();
-        $u = AuthService::getLoggedUser();
+        $httpVars   = $requestInterface->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx        = $requestInterface->getAttribute("ctx");
+        $u = $ctx->getUser();
         if($u == null) return;
         $sigResponse = $httpVars["sig_response"];
+
         require_once($this->getBaseDir()."/duo_php/duo_web.php");
-        $appUnique = $this->getFilteredOption("DUO_AUTH_AKEY");
-        $iKey = $this->getFilteredOption("DUO_AUTH_IKEY");
-        $sKey = $this->getFilteredOption("DUO_AUTH_SKEY");
+        $appUnique  = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
+        $iKey       = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
+        $sKey       = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
         $verif = Duo::verifyResponse($iKey, $sKey, $appUnique, $sigResponse);
 
@@ -148,7 +153,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             $u->recomputeMergedRole();
             AuthService::updateUser($u);
             ConfService::switchUserToActiveRepository($u);
-            $force = $u->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+            $force = $u->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if ($force != "" && $u->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
                 $passId = $force;

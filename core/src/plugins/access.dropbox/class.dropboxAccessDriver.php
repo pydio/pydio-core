@@ -154,9 +154,9 @@ class dropboxAccessDriver extends fsAccessDriver
         Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
 
-    public function makeSharedRepositoryOptions($httpVars, $repository)
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
         $newOptions["DROPBOX_OAUTH_TOKENS"] = $this->getTokens();
         return $newOptions;
     }

@@ -180,7 +180,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             }
 
             $textQuery = $httpVars["query"];
-            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
+            if($this->getContextualOption($ctx, "AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
                 }else if($textQuery[strlen($textQuery)-1] != "*" ){
@@ -244,7 +244,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
-            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            $maxResults = $this->getContextualOption($ctx, "MAX_RESULTS");
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
@@ -327,7 +327,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
-            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            $maxResults = $this->getContextualOption($ctx, "MAX_RESULTS");
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
@@ -528,7 +528,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $ajxpNode->loadNodeInfo();
 
         $parseContent = $this->indexContent;
-        if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
+        if ($parseContent && $ajxpNode->bytesize > $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
 

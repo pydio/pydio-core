@@ -21,6 +21,7 @@
 namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -71,11 +72,12 @@ interface IAjxpWrapperProvider
     public function nodeWillChange($node, $newSize = null);
 
     /**
+     * @param ContextInterface $ctx
      * @param $nodePath
      * @param $nodeName
      * @param $isLeaf
      * @param $lsOptions
      * @return mixed
      */
-    public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions);
+    public function filterNodeName(ContextInterface $ctx, $nodePath, $nodeName, &$isLeaf, $lsOptions);
 }

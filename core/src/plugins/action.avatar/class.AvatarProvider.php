@@ -34,8 +34,9 @@ class AvatarProvider extends Plugin
 {
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $provider = $this->getFilteredOption("AVATAR_PROVIDER");
-        $type = $this->getFilteredOption("GRAVATAR_TYPE");
+        $ctx = $requestInterface->getAttribute("ctx");
+        $provider = $this->getContextualOption($ctx, "AVATAR_PROVIDER");
+        $type = $this->getContextualOption($ctx, "GRAVATAR_TYPE");
         $httpVars = $requestInterface->getParsedBody();
         if ($requestInterface->getAttribute("action") == "get_avatar_url") {
             $suffix = "";

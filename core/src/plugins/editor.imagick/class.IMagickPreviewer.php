@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
@@ -57,11 +58,11 @@ class IMagickPreviewer extends Plugin
 
     public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
+        $convert = $this->getContextualOption($contextInterface, "IMAGE_MAGICK_CONVERT");
         if (empty($convert)) {
             return false;
         }
-        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $contextInterface->getRepository()));
+        $flyThreshold = 1024*1024*intval($this->getContextualOption($contextInterface, "ONTHEFLY_THRESHOLD"));
         $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
@@ -101,7 +102,7 @@ class IMagickPreviewer extends Plugin
             } else if ($this->extractAll) { // on the fly extract mode
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
-                $files = $this->listPreviewFiles($file, $prefix);
+                $files = $this->listPreviewFiles($contextInterface, $file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
                 return false;
@@ -201,11 +202,11 @@ class IMagickPreviewer extends Plugin
         return $files;
     }
 
-    protected function listPreviewFiles($file, $prefix)
+    protected function listPreviewFiles(ContextInterface $ctx, $file, $prefix)
     {
         $files = array();
         $index = 0;
-        $unoconv =  $this->getFilteredOption("UNOCONV");
+        $unoconv =  $this->getContextualOption($ctx, "UNOCONV");
         if (!empty($unoconv)) {
             $officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
             $extension = pathinfo($file, PATHINFO_EXTENSION);

@@ -38,8 +38,8 @@ class EtherpadClient extends Plugin
 
     public function switchAction($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
-        $this->baseURL = rtrim($this->getFilteredOption("ETHERPAD_SERVER"), "/");
-        $this->apiKey =  $this->getFilteredOption("ETHERPAD_APIKEY");
+        $this->baseURL = rtrim($this->getContextualOption($ctx, "ETHERPAD_SERVER"), "/");
+        $this->apiKey =  $this->getContextualOption($ctx, "ETHERPAD_APIKEY");
 
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if ($userSelection->isEmpty()){

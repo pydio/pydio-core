@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -29,54 +31,58 @@ interface AJXP_MessageExchanger
 {
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @return mixed
      */
-    public function suscribeToChannel($channelName, $clientId);
+    public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId);
 
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @return mixed
      */
-    public function unsuscribeFromChannel($channelName, $clientId);
+    public function unsuscribeFromChannel(ContextInterface $ctx, $channelName, $clientId);
 
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @param $userId
      * @param $userGroup
      * @return mixed
      */
-    public function consumeInstantChannel($channelName, $clientId, $userId, $userGroup);
+    public function consumeInstantChannel(ContextInterface $ctx, $channelName, $clientId, $userId, $userGroup);
 
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $filter
      * @return mixed
      */
-    public function consumeWorkerChannel($channelName, $filter = null);
-
+    public function consumeWorkerChannel(ContextInterface $ctx, $channelName, $filter = null);
 
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param string $channel Name of the persistant queue to create
      * @param object $message Message to send
      * @return mixed
      */
-    public function publishWorkerMessage($channel, $message);
+    public function publishWorkerMessage(ContextInterface $ctx, $channel, $message);
 
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param $channel
      * @param $message
      * @return mixed
      */
-    public function publishInstantMessage($channel, $message);
-
-
+    public function publishInstantMessage(ContextInterface $ctx, $channel, $message);
+    
 }

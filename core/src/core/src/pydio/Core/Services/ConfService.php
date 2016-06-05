@@ -906,7 +906,7 @@ class ConfService
     /**
      * Add dynamically created repository
      *
-     * @param \Pydio\Access\Core\Model\Repository $oRepository
+     * @param \Pydio\Core\Model\RepositoryInterface $oRepository
      * @return -1|null if error
      */
     public static function addRepository($oRepository)
@@ -914,7 +914,7 @@ class ConfService
         return self::getInstance()->addRepositoryInst($oRepository);
     }
     /**
-     * @param \Pydio\Access\Core\Model\Repository $oRepository
+     * @param Repository|\Pydio\Core\Model\RepositoryInterface $oRepository
      * @return -1|null on error
      */
     public function addRepositoryInst($oRepository)

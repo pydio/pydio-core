@@ -120,6 +120,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     {
         $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
         $uniqNode = $userSelection->getUniqueNode();
+        /** @var AJXP_FeedStore $feedStore */
         $feedStore = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {
@@ -131,7 +132,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
             case "post_comment":
 
                 $uId = $ctx->getUser()->getId();
-                $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
+                $limit = $this->getContextualOption($ctx, "COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
                     $content = substr(Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
                 } else {

@@ -34,6 +34,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -71,7 +72,7 @@ class ShareCenter extends Plugin
      */
     private $accessDriver;
     /**
-     * @var Repository
+     * @var RepositoryInterface
      */
     private $repository;
     private $urlBase;
@@ -95,6 +96,11 @@ class ShareCenter extends Plugin
      * @var ShareRightsManager
      */
     private $rightsManager;
+
+    /**
+     * @var ContextInterface
+     */
+    private $currentContext;
 
     /**************************/
     /* PLUGIN LIFECYCLE METHODS
@@ -154,8 +160,8 @@ class ShareCenter extends Plugin
             // All share- actions
             $xpathesToRemove[] = 'action[contains(@name, "share-")]';
         }else{
-            $folderSharingAllowed = $this->getAuthorization("folder", "any");
-            $fileSharingAllowed = $this->getAuthorization("file", "any");
+            $folderSharingAllowed = $this->getAuthorization($ctx, "folder", "any");
+            $fileSharingAllowed   = $this->getAuthorization($ctx, "file", "any");
             if($fileSharingAllowed === false){
                 // Share file button
                 $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
@@ -221,15 +227,18 @@ class ShareCenter extends Plugin
     /**************************/
     /**
      * Compute right to create shares based on plugin options
+     * @param ContextInterface $ctx
      * @param string $nodeType "file"|"folder"
      * @param string $shareType "any"|"minisite"|"workspace"
      * @return bool
      */
-    protected function getAuthorization($nodeType, $shareType = "any"){
-        $filesMini = $this->getFilteredOption("ENABLE_FILE_PUBLIC_LINK");
-        $filesInternal = $this->getFilteredOption("ENABLE_FILE_INTERNAL_SHARING");
-        $foldersMini = $this->getFilteredOption("ENABLE_FOLDER_PUBLIC_LINK");
-        $foldersInternal = $this->getFilteredOption("ENABLE_FOLDER_INTERNAL_SHARING");
+    protected function getAuthorization(ContextInterface $ctx, $nodeType, $shareType = "any"){
+
+        $filesMini       = $this->getContextualOption($ctx, "ENABLE_FILE_PUBLIC_LINK");
+        $filesInternal   = $this->getContextualOption($ctx, "ENABLE_FILE_INTERNAL_SHARING");
+        $foldersMini     = $this->getContextualOption($ctx, "ENABLE_FOLDER_PUBLIC_LINK");
+        $foldersInternal = $this->getContextualOption($ctx, "ENABLE_FOLDER_INTERNAL_SHARING");
+
         if($shareType == "any"){
             return ($nodeType == "file" ? $filesInternal || $filesMini : $foldersInternal || $foldersMini);
         }else if($shareType == "minisite"){
@@ -238,20 +247,7 @@ class ShareCenter extends Plugin
             return ($nodeType == "file" ? $filesInternal : $foldersInternal);
         }
         return false;
-        /*
-        if($nodeType == "file"){
-            return $this->getFilteredOption("ENABLE_FILE_PUBLIC_LINK") !== false;
-        }else{
-            $opt = $this->getFilteredOption("ENABLE_FOLDER_SHARING");
-            if($shareType == "minisite"){
-                return ($opt == "minisite" || $opt == "both");
-            }else if($shareType == "workspace"){
-                return ($opt == "workspace" || $opt == "both");
-            }else{
-                return ($opt !== "disable");
-            }
-        }
-        */
+
     }
 
     /**
@@ -288,6 +284,7 @@ class ShareCenter extends Plugin
      * @return ShareStore
      */
     public function getShareStore(){
+
         if(!isSet($this->shareStore)){
             $hMin = 32;
             if(isSet($this->repository)){
@@ -438,6 +435,7 @@ class ShareCenter extends Plugin
      * @throws \Exception
      */
     public function preProcessDownload(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
+
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             $hash = $_SESSION["CURRENT_MINISITE"];
             $share = $this->getShareStore()->loadShareObject($hash);
@@ -451,10 +449,22 @@ class ShareCenter extends Plugin
                 }
             }
         }
+
     }
 
-    public function migrateLegacyShares($action, $httpVars, $fileVars){
-        LegacyPubliclet::migrateLegacyMeta($this, $this->getShareStore(), $this->getRightsManager(), $httpVars["dry_run"] !== "run");
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function migrateLegacyShares(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
+    {
+        LegacyPubliclet::migrateLegacyMeta(
+            $requestInterface->getAttribute("ctx"),
+            $this,
+            $this->getShareStore(),
+            $this->getRightsManager(),
+            $requestInterface->getParsedBody()["dry_run"] !== "run"
+        );
     }
 
     /**
@@ -469,8 +479,7 @@ class ShareCenter extends Plugin
         $action = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
         /** @var ContextInterface $ctx */
-        $ctx = $requestInterface->getAttribute("ctx");
-
+        $this->currentContext = $ctx = $requestInterface->getAttribute("ctx");
 
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
             throw new \Exception("Cannot find access driver!");
@@ -527,7 +536,7 @@ class ShareCenter extends Plugin
 
                 if ($subAction == "delegate_repo") {
 
-                    $auth = $this->getAuthorization("folder", "workspace");
+                    $auth = $this->getAuthorization($ctx, "folder", "workspace");
                     if(!$auth){
                         $mess = ConfService::getMessages();
                         throw new \Exception($mess["351"]);
@@ -1320,7 +1329,8 @@ class ShareCenter extends Plugin
             if($n->isLeaf()) $hasFile = true;
             else $hasDir = true;
         }
-        if( ( $hasDir && !$this->getAuthorization("folder", "minisite") ) || ($hasFile && !$this->getAuthorization("file"))){
+        if( ( $hasDir && !$this->getAuthorization($this->currentContext, "folder", "minisite") )
+            || ($hasFile && !$this->getAuthorization($this->currentContext, "file"))){
             throw new \Exception(103);
         }
         if($setFilter){ // Either it's a file, or many nodes are shared
@@ -1377,7 +1387,8 @@ class ShareCenter extends Plugin
             throw new \Exception($mess["share_center.352"]);
         }
 
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $this->currentContext->getUser();
+        $currentRepo = $this->currentContext->getRepository();
 
         if (isSet($editingRepo)) {
 
@@ -1395,7 +1406,7 @@ class ShareCenter extends Plugin
             $newScope = ((isSet($httpVars["share_scope"]) && $httpVars["share_scope"] == "public") ? "public" : "private");
             $oldScope = $editingRepo->getOption("SHARE_ACCESS");
             $currentOwner = $editingRepo->getOwner();
-            if($newScope != $oldScope && $currentOwner != AuthService::getLoggedUser()->getId()){
+            if($newScope != $oldScope && $currentOwner != $loggedUser->getId()){
                 $mess = ConfService::getMessages();
                 throw new \Exception($mess["share_center.224"]);
             }
@@ -1405,7 +1416,7 @@ class ShareCenter extends Plugin
             }
             if(isSet($httpVars["transfer_owner"])){
                 $newOwner = $httpVars["transfer_owner"];
-                if($newOwner != $currentOwner && $currentOwner != AuthService::getLoggedUser()->getId()){
+                if($newOwner != $currentOwner && $currentOwner != $loggedUser->getId()){
                     $mess = ConfService::getMessages();
                     throw new \Exception($mess["share_center.224"]);
                 }
@@ -1419,13 +1430,13 @@ class ShareCenter extends Plugin
 
         } else {
 
-            $options = $this->accessDriver->makeSharedRepositoryOptions($httpVars, $this->repository);
+            $options = $this->accessDriver->makeSharedRepositoryOptions($this->currentContext, $httpVars);
             // TMP TESTS
             $options["SHARE_ACCESS"] = $httpVars["share_scope"];
-            $newRepo = $this->repository->createSharedChild(
+            $newRepo = $currentRepo->createSharedChild(
                 $label,
                 $options,
-                $this->repository->getId(),
+                $currentRepo->getId(),
                 $loggedUser->getId(),
                 null
             );
@@ -1530,8 +1541,9 @@ class ShareCenter extends Plugin
         // 103 : current user is not allowed to share
         // SUCCESS
         // 200
-        $loggedUser = AuthService::getLoggedUser();
-        $actRights = $loggedUser->mergedRole->listActionsStatesFor($this->repository);
+        $loggedUser = $this->currentContext->getUser();
+        $currentRepo = $this->currentContext->getRepository();
+        $actRights = $loggedUser->getMergedRole()->listActionsStatesFor($currentRepo);
         if (isSet($actRights["share"]) && $actRights["share"] === false) {
             $mess = ConfService::getMessages();
             throw new \Exception($mess["351"]);
@@ -1539,8 +1551,8 @@ class ShareCenter extends Plugin
 
         $newRepo = $this->createOrLoadSharedRepository($httpVars, $update);
 
-        $selection = new UserSelection($this->repository, $httpVars);
-        $this->getRightsManager()->assignSharedRepositoryPermissions($this->repository, $newRepo, $update, $users, $groups, $selection);
+        $selection = UserSelection::fromContext($this->currentContext, $httpVars);
+        $this->getRightsManager()->assignSharedRepositoryPermissions($currentRepo, $newRepo, $update, $users, $groups, $selection);
 
         // HANDLE WATCHES ON CHILDREN AND PARENT
         foreach($users as $userName => $userEntry){
@@ -1548,19 +1560,19 @@ class ShareCenter extends Plugin
                 $newRepo->getId(),
                 $userName,
                 $userEntry["WATCH"],
-                AuthService::getLoggedUser()->getId()
+                $loggedUser->getId()
             );
         }
         $this->toggleWatchOnSharedRepository(
             $newRepo->getId(),
-            AuthService::getLoggedUser()->getId(),
+            $loggedUser->getId(),
             ($httpVars["self_watch_folder"] == "true")
         );
 
         $this->logInfo(($update?"Update":"New")." Share", array(
             "file" => "'".$selection->getUniqueFile()."'",
             "files" => $selection->getFiles(),
-            "repo_uuid" => $this->repository->getId(),
+            "repo_uuid" => $currentRepo->getId(),
             "shared_repo_uuid" => $newRepo->getId()
         ));
 
@@ -1611,7 +1623,7 @@ class ShareCenter extends Plugin
         $originalHttpVars = $httpVars;
         $ocsStore = new OCS\Model\SQLStore();
         $ocsClient = new OCS\Client\OCSClient();
-        $userSelection = new UserSelection($this->repository, $httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
         $mess = ConfService::getMessages();
 
         /**
@@ -1621,7 +1633,7 @@ class ShareCenter extends Plugin
 
         // PUBLIC LINK
         if(isSet($httpVars["enable_public_link"])){
-            if(!$this->getAuthorization($ajxpNode->isLeaf() ? "file":"folder", "minisite")){
+            if(!$this->getAuthorization($ctx, $ajxpNode->isLeaf() ? "file":"folder", "minisite")){
                 throw new \Exception($mess["share_center." . ($ajxpNode->isLeaf() ? "225" : "226")]);
             }
             $this->shareObjectFromParameters($httpVars, $hiddenUserEntries, $shareObjects, "public");
@@ -1651,7 +1663,7 @@ class ShareCenter extends Plugin
 
         $users = array(); $groups = array();
         $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
-        if((count($users) || count($groups)) && !$this->getAuthorization($ajxpNode->isLeaf()?"file":"folder", "workspace")){
+        if((count($users) || count($groups)) && !$this->getAuthorization($ctx, $ajxpNode->isLeaf()?"file":"folder", "workspace")){
             $users = $groups = array();
         }
         foreach($hiddenUserEntries as $entry){
@@ -1671,7 +1683,7 @@ class ShareCenter extends Plugin
 
         foreach($shareObjects as $shareObject){
 
-            $shareObject->setParentRepositoryId($this->repository->getId());
+            $shareObject->setParentRepositoryId($ctx->getRepositoryId());
             $shareObject->attachToRepository($newRepo->getId());
             $shareObject->save();
             if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){

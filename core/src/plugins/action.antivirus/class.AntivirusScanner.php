@@ -34,10 +34,11 @@ class AntivirusScanner extends Plugin
 
 
         // This block scans or doesn't scan the file. This is based on plugin parameters
+        $trace = $this->getContextualOption($newNode->getContext(), "TRACE");
         if ($this->file_size < $this->scan_max_size) {
             if ($this->scan_all == true) {
                 if ($this->inList()==true) {
-                    if ($this->getFilteredOption("TRACE") == false) {return;}
+                    if ($trace === false) {return;}
                     $this->scanLater();
                     return ;
                 } else {
@@ -49,7 +50,7 @@ class AntivirusScanner extends Plugin
                     $this->scanNow();
                     return ;
                 } else {
-                    if ($this->getFilteredOption("TRACE") == false) {return;}
+                    if ($trace === false) {return;}
                     $this->scanLater();
                     return ;
                 }

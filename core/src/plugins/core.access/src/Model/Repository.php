@@ -36,7 +36,7 @@ define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
  * Class Repository
  * @package Pydio\Access\Core\Model
  */
-class Repository implements AjxpGroupPathProvider, RepositoryInterface
+class Repository implements RepositoryInterface
 {
     /**
      * @var string

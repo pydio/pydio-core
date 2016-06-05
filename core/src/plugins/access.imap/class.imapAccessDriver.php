@@ -174,7 +174,7 @@ class imapAccessDriver extends fsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
-    public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions)
+    public function filterNodeName(ContextInterface $contextInterface, $nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
         return true;
     }

@@ -25,6 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
@@ -100,14 +101,19 @@ class MqManager extends Plugin
             $this->logDebug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
             Controller::applyHook("msg.notification", array(&$notification));
         } else {
-            if($this->msgExchanger) $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
+            if($this->msgExchanger) {
+                $this->msgExchanger->publishWorkerMessage(
+                    $notification->getNode()->getContext(),
+                    "user_notifications",
+                    $notification);
+            }
         }
     }
 
-    public function consumeQueue($action, $httpVars, $fileVars)
+    public function consumeQueue($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
-        $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
+        $queueObjects = $this->msgExchanger->consumeWorkerChannel($ctx, "user_notifications");
         if (is_array($queueObjects)) {
             $this->logDebug("Processing notification queue, ".count($queueObjects)." notifs to handle");
             foreach ($queueObjects as $notification) {
@@ -157,15 +163,18 @@ class MqManager extends Plugin
 
     public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
+        $ctx = Context::fromGlobalServices();
+        $currentUser = $ctx->getUser();
+
         if ($repositoryId === AJXP_REPO_SCOPE_ALL) {
             $userId = $targetUserId;
         } else {
             $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
             if ($scope == "USER") {
                 if($targetUserId) $userId = $targetUserId;
-                else $userId = AuthService::getLoggedUser()->getId();
+                else $userId = $currentUser->getId();
             } else if ($scope == "GROUP") {
-                $gPath = AuthService::getLoggedUser()->getGroupPath();
+                $gPath = $currentUser->getGroupPath();
             } else if (isSet($targetUserId)) {
                 $userId = $targetUserId;
             } else if (isSet($targetGroupPath)) {
@@ -187,7 +196,7 @@ class MqManager extends Plugin
         }
 
         if ($this->msgExchanger) {
-            $this->msgExchanger->publishInstantMessage("nodes:$repositoryId", $message);
+            $this->msgExchanger->publishInstantMessage($ctx, "nodes:$repositoryId", $message);
         }
 
 
@@ -202,8 +211,8 @@ class MqManager extends Plugin
             $input["NODE_PATHES"] = $nodePathes;
         }
 
-        $host = $this->getFilteredOption("NSQ_HOST");
-        $port = $this->getFilteredOption("NSQ_PORT");
+        $host = $this->getContextualOption($ctx, "NSQ_HOST");
+        $port = $this->getContextualOption($ctx, "NSQ_PORT");
         if(!empty($host) && !empty($port)){
             if(empty($this->nsqClient)){
                 // Publish on NSQ
@@ -269,12 +278,12 @@ class MqManager extends Plugin
         switch ($action) {
             case "client_register_channel":
                 
-                $this->msgExchanger->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
+                $this->msgExchanger->suscribeToChannel($ctx, $httpVars["channel"], $httpVars["client_id"]);
                 break;
             
             case "client_unregister_channel":
                 
-                $this->msgExchanger->unsuscribeFromChannel($httpVars["channel"], $httpVars["client_id"]);
+                $this->msgExchanger->unsuscribeFromChannel($ctx, $httpVars["channel"], $httpVars["client_id"]);
                 break;
             
             case "client_consume_channel":
@@ -309,7 +318,7 @@ class MqManager extends Plugin
                     return;
                 }
 
-                $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
+                $data = $this->msgExchanger->consumeInstantChannel($ctx, $httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
                 if (count($data)) {
                    ksort($data);
                    foreach ($data as $messageObject) {
@@ -338,7 +347,7 @@ class MqManager extends Plugin
         $this->logDebug("Entering wsAuthenticate");
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
-        $configs = $this->getConfigs();
+        $this->getConfigs();
         /*if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
         }*/
@@ -378,7 +387,6 @@ class MqManager extends Plugin
         $process = Controller::runCommandInBackground($cmd, AJXP_CACHE_DIR."/cmd_outputs/worker.log");
         if ($process != null) {
             $pId = $process->getPid();
-            $wDir = $this->getPluginWorkDir(true);
             file_put_contents($pidFile, $pId);
             return "SUCCESS: Started worker with process ID $pId";
         }
@@ -506,7 +514,6 @@ class MqManager extends Plugin
         $process = Controller::runCommandInBackground($cmd, null);
         if ($process != null) {
             $pId = $process->getPid();
-            $wDir = $this->getPluginWorkDir(true);
             file_put_contents($pidFile, $pId);
             return "SUCCESS: Started WebSocket Server with process ID $pId";
         }

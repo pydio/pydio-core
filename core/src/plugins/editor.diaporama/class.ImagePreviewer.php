@@ -55,7 +55,7 @@ class ImagePreviewer extends Plugin
                 return;
             }
             $this->logInfo('Preview', 'Preview content of '.$file, array("files" =>$selection->getUniqueFile()));
-            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getFilteredOption("GENERATE_THUMBNAIL", $contextInterface->getRepository())) {
+            if (isSet($httpVars["get_thumb"]) && $httpVars["get_thumb"] == "true" && $this->getContextualOption($contextInterface, "GENERATE_THUMBNAIL")) {
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;
@@ -154,12 +154,14 @@ class ImagePreviewer extends Plugin
         $isImage = Utils::is_image($currentPath);
         $ajxpNode->is_image = $isImage;
         if(!$isImage) return;
+
+        $context = $ajxpNode->getContext();
         $setRemote = false;
-        $remoteWrappers = $this->getFilteredOption("META_EXTRACTION_REMOTEWRAPPERS");
+        $remoteWrappers = $this->getContextualOption($context, "META_EXTRACTION_REMOTEWRAPPERS");
         if (is_string($remoteWrappers)) {
             $remoteWrappers = explode(",",$remoteWrappers);
         }
-        $remoteThreshold = $this->getFilteredOption("META_EXTRACTION_THRESHOLD");
+        $remoteThreshold = $this->getContextualOption($context, "META_EXTRACTION_THRESHOLD");
         if (in_array($wrapperClassName, $remoteWrappers)) {
             if ($remoteThreshold != 0 && isSet($ajxpNode->bytesize)) {
                 $setRemote = ($ajxpNode->bytesize > $remoteThreshold);
@@ -177,9 +179,9 @@ class ImagePreviewer extends Plugin
                 $realFile = $ajxpNode->getRealFile();
                 list($width, $height, $type, $attr) = @getimagesize($realFile);
 
-                if($this->getFilteredOption("EXIF_ROTATION")){
+                if($this->getContextualOption($context, "EXIF_ROTATION")){
                     require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-                    $pThumb = new PThumb($this->getFilteredOption["THUMBNAIL_QUALITY"],$this->getFilteredOption("EXIF_ROTATION"));
+                    $pThumb = new PThumb($this->getContextualOption($context, "THUMBNAIL_QUALITY"),$this->getContextualOption($context, "EXIF_ROTATION"));
                     $orientation = $pThumb->exiforientation($realFile, false);
                     if ($pThumb->rotationsupported($orientation))
                     {

@@ -23,7 +23,6 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -92,11 +91,11 @@ class EncfsMounter extends Plugin
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
 
-        $xmlTemplate = $this->getFilteredOption("ENCFS_XML_TEMPLATE");
         $actionName = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
+        $xmlTemplate = $this->getContextualOption($ctx, "ENCFS_XML_TEMPLATE");
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if($userSelection->isEmpty()){
             throw new Exception("Please select a folder");
@@ -104,7 +103,9 @@ class EncfsMounter extends Plugin
         $node = $userSelection->getUniqueNode();
 
         switch ($actionName) {
+
             case "encfs.cypher_folder" :
+
                 if (empty($xmlTemplate) || !is_file($xmlTemplate)) {
                     throw new Exception("It seems that you have not set the plugin 'Enfcs XML File' configuration, or the system cannot find it!");
                 }
@@ -122,11 +123,11 @@ class EncfsMounter extends Plugin
                     // NEW FOLDER SCENARIO
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
                     mkdir($raw);
-                    $result = self::initEncFolder($raw, $xmlTemplate, $this->getFilteredOption("ENCFS_XML_PASSWORD"), $pass);
+                    $result = self::initEncFolder($raw, $xmlTemplate, $this->getContextualOption($ctx, "ENCFS_XML_PASSWORD"), $pass);
                     if ($result) {
                         // Mount folder
                         mkdir($clear);
-                        $uid = $this->getFilteredOption("ENCFS_UID");
+                        $uid = $this->getContextualOption($ctx, "ENCFS_UID");
                         self::mountFolder($raw, $clear, $pass, $uid);
                         $content = scandir($dir);
                         foreach ($content as $fileOrFolder) {
@@ -142,11 +143,13 @@ class EncfsMounter extends Plugin
                     self::umountFolder($dir);
                 }
                 break;
+
             case "encfs.uncypher_folder":
+
                 $dir = $this->getWorkingPath($ctx).$node->getPath();
                 $raw = str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", $dir);
                 $pass = $httpVars["pass"];
-                $uid = $this->getFilteredOption("ENCFS_UID");
+                $uid = $this->getContextualOption($ctx, "ENCFS_UID");
                 if (is_dir($raw)) {
                     self::mountFolder($raw, $dir, $pass, $uid);
                 }

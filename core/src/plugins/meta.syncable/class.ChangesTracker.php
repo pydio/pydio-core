@@ -22,6 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -63,7 +64,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             return true;
         }
         try{
-            $this->accessDriver->filterUserSelectionToHidden(array($path));
+            $this->accessDriver->filterUserSelectionToHidden(Context::fromGlobalServices(), array($path));
         }catch(Exception $e){
             return true;
         }

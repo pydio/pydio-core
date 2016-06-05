@@ -1097,8 +1097,8 @@ abstract class AbstractConfDriver extends Plugin
             case "user_delete_user":
 
                 $userId = $httpVars["user_id"];
-                $loggedUser = ConfService::getConfStorageImpl()->createUserObject($userId);
-                if ($loggedUser == null || !$loggedUser->hasParent() || $loggedUser->getParent() != $loggedUser->getId()) {
+                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                if ($userObject == null || !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId()) {
                     throw new \Exception("You are not allowed to edit this user");
                 }
                 AuthService::deleteUser($userId);
@@ -1235,17 +1235,17 @@ abstract class AbstractConfDriver extends Plugin
                         $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
                     }
                 }
-                foreach ($allUsers as $userId => $loggedUser) {
-                    if($loggedUser->getId() == $loggedUser->getId()) continue;
-                    if ( ( !$loggedUser->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $loggedUser->getParent() == $loggedUser->getId() ) {
-                        $userLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $loggedUser, "core.conf", $userId);
-                        $userAvatar = ConfService::getUserPersonalParameter("avatar", $loggedUser, "core.conf", "");
+                foreach ($allUsers as $userId => $userObject) {
+                    if($userObject->getId() == $loggedUser->getId()) continue;
+                    if ( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
+                        $userLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                        $userAvatar = ConfService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
                         //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
                         if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
                             $userDisplay = $userLabel;
                         }
-                        $userIsExternal = $loggedUser->hasParent() ? "true":"false";
+                        $userIsExternal = $userObject->hasParent() ? "true":"false";
                         $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"$userLabel\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }

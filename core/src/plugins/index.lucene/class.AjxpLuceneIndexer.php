@@ -81,9 +81,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     }
 
 
-    protected function setDefaultAnalyzer()
+    /**
+     * @param string $queryAnalyzer
+     * @param int $wildcardLimitation
+     */
+    protected function setDefaultAnalyzer($queryAnalyzer, $wildcardLimitation)
     {
-        switch ($this->getFilteredOption("QUERY_ANALYSER")) {
+        switch ($queryAnalyzer) {
             case "utf8num_insensitive":
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
                 break;
@@ -112,7 +116,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
                 break;
         }
-        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(intval($this->getFilteredOption("WILDCARD_LIMITATION")));
+        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength($wildcardLimitation);
 
     }
 
@@ -161,7 +165,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 return null;
             }
             $textQuery = $httpVars["query"];
-            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
+            if($this->getContextualOption($ctx, "AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
                 }else if($textQuery[strlen($textQuery)-1] != "*" ){
@@ -195,7 +199,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $index->setDefaultSearchField("basename");
                 $query = $this->filterSearchRangesKeywords($textQuery);
             }
-            $this->setDefaultAnalyzer();
+            $this->setDefaultAnalyzer(
+                $this->getContextualOption($ctx, "QUERY_ANALYSER"),
+                intval($this->getContextualOption($ctx, "WILDCARD_LIMITATION"))
+            );
             if ($query == "*") {
                 $index->setDefaultSearchField("ajxp_node");
                 $query = "yes";
@@ -244,7 +251,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
+                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -314,7 +321,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
+                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -485,7 +492,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
             }
         }
-        $this->setDefaultAnalyzer();
+        $refNode = ($oldNode != null ? $oldNode : $newNode);
+        $this->setDefaultAnalyzer(
+            $this->getContextualOption($refNode->getContext(), "QUERY_ANALYSER"),
+            intval($this->getContextualOption($refNode->getContext(), "WILDCARD_LIMITATION"))
+        );
         if ($oldNode != null && $copy == false) {
             $oldDocId = $this->getIndexedDocumentId($oldIndex, $oldNode);
             if ($oldDocId != null) {
@@ -554,10 +565,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
         $parseContent = $this->indexContent;
-        if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
+        if ($parseContent && $ajxpNode->bytesize > $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
-        if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_HTML")))) {
+        if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
             $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")) {
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());

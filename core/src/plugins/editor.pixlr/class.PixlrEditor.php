@@ -67,7 +67,7 @@ class PixlrEditor extends Plugin
 
 
             $saveTarget = $target."/fake_save_pixlr.php";
-            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository)) {
+            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
                 $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
             }
             $params = array(
@@ -127,7 +127,7 @@ class PixlrEditor extends Plugin
             $url = $httpVars["new_url"];
             $urlParts = parse_url($url);
             $query = $urlParts["query"];
-            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository)) {
+            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
                 $scriptName = basename($urlParts["path"]);
                 $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
                 if ($token != md5($httpVars["secure_token"])) {
