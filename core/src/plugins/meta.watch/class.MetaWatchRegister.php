@@ -372,7 +372,6 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         if($actionName !== "toggle_watch") return;
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
-        $ctxUser = $ctx->getUser();
 
         $us = new UserSelection($this->accessDriver->repository, $httpVars);
         $node = $us->getUniqueNode();

@@ -545,7 +545,7 @@ class AjxpScheduler extends Plugin
     public function fakeLongTask($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $context)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        $this->logInfo(__FUNCTION__, "Running Fake task on ".$context->getId());
+        $this->logInfo(__FUNCTION__, "Running Fake task on ".$context->getRepositoryId());
         print('STARTING FAKE TASK');
         sleep($minutes * 30);
         print('ENDIND FAKE TASK');

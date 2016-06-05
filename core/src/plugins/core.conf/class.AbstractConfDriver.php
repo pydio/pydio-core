@@ -408,7 +408,7 @@ abstract class AbstractConfDriver extends Plugin
     {
         $test=CacheService::fetch("shared", "pydio:user:" . $userId);
         if($test !== false && $test instanceof AbstractAjxpUser){
-            if($test->personalRole == null){
+            if($test->getPersonalRole() === null){
                 $test->personalRole = $test->roles["AJXP_USR_/".$userId];
             }
             $test->recomputeMergedRole();
@@ -806,7 +806,6 @@ abstract class AbstractConfDriver extends Plugin
 
                 } else {
                     $updating = false;
-                    $loggedUser = $loggedUser;
                     Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
 
@@ -823,10 +822,14 @@ abstract class AbstractConfDriver extends Plugin
                             $name = $xmlNode->getAttribute("name");
                             if (isSet($data[$name]) || $data[$name] === "") {
                                 if($data[$name] == "__AJXP_VALUE_SET__") continue;
-                                if ($data[$name] === "" || $loggedUser->parentRole == null
-                                    || $loggedUser->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
-                                    || $loggedUser->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]) {
-                                    $loggedUser->personalRole->setParameterValue($pluginId, $name, $data[$name]);
+                                $pRole = null;
+                                $persRole = $loggedUser->getPersonalRole();
+                                if($loggedUser instanceof AbstractAjxpUser) $pRole = $loggedUser->parentRole;
+                                if ($data[$name] === ""
+                                    || $pRole === null || $pRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
+                                    || $persRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name])
+                                {
+                                    $persRole->setParameterValue($pluginId, $name, $data[$name]);
                                     $rChanges = true;
                                 }
                             }
@@ -834,7 +837,7 @@ abstract class AbstractConfDriver extends Plugin
                     }
                 }
                 if ($rChanges) {
-                    AuthService::updateRole($loggedUser->personalRole, $loggedUser);
+                    AuthService::updateRole($loggedUser->getPersonalRole(), $loggedUser);
                     $loggedUser->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
                         AuthService::updateUser($loggedUser);
@@ -886,7 +889,7 @@ abstract class AbstractConfDriver extends Plugin
                 $result = array();
                 $params = explode(",", $paramsString);
                 foreach($params as $p){
-                    $result[$p] = $loggedUser->personalRole->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
+                    $result[$p] = $loggedUser->getPersonalRole()->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
                 }
 
                 $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
@@ -1051,7 +1054,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 // Make sure we do not overwrite otherwise loaded rights.
                 $loggedUser->load();
-                $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
+                $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                 $loggedUser->save("superuser");
                 $loggedUser->recomputeMergedRole();
                 AuthService::updateUser($loggedUser);
@@ -1079,7 +1082,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 // Make sure we do not override remotely set rights
                 $loggedUser->load();
-                $loggedUser->personalRole->setAcl($repoId, "");
+                $loggedUser->getPersonalRole()->setAcl($repoId, "");
                 $loggedUser->save("superuser");
                 AuthService::updateUser($loggedUser);
 

@@ -40,7 +40,7 @@ class RepositoryLoadException extends PydioException
     {
         $message = "Error while loading workspace ".$repository->getDisplay()." : ".implode("\n-", $errors);
         $this->repository = $repository;
-        parent::__construct($message, null, 5000);
+        parent::__construct($message, false, 5000);
     }
 
     public function getRepository(){

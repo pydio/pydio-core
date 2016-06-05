@@ -45,6 +45,9 @@ class AJXP_Logger extends Plugin
      * @var AbstractLogDriver
      */
     protected $pluginInstance;
+    /**
+     * @var AbstractLogDriver
+     */
     protected static $loggerInstance;
     protected static $globalOptions;
 
@@ -71,7 +74,6 @@ class AJXP_Logger extends Plugin
      * @param string $source The source of the message (plugin id or classname)
      * @param string $prefix A quick description
      * @param array $messages An array of messages (string or array).
-     * @param array $nodePathes Optional array of pathes
      */
     public static function log2($level, $source, $prefix, $messages = array())
     {
@@ -122,7 +124,6 @@ class AJXP_Logger extends Plugin
      * @static
      * @param string $source  The source of the message (plugin id or classname)
      * @param string $prefix  A quick description
-     * @param string|array $messages Variable number of message args (string or array).
      * @return void
      */
     public static function debug($source, $prefix = "")
@@ -267,7 +268,7 @@ class AJXP_Logger extends Plugin
     /**
      * Format an array as a readable string
      *
-     * @param Array $params
+     * @param array $params
      * @return String readable list of parameters.
      */
     public static function arrayToString($params)

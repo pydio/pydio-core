@@ -1548,7 +1548,7 @@ class ConfService
     }
 
     /**
-     * @param Repository $repository
+     * @param RepositoryInterface $repository
      */
     public static function switchBackAfterRepositoryError($repository){
         self::getInstance()->removeRepositoryFromCache($repository->getId());

@@ -675,7 +675,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if(!AuthService::canAdministrate($userObject)){
                         throw new \Exception("Cant find user!");
                     }
-                    $role = $userObject->personalRole;
+                    $role = $userObject->getPersonalRole();
                 } else {
                     $role = AuthService::getRole($roleId, $roleGroup);
                 }
@@ -858,7 +858,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if(!AuthService::canAdministrate($userObject)){
                         throw new \Exception("Cannot post role for user ".$usrId);
                     }
-                    $originalRole = $userObject->personalRole;
+                    $originalRole = $userObject->getPersonalRole();
                 } else {
                     // second param = create if not exists.
                     $originalRole = AuthService::getRole($roleId, $roleGroup);
@@ -1082,7 +1082,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(!AuthService::canAdministrate($user)){
                     throw new \Exception("Cannot update user with id ".$userId);
                 }
-                $user->personalRole->setAcl(Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
+                $user->getPersonalRole()->setAcl(Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
                 $user->save();
                 $loggedUser = $ctx->getUser();
                 if ($loggedUser->getId() == $user->getId()) {
@@ -1536,7 +1536,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $groupRole->setAcl($newRep->getId(), $defaultRights);
                     }
                     $loggedUser = $ctx->getUser();
-                    $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
+                    $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                     $loggedUser->recomputeMergedRole();
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);

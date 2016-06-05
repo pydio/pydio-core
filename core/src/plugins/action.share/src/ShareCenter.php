@@ -1662,7 +1662,7 @@ class ShareCenter extends Plugin
             return null;
         }
 
-        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups);
+        $newRepo = $this->createSharedRepository($httpVars, $update, $users, $groups);
 
         foreach($shareObjects as $shareObject){
 

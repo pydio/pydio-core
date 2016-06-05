@@ -862,7 +862,7 @@ class PluginsService
     /*********************************/
     /**
      * Save plugin registry to cache
-     * @param AbstractCacheDriver $cacheStorage
+     * @param AbstractCacheDriver|null $cacheStorage
      */
     private function savePluginsRegistryToCache($cacheStorage) {
         if (!empty ($cacheStorage)) {
@@ -957,8 +957,9 @@ class PluginsService
                 // Retrieving Registry from Server Cache
                 if (!empty($cacheStorage)) {
                     $res = $cacheStorage->fetch(AJXP_CACHE_SERVICE_NS_SHARED, 'plugins_registry');
-
-                    $this->detectedPlugins=$res;
+                    if(is_array($res)){
+                        $this->detectedPlugins=$res;
+                    }
                 }
 
                 // Retrieving Registry from files cache
@@ -1100,7 +1101,7 @@ class PluginsService
         if ($crtRepo != null && $crtRepo instanceof Repository) {
             $crtRepoId = $crtRepo->getId();
         }
-        $actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
+        $actionRights = $loggedUser->getMergedRole()->listActionsStatesFor($crtRepo);
         $changes = false;
         $xPath = new DOMXPath($registry);
         foreach ($actionRights as $pluginName => $actions) {
@@ -1115,7 +1116,7 @@ class PluginsService
                 $changes = true;
             }
         }
-        $parameters = $loggedUser->mergedRole->listParameters();
+        $parameters = $loggedUser->getMergedRole()->listParameters();
         foreach ($parameters as $scope => $paramsPlugs) {
             if ($scope === AJXP_REPO_SCOPE_ALL || $scope === $crtRepoId || ($crtRepo != null && $crtRepo->hasParent() && $scope === AJXP_REPO_SCOPE_SHARED)) {
                 foreach ($paramsPlugs as $plugId => $params) {

@@ -356,8 +356,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function uploadAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        /** @var ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
         $selection = new UserSelection($this->repository);
         $httpVars = $request->getParsedBody();
         $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";

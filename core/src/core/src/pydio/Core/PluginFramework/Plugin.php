@@ -21,11 +21,10 @@
 namespace Pydio\Core\PluginFramework;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
@@ -170,7 +169,7 @@ class Plugin implements \Serializable
 
     /**
      * @param string $optionName
-     * @param string|\Pydio\Access\Core\Model\Repository $repositoryScope
+     * @param string|RepositoryInterface $repositoryScope
      * @param null|\Pydio\Conf\Core\AbstractAjxpUser $userObject
      * @return mixed|null
      */
@@ -187,7 +186,7 @@ class Plugin implements \Serializable
             if ($repositoryScope === AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
                 if($repo != null) $repositoryScope = $repo->getId();
-            }else if(is_object($repositoryScope) && $repositoryScope instanceof Repository){
+            }else if(is_object($repositoryScope) && $repositoryScope instanceof RepositoryInterface){
                 $repo = $repositoryScope;
                 $repositoryScope = $repo->getId();
             }
