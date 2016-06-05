@@ -37,6 +37,7 @@ use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -238,6 +239,7 @@ class PluginsService
             $keys = array_keys($metaSources);
             foreach ($keys as $plugId) {
                 if($plugId == "") continue;
+                /** @var AJXP_AbstractMetaSource $instance */
                 $instance = $this->getPluginById($plugId);
                 if (!is_object($instance)) {
                     continue;
@@ -246,8 +248,8 @@ class PluginsService
                     continue;
                 }
                 try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
-                    $instance->beforeInitMeta($plugInstance, $repository);
+                    $instance->init($ctx, AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    $instance->beforeInitMeta($ctx, $plugInstance);
                 } catch (\Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $errors[] = $e->getMessage();
@@ -257,14 +259,13 @@ class PluginsService
 
         // INIT MAIN DRIVER
         try {
-            $plugInstance->init($repository);
-            $plugInstance->initRepository();
+            $plugInstance->init($ctx);
         }catch (PydioUserAlertException $ua){
             throw $ua;
         }catch (\Exception $e){
             new RepositoryLoadException($repository, [$e->getMessage()]);
         }
-        $repository->driverInstance = $plugInstance;
+        $repository->setDriverInstance($plugInstance);
 
         $this->deferBuildingRegistry();
         $this->setPluginUniqueActiveForType("access", $accessType);
@@ -276,16 +277,17 @@ class PluginsService
             foreach ($keys as $plugId) {
                 if($plugId == "") continue;
                 $split = explode(".", $plugId);
+                /** @var AJXP_AbstractMetaSource $instance */
                 $instance = $this->getPluginById($plugId);
                 if (!is_object($instance)) {
                     continue;
                 }
                 try {
-                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    $instance->init($ctx, AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
                     if(!method_exists($instance, "initMeta")) {
                         throw new \Exception("Meta Source $plugId does not implement the initMeta method.");
                     }
-                    $instance->initMeta($plugInstance);
+                    $instance->initMeta($ctx, $plugInstance);
                 } catch (\Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $errors[] = $e->getMessage();
@@ -528,7 +530,7 @@ class PluginsService
              * @var Plugin $plugin
              */
             $plugin = $this->detectedPlugins[$type][$name];
-            $plugin->init($pluginOptions);
+            $plugin->init($this->context, $pluginOptions);
             return clone $plugin;
         }
 
@@ -537,7 +539,7 @@ class PluginsService
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
         $plugin->loadConfigs(array()); // Load default
-        $plugin->init($pluginOptions);
+        $plugin->init($this->context, $pluginOptions);
         return $plugin;
     }
 
@@ -641,7 +643,7 @@ class PluginsService
         $o = $this->getOrderByDependency($toActivate, false);
         foreach ($o as $id) {
             $pObject = $toActivate[$id];
-            $pObject->init(array());
+            $pObject->init($this->context, array());
             try {
                 $pObject->performChecks();
                 if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;

@@ -25,6 +25,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -70,17 +72,22 @@ class MqManager extends Plugin
     private $hasPendingMessage = false;
 
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try {
-            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
+            $pService = PluginsService::getInstance($ctx);
+            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger", $pService);
             if(!empty($this->msgExchanger)){
-                \Pydio\Core\PluginFramework\PluginsService::getInstance()->setPluginActive($this->msgExchanger->getType(), $this->msgExchanger->getName(), true, $this->msgExchanger);
+                $pService->setPluginActive($this->msgExchanger->getType(), $this->msgExchanger->getName(), true, $this->msgExchanger);
             }
-            if(AuthService::$bufferedMessage != null && AuthService::getLoggedUser() != null){
-                $this->sendInstantMessage(AuthService::$bufferedMessage, ConfService::getCurrentRepositoryId(), AuthService::getLoggedUser()->getId());
+            if(AuthService::$bufferedMessage != null && $ctx->hasUser()){
+                $this->sendInstantMessage(AuthService::$bufferedMessage, $ctx->getRepositoryId(), $ctx->getUser()->getId());
                 AuthService::$bufferedMessage = null;
             }
         } catch (Exception $e) {}

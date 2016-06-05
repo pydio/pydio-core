@@ -40,9 +40,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class TaskController extends Plugin implements SqlTableProvider
 {
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         TaskService::getInstance()->setProvider(new SqlTasksProvider());
     }
 

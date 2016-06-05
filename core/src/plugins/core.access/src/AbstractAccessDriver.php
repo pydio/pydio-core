@@ -24,6 +24,8 @@ use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
@@ -44,7 +46,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class AbstractAccessDriver
  * Abstract representation of an action driver. Must be implemented.
  */
-class AbstractAccessDriver extends Plugin
+abstract class AbstractAccessDriver extends Plugin
 {
     /**
     * @var Repository
@@ -52,19 +54,31 @@ class AbstractAccessDriver extends Plugin
     public $repository;
     public $driverType = "access";
 
-    public function init($repository, $options = array())
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     * @throws PydioException
+     */
+    public function init(ContextInterface $ctx, $options = array())
     {
-        //$this->loadActionsFromManifest();
-        parent::init($options);
-        $this->repository = $repository;
+        parent::init($ctx, $options);
+        if(!$ctx->hasRepository()){
+            throw new PydioException("Cannot instanciate an access plugin without a valid repository");
+        }
+        $this->repository = $ctx->getRepository();
+        $this->initRepository($ctx);
     }
 
-    public function initRepository()
-    {
-        // To be implemented by subclasses
-    }
+    /**
+     * @param ContextInterface $ctx
+     */
+    abstract protected function initRepository(ContextInterface $ctx);
 
 
+    /**
+     * @param ServerRequestInterface $request
+     * @throws \Exception
+     */
     public function accessPreprocess(ServerRequestInterface &$request)
     {
         $actionName = $request->getAttribute("action");
@@ -119,6 +133,12 @@ class AbstractAccessDriver extends Plugin
         throw new \Exception("Current driver does not support recursive directory usage!");
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function crossRepositoryCopy(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();

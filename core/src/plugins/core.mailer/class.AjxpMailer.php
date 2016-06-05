@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
@@ -43,16 +44,21 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     public $mailCache;
     protected $_dibiDriver;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         if (AJXP_SERVER_DEBUG) {
             $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
         }
         $pConf = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
         if (!empty($pConf)) {
-            $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer");
-            PluginsService::getInstance()->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
+            $pService = PluginsService::getInstance($ctx);
+            $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer", $pService);
+            $pService->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
         }
     }
 

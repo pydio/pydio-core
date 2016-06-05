@@ -101,19 +101,24 @@ class ShareCenter extends Plugin
     /**************************/
     /**
      * Plugin initializer
+     * @param ContextInterface $ctx
      * @param array $options
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $this->repository = ConfService::getRepository();
-        if (!($this->repository->driverInstance instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
+        parent::init($ctx, $options);
+        if(!$ctx->hasRepository()){
+            $this->enabled = false;
             return;
         }
-        $this->accessDriver = $this->repository->driverInstance;
+        $this->repository = $ctx->getRepository();
+        if (!($this->repository->getDriverInstance() instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
+            return;
+        }
+        $this->accessDriver = $this->repository->getDriverInstance();
         $this->urlBase = "pydio://". $this->repository->getId();
-        if (array_key_exists("meta.watch", PluginsService::getInstance()->getActivePlugins())) {
-            $this->watcher = PluginsService::getInstance()->getPluginById("meta.watch");
+        if (array_key_exists("meta.watch", PluginsService::getInstance($ctx)->getActivePlugins())) {
+            $this->watcher = PluginsService::getInstance($ctx)->getPluginById("meta.watch");
         }
     }
 

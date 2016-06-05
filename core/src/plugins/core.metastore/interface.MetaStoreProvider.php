@@ -20,7 +20,11 @@
  */
 namespace Pydio\Metastore\Core;
 
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 define('AJXP_METADATA_SHAREDUSER', 'AJXP_METADATA_SHAREDUSER');
@@ -36,8 +40,12 @@ define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
  */
 interface MetaStoreProvider
 {
-    public function init($options);
-    public function initMeta($accessDriver);
+
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver|IAjxpWrapperProvider $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver);
 
     /**
      * @abstract

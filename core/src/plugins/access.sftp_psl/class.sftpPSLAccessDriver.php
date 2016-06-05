@@ -52,9 +52,10 @@ class sftpPSLAccessDriver extends fsAccessDriver
     protected $urlBase;
 
     /**
-     * initRepository
+     * @param ContextInterface $contextInterface
+     * @throws \Exception
      */
-    public function initRepository()
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

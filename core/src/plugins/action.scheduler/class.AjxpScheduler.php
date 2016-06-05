@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -44,12 +45,15 @@ class AjxpScheduler extends Plugin
 
     }
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $u = AuthService::getLoggedUser();
-        if($u == null) return;
-        if ($u->getGroupPath() != "/") {
+        parent::init($ctx, $options);
+        if(!$ctx->hasUser()) return;
+        if ($ctx->getUser()->getGroupPath() != "/") {
             $this->enabled = false;
         }
     }

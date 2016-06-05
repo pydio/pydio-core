@@ -24,6 +24,8 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -35,7 +37,12 @@ class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         $this->detectStreamWrapper(true);
         $this->urlBase = "pydio://".$this->repository->getId();

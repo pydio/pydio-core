@@ -69,11 +69,15 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     private $specificId = "";
     private $verboseIndexation = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $metaFields = $this->getFilteredOption("index_meta_fields");
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
+        parent::init($ctx, $options);
+        $metaFields = $this->getContextualOption($ctx, "index_meta_fields");
+        $specKey = $this->getContextualOption($ctx, "repository_specific_keywords");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
@@ -84,14 +88,18 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
         /* Connexion to Elastica Client with the default parameters */
         $this->client = new Elastica\Client(array(
-            "host" => $this->getFilteredOption("ELASTICSEARCH_HOST"),
-            "port" => $this->getFilteredOption("ELASTICSEARCH_PORT"))
+            "host" => $this->getContextualOption($ctx, "ELASTICSEARCH_HOST"),
+            "port" => $this->getContextualOption($ctx, "ELASTICSEARCH_PORT"))
         );
 
-        $this->indexContent = ($this->getFilteredOption("index_content") == true);
+        $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
     }
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param \Pydio\Access\Core\AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
         $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
@@ -107,7 +115,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
             }
         }
-        parent::init($this->options);
+        parent::init($ctx, $this->options);
     }
 
     /**

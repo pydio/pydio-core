@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -44,15 +45,21 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
 
     private $storageMode;
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     * @throws Exception
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
-        $feed = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        parent::initMeta($ctx, $accessDriver);
+        $pService = PluginsService::getInstance($ctx);
+        $feed = $pService->getUniqueActivePluginForType("feed");
         if ($feed) {
             $this->storageMode = "FEED";
             $this->feedStore = $feed;
         } else {
-            $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+            $store = $pService->getUniqueActivePluginForType("metastore");
             if ($store === false) {
                 throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
             }

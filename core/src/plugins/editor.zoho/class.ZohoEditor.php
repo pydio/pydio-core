@@ -25,6 +25,7 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -48,9 +49,14 @@ class ZohoEditor extends Plugin
         }
     }
 
-    public function init($options){
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
+    {
 
-        parent::init($options);
+        parent::init($ctx, $options);
         if(!extension_loaded("openssl")) return;
 
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";

@@ -28,6 +28,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -182,4 +183,11 @@ class WmsBrowser extends AbstractAccessDriver
     }
 
 
+    /**
+     * @param ContextInterface $ctx
+     */
+    protected function initRepository(ContextInterface $ctx)
+    {
+        // TODO: Implement initRepository() method.
+    }
 }

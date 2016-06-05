@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -47,20 +48,20 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      *
      * Gives the driver a chance to set up it's connection / file resource etc..
      *
-     * @param array $options array of options specific to the logger driver.
-     * @access public
+     * @param ContextInterface $ctx
+     * @param array $options
+     * @throws \Pydio\Core\Exception\DBConnectionException
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if(!dibi::isConnected()) {
                 dibi::connect($this->sqlDriver);
             }
         } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
+            throw new \Pydio\Core\Exception\DBConnectionException();
         }
         $this->queries = Utils::loadSerialFile($this->getBaseDir()."/queries.json", false, "json");
     }

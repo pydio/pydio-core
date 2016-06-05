@@ -2954,4 +2954,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     */
+    protected function initRepository(ContextInterface $ctx)
+    {
+        // TODO: Implement initRepository() method.
+    }
 }

@@ -23,6 +23,7 @@ namespace Pydio\Access\Driver\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use RecursiveDirectoryIterator;
@@ -83,4 +84,11 @@ class jsapiAccessDriver extends AbstractAccessDriver
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     */
+    protected function initRepository(ContextInterface $ctx)
+    {
+        // TODO: Implement initRepository() method.
+    }
 }

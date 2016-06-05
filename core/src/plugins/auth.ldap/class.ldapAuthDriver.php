@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\ProgressBarCLI;
@@ -68,9 +69,13 @@ class ldapAuthDriver extends AbstractAuthDriver
      */
     public $paramsMapping = array();
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $options = $this->options;
         $this->ldapUrl = $options["LDAP_URL"];
         if (isSet($options["LDAP_PROTOCOL"]) && $options["LDAP_PROTOCOL"] == "ldaps") {

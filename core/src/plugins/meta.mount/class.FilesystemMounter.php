@@ -22,6 +22,7 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
@@ -41,28 +42,25 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
     protected $repository;
 
     /**
+     * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
-     * @param Repository $repository
      */
-    public function beforeInitMeta($accessDriver, $repository)
+    public function beforeInitMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         $this->accessDriver = $accessDriver;
-        $this->repository = $repository;
+        $this->repository = $ctx->getRepository();
         if($this->isAlreadyMounted()) return;
         $this->mountFS();
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
      */
-    public function initMeta($accessDriver)
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
         $this->repository = $this->accessDriver->repository;
-        /*
-        if($this->isAlreadyMounted()) return;
-        $this->mountFS();
-        */
     }
 
     protected function getCredentials()

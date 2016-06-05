@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -34,9 +35,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
 {
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-           parent::init($options);
+           parent::init($ctx, $options);
            $this->sqlDriver = $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
        }
 

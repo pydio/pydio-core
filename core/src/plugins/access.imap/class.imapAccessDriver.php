@@ -24,6 +24,7 @@ use DOMNode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 
@@ -44,7 +45,12 @@ class imapAccessDriver extends fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

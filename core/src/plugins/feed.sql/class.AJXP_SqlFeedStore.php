@@ -39,10 +39,14 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
 
     private $sqlDriver;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
-        parent::init($options);
+        parent::init($ctx, $options);
     }
 
     public function performChecks()

@@ -80,16 +80,21 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     protected $wrapperClassName;
     protected $urlBase;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
         } else {
             $this->driverConf = array();
         }
-        if ( $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository) == true ) {
+        if ( $this->getContextualOption($contextInterface, "PROBE_REAL_SIZE") == true ) {
             // PASS IT TO THE WRAPPER
-            ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository));
+            ConfService::setConf("PROBE_REAL_SIZE", true);
         }
         $create = $this->repository->getOption("CREATE");
         $path = TextEncoder::toStorageEncoding($this->repository->getOption("PATH"));

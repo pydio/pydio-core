@@ -49,7 +49,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class UserDashboardDriver extends AbstractAccessDriver
 {
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         require_once AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php";
     }

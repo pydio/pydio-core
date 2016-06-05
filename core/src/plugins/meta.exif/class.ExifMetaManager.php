@@ -19,9 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -39,7 +41,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 {
     protected $metaDefinitions;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $contextInterface
+     * @param array $options
+     */
+    public function init(ContextInterface $contextInterface, $options = [])
     {
         $this->options = $options;
     }
@@ -51,11 +57,16 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
+
         if(!function_exists("exif_read_data")) return ;
-        //$messages = ConfService::getMessages();
+
         $def = $this->getMetaDefinition();
         if (!count($def)) {
             return ;
@@ -81,7 +92,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
         $html->appendChild($cdata);
 
-        parent::init($this->options);
+        parent::init($ctx, $this->options);
 
     }
 

@@ -112,7 +112,12 @@ class s3AccessDriver extends fsAccessDriver
         return parent::detectStreamWrapper($register);
     }
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         $this->detectStreamWrapper(true);
 

@@ -46,20 +46,24 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     private $indexContent = false;
     private $verboseIndexation = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
-        $metaFields = $this->getFilteredOption("index_meta_fields");
+        $metaFields = $this->getContextualOption($ctx, "index_meta_fields");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
-        $this->indexContent = ($this->getFilteredOption("index_content") == true);
+        $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
     }
 
-    public function initMeta($accessDriver)
+    public function initMeta(ContextInterface $contextInterface, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($contextInterface, $accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->getXPath()->query("/indexer")->item(0);
@@ -73,7 +77,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
             }
         }
-        parent::init($this->options);
+        parent::init($contextInterface, $this->options);
     }
 
 
@@ -96,7 +100,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
                 break;
             case "textnum_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_textNum());
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum());
                 break;
             case "text_insensitive":
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text_CaseInsensitive());

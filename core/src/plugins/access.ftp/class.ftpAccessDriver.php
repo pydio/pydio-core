@@ -76,7 +76,12 @@ class ftpAccessDriver extends fsAccessDriver
         $this->redirectActionsToMethod($contribNode, array("upload", "next_to_remote", "trigger_remote_copy"), "uploadActions");
     }
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

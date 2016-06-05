@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Exception\DBConnectionException;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -70,10 +71,13 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * 		)
      *
      * @see AbstractConfDriver#init($options)
+     * @param ContextInterface $ctx
+     * @param array $options
+     * @throws DBConnectionException
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if(!dibi::isConnected()) {

@@ -22,6 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -45,10 +46,14 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
 {
     private $sqlDriver;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
         $this->sqlDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
-        parent::init($options);
+        parent::init($ctx, $options);
     }
 
     protected function excludeFromSync($path){

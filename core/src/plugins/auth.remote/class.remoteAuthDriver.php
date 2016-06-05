@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -60,7 +61,11 @@ class remoteAuthDriver extends AbstractAuthDriver
     /** The current url array */
     public $urls;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
         // Migrate new version of the options
         if (isSet($options["CMS_TYPE"])) {
@@ -106,7 +111,7 @@ class remoteAuthDriver extends AbstractAuthDriver
                 }
             }
         }
-        parent::init($options);
+        parent::init($ctx, $options);
         $options = $this->options;
 
         $this->usersSerFile = $options["USERS_FILEPATH"];

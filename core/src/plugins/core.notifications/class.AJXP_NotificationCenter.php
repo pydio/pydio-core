@@ -46,19 +46,24 @@ class AJXP_NotificationCenter extends Plugin
      */
     private $eventStore = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
+        parent::init($ctx, $options);
+        $this->userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
+        $pService = \Pydio\Core\PluginFramework\PluginsService::getInstance($ctx);
         try {
-            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore");
+            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore", $pService);
         } catch (Exception $e) {
 
         }
         if ($this->eventStore === false) {
             $this->pluginConf["USER_EVENTS"] = false;
         }else{
-            \Pydio\Core\PluginFramework\PluginsService::getInstance()->setPluginActive($this->eventStore->getType(), $this->eventStore->getName(), true, $this->eventStore);
+            $pService->setPluginActive($this->eventStore->getType(), $this->eventStore->getName(), true, $this->eventStore);
         }
     }
 

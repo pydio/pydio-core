@@ -21,6 +21,7 @@
 namespace Pydio\Authfront\Core;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -70,12 +71,17 @@ class FrontendsLoader extends Plugin {
 
     }
 
-    public function init($options){
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
+    {
 
-        parent::init($options);
+        parent::init($ctx, $options);
 
         // Load all enabled frontend plugins
-        $fronts = PluginsService::getInstance()->getPluginsByType("authfront");
+        $fronts = PluginsService::getInstance($ctx)->getPluginsByType("authfront");
         usort($fronts, array($this, "frontendsSort"));
         foreach($fronts as $front){
             if($front->isEnabled()){
@@ -83,7 +89,7 @@ class FrontendsLoader extends Plugin {
                 $protocol = $configs["PROTOCOL_TYPE"];
                 if($protocol == "session_only" && !AuthService::$useSession) continue;
                 if($protocol == "no_session" && AuthService::$useSession) continue;
-                PluginsService::getInstance()->setPluginActive($front->getType(), $front->getName(), true);
+                PluginsService::getInstance($ctx)->setPluginActive($front->getType(), $front->getName(), true);
             }
         }
 

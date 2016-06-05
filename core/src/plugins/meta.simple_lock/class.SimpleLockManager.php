@@ -19,8 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -44,15 +46,20 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
     */
     protected $metaStore;
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     * @throws PydioException
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
-        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        parent::initMeta($ctx, $accessDriver);
+        $store = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("metastore");
         if ($store === false) {
-            throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
+            throw new PydioException("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
         $this->metaStore = $store;
-        $this->metaStore->initMeta($accessDriver);
+        $this->metaStore->initMeta($ctx, $accessDriver);
     }
 
     /**

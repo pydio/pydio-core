@@ -21,6 +21,7 @@
 namespace Pydio\Meta\Core;
 
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -38,10 +39,11 @@ abstract class AJXP_AbstractMetaSource extends Plugin {
     protected $accessDriver;
 
     /**
-     *
+     * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
      */
-    public function initMeta($accessDriver){
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
+    {
 
         $this->accessDriver = $accessDriver;
         // Override options with parent META SOURCE options

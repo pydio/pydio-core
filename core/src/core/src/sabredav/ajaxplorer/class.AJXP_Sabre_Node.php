@@ -21,6 +21,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -245,9 +246,11 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      */
     protected function getMetastore()
     {
-        $metaStore = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $ctx = Context::fromGlobalServices();
+        /** @var MetaStoreProvider $metaStore */
+        $metaStore = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("metastore");
         if($metaStore === false) return false;
-        $metaStore->initMeta($this->getAccessDriver());
+        $metaStore->initMeta($ctx, $this->getAccessDriver());
         return $metaStore;
     }
 

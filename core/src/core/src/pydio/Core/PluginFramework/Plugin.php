@@ -61,6 +61,9 @@ class Plugin implements \Serializable
     protected $enabled;
     protected $registryContributions = array();
     protected $contributionsLoaded = false;
+    /**
+     * @var array
+     */
     protected $options; // can be passed at init time
     protected $pluginConf; // can be passed at load time
     protected $pluginConfDefinition;
@@ -150,14 +153,20 @@ class Plugin implements \Serializable
     }
 
     /**
-     * @param $options
+     * @param ContextInterface $ctx
+     * @param array $options
      * @return void
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $optionName
+     * @return mixed|null
+     */
     protected function getContextualOption(ContextInterface $ctx, $optionName){
         if($ctx->hasRepository()){
             $repo = $ctx->getRepository();

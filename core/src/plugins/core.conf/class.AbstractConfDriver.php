@@ -60,10 +60,13 @@ abstract class AbstractConfDriver extends Plugin
     public $options;
     public $driverType = "conf";
 
-
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $options = $this->options;
 
         // BACKWARD COMPATIBILIY PREVIOUS CONFIG VIA OPTIONS

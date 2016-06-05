@@ -50,7 +50,12 @@ class smbAccessDriver extends fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

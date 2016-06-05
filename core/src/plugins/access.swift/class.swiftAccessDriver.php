@@ -58,8 +58,11 @@ class swiftAccessDriver extends fsAccessDriver
 
     }
 
-
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

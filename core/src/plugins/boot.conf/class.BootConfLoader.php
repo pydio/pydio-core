@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -62,9 +63,13 @@ class BootConfLoader extends AbstractConfDriver
         return BootConfLoader::$internalConf;
     }
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         try {
             $dir = $this->getPluginWorkDir(true);
             if(!is_file($dir.DIRECTORY_SEPARATOR."server_uuid")){

@@ -19,8 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -47,22 +49,31 @@ class UserMetaManager extends AJXP_AbstractMetaSource
     protected $fieldsAdditionalData = array();
     private $metaOptionsParsed = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
         $this->options = $options;
-        // Do nothing
+        // Do not call parent
     }
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     * @throws PydioException
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
 
-        $store = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        $store = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("metastore");
         if ($store === false) {
-            throw new Exception("The 'meta.user' plugin requires at least one active 'metastore' plugin");
+            throw new PydioException("The 'meta.user' plugin requires at least one active 'metastore' plugin");
         }
         $this->metaStore = $store;
-        $this->metaStore->initMeta($accessDriver);
+        $this->metaStore->initMeta($ctx, $accessDriver);
 
         //$messages = ConfService::getMessages();
         $def = $this->getMetaDefinition();
@@ -73,7 +84,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
         $editButton = '';
-        $u = AuthService::getLoggedUser();
+        $u = $ctx->getUser();
         if($u != null && $u->canWrite($this->accessDriver->repository->getId())){
             $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
         }
@@ -170,7 +181,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
             $tag->setAttribute("ajxpOptions", $v);
         }
 
-        parent::init($this->options);
+        parent::init($ctx, $this->options);
 
     }
 

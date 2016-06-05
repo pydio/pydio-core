@@ -22,6 +22,7 @@ namespace Pydio\Access\Driver\DataProvider;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
@@ -41,7 +42,12 @@ class mysqlAccessDriver extends AbstractAccessDriver
     /** The user password */
     public $password;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         $this->user = $this->repository->getOption("DB_USER");
         $this->password = $this->repository->getOption("DB_PASS");

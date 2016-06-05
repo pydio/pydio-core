@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -47,9 +48,12 @@ class multiAuthDriver extends AbstractAuthDriver
      */
     public $drivers =  array();
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        //parent::init($options);
         $this->options = $options;
         $this->driversDef = $this->getOption("DRIVERS");
         $this->masterSlaveMode = ($this->getOption("MODE") == "MASTER_SLAVE");

@@ -20,6 +20,7 @@
  */
 namespace Pydio\OCS;
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
@@ -36,9 +37,13 @@ class OCSPlugin extends Plugin{
      */
     protected $controller;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         Controller::registerIncludeHook("repository.list", array($this, "populateRemotes"));
         Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
     }

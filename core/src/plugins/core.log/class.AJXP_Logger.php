@@ -21,6 +21,7 @@
 namespace Pydio\Log\Core;
 
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
@@ -51,13 +52,18 @@ class AJXP_Logger extends Plugin
     protected static $loggerInstance;
     protected static $globalOptions;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         self::$globalOptions = $this->pluginConf;
-        $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "Pydio\\Log\\Core\\AbstractLogDriver");
+        $pService = PluginsService::getInstance($ctx);
+        $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "Pydio\\Log\\Core\\AbstractLogDriver", $pService);
         if ($this->pluginInstance != false) {
-            PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
+            $pService->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
     }
