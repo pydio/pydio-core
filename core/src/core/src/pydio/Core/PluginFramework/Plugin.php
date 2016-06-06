@@ -21,9 +21,10 @@
 namespace Pydio\Core\PluginFramework;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
@@ -60,6 +61,9 @@ class Plugin implements \Serializable
     protected $enabled;
     protected $registryContributions = array();
     protected $contributionsLoaded = false;
+    /**
+     * @var array
+     */
     protected $options; // can be passed at init time
     protected $pluginConf; // can be passed at load time
     protected $pluginConfDefinition;
@@ -149,17 +153,32 @@ class Plugin implements \Serializable
     }
 
     /**
-     * @param $options
+     * @param ContextInterface $ctx
+     * @param array $options
      * @return void
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
         $this->options = array_merge($this->loadOptionsDefaults(), $options);
     }
 
     /**
+     * @param ContextInterface $ctx
+     * @param $optionName
+     * @return mixed|null
+     */
+    protected function getContextualOption(ContextInterface $ctx, $optionName){
+        if($ctx->hasRepository()){
+            $repo = $ctx->getRepository();
+        }else{
+            $repo = AJXP_REPO_SCOPE_ALL;
+        }
+        return $this->getFilteredOption($optionName, $repo, $ctx->getUser());
+    }
+
+    /**
      * @param string $optionName
-     * @param string|\Pydio\Access\Core\Model\Repository $repositoryScope
+     * @param string|RepositoryInterface $repositoryScope
      * @param null|\Pydio\Conf\Core\AbstractAjxpUser $userObject
      * @return mixed|null
      */
@@ -176,7 +195,7 @@ class Plugin implements \Serializable
             if ($repositoryScope === AJXP_REPO_SCOPE_ALL) {
                 $repo = ConfService::getRepository();
                 if($repo != null) $repositoryScope = $repo->getId();
-            }else if(is_object($repositoryScope) && $repositoryScope instanceof Repository){
+            }else if(is_object($repositoryScope) && $repositoryScope instanceof RepositoryInterface){
                 $repo = $repositoryScope;
                 $repositoryScope = $repo->getId();
             }
@@ -246,9 +265,10 @@ class Plugin implements \Serializable
 
     /**
      * Main function for loading all the nodes under registry_contributions.
+     * @param ContextInterface $ctx
      * @param bool $dry
      */
-    protected function loadRegistryContributions($dry = false)
+    protected function loadRegistryContributions(ContextInterface $ctx, $dry = false)
     {
         if($this->manifestXML != null) $this->unserializeManifest();
         $regNodes = $this->xPath->query("registry_contributions/*");
@@ -271,11 +291,11 @@ class Plugin implements \Serializable
                 } else {
                     $exclude = array();
                 }
-                $this->initXmlContributionFile($filename, $include, $exclude, $dry);
+                $this->initXmlContributionFile($ctx, $filename, $include, $exclude, $dry);
             } else {
                 if (!$dry) {
                     $this->registryContributions[]=$regNode;
-                    $this->parseSpecificContributions($regNode);
+                    $this->parseSpecificContributions($ctx, $regNode);
                 }
             }
         }
@@ -291,26 +311,27 @@ class Plugin implements \Serializable
         }
         if (!$dry) {
             $this->registryContributions[]=$pluginContrib->documentElement;
-            $this->parseSpecificContributions($pluginContrib->documentElement);
+            $this->parseSpecificContributions($ctx, $pluginContrib->documentElement);
             $this->contributionsLoaded = true;
         }
     }
 
     /**
      * Load an external XML file and include/exclude its nodes as contributions.
+     * @param ContextInterface $ctx
      * @param string $xmlFile Path to the file from the base install path
      * @param array $include XPath query for XML Nodes to include
      * @param array $exclude XPath query for XML Nodes to exclude from the included ones.
      * @param bool $dry Dry-run of the inclusion
      */
-    protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array(), $dry = false)
+    protected function initXmlContributionFile(ContextInterface $ctx, $xmlFile, $include=array("*"), $exclude=array(), $dry = false)
     {
         $contribDoc = new \DOMDocument();
         $contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
         if (!is_array($include) && !is_array($exclude)) {
             if (!$dry) {
                 $this->registryContributions[] = $contribDoc->documentElement;
-                $this->parseSpecificContributions($contribDoc->documentElement);
+                $this->parseSpecificContributions($ctx, $contribDoc->documentElement);
             }
             return;
         }
@@ -365,7 +386,7 @@ class Plugin implements \Serializable
             }
             if (!$dry) {
                 $this->registryContributions[] = $node;
-                $this->parseSpecificContributions($node);
+                $this->parseSpecificContributions($ctx, $node);
             } else {
                 $this->reloadXPath();
             }
@@ -374,10 +395,11 @@ class Plugin implements \Serializable
     /**
      * Dynamically modify some registry contributions nodes. Can be easily derivated to enable/disable
      * some features dynamically during plugin initialization.
+     * @param ContextInterface $ctx
      * @param \DOMNode $contribNode
      * @return void
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         //Append plugin id to callback tags
         $callbacks = $contribNode->getElementsByTagName("serverCallback");
@@ -501,7 +523,7 @@ class Plugin implements \Serializable
     public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false)
     {
         if ($externalFiles && !$this->externalFilesAppended) {
-            $this->loadRegistryContributions(true);
+            $this->loadRegistryContributions(Context::fromGlobalServices(), true);
             $this->externalFilesAppended = true;
         }
         if($this->manifestXML != null) $this->unserializeManifest();
@@ -527,13 +549,14 @@ class Plugin implements \Serializable
     /**
      * Return the registry contributions. The parameter can be used by subclasses to optimize the size of the XML returned :
      * the extended version is called when sending to the client, whereas the "small" version is loaded to find and apply actions.
+     * @param ContextInterface $ctx
      * @param bool $extendedVersion Can be used by subclasses to optimize the size of the XML returned.
      * @return array
      */
-    public function getRegistryContributions($extendedVersion = true)
+    public function getRegistryContributions(ContextInterface $ctx, $extendedVersion = true)
     {
         if (!$this->contributionsLoaded) {
-            $this->loadRegistryContributions();
+            $this->loadRegistryContributions($ctx);
         }
         return $this->registryContributions;
     }

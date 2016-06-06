@@ -1,5 +1,6 @@
 <?php
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -16,9 +17,9 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
     /**
      * @param DOMNode $contribNode
      */
-    public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
-        if($this->getFilteredOption("HIDE_MYSHARES_SECTION") !== true) return;
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
+        parent::parseSpecificContributions($ctx, $contribNode);
+        if($this->getContextualOption($ctx, "HIDE_MYSHARES_SECTION") !== true) return;
         if($contribNode->nodeName != "client_configs") return ;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
@@ -33,10 +34,10 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
     protected function extractIndexableContent($ajxpNode){
 
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
-        if (in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_TXT")))) {
+        if (in_array($ext, explode(",",$this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_TXT")))) {
             return file_get_contents($ajxpNode->getUrl());
         }
-        $unoconv = $this->getFilteredOption("UNOCONV");
+        $unoconv = $this->getContextualOption($ajxpNode->getContext(),"UNOCONV");
         $pipe = false;
         if (!empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
             $targetExt = "txt";
@@ -64,7 +65,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
                 $ext = "pdf";
             }
         }
-        $pdftotext = $this->getFilteredOption("PDFTOTEXT");
+        $pdftotext = $this->getContextualOption($ajxpNode->getContext(), "PDFTOTEXT");
         if (!empty($pdftotext) && in_array($ext, array("pdf"))) {
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
             if ($pipe && isset($newTarget) && is_file($newTarget)) {

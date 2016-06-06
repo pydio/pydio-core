@@ -36,7 +36,7 @@ define('AJXP_REPOSITORY_TYPE_LOCAL', 'local');
  * Class Repository
  * @package Pydio\Access\Core\Model
  */
-class Repository implements AjxpGroupPathProvider, RepositoryInterface
+class Repository implements RepositoryInterface
 {
     /**
      * @var string
@@ -202,14 +202,12 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
         }
     }
 
-    public function createSharedChild($newLabel, $newOptions, $parentId = null, $owner = null, $uniqueUser = null)
+    public function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
         $newOptions = array_merge($this->options, $newOptions);
         $newOptions["CREATION_TIME"] = time();
-        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
-            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
-        }
+        $newOptions["CREATION_USER"] = $owner;
         $repo->options = $newOptions;
         if ($parentId === null) {
             $parentId = $this->getId();
@@ -219,15 +217,13 @@ class Repository implements AjxpGroupPathProvider, RepositoryInterface
         return $repo;
     }
 
-    public function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null)
+    public function createTemplateChild($newLabel, $newOptions, $creator = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
         $newOptions["CREATION_TIME"] = time();
-        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
-            $newOptions["CREATION_USER"] = AuthService::getLoggedUser()->getId();
-        }
+        $newOptions["CREATION_USER"] = $creator;
         $repo->options = $newOptions;
-        $repo->setOwnerData($this->getId(), $owner, $uniqueUser);
+        $repo->setOwnerData($this->getId(), null, $uniqueUser);
         $repo->setInferOptionsFromParent(true);
         return $repo;
     }

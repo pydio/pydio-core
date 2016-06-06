@@ -27,6 +27,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Access\Core\RecycleBinManager;
 
@@ -50,19 +51,25 @@ class Driver extends fsAccessDriver
      * Driver Initialization
      *
      */
-    public function init($repository, $options = array())
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function init(ContextInterface $ctx, $options = array())
     {
-        parent::init($repository, $options);
+        parent::init($ctx, $options);
 
-        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\Access\Core\Stream\AuthWrapper", "pydio.dav");
-        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\Access\Core\Stream\PathWrapper", "pydio.dav");
+        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\\Access\\Core\\Stream\\AuthWrapper", "pydio.dav");
+        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\\Access\\Core\\Stream\\PathWrapper", "pydio.dav");
     }
 
     /**
      * Repository Initialization
-     *
+     * @param ContextInterface $ctx
+     * @throws \Exception
      */
-    public function initRepository()
+    protected function initRepository(ContextInterface $ctx)
     {
         $this->detectStreamWrapper(true);
 

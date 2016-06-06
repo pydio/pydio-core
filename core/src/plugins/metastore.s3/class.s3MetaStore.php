@@ -19,7 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -33,24 +34,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 {
-    private static $currentMetaName;
     private static $metaCache;
-    private static $fullMetaCache;
-
-    protected $globalMetaFile;
     protected $bucketName;
-
-
-    public function init($options)
+    
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        $this->options = $options;
-        $this->loadRegistryContributions();
-        $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
-    }
-
-    public function initMeta($accessDriver)
-    {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
         $this->bucketName = $this->accessDriver->repository->getOption("CONTAINER");
     }
 

@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -32,12 +33,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class UpdateController extends Plugin
 {
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $u = AuthService::getLoggedUser();
-        if($u == null) return;
-        if ($u->getGroupPath() != "/") {
+        parent::init($ctx, $options);
+        if($ctx->hasUser() && $ctx->getUser()->getGroupPath() !== "/"){
             $this->enabled = false;
         }
     }
@@ -46,9 +49,9 @@ class UpdateController extends Plugin
      * Parse
      * @param DOMNode $contribNode
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($this->pluginConf["ENABLE_324_IMPORT"] == true) return;
 
         if($contribNode->nodeName != "actions") return ;
@@ -64,10 +67,12 @@ class UpdateController extends Plugin
         $contribNode->removeChild($compressNode);
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $loggedUser = AuthService::getLoggedUser();
-        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
+        $loggedUser = $contextInterface->getUser();
+        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) {
+            throw new \Pydio\Core\Exception\AuthRequiredException();
+        }
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
         if (!empty($this->pluginConf["PROXY_HOST"]) || !empty($this->pluginConf["UPDATE_SITE_USER"])) {
             AjaXplorerUpgrader::configureProxy(
@@ -110,9 +115,7 @@ class UpdateController extends Plugin
 
             case "test_upgrade_scripts":
 
-                if(!AJXP_SERVER_DEBUG
-                    || AuthService::getLoggedUser() == null
-                    || !AuthService::getLoggedUser()->isAdmin()){
+                if(!AJXP_SERVER_DEBUG){
                     break;
                 }
                 $upgrader = new AjaXplorerUpgrader("", "", "");

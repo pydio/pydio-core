@@ -26,6 +26,8 @@ use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -35,6 +37,7 @@ use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -69,7 +72,8 @@ class Controller
     private static function initXPath($useCache = false)
     {
         if (!isSet(self::$xPath)) {
-            $registry = ConfService::getFilteredXMLRegistry(false, false, $useCache);
+            $ctx = Context::fromGlobalServices();
+            $registry = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(false, false, $useCache);
             self::$xPath = new \DOMXPath($registry);
         }
         return self::$xPath;
@@ -245,11 +249,31 @@ class Controller
         return $response;
     }
 
+    /**
+     * @param Task $task
+     */
     public static function applyTaskInBackground(Task $task){
+
         $parameters = $task->getParameters();
         $task->setStatus(Task::STATUS_RUNNING);
         TaskService::getInstance()->updateTask($task);
         self::applyActionInBackground($task->getWsId(), $task->getAction(), $parameters, $task->getUserId(), "", $task->getId());
+
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param string $action
+     * @param array $parameters
+     * @return ServerRequestInterface
+     */
+    public static function executableRequest(ContextInterface $context, $action, $parameters = []){
+        $request = ServerRequestFactory::fromGlobals();
+        $request = $request
+            ->withAttribute("ctx", $context)
+            ->withAttribute("action", $action)
+            ->withParsedBody($parameters);
+        return $request;
     }
 
     /**
@@ -265,24 +289,6 @@ class Controller
      */
     public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "", $taskId = null)
     {
-/*
-        if (empty($user)) {
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
-            else $user = "shared";
-        }
-        $fName = AJXP_DATA_PATH."/plugins/mq.serial/worker-queue";
-        $fData = file_get_contents($fName);
-        $data = json_decode($fData, true);
-        $data[] = array(
-            "userId" => $user,
-            "repoId" => $currentRepositoryId,
-            "actionName" => $actionName,
-            "parameters" => $parameters
-        );
-        file_put_contents($fName, json_encode($data));
-        return ;
-*/
-
 
         $token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
@@ -295,22 +301,7 @@ class Controller
                 $user = "shared";
             }
         }
-/*
-        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.mq/vendor/autoload.php");
-        $nsq = new nsqphp\nsqphp;
-        $nsq->publishTo("localhost", 1);
-        $payload = array(
-            'msg' => 'bg',
-            'data' => [
-                'repository_id' => $currentRepositoryId,
-                'user_id'       => $user,
-                'action'        => $actionName,
-                'parameters'    => $parameters
-            ]);
-        $nsq->publish('pydio', new nsqphp\Message\Message(json_encode($payload)));
-
-        return;
-*/
+        
         if (Services\AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){
@@ -343,10 +334,7 @@ class Controller
             }
         }
 
-        $repoObject = ConfService::getRepository();
-        if(empty($repoObject)){
-            $repoObject = ConfService::getRepositoryById($currentRepositoryId);
-        }
+        $repoObject = ConfService::getRepositoryById($currentRepositoryId);
         $clearEnv = false;
         if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
             $encodedCreds = AJXP_Safe::getEncodedCredentialString();
@@ -504,7 +492,7 @@ class Controller
         }else{
 
             $httpVars = $request->getParsedBody();
-            $result = $plugInstance->$methodName($request->getAttribute("action"), $httpVars, $_FILES);
+            $result = $plugInstance->$methodName($request->getAttribute("action"), $httpVars, $_FILES, $request->getAttribute("ctx"));
             // May have been modified
             $request = $request->withParsedBody($httpVars);
 

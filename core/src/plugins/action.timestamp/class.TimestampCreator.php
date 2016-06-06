@@ -19,10 +19,11 @@ class TimestampCreator extends Plugin
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {
         $mess = ConfService::getMessages();
+        $ctx = $requestInterface->getAttribute("ctx");
 
-        $timestamp_url = $this->getFilteredOption("TIMESTAMP_URL");
-        $timestamp_login = $this->getFilteredOption("USER");
-        $timestamp_password = $this->getFilteredOption("PASS");
+        $timestamp_url      = $this->getContextualOption($ctx, "TIMESTAMP_URL");
+        $timestamp_login    = $this->getContextualOption($ctx, "USER");
+        $timestamp_password = $this->getContextualOption($ctx, "PASS");
 
         //Check if the configuration has been initiated
         if (empty($timestamp_url) || empty($timestamp_login) || !empty($timestamp_password) ) {
@@ -38,8 +39,8 @@ class TimestampCreator extends Plugin
         }
 
         //Get active repository
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository, $requestInterface->getParsedBody());
+        $ctx = $requestInterface->getAttribute("ctx");
+        $selection = UserSelection::fromContext($ctx, $requestInterface->getParsedBody());
         $destStreamURL = $selection->currentBaseUrl();
 
         $fileName = $selection->getUniqueFile();

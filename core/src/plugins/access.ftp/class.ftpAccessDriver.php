@@ -29,7 +29,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Http\Response\SerializableResponseStream;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
@@ -65,17 +65,23 @@ class ftpAccessDriver extends fsAccessDriver
 
     /**
      * Parse
+     * @param ContextInterface $ctx
      * @param DOMNode $contribNode
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
         $this->disableArchiveBrowsingContributions($contribNode);
         $this->redirectActionsToMethod($contribNode, array("upload", "next_to_remote", "trigger_remote_copy"), "uploadActions");
     }
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -93,19 +99,22 @@ class ftpAccessDriver extends fsAccessDriver
 
     public function uploadActions(ServerRequestInterface &$request, ResponseInterface &$response)
     {
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+
         switch ($request->getAttribute("action")) {
 
             case "next_to_remote":
                 $taskId = $request->getAttribute("pydio-task-id");
-                if(!$this->hasFilesToCopy()) {
+                if(!$this->hasFilesToCopy($ctx)) {
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
                     break;
                 }
 
-                $fData = $this->getNextFileToCopy();
+                $fData = $this->getNextFileToCopy($ctx);
                 $nextFile = '';
-                if ($this->hasFilesToCopy()) {
-                    $nextFile = $this->getFileNameToCopy();
+                if ($this->hasFilesToCopy($ctx)) {
+                    $nextFile = $this->getFileNameToCopy($ctx);
                 }
                 $this->logDebug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
                 $destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
@@ -199,44 +208,7 @@ class ftpAccessDriver extends fsAccessDriver
                         $destName = tempnam($destCopy, "");
                         $boxData["tmp_name"] = $destName;
                         $this->copyUploadedData($uploadedFile, $destName, $mess);
-                        $this->storeFileToCopy($boxData);
-                        /*
-                        if (isSet($boxData["input_upload"])) {
-                            try {
-                                $destName = tempnam($destCopy, "");
-                                $this->logDebug("Begining reading INPUT stream");
-                                $input = fopen("php://input", "r");
-                                $output = fopen($destName, "w");
-                                $sizeRead = 0;
-                                while ($sizeRead < intval($boxData["size"])) {
-                                    $chunk = fread($input, 4096);
-                                    $sizeRead += strlen($chunk);
-                                    fwrite($output, $chunk, strlen($chunk));
-                                }
-                                fclose($input);
-                                fclose($output);
-                                $boxData["tmp_name"] = $destName;
-                                $this->storeFileToCopy($boxData);
-                                $this->logDebug("End reading INPUT stream");
-                            } catch (\Exception $e) {
-                                $errorCode=411;
-                                $errorMessage = $e->getMessage();
-                                break;
-                            }
-                        } else {
-                            $destName = $destCopy."/".basename($boxData["tmp_name"]);
-                            if ($destName == $boxData["tmp_name"]) $destName .= "1";
-                            if (move_uploaded_file($boxData["tmp_name"], $destName)) {
-                                $boxData["tmp_name"] = $destName;
-                                $this->storeFileToCopy($boxData);
-                            } else {
-                                $mess = ConfService::getMessages();
-                                $errorCode = 411;
-                                $errorMessage="$mess[33] ".$boxData["name"];
-                                break;
-                            }
-                        }
-                    }*/
+                        $this->storeFileToCopy($ctx, $boxData);
                         $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
 
                         $task = TaskService::actionAsTask("next_to_remote", []);
@@ -301,32 +273,26 @@ class ftpAccessDriver extends fsAccessDriver
     }
 
 
-    public function storeFileToCopy($fileData)
+    public function storeFileToCopy(ContextInterface $ctx, $fileData)
     {
-        $user = AuthService::getLoggedUser();
+        $user = $ctx->getUser();
         $files = $user->getTemporaryData("tmp_upload");
         $this->logDebug("Saving user temporary data", array($fileData));
         $files[] = $fileData;
         $user->saveTemporaryData("tmp_upload", $files);
-        /*
-        if(Utils::userAgentIsNativePydioApp()){
-            $this->logInfo("Up from",$_SERVER["HTTP_USER_AGENT"]." - direct triger of next to remote");
-            $this->uploadActions("next_to_remote", array(), array());
-        }
-        */
     }
 
-    public function getFileNameToCopy()
+    public function getFileNameToCopy(ContextInterface $ctx)
     {
-            $user = AuthService::getLoggedUser();
+            $user = $ctx->getUser();
             $files = $user->getTemporaryData("tmp_upload");
             return $files[0]["name"];
     }
 
-    public function getNextFileToCopy()
+    public function getNextFileToCopy(ContextInterface $ctx)
     {
-            if(!$this->hasFilesToCopy()) return "";
-            $user = AuthService::getLoggedUser();
+            if(!$this->hasFilesToCopy($ctx)) return "";
+            $user = $ctx->getUser();
             $files = $user->getTemporaryData("tmp_upload");
             $fData = $files[0];
             array_shift($files);
@@ -334,9 +300,9 @@ class ftpAccessDriver extends fsAccessDriver
             return $fData;
     }
 
-    public function hasFilesToCopy()
+    public function hasFilesToCopy(ContextInterface $ctx)
     {
-            $user = AuthService::getLoggedUser();
+            $user = $ctx->getUser();
             $files = $user->getTemporaryData("tmp_upload");
             return (count($files)?true:false);
     }

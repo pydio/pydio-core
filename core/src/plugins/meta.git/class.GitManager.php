@@ -21,10 +21,10 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
@@ -49,12 +49,13 @@ class GitManager extends AJXP_AbstractMetaSource
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
      * @throws Exception
      */
-    public function initMeta($accessDriver)
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
         require_once("VersionControl/Git.php");
         $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");

@@ -20,6 +20,7 @@
  */
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -42,9 +43,9 @@ class UserGuiController extends Plugin
      * Parse
      * @param DOMNode $contribNode
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if (substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user') {
             if ($contribNode->nodeName == "client_configs") {
                 $children = $contribNode->childNodes;

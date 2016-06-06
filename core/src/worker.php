@@ -73,17 +73,12 @@ function applyTask($task, $logger){
         }
         ConfService::switchRootDir($repo->getId());
     }
-    // DRIVERS BELOW NEED IDENTIFICATION CHECK
-    $logger->debug("Load Driver");
-    if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
-        ConfService::getConfStorageImpl();
-        ConfService::loadDriverForRepository($repo);
-    }
     $logger->debug("Init plugins");
-    $pServ = PluginsService::getInstance();
-    $pServ->initActivePlugins();
+    $newCtx = \Pydio\Core\Model\Context::contextWithObjects(AuthService::getLoggedUser(), $repo);
+    $pServ = PluginsService::getInstance($newCtx);
 
     $fakeRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals(array(), array(), $parameters)
+        ->withAttribute("ctx", $newCtx)
         ->withAttribute("action", $actionName)
         ->withAttribute("pydio-task-id", $task->getId());
     ;
@@ -101,11 +96,13 @@ function applyTask($task, $logger){
     $logger->debug("Empty ShutdownScheduler!");
     ShutdownScheduler::getInstance()->callRegisteredShutdown();
 
-    $logger->debug("Invalidate");
-    ConfService::getInstance()->invalidateLoadedRepositories();
     $logger->debug("Disconnecting");
     AuthService::disconnect();
-    $pServ->updateXmlRegistry(null, true);
+    $repo->driverInstance = null;
+    $logger->debug("Clear Plugins Registry");
+    PluginsService::clearInstance($newCtx);
+    $logger->debug("Clear Loaded Repositories");
+    ConfService::getInstance()->invalidateLoadedRepositories();
 
     restore_error_handler();
 

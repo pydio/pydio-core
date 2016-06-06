@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
@@ -121,13 +122,12 @@ class textLogDriver extends AbstractLogDriver
      * Sets the user defined options.
      * Makes sure that the folder and file exist, and makes them if they don't.
      *
-     * @param array $options array of options specific to the logger driver.
-     * @access public
-     * @return null
+     * @param ContextInterface $ctx
+     * @param array $options
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
 
         $this->severityDescription = 0;
         $this->stack = array();

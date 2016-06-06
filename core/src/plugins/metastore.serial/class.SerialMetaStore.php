@@ -41,11 +41,13 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
 
     protected $globalMetaFile;
 
-
-    public function init($options)
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(\Pydio\Core\Model\ContextInterface $ctx, $options = [])
     {
         $this->options = $options;
-        $this->loadRegistryContributions();
         $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
     }
 

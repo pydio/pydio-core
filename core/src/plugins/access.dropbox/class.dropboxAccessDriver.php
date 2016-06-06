@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\Dropbox;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioUserAlertException;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 
@@ -44,7 +45,12 @@ class dropboxAccessDriver extends fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioUserAlertException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -148,9 +154,9 @@ class dropboxAccessDriver extends fsAccessDriver
         Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
 
-    public function makeSharedRepositoryOptions($httpVars, $repository)
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
         $newOptions["DROPBOX_OAUTH_TOKENS"] = $this->getTokens();
         return $newOptions;
     }

@@ -23,6 +23,8 @@ namespace Pydio\Tasks;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -61,8 +63,8 @@ interface ITasksProvider
     public function getPendingTasks();
 
     /**
-     * @param AbstractAjxpUser $user
-     * @param Repository $repository
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @return Task[]
      */
     public function getCurrentRunningTasks($user, $repository);
@@ -75,8 +77,8 @@ interface ITasksProvider
     public function getActiveTasksForNode(AJXP_Node $node);
 
     /**
-     * @param AbstractAjxpUser $user
-     * @param Repository $repository
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @param int $status
      * @return Task[]
      */

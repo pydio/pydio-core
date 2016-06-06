@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
@@ -68,11 +69,15 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     private $specificId = "";
     private $verboseIndexation = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $metaFields = $this->getFilteredOption("index_meta_fields");
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
+        parent::init($ctx, $options);
+        $metaFields = $this->getContextualOption($ctx, "index_meta_fields");
+        $specKey = $this->getContextualOption($ctx, "repository_specific_keywords");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
@@ -83,14 +88,18 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
         /* Connexion to Elastica Client with the default parameters */
         $this->client = new Elastica\Client(array(
-            "host" => $this->getFilteredOption("ELASTICSEARCH_HOST"),
-            "port" => $this->getFilteredOption("ELASTICSEARCH_PORT"))
+            "host" => $this->getContextualOption($ctx, "ELASTICSEARCH_HOST"),
+            "port" => $this->getContextualOption($ctx, "ELASTICSEARCH_PORT"))
         );
 
-        $this->indexContent = ($this->getFilteredOption("index_content") == true);
+        $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
     }
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param \Pydio\Access\Core\AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
         $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
@@ -106,7 +115,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
             }
         }
-        parent::init($this->options);
+        parent::init($ctx, $this->options);
     }
 
     /**
@@ -137,6 +146,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     {
         $actionName = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $ctxUser = $ctx->getUser();
 
         $messages = ConfService::getMessages();
         $repoId = $this->accessDriver->repository->getId();
@@ -168,7 +180,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             }
 
             $textQuery = $httpVars["query"];
-            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
+            if($this->getContextualOption($ctx, "AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
                 }else if($textQuery[strlen($textQuery)-1] != "*" ){
@@ -232,7 +244,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
-            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            $maxResults = $this->getContextualOption($ctx, "MAX_RESULTS");
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
@@ -291,11 +303,11 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $searchField = $httpVars["field"];
 
             if ($scope == "user") {
-                if (AuthService::usersEnabled() && AuthService::getLoggedUser() == null) {
+                if (AuthService::usersEnabled() && $ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
-                $sParts[] = "ajxp_user:".AuthService::getLoggedUser()->getId();
+                $sParts[] = "ajxp_user:".$ctxUser->getId();
             } else {
                 $sParts[] = "ajxp_scope:shared";
             }
@@ -315,7 +327,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
-            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            $maxResults = $this->getContextualOption($ctx, "MAX_RESULTS");
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
@@ -334,7 +346,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     $fieldQuery,
                     $qb->filter()->bool()
                         ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "user")))
-                        ->addMust(new Elastica\Filter\Term(array("user" => AuthService::getLoggedUser()->getId())))
+                        ->addMust(new Elastica\Filter\Term(array("user" => $ctxUser->getId())))
                 )
             );
 
@@ -516,7 +528,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $ajxpNode->loadNodeInfo();
 
         $parseContent = $this->indexContent;
-        if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
+        if ($parseContent && $ajxpNode->bytesize > $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
 

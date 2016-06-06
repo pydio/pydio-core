@@ -24,6 +24,8 @@ use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -43,7 +45,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class AbstractAccessDriver
  * Abstract representation of an action driver. Must be implemented.
  */
-class AbstractAccessDriver extends Plugin
+abstract class AbstractAccessDriver extends Plugin
 {
     /**
     * @var Repository
@@ -51,19 +53,31 @@ class AbstractAccessDriver extends Plugin
     public $repository;
     public $driverType = "access";
 
-    public function init($repository, $options = array())
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     * @throws PydioException
+     */
+    public function init(ContextInterface $ctx, $options = array())
     {
-        //$this->loadActionsFromManifest();
-        parent::init($options);
-        $this->repository = $repository;
+        parent::init($ctx, $options);
+        if(!$ctx->hasRepository()){
+            throw new PydioException("Cannot instanciate an access plugin without a valid repository");
+        }
+        $this->repository = $ctx->getRepository();
+        $this->initRepository($ctx);
     }
 
-    public function initRepository()
-    {
-        // To be implemented by subclasses
-    }
+    /**
+     * @param ContextInterface $ctx
+     */
+    abstract protected function initRepository(ContextInterface $ctx);
 
 
+    /**
+     * @param ServerRequestInterface $request
+     * @throws \Exception
+     */
     public function accessPreprocess(ServerRequestInterface &$request)
     {
         $actionName = $request->getAttribute("action");
@@ -87,12 +101,7 @@ class AbstractAccessDriver extends Plugin
             }
         }
     }
-
-    protected function parseSpecificContributions(&$contribNode)
-    {
-        parent::parseSpecificContributions($contribNode);
-    }
-
+    
 
     /**
      * Populate publiclet options
@@ -107,11 +116,11 @@ class AbstractAccessDriver extends Plugin
 
     /**
      * Populate shared repository options
+     * @param ContextInterface $ctx
      * @param array $httpVars
-     * @param Repository $repository
      * @return array
      */
-    public function makeSharedRepositoryOptions($httpVars, $repository){}
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){}
 
     /**
      * @param $directoryPath string
@@ -123,6 +132,12 @@ class AbstractAccessDriver extends Plugin
         throw new \Exception("Current driver does not support recursive directory usage!");
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function crossRepositoryCopy(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
@@ -136,8 +151,9 @@ class AbstractAccessDriver extends Plugin
 
         ConfService::detectRepositoryStreams(true);
         $mess = ConfService::getMessages();
-        $selection = new UserSelection(ConfService::getRepository());
-        $selection->initFromHttpVars($httpVars);
+
+        $ctx = $requestInterface->getAttribute("ctx");
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
 
         $repositoryId = $this->repository->getId();
@@ -151,7 +167,9 @@ class AbstractAccessDriver extends Plugin
 
         // Check rights
         if (AuthService::usersEnabled()) {
-            $loggedUser = AuthService::getLoggedUser();
+            /** @var ContextInterface $ctx */
+            $ctx = $requestInterface->getAttribute("ctx");
+            $loggedUser = $ctx->getUser();
             if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)
                 || (isSet($httpVars["moving_files"]) && !$loggedUser->canWrite($repositoryId))
             ){
@@ -583,26 +601,35 @@ class AbstractAccessDriver extends Plugin
 
     /**
      * Test if userSelection is containing a hidden file, which should not be the case!
+     * @param ContextInterface $ctx
      * @param array $files
      * @throws \Exception
      */
-    public function filterUserSelectionToHidden($files)
+    public function filterUserSelectionToHidden(ContextInterface $ctx, $files)
     {
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
+        $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
         foreach ($files as $file) {
             $file = basename($file);
             if (Utils::isHidden($file) && !$showHiddenFiles) {
                 throw new \Exception("$file Forbidden", 411);
             }
-            if ($this->filterFile($file) || $this->filterFolder($file)) {
+            if ($this->filterFile($ctx, $file) || $this->filterFolder($ctx, $file)) {
                 throw new \Exception("$file Forbidden", 411);
             }
         }
     }
 
-    public function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions)
+    /**
+     * @param ContextInterface $ctx
+     * @param $nodePath
+     * @param $nodeName
+     * @param $isLeaf
+     * @param $lsOptions
+     * @return bool
+     */
+    public function filterNodeName(ContextInterface $ctx, $nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
+        $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
         if($isLeaf === ""){
             $isLeaf = (is_file($nodePath."/".$nodeName) || Utils::isBrowsableArchive($nodeName));
         }
@@ -620,7 +647,7 @@ class AbstractAccessDriver extends Plugin
                 && $nodePath."/".$nodeName == RecycleBinManager::getRecyclePath()){
                 return false;
             }
-            return !$this->filterFolder($nodeName);
+            return !$this->filterFolder($ctx, $nodeName);
         } else {
             if($nodeName == "." || $nodeName == "..") return false;
             if(RecycleBinManager::recycleEnabled()
@@ -628,19 +655,25 @@ class AbstractAccessDriver extends Plugin
                 && $nodeName == RecycleBinManager::getCacheFileName()){
                 return false;
             }
-            return !$this->filterFile($nodeName);
+            return !$this->filterFile($ctx, $nodeName);
         }
     }
 
-    public function filterFile($fileName, $hiddenTest = false)
+    /**
+     * @param ContextInterface $ctx
+     * @param string $fileName
+     * @param bool $hiddenTest
+     * @return bool
+     */
+    public function filterFile(ContextInterface $ctx, $fileName, $hiddenTest = false)
     {
         $pathParts = pathinfo($fileName);
         if($hiddenTest){
-            $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
+            $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
             if (Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
         }
-        $hiddenFileNames = $this->getFilteredOption("HIDE_FILENAMES", $this->repository);
-        $hiddenExtensions = $this->getFilteredOption("HIDE_EXTENSIONS", $this->repository);
+        $hiddenFileNames = $this->getContextualOption($ctx, "HIDE_FILENAMES");
+        $hiddenExtensions = $this->getContextualOption($ctx, "HIDE_EXTENSIONS");
         if (!empty($hiddenFileNames)) {
             if (!is_array($hiddenFileNames)) {
                 $hiddenFileNames = explode(",",$hiddenFileNames);
@@ -660,9 +693,15 @@ class AbstractAccessDriver extends Plugin
         return false;
     }
 
-    public function filterFolder($folderName, $compare = "equals")
+    /**
+     * @param ContextInterface $ctx
+     * @param string $folderName
+     * @param string $compare
+     * @return bool
+     */
+    public function filterFolder(ContextInterface $ctx, $folderName, $compare = "equals")
     {
-        $hiddenFolders = $this->getFilteredOption("HIDE_FOLDERS", $this->repository);
+        $hiddenFolders = $this->getContextualOption($ctx, "HIDE_FOLDERS");
         if (!empty($hiddenFolders)) {
             if (!is_array($hiddenFolders)) {
                 $hiddenFolders = explode(",",$hiddenFolders);

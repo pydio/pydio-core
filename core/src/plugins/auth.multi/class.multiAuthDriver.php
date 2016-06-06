@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -47,9 +48,12 @@ class multiAuthDriver extends AbstractAuthDriver
      */
     public $drivers =  array();
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        //parent::init($options);
         $this->options = $options;
         $this->driversDef = $this->getOption("DRIVERS");
         $this->masterSlaveMode = ($this->getOption("MODE") == "MASTER_SLAVE");
@@ -73,22 +77,23 @@ class multiAuthDriver extends AbstractAuthDriver
             }
             $this->drivers[$name] = $instance;
         }
+        $multi = PluginsService::getInstance()->findPluginById("authfront.multi");
+        $multi->options = $this->options;
         if(!$this->masterSlaveMode){
             // Enable Multiple choice login screen
-            $multi = PluginsService::getInstance()->findPluginById("authfront.multi");
-            $multi->enabled = true;
-            $multi->options = $this->options;
+            PluginsService::getInstance()->setPluginActive("authfront", "multi", true, $multi);
+        }else{
+            PluginsService::getInstance()->setPluginActive("authfront", "multi", false, $multi);
         }
         // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
         // WILL BE CALLED LATER, TO BE SURE THAT THE
         // SESSION IS ALREADY STARTED.
     }
 
-    public function getRegistryContributions( $extendedVersion = true )
+    public function getRegistryContributions(\Pydio\Core\Model\ContextInterface $ctx, $extendedVersion = true )
     {
-        // $this->logDebug("get contributions NOW");
-        $this->loadRegistryContributions();
-        return parent::getRegistryContributions( $extendedVersion );
+        $this->loadRegistryContributions($ctx);
+        return parent::getRegistryContributions($ctx, $extendedVersion);
     }
 
     private function detectCurrentDriver()
@@ -279,28 +284,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         return $groups;
     }
-
-    /*
-    public function preLogUser($remoteSessionId)
-    {
-        if ($this->masterSlaveMode) {
-            $this->drivers[$this->slaveName]->preLogUser($remoteSessionId);
-            if (AuthService::getLoggedUser() == null) {
-                $this->drivers[$this->masterName]->preLogUser($remoteSessionId);
-                return;
-            }
-            return;
-        }
-
-        if ($this->getCurrentDriver()) {
-            $this->getCurrentDriver()->preLogUser($remoteSessionId);
-            return;
-        } else {
-            throw new Exception("No driver instanciated in multi driver!");
-        }
-    }
-    */
-
+    
     public function userExistsWrite($login)
     {
         if ($this->masterSlaveMode) {

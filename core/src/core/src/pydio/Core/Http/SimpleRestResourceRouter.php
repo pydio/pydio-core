@@ -185,7 +185,7 @@ class SimpleRestResourceRouter
      *
      * @param string|object $destination
      * @param object $sourceObject
-     * @return object
+     * @return mixed
      */
     public static function cast($destination, $sourceObject)
     {

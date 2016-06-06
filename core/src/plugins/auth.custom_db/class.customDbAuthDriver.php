@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
@@ -41,9 +42,13 @@ class customDbAuthDriver extends AbstractAuthDriver
 
     protected $coreSqlDriver;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_CUSTOM_DRIVER"]);
         $this->coreSqlDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
 

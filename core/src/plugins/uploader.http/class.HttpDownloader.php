@@ -44,8 +44,7 @@ class HttpDownloader extends Plugin
         //$this->logInfo("DL file", $httpVars);
         $httpVars = $request->getParsedBody();
         $action = $request->getAttribute("action");
-        $repository = ConfService::getRepository();
-        $userSelection = new UserSelection($repository);
+        $userSelection = UserSelection::fromContext($request->getAttribute("ctx"), $httpVars);
         $dir = Utils::decodeSecureMagic($httpVars["dir"]);
         $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";
         $dlURL = null;

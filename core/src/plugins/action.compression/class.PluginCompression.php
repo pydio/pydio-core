@@ -54,7 +54,9 @@ class PluginCompression extends Plugin
     {
         $httpVars = $requestInterface->getParsedBody();
         $messages = ConfService::getMessages();
-        $repository = ConfService::getRepository();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $repository = $ctx->getRepository();
         $userSelection = new UserSelection($repository, $httpVars);
         $nodes = $userSelection->buildNodes();
         $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
@@ -252,9 +254,7 @@ class PluginCompression extends Plugin
                 $nodesDiff = new NodesDiff();
                 $nodesDiff->add($newNode);
                 Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $repository->getId()));
-                $indexRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals()
-                    ->withParsedBody(["file" => $newNode->getPath()])
-                    ->withAttribute("action", "index");
+                $indexRequest = Controller::executableRequest($requestInterface->getAttribute("ctx"), "index", ["file" => $newNode->getPath()]);
                 Controller::run($indexRequest);
                 break;
 

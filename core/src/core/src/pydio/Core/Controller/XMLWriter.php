@@ -22,6 +22,7 @@ namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
@@ -420,15 +421,16 @@ class XMLWriter
      * List all bookmmarks as XML
      * @static
      * @param $allBookmarks
+     * @param RepositoryInterface $repository
      * @param bool $print
      * @param string $format legacy|node_list
      * @return string
      */
-    public static function writeBookmarks($allBookmarks, $print = true, $format = "legacy")
+    public static function writeBookmarks($allBookmarks, $repository, $print = true, $format = "legacy")
     {
         $driver = false;
         if ($format == "node_list") {
-            $driver = ConfService::loadRepositoryDriver();
+            $driver = $repository->getDriverInstance();
             if (!($driver instanceof IAjxpWrapperProvider)) {
                 $driver = false;
             }

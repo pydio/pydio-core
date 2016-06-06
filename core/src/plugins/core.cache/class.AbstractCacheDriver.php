@@ -27,6 +27,7 @@ define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
@@ -54,12 +55,7 @@ abstract class AbstractCacheDriver extends Plugin
      */
     protected $namespacedCaches = array();
 
-
-    public function init($options)
-    {
-      parent::init($options);
-    }
-
+    
     /**
      * @param string $namespace
      * @return Cache\CacheProvider

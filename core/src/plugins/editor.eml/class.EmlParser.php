@@ -23,6 +23,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
@@ -59,18 +60,19 @@ class EmlParser extends Plugin
     {
         $httpVars = $requestInterface->getParsedBody();
         $action = $requestInterface->getAttribute("action");
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
 
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         if($selection->isEmpty()) return;
         $node = $selection->getUniqueNode();
         $file = $node->getUrl();
         Controller::applyHook("node.read", array($node));
 
-        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
+        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId());
 
         $mess = ConfService::getMessages();
         switch ($action) {
@@ -154,10 +156,11 @@ class EmlParser extends Plugin
                 $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
-                $async = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use($part, $repository){
+                $attachRepo = $ctx->getRepository();
+                $async = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use($part, $attachRepo){
                     if ($part !== false) {
                         $fake = new fsAccessDriver("fake", "");
-                        $fake->repository = $repository;
+                        $fake->repository = $attachRepo;
                         $fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
                     }
                 });
@@ -194,7 +197,7 @@ class EmlParser extends Plugin
                     if (isSet($httpVars["dest_repository_id"])) {
                         $destRepoId = $httpVars["dest_repository_id"];
                         if (AuthService::usersEnabled()) {
-                            $loggedUser = AuthService::getLoggedUser();
+                            $loggedUser = $ctx->getUser();
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }
                         $destRepoObject = ConfService::getRepositoryById($destRepoId);

@@ -1,6 +1,7 @@
 <?php
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -17,9 +18,14 @@ class radiusAuthDriver extends AbstractAuthDriver
     public $radiusPort = 1812;
     public $radiusSecret;
     public $radiusAuthType = 'chap';
-    public function init($options)
+
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->radiusServer = $options["RADIUS Server"];
         if ($options["RADIUS Port"])
             $this->radiusPort = $options["RADIUS Port"];

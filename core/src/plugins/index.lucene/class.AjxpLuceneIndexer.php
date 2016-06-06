@@ -22,6 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -45,20 +46,24 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     private $indexContent = false;
     private $verboseIndexation = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
-        $metaFields = $this->getFilteredOption("index_meta_fields");
+        $metaFields = $this->getContextualOption($ctx, "index_meta_fields");
         if (!empty($metaFields)) {
             $this->metaFields = explode(",",$metaFields);
         }
-        $this->indexContent = ($this->getFilteredOption("index_content") == true);
+        $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
     }
 
-    public function initMeta($accessDriver)
+    public function initMeta(ContextInterface $contextInterface, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($contextInterface, $accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->getXPath()->query("/indexer")->item(0);
@@ -72,13 +77,17 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
             }
         }
-        parent::init($this->options);
+        parent::init($contextInterface, $this->options);
     }
 
 
-    protected function setDefaultAnalyzer()
+    /**
+     * @param string $queryAnalyzer
+     * @param int $wildcardLimitation
+     */
+    protected function setDefaultAnalyzer($queryAnalyzer, $wildcardLimitation)
     {
-        switch ($this->getFilteredOption("QUERY_ANALYSER")) {
+        switch ($queryAnalyzer) {
             case "utf8num_insensitive":
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
                 break;
@@ -95,7 +104,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
                 break;
             case "textnum_sensitive":
-                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_textNum());
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum());
                 break;
             case "text_insensitive":
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text_CaseInsensitive());
@@ -107,7 +116,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
                 break;
         }
-        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(intval($this->getFilteredOption("WILDCARD_LIMITATION")));
+        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength($wildcardLimitation);
 
     }
 
@@ -123,6 +132,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         $repoId = $this->accessDriver->repository->getId();
         $actionName = $requestInterface->getAttribute("action");
         $httpVars   = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $ctxUser = $ctx->getUser();
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
@@ -153,7 +165,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 return null;
             }
             $textQuery = $httpVars["query"];
-            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
+            if($this->getContextualOption($ctx, "AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
                 }else if($textQuery[strlen($textQuery)-1] != "*" ){
@@ -187,7 +199,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $index->setDefaultSearchField("basename");
                 $query = $this->filterSearchRangesKeywords($textQuery);
             }
-            $this->setDefaultAnalyzer();
+            $this->setDefaultAnalyzer(
+                $this->getContextualOption($ctx, "QUERY_ANALYSER"),
+                intval($this->getContextualOption($ctx, "WILDCARD_LIMITATION"))
+            );
             if ($query == "*") {
                 $index->setDefaultSearchField("ajxp_node");
                 $query = "yes";
@@ -236,7 +251,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
+                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -270,11 +285,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $sParts[] = "$searchField:true";
             }
             if ($scope == "user" && AuthService::usersEnabled()) {
-                if (AuthService::getLoggedUser() == null) {
+                if ($ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
-                $sParts[] = "ajxp_user:".AuthService::getLoggedUser()->getId();
+                $sParts[] = "ajxp_user:".$ctxUser->getId();
             } else {
                 $sParts[] = "ajxp_scope:shared";
             }
@@ -306,7 +321,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
+                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -477,7 +492,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
             }
         }
-        $this->setDefaultAnalyzer();
+        $refNode = ($oldNode != null ? $oldNode : $newNode);
+        $this->setDefaultAnalyzer(
+            $this->getContextualOption($refNode->getContext(), "QUERY_ANALYSER"),
+            intval($this->getContextualOption($refNode->getContext(), "WILDCARD_LIMITATION"))
+        );
         if ($oldNode != null && $copy == false) {
             $oldDocId = $this->getIndexedDocumentId($oldIndex, $oldNode);
             if ($oldDocId != null) {
@@ -546,10 +565,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
         $parseContent = $this->indexContent;
-        if ($parseContent && $ajxpNode->bytesize > $this->getFilteredOption("PARSE_CONTENT_MAX_SIZE")) {
+        if ($parseContent && $ajxpNode->bytesize > $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_MAX_SIZE")) {
             $parseContent = false;
         }
-        if ($parseContent && in_array($ext, explode(",",$this->getFilteredOption("PARSE_CONTENT_HTML")))) {
+        if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
             $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")) {
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());

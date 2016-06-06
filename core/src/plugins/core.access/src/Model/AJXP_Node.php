@@ -24,6 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -68,7 +71,7 @@ class AJXP_Node implements \JsonSerializable
      */
     protected $nodeInfoLevel = "minimal";
     /**
-     * @var .\Repository
+     * @var RepositoryInterface
      */
     private $_repository;
     /**
@@ -128,6 +131,19 @@ class AJXP_Node implements \JsonSerializable
             $this->_repository = ConfService::getRepositoryById($this->urlParts["host"]);
         }
         return $this->_repository;
+    }
+    
+    public function getContext(){
+        if(empty($this->_user) && AuthService::getLoggedUser() !== null){
+            $uObject = AuthService::getLoggedUser();
+            $this->_user = $uObject->getId();
+        }
+        $ctx = new Context($this->getUser());
+        $ctx->setRepositoryObject($this->getRepository());
+        if(isSet($uObject)){
+            $ctx->setUserObject($uObject);
+        }
+        return $ctx;
     }
 
     /**

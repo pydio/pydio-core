@@ -27,6 +27,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
@@ -49,7 +50,12 @@ class smbAccessDriver extends fsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -91,12 +97,11 @@ class smbAccessDriver extends fsAccessDriver
     }
 
     /**
-     * Parse
-     * @param DOMNode $contribNode
+     * @inheritdoc
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if ($contribNode->nodeName != "actions" || (isSet($this->pluginConf["SMB_ENABLE_ZIP"]) && $this->pluginConf["SMB_ENABLE_ZIP"] == true)) {
             return ;
         }

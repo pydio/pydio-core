@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
@@ -70,10 +72,11 @@ interface AJXP_FeedStore
 
 
     /**
+     * @param ContextInterface $ctx
      * @param $alertId
      * @param $occurrences
      */
-    public function dismissAlertById($alertId, $occurrences = 1);
+    public function dismissAlertById(ContextInterface $ctx, $alertId, $occurrences = 1);
 
     /**
      * @param string $indexPath

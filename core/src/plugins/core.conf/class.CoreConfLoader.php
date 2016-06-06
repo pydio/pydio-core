@@ -21,7 +21,7 @@
 
 namespace Pydio\Conf\Core;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreConfLoader extends Plugin
+class CoreConfLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractConfDriver
@@ -39,14 +39,17 @@ class CoreConfLoader extends Plugin
     protected static $confImpl;
 
     /**
+     * @param PluginsService|null $pluginsService
      * @return AbstractConfDriver
      */
-    public function getConfImpl()
+    public function getImplementation($pluginsService = null)
     {
         if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver");
-                PluginsService::getInstance()->setPluginUniqueActiveForType("conf", self::$confImpl->getName());
+                if($pluginsService === null){
+                    $pluginsService = PluginsService::getInstance();
+                }
+                self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver", $pluginsService);
             }
         }
         return self::$confImpl;

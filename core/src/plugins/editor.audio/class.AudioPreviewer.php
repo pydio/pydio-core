@@ -46,24 +46,30 @@ class AudioPreviewer extends Plugin
         $httpVars["dir"] = base64_decode($httpVars["dir"]);
     }
 
-    public function switchAction($action, $httpVars, $postProcessData)
+    public function switchAction($action, $httpVars, $postProcessData, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
 
         if ($action == "audio_proxy") {
 
-            $selection = new UserSelection($repository, $httpVars);
+            $selection = UserSelection::fromContext($contextInterface, $httpVars);
             $destStreamURL = $selection->currentBaseUrl();
 
-            $node = new AJXP_Node($destStreamURL."/".$selection->getUniqueFile());
+            $node = $selection->getUniqueNode();
             // Backward compat
             // May be a backward compatibility problem, try to base64decode the filepath
-            if(!file_exists($node->getUrl()) && strpos($httpVars["file"], "base64encoded:") === false){
+            $exist = false;
+            try{
+                $exist = file_exists($node->getUrl());
+            }catch(\Exception $e){
+            }
+            if(!$exist && strpos($httpVars["file"], "base64encoded:") === false){
                 $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
                 if(!file_exists($destStreamURL.$file)){
                     throw new Exception("Cannot find file!");
                 }else{
+                    $user = $node->getUser();
                     $node = new AJXP_Node($destStreamURL.$file);
+                    $node->setUser($user);
                 }
             }
             if(!is_readable($node->getUrl())){

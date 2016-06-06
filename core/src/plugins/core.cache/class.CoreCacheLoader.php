@@ -21,6 +21,7 @@
 namespace Pydio\Cache\Core;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\HTMLWriter;
@@ -36,25 +37,28 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @static
  * Provides access to the cache via the Doctrine interface
  */
-class CoreCacheLoader extends Plugin
+class CoreCacheLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractCacheDriver
      */
     protected static $cacheInstance;
 
-    public function getCacheImpl()
+    /**
+     * @param PluginsService|null $pluginsService
+     * @return null|AbstractCacheDriver|Plugin
+     */
+    public function getImplementation($pluginsService = null)
     {
 
         $pluginInstance = null;
 
         if (!isSet(self::$cacheInstance) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$cacheInstance->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
-                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver");
-
-                if ($pluginInstance != false) {
-                    PluginsService::getInstance()->setPluginUniqueActiveForType("cache", $pluginInstance->getName(), $pluginInstance);
+                if($pluginsService === null){
+                    $pluginsService = PluginsService::getInstance();
                 }
+                $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver", $pluginsService);
             }
             self::$cacheInstance = $pluginInstance;
             if($pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
@@ -173,7 +177,7 @@ class CoreCacheLoader extends Plugin
 
     public function exposeCacheStats($actionName, $httpVars, $fileVars){
 
-        $cImpl = $this->getCacheImpl();
+        $cImpl = $this->getImplementation();
         $result = [];
         if($cImpl != null){
             $nspaces = $cImpl->listNamespaces();

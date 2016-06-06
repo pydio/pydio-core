@@ -48,6 +48,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
                 AuthService::updateUser($u);
             }
+            ConfService::switchRootDir();
             return true;
         }
         if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
@@ -58,17 +59,13 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 $guest->save("superuser");
             }
             AuthService::logUser("guest", null);
+            ConfService::switchRootDir();
             return true;
         }
         return false;
 
     }
-
-    protected function logUserFromLoginAction(&$httpVars){
-
-
-    }
-
+    
     function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
         $httpVars = $request->getParsedBody();

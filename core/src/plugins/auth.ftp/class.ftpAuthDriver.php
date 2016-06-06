@@ -21,6 +21,7 @@
 use Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
@@ -47,14 +48,19 @@ class ftpAuthDriver extends AbstractAuthDriver
 {
     public $driverName = "ftp";
 
-    public function init($options){
-        parent::init($options);
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
+    {
+        parent::init($ctx, $options);
         if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false){
             return;
         }
         // ENABLE WEBFTP LOGIN SCREEN
         $this->logDebug(__FUNCTION__, "Enabling authfront.webftp");
-        PluginsService::findPluginById("authfront.webftp")->enabled = true;
+        PluginsService::getInstance($ctx)->getPluginById("authfront.webftp")->enabled = true;
     }
 
     public function listUsers($baseGroup = "/", $recursive = true)

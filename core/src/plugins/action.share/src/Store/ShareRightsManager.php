@@ -393,7 +393,7 @@ class ShareRightsManager
     }
 
     /**
-     * @param \Pydio\Access\Core\Model\Repository $parentRepository
+     * @param \Pydio\Core\Model\RepositoryInterface $parentRepository
      * @param Repository $childRepository
      * @param bool $isUpdate
      * @param array $users

@@ -19,10 +19,12 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -46,17 +48,25 @@ class SvnManager extends AJXP_AbstractMetaSource
     private static $svnListCache;
     private $commitMessageParams;
 
-    public function init($options)
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(\Pydio\Core\Model\ContextInterface $ctx, $options = [])
     {
         $this->options = $options;
         // Do nothing
     }
 
-    public function initMeta($accessDriver)
+    /**
+     * @param ContextInterface $ctx
+     * @param AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         require_once("svn_lib.inc.php");
-        parent::initMeta($accessDriver);
-        parent::init($this->options);
+        parent::initMeta($ctx, $accessDriver);
+        parent::init($ctx, $this->options);
     }
 
     protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)

@@ -20,6 +20,7 @@
  */
 
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -31,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreAuthLoader extends Plugin
+class CoreAuthLoader extends Plugin implements CoreInstanceProvider
 {
     /**
      * @var AbstractAuthDriver
@@ -51,17 +52,27 @@ class CoreAuthLoader extends Plugin
         }
         return $configs;
     }
-
-    public function getAuthImpl()
+    
+    /**
+     * @param PluginsService|null $pluginsServiceInstance
+     * @return null|AbstractAuthDriver|Plugin
+     * @throws Exception
+     */
+    public function getImplementation($pluginsServiceInstance = null)
     {
+        if($pluginsServiceInstance === null){
+            $pluginsServiceInstance = PluginsService::getInstance();
+        }
         if (!isSet(self::$authStorageImpl)) {
             if (!isSet($this->pluginConf["MASTER_INSTANCE_CONFIG"])) {
                 throw new Exception("Please set up at least one MASTER_INSTANCE_CONFIG in core.auth options");
             }
             $masterName = is_array($this->pluginConf["MASTER_INSTANCE_CONFIG"]) ? $this->pluginConf["MASTER_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["MASTER_INSTANCE_CONFIG"];
-            $masterName = str_replace("auth.", "", $masterName);
-            if (!empty($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) && !empty($this->pluginConf["MULTI_MODE"])) {
+            if(is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) && $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] !== $masterName){
                 $slaveName = is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) ? $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["SLAVE_INSTANCE_CONFIG"];
+            }
+            if (!empty($slaveName) && !empty($this->pluginConf["MULTI_MODE"])) {
+                $masterName = str_replace("auth.", "", $masterName);
                 $slaveName = str_replace("auth.", "", $slaveName);
                 // Manually set up a multi config
 
@@ -114,12 +125,10 @@ class CoreAuthLoader extends Plugin
                     }
                 }
                 $newOptions = array_merge($newOptions, $masterMainAuthOptions);
-                self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($newOptions, "AbstractAuthDriver");
-                PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName(), self::$authStorageImpl);
+                self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($newOptions, "Pydio\\Auth\\Core\\AbstractAuthDriver", $pluginsServiceInstance);
 
             } else {
-                self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["MASTER_INSTANCE_CONFIG"], "Pydio\\Auth\\Core\\AbstractAuthDriver");
-                PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName());
+                self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["MASTER_INSTANCE_CONFIG"], "Pydio\\Auth\\Core\\AbstractAuthDriver", $pluginsServiceInstance);
             }
         }
         return self::$authStorageImpl;

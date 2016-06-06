@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 
@@ -111,7 +112,12 @@ class s3AccessDriver extends fsAccessDriver
         return parent::detectStreamWrapper($register);
     }
 
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         $this->detectStreamWrapper(true);
 
@@ -168,13 +174,12 @@ class s3AccessDriver extends fsAccessDriver
 
     }
 
-        /**
-     * Parse
-     * @param DOMNode $contribNode
+    /**
+     * @inheritdoc
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
         $this->disableArchiveBrowsingContributions($contribNode);
     }
@@ -232,9 +237,15 @@ class s3AccessDriver extends fsAccessDriver
         }
     }
 
-    public function makeSharedRepositoryOptions($httpVars, $repository)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $httpVars
+     * @return array
+     * @throws \Exception
+     */
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
         $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
         return $newOptions;
     }

@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
@@ -55,15 +56,14 @@ class IMagickPreviewer extends Plugin
         }
     }
 
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
-        $repository = ConfService::getRepository();
-        $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
+        $convert = $this->getContextualOption($contextInterface, "IMAGE_MAGICK_CONVERT");
         if (empty($convert)) {
             return false;
         }
-        $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository));
-        $selection = new UserSelection($repository, $httpVars);
+        $flyThreshold = 1024*1024*intval($this->getContextualOption($contextInterface, "ONTHEFLY_THRESHOLD"));
+        $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "imagick_data_proxy") {
@@ -102,7 +102,7 @@ class IMagickPreviewer extends Plugin
             } else if ($this->extractAll) { // on the fly extract mode
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
-                $files = $this->listPreviewFiles($file, $prefix);
+                $files = $this->listPreviewFiles($contextInterface, $file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
                 return false;
@@ -121,8 +121,8 @@ class IMagickPreviewer extends Plugin
             $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = Utils::decodeSecureMagic($httpVars["src_file"]);
-                if($repository->hasContentFilter()){
-                    $contentFilter = $repository->getContentFilter();
+                if($contextInterface->getRepository()->hasContentFilter()){
+                    $contentFilter = $contextInterface->getRepository()->getContentFilter();
                     $srcfile = $contentFilter->filterExternalPath($srcfile);
                 }
                 $size = filesize($destStreamURL."/".$srcfile);
@@ -202,11 +202,11 @@ class IMagickPreviewer extends Plugin
         return $files;
     }
 
-    protected function listPreviewFiles($file, $prefix)
+    protected function listPreviewFiles(ContextInterface $ctx, $file, $prefix)
     {
         $files = array();
         $index = 0;
-        $unoconv =  $this->getFilteredOption("UNOCONV");
+        $unoconv =  $this->getContextualOption($ctx, "UNOCONV");
         if (!empty($unoconv)) {
             $officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
             $extension = pathinfo($file, PATHINFO_EXTENSION);

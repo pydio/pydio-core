@@ -36,12 +36,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class FileMimeSender extends Plugin
 {
-    public function switchAction($action, $httpVars, $filesVars)
+    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
         $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
         
         if (AuthService::usersEnabled()) {
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $ctx->getUser();
             if ($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
                 AuthService::logUser("guest", null);
                 $loggedUser = AuthService::getLoggedUser();

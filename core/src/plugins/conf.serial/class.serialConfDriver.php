@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -44,9 +45,13 @@ class serialConfDriver extends AbstractConfDriver
     public $aliasesIndexFile;
     public $pluginsConfigsFile;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $this->repoSerialFile = VarsFilter::filter($this->options["REPOSITORIES_FILEPATH"]);
         $this->usersSerialDir = VarsFilter::filter($this->options["USERS_DIRPATH"]);
         $this->rolesSerialFile = VarsFilter::filter($this->options["ROLES_FILEPATH"]);

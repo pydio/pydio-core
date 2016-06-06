@@ -29,18 +29,31 @@ class MultiAuthFrontend extends AbstractAuthFrontend {
         return false;
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
+        $sources = array();
+
+        if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])
+            || (isSet($this->options["MODE"]) && $this->options["MODE"] == "MASTER_SLAVE") ) {
+
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $action = $actionXpath->query('action[@name="login"]', $contribNode);
+            if($action->length) {
+                $action = $action->item(0);
+                $contribNode->removeChild($action);
+            }
+            return;
+
+        }
 
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $loginCallbackNodeList = $actionXpath->query('//clientCallback', $contribNode);
         $callbackNode = $loginCallbackNodeList->item(0);
         $xmlContent = $callbackNode->firstChild->wholeText;
 
-        $sources = array();
-        if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])) return;
+
         foreach ($this->options["DRIVERS"] as $driverDef) {
             $dName = $driverDef["NAME"];
             if (isSet($driverDef["LABEL"])) {
@@ -50,6 +63,7 @@ class MultiAuthFrontend extends AbstractAuthFrontend {
             }
             $sources[$dName] = $dLabel;
         }
+
         $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
         $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->options["MASTER_DRIVER"], $xmlContent);
         $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->options["USER_ID_SEPARATOR"], $xmlContent);

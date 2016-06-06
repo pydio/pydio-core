@@ -53,6 +53,10 @@ class PowerFSController extends Plugin
 
         $selection = new UserSelection();
         $httpVars = $request->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $repository = $ctx->getRepository();
+
         $dir = $httpVars["dir"] OR "";
         $dir = Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
@@ -60,7 +64,7 @@ class PowerFSController extends Plugin
         if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
-        $urlBase = "pydio://". ConfService::getRepository()->getId();
+        $urlBase = "pydio://". $repository->getId();
         $mess = ConfService::getMessages();
         $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         if($request->getAttribute("action") != "postcompress_download"){
@@ -130,7 +134,7 @@ class PowerFSController extends Plugin
                     $archiveName = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$opeId."_".$archiveName;
                 }
                 chdir($rootDir);
-                $cmd = $this->getFilteredOption("ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
+                $cmd = $this->getContextualOption($ctx, "ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
@@ -174,12 +178,12 @@ class PowerFSController extends Plugin
                     $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase.$dir."/".$archiveName);
                     $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
                     $nodesDiff->add($newNode);
-                    Controller::applyHook("msg.instant", array($nodesDiff->toXML(), ConfService::getCurrentRepositoryId()));
+                    Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $repository->getId()));
                 }else{
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
                     $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$opeId."',archive_name:'".$archiveName."'}); ";
                     $actionTrigger = BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]);
-                    Controller::applyHook("msg.instant", array($actionTrigger->toXML(), ConfService::getCurrentRepositoryId()));
+                    Controller::applyHook("msg.instant", array($actionTrigger->toXML(), $repository->getId()));
 
                 }
 

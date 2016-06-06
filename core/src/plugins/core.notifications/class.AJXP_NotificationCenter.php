@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -44,23 +46,30 @@ class AJXP_NotificationCenter extends Plugin
      */
     private $eventStore = false;
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
+        parent::init($ctx, $options);
+        $this->userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
+        $pService = \Pydio\Core\PluginFramework\PluginsService::getInstance($ctx);
         try {
-            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore");
+            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore", $pService);
         } catch (Exception $e) {
 
         }
         if ($this->eventStore === false) {
             $this->pluginConf["USER_EVENTS"] = false;
+        }else{
+            $pService->setPluginActive($this->eventStore->getType(), $this->eventStore->getName(), true, $this->eventStore);
         }
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-           parent::parseSpecificContributions($contribNode);
+           parent::parseSpecificContributions($ctx, $contribNode);
 
            // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
@@ -127,8 +136,7 @@ class AJXP_NotificationCenter extends Plugin
     }
 
     public function loadRepositoryInfo(&$data){
-        $req = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
-        $req = $req->withParsedBody([
+        $body = [
             'format' => 'array',
             'current_repository'=>true,
             'feed_type'=>'notif',
@@ -136,7 +144,8 @@ class AJXP_NotificationCenter extends Plugin
             'path'=>'/',
             'merge_description'=>true,
             'description_as_label'=>false
-        ])->withAttribute("action", "get_my_feed");
+        ];
+        $req = Controller::executableRequest(Context::fromGlobalServices(), "get_my_feed", $body);
         $this->loadUserFeed($req, new \Zend\Diactoros\Response\EmptyResponse(), $returnData);
         $data["core.notifications"] = $returnData;
     }
@@ -145,14 +154,17 @@ class AJXP_NotificationCenter extends Plugin
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @param array $returnData
+     * @throws \Pydio\Core\Exception\PydioException
      */
     public function loadUserFeed(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, &$returnData = [])
     {
         $httpVars = $requestInterface->getParsedBody();
         if(!$this->eventStore) {
-            return;
+            throw new \Pydio\Core\Exception\PydioException("Cannot find eventStore for notification plugin");
         }
-        $u = AuthService::getLoggedUser();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $u = $ctx->getUser();
 
         $mess = ConfService::getMessages();
         $nodesList = new \Pydio\Access\Core\Model\NodesList();
@@ -179,13 +191,13 @@ class AJXP_NotificationCenter extends Plugin
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
         $authRepos = array();
-        $crtRepId = ConfService::getCurrentRepositoryId();
-        if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
+        $crtRepId = $ctx->getRepositoryId();
+        if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
         } else if (isSet($httpVars["current_repository"])){
             $authRepos[] = $crtRepId;
         } else {
-            $accessibleRepos = ConfService::getAccessibleRepositories(AuthService::getLoggedUser(), false, true, false);
+            $accessibleRepos = ConfService::getAccessibleRepositories($u, false, true, false);
             $authRepos = array_keys($accessibleRepos);
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
@@ -278,29 +290,37 @@ class AJXP_NotificationCenter extends Plugin
     }
 
 
-    public function dismissUserAlert($actionName, $httpVars, $fileVars)
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     */
+    public function dismissUserAlert($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         if(!$this->eventStore) return;
         $alertId = $httpVars["alert_id"];
         $oc = 1;
         if(isSet($httpVars["occurrences"])) $oc = intval($httpVars["occurrences"]);
-        $this->eventStore->dismissAlertById($alertId, $oc);
+        $this->eventStore->dismissAlertById($ctx, $alertId, $oc);
     }
 
 
     public function loadUserAlerts(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, \Pydio\Access\Core\Model\NodesList &$nodesList = null)
     {
         if(!$this->eventStore) return;
-        $u = AuthService::getLoggedUser();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $u = $ctx->getUser();
         $userId = $u->getId();
         $repositoryFilter = null;
         $httpVars = $requestInterface->getParsedBody();
 
-        if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
+        if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
             $repositoryFilter = $httpVars["repository_id"];
         }
         if ($repositoryFilter == null) {
-            $repositoryFilter = ConfService::getRepository()->getId();
+            $repositoryFilter = $ctx->getRepositoryId();
         }
         $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
         if(!count($res)) return;
@@ -366,7 +386,7 @@ class AJXP_NotificationCenter extends Plugin
                     @$node->loadNodeInfo();
                 } catch (Exception $e) {
                     if($notification->alert_id){
-                        $this->eventStore->dismissAlertById($notification->alert_id);
+                        $this->eventStore->dismissAlertById($ctx, $notification->alert_id);
                     }
                     continue;
                 }

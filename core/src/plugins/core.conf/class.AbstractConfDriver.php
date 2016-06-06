@@ -32,6 +32,9 @@ use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
@@ -42,6 +45,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -56,10 +60,13 @@ abstract class AbstractConfDriver extends Plugin
     public $options;
     public $driverType = "conf";
 
-
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
         $options = $this->options;
 
         // BACKWARD COMPATIBILIY PREVIOUS CONFIG VIA OPTIONS
@@ -81,9 +88,9 @@ abstract class AbstractConfDriver extends Plugin
 
     }
 
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if ($contribNode->nodeName == 'client_configs' && !ConfService::getCoreConf("WEBDAV_ENABLE")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $webdavCompNodeList = $actionXpath->query('component_config/additional_tab[@id="webdav_pane"]', $contribNode);
@@ -105,11 +112,11 @@ abstract class AbstractConfDriver extends Plugin
         }
 
         // SWITCH TO DASHBOARD ACTION
-        $u = AuthService::getLoggedUser();
+        $u = $ctx->getUser();
         $access = true;
         if($u == null) $access = false;
         else {
-            $acl = $u->mergedRole->getAcl("ajxp_user");
+            $acl = $u->getMergedRole()->getAcl("ajxp_user");
             if(empty($acl)) $access = false;
         }
         if(!$access){
@@ -404,7 +411,7 @@ abstract class AbstractConfDriver extends Plugin
     {
         $test=CacheService::fetch("shared", "pydio:user:" . $userId);
         if($test !== false && $test instanceof AbstractAjxpUser){
-            if($test->personalRole == null){
+            if($test->getPersonalRole() === null){
                 $test->personalRole = $test->roles["AJXP_USR_/".$userId];
             }
             $test->recomputeMergedRole();
@@ -580,6 +587,10 @@ abstract class AbstractConfDriver extends Plugin
     {
         $httpVars = $requestInterface->getParsedBody();
         $action = $requestInterface->getAttribute("action");
+        /** @var ContextInterface $ctx */
+        $ctx    = $requestInterface->getAttribute("ctx");
+        $loggedUser = $ctx->getUser();
+
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = Utils::securePath($getValue);
         }
@@ -601,15 +612,10 @@ abstract class AbstractConfDriver extends Plugin
                     throw new PydioException("Trying to switch to an unkown repository!");
                 }
                 ConfService::switchRootDir($repository_id);
-                // Load try to init the driver now, to trigger an exception
-                // if it's not loading right.
-                ConfService::loadRepositoryDriver();
-                if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
-                    $user = AuthService::getLoggedUser();
-                    $activeRepId = ConfService::getCurrentRepositoryId();
-                    $user->setArrayPref("history", "last_repository", $activeRepId);
-                    $user->setArrayPref("repository_last_connected", $activeRepId, time());
-                    $user->save("user");
+                PluginsService::getInstance();
+                if (AuthService::usersEnabled() && $loggedUser !== null) {
+                    $loggedUser->setArrayPref("repository_last_connected", $repository_id, time());
+                    $loggedUser->save("user");
                 }
 
                 $this->logInfo("Switch Repository", array("rep. id"=>$repository_id));
@@ -621,8 +627,9 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "get_xml_registry" :
             case "state" :
-
-                $clone = ConfService::getFilteredXMLRegistry(true, true);
+                
+                
+                $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
                 $clonePath = new \DOMXPath($clone);
                 if(!AJXP_SERVER_DEBUG){
                     $serverCallbacks = $clonePath->query("//serverCallback|hooks");
@@ -663,8 +670,8 @@ abstract class AbstractConfDriver extends Plugin
             case "get_bookmarks":
 
                 $bmUser = null;
-                if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
-                    $bmUser = AuthService::getLoggedUser();
+                if (AuthService::usersEnabled() && $loggedUser != null) {
+                    $bmUser = $loggedUser;
                 } else if (!AuthService::usersEnabled()) {
                     $confStorage = ConfService::getConfStorageImpl();
                     $bmUser = $confStorage->createUserObject("shared");
@@ -674,13 +681,15 @@ abstract class AbstractConfDriver extends Plugin
                 if ($bmUser == null) {
                     break;
                 }
-                $driver = ConfService::loadRepositoryDriver();
+                /** @var ContextInterface $ctx */
+                $ctx = $requestInterface->getAttribute("ctx");
+                $driver = $ctx->getRepository()->getDriverInstance();
                 if (!($driver instanceof IAjxpWrapperProvider)) {
                     $driver = false;
                 }
 
 
-                $repositoryId = ConfService::getCurrentRepositoryId();
+                $repositoryId = $ctx->getRepositoryId();
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
                     $bmPath = Utils::decodeSecureMagic($httpVars["bm_path"]);
                     if ($httpVars["bm_action"] == "add_bookmark") {
@@ -703,18 +712,18 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->renameBookmark($repositoryId, $bmPath, $title);
                     }
                     Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
-                            ConfService::getRepository()->getId(),
-                            AuthService::getLoggedUser()->getId())
+                            $repositoryId,
+                            $loggedUser->getId())
                     );
 
-                    if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+                    if (AuthService::usersEnabled() && $loggedUser != null) {
                         $bmUser->save("user");
                         AuthService::updateUser($bmUser);
                     } else if (!AuthService::usersEnabled()) {
                         $bmUser->save("user");
                     }
                 }
-                $doc = new XMLDocMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $doc = new XMLMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx->getRepository(), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
                 $x = new SerializableResponseStream([$doc]);
                 $responseInterface = $responseInterface->withBody($x);
 
@@ -725,19 +734,18 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "save_user_pref":
 
-                $userObject = AuthService::getLoggedUser();
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
                     $prefName = Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
                     $prefValue = \Pydio\Core\Utils\Utils::sanitize(TextEncoder::magicDequote($httpVars["pref_value_".$i]));
                     if($prefName == "password") continue;
-                    if ($prefName != "pending_folder" && $userObject == null) {
+                    if ($prefName != "pending_folder" && $loggedUser == null) {
                         $i++;
                         continue;
                     }
-                    $userObject->setPref($prefName, $prefValue);
-                    $userObject->save("user");
-                    AuthService::updateUser($userObject);
+                    $loggedUser->setPref($prefName, $prefValue);
+                    $loggedUser->save("user");
+                    AuthService::updateUser($loggedUser);
                     $i++;
                 }
 
@@ -765,8 +773,7 @@ abstract class AbstractConfDriver extends Plugin
                     if (AuthService::userExists($data["new_user_id"],"w")) {
                         throw new \Exception($mess["ajxp_conf.43"]);
                     }
-                    $loggedUser = AuthService::getLoggedUser();
-                    $limit = $loggedUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                    $limit = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
                         $count = count($this->getUserChildren($loggedUser->getId()));
                         if ($count >= $limit) {
@@ -775,12 +782,12 @@ abstract class AbstractConfDriver extends Plugin
                     }
 
                     AuthService::createUser($data["new_user_id"], $data["new_password"]);
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($data["new_user_id"]);
-                    $userObject->setParent($loggedUser->getId());
-                    $userObject->save('superuser');
-                    $userObject->personalRole->clearAcls();
-                    $userObject->setGroupPath($loggedUser->getGroupPath());
-                    $userObject->setProfile("shared");
+                    $loggedUser = ConfService::getConfStorageImpl()->createUserObject($data["new_user_id"]);
+                    $loggedUser->setParent($loggedUser->getId());
+                    $loggedUser->save('superuser');
+                    $loggedUser->getPersonalRole()->clearAcls();
+                    $loggedUser->setGroupPath($loggedUser->getGroupPath());
+                    $loggedUser->setProfile("shared");
 
                 } else if($action == "user_create_user" && isSet($httpVars["NEW_existing_user_id"])){
 
@@ -790,8 +797,8 @@ abstract class AbstractConfDriver extends Plugin
                     if(!AuthService::userExists($userId)){
                         throw new \Exception("Cannot find user");
                     }
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
-                    if($userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                    $loggedUser = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    if($loggedUser->getParent() != $loggedUser->getId()){
                         throw new \Exception("Cannot find user");
                     }
                     if(!empty($data["new_password"])){
@@ -800,11 +807,10 @@ abstract class AbstractConfDriver extends Plugin
 
                 } else {
                     $updating = false;
-                    $userObject = AuthService::getLoggedUser();
                     Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
 
-                $paramNodes = PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+                $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
                 if (is_array($paramNodes) && count($paramNodes)) {
                     foreach ($paramNodes as $xmlNode) {
@@ -817,10 +823,14 @@ abstract class AbstractConfDriver extends Plugin
                             $name = $xmlNode->getAttribute("name");
                             if (isSet($data[$name]) || $data[$name] === "") {
                                 if($data[$name] == "__AJXP_VALUE_SET__") continue;
-                                if ($data[$name] === "" || $userObject->parentRole == null
-                                    || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
-                                    || $userObject->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]) {
-                                    $userObject->personalRole->setParameterValue($pluginId, $name, $data[$name]);
+                                $pRole = null;
+                                $persRole = $loggedUser->getPersonalRole();
+                                if($loggedUser instanceof AbstractAjxpUser) $pRole = $loggedUser->parentRole;
+                                if ($data[$name] === ""
+                                    || $pRole === null || $pRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
+                                    || $persRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name])
+                                {
+                                    $persRole->setParameterValue($pluginId, $name, $data[$name]);
                                     $rChanges = true;
                                 }
                             }
@@ -828,16 +838,16 @@ abstract class AbstractConfDriver extends Plugin
                     }
                 }
                 if ($rChanges) {
-                    AuthService::updateRole($userObject->personalRole, $userObject);
-                    $userObject->recomputeMergedRole();
+                    AuthService::updateRole($loggedUser->getPersonalRole(), $loggedUser);
+                    $loggedUser->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
-                        AuthService::updateUser($userObject);
+                        AuthService::updateUser($loggedUser);
                     }
                 }
 
                 if ($action == "user_create_user") {
 
-                    Controller::applyHook($updating?"user.after_update":"user.after_create", array($userObject));
+                    Controller::applyHook($updating?"user.after_update":"user.after_create", array($loggedUser));
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
                         $mailer = PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
@@ -872,15 +882,15 @@ abstract class AbstractConfDriver extends Plugin
                 if(!\Pydio\Core\Services\AuthService::userExists($userId)){
                     throw new \Exception("Cannot find user");
                 }
-                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
-                if($userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                $loggedUser = ConfService::getConfStorageImpl()->createUserObject($userId);
+                if($loggedUser->getParent() != $loggedUser->getId()){
                     throw new \Exception("Cannot find user");
                 }
                 $paramsString = ConfService::getCoreConf("NEWUSERS_EDIT_PARAMETERS", "conf");
                 $result = array();
                 $params = explode(",", $paramsString);
                 foreach($params as $p){
-                    $result[$p] = $userObject->personalRole->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
+                    $result[$p] = $loggedUser->getPersonalRole()->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
                 }
 
                 $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
@@ -893,7 +903,6 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "webdav_preferences" :
 
-                $userObject = AuthService::getLoggedUser();
                 $webdavActive = false;
                 $passSet = false;
                 $digestSet = false;
@@ -904,7 +913,7 @@ abstract class AbstractConfDriver extends Plugin
                     $baseURL = \Pydio\Core\Utils\Utils::detectServerURL();
                 }
                 $webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
-                $davData = $userObject->getPref("AJXP_WEBDAV_DATA");
+                $davData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
                 $digestSet = isSet($davData["HA1"]);
                 if (isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])) {
                     if (!empty($httpVars["activate"])) {
@@ -917,14 +926,14 @@ abstract class AbstractConfDriver extends Plugin
                     if (!empty($httpVars["webdav_pass"])) {
                         $password = $httpVars["webdav_pass"];
                         if (function_exists('mcrypt_encrypt')) {
-                            $user = $userObject->getId();
+                            $user = $loggedUser->getId();
                             $secret = (defined("AJXP_SAFE_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
                             $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB));
                         }
                         $davData["PASS"] = $password;
                     }
-                    $userObject->setPref("AJXP_WEBDAV_DATA", $davData);
-                    $userObject->save("user");
+                    $loggedUser->setPref("AJXP_WEBDAV_DATA", $davData);
+                    $loggedUser->save("user");
                 }
                 if (!empty($davData)) {
                     $webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true);
@@ -932,12 +941,11 @@ abstract class AbstractConfDriver extends Plugin
                 }
                 $repoList = ConfService::getRepositoriesList();
                 $davRepos = array();
-                $loggedUser = AuthService::getLoggedUser();
                 foreach ($repoList as $repoIndex => $repoObject) {
                     $accessType = $repoObject->getAccessType();
                     $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-            if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getOption("AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
-                        $davRepos[$repoIndex] = $webdavBaseUrl ."".($repoObject->getSlug()==null?$repoObject->getId():$repoObject->getSlug());
+                    if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getOption("AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
+                        $davRepos[$repoIndex] = $webdavBaseUrl . "" . ($repoObject->getSlug() == null ? $repoObject->getId() : $repoObject->getSlug());
                     }
                 }
                 $prefs = array(
@@ -1008,7 +1016,7 @@ abstract class AbstractConfDriver extends Plugin
                         $name = $paramNode->getAttribute("name");
                         if ( strpos($name, "TPL_") === 0 ) {
                             if ($name == "TPL_DEFAULT_LABEL") {
-                                $defaultLabel = str_replace("AJXP_USER", AuthService::getLoggedUser()->getId(), $repo->getOption($name));
+                                $defaultLabel = str_replace("AJXP_USER", $loggedUser->getId(), $repo->getOption($name));
                             }
                             continue;
                         }
@@ -1035,8 +1043,7 @@ abstract class AbstractConfDriver extends Plugin
                 $tplRepo = ConfService::getRepositoryById($tplId);
                 $options = array();
                 Utils::parseStandardFormParameters($httpVars, $options);
-                $loggedUser = AuthService::getLoggedUser();
-                $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, null, $loggedUser->getId());
+                $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
                 if (!empty($gPath)) {
                     $newRep->setGroupPath($gPath);
@@ -1048,7 +1055,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 // Make sure we do not overwrite otherwise loaded rights.
                 $loggedUser->load();
-                $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
+                $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                 $loggedUser->save("superuser");
                 $loggedUser->recomputeMergedRole();
                 AuthService::updateUser($loggedUser);
@@ -1065,7 +1072,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 $repoId = $httpVars["repository_id"];
                 $repository = ConfService::getRepositoryById($repoId);
-                if (!$repository->getUniqueUser()||$repository->getUniqueUser()!=AuthService::getLoggedUser()->getId()) {
+                if (!$repository->getUniqueUser()||$repository->getUniqueUser()!= $loggedUser->getId()) {
                     throw new \Exception("You are not allowed to perform this operation!");
                 }
                 $res = ConfService::deleteRepository($repoId);
@@ -1074,10 +1081,9 @@ abstract class AbstractConfDriver extends Plugin
                     throw new PydioException($mess[427]);
                 }
 
-                $loggedUser = AuthService::getLoggedUser();
                 // Make sure we do not override remotely set rights
                 $loggedUser->load();
-                $loggedUser->personalRole->setAcl($repoId, "");
+                $loggedUser->getPersonalRole()->setAcl($repoId, "");
                 $loggedUser->save("superuser");
                 AuthService::updateUser($loggedUser);
 
@@ -1092,7 +1098,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 $userId = $httpVars["user_id"];
                 $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
-                if ($userObject == null || !$userObject->hasParent() || $userObject->getParent() != AuthService::getLoggedUser()->getId()) {
+                if ($userObject == null || !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId()) {
                     throw new \Exception("You are not allowed to edit this user");
                 }
                 AuthService::deleteUser($userId);
@@ -1114,7 +1120,7 @@ abstract class AbstractConfDriver extends Plugin
                 if (!ConfService::getAuthDriverImpl()->usersEditable()) {
                     break;
                 }
-                $loggedUser = AuthService::getLoggedUser();
+
                 $crtValue = $httpVars["value"];
                 $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
@@ -1154,10 +1160,10 @@ abstract class AbstractConfDriver extends Plugin
                     $listRoleType = false;
 
                     if(isSet($roleOrGroup["PREFIX"])){
-                        $rolePrefix    = $loggedUser->mergedRole->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
-                        $excludeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
-                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
-                        $listUserRolesOnly = $loggedUser->mergedRole->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
+                        $rolePrefix    = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
+                        $excludeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
+                        $includeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
+                        $listUserRolesOnly = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
                         if (is_array($listUserRolesOnly) && isset($listUserRolesOnly["group_switch_value"])) {
                             switch ($listUserRolesOnly["group_switch_value"]) {
                                 case "userroles":
@@ -1253,9 +1259,9 @@ abstract class AbstractConfDriver extends Plugin
             case "load_repository_info":
 
                 $data = array();
-                $repo = ConfService::getRepository();
+                $repo = $ctx->getRepository();
                 if($repo != null){
-                    $users = AuthService::countUsersForRepository(ConfService::getRepository()->getId(), true);
+                    $users = AuthService::countUsersForRepository($repo->getId(), true);
                     $data["core.users"] = $users;
                     if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
                         Controller::applyHook("repository.load_info", array(&$data));
@@ -1276,11 +1282,11 @@ abstract class AbstractConfDriver extends Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    if (isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null
-                        && ( AuthService::getLoggedUser()->getId() == $httpVars["user_id"] || AuthService::getLoggedUser()->isAdmin() )) {
+                    if (isSet($httpVars["user_id"]) && $loggedUser != null
+                        && ( $loggedUser->getId() == $httpVars["user_id"] || $loggedUser->isAdmin() )) {
                         $context = array("USER" => \Pydio\Core\Utils\Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS));
-                    } else if(AuthService::getLoggedUser() !== null) {
-                        $context = array("USER" => AuthService::getLoggedUser()->getId());
+                    } else if($loggedUser !== null) {
+                        $context = array("USER" => $loggedUser->getId());
                     } else {
                         $context = array();
                     }
@@ -1334,7 +1340,7 @@ abstract class AbstractConfDriver extends Plugin
     }
 
     /**
-     * @param AbstractAjxpUser $userObject
+     * @param UserInterface $userObject
      * @param string $rolePrefix get all roles with prefix
      * @param string $includeString get roles in this string
      * @param string $excludeString eliminate roles in this string
@@ -1390,20 +1396,23 @@ abstract class AbstractConfDriver extends Plugin
         return $allRoles;
     }
 
+
     /**
-     * @param string $actionName
-     * @param array $httpVars
-     * @param array $fileVars
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    public function publishPermissionsMask($actionName, $httpVars, $fileVars){
+    public function publishPermissionsMask(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
         $mask = array();
-        HTMLWriter::charsetHeader("application/json");
-        if(!AuthService::usersEnabled() || AuthService::getLoggedUser() == null){
-            print json_encode($mask);
-            return;
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $user = $ctx->getUser();
+
+        if(!AuthService::usersEnabled() || $user == null){
+            $responseInterface = new JsonResponse($mask);
+            return $responseInterface;
         }
-        $repoId = ConfService::getCurrentRepositoryId();
-        $role = AuthService::getLoggedUser()->mergedRole;
+        $repoId = $ctx->getRepositoryId();
+        $role = $user->getMergedRole();
         if($role->hasMask($repoId)){
             $fullMask = $role->getMask($repoId);
             foreach($fullMask->flattenTree() as $path => $permission){
@@ -1415,8 +1424,8 @@ abstract class AbstractConfDriver extends Plugin
                 );
             }
         }
-        print json_encode($mask);
-        return;
+        $responseInterface = new JsonResponse($mask);
+        return $responseInterface;
 
     }
 }

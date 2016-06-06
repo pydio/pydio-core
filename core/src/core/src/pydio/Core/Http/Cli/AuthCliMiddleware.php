@@ -23,8 +23,11 @@ namespace Pydio\Core\Http\Cli;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Http\Server;
+use Pydio\Core\Model\Context;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Zend\Diactoros\Response;
@@ -43,6 +46,8 @@ class AuthCliMiddleware
      */
     public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
+        $driverImpl = ConfService::getAuthDriverImpl();
+        PluginsService::getInstance()->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
         $options = $requestInterface->getAttribute("cli-options");
         $optUser = $options["u"];
@@ -156,8 +161,12 @@ class AuthCliMiddleware
                     $loggedUser = AuthService::getLoggedUser();
                     if($loggedUser == null) continue;
                     ConfService::switchRootDir($optRepoId, true);
-                    ConfService::reloadServicesAndActivePlugins();
+                    Controller::registryReset();
                     $subResponse = new Response();
+                    $ctx = new Context();
+                    $ctx->setUserObject($loggedUser);
+                    $ctx->setRepositoryId($optRepoId);
+                    $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
 
                     $subResponse = Server::callNextMiddleWareAndRewind(function($middleware){
                         return (is_array($middleware) && $middleware["0"] == "Pydio\\Core\\Http\\Cli\\AuthCliMiddleware" && $middleware[1] == "handleRequest");
@@ -179,7 +188,12 @@ class AuthCliMiddleware
         }else{
 
             ConfService::switchRootDir($optRepoId, true);
-            ConfService::reloadServicesAndActivePlugins();
+
+            $ctx = new Context();
+            $ctx->setUserObject($loggedUser);
+            $ctx->setRepositoryId($optRepoId);
+            $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+
             return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
         }

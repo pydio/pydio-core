@@ -22,6 +22,7 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -36,11 +37,12 @@ class FSMonitoringManager extends AJXP_AbstractMetaSource
     private $repoBase;
 
     /**
+     * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
      */
-    public function initMeta($accessDriver)
+    public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        parent::initMeta($accessDriver);
+        parent::initMeta($ctx, $accessDriver);
         $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
     }

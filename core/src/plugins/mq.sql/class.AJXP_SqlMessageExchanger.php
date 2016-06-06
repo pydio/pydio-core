@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -34,9 +35,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
 {
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-           parent::init($options);
+           parent::init($ctx, $options);
            $this->sqlDriver = $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
        }
 
@@ -95,8 +100,9 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param $channelName
      * @param $clientId
      * @return mixed
+     * @throws Exception
      */
-    public function suscribeToChannel($channelName, $clientId)
+    public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName, true);
         if (AuthService::usersEnabled()) {
@@ -128,7 +134,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param $clientId
      * @return mixed
      */
-    public function unsuscribeFromChannel($channelName, $clientId)
+    public function unsuscribeFromChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
@@ -142,7 +148,12 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
         }
     }
 
-    public function publishToChannel($channelName, $messageObject)
+    /**
+     * @param ContextInterface $ctx
+     * @param $channelName
+     * @param $messageObject
+     */
+    public function publishToChannel(ContextInterface $ctx, $channelName, $messageObject)
     {
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
@@ -160,10 +171,12 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param $userGroup
      * @return mixed
      */
-    public function consumeInstantChannel($channelName, $clientId, $userId, $userGroup)
+    public function consumeInstantChannel(ContextInterface $ctx, $channelName, $clientId, $userId, $userGroup)
     {
         $this->loadChannel($channelName);
-        if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
+        if(!isSet($this->channels) || !isSet($this->channels[$channelName])) {
+            return null;
+        }
         // Check dead clients
         if (is_array($this->channels[$channelName]["CLIENTS"])) {
             $toRemove = array();
@@ -171,22 +184,18 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
                 $cAlive = $cData["ALIVE"];
                 if( $cId != $clientId &&  time() - $cAlive > $this->clientsGCTime * 60) $toRemove[] = $cId;
             }
-            if(count($toRemove)) foreach($toRemove as $c) $this->unsuscribeFromChannel($channelName, $c);
+            if(count($toRemove)) {
+                foreach($toRemove as $c) {
+                    $this->unsuscribeFromChannel($ctx, $channelName, $c);
+                }
+            }
         }
         if (!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) {
             // Auto Suscribe
-            $this->suscribeToChannel($channelName, $clientId);
+            $this->suscribeToChannel($ctx, $channelName, $clientId);
         }
         $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
 
-        /*
-        $user = AuthService::getLoggedUser();
-        if ($user == null) {
-            throw new Exception("You must be logged in");
-        }
-        $GROUP_PATH = $user->getGroupPath();
-        if($GROUP_PATH == null) $GROUP_PATH = false;
-        */
         $result = array();
         foreach ($this->channels[$channelName]["MESSAGES"] as $index => $object) {
             if (!isSet($object->messageRC[$clientId])) {
@@ -210,17 +219,13 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
         }
         return $result;
     }
-
-
-
-
-
+    
     /**
      * @param $channelName
      * @param $filter
      * @return mixed
      */
-    public function consumeWorkerChannel($channelName, $filter = null)
+    public function consumeWorkerChannel(ContextInterface $ctx, $channelName, $filter = null)
     {
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
@@ -247,7 +252,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param object $message Message to send
      * @return mixed
      */
-    public function publishWorkerMessage($channel, $message)
+    public function publishWorkerMessage(ContextInterface $ctx, $channel, $message)
     {
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
@@ -272,7 +277,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      * @param $message
      * @return Object
      */
-    public function publishInstantMessage($channel, $message)
+    public function publishInstantMessage(ContextInterface $ctx, $channel, $message)
     {
         $this->loadChannel($channel);
         if(!isSet($this->channels) || !isSet($this->channels[$channel])) return;

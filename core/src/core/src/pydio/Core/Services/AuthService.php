@@ -26,6 +26,8 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Conf\Core\AjxpRole;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\CookiesHelper;
@@ -426,7 +428,7 @@ class AuthService
                 }
             }
             //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
-            $paramNodes = PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
+            $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
                     $default = $xmlNode->getAttribute("default");
@@ -1112,20 +1114,27 @@ class AuthService
         ConfService::getInstance()->invalidateLoadedRepositories();
     }
 
-    public static function filterPluginParameters($pluginId, $params, $repoId = null)
+    /**
+     * @param string $pluginId
+     * @param array $params
+     * @param ContextInterface $ctx
+     * @return array
+     */
+    public static function filterPluginParameters($pluginId, $params, ContextInterface $ctx)
     {
-        $logged = self::getLoggedUser();
-        if($logged == null) return $params;
-        if ($repoId == null) {
-            $repo = ConfService::getRepository();
-            if($repo!=null) $repoId = $repo->getId();
+        if(!$ctx->hasUser()){
+            return $params;
         }
-        if($logged == null || $logged->mergedRole == null) return $params;
-        $roleParams = $logged->mergedRole->listParameters();
-        if (iSSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])) {
+        $repoId = $ctx->getRepositoryId();
+        $mergedRole = $ctx->getUser()->getMergedRole();
+        if(empty($mergedRole)) {
+            return $params;
+        }
+        $roleParams = $mergedRole->listParameters();
+        if (isSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])) {
             $params = array_merge($params, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
         }
-        if ($repoId != null && isSet($roleParams[$repoId][$pluginId])) {
+        if ($repoId !== null && isSet($roleParams[$repoId][$pluginId])) {
             $params = array_merge($params, $roleParams[$repoId][$pluginId]);
         }
         return $params;

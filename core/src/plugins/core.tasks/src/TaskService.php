@@ -28,6 +28,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -90,12 +91,11 @@ class TaskService implements ITasksProvider
             $action = $task->getAction();
             $id = $task->getId();
             if(empty($request)){
-                $request = ServerRequestFactory::fromGlobals();
+                $ctx = Context::fromGlobalServices();
+            }else{
+                $ctx = $request->getAttribute("ctx");
             }
-            $request = $request
-                ->withAttribute("action", $action)
-                ->withAttribute("pydio-task-id", $id)
-                ->withParsedBody($params);
+            $request = Controller::executableRequest($ctx, $action, $params)->withAttribute("pydio-task-id", $id);
             return Controller::run($request);
         }
 

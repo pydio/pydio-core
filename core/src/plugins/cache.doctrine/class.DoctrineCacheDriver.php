@@ -31,6 +31,7 @@ define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
 use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 use \Pydio\Plugins\Cache\Doctrine\Ext;
@@ -58,16 +59,14 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
     /**
      * Initialise the cache driver based on config
-     *
+     * @param ContextInterface $ctx
      * @param array $options array of options specific to the cache driver.
-     * @access public
-     * @return null
      */
-    public function init($options)
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
+        parent::init($ctx, $options);
 
-        $driverOptions = $this->getFilteredOption("DRIVER");
+        $driverOptions = $this->getContextualOption($ctx, "DRIVER");
         if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
             return;
         }

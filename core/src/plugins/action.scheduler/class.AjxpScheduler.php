@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -44,12 +45,15 @@ class AjxpScheduler extends Plugin
 
     }
 
-    public function init($options)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $options
+     */
+    public function init(ContextInterface $ctx, $options = [])
     {
-        parent::init($options);
-        $u = AuthService::getLoggedUser();
-        if($u == null) return;
-        if ($u->getGroupPath() != "/") {
+        parent::init($ctx, $options);
+        if(!$ctx->hasUser()) return;
+        if ($ctx->getUser()->getGroupPath() != "/") {
             $this->enabled = false;
         }
     }
@@ -78,9 +82,13 @@ class AjxpScheduler extends Plugin
         }
     }
 
-    public function parseSpecificContributions(&$contribNode)
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param DOMNode $contribNode
+     */
+    public function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="repository_id"]', $contribNode);
@@ -94,7 +102,7 @@ class AjxpScheduler extends Plugin
         $sVals[] = "*|All Repositories";
         $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
 
-        if(!AuthService::usersEnabled() || AuthService::getLoggedUser() == null) return;
+        if(!AuthService::usersEnabled() || !$ctx->hasUser()) return;
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="user_id"]', $contribNode);
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
@@ -247,7 +255,7 @@ class AjxpScheduler extends Plugin
         return 0;
     }
 
-    public function switchAction($action, $httpVars, $postProcessData)
+    public function switchAction($action, $httpVars, $postProcessData, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         switch ($action) {
 
@@ -302,7 +310,7 @@ class AjxpScheduler extends Plugin
                 $logFile = AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cmd_outputs".DIRECTORY_SEPARATOR."cron_commands.log";
                 $cronTiming = "*/5 * * * *";
                 HTMLWriter::charsetHeader("text/plain", "UTF-8");
-                print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=".AuthService::getLoggedUser()->getId()." -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
+                print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=".$contextInterface->getUser()->getId()." -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
 
                 break;
 
@@ -538,10 +546,10 @@ class AjxpScheduler extends Plugin
 
     }
 
-    public function fakeLongTask($action, $httpVars, $fileVars)
+    public function fakeLongTask($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $context)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        $this->logInfo(__FUNCTION__, "Running Fake task on ".AuthService::getLoggedUser()->getId());
+        $this->logInfo(__FUNCTION__, "Running Fake task on ".$context->getRepositoryId());
         print('STARTING FAKE TASK');
         sleep($minutes * 30);
         print('ENDIND FAKE TASK');

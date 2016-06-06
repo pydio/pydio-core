@@ -54,8 +54,11 @@ class JumploaderProcessor extends Plugin
         if(!count($request->getUploadedFiles()) || isSet($httpVars["simple_uploader"]) || isset($httpVars["xhr_uploader"]) || isSet($httpVars["Filename"])){
             return;
         }
-        $repository = ConfService::getRepository();
-        $driver = ConfService::loadDriverForRepository($repository);
+        
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $repository = $ctx->getRepository();
+        $driver = $repository->getDriverInstance();
 
         if (method_exists($driver, "storeFileToCopy")) {
             self::$remote = true;
@@ -202,9 +205,9 @@ class JumploaderProcessor extends Plugin
         if (isset($result["ERROR"])) {
             if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
-                $repository = ConfService::getRepository();
+
                 $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-                $context = new UserSelection($repository);
+                $context = UserSelection::fromContext($request->getAttribute("ctx"), []);
                 $destStreamURL = $context->currentBaseUrl().$dir."/";
 
                 if ($httpVars["partitionCount"] > 1) {
@@ -231,8 +234,10 @@ class JumploaderProcessor extends Plugin
             return ;
         }
 
-        $repository = ConfService::getRepository();
-        $driver = ConfService::loadDriverForRepository($repository);
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $repository = $ctx->getRepository();
+        $driver = $repository->getDriverInstance();
 
         if ($httpVars["lastPartition"]) {
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);

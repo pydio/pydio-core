@@ -38,10 +38,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PixlrEditor extends Plugin
 {
-  public function switchAction($action, $httpVars, $filesVars)
+  public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
   {
-        $repository = ConfService::getRepository();
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($contextInterface, $httpVars);
+        $repository = $contextInterface->getRepository();
         $selectedNode = $selection->getUniqueNode();
         $selectedNodeUrl = $selectedNode->getUrl();
 
@@ -67,7 +67,7 @@ class PixlrEditor extends Plugin
 
 
             $saveTarget = $target."/fake_save_pixlr.php";
-            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository)) {
+            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
                 $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
             }
             $params = array(
@@ -127,7 +127,7 @@ class PixlrEditor extends Plugin
             $url = $httpVars["new_url"];
             $urlParts = parse_url($url);
             $query = $urlParts["query"];
-            if ($this->getFilteredOption("CHECK_SECURITY_TOKEN", $repository)) {
+            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
                 $scriptName = basename($urlParts["path"]);
                 $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
                 if ($token != md5($httpVars["secure_token"])) {

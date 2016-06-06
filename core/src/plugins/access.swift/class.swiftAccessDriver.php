@@ -28,6 +28,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 
 /**
@@ -57,8 +58,11 @@ class swiftAccessDriver extends fsAccessDriver
 
     }
 
-
-    public function initRepository()
+    /**
+     * @param ContextInterface $contextInterface
+     * @throws \Exception
+     */
+    protected function initRepository(ContextInterface $contextInterface)
     {
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -91,12 +95,11 @@ class swiftAccessDriver extends fsAccessDriver
     }
 
     /**
-     * Parse
-     * @param DOMNode $contribNode
+     * @inheritdoc
      */
-    protected function parseSpecificContributions(&$contribNode)
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        parent::parseSpecificContributions($contribNode);
+        parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
         $this->disableArchiveBrowsingContributions($contribNode);
     }
@@ -124,9 +127,15 @@ class swiftAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function makeSharedRepositoryOptions($httpVars, $repository)
+    /**
+     * @param ContextInterface $ctx
+     * @param array $httpVars
+     * @return array
+     * @throws \Exception
+     */
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
         $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
         return $newOptions;
     }

@@ -26,7 +26,10 @@ use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Http\Server;
+use Pydio\Core\Model\Context;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Zend\Diactoros\Response\EmptyResponse;
@@ -46,18 +49,18 @@ class AuthMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
-        $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
-        if($response != null){
-            return $response;
-        }
-
-        self::bootSessionServer($requestInterface);
 
         try{
+            $driverImpl = ConfService::getAuthDriverImpl();
+            PluginsService::getInstance()->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
-            ConfService::reloadServicesAndActivePlugins();
+            $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
+            if($response != null){
+                return $response;
+            }
+            self::bootSessionServer($requestInterface);
 
-        }catch (NoActiveWorkspaceException $ex){
+        } catch (NoActiveWorkspaceException $ex){
 
             $logged = AuthService::getLoggedUser();
             if($logged !== null) $lock = $logged->getLock();
@@ -65,8 +68,14 @@ class AuthMiddleware
                 throw new AuthRequiredException();
             }
 
+        } catch (RepositoryLoadException $r){
+            
+            ConfService::switchBackAfterRepositoryError($r->getRepository());
+            throw $r;
+            
         }
 
+        $requestInterface = $requestInterface->withAttribute("ctx", Context::fromGlobalServices());
         try{
 
             return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
@@ -78,6 +87,11 @@ class AuthMiddleware
             }else{
                 return new EmptyResponse();
             }
+        } catch (RepositoryLoadException $r){
+
+            ConfService::switchBackAfterRepositoryError($r->getRepository());
+            throw $r;
+
         }
 
     }
@@ -99,7 +113,7 @@ class AuthMiddleware
             if ($loggedUser != null) {
                 $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($parameters["tmp_repository_id"])?$parameters["tmp_repository_id"]:"-1"));
                 if (!$res) {
-                    AuthService::disconnect();
+                    throw new NoActiveWorkspaceException();
                 }
             }
         }

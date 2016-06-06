@@ -24,6 +24,8 @@ use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -67,9 +69,11 @@ class AJXP_ClientDriver extends Plugin
      */
     public function getBootConf(ServerRequestInterface &$request, ResponseInterface &$response){
 
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $out = array();
         Utils::parseApplicationGetParameters($request->getQueryParams(), $out, $_SESSION);
-        $config = $this->computeBootConf();
+        $config = $this->computeBootConf($ctx);
         $response = $response->withHeader("Content-type", "application/json;charset=UTF-8");
         $response->getBody()->write(json_encode($config));
 
@@ -85,6 +89,8 @@ class AJXP_ClientDriver extends Plugin
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
         $mess = ConfService::getMessages();
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
 
         $httpVars = $request->getParsedBody();
         HTMLWriter::internetExplorerMainDocumentHeader($response);
@@ -147,14 +153,14 @@ class AJXP_ClientDriver extends Plugin
         // PRECOMPUTE BOOT CONF
         $userAgent = $request->getServerParams()['HTTP_USER_AGENT'];
         if (!preg_match('/MSIE 7/',$userAgent) && !preg_match('/MSIE 8/',$userAgent)) {
-            $preloadedBootConf = $this->computeBootConf();
+            $preloadedBootConf = $this->computeBootConf($ctx);
             Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
             $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
         }
 
         // PRECOMPUTE REGISTRY
         if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
-            $clone = ConfService::getFilteredXMLRegistry(true, true);
+            $clone = $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
             if(!AJXP_SERVER_DEBUG){
                 $clonePath = new DOMXPath($clone);
                 $serverCallbacks = $clonePath->query("//serverCallback|hooks");
@@ -167,7 +173,7 @@ class AJXP_ClientDriver extends Plugin
 
         $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
         $crtTheme = $this->pluginConf["GUI_THEME"];
-        $additionalFrameworks = $this->getFilteredOption("JS_RESOURCES_BEFORE");
+        $additionalFrameworks = $this->getContextualOption($ctx, "JS_RESOURCES_BEFORE");
         $ADDITIONAL_FRAMEWORKS = "";
         if( !empty($additionalFrameworks) ){
             $frameworkList = explode(",", $additionalFrameworks);
@@ -279,7 +285,11 @@ class AJXP_ClientDriver extends Plugin
         return false;
     }
 
-    public function computeBootConf()
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     */
+    public function computeBootConf(ContextInterface $ctx)
     {
         if (isSet($_GET["server_prefix_uri"])) {
             $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
@@ -294,26 +304,26 @@ class AJXP_ClientDriver extends Plugin
         }
         $config["zipEnabled"] = ConfService::zipBrowsingEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::zipCreationEnabled();
-        $customIcon = $this->getFilteredOption("CUSTOM_ICON");
+        $customIcon = $this->getContextualOption($ctx, "CUSTOM_ICON");
         self::filterXml($customIcon);
         $config["customWording"] = array(
-            "welcomeMessage" => $this->getFilteredOption("CUSTOM_WELCOME_MESSAGE"),
+            "welcomeMessage" => $this->getContextualOption($ctx, "CUSTOM_WELCOME_MESSAGE"),
             "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
             "icon"			 => $customIcon,
-            "iconWidth"		 => $this->getFilteredOption("CUSTOM_ICON_WIDTH"),
-            "iconHeight"     => $this->getFilteredOption("CUSTOM_ICON_HEIGHT"),
-            "iconOnly"       => $this->getFilteredOption("CUSTOM_ICON_ONLY"),
-            "titleFontSize"	 => $this->getFilteredOption("CUSTOM_FONT_SIZE")
+            "iconWidth"		 => $this->getContextualOption($ctx, "CUSTOM_ICON_WIDTH"),
+            "iconHeight"     => $this->getContextualOption($ctx, "CUSTOM_ICON_HEIGHT"),
+            "iconOnly"       => $this->getContextualOption($ctx, "CUSTOM_ICON_ONLY"),
+            "titleFontSize"	 => $this->getContextualOption($ctx, "CUSTOM_FONT_SIZE")
         );
-        $cIcBin = $this->getFilteredOption("CUSTOM_ICON_BINARY");
+        $cIcBin = $this->getContextualOption($ctx, "CUSTOM_ICON_BINARY");
         if (!empty($cIcBin)) {
             $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
         }
         $config["usersEnabled"] = AuthService::usersEnabled();
-        $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
+        $config["loggedUser"] = ($ctx->hasUser());
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
-        $timeoutTime = $this->getFilteredOption("CLIENT_TIMEOUT_TIME");
+        $timeoutTime = $this->getContextualOption($ctx, "CLIENT_TIMEOUT_TIME");
         if (empty($timeoutTime)) {
             $to = $config["session_timeout"];
         } else {
@@ -321,17 +331,17 @@ class AJXP_ClientDriver extends Plugin
         }
         if($currentIsMinisite) $to = -1;
         $config["client_timeout"] = intval($to);
-        $config["client_timeout_warning"] = floatval($this->getFilteredOption("CLIENT_TIMEOUT_WARN"));
+        $config["client_timeout_warning"] = floatval($this->getContextualOption($ctx, "CLIENT_TIMEOUT_WARN"));
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-        $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
+        $analytic = $this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
                 "id"=> 		$analytic,
-                "domain" => $this->getFilteredOption('GOOGLE_ANALYTICS_DOMAIN'),
-                "event" => 	$this->getFilteredOption('GOOGLE_ANALYTICS_EVENT')
+                "domain" => $this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_DOMAIN'),
+                "event" => 	$this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_EVENT')
             );
         }
         $config["i18nMessages"] = ConfService::getMessages();
