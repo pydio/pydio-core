@@ -89,7 +89,9 @@ class IMagickPreviewer extends Plugin
                 Controller::applyHook("node.read", array($node));
             }
 
-            $cache = LocalCache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, array($this, "generateJpegsCallback"));
+            $cache = LocalCache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, function($masterFile, $targetFile) use ($contextInterface){
+                return $this->generateJpegsCallback($contextInterface, $masterFile, $targetFile);
+            });
             $cacheData = $cache->getData();
 
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view
@@ -118,6 +120,7 @@ class IMagickPreviewer extends Plugin
             }
 
         } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
+
             $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = Utils::decodeSecureMagic($httpVars["src_file"]);
@@ -130,7 +133,7 @@ class IMagickPreviewer extends Plugin
                 else $this->useOnTheFly = false;
 
                 if($this->useOnTheFly) $this->onTheFly = true;
-                $this->generateJpegsCallback($destStreamURL.$srcfile, $file);
+                $this->generateJpegsCallback($contextInterface, $destStreamURL.$srcfile, $file);
 
             }
             if(!is_file($file)) return false;
@@ -139,6 +142,7 @@ class IMagickPreviewer extends Plugin
             header('Cache-Control: public');
             readfile($file);
             exit(1);
+
         } else if ($action == "delete_imagick_data" && !$selection->isEmpty()) {
             /*
             $files = $this->listExtractedJpg(AJXP_CACHE_DIR."/".$httpVars["file"]);
@@ -243,13 +247,14 @@ class IMagickPreviewer extends Plugin
         return $files;
     }
 
-    public function generateJpegsCallback($masterFile, $targetFile)
+    public function generateJpegsCallback(ContextInterface $ctx, $masterFile, $targetFile)
     {
-        $unoconv =  $this->getFilteredOption("UNOCONV");
+        $unoconv =  $this->getContextualOption($ctx, "UNOCONV");
         if (!empty($unoconv)) {
             $officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
         } else {
             $unoconv = false;
+            $officeExt = [];
         }
 
         $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
@@ -265,6 +270,8 @@ class IMagickPreviewer extends Plugin
         if ($isStream) {
             $backToStreamTarget = $targetFile;
             $targetFile = tempnam(Utils::getAjxpTmpDir(), "imagick_").".pdf";
+        }else{
+            $backToStreamTarget = null;
         }
         $workingDir = dirname($targetFile);
         $out = array();
@@ -287,7 +294,9 @@ class IMagickPreviewer extends Plugin
                 } else {
                     $unoconv =  "HOME=".Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
-                putenv('LC_CTYPE='.AJXP_LOCALE);
+                if(defined('AJXP_LOCALE')){
+                    putenv('LC_CTYPE='.AJXP_LOCALE);
+                }
                 exec($unoconv, $out, $return);
             }
             if (is_file($unoDoc)) {
@@ -309,10 +318,10 @@ class IMagickPreviewer extends Plugin
             }
         }
 
-        $customOptions = $this->getFilteredOption("IM_CUSTOM_OPTIONS");
-        $customEnvPath = $this->getFilteredOption("ADDITIONAL_ENV_PATH");
-        $viewerQuality = $this->getFilteredOption("IM_VIEWER_QUALITY");
-        $thumbQuality = $this->getFilteredOption("IM_THUMB_QUALITY");
+        $customOptions = $this->getContextualOption($ctx, "IM_CUSTOM_OPTIONS");
+        $customEnvPath = $this->getContextualOption($ctx, "ADDITIONAL_ENV_PATH");
+        $viewerQuality = $this->getContextualOption($ctx, "IM_VIEWER_QUALITY");
+        $thumbQuality = $this->getContextualOption($ctx, "IM_THUMB_QUALITY");
         if (empty($customOptions)) {
             $customOptions = "";
         }
@@ -320,7 +329,7 @@ class IMagickPreviewer extends Plugin
             putenv("PATH=".getenv("PATH").":".$customEnvPath);
         }
         $params = $customOptions." ".( $this->extractAll? $viewerQuality : $thumbQuality );
-        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".$params." ".escapeshellarg(($masterFile).$pageLimit)." ".escapeshellarg($tmpFileThumb);
+        $cmd = $this->getContextualOption($ctx, "IMAGE_MAGICK_CONVERT")." ".$params." ".escapeshellarg(($masterFile).$pageLimit)." ".escapeshellarg($tmpFileThumb);
         $this->logDebug("IMagick Command : $cmd");
         session_write_close(); // Be sure to give the hand back
         exec($cmd, $out, $return);
@@ -328,7 +337,7 @@ class IMagickPreviewer extends Plugin
             throw new PydioException(implode("\n", $out));
         }
         if(!(is_file($tmpFileThumb) || is_file(str_replace(".jpg", "-0.jpg", $tmpFileThumb)))){
-            throw new PydioException("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getFilteredOption("IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
+            throw new PydioException("Error while converting PDF file to JPG thumbnail. Return code '$return'. Command used '".$this->getContextualOption($ctx, "IMAGE_MAGICK_CONVERT")."': is the binary at the correct location? Is the server allowed to use it?");
         }
         if (!$this->extractAll) {
             rename($tmpFileThumb, $targetFile);

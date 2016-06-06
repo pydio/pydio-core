@@ -253,7 +253,7 @@ class PluginCompression extends Plugin
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
                 $nodesDiff = new NodesDiff();
                 $nodesDiff->add($newNode);
-                Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $repository->getId()));
+                Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
                 $indexRequest = Controller::executableRequest($requestInterface->getAttribute("ctx"), "index", ["file" => $newNode->getPath()]);
                 Controller::run($indexRequest);
                 break;

@@ -215,7 +215,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         $filter = null;
         $masks = array();
         $currentRepo = $this->accessDriver->repository;
-        Controller::applyHook("role.masks", array($currentRepo->getId(), &$masks, AJXP_Permission::READ));
+        Controller::applyHook("role.masks", array($contextInterface, &$masks, AJXP_Permission::READ));
         if(count($masks) == 1 && $masks[0] == "/"){
             $masks = array();
         }

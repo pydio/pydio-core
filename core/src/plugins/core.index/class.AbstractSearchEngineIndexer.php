@@ -128,17 +128,16 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
     }
 
     /**
-     * @param String $repositoryId
-     * @param String $userId
+     * @param ContextInterface $ctx
      * @return string
      */
-    protected function buildSpecificId($repositoryId, $userId = null){
+    protected function buildSpecificId(ContextInterface $ctx){
         $specificId = "";
-        $specKey = $this->getFilteredOption("repository_specific_keywords");
+        $specKey = $this->getContextualOption($ctx, "repository_specific_keywords");
         if (!empty($specKey)) {
-            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $userId));
+            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx->hasUser()? $ctx->getUser()->getId() : null));
         }
-        return $repositoryId.$specificId;
+        return $ctx->getRepositoryId().$specificId;
     }
 
 } 

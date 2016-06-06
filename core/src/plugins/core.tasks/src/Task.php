@@ -21,6 +21,9 @@
 namespace Pydio\Tasks;
 
 
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 class Task
@@ -166,7 +169,12 @@ class Task
         $this->label = $label;
     }
 
-
+    /**
+     * @return ContextInterface
+     */
+    public function getContext(){
+        return new Context($this->userId, $this->wsId);
+    }
 
     /**
      * @return string

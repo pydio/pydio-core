@@ -42,12 +42,12 @@ class AntivirusScanner extends Plugin
                     $this->scanLater();
                     return ;
                 } else {
-                    $this->scanNow();
+                    $this->scanNow($newNode);
                     return ;
                 }
             } else {
                 if ($this->inList()==true) {
-                    $this->scanNow();
+                    $this->scanNow($newNode);
                     return ;
                 } else {
                     if ($trace === false) {return;}
@@ -82,10 +82,11 @@ class AntivirusScanner extends Plugin
 
     /**
      * This function immediatly scans the file, it calls the antivirus command
+     * @param AJXP_Node $nodeObject
      */
-    private function scanNow()
+    private function scanNow($nodeObject)
     {
-        $command = $this->getFilteredOption("COMMAND");
+        $command = $this->getContextualOption($nodeObject->getContext(), "COMMAND");
         $command = str_replace('$' . 'FILE', escapeshellarg($this->path), $command);
 
         ob_start();
@@ -180,19 +181,21 @@ class AntivirusScanner extends Plugin
 
     /**
      * This function initializes the extension list
+     * @param AJXP_Node $nodeObject
      */
-    public function setExtensionScan()
+    public function setExtensionScan($nodeObject)
     {
-        $this->extension_scan =  $this->getFilteredOption("EXT");
+        $this->extension_scan =  $this->getContextualOption($nodeObject->getContext(), "EXT");
         return ;
     }
 
     /**
      * this function initializes attribute scan_all
+     * @param AJXP_Node $nodeObject
      */
-    public function setScanAll()
+    public function setScanAll($nodeObject)
     {
-        $extension = $this->getFilteredOption("EXT");
+        $extension = $this->getContextualOption($nodeObject->getContext(), "EXT");
         if (substr($extension, 0, 2) == "*/") {
             $this->scan_all = true;
         } else {
@@ -203,19 +206,21 @@ class AntivirusScanner extends Plugin
 
     /**
      * this function initializes the trace folder
+     * @param AJXP_Node $nodeObject
      */
-    public function setScanDiffFolder ()
+    public function setScanDiffFolder ($nodeObject)
     {
-        $this->scan_diff_folder = $this->getFilteredOption("PATH");
+        $this->scan_diff_folder = $this->getContextualOption($nodeObject->getContext(), "PATH");
         return ;
     }
 
     /**
      * this function initializes max size of the scanned file
+     * @param AJXP_Node $nodeObject
      */
-    public function setScanMaxSize ()
+    public function setScanMaxSize ($nodeObject)
     {
-        $this->scan_max_size = Utils::convertBytes($this->getFilteredOption("SIZE"));
+        $this->scan_max_size = Utils::convertBytes($this->getContextualOption($nodeObject->getContext(), "SIZE"));
         return ;
     }
 

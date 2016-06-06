@@ -642,7 +642,7 @@ class ShareCenter extends Plugin
                 }
 
 
-                Controller::applyHook("msg.instant", array("<reload_shared_elements/>", $ajxpNode->getRepositoryId()));
+                Controller::applyHook("msg.instant", array( $ajxpNode->getContext(), "<reload_shared_elements/>"));
                 /*
                  * Send IM to inform that node has been shared or unshared.
                  * Should be done only if share scope is public.
@@ -650,7 +650,7 @@ class ShareCenter extends Plugin
                 if($shareScope == "public"){
                     $ajxpNode->loadNodeInfo();
                     $content = XMLWriter::writeNodesDiff(["UPDATE" => array($ajxpNode->getPath() => $ajxpNode)]);
-                    Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
+                    Controller::applyHook("msg.instant", array($ajxpNode->getContext(), $content, null, null, [$ajxpNode->getPath()]));
                 }
 
                 if(!isSet($httpVars["return_json"])){
@@ -820,12 +820,12 @@ class ShareCenter extends Plugin
                             $x = new SerializableResponseStream([new UserMessage($mess["share_center.216"])]);
                             $responseInterface = $responseInterface->withBody($x);
 
-                            Controller::applyHook("msg.instant", array("<reload_shared_elements/>", $ajxpNode->getRepositoryId()));
+                            Controller::applyHook("msg.instant", array($ajxpNode->getContext(), "<reload_shared_elements/>"));
 
                             if(isSet($httpVars["share_scope"]) &&  $httpVars["share_scope"] == "public"){
                                 $ajxpNode->loadNodeInfo();
                                 $content = XMLWriter::writeNodesDiff(["UPDATE" => [$ajxpNode->getPath() => $ajxpNode]]);
-                                Controller::applyHook("msg.instant", array($content, $ajxpNode->getRepositoryId(), null, null, [$ajxpNode->getPath()]));
+                                Controller::applyHook("msg.instant", array($ajxpNode->getContext(), $content, null, null, [$ajxpNode->getPath()]));
                             }
 
                         }
@@ -1494,7 +1494,7 @@ class ShareCenter extends Plugin
         $existingShortForm = $shareObject->getShortFormUrl();
         if(empty($existingShortForm)){
             $shortForm = "";
-            Controller::applyHook("url.shorten", array($url, &$shortForm));
+            Controller::applyHook("url.shorten", array($this->currentContext, $url, &$shortForm));
             if(!empty($shortForm)){
                 $shareObject->setShortFormUrl($shortForm);
                 $shareObject->save();
@@ -1708,7 +1708,7 @@ class ShareCenter extends Plugin
                 $existingShortForm = $shareObject->getShortFormUrl();
                 if(empty($existingShortForm)){
                     $shortForm = "";
-                    Controller::applyHook("url.shorten", array($url, &$shortForm));
+                    Controller::applyHook("url.shorten", array($ctx, $url, &$shortForm));
                     if(!empty($shortForm)){
                         $shareObject->setShortFormUrl($shortForm);
                         $shareObject->save();

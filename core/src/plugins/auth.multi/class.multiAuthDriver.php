@@ -323,7 +323,7 @@ class multiAuthDriver extends AbstractAuthDriver
             if ($this->drivers[$this->masterName]->userExists($login)) {
                 // check master, and refresh slave if necessary
                 if ($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)) {
-                    if($this->getFilteredOption("CACHE_MASTER_USERS_TO_SLAVE")){
+                    if($this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE")){
                         if ($this->drivers[$this->slaveName]->userExists($login)) {
                             $this->drivers[$this->slaveName]->changePassword($login, $pass);
                         } else {
@@ -332,7 +332,7 @@ class multiAuthDriver extends AbstractAuthDriver
                     }
                     return true;
                 } else {
-                    if(!$this->getFilteredOption("CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)){
+                    if(!$this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)){
                         // User may in fact be a SLAVE user
                         return $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
                     }

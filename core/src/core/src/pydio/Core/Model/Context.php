@@ -82,6 +82,30 @@ class Context implements ContextInterface
     }
 
     /**
+     * @return Context
+     */
+    public static function emptyContext(){
+        return new Context();
+    }
+
+    /**
+     * @param $userId
+     * @return ContextInterface
+     */
+    public function withUserId($userId){
+        return new Context($userId, $this->repositoryId);
+    }
+
+    /**
+     * @param $repositoryId
+     * @return ContextInterface
+     */
+    public function withRepositoryId($repositoryId){
+        return new Context($this->userId, $repositoryId);
+    }
+
+
+    /**
      * @return boolean
      */
     public function hasUser()

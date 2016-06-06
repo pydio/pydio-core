@@ -400,7 +400,7 @@ class AJXP_ClientDriver extends Plugin
         } else {
             $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         }
-        Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), $user->getId()));
+        Controller::applyHook("msg.instant", array($fromNode->getContext(), "<reload_bookmarks/>", $user->getId()));
     }
 
     public static function filterXml(&$value)

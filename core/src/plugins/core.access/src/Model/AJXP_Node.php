@@ -472,6 +472,14 @@ class AJXP_Node implements \JsonSerializable
     }
 
     /**
+     * Check if node wrapper is local or remote
+     * @return bool
+     */
+    public function wrapperIsRemote(){
+        return AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
+    }
+
+    /**
      * @return string URL of the node in the form ajxp.protocol://repository_id/path/to/node
      */
     public function getUrl()

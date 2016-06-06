@@ -25,7 +25,6 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -130,7 +129,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      * @param \Pydio\Access\Core\Model\AJXP_Node $parentNode
      */
     public function indexationStarts($parentNode){
-        $this->loadIndex($parentNode->getRepositoryId(), true, $parentNode->getUser());
+        $this->loadIndex($parentNode->getContext(), true);
     }
 
     /**
@@ -410,7 +409,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      */
     public function updateNodeIndexMeta($node)
     {
-        $this->loadIndex($node->getRepositoryId(), true, $node->getUser());
+        $this->loadIndex($node->getContext(), true);
         if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
 
             $query = new Elastica\Query\Term();
@@ -446,9 +445,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     public function updateNodeIndex($oldNode, $newNode = null, $copy = false, $recursive = false)
     {
         if($oldNode == null){
-            $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+            $this->loadIndex($newNode->getContext(), true);
         }else{
-            $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+            $this->loadIndex($oldNode->getContext(), true);
         }
 
         if ($oldNode != null && $copy == false) {
@@ -672,13 +671,12 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     /**
      *
      * load the index into the class parameter currentIndex
-     * @param Integer $repositoryId
+     * @param ContextInterface $ctx
      * @param bool $create
-     * @param null $resolveUserId
      */
-    protected function loadIndex($repositoryId, $create = true, $resolveUserId = null)
+    protected function loadIndex(ContextInterface $ctx, $create = true)
     {
-        $specificId = $this->buildSpecificId($repositoryId, $resolveUserId);
+        $specificId = $this->buildSpecificId($ctx);
 
         $this->currentIndex = $this->client->getIndex($specificId);
 

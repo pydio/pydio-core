@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\Context;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -35,8 +37,8 @@ class PhpMailLiteMailer extends AjxpMailer
 
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
         $mail = new PHPMailerLite(true);
-        $mail->Mailer = $this->getFilteredOption("MAILER");
-        $mail->Sendmail = $this->getFilteredOption("SENDMAIL_PATH");
+        $mail->Mailer = $this->getContextualOption(Context::emptyContext(), "MAILER");
+        $mail->Sendmail = $this->getContextualOption(Context::emptyContext(), "SENDMAIL_PATH");
         $from = $this->resolveFrom($from);
         if (!is_array($from) || empty($from["adress"])) {
             throw new Exception("Cannot send email without a FROM address. Please check your core.mailer configuration.");
@@ -45,7 +47,7 @@ class PhpMailLiteMailer extends AjxpMailer
             if ($from["adress"] != $from["name"]) {
                 $mail->SetFrom($from["adress"], $from["name"]);
             } else {
-                $mail->setFrom($from["adress"]);
+                $mail->SetFrom($from["adress"]);
             }
         }
         foreach ($realRecipients as $address) {
@@ -58,7 +60,7 @@ class PhpMailLiteMailer extends AjxpMailer
         $mail->WordWrap = 50;                                 // set word wrap to 50 characters
         $mail->IsHTML($useHtml);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
-        $mail->Encoding = $this->getFilteredOption("MAIL_ENCODING");
+        $mail->Encoding = $this->getContextualOption(Context::emptyContext(), "MAIL_ENCODING");
         foreach ($images as $image) {
             $mail->AddEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
         }

@@ -72,7 +72,7 @@ class inboxAccessDriver extends fsAccessDriver
         }
     }
 
-    public function loadRepositoryInfo(&$data){
+    public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $allNodes = self::getNodes(false, false);
         $data['access.inbox'] = array(
             'files' => count($allNodes)

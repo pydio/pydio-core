@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
@@ -121,7 +122,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         $repoOrs = array();
         foreach($filterByRepositories as $repoId){
             $masks = array();
-            Controller::applyHook("role.masks", array($repoId, &$masks, AJXP_Permission::READ));
+            Controller::applyHook("role.masks", array(new Context($userId, $repoId), &$masks, AJXP_Permission::READ));
             if(count($masks)){
                 $pathesOr = array();
                 foreach($masks as $mask){

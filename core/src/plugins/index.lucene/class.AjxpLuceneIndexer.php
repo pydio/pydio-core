@@ -151,9 +151,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
             require_once("Zend/Search/Lucene.php");
             try {
-                $index =  $this->loadIndex($repoId, false);
+                $index =  $this->loadIndex($ctx, false);
             } catch (Exception $ex) {
-                if ($this->seemsCurrentlyIndexing($repoId, 3)){
+                if ($this->seemsCurrentlyIndexing($ctx, 3)){
                     $x->addChunk(new UserMessage($messages["index.lucene.11"]));
                 }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
@@ -268,7 +268,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             $scope = "user";
 
             try {
-                $index =  $this->loadIndex($repoId, false);
+                $index =  $this->loadIndex($ctx, false);
             } catch (Exception $ex) {
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
@@ -340,7 +340,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      * @param AJXP_Node $parentNode
      */
     public function indexationStarts($parentNode){
-        $this->currentIndex = $this->loadTemporaryIndex($parentNode->getRepositoryId());
+        $this->currentIndex = $this->loadTemporaryIndex($parentNode->getContext());
     }
 
     /**
@@ -353,7 +353,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         $this->currentIndex->commit();
         unset($this->currentIndex);
         $this->logDebug('INDEX.END', 'Merging Temporary in main');
-        $this->mergeTemporaryIndexToMain($parentNode->getRepositoryId());
+        $this->mergeTemporaryIndexToMain($parentNode->getContext());
         $this->logDebug('INDEX.END', 'Done');
     }
 
@@ -433,7 +433,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if (isSet($this->currentIndex)) {
                 $index = $this->currentIndex;
             } else {
-                $index =  $this->loadIndex($node->getRepositoryId(), true, $node->getUser());
+                $index =  $this->loadIndex($node->getContext(), true);
             }
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
@@ -478,17 +478,17 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             $oldIndex = $newIndex = $this->currentIndex;
         } else {
             if($oldNode == null){
-                $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                $newIndex = $oldIndex = $this->loadIndex($newNode->getContext(), true);
             }else if($newNode == null){
-                $oldIndex = $newIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                $oldIndex = $newIndex = $this->loadIndex($oldNode->getContext(), true);
             }else{
                 $newId = $newNode->getRepositoryId();
                 $oldId = $oldNode->getRepositoryId();
                 if($newId == $oldId){
-                    $newIndex = $oldIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
+                    $newIndex = $oldIndex = $this->loadIndex($newNode->getContext(), true);
                 }else{
-                    $newIndex = $this->loadIndex($newNode->getRepositoryId(), true, $newNode->getUser());
-                    $oldIndex = $this->loadIndex($oldNode->getRepositoryId(), true, $oldNode->getUser());
+                    $newIndex = $this->loadIndex($newNode->getContext(), true);
+                    $oldIndex = $this->loadIndex($oldNode->getContext(), true);
                 }
             }
         }
@@ -667,36 +667,35 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     }
 
     /**
-     * @param $repositoryId
-     * @param null $resolveUserId
+     * @param ContextInterface $ctx
      * @return string
      */
-    protected function getIndexPath($repositoryId, $resolveUserId = null){
+    protected function getIndexPath(ContextInterface $ctx){
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
         if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
-        $iPath = $mainCacheDir."/indexes/index-".$this->buildSpecificId($repositoryId, $resolveUserId);
+        $iPath = $mainCacheDir."/indexes/index-".$this->buildSpecificId($ctx);
         return $iPath;
     }
 
     /**
-     * @param $repositoryId
+     * @param ContextInterface $ctx
      * @return Zend_Search_Lucene_Interface
      */
-    protected function loadTemporaryIndex($repositoryId){
-        $indexPath = $this->getIndexPath($repositoryId);
+    protected function loadTemporaryIndex(ContextInterface $ctx){
+        $indexPath = $this->getIndexPath($ctx);
         $tmpIndexPath = $indexPath."-PYDIO_TMP";
         $this->clearIndexIfExists($tmpIndexPath);
         $this->copyIndex($indexPath, $tmpIndexPath);
-        return $this->loadIndex($repositoryId, true, null, $tmpIndexPath);
+        return $this->loadIndex($ctx, true, $tmpIndexPath);
     }
 
     /**
-     * @param String $repositoryId
+     * @param ContextInterface $ctx
      * @param int $checkInterval
      * @return bool
      */
-    protected function seemsCurrentlyIndexing($repositoryId, $checkInterval){
-        $tmpIndexPath = $this->getIndexPath($repositoryId)."-PYDIO_TMP";
+    protected function seemsCurrentlyIndexing(ContextInterface $ctx, $checkInterval){
+        $tmpIndexPath = $this->getIndexPath($ctx)."-PYDIO_TMP";
         if(is_dir($tmpIndexPath)){
             $mtime = filemtime($tmpIndexPath);
             if(time() - $mtime <= 60 * $checkInterval){
@@ -707,10 +706,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     }
 
     /**
-     * @param $repositoryId
+     * @param ContextInterface $ctx
      */
-    protected function mergeTemporaryIndexToMain($repositoryId){
-        $indexPath = $this->getIndexPath($repositoryId);
+    protected function mergeTemporaryIndexToMain(ContextInterface $ctx){
+        $indexPath = $this->getIndexPath($ctx);
         $tmpIndexPath = $indexPath."-PYDIO_TMP";
         $this->clearIndexIfExists($indexPath);
         $this->moveIndex($tmpIndexPath, $indexPath);
@@ -762,19 +761,18 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
 
     /**
      *
-     * Enter description here ...
-     * @param Integer $repositoryId
+     * Load index for context
+     * @param ContextInterface $ctx
      * @param bool $create
-     * @param null $resolveUserId
      * @param null $iPath
      * @throws Exception
      * @return Zend_Search_Lucene_Interface the index
      */
-    protected function loadIndex($repositoryId, $create = true, $resolveUserId = null, $iPath = null)
+    protected function loadIndex(ContextInterface $ctx, $create = true, $iPath = null)
     {
         require_once("Zend/Search/Lucene.php");
         if($iPath == null){
-            $iPath = $this->getIndexPath($repositoryId, $resolveUserId);
+            $iPath = $this->getIndexPath($ctx);
         }
         if (is_dir($iPath)) {
             try{

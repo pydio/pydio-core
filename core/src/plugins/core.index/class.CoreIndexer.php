@@ -72,8 +72,8 @@ class CoreIndexer extends Plugin {
             $task = TaskService::actionAsTask($ctx, "index", $httpVars, [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
             $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
             TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
-            $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();
-            return null;
+            $responseInterface = $responseInterface->withBody(new \Pydio\Core\Http\Response\SerializableResponseStream(new \Pydio\Core\Http\Message\UserMessage("Indexation launched")));
+            return $responseInterface;
         }
         // GIVE BACK THE HAND TO USER
         session_write_close();

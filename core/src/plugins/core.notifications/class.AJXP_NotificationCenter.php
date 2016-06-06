@@ -93,14 +93,15 @@ class AJXP_NotificationCenter extends Plugin
         if ($this->eventStore) {
             $this->eventStore->persistAlert($notification);
             Controller::applyHook("msg.instant",array(
+                $notification->getNode()->getContext(),
                 "<reload_user_feed/>",
-                $notification->getNode()->getRepositoryId(),
                 $notification->getTarget()
             ));
             if($notification->getNode()->getRepository() != null && $notification->getNode()->getRepository()->hasParent()){
+                $parentRepoId = $notification->getNode()->getRepository()->getParentId();
                 Controller::applyHook("msg.instant",array(
+                    $notification->getNode()->getContext()->withRepositoryId($parentRepoId),
                     "<reload_user_feed/>",
-                    $notification->getNode()->getRepository()->getParentId(),
                     $notification->getTarget()
                 ));
             }
@@ -123,15 +124,15 @@ class AJXP_NotificationCenter extends Plugin
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
         $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
         Controller::applyHook("msg.instant",array(
+            $ctx,
             "<reload_user_feed/>",
-            $repository->getId(),
             $userObject->getId()
         ));
         $this->eventStore->persistEvent("node.change", func_get_args(), $repository->getId(), $repositoryScope, $repositoryOwner, $userObject->getId(), $userObject->getGroupPath());
 
     }
 
-    public function loadRepositoryInfo(&$data){
+    public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $body = [
             'format' => 'array',
             'current_repository'=>true,
@@ -141,7 +142,7 @@ class AJXP_NotificationCenter extends Plugin
             'merge_description'=>true,
             'description_as_label'=>false
         ];
-        $req = Controller::executableRequest(Context::fromGlobalServices(), "get_my_feed", $body);
+        $req = Controller::executableRequest($ctx, "get_my_feed", $body);
         $this->loadUserFeed($req, new \Zend\Diactoros\Response\EmptyResponse(), $returnData);
         $data["core.notifications"] = $returnData;
     }

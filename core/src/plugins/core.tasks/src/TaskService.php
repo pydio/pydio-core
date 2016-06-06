@@ -76,7 +76,7 @@ class TaskService implements ITasksProvider
         if($workers && !$task->getSchedule()->shouldRunNow()){
             AJXP_Logger::getInstance()->logInfo("TaskService", "Enqueuing Task ".$task->getId());
             $msg = ["pending_task" => $task->getId()];
-            Controller::applyHook("msg.task", [$msg]);
+            Controller::applyHook("msg.task", [$task->getContext(), $msg]);
             return $response;
         }
 
@@ -116,7 +116,7 @@ class TaskService implements ITasksProvider
         if(isSet($nodesDiff)){
             $xmlString = $nodesDiff->toXML();
         }
-        Controller::applyHook("msg.instant", array("<task id='".$task->getId()."' data=\"".$json."\"/>".$xmlString, $task->getWsId(), $task->getUserId()));
+        Controller::applyHook("msg.instant", array($task->getContext(), "<task id='".$task->getId()."' data=\"".$json."\"/>".$xmlString, $task->getUserId()));
 
     }
 

@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -126,6 +127,21 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         return parent::getFilteredOption($optionName, $repoScope, $userObject);
     }
 
+    public function getContextualOption(ContextInterface $ctx, $optionName)
+    {
+        $repo = $ctx->getRepository();
+        $user = $ctx->getUser();
+        if ($repo->hasParent() && $repo->getOwner() != null && $repo->getOwner() != $user->getId()) {
+            // Pass parent user instead of currently logged
+            $userObject = ConfService::getConfStorageImpl()->createUserObject($repo->getOwner());
+            $newCtx = \Pydio\Core\Model\Context::contextWithObjects($userObject, $repo);
+            return parent::getContextualOption($newCtx, $optionName);
+        }else{
+            return parent::getContextualOption($ctx, $optionName);
+        }
+
+    }
+
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param int $newSize
@@ -172,20 +188,27 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         return;
     }
 
-    public function loadRepositoryInfo(&$data){
+    public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $data['meta.quota'] = array(
             'usage' => $u = $this->getUsage(),
             'total' => $this->getAuthorized()
         );
     }
 
+    /**
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
+     * @param bool $copy
+     * @throws Exception
+     */
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
         $repoOptions = $this->getWorkingRepositoryOptions();
         $q = $this->accessDriver->directoryUsage("", $repoOptions);
         $this->storeUsage($q);
         $t = $this->getAuthorized();
-        Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
+        $refNode = ($oldNode !== null ? $oldNode : $newNode);
+        Controller::applyHook("msg.instant", array($refNode->getContext(), "<metaquota usage='{$q}' total='{$t}'/>"));
     }
 
     protected function storeUsage($quota)

@@ -59,7 +59,10 @@ class ImagePreviewer extends Plugin
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;
-                $cacheItem = LocalCache::getItem("diaporama_".$dimension, $destStreamURL.$file, array($this, "generateThumbnail"));
+                //$cacheItem = LocalCache::getItem("diaporama_".$dimension, $destStreamURL.$file, array($this, "generateThumbnail"));
+                $cacheItem = LocalCache::getItem("diaporama_".$dimension, $destStreamURL.$file, function($masterFile, $targetFile) use ($contextInterface){
+                    return $this->generateThumbnail($contextInterface, $masterFile, $targetFile);
+                });
                 $data = $cacheItem->getData();
                 $cId = $cacheItem->getId();
 
@@ -117,11 +120,11 @@ class ImagePreviewer extends Plugin
         }
     }
 
-    public function generateThumbnail($masterFile, $targetFile)
+    public function generateThumbnail(\Pydio\Core\Model\ContextInterface $ctx, $masterFile, $targetFile)
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
+        $pThumb = new PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
 
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";

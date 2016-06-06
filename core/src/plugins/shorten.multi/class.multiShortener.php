@@ -4,6 +4,7 @@
 *         based in bit.ly plugin
 */
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -21,13 +22,13 @@ class multiShortener extends Plugin
      * @param string $url
      * @param string $shorten
      */
-    public function processShortenHook($url, &$shorten){
-        $shorten = $this->generateLink($url);
+    public function processShortenHook(ContextInterface $ctx, $url, &$shorten){
+        $shorten = $this->generateLink($ctx, $url);
     }
 
-    protected function generateLink($url){
+    protected function generateLink(ContextInterface $ctx, $url){
 
-        $type = $this->getFilteredOption("SHORTEN_TYPE");
+        $type = $this->getContextualOption($ctx, "SHORTEN_TYPE");
         if(empty($type)) return null;
         switch (intval($type["shorten_type"])) {
             case 0:

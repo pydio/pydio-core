@@ -922,7 +922,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 if(!empty($taskId)) {
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
-                    Controller::applyHook("msg.instant", array($nodesDiffs->toXML(), $this->repository->getId()));
+                    Controller::applyHook("msg.instant", array($ctx, $nodesDiffs->toXML()));
                 }
 
                 break;
@@ -1201,6 +1201,14 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     break;
                 }
 
+                $metaData = array();
+                if (RecycleBinManager::recycleEnabled() && $dir == "") {
+                    $metaData["repo_has_recycle"] = "true";
+                }
+                $parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
+                $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
+                Controller::applyHook("node.read", array(&$parentAjxpNode));
+
                 $streamIsSeekable = AJXP_MetaStreamWrapper::wrapperIsSeekable($path);
 
                 $sharedHandle = null; $handle = null;
@@ -1208,7 +1216,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $handle = opendir($path);
                     $sharedHandle = $handle;
                 }
-                $countFiles = $this->countFiles($path, !$lsOptions["f"], false, $sharedHandle);
+                $countFiles = $this->countFiles($parentAjxpNode, !$lsOptions["f"], false, $sharedHandle);
                 if(isSet($sharedHandle)){
                     rewind($handle);
                 }
@@ -1225,13 +1233,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $offset = $limitPerPage = 0;
                 }
 
-                $metaData = array();
-                if (RecycleBinManager::recycleEnabled() && $dir == "") {
-                    $metaData["repo_has_recycle"] = "true";
-                }
-                $parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
-                $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
-                Controller::applyHook("node.read", array(&$parentAjxpNode));
                 $nodesList->setParentNode($parentAjxpNode);
                 if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! Utils::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
@@ -1242,7 +1243,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                             "currentOrderDir"=> isSet($orderDirection)?$orderDirection:$defaultDirection
                         );
                     }
-                    $foldersCounts = $this->countFiles($path, TRUE, false, $sharedHandle);
+                    $foldersCounts = $this->countFiles($parentAjxpNode, TRUE, false, $sharedHandle);
                     if(isSet($sharedHandle)) {
                         rewind($sharedHandle);
                     }
@@ -1346,7 +1347,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                      */
                     foreach ($fullList["d"] as &$nodeDir) {
                         if($breakNow){
-                            $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
+                            $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir, false, true)?"true":"false"));
                             $nodesList->addBranch($nodeDir);
                             continue;
                         }
@@ -1477,7 +1478,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $metaData["filename"] = $ajxpNode->getPath();
 
         if (RecycleBinManager::recycleEnabled() && $ajxpNode->getPath() == RecycleBinManager::getRelativeRecycle()) {
-            $recycleIcon = ($this->countFiles($ajxpNode->getUrl(), false, true)>0?"trashcan_full.png":"trashcan.png");
+            $recycleIcon = ($this->countFiles($ajxpNode, false, true)>0?"trashcan_full.png":"trashcan.png");
             $metaData["icon"] = $recycleIcon;
             $metaData["mimestring"] = $mess[122];
             $ajxpNode->setLabel($mess[122]);
@@ -1824,8 +1825,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
-    public function countFiles($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHANDLE = null)
+    public function countFiles(AJXP_Node $dirNode, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHANDLE = null)
     {
+        $dirName = $dirNode->getUrl();
         if(is_resource($dirHANDLE)){
             $handle = $dirHANDLE;
         }else{
@@ -1834,17 +1836,17 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if ($handle === false) {
             throw new \Exception("Error while trying to open directory ".$dirName);
         }
-        if ($foldersOnly && !AJXP_MetaStreamWrapper::wrapperIsRemote($dirName)) {
+        if ($foldersOnly && !$dirNode->wrapperIsRemote()) {
             if($dirHANDLE == null || !is_resource($dirHANDLE)){
                 closedir($handle);
             }
-            $path = AJXP_MetaStreamWrapper::getRealFSReference($dirName, true);
+            $path = $dirNode->getRealFile();
             $dirs = glob($path."/*", GLOB_ONLYDIR|GLOB_NOSORT);
             if($dirs === false) return 0;
             return count($dirs);
         }
         $count = 0;
-        $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository);
+        $showHiddenFiles = $this->getContextualOption($dirNode->getContext(), "SHOW_HIDDEN_FILES");
         while (false !== ($file = readdir($handle))) {
             if($file != "." && $file !=".."
                 && !(Utils::isHidden($file) && !$showHiddenFiles)){
@@ -2139,7 +2141,8 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Done");
             $nodesDiff = new NodesDiff();
             $nodesDiff->remove($selectedFiles);
-            Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $this->repository->getId()));
+            $t = TaskService::getInstance()->getTaskById($taskId);
+            Controller::applyHook("msg.instant", array($t->getContext(), $nodesDiff->toXML()));
         }
         return null;
     }

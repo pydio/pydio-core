@@ -86,4 +86,16 @@ interface ContextInterface
      * @return string
      */
     public function getStringIdentifier();
+
+    /**
+     * @param $userId
+     * @return ContextInterface
+     */
+    public function withUserId($userId);
+
+    /**
+     * @param $repositoryId
+     * @return ContextInterface
+     */
+    public function withRepositoryId($repositoryId);
 }

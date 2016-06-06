@@ -108,9 +108,10 @@ class doctrineCacheDriver extends AbstractCacheDriver
     }
 
     private function initCacheWithNamespace($namespace){
-        $cacheDriver = null;
-        $driverOptions = $this->getFilteredOption("DRIVER");
-        $cachePrefix = $this->getFilteredOption("CACHE_PREFIX");
+        $cacheDriver    = null;
+        $emptyContext   = \Pydio\Core\Model\Context::emptyContext();
+        $driverOptions  = $this->getContextualOption($emptyContext, "DRIVER");
+        $cachePrefix    = $this->getContextualOption($emptyContext, "CACHE_PREFIX");
 
         if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
             return null;

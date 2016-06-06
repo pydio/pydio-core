@@ -711,9 +711,7 @@ abstract class AbstractConfDriver extends Plugin
                         $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
                         $bmUser->renameBookmark($repositoryId, $bmPath, $title);
                     }
-                    Controller::applyHook("msg.instant", array("<reload_bookmarks/>",
-                            $repositoryId,
-                            $loggedUser->getId())
+                    Controller::applyHook("msg.instant", array($ctx, "<reload_bookmarks/>", $loggedUser->getId())
                     );
 
                     if (AuthService::usersEnabled() && $loggedUser != null) {
@@ -1264,7 +1262,7 @@ abstract class AbstractConfDriver extends Plugin
                     $users = AuthService::countUsersForRepository($repo->getId(), true);
                     $data["core.users"] = $users;
                     if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
-                        Controller::applyHook("repository.load_info", array(&$data));
+                        Controller::applyHook("repository.load_info", array($ctx, &$data));
                     }
                 }
 

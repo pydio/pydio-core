@@ -77,7 +77,7 @@ class PowerFSController extends Plugin
 
                 $archive = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
-                $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
                     $response = $response->withBody(new \Pydio\Core\Http\Response\AsyncResponseStream(function() use($fsDriver, $archive, $archiveName){
@@ -178,12 +178,12 @@ class PowerFSController extends Plugin
                     $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase.$dir."/".$archiveName);
                     $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
                     $nodesDiff->add($newNode);
-                    Controller::applyHook("msg.instant", array($nodesDiff->toXML(), $repository->getId()));
+                    Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
                 }else{
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
                     $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$opeId."',archive_name:'".$archiveName."'}); ";
                     $actionTrigger = BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]);
-                    Controller::applyHook("msg.instant", array($actionTrigger->toXML(), $repository->getId()));
+                    Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML()));
 
                 }
 

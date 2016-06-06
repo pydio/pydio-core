@@ -88,7 +88,7 @@ class MqManager extends Plugin
                 $pService->setPluginActive($this->msgExchanger->getType(), $this->msgExchanger->getName(), true, $this->msgExchanger);
             }
             if(AuthService::$bufferedMessage != null && $ctx->hasUser()){
-                $this->sendInstantMessage(AuthService::$bufferedMessage, $ctx->getRepositoryId(), $ctx->getUser()->getId());
+                $this->sendInstantMessage($ctx, AuthService::$bufferedMessage, $ctx->getUser()->getId());
                 AuthService::$bufferedMessage = null;
             }
         } catch (Exception $e) {}
@@ -131,8 +131,9 @@ class MqManager extends Plugin
     {
         $content = "";$repo = "";$targetUserId=null; $nodePathes = array();
         $update = false;
+        $ctx = null;
         if ($newNode != null) {
-            $repo = $newNode->getRepositoryId();
+            $ctx = $newNode->getContext();
             $targetUserId = $newNode->getUser();
             $nodePathes[] = $newNode->getPath();
             $update = false;
@@ -147,26 +148,27 @@ class MqManager extends Plugin
         }
         if ($origNode != null && ! $update && !$copy) {
 
-            $repo = $origNode->getRepositoryId();
+            $ctx = $origNode->getContext();
             $targetUserId = $origNode->getUser();
             $nodePathes[] = $origNode->getPath();
             $content = XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
 
         }
-        if (!empty($content) && $repo != "") {
+        if (!empty($content) && !empty($ctx)) {
 
-            $this->sendInstantMessage($content, $repo, $targetUserId, null, $nodePathes);
+            $this->sendInstantMessage($ctx, $content, $targetUserId, null, $nodePathes);
 
         }
 
     }
 
-    public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
+    public function sendInstantMessage(ContextInterface $ctx, $xmlContent, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
         $ctx = Context::fromGlobalServices();
         $currentUser = $ctx->getUser();
+        $repositoryId = $ctx->getRepositoryId();
 
-        if ($repositoryId === AJXP_REPO_SCOPE_ALL) {
+        if (!$ctx->hasRepository()) {
             $userId = $targetUserId;
         } else {
             $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
@@ -226,11 +228,11 @@ class MqManager extends Plugin
 
     }
 
-    public function sendTaskMessage($content){
+    public function sendTaskMessage(ContextInterface $ctx, $content){
 
         $this->logInfo("Core.mq", "Should now publish a message to NSQ :". json_encode($content));
-        $host = $this->getFilteredOption("NSQ_HOST");
-        $port = $this->getFilteredOption("NSQ_PORT");
+        $host = $this->getContextualOption($ctx, "NSQ_HOST");
+        $port = $this->getContextualOption($ctx, "NSQ_PORT");
         if(!empty($host) && !empty($port)){
             // Publish on NSQ
             try{
@@ -302,7 +304,7 @@ class MqManager extends Plugin
                 }
                 $currentRepository = $ctx->getRepositoryId();
                 $currentRepoMasks = array(); $regexp = null;
-                Controller::applyHook("role.masks", array($currentRepository, &$currentRepoMasks, AJXP_Permission::READ));
+                Controller::applyHook("role.masks", array($ctx, &$currentRepoMasks, AJXP_Permission::READ));
                 if(count($currentRepoMasks)){
                     $regexps = array();
                     foreach($currentRepoMasks as $path){
