@@ -318,13 +318,15 @@ class MqManager extends Plugin
         }
     }
 
-    public function wsAuthenticate(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
+    public function wsAuthenticate(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $this->logDebug("Entering wsAuthenticate");
+
         $configs = $this->getConfigs();
-        /*if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
+        $httpVars = $request->getQueryParams();
+        if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
-        }*/
+        }
         $user = AuthService::getLoggedUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
@@ -339,7 +341,7 @@ class MqManager extends Plugin
         $this->logDebug("Authenticating user ".$user->id." through WebSocket");
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $x->addChunk(new \Pydio\Core\Http\Message\XMLMessage($xml));
-        $responseInterface = $responseInterface->withBody($x);
+        $response = $response->withBody($x);
 
     }
 
@@ -399,12 +401,14 @@ class MqManager extends Plugin
 
         $hosts = [];
 
-            // Getting URLs of the Pydio system
+        $configs = $this->getConfigs();
+
+        // Getting URLs of the Pydio system
         $serverURL = Utils::detectServerURL();
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
-        $authURL = $serverURL . "/api/pydio/ws_authenticate";
+        $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
 
-            // Websocket
+        // Websocket Server Config
         $host = $params["WS_HOST"];
         $port = $params["WS_PORT"];
         $secure = $params["WS_SECURE"];
@@ -419,7 +423,7 @@ class MqManager extends Plugin
             ]
         );
 
-            // Upload
+        // Upload Server Config
         $host = $params["UPLOAD_HOST"];
         $port = $params["UPLOAD_PORT"];
         $secure = $params["UPLOAD_SECURE"];
