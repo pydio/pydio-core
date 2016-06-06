@@ -353,7 +353,7 @@ class MqManager extends Plugin
         }
 
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx = $requestInterface->getAttribute("ctx");
+        $ctx = $request->getAttribute("ctx");
         $user = $ctx->getUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
