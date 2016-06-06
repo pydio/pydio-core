@@ -344,30 +344,35 @@ class MqManager extends Plugin
         }
     }
 
-    public function wsAuthenticate(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
+    public function wsAuthenticate(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $this->logDebug("Entering wsAuthenticate");
-        /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx = $requestInterface->getAttribute("ctx");
-        $this->getConfigs();
-        /*if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
+
+        $configs = $this->getConfigs();
+        $httpVars = $request->getQueryParams();
+        if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
-        }*/
+        }
+
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $user = $ctx->getUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
         }
+
         $xml = XMLWriter::getUserXML($ctx, $user);
         // add groupPath
         if ($user->getGroupPath() != null) {
             $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
+
         $this->logDebug("Authenticating user ".$user->getId()." through WebSocket");
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $x->addChunk(new \Pydio\Core\Http\Message\XMLMessage($xml));
-        $responseInterface = $responseInterface->withBody($x);
+        $response = $response->withBody($x);
 
     }
 
@@ -426,12 +431,14 @@ class MqManager extends Plugin
 
         $hosts = [];
 
-            // Getting URLs of the Pydio system
+        $configs = $this->getConfigs();
+
+        // Getting URLs of the Pydio system
         $serverURL = Utils::detectServerURL();
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
-        $authURL = $serverURL . "/api/pydio/ws_authenticate";
+        $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
 
-            // Websocket
+        // Websocket Server Config
         $host = $params["WS_HOST"];
         $port = $params["WS_PORT"];
         $secure = $params["WS_SECURE"];
@@ -446,7 +453,7 @@ class MqManager extends Plugin
             ]
         );
 
-            // Upload
+        // Upload Server Config
         $host = $params["UPLOAD_HOST"];
         $port = $params["UPLOAD_PORT"];
         $secure = $params["UPLOAD_SECURE"];

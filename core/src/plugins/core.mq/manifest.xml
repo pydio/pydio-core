@@ -23,7 +23,7 @@
         <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket port]" label="CONF_MESSAGE[WS Port]" name="WS_PORT" type="string" expose="true" default="8090"/>
         <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket secure]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SECURE" type="boolean" expose="true" default="false"/>
         <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket path]" label="CONF_MESSAGE[WS Path]" name="WS_PATH" type="string" expose="true" default="ws"/>
-
+        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket Authentication Key]" label="CONF_MESSAGE[WS Admin Key]" name="WS_SERVER_ADMIN" type="string" default="adminsecretkey"/>
 
         <global_param group="CONF_MESSAGE[Upload]" description="CONF_MESSAGE[Upload server is running]" label="CONF_MESSAGE[Upload]" name="UPLOAD_ACTIVE" type="boolean" expose="true"/>
 
