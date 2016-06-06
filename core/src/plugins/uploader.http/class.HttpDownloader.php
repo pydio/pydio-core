@@ -68,118 +68,46 @@ class HttpDownloader extends Plugin
         switch ($action) {
             case "external_download":
 
+                // Preparing the task
                 $taskId = $request->getAttribute("pydio-task-id");
-                if(empty($taskId)){
+                if(empty($taskId)) {
                     $task = TaskService::actionAsTask($request->getAttribute("ctx"), "external_download", $httpVars, [], Task::FLAG_HAS_PROGRESS | Task::FLAG_STOPPABLE);
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
                 }
 
-                require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
-                session_write_close();
+                // Parameters
+                $url = $httpVars["file"];
+                $node = new AJXP_Node($currentDirUrl.$basename);
 
-                $httpClient = new http_class();
-                $arguments = array();
-                $httpClient->GetRequestArguments($httpVars["file"], $arguments);
-                $err = $httpClient->Open($arguments);
-                $collectHeaders = array(
-                    "ajxp-last-redirection" => "",
-                    "content-disposition"	=> "",
-                    "content-length"		=> ""
-                );
-                if(!empty($err)){
-                    throw new Exception($err);
+                // Work
+                try {
+                    $this->externalDownload(
+                        $url,  // Original url for the file
+                        $node, // Destination node
+                        function ($msg, $progress) use ($taskId) {
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, sprintf($msg, $progress), null, $progress);
+                        } //  Showing progress for the download
+                    );
+                } catch (Exception $e) {
+                    // In case of a problem, removing the task
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
+                    return false;
                 }
 
-                $err = $httpClient->SendRequest($arguments);
-                $httpClient->follow_redirect = true;
-
-                $pidHiddenFileName = $currentDirUrl.".".$basename.".pid";
-                if (is_file($pidHiddenFileName)) {
-                    $pid = file_get_contents($pidHiddenFileName);
-                    @unlink($pidHiddenFileName);
-                }
-
-                if(!empty($err)){
-                    $httpClient->Close();
-                    throw new Exception($err);
-                }
-
-                $httpClient->ReadReplyHeaders($collectHeaders);
-
-                $totalSize = -1;
-                if (!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false) {
-                    $ar = explode("filename=", $collectHeaders["content-disposition"]);
-                    $basename = trim(array_pop($ar));
-                    $basename = str_replace("\"", "", $basename); // Remove quotes
-                }
-                if (!empty($collectHeaders["content-length"])) {
-                    $totalSize = intval($collectHeaders["content-length"]);
-                    $this->logDebug("Should download $totalSize bytes!");
-                }
-                if ($totalSize != -1) {
-                    $node = new AJXP_Node($currentDirUrl.$basename);
-                    Controller::applyHook("node.before_create", array($node, $totalSize));
-                }
-
-                $tmpFilename = $currentDirUrl.$basename.".dlpart";
-                $hiddenFilename = $currentDirUrl."__".$basename.".ser";
-                $filename = $currentDirUrl.$basename;
-
-                $dlData = array(
-                    "sourceUrl" => $getPath,
-                    "totalSize" => $totalSize
-                );
-                if (isSet($pid)) {
-                    $dlData["pid"] = $pid;
-                }
-                //file_put_contents($hiddenFilename, serialize($dlData));
-                $fpHid=fopen($hiddenFilename,"w");
-                fputs($fpHid,serialize($dlData));
-                fclose($fpHid);
-
-                // NOW READ RESPONSE
-                $readBodySize = 0;
-                $currentPercent = 0;
-                $checkStopEvery = 1024*1024;
-                $destStream = fopen($tmpFilename, "w");
-                while (true) {
-                    $body = "";
-                    $error = $httpClient->ReadReplyBody($body, 4096);
-                    if($error != "" || strlen($body) == 0) {
-                        break;
-                    }
-                    fwrite($destStream, $body, strlen($body));
-                    $readBodySize += strlen($body);
-                    if($totalSize > 0){
-                        $newPercent = round(100 * $readBodySize / $totalSize);
-                        if(!empty($taskId) && $newPercent > $currentPercent){
-                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Downloading ... " . $newPercent . " %", null, $newPercent);
-                        }
-                        $currentPercent = $newPercent;
-                    }
-                    if(!empty($taskId) && $readBodySize >= $checkStopEvery &&  $readBodySize % $checkStopEvery === 0
-                        && TaskService::getInstance()->getTaskById($taskId)->getStatus() === Task::STATUS_PAUSED){
-                        break;
-                    }
-                }
-                fclose($destStream);
-                rename($tmpFilename, $filename);
-                unlink($hiddenFilename);
-                $httpClient->Close();
-
+                // Ending the task
                 if (isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)) {
                     Controller::applyHook("node.before_path_change", array(new AJXP_Node($dlFile)));
                     unlink($dlFile);
                     Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                 }
                 $mess = ConfService::getMessages();
-                Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false), true);
+                Controller::applyHook("node.change", array(null, $node, false), true);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, $mess["httpdownloader.8"]);
-
 
             break;
             case "update_dl_data":
+
                 $file = Utils::decodeSecureMagic($httpVars["file"]);
                 header("text/plain");
                 if (is_file($currentDirUrl.$file)) {
@@ -213,7 +141,94 @@ class HttpDownloader extends Plugin
         }
 
         return false;
+    }
 
+
+    /**
+     * @param string $url
+     * @param AJXP_Node $node
+     * @param $updateFn
+     * @throws Exception
+     */
+    public function externalDownload($url, $node, $updateFn) {
+
+        $client = new GuzzleHttp\Client(['base_url' => $url]);
+
+        $response = $client->get();
+
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception("There was a problem retrieving the file from the server");
+        }
+
+        $totalSize = -1;
+
+        $contentDisposition = $response->getHeader("Content-Disposition");
+        $contentLength = $response->getHeader("Content-Length");
+
+        if (strstr($contentDisposition, "filename")!== false) {
+            $ar = explode("filename=", $contentDisposition);
+            $basename = trim(array_pop($ar));
+            $basename = str_replace("\"", "", $basename); // Remove quotes
+        }
+
+        if (!empty($contentLength)) {
+            $totalSize = intval($contentLength);
+            $this->logDebug("Should download $totalSize bytes!");
+        }
+        if ($totalSize != -1) {
+            Controller::applyHook("node.before_create", array($node, $totalSize));
+        }
+
+        $basename = basename($node->getPath());
+        $tmpFilename = $node->getUrl().".dlpart";
+        $hiddenFilename = rtrim($node->getUrl(), $basename) . "__" . $basename .".ser";
+
+        $filename = $node->getUrl();
+
+        $dlData = array(
+            "sourceUrl" => $url,
+            "totalSize" => $totalSize
+        );
+        if (isSet($pid)) {
+            $dlData["pid"] = $pid;
+        }
+
+        //file_put_contents($hiddenFilename, serialize($dlData));
+        $fpHid=fopen($hiddenFilename,"w");
+        fputs($fpHid,serialize($dlData));
+        fclose($fpHid);
+
+        // NOW READ RESPONSE
+        $readBodySize = 0;
+        $currentPercent = 0;
+        $destStream = fopen($tmpFilename, "w");
+
+        $body = $response->getBody();
+
+        // Copy-ing the body to the destination file
+        while (!$body->eof()) {
+            $body->read(4096);
+
+            $part = $body->read(4096);
+            $readBytes = strlen($part);
+
+            fwrite($destStream, $part, $readBytes);
+
+            $readBodySize += $readBytes;
+
+            if($totalSize > 0) {
+                $newPercent = round(100 * $readBodySize / $totalSize);
+                if($newPercent > $currentPercent) {
+                    $updateFn("Downloading ... %d %%", $newPercent);
+                }
+
+                $currentPercent = $newPercent;
+            }
+        }
+
+        fclose($destStream);
+        rename($tmpFilename, $filename);
+        unlink($hiddenFilename);
     }
 
     /**
