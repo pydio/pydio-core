@@ -475,7 +475,7 @@ class ConfService
         if ($scope == "user") {
             return self::getInstance()->getLoadedRepositories();
         } else {
-            return self::getInstance()->initRepositoriesListInst("all", $includeShared);
+            return self::getInstance()->initRepositoriesListInst("all", null, $includeShared);
         }
     }
 
@@ -510,7 +510,7 @@ class ConfService
                 unset($this->configs["REPOSITORIES"]);
             }
         }
-        $this->configs["REPOSITORIES"] = $this->initRepositoriesListInst();
+        $this->configs["REPOSITORIES"] = $this->initRepositoriesListInst("user", AuthService::getLoggedUser());
         $_SESSION["REPOSITORIES"] = $this->configs["REPOSITORIES"];
         return $this->configs["REPOSITORIES"];
     }
@@ -762,13 +762,13 @@ class ConfService
 
     /**
      * @param $scope String "user", "all"
+     * @param UserInterface|null $loggedUser
      * @param bool $includeShared
      * @return array
      */
-    protected function initRepositoriesListInst($scope = "user", $includeShared = true)
+    protected function initRepositoriesListInst($scope = "user", $loggedUser = null, $includeShared = true)
     {
         // APPEND CONF FILE REPOSITORIES
-        $loggedUser = AuthService::getLoggedUser();
         $objList = array();
         if($loggedUser != null){
             $l = $loggedUser->getLock();
@@ -786,8 +786,8 @@ class ConfService
         $confDriver = self::getConfStorageImpl();
         if($scope == "user"){
             $acls = array();
-            if(AuthService::getLoggedUser() != null){
-                $acls = AuthService::getLoggedUser()->mergedRole->listAcls(true);
+            if($loggedUser != null){
+                $acls = $loggedUser->getMergedRole()->listAcls(true);
             }
             if(!count($acls)) {
                 $drvList = array();

@@ -28,6 +28,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
@@ -871,7 +872,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $data = json_decode($jsonData, true);
                 $roleData = $data["ROLE"];
                 $binariesContext = array();
+                $parseContext = $ctx;
                 if (isset($userObject)) {
+                    $parseContext = new Context(null, $ctx->getRepositoryId());
+                    $parseContext->setUserObject($userObject);
                     $binariesContext = array("USER" => $userObject->getId());
                 }
                 if(isSet($data["FORMS"])){
@@ -880,9 +884,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         foreach ($plugData as $plugId => $formsData) {
                             $parsed = array();
                             Utils::parseStandardFormParameters(
+                                $parseContext,
                                 $formsData,
                                 $parsed,
-                                ($userObject!=null?$usrId:null),
                                 "ROLE_PARAM_",
                                 $binariesContext,
                                 AJXP_Role::$cypheredPassPrefix
@@ -1284,6 +1288,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             break;
 
             case "save_custom_user_params" :
+
                 $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 if ($userId == $loggedUser->getId()) {
                     $user = $loggedUser;
@@ -1299,7 +1304,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(!is_array($custom)) $custom = array();
 
                 $options = $custom;
-                $this->parseParameters($httpVars, $options, $userId, false, $custom);
+                $newCtx = new Context($userId, $ctx->getRepositoryId());
+                $this->parseParameters($newCtx, $httpVars, $options, false, $custom);
                 $custom = $options;
                 $user->setPref("CUSTOM_PARAMS", $custom);
                 $user->save();
@@ -1333,7 +1339,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $options = $wallet[$repoID];
                 $existing = $options;
-                $this->parseParameters($httpVars, $options, $userId, false, $existing);
+                $newCtx = new Context($userId, $ctx->getRepositoryId());
+                $this->parseParameters($newCtx, $httpVars, $options, false, $existing);
                 $wallet[$repoID] = $options;
                 $user->setPref("AJXP_WALLET", $wallet);
                 $user->save();
@@ -1448,7 +1455,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = $repDef["DRIVER_OPTIONS"];
                 } else {
                     $options = array();
-                    $this->parseParameters($repDef, $options, null, true);
+                    $this->parseParameters($ctx, $repDef, $options, true);
                 }
                 if (count($options)) {
                     $repDef["DRIVER_OPTIONS"] = $options;
@@ -1717,7 +1724,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if(!$repo->isTemplate){
                         foreach($existing as $exK) $existingValues[$exK] = $repo->getOption($exK, true);
                     }
-                    $this->parseParameters($httpVars, $options, null, true, $existingValues);
+                    $this->parseParameters($ctx, $httpVars, $options, true, $existingValues);
                     if (count($options)) {
                         foreach ($options as $key=>$value) {
                             if ($key == "AJXP_SLUG") {
@@ -1822,7 +1829,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
                 } else {
                     $options = array();
-                    $this->parseParameters($httpVars, $options, null, true);
+                    $this->parseParameters($ctx, $httpVars, $options, true);
                 }
                 $repoOptions = $repo->getOption("META_SOURCES");
                 if (is_array($repoOptions) && isSet($repoOptions[$metaSourceType])) {
@@ -1879,7 +1886,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
                     } else {
                         $options = array();
-                        $this->parseParameters($httpVars, $options, null, true);
+                        $this->parseParameters($ctx, $httpVars, $options, true);
                     }
                     if(isset($repoOptions[$metaSourceId])){
                         $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
@@ -2094,7 +2101,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "run_plugin_action":
 
                 $options = array();
-                $this->parseParameters($httpVars, $options, null, true);
+                $this->parseParameters($ctx, $httpVars, $options, true);
                 $pluginId = $httpVars["action_plugin_id"];
                 if (isSet($httpVars["button_key"])) {
                     $options = $options[$httpVars["button_key"]];
@@ -2117,7 +2124,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "edit_plugin_options":
 
                 $options = array();
-                $this->parseParameters($httpVars, $options, null, true);
+                $this->parseParameters($ctx, $httpVars, $options, true);
                 $confStorage = ConfService::getConfStorageImpl();
                 $pluginId = Utils::sanitize($httpVars["plugin_id"], AJXP_SANITIZE_ALPHANUM);
                 list($pType, $pName) = explode(".", $pluginId);
@@ -2911,10 +2918,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
-
-    protected function parseParameters(&$repDef, &$options, $userId = null, $globalBinaries = false, $existingValues = array())
+    /**
+     * @param ContextInterface $ctx
+     * @param $repDef
+     * @param $options
+     * @param bool $globalBinaries
+     * @param array $existingValues
+     */
+    protected function parseParameters(ContextInterface $ctx, &$repDef, &$options, $globalBinaries = false, $existingValues = array())
     {
-        Utils::parseStandardFormParameters($repDef, $options, $userId, "DRIVER_OPTION_", ($globalBinaries?array():null));
+        Utils::parseStandardFormParameters($ctx, $repDef, $options, "DRIVER_OPTION_", ($globalBinaries?array():null));
         if(!count($existingValues)){
             return;
         }

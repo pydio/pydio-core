@@ -360,7 +360,7 @@ class MqManager extends Plugin
             throw new Exception("You must be logged in");
         }
 
-        $xml = XMLWriter::getUserXML($user);
+        $xml = XMLWriter::getUserXML($ctx, $user);
         // add groupPath
         if ($user->getGroupPath() != null) {
             $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";

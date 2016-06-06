@@ -32,6 +32,8 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
     function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
         $httpVars = $request->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx      = $request->getAttribute("ctx");
         // CATCH THE STANDARD LOGIN OPERATION
         if($request->getAttribute("action") != "login"){
             return false;
@@ -76,9 +78,9 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
                 $loggingResult = -4; // Force captcha reload
             }
         }
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $ctx->getUser();
         if ($loggedUser != null) {
-            $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+            $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if (isSet($httpVars["tmp_repository_id"])) {
                 $passId = $httpVars["tmp_repository_id"];
@@ -111,7 +113,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
 
             $res = Duo::signRequest($iKey, $sKey, $appUnique, $loggedUser->getId());
 
-            $loggedUser->personalRole->setParameterValue("authfront.duosecurity", "DUO_AUTH_LAST_SIGNATURE", $res);
+            $loggedUser->getPersonalRole()->setParameterValue("authfront.duosecurity", "DUO_AUTH_LAST_SIGNATURE", $res);
             $loggedUser->setLock("duo_show_iframe");
             $loggedUser->save("superuser");
         }

@@ -72,7 +72,7 @@ class AJXP_ClientDriver extends Plugin
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         $out = array();
-        Utils::parseApplicationGetParameters($request->getQueryParams(), $out, $_SESSION);
+        Utils::parseApplicationGetParameters($ctx, $request->getQueryParams(), $out, $_SESSION);
         $config = $this->computeBootConf($ctx);
         $response = $response->withHeader("Content-type", "application/json;charset=UTF-8");
         $response->getBody()->write(json_encode($config));
@@ -144,7 +144,7 @@ class AJXP_ClientDriver extends Plugin
             */
         }
 
-        Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
+        Utils::parseApplicationGetParameters($ctx, $_GET, $START_PARAMETERS, $_SESSION);
 
         $confErrors = ConfService::getErrors();
         if (count($confErrors)) {
@@ -357,8 +357,8 @@ class AJXP_ClientDriver extends Plugin
      */
     public function nodeBookmarkMetadata(&$ajxpNode)
     {
-        $user = AuthService::getLoggedUser();
-        if($user == null) return;
+        $user = $ajxpNode->getContext()->getUser();
+        if(empty($user)) return;
         $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         if (is_array($metadata) && count($metadata)) {
             $ajxpNode->mergeMetadata(array(
@@ -390,7 +390,7 @@ class AJXP_ClientDriver extends Plugin
      */
     public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){
         if($copy || $fromNode == null) return;
-        $user = AuthService::getLoggedUser();
+        $user = $fromNode->getContext()->getUser();
         if($user == null) return;
         if (!isSet(self::$loadedBookmarks)) {
             self::$loadedBookmarks = $user->getBookmarks($fromNode->getRepositoryId());
@@ -400,7 +400,7 @@ class AJXP_ClientDriver extends Plugin
         } else {
             $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         }
-        Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), AuthService::getLoggedUser()->getId()));
+        Controller::applyHook("msg.instant", array("<reload_bookmarks/>", $fromNode->getRepositoryId(), $user->getId()));
     }
 
     public static function filterXml(&$value)

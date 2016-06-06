@@ -74,7 +74,7 @@ class dropboxAccessDriver extends fsAccessDriver
         if(!empty($_SESSION["OAUTH_DROPBOX_TOKENS"])) return;
 
         // TOKENS IN FILE ?
-        $tokens = $this->getTokens();
+        $tokens = $this->getTokens($contextInterface);
         if (!empty($tokens)) {
             $_SESSION["OAUTH_DROPBOX_TOKENS"] = $tokens;
             return;
@@ -108,7 +108,7 @@ class dropboxAccessDriver extends fsAccessDriver
                 }
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
                 $_SESSION['OAUTH_DROPBOX_TOKENS'] = $tokens;
-                $this->setTokens($tokens);
+                $this->setTokens($contextInterface, $tokens);
                 return;
         }
 
@@ -128,14 +128,15 @@ class dropboxAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function getTokens()
+    public function getTokens(ContextInterface $ctx)
     {
-        if($this->repository->getOption("DROPBOX_OAUTH_TOKENS") !== null && is_array($this->repository->getOption("DROPBOX_OAUTH_TOKENS"))){
-            return $this->repository->getOption("DROPBOX_OAUTH_TOKENS");
+        $repo = $ctx->getRepository();
+        if($repo->getOption("DROPBOX_OAUTH_TOKENS") !== null && is_array($repo->getOption("DROPBOX_OAUTH_TOKENS"))){
+            return $repo->getOption("DROPBOX_OAUTH_TOKENS");
         }
-        $repositoryId = $this->repository->getId();
+        $repositoryId = $repo->getId();
         if(AuthService::usersEnabled()) {
-            $u = AuthService::getLoggedUser();
+            $u = $ctx->getUser();
             $userId = $u->getId();
             if($u->getResolveAsParent()){
                 $userId = $u->getParent();
@@ -146,10 +147,10 @@ class dropboxAccessDriver extends fsAccessDriver
         return Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens");
     }
 
-    public function setTokens($oauth_tokens)
+    public function setTokens(ContextInterface $ctx, $oauth_tokens)
     {
-        $repositoryId = $this->repository->getId();
-        if(AuthService::usersEnabled()) $userId = AuthService::getLoggedUser()->getId();
+        $repositoryId = $ctx->getUser()->getId();
+        if(AuthService::usersEnabled()) $userId = $ctx->getUser()->getId();
         else $userId = "shared";
         Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
@@ -157,7 +158,7 @@ class dropboxAccessDriver extends fsAccessDriver
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
         $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
-        $newOptions["DROPBOX_OAUTH_TOKENS"] = $this->getTokens();
+        $newOptions["DROPBOX_OAUTH_TOKENS"] = $this->getTokens($ctx);
         return $newOptions;
     }
 

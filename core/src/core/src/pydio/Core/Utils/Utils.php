@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
@@ -384,12 +385,13 @@ class Utils
      * + skipIOS
      * + gui
      * @static
+     * @param ContextInterface $ctx
      * @param $parameters
      * @param $output
      * @param $session
      * @return void
      */
-    public static function parseApplicationGetParameters($parameters, &$output, &$session)
+    public static function parseApplicationGetParameters(ContextInterface $ctx, $parameters, &$output, &$session)
     {
         $output["EXT_REP"] = "/";
 
@@ -411,7 +413,7 @@ class Utils
                 $parameters["repository_id"] = $repository->getId();
             }
             if (AuthService::usersEnabled()) {
-                $loggedUser = AuthService::getLoggedUser();
+                $loggedUser = $ctx->getUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
                     $output["FORCE_REGISTRY_RELOAD"] = true;
                     $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
@@ -1731,10 +1733,10 @@ class Utils
         }
     }
 
-    public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null, $cypheredPassPrefix = "")
+    public static function parseStandardFormParameters(ContextInterface $ctx, &$repDef, &$options, $prefix = "DRIVER_OPTION_", $binariesContext = null, $cypheredPassPrefix = "")
     {
         if ($binariesContext === null) {
-            $binariesContext = array("USER" => (AuthService::getLoggedUser()!= null)?AuthService::getLoggedUser()->getId():"shared");
+            $binariesContext = array("USER" => ($ctx->hasUser())?$ctx->getUser()->getId():"shared");
         }
         $replicationGroups = array();
         $switchesGroups = array();
@@ -1752,10 +1754,10 @@ class Utils
                         $value = intval($value);
                     } else if ($type == "array") {
                         $value = explode(",", $value);
-                    } else if ($type == "password" && $userId!=null) {
+                    } else if ($type == "password" && $ctx->hasUser()) {
                         if (trim($value) != "" && $value != "__AJXP_VALUE_SET__" && function_exists('mcrypt_encrypt')) {
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-                            $value = $cypheredPassPrefix . base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB));
+                            $value = $cypheredPassPrefix . base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($ctx->getUser()->getId()."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB));
                         }
                     } else if ($type == "binary" && $binariesContext !== null) {
                         if (!empty($value)) {

@@ -171,7 +171,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-                    $task = \Pydio\Tasks\TaskService::actionAsTask("index", []);
+                    $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
                 }else{

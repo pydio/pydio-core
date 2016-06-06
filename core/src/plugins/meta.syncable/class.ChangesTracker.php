@@ -236,7 +236,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             }
         }
         if($this->options["REQUIRES_INDEXATION"]){
-            $task = TaskService::actionAsTask("index", []);
+            $task = TaskService::actionAsTask($contextInterface, "index", []);
             TaskService::getInstance()->enqueueTask($task);
             // Unset the REQUIRES_INDEXATION FLAG
             $meta =  $currentRepo->getOption("META_SOURCES");
@@ -541,7 +541,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 if($copy && !$newNode->isLeaf()){
                     // Make sure to index the content of this folder
                     $this->logInfo("Core.index", "Should reindex folder ".$newNode->getPath());
-                    $task = TaskService::actionAsTask("index", ["file" => $newNode->getPath()]);
+                    $task = TaskService::actionAsTask($newNode->getContext(), "index", ["file" => $newNode->getPath()]);
                     $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     TaskService::getInstance()->enqueueTask($task);
                 }
@@ -591,7 +591,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
                                 $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".$newNode->getPath()."), relaunching a recursive indexation!");
-                                $task = TaskService::actionAsTask("index", ["file" => $newNode->getPath()]);
+                                $task = TaskService::actionAsTask($newNode->getContext(), "index", ["file" => $newNode->getPath()]);
                                 $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                                 TaskService::getInstance()->enqueueTask($task);
 

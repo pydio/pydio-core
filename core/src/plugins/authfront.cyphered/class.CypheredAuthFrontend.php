@@ -115,6 +115,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
     function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
         $httpVars = $request->getParsedBody();
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx      = $request->getAttribute("ctx");
         $checkNonce = $this->pluginConf["CHECK_NONCE"] === true;
         $token = $this->detectVar($httpVars, "cyphered_token");
         $tokenInc = $this->detectVar($httpVars, "cyphered_token_inc");
@@ -135,8 +137,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
             $this->logDebug(__FUNCTION__, "Cyphered Token found but wrong deserizalized data");
             return false;
         }
-        if(AuthService::getLoggedUser() != null){
-            $currentUser = AuthService::getLoggedUser()->getId();
+        if($ctx->hasUser() != null){
+            $currentUser = $ctx->getUser()->getId();
             if($currentUser != $data["user_id"]){
                 AuthService::disconnect();
             }
@@ -161,8 +163,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
                 $keys[$userId] = $tokenInc;
                 $this->storeLastKeys($keys);
             }
-            $loggedUser = AuthService::getLoggedUser();
-            $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+            $loggedUser = $ctx->getUser();
+            $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if (isSet($httpVars["tmp_repository_id"])) {
                 $passId = $httpVars["tmp_repository_id"];

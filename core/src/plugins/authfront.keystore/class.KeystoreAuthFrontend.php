@@ -103,17 +103,21 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
      * @param array $fileVars
      * @return String
      */
-    function authTokenActions($action, $httpVars, $fileVars){
+    function authTokenActions($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $ctx){
 
-        if(AuthService::getLoggedUser() == null) return null;
+        if(!$ctx->hasUser()) {
+            return null;
+        }
         $this->storage = ConfService::getConfStorageImpl();
         if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
 
-        $user = AuthService::getLoggedUser()->getId();
-        if(AuthService::getLoggedUser()->isAdmin() && isSet($httpVars["user_id"])){
+        $u = $ctx->getUser();
+        $user = $u->getId();
+        if($u->isAdmin() && isSet($httpVars["user_id"])){
             $user = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
         }
         switch($action){
+            
             case "keystore_generate_auth_token":
 
                 if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){

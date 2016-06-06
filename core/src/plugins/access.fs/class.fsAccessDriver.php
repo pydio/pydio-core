@@ -698,7 +698,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $taskId = $request->getAttribute("pydio-task-id");
                 if($request->getAttribute("pydio-task-id") === null){
-                    $task = TaskService::actionAsTask($action, $httpVars);
+                    $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
@@ -817,7 +817,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $taskId = $request->getAttribute("pydio-task-id");
                 if($taskId === null && ($size > $bgSizeThreshold)){
-                    $task = TaskService::actionAsTask($action, $httpVars);
+                    $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     if($size > $bgWorkerThreshold){
                         $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     }
@@ -857,7 +857,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $size += $node->getSizeRecursive();
                 }
                 if($taskId === null && ($size > $bgSizeThreshold)){
-                    $task = TaskService::actionAsTask($action, $httpVars);
+                    $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
                     if($size > $bgWorkerThreshold){
                         $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));

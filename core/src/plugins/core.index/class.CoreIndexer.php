@@ -69,7 +69,7 @@ class CoreIndexer extends Plugin {
         }
         $taskId = $requestInterface->getAttribute("pydio-task-id");
         if (empty($taskId)) {
-            $task = TaskService::actionAsTask("index", $httpVars, "", "", [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+            $task = TaskService::actionAsTask($ctx, "index", $httpVars, [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
             $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
             TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             $responseInterface = new \Zend\Diactoros\Response\EmptyResponse();

@@ -58,10 +58,8 @@ class PluginSkeleton extends Plugin
     }
 
     /**
-     * @param String $action
-     * @param array $httpVars
-     * @param array $fileVars
-     * @return void
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
      */
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {

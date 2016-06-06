@@ -143,8 +143,9 @@ abstract class AbstractAccessDriver extends Plugin
         $httpVars = $requestInterface->getParsedBody();
 
         $taskId = $requestInterface->getAttribute("pydio-task-id");
+        $ctx = $requestInterface->getAttribute("ctx");
         if(empty($taskId)){
-            $task = TaskService::actionAsTask("cross_copy", $httpVars);
+            $task = TaskService::actionAsTask($ctx, "cross_copy", $httpVars);
             $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             return;
         }
@@ -152,7 +153,6 @@ abstract class AbstractAccessDriver extends Plugin
         ConfService::detectRepositoryStreams(true);
         $mess = ConfService::getMessages();
 
-        $ctx = $requestInterface->getAttribute("ctx");
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
 

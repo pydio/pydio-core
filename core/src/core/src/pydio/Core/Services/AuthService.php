@@ -21,14 +21,12 @@
 namespace Pydio\Core\Services;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Conf\Core\AjxpRole;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
@@ -189,7 +187,7 @@ class AuthService
 
     /**
      * @static
-     * @param AbstractAjxpUser $user
+     * @param UserInterface $user
      */
     public static function refreshRememberCookie($user)
     {
@@ -199,7 +197,7 @@ class AuthService
         }
         $rememberPass = CookiesHelper::getCookieString($user);
         if(self::$useSession) {
-            setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+            setcookie("AjaXplorer-remember", $user->getId().":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
         }
     }
 
