@@ -21,6 +21,7 @@
 namespace Pydio\Log\Core;
 
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -319,7 +320,7 @@ class AJXP_Logger extends Plugin
     {
         if (!isset(self::$loggerInstance)) {
             $p = PluginsService::findPlugin("core", "log");
-            if(is_object($p)) $p->init(array());
+            if(is_object($p)) $p->init(Context::fromGlobalServices(), array());
         }
         return self::$loggerInstance;
     }
