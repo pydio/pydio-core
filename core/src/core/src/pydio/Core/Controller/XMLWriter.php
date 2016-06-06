@@ -22,10 +22,10 @@ namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -498,24 +498,26 @@ class XMLWriter
     /**
      * Extract all the user data and put it in XML
      * @static
+     * @param ContextInterface $ctx
      * @param AbstractAjxpUser|null $userObject
      * @return string
      */
-    public static function getUserXML($userObject = null)
+    public static function getUserXML(ContextInterface $ctx, $userObject = null)
     {
         $buffer = "";
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $ctx->getUser();
+        $currentRepoId = $ctx->getRepositoryId();
         $confDriver = ConfService::getConfStorageImpl();
         if($userObject != null) $loggedUser = $userObject;
         if (!Services\AuthService::usersEnabled()) {
             $buffer.="<user id=\"shared\">";
-            $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
+            $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"1\" read=\"1\"/>";
             $buffer.= XMLWriter::writeRepositoriesData(null);
             $buffer.="</user>";
         } else if ($loggedUser != null) {
             $lock = $loggedUser->getLock();
             $buffer.="<user id=\"".$loggedUser->id."\">";
-            $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
+            $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"".($loggedUser->canWrite($currentRepoId)?"1":"0")."\" read=\"".($loggedUser->canRead($currentRepoId)?"1":"0")."\"/>";
             $buffer.= XMLWriter::writeRepositoriesData($loggedUser);
             $buffer.="<preferences>";
             $preferences = $confDriver->getExposedPreferences($loggedUser);

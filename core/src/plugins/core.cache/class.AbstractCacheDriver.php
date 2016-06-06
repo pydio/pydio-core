@@ -69,14 +69,18 @@ abstract class AbstractCacheDriver extends Plugin
      * @return string
      */
     public static function computeIdForNode($node, $cacheType, $details = ''){
+        $ctx = $node->getContext();
         $repo = $node->getRepository();
+        $user = $ctx->getUser();
         if($repo == null) return "failed-id";
         $scope = $repo->securityScope();
         $additional = "";
         if($scope === "USER"){
-            $additional = AuthService::getLoggedUser()->getId()."@";
+            $additional = ($user!==null ? $user->getId() : "shared")."@";
         }else if($scope == "GROUP"){
-            $additional =  ltrim(str_replace("/", "__", AuthService::getLoggedUser()->getGroupPath()), "__")."@";
+            $gPath = "/";
+            if($user !== null) $gPath = $user->getGroupPath();
+            $additional =  ltrim(str_replace("/", "__", $gPath), "__")."@";
         }
         $scheme = parse_url($node->getUrl(), PHP_URL_SCHEME);
         return str_replace($scheme . "://", $cacheType."://".$additional, $node->getUrl()).($details?"##".$details:"");

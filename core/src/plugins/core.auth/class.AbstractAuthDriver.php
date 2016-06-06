@@ -117,10 +117,10 @@ class AbstractAuthDriver extends Plugin
             if ($logged == null) {
                 return $this->registryContributions;
             } else {
-                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($logged);
+                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($ctx, $logged);
             }
         } else {
-            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML(null);
+            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($ctx, null);
         }
         $dom = new \DOMDocument();
         $dom->loadXML($xmlString);

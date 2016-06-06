@@ -356,7 +356,7 @@ class MqManager extends Plugin
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
         }
-        $xml = XMLWriter::getUserXML($user);
+        $xml = XMLWriter::getUserXML($ctx, $user);
         // add groupPath
         if ($user->getGroupPath() != null) {
             $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";

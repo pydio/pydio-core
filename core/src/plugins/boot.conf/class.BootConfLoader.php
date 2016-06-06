@@ -172,10 +172,10 @@ class BootConfLoader extends AbstractConfDriver
      * @param $httpVars
      * @param $fileVars
      */
-    public function applyInstallerForm($action, $httpVars, $fileVars)
+    public function applyInstallerForm($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $data = array();
-        Utils::parseStandardFormParameters($httpVars, $data, null, "");
+        Utils::parseStandardFormParameters($ctx, $httpVars, $data, "");
 
         list($newConfigPlugin, $newAuthPlugin, $newCachePlugin) = $this->createBootstrapConf($data);
 
@@ -436,10 +436,10 @@ class BootConfLoader extends AbstractConfDriver
      * @param $fileVars
      * @throws Exception
      */
-    public function testConnexions($action, $httpVars, $fileVars)
+    public function testConnexions($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $data = array();
-        Utils::parseStandardFormParameters($httpVars, $data, null, "DRIVER_OPTION_");
+        Utils::parseStandardFormParameters($ctx, $httpVars, $data, "DRIVER_OPTION_");
 
         if ($action == "boot_test_sql_connexion") {
 

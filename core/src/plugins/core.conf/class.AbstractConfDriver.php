@@ -764,7 +764,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
                     $updating = false;
-                    Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    Utils::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
                     $original_id = Utils::decodeSecureMagic($data["new_user_id"]);
                     $data["new_user_id"] = Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
                     if($original_id != $data["new_user_id"]){
@@ -792,7 +792,7 @@ abstract class AbstractConfDriver extends Plugin
                 } else if($action == "user_create_user" && isSet($httpVars["NEW_existing_user_id"])){
 
                     $updating = true;
-                    \Pydio\Core\Utils\Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    \Pydio\Core\Utils\Utils::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
                     $userId = $data["existing_user_id"];
                     if(!AuthService::userExists($userId)){
                         throw new \Exception("Cannot find user");
@@ -807,7 +807,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 } else {
                     $updating = false;
-                    Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
+                    Utils::parseStandardFormParameters($ctx, $httpVars, $data, "PREFERENCES_");
                 }
 
                 $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
@@ -1042,7 +1042,7 @@ abstract class AbstractConfDriver extends Plugin
                 $tplId = $httpVars["template_id"];
                 $tplRepo = ConfService::getRepositoryById($tplId);
                 $options = array();
-                Utils::parseStandardFormParameters($httpVars, $options);
+                Utils::parseStandardFormParameters($ctx, $httpVars, $options);
                 $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
                 if (!empty($gPath)) {

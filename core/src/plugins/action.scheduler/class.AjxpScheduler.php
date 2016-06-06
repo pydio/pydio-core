@@ -106,7 +106,7 @@ class AjxpScheduler extends Plugin
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="user_id"]', $contribNode);
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
-        $paramNode->attributes->getNamedItem("default")->nodeValue = AuthService::getLoggedUser()->getId();
+        $paramNode->attributes->getNamedItem("default")->nodeValue = $ctx->getUser()->getId();
     }
 
     public function getTaskById($tId)

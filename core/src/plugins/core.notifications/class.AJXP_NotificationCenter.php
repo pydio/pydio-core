@@ -113,25 +113,21 @@ class AJXP_NotificationCenter extends Plugin
         if(!$this->eventStore) return;
 
         $n = ($oldNode == null ? $newNode : $oldNode);
-        $repoId = $n->getRepositoryId();
-        if($n->getUser()){
-            $userId = $n->getUser();
-            $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
-            if($obj) $userGroup = $obj->getGroupPath();
-        }else{
-            $userId = AuthService::getLoggedUser()->getId();
-            $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        $ctx = $n->getContext();
+        if(!$ctx->hasUser() || !$ctx->hasRepository()){
+            return;
         }
-        $repository = ConfService::getRepositoryById($repoId);
+        $repository = $n->getContext()->getRepository();
+        $userObject = $n->getContext()->getUser();
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
         $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
         Controller::applyHook("msg.instant",array(
             "<reload_user_feed/>",
-            $repoId,
-            $userId
+            $repository->getId(),
+            $userObject->getId()
         ));
-        $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
+        $this->eventStore->persistEvent("node.change", func_get_args(), $repository->getId(), $repositoryScope, $repositoryOwner, $userObject->getId(), $userObject->getGroupPath());
 
     }
 

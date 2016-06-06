@@ -29,11 +29,10 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
-use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -121,22 +120,15 @@ class TaskService implements ITasksProvider
 
     }
 
-    public static function actionAsTask($actionName, $parameters, $repoId = "", $user = "", $nodePathes = [], $flags = 0){
+    public static function actionAsTask(ContextInterface $ctx, $actionName, $parameters, $nodePathes = [], $flags = 0){
 
-        if (empty($user)) {
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) {
-                $user = AuthService::getLoggedUser()->getId();
-            }else {
-                $user = "shared";
-            }
-        }
-        if(empty($repoId)){
-            $repoId = ConfService::getCurrentRepositoryId();
-        }
+        $userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
+        $repoId = $ctx->getRepositoryId();
+        
         $task = new Task();
         $task->setLabel("Launching action ".$actionName);
         $task->setId(Utils::createGUID());
-        $task->setUserId($user);
+        $task->setUserId($userId);
         $task->setWsId($repoId);
         $task->setStatus(Task::STATUS_PENDING);
         $task->setStatusMessage("Starting...");
