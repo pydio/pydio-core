@@ -187,6 +187,7 @@ class FileReaderResponse extends AsyncResponseStream
         if ($headerType == "plain") {
 
             header("Content-type:text/plain");
+            header("Content-Length: ".$size);
 
         } else if ($headerType == "image") {
 
