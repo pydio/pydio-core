@@ -1023,7 +1023,7 @@ class ShareCenter extends Plugin
             $delete = true;
         }else{
             $repo = $newNode->getRepository();
-            $recycle = $repo->getOption("RECYCLE_BIN");
+            $recycle = $repo->getContextOption($newNode->getContext(), "RECYCLE_BIN");
             if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
                 $delete = true;
             }
