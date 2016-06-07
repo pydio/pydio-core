@@ -24,6 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
@@ -53,7 +54,17 @@ class ShareStore {
 
     var $shareMetaManager;
 
-    public function __construct($downloadFolder, $hashMinLength = 32){
+    /** @var  ContextInterface */
+    private $context;
+
+    /**
+     * ShareStore constructor.
+     * @param ContextInterface $context
+     * @param string $downloadFolder
+     * @param int $hashMinLength
+     */
+    public function __construct(ContextInterface $context, $downloadFolder, $hashMinLength = 32){
+        $this->context = $context;
         $this->downloadFolder = $downloadFolder;
         $this->hashMinLength = $hashMinLength;
         $storage = ConfService::getConfStorageImpl();
@@ -115,7 +126,7 @@ class ShareStore {
     public function createEmptyShareObject(){
         $shareObject = new ShareLink($this);
         if(AuthService::usersEnabled()){
-            $shareObject->setOwnerId(AuthService::getLoggedUser()->getId());
+            $shareObject->setOwnerId($this->context->getUser()->getId());
         }
         return $shareObject;
     }
@@ -343,7 +354,7 @@ class ShareStore {
             $mess = ConfService::getMessages();
             throw new \Exception($mess["share_center.160"]);
         }
-        $crtUser = AuthService::getLoggedUser();
+        $crtUser = $this->context->getUser();
         if($crtUser->getId() == $userId) return true;
         if($crtUser->isAdmin()) return true;
         $user = ConfService::getConfStorageImpl()->createUserObject($userId);
@@ -671,11 +682,11 @@ class ShareStore {
     public function clearExpiredFiles($currentUser = true)
     {
         if($currentUser){
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $this->context->getUser();
             $userId = $loggedUser->getId();
             $originalUser = null;
         }else{
-            $originalUser = AuthService::getLoggedUser()->getId();
+            $originalUser = $this->context->getUser()->getId();
             $userId = null;
         }
         $deleted = array();
@@ -708,7 +719,7 @@ class ShareStore {
      */
     private function deleteExpiredPubliclet($elementId, $data){
 
-        if(AuthService::getLoggedUser() == null ||  AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){
+        if($this->context->hasUser() ||  $this->context->getUser()->getId() != $data["OWNER_ID"]){
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
         $repoObject = $data["REPOSITORY"];

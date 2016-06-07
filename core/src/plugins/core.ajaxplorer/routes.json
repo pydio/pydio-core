@@ -20,7 +20,7 @@
     "routes": [
       "/shares[{optional:.+}]"
     ],
-    "class": "Pydio\\Core\\Http\\DAVServer",
+    "class": "Pydio\\Core\\Http\\Dav\\DAVServer",
     "method": "handleRoute"
   },
   "/ocs-provider":{

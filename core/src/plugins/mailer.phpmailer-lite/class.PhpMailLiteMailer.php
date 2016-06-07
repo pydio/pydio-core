@@ -20,6 +20,7 @@
  */
 
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -30,10 +31,21 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PhpMailLiteMailer extends AjxpMailer
 {
-    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
+    /**
+     * @param ContextInterface $ctx
+     * @param $recipients
+     * @param $subject
+     * @param $body
+     * @param null $from
+     * @param array $images
+     * @param bool $useHtml
+     * @throws Exception
+     * @throws phpmailerException
+     */
+    protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
     {
         require_once("lib/class.phpmailer-lite.php");
-        $realRecipients = $this->resolveAdresses($recipients);
+        $realRecipients = $this->resolveAdresses($ctx, $recipients);
 
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
         $mail = new PHPMailerLite(true);

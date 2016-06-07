@@ -74,16 +74,16 @@ class smbAccessDriver extends fsAccessDriver
         $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
 
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
 
-        if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
-            @mkdir($this->urlBase."/".$recycle);
-            if (!is_dir($this->urlBase."/".$recycle)) {
+        if ($recycle!= "" && !is_dir($contextInterface->getUrlBase()."/".$recycle)) {
+            @mkdir($contextInterface->getUrlBase()."/".$recycle);
+            if (!is_dir($contextInterface->getUrlBase()."/".$recycle)) {
                 throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
             }
         }
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
 
     }

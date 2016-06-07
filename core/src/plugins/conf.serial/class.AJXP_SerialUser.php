@@ -245,9 +245,6 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $p[$this->getId()] = $this->getId();
         $u->setChildrenPointer($p);
         $u->save("superuser");
-        if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentId) {
-            AuthService::updateUser($u);
-        }
         parent::setParent($parentId);
     }
 

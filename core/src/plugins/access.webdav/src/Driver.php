@@ -88,10 +88,9 @@ class Driver extends fsAccessDriver
 
         // Config
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $uId = $ctx->hasUser()?$ctx->getUser()->getId():"shared";
-        $this->urlBase = "pydio://".$uId."@".$ctx->getRepositoryId();
+        $this->urlBase = $ctx->getUrlBase();
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($ctx->getUrlBase(), "/".$recycle);
         }
     }
 

@@ -200,9 +200,9 @@ class Repository implements RepositoryInterface
         $this->slug = \Pydio\Core\Utils\Utils::slugify($display);
         $this->inferOptionsFromParent = false;
         $this->options["CREATION_TIME"] = time();
-        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
-            $this->options["CREATION_USER"] = AuthService::getLoggedUser()->getId();
-        }
+//        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+//            $this->options["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+//        }
     }
 
     public function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser = null)

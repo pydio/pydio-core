@@ -26,7 +26,6 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -68,7 +67,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
         return $this->_dibiDriver;
     }
-    public function mailConsumeQueue ($action, $httpVars, $fileVars) {
+    public function mailConsumeQueue ($action, $httpVars, $fileVars, ContextInterface $ctx) {
 
         if ($action === "consume_mail_queue") {
             $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
@@ -140,7 +139,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     }
                     $body .= $useHtml ? "</div>" : "";
                     try {
-                        $mailer->sendMail(array($recipient),
+                        $mailer->sendMail(
+                            $ctx, 
+                            array($recipient),
                             $digestTitle,
                             $body,
                             null,
@@ -288,6 +289,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             if ($mailer !== false) {
                 try {
                     $mailer->sendMail(
+                        $notification->getNode()->getContext(),
                         array($notification->getTarget()),
                         $notification->getDescriptionShort(),
                         $notification->getDescriptionLong(),
@@ -302,7 +304,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
-    public function sendMail($recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
+    public function sendMail(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
     {
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
@@ -348,7 +350,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
         }
         $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);
-        $this->sendMailImpl($recipients, $subject, $body, $from, $images, $useHtml);
+        $this->sendMailImpl($ctx, $recipients, $subject, $body, $from, $images, $useHtml);
         if (AJXP_SERVER_DEBUG) {
             if(!$useHtml) {
                 $rowBody = '[TEXT ONLY] '.AjxpMailer::simpleHtml2Text($rowBody);
@@ -358,7 +360,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
-    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
+    protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
     }
 
     public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
@@ -376,7 +378,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         //$toGroups =  explode(",", $httpVars["groups_ids"]);
         $toUsers = $httpVars["emails"];
 
-        $emails = $this->resolveAdresses($toUsers);
+        $emails = $this->resolveAdresses($requestInterface->getAttribute("ctx"), $toUsers);
         $from = $this->resolveFrom($httpVars["from"]);
         $imageLink = isSet($httpVars["link"]) ? $httpVars["link"] : null;
 
@@ -386,21 +388,21 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         $responseInterface = $responseInterface->withBody($x);
 
         if (count($emails)) {
-            $mailer->sendMail($emails, $subject, $body, $from, $imageLink);
+            $mailer->sendMail($requestInterface->getAttribute("ctx"), $emails, $subject, $body, $from, $imageLink);
             $x->addChunk(new \Pydio\Core\Http\Message\UserMessage(str_replace("%s", count($emails), $mess["core.mailer.1"])));
         } else {
             $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["core.mailer.2"], LOG_LEVEL_ERROR));
         }
     }
 
-    public function resolveFrom($fromAdress = null)
+    public function resolveFrom(ContextInterface $ctx, $fromAdress = null)
     {
         $fromResult = array();
         if ($fromAdress != null) {
-            $arr = $this->resolveAdresses(array($fromAdress));
+            $arr = $this->resolveAdresses($ctx, array($fromAdress));
             if(count($arr)) $fromResult = $arr[0];
-        } else if (AuthService::getLoggedUser() != null) {
-            $arr = $this->resolveAdresses(array(AuthService::getLoggedUser()));
+        } else if ($ctx->hasUser()) {
+            $arr = $this->resolveAdresses($ctx, array($ctx->getUser()));
             if(count($arr)) $fromResult = $arr[0];
         }
         if (!count($fromResult)) {
@@ -416,14 +418,14 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @return array
      *
      */
-    public function resolveAdresses($recipients)
+    public function resolveAdresses(ContextInterface $ctx, $recipients)
     {
         $realRecipients = array();
         foreach ($recipients as $recipient) {
             if (is_string($recipient) && strpos($recipient, "/AJXP_TEAM/") === 0) {
                 $confDriver = ConfService::getConfStorageImpl();
                 if (method_exists($confDriver, "teamIdToUsers")) {
-                    $newRecs = $confDriver->teamIdToUsers(str_replace("/AJXP_TEAM/", "", $recipient));
+                    $newRecs = $confDriver->teamIdToUsers($ctx->getUser(), str_replace("/AJXP_TEAM/", "", $recipient));
                 }
             }
         }

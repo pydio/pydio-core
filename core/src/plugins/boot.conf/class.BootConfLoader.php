@@ -462,6 +462,7 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug = PluginsService::findPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
+                $ctx, 
                 array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
                 "Pydio Test Mail",
                 "Body of the test",
@@ -734,12 +735,13 @@ class BootConfLoader extends AbstractConfDriver
     }
 
     /**
+     * @param $ctx ContextInterface
      * @param string $repositoryId
      * @param boolean $details
      * @param bool $admin
      * @return array
      */
-    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
+    public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
         return array();
     }
 

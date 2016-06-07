@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 
 use DOMNode;
 use PclZip;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -68,7 +69,7 @@ class sftpPSLAccessDriver extends fsAccessDriver
         require_once($this->getBaseDir()."/SFTPPSL_StreamWrapper.php");
         
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
     }
 
     public function detectStreamWrapper($register = false)
@@ -90,13 +91,14 @@ class sftpPSLAccessDriver extends fsAccessDriver
     }
 
     /**
-     * @param array $src
+     * @param UserSelection $selection
      * @param string $dest
      * @param string $basedir
+     * @param string $taskId
      * @return PclZip zipfile
      * @throws \Exception
      */
-    public function makeZip ($src, $dest, $basedir)
+    public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
         @set_time_limit(60);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
@@ -106,13 +108,15 @@ class sftpPSLAccessDriver extends fsAccessDriver
         $uniqfolder = '/tmp/ajaxplorer-zip-'.$uniqid;
         mkdir($uniqfolder);
 
-        foreach ($src as $item) {
+        $nodes = $selection->buildNodes();
+        foreach ($nodes as $node) {
+            $item = $node->getPath();
             $basedir = trim(dirname($item));
             $basename = basename($item);
             $uniqpath = $uniqfolder.'/'.$basename;
-            $this->full_copy($this->urlBase.$item, $uniqpath);
+            $this->full_copy($node->getUrl(), $uniqpath);
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $uniqpath,
-                                 PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);
+                PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);
         }
         $this->logDebug("Pathes", $filePaths);
         $this->logDebug("Basedir", array($basedir));

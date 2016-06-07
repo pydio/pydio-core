@@ -24,6 +24,8 @@ use MetaWatchRegister;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
@@ -58,14 +60,19 @@ class ShareRightsManager
      */
     var $options;
 
+    /** @var  ContextInterface */
+    var $context;
+
     /**
      * ShareRightsManager constructor.
+     * @param ContextInterface $context
      * @param array $options
      * @param ShareStore $store
      * @param MetaWatchRegister|bool $watcher
      */
-    public function __construct($options, $store, $watcher = false)
+    public function __construct(ContextInterface $context, $options, $store, $watcher = false)
     {
+        $this->context = $context;
         $this->options = $options;
         $this->watcher = $watcher;
         $this->store = $store;
@@ -179,7 +186,7 @@ class ShareRightsManager
         $index = 0;
         $allowCrossUserSharing = ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf");
         $allowSharedUsersCreation = ConfService::getCoreConf("USER_CREATE_USERS", "conf");
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $this->context->getUser();
         $confDriver = ConfService::getConfStorageImpl();
         $mess = ConfService::getMessages();
 
@@ -228,7 +235,7 @@ class ShareRightsManager
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
                     if (method_exists($confDriver, "teamIdToUsers")) {
-                        $teamUsers = $confDriver->teamIdToUsers(str_replace("/AJXP_TEAM/", "", $u));
+                        $teamUsers = $confDriver->teamIdToUsers($this->context->getUser(), str_replace("/AJXP_TEAM/", "", $u));
                         foreach ($teamUsers as $userId) {
                             $users[$userId] = array("ID" => $userId, "TYPE" => "user", "RIGHT" => $rightString);
                             if ($this->watcher !== false) {
@@ -408,7 +415,7 @@ class ShareRightsManager
             $this->unregisterRemovedUsers($childRepoId, $users, $groups, $selection->getUniqueNode());
         }
         $confDriver = ConfService::getConfStorageImpl();
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $this->context->getUser();
         foreach ($users as $userName => $userEntry) {
 
             if (AuthService::userExists($userName, "r")) {
@@ -508,12 +515,12 @@ class ShareRightsManager
     }
 
     /**
-     * @param AbstractAjxpUser $parentUser
+     * @param UserInterface $parentUser
      * @param string $userName
      * @param string $password
      * @param bool $isHidden
      * @param string $display
-     * @return AbstractAjxpUser
+     * @return UserInterface
      * @throws \Exception
      */
     public function createNewUser($parentUser, $userName, $password, $isHidden, $display){
@@ -527,7 +534,7 @@ class ShareRightsManager
         if(!$isHidden){
             // This is an explicit user creation - check possible limits
             Controller::applyHook("user.before_create", array($userName, null, false, false));
-            $limit = $parentUser->mergedRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+            $limit = $parentUser->getMergedRole()->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
             if (!empty($limit) && intval($limit) > 0) {
                 $count = count($confDriver->getUserChildren($parentUser->getId()));
                 if ($count >= $limit) {

@@ -72,7 +72,7 @@ class LegacyPubliclet
      * @return array|false
      * @throws \Exception
      */
-    public static function publicletToJson($shareId, $shareMeta, $shareStore, $publicAccessManager, $watcher, $node){
+    public static function publicletToJson(ContextInterface $ctx, $shareId, $shareMeta, $shareStore, $publicAccessManager, $watcher, $node){
 
         $messages = ConfService::getMessages();
         $elementWatch = false;
@@ -84,7 +84,7 @@ class LegacyPubliclet
         foreach($shareStore->modifiableShareKeys as $key){
             if(isSet($pData[$key])) $shareMeta[$key] = $pData[$key];
         }
-        if ($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId() && !AuthService::getLoggedUser()->isAdmin()) {
+        if ($pData["OWNER_ID"] != $ctx->getUser()->getId() && !$ctx->getUser()->isAdmin()) {
             throw new \Exception($messages["share_center.48"]);
         }
         if (isSet($shareMeta["short_form_url"])) {
@@ -96,7 +96,7 @@ class LegacyPubliclet
             $result = array();
             $elementWatch = $watcher->hasWatchOnNode(
                 $node,
-                AuthService::getLoggedUser()->getId(),
+                $ctx->getUser()->getId(),
                 MetaWatchRegister::$META_WATCH_USERS_NAMESPACE,
                 $result
             );

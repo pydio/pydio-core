@@ -6,11 +6,4 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'AJXP_Sabre_AuthBackendBasic' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_AuthBackendBasic.php',
-    'AJXP_Sabre_AuthBackendDigest' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_AuthBackendDigest.php',
-    'AJXP_Sabre_BrowserPlugin' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_BrowserPlugin.php',
-    'AJXP_Sabre_Collection' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_Collection.php',
-    'AJXP_Sabre_Node' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_Node.php',
-    'AJXP_Sabre_NodeLeaf' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_NodeLeaf.php',
-    'AJXP_Sabre_RootCollection' => $baseDir . '/../../core/src/sabredav/ajaxplorer/class.AJXP_Sabre_RootCollection.php',
 );

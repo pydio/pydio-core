@@ -22,10 +22,13 @@
 namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareStore.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
 
+use Pydio\Core\Http\Dav\BrowserPlugin;
+use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Share\Store\ShareStore;
 use Sabre;
 
 class Server extends Sabre\DAV\Server
@@ -35,7 +38,7 @@ class Server extends Sabre\DAV\Server
 
     public function __construct()
     {
-        $this->rootCollection = new \AJXP_Sabre_Collection("/", null, null);
+        $this->rootCollection = new Collection("/", null, null);
         parent::__construct($this->rootCollection);
     }
 
@@ -47,7 +50,7 @@ class Server extends Sabre\DAV\Server
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
             if(isSet($userPass[0])){
-                $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
                     $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
@@ -89,7 +92,7 @@ class Server extends Sabre\DAV\Server
         $this->addPlugin($lockPlugin);
 
         if (ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
-            $browerPlugin = new \AJXP_Sabre_BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
+            $browerPlugin = new BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
             $extPlugin = new Sabre\DAV\Browser\GuessContentType();
             $this->addPlugin($browerPlugin);
             $this->addPlugin($extPlugin);
@@ -106,7 +109,7 @@ class Server extends Sabre\DAV\Server
      * This will expose folder as /dav/FolderName and file as /dav/FileName.txt
      *
      * @param $baseUri
-     * @return \AJXP_Sabre_Collection|SharingCollection
+     * @return Collection|SharingCollection
      * @throws \Exception
      */
     protected function initCollectionForFileOrFolderAsUniqueItem(&$baseUri){
@@ -114,7 +117,7 @@ class Server extends Sabre\DAV\Server
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
             if(isSet($userPass[0])){
-                $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
                     $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
@@ -124,7 +127,7 @@ class Server extends Sabre\DAV\Server
                 }
             }
         }catch (\Exception $e){}
-        $rootCollection =  new \AJXP_Sabre_Collection("/", null, null);
+        $rootCollection =  new Collection("/", null, null);
         if(isSet($baseDir)){
             $currentPath = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
             if($currentPath == $baseUri || $currentPath == $baseUri."/"){

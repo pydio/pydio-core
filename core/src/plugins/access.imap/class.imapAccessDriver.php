@@ -59,8 +59,7 @@ class imapAccessDriver extends fsAccessDriver
         }
 
         $this->detectStreamWrapper(true);
-        $uId = $contextInterface->hasUser() ? $contextInterface->getUser() : "shared";
-        $this->urlBase = "pydio://".$uId."@".$contextInterface->getRepositoryId();
+        $this->urlBase = $contextInterface->getUrlBase();
 
     }
 

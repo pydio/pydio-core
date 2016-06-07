@@ -53,6 +53,12 @@ interface ContextInterface
     public function resetUser();
 
     /**
+     * Build Url base pydio:://user'@'repoId
+     * @return string
+     */
+    public function getUrlBase();
+
+    /**
      * @return boolean
      */
     public function hasRepository();

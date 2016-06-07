@@ -22,18 +22,20 @@ namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Share\Store\ShareStore;
 use Sabre\DAV;
 use Sabre\HTTP;
 
-require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareStore.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
 
 class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {
 
     /**
-     * @var \AJXP_Sabre_Collection
+     * @var Collection
      */
     var $rootCollection;
     /**
@@ -43,7 +45,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
     /**
      * OCS_DavAuthSharingBackend constructor.
-     * @param \AJXP_Sabre_Collection $rootCollection Repository object will be updated once authentication is passed
+     * @param Collection $rootCollection Repository object will be updated once authentication is passed
      */
     public function __construct($rootCollection){
         $this->rootCollection = $rootCollection;
@@ -95,7 +97,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $shareStore = new \ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+        $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;

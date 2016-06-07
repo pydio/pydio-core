@@ -147,6 +147,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
             $percent = $this->getContextualOption($ctx, "SOFT_QUOTA");
             $quota = $this->getContextualOption($ctx, "DEFAULT_QUOTA");
             $mailer->sendMail(
+                $ctx, 
                 array($ctx->getUser()->getId()),
                 "You are close to exceed your quota!",
                 "You are currently using more than $percent% of your authorized quota of $quota!");

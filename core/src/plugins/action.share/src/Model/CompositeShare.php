@@ -23,6 +23,7 @@ namespace Pydio\Share\Model;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -118,14 +119,14 @@ class CompositeShare
      * @param array $messages
      * @return array|false
      */
-    public function toJson($watcher, $rightsManager, $publicAccessManager, $messages){
+    public function toJson(ContextInterface $ctx, $watcher, $rightsManager, $publicAccessManager, $messages){
 
         $repoRootNode = new AJXP_Node("pydio://".$this->getRepositoryId()."/");
         $elementWatch = false;
         if ($watcher != false) {
             $elementWatch = $watcher->hasWatchOnNode(
                 $repoRootNode,
-                AuthService::getLoggedUser()->getId(),
+                $ctx->getUser()->getId(),
                 \MetaWatchRegister::$META_WATCH_NAMESPACE
             );
         }
@@ -139,7 +140,7 @@ class CompositeShare
         }
         $jsonData = array(
             "repositoryId"  => $this->getRepositoryId(),
-            "users_number"  => AuthService::countUsersForRepository($this->getRepositoryId()),
+            "users_number"  => AuthService::countUsersForRepository($ctx, $this->getRepositoryId()),
             "label"         => $this->getRepository()->getDisplay(),
             "description"   => $this->getRepository()->getDescription(),
             "entries"       => $sharedEntries,

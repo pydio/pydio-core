@@ -87,10 +87,9 @@ class swiftAccessDriver extends fsAccessDriver
         $recycle    = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $this->detectStreamWrapper(true);
-        $u = $contextInterface->hasUser() ? $contextInterface->getUser()->getId() : "shared";
-        $this->urlBase = "pydio://".$u."@".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
     }
 

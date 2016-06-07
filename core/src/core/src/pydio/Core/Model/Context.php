@@ -151,7 +151,13 @@ class Context implements ContextInterface
         $this->userId = null;
         $this->userObject = null;
     }
-    
+
+    public function getUrlBase()
+    {
+        $uId = $this->hasUser() ? $this->getUser()->getId() : null;
+        return "pydio://".$uId."@".$this->getRepositoryId();
+    }
+
     /**
      * @return boolean
      */

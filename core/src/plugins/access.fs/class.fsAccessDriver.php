@@ -98,8 +98,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
         $chmod = $this->repository->getContextOption($contextInterface, "CHMOD_VALUE");
         $this->detectStreamWrapper(true);
-        $uId = $contextInterface->hasUser()? $contextInterface->getUser()->getId(): "shared";
-        $this->urlBase = "pydio://".$uId."@".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
 
 
         if ($create == true) {
@@ -112,13 +111,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if (!is_dir($path."/".$recycle)) {
                     throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
                 } else {
-                    $this->setHiddenAttribute(new AJXP_Node($this->urlBase ."/".$recycle));
+                    $this->setHiddenAttribute(new AJXP_Node($contextInterface->getUrlBase() ."/".$recycle));
                 }
             }
             $dataTemplate = $this->repository->getContextOption($contextInterface, "DATA_TEMPLATE");
             if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")) {
                 $errs = array();$succ = array();
-                $repoData = array('base_url' => $this->urlBase, 'chmod' => $chmod, 'recycle' => $recycle);
+                $repoData = array('base_url' => $contextInterface->getUrlBase(), 'chmod' => $chmod, 'recycle' => $recycle);
                 $this->dircopy($dataTemplate, $path, $succ, $errs, false, false, $repoData, $repoData);
                 touch($path."/.ajxp_template");
             }
@@ -128,7 +127,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
         }
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
     }
 
@@ -2061,28 +2060,25 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
     /**
-     * @param String $from
-     * @param String $to
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
      * @param Boolean $copy
      */
-    public function nodeChanged(&$from, &$to, $copy = false)
+    public function nodeChanged(&$fromNode = null, &$toNode = null, $copy = false)
     {
-        $fromNode = $toNode = null;
-        if($from != null) $fromNode = new AJXP_Node($this->urlBase.$from);
-        if($to != null) $toNode = new AJXP_Node($this->urlBase.$to);
         Controller::applyHook("node.change", array($fromNode, $toNode, $copy));
     }
 
     /**
-     * @param String $node
+     * @param AJXP_Node $node
      * @param null $newSize
      */
     public function nodeWillChange($node, $newSize = null)
     {
         if ($newSize != null) {
-            Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node), $newSize));
+            Controller::applyHook("node.before_change", array($node, $newSize));
         } else {
-            Controller::applyHook("node.before_path_change", array(new AJXP_Node($this->urlBase.$node)));
+            Controller::applyHook("node.before_path_change", array($node));
         }
     }
 

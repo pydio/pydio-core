@@ -122,10 +122,11 @@ class ShareCenter extends Plugin
             return;
         }
         $this->accessDriver = $this->repository->getDriverInstance();
-        $this->urlBase = "pydio://". $this->repository->getId();
+        $this->urlBase = $ctx->getUrlBase();
         if (array_key_exists("meta.watch", PluginsService::getInstance($ctx)->getActivePlugins())) {
             $this->watcher = PluginsService::getInstance($ctx)->getPluginById("meta.watch");
         }
+        $this->currentContext = $ctx;
     }
 
     /**
@@ -287,10 +288,11 @@ class ShareCenter extends Plugin
 
         if(!isSet($this->shareStore)){
             $hMin = 32;
-            if(isSet($this->repository)){
-                $hMin = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository);
+            if(isSet($this->currentContext)){
+                $hMin = $this->getContextualOption($this->currentContext, "HASH_MIN_LENGTH");
             }
             $this->shareStore = new ShareStore(
+                $this->currentContext,
                 ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
                 $hMin
             );
@@ -326,11 +328,19 @@ class ShareCenter extends Plugin
      */
     protected function getRightsManager(){
         if(!isSet($this->rightsManager)){
-            $options = array(
-                "SHARED_USERS_TMP_PREFIX" => $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository),
-                "SHARE_FORCE_PASSWORD" => $this->getFilteredOption("SHARE_FORCE_PASSWORD", $this->repository)
-            );
+            if(isSet($this->currentContext)){
+                $options = array(
+                    "SHARED_USERS_TMP_PREFIX" => $this->getContextualOption($this->currentContext, "SHARED_USERS_TMP_PREFIX"),
+                    "SHARE_FORCE_PASSWORD" => $this->getContextualOption($this->currentContext, "SHARE_FORCE_PASSWORD")
+                );
+            }else{
+                $options = array(
+                    "SHARED_USERS_TMP_PREFIX" => "ext_",
+                    "SHARE_FORCE_PASSWORD" => false
+                );
+            }
             $this->rightsManager = new ShareRightsManager(
+                $this->currentContext,
                 $options,
                 $this->getShareStore(),
                 $this->watcher);
@@ -382,7 +392,7 @@ class ShareCenter extends Plugin
     }
 
     protected function toggleWatchOnSharedRepository($childRepoId, $userId, $toggle = true, $parentUserId = null){
-        if ($this->watcher === false || AuthService::getLoggedUser() == null) {
+        if ($this->watcher === false || !$this->currentContext->hasUser() == null) {
             return;
         }
         $rootNode = new AJXP_Node("pydio://".$childRepoId."/");
@@ -659,7 +669,7 @@ class ShareCenter extends Plugin
 
                     $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($ajxpNode);
                     if(!empty($compositeShare)){
-                        $responseInterface = new JsonResponse($this->compositeShareToJson($compositeShare));
+                        $responseInterface = new JsonResponse($this->compositeShareToJson($ctx, $compositeShare));
                     }else{
                         $responseInterface = new JsonResponse([]);
                     }
@@ -737,14 +747,14 @@ class ShareCenter extends Plugin
                     $parsedMeta = array($httpVars["hash"] => array("type" => "file"));
                     $jsonData = array();
                     foreach($parsedMeta as $shareId => $shareMeta){
-                        $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
+                        $jsonData[] = $this->shareToJson($ctx, $shareId, $shareMeta, $node);
                     }
                     $responseInterface = new JsonResponse($jsonData);
 
                 }else{
 
                     $file = Utils::decodeSecureMagic($httpVars["file"]);
-                    $node = new AJXP_Node($this->urlBase.$file);
+                    $node = new AJXP_Node($ctx->getUrlBase().$file);
                     $loggedUser = $ctx->getUser();
                     if(isSet($httpVars["owner"]) && $loggedUser->isAdmin()
                         && $loggedUser->getGroupPath() == "/" && $loggedUser->getId() != Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS)){
@@ -764,7 +774,7 @@ class ShareCenter extends Plugin
                         $mess = ConfService::getMessages();
                         throw new \Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
                     }
-                    $responseInterface = new JsonResponse($this->compositeShareToJson($compositeShare));
+                    $responseInterface = new JsonResponse($this->compositeShareToJson($ctx, $compositeShare));
 
                 }
 
@@ -1586,6 +1596,7 @@ class ShareCenter extends Plugin
      * @throws \Exception
      */
     protected function shareObjectFromParameters($linkData, &$hiddenUserEntries, &$shareObjects,  $type = "public", $invitationLabel = ""){
+
         if(isSet($linkData["hash"])){
             $link = $this->getShareStore()->loadShareObject($linkData["hash"]);
         }else{
@@ -1593,7 +1604,9 @@ class ShareCenter extends Plugin
                 $link = $this->getShareStore()->createEmptyShareObject();
             }else{
                 $link = new TargettedLink($this->getShareStore());
-                if(AuthService::usersEnabled()) $link->setOwnerId(AuthService::getLoggedUser()->getId());
+                if(AuthService::usersEnabled()) {
+                    $link->setOwnerId($this->currentContext->getUser()->getId());
+                }
                 $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $invitationLabel);
             }
         }
@@ -1605,6 +1618,7 @@ class ShareCenter extends Plugin
             (isSet($linkData["guest_user_pass"])?$linkData["guest_user_pass"]:null)
         );
         $shareObjects[] = $link;
+
     }
 
     /**
@@ -1860,7 +1874,7 @@ class ShareCenter extends Plugin
      * @param CompositeShare $compositeShare
      * @return array
      */
-    public function compositeShareToJson($compositeShare){
+    public function compositeShareToJson(ContextInterface $ctx, $compositeShare){
 
         $repoId = $compositeShare->getRepositoryId();
         $repo = $compositeShare->getRepository();
@@ -1889,7 +1903,7 @@ class ShareCenter extends Plugin
             return $notExistsData;
         }
 
-        $jsonData = $compositeShare->toJson($this->watcher, $this->getRightsManager(), $this->getPublicAccessManager(), $messages);
+        $jsonData = $compositeShare->toJson($ctx, $this->watcher, $this->getRightsManager(), $this->getPublicAccessManager(), $messages);
         if($jsonData === false){
             return $notExistsData;
         }
@@ -1904,7 +1918,7 @@ class ShareCenter extends Plugin
      * @throws \Exception
      * @return array|bool
      */
-    public function shareToJson($shareId, $shareMeta, $node = null){
+    public function shareToJson(ContextInterface $ctx, $shareId, $shareMeta, $node = null){
 
         $messages = ConfService::getMessages();
         $jsonData = array();
@@ -1912,6 +1926,7 @@ class ShareCenter extends Plugin
         if($shareMeta["type"] == "file"){
 
             $jsonData = LegacyPubliclet::publicletToJson(
+                $ctx,
                 $shareId,
                 $shareMeta,
                 $this->getShareStore(),
@@ -1962,7 +1977,7 @@ class ShareCenter extends Plugin
             if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
                     new AJXP_Node("pydio://".$repoId."/"),
-                    AuthService::getLoggedUser()->getId(),
+                    $ctx->hasUser()?$ctx->getUser()->getId():"shared",
                     MetaWatchRegister::$META_WATCH_NAMESPACE
                 );
             }
@@ -1981,7 +1996,7 @@ class ShareCenter extends Plugin
             }
             $jsonData = array(
                 "repositoryId"  => $repoId,
-                "users_number"  => AuthService::countUsersForRepository($repoId),
+                "users_number"  => AuthService::countUsersForRepository($ctx, $repoId),
                 "label"         => $repo->getDisplay(),
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,

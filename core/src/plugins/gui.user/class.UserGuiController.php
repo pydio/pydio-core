@@ -70,6 +70,7 @@ class UserGuiController extends Plugin
     {
         $action = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
+        $context = $requestInterface->getAttribute("ctx");
         
         switch ($action) {
             case "user_access_point":
@@ -115,7 +116,7 @@ class UserGuiController extends Plugin
                         if ($mailer !== false) {
                             $mess = ConfService::getMessages();
                             $link = Utils::detectServerURL()."/user/reset-password/".$uuid;
-                            $mailer->sendMail(array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
+                            $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';
                         }

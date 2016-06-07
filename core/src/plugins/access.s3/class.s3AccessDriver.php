@@ -72,19 +72,19 @@ class s3AccessDriver extends fsAccessDriver
 
         $recycle = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->urlBase = "pydio://".($contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared"). "@" .$contextInterface->getRepositoryId();
+        $this->urlBase = $contextInterface->getUrlBase();
 
-        if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
-            @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
-            if(!is_dir($this->urlBase. "/" . $recycle . "/")) {
+        if ($recycle!= "" && !is_dir($contextInterface->getUrlBase(). "/" . $recycle . "/")) {
+            @mkdir($contextInterface->getUrlBase(). "/" . $recycle . "/", 0777, true);
+            if(!is_dir($contextInterface->getUrlBase(). "/" . $recycle . "/")) {
                 throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
             } else {
-                $this->setHiddenAttribute(new AJXP_Node($this->urlBase. "/" . $recycle . "/"));
+                $this->setHiddenAttribute(new AJXP_Node($contextInterface->getUrlBase(). "/" . $recycle . "/"));
             }
         }
 
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
     }
 

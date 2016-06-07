@@ -49,15 +49,15 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
 
         $repositoryId = $repository->getId();
 
-        if(AuthService::usersEnabled()) {
-            $u = AuthService::getLoggedUser();
+        $ctx = AJXP_Node::contextFromUrl($url);
+        if($ctx->hasUser()) {
+            $u = $ctx->getUser();
             $userId = $u->getId();
         } else {
             $userId = 'shared';
         }
 
         // User information
-        $ctx = AJXP_Node::contextFromUrl($url);
         // Repository params
         $clientId     = $repository->getContextOption($ctx, 'CLIENT_ID');
         $clientSecret = $repository->getContextOption($ctx, 'CLIENT_SECRET');

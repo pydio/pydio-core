@@ -25,6 +25,7 @@ use DOMNode;
 use PclZip;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
@@ -32,6 +33,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Utils;
+use Sabre\CalDAV\Principal\User;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -70,12 +73,11 @@ class sftpAccessDriver extends fsAccessDriver
         $path       = $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
         $recycle    = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         $this->detectStreamWrapper(true);
-        $uId = $contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared";
-        $this->urlBase = "pydio://".$uId."@".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
         restore_error_handler();
-        if (!file_exists($this->urlBase)) {
+        if (!file_exists($contextInterface->getUrlBase())) {
             if ($contextInterface->getRepository()->getContextOption($contextInterface, "CREATE")) {
-                $test = @mkdir($this->urlBase);
+                $test = @mkdir($contextInterface->getUrlBase());
                 if (!$test) {
                     throw new PydioException("Cannot create path ($path) for your repository! Please check the configuration.");
                 }
@@ -84,7 +86,7 @@ class sftpAccessDriver extends fsAccessDriver
             }
         }
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
     }
 
@@ -101,8 +103,8 @@ class sftpAccessDriver extends fsAccessDriver
     protected function filecopy($srcFile, $destFile)
     {
         if (AJXP_MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
-            $srcFilePath = str_replace($this->urlBase, "", $srcFile);
-            $destFilePath = str_replace($this->urlBase, "", $destFile);
+            $srcFilePath = Utils::safeParseUrl($srcFile)["path"];
+            $destFilePath = Utils::safeParseUrl($destFile)["path"];
             $destDirPath = dirname($destFilePath);
             list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection(AJXP_Node::contextFromUrl($srcFile));
             $remoteSrc = $remote_base_path.$srcFilePath;
@@ -117,13 +119,13 @@ class sftpAccessDriver extends fsAccessDriver
 
 
     /**
-     * @param $src
+     * @param UserSelection $selection
      * @param $dest
      * @param $basedir
      * @throws \Exception
      * @return PclZip Zip Archive
      */
-    public function makeZip ($src, $dest, $basedir)
+    public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
         @set_time_limit(60);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
@@ -133,11 +135,13 @@ class sftpAccessDriver extends fsAccessDriver
         $uniqfolder = '/tmp/ajaxplorer-zip-'.$uniqid;
         mkdir($uniqfolder);
 
-        foreach ($src as $item) {
+        $nodes = $selection->buildNodes();
+        foreach ($nodes as $node) {
+            $item = $node->getPath();
             $basedir = trim(dirname($item));
             $basename = basename($item);
             $uniqpath = $uniqfolder.'/'.$basename;
-            $this->full_copy($this->urlBase.$item, $uniqpath);
+            $this->full_copy($node->getUrl(), $uniqpath);
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $uniqpath,
                                  PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);
         }

@@ -90,10 +90,10 @@ class ftpAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared"."@".$contextInterface->getRepositoryId();
+        $this->urlBase = $contextInterface->getUrlBase();
         $recycle = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+            RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
 
     }
@@ -118,7 +118,7 @@ class ftpAccessDriver extends fsAccessDriver
                     $nextFile = $this->getFileNameToCopy($ctx);
                 }
                 $this->logDebug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
-                $destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
+                $destPath = $ctx->getUrlBase().base64_decode($fData['destination'])."/".$fData['name'];
                 //$destPath = AJXP_Utils::decodeSecureMagic($destPath);
                 // DO NOT "SANITIZE", THE URL IS ALREADY IN THE FORM ajxp.ftp://repoId/filename
                 $destPath = TextEncoder::fromPostedFileName($destPath);
@@ -182,7 +182,7 @@ class ftpAccessDriver extends fsAccessDriver
                         $fileName = $uploadedFile->getClientFilename();
 
                         if (isSet($httpVars["auto_rename"])) {
-                            $destination = $this->urlBase . $destinationFolder;
+                            $destination = $ctx->getUrlBase() . $destinationFolder;
                             $fileName = fsAccessDriver::autoRenameForDest($destination, $fileName);
                         }
                         $boxData = [

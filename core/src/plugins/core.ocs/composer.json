@@ -6,8 +6,6 @@
   "autoload": {
     "psr-4": {
       "Pydio\\OCS\\": "./src"
-    },
-    "classmap":["../../core/src/sabredav/ajaxplorer"],
-    "files":["../../core/src/sabredav/lib/Sabre/autoload.php"]
+    }
   }
 }

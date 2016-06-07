@@ -473,12 +473,13 @@ abstract class AbstractConfDriver extends Plugin
     abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $splitByType = false);
     /**
      * @abstract
+     * @param ContextInterface $ctx
      * @param string $repositoryId
      * @param boolean $details
      * @param boolean $admin
      * @return Integer|array
      */
-    abstract public function countUsersForRepository($repositoryId, $details = false, $admin = false);
+    abstract public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin = false);
 
 
     /**
@@ -854,7 +855,7 @@ abstract class AbstractConfDriver extends Plugin
                             $apptitle = ConfService::getCoreConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
                             $body = str_replace(array("%s", "%link", "%user", "%pass"), array($apptitle, $link, $data["new_user_id"], $data["new_password"]), $mess["508"]);
-                            $mailer->sendMail(array($data["email"]), $subject, $body);
+                            $mailer->sendMail($ctx, array($data["email"]), $subject, $body);
                         }
                     }
 
@@ -1259,7 +1260,7 @@ abstract class AbstractConfDriver extends Plugin
                 $data = array();
                 $repo = $ctx->getRepository();
                 if($repo != null){
-                    $users = AuthService::countUsersForRepository($repo->getId(), true);
+                    $users = AuthService::countUsersForRepository($ctx, $repo->getId(), true);
                     $data["core.users"] = $users;
                     if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
                         Controller::applyHook("repository.load_info", array($ctx, &$data));

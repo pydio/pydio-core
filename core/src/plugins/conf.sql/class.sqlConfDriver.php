@@ -27,6 +27,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Exception\DBConnectionException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -661,22 +662,28 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param string $repositoryId
      * @param boolean $details
      * @param bool $admin
      * @return array|int
      */
-    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
+    public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
         $object = ConfService::getRepositoryById($repositoryId);
         if(!$admin){
             if($object->securityScope() == "USER"){
-                if($details) return array('users' => 1);
-                else return 1;
-            }else if($object->securityScope() == "GROUP"){
-                // Count users from current group
-                $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
-                if($details) return array('users' => $groupUsers);
-                else return $groupUsers;
+                if($details) {
+                    return array('users' => 1);
+                } else {
+                    return 1;
+                }
+            }else if($object->securityScope() == "GROUP" && $ctx->hasUser()){
+                $groupUsers = AuthService::authCountUsers($ctx->getUser()->getGroupPath());
+                if($details) {
+                    return array('users' => $groupUsers);
+                } else {
+                    return $groupUsers;
+                }
             }
         }
 
@@ -1169,13 +1176,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return true;
     }
 
-    public function listUserTeams()
+    public function listUserTeams(UserInterface $parentUser)
     {
-        if (AuthService::getLoggedUser() == null) {
-            return array();
-        }
         dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
-        $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", AuthService::getLoggedUser()->getId());
+        $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", $parentUser->getId());
         $data = $res->fetchAll();
         $all = array();
         foreach ($data as $row) {
@@ -1188,10 +1192,13 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $all;
     }
 
-    public function teamIdToUsers($teamId)
+    public function teamIdToUsers(UserInterface $parentUser, $teamId)
     {
-        $res = array();
-        $teams = $this->listUserTeams();
+        if(empty($parentUser)) {
+            return [];
+        }
+        $res = [];
+        $teams = $this->listUserTeams($parentUser);
         $teamData = $teams[$teamId];
         foreach ($teamData["USERS"] as $userId) {
             if (AuthService::userExists($userId)) {
@@ -1203,23 +1210,23 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $res;
     }
 
-    private function addUserToTeam($teamId, $userId, $teamLabel = null)
+    private function addUserToTeam(UserInterface $parentUser, $teamId, $userId, $teamLabel = null)
     {
         if ($teamLabel == null) {
             $res = dibi::query("SELECT [team_label] FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
-                $teamId, AuthService::getLoggedUser()->getId());
+                $teamId, $parentUser->getId());
             $teamLabel = $res->fetchSingle();
         }
         dibi::query("INSERT INTO [ajxp_user_teams] ([team_id],[user_id],[team_label],[owner_id]) VALUES (%s,%s,%s,%s)",
-            $teamId, $userId, $teamLabel, AuthService::getLoggedUser()->getId()
+            $teamId, $userId, $teamLabel, $parentUser->getId()
         );
     }
 
-    private function editTeamUsers($teamId, $users, $teamLabel = null)
+    private function editTeamUsers(UserInterface $parentUser, $teamId, $users, $teamLabel = null)
     {
         if ($teamLabel == null) {
             $res = dibi::query("SELECT [team_label] FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
-                $teamId, AuthService::getLoggedUser()->getId());
+                $teamId, $parentUser->getId());
             $teamLabel = $res->fetchSingle();
         }
         // Remove old users
@@ -1227,28 +1234,30 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         foreach($users as $userId){
             if(!AuthService::userExists($userId, "r")) continue;
             dibi::query("INSERT INTO [ajxp_user_teams] ([team_id],[user_id],[team_label],[owner_id]) VALUES (%s,%s,%s,%s)",
-                $teamId, $userId, $teamLabel, AuthService::getLoggedUser()->getId()
+                $teamId, $userId, $teamLabel, $parentUser->getId()
             );
         }
     }
 
-    private function removeUserFromTeam($teamId, $userId = null)
+    private function removeUserFromTeam(UserInterface $parentUser, $teamId, $userId = null)
     {
         if ($userId == null) {
             dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
-                $teamId, AuthService::getLoggedUser()->getId()
+                $teamId, $parentUser->getId()
             );
         } else {
             dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [user_id] = %s AND [owner_id] = %s",
-                $teamId, $userId, AuthService::getLoggedUser()->getId()
+                $teamId, $userId, $parentUser->getId()
             );
         }
     }
 
-    public function userTeamsActions($actionName, $httpVars, $fileVars)
+    public function userTeamsActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         switch ($actionName) {
+
             case "user_team_create":
+
                 $userIds = $httpVars["user_ids"];
                 $teamLabel = Utils::sanitize($httpVars["team_label"], AJXP_SANITIZE_HTML_STRICT);
                 if(empty($teamLabel)){
@@ -1260,22 +1269,32 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $teamId = Utils::slugify($teamLabel)."-".intval(rand(0,1000));
                 foreach ($userIds as $userId) {
                     $id = Utils::sanitize($userId, AJXP_SANITIZE_EMAILCHARS);
-                    $this->addUserToTeam($teamId, $id, $teamLabel);
+                    $this->addUserToTeam($ctx->getUser(), $teamId, $id, $teamLabel);
                 }
                 echo 'Created Team $teamId';
+
                 break;
+
             case "user_team_delete":
-                $this->removeUserFromTeam($httpVars["team_id"], null);
+
+                $this->removeUserFromTeam($ctx->getUser(), $httpVars["team_id"], null);
                 break;
+
             case "user_team_add_user":
-                $this->addUserToTeam($httpVars["team_id"], $httpVars["user_id"], null);
+
+                $this->addUserToTeam($ctx->getUser(), $httpVars["team_id"], $httpVars["user_id"], null);
                 break;
+
             case "user_team_edit_users":
-                $this->editTeamUsers($httpVars["team_id"], $httpVars["users"], $httpVars["team_label"]);
+
+                $this->editTeamUsers($ctx->getUser(), $httpVars["team_id"], $httpVars["users"], $httpVars["team_label"]);
                 break;
+
             case "user_team_delete_user":
-                $this->removeUserFromTeam($httpVars["team_id"], $httpVars["user_id"]);
+
+                $this->removeUserFromTeam($ctx->getUser(), $httpVars["team_id"], $httpVars["user_id"]);
                 break;
+
         }
     }
 

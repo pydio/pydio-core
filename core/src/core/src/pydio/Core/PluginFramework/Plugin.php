@@ -168,55 +168,41 @@ class Plugin implements \Serializable
      * @return mixed|null
      */
     protected function getContextualOption(ContextInterface $ctx, $optionName){
-        if($ctx->hasRepository()){
-            $repo = $ctx->getRepository();
-        }else{
-            $repo = AJXP_REPO_SCOPE_ALL;
-        }
-        return $this->getFilteredOption($optionName, $repo, $ctx->getUser());
-    }
 
-    /**
-     * @param string $optionName
-     * @param string|RepositoryInterface $repositoryScope
-     * @param null|\Pydio\Conf\Core\AbstractAjxpUser $userObject
-     * @return mixed|null
-     */
-    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL, $userObject = null)
-    {
         if(!is_array($this->options)) $this->options = array();
         $merged = $this->options;
         if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
-        $loggedUser = $userObject;
-        if($loggedUser == null){
-            $loggedUser = AuthService::getLoggedUser();
-        }
-        if ($loggedUser != null) {
-            if ($repositoryScope === AJXP_REPO_SCOPE_ALL) {
-                $repo = ConfService::getRepository();
-                if($repo != null) $repositoryScope = $repo->getId();
-            }else if(is_object($repositoryScope) && $repositoryScope instanceof RepositoryInterface){
-                $repo = $repositoryScope;
-                $repositoryScope = $repo->getId();
+
+        if ($ctx->hasUser()) {
+
+            $loggedUser = $ctx->getUser();
+            if($ctx->hasRepository()){
+                $repository = $ctx->getRepository();
+                $repositoryScope = $ctx->getRepositoryId();
+            }else{
+                $repositoryScope = AJXP_REPO_SCOPE_ALL;
             }
-            $test = $loggedUser->mergedRole->filterParameterValue(
+
+            $test = $loggedUser->getMergedRole()->filterParameterValue(
                 $this->getId(),
                 $optionName,
                 $repositoryScope,
                 isSet($merged[$optionName]) ? $merged[$optionName] : null
             );
-            if (isSet($repo) && $repo != null && $repo->hasParent()) {
-                $retest = $loggedUser->mergedRole->filterParameterValue(
+
+            if (isSet($repository) && $repository->hasParent()) {
+                $retest = $loggedUser->getMergedRole()->filterParameterValue(
                     $this->getId(),
                     $optionName,
-                    $repo->getParentId(),
+                    $repository->getParentId(),
                     null
                 );
                 if($retest !== null) {
                     $test = $retest;
-                }else if($repo->hasOwner()){
+
+                }else if($repository->hasOwner()) {
                     // Test shared scope
-                    $retest = $loggedUser->mergedRole->filterParameterValue(
+                    $retest = $loggedUser->getMergedRole()->filterParameterValue(
                         $this->getId(),
                         $optionName,
                         AJXP_REPO_SCOPE_SHARED,

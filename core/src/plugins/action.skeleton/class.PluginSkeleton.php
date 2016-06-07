@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -80,11 +80,12 @@ class PluginSkeleton extends Plugin
      * as it happen too early in the application, so it must be declared directly inside the conf.php
      *
      * @param String $value
+     * @param ContextInterface $context
      */
-    public static function filterVars(&$value)
+    public static function filterVars(&$value, $context)
     {
-        if (AuthService::getLoggedUser() != null) {
-            $value = str_replace("CUSTOM_VARIABLE_USER", AuthService::getLoggedUser()->getId(), $value);
+        if ($context->hasUser()) {
+            $value = str_replace("CUSTOM_VARIABLE_USER", $context->getUser()->getId(), $value);
         }
     }
 }

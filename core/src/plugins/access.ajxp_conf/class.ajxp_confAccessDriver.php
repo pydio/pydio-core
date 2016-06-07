@@ -1669,7 +1669,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 print("</metasources>");
                 if(!$repository->isTemplate){
                     print "<additional_info>";
-                    $users = AuthService::countUsersForRepository($repId, false, true);
+                    $users = AuthService::countUsersForRepository($ctx, $repId, false, true);
                     $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", null, "", "serial", '', $repId);
                     print('<users total="'.$users.'"/>');
                     print('<shares total="'.count($shares).'"/>');

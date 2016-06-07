@@ -138,6 +138,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             break;
 
             case "delete" :
+                
                 $mime = $httpVars["ajxp_mime"];
                 $selection = new UserSelection();
                 $selection->initFromHttpVars($httpVars);

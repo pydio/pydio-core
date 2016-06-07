@@ -45,7 +45,7 @@ class inboxAccessDriver extends fsAccessDriver
     protected function initRepository(ContextInterface $contextInterface)
     {
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $this->urlBase = $contextInterface->getUrlBase();
     }
 
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)

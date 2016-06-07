@@ -890,14 +890,15 @@ class AuthService
 
     /**
      * Count the number of users who have either read or write access to a repository
+     * @param ContextInterface $ctx
      * @param $repositoryId
      * @param bool $details
      * @param bool $admin True if called in an admin context
      * @return array|int
      */
-    public static function countUsersForRepository($repositoryId, $details = false, $admin = false)
+    public static function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin = false)
     {
-        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details, $admin);
+        return ConfService::getConfStorageImpl()->countUsersForRepository($ctx, $repositoryId, $details, $admin);
     }
 
     /**

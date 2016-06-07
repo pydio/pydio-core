@@ -20,17 +20,18 @@
  */
 
 namespace Pydio\OCS\Server\Dav;
+use Pydio\Core\Http\Dav\Collection;
 use Sabre\DAV\SimpleCollection;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class SharingCollection extends \AJXP_Sabre_Collection
+class SharingCollection extends Collection
 {
     public function getChildren()
     {
-        if($this->path == "/" && !$this->repository->hasContentFilter()){
-            $basePath = $this->repository->getOption("PATH");
+        if($this->path == "/" && !$this->context->getRepository()->hasContentFilter()){
+            $basePath = $this->context->getRepository()->getContextOption($this->context, "PATH");
             $dirName = basename($basePath);
             $this->children[$dirName] = new SimpleCollection($dirName);
             return $this->children;

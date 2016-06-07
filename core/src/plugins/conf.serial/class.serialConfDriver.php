@@ -407,12 +407,13 @@ class serialConfDriver extends AbstractConfDriver
     }
 
     /**
+     * @param $ctx ContextInterface
      * @param string $repositoryId
      * @param boolean $details
      * @param bool $admin
      * @return array
      */
-    public function countUsersForRepository($repositoryId, $details = false, $admin=false){
+    public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
         $c = count($this->getUsersForRepository($repositoryId));
         if($details) return array("users" => $c);
         else return $c;
@@ -559,9 +560,6 @@ class serialConfDriver extends AbstractConfDriver
                 unset($pointer[$userId]);
                 $parentObject->setChildrenPointer($pointer);
                 $parentObject->save("superuser");
-                if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentObject->getId()) {
-                    AuthService::updateUser($parentObject);
-                }
             }
         }
 

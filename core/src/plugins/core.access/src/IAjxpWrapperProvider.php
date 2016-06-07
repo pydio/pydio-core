@@ -58,14 +58,14 @@ interface IAjxpWrapperProvider
     public function createEmptyFile(AJXP_Node $node, $content = "", $forceCreation = false);
 
     /**
-     * @param String $from
-     * @param String $to
+     * @param AJXP_Node $from
+     * @param AJXP_Node $to
      * @param Boolean $copy
      */
-    public function nodeChanged(&$from, &$to, $copy = false);
+    public function nodeChanged(&$from = null, &$to  = null, $copy = false);
 
     /**
-     * @param String $node
+     * @param AJXP_Node $node
      * @param null $newSize
      * @return
      */
