@@ -36,10 +36,10 @@ $mess = array(
     "12"=> "I vecchi plugin  meta.serial sono stati rimossi e divisi in metastore.serial e meta.user",
     "13"=> "Simula migrazione",
     "14"=> "Avvia migrazione reale",
-    "15" => "Are you sure that you want to perform the upgrade?",
-    "16" => "The following packages will be downloaded and installed.",
-    "17" => "Checking for available upgrades...",
-    "18" => "No necessary upgrade detected: click to perform a new check.",
-    "19" => "Click to check for new upgrade",
-    "20" => "Check now"
+    "15" => "Sicuro di voler procedere con l'aggiornamento?",
+    "16" => "I seguenti pacchetti saranno scaricati ed installati.",
+    "17" => "Verifica disponibilità aggiornamenti...",
+    "18" => "Nessun aggiornamento necessario: clicca per eseguire un nuovo controllo.",
+    "19" => "Clicca per cercare nuovi aggiornamenti",
+    "20" => "Controlla"
 );

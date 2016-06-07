@@ -31,6 +31,6 @@ $mess=array(
 "How the password is minimaly hashed in the table" => "How the password is minimaly hashed in the table",
 "Test User" => "Test User",
 "Use an existing user ID and click on Test Connexion to verify it is correctly found" => "Use an existing user ID and click on Test Connexion to verify it is correctly found",
-"Test Connexion" => "Test Connexion",
-"Test the SQL connexion" => "Test the SQL connexion",
+"Test Connexion" => "Test Connection",
+"Test the SQL connexion" => "Test the SQL connection",
 );
