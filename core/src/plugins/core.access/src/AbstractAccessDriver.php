@@ -123,12 +123,11 @@ abstract class AbstractAccessDriver extends Plugin
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){}
 
     /**
-     * @param $directoryPath string
-     * @param $repositoryResolvedOptions array
+     * @param $node AJXP_Node
      * @return int
      * @throws \Exception
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
+    public function directoryUsage(AJXP_Node $node){
         throw new \Exception("Current driver does not support recursive directory usage!");
     }
 

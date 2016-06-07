@@ -584,7 +584,7 @@ class ShareStore {
                     $repo->setDisplay($newNodeLabel);
                 }
                 $cFilter = $repo->getContentFilter();
-                $path = $repo->getOption("PATH", true);
+                $path = $repo->getSafeOption("PATH");
                 $save = false;
                 if(isSet($cFilter)){
                     if($parentRepositoryPath !== null){
@@ -608,7 +608,7 @@ class ShareStore {
                     //ConfService::getConfStorageImpl()->saveRepository($repo, true);
                     ConfService::replaceRepository($repo->getId(), $repo);
                 }
-                $access = $repo->getOption("SHARE_ACCESS");
+                $access = $repo->getSafeOption("SHARE_ACCESS");
                 if(!empty($access) && $access == "PUBLIC"){
                     $publicShares[$id] = $data;
                 }else{

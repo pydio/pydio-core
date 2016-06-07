@@ -624,7 +624,7 @@ class AJXP_Node implements \JsonSerializable
             Controller::applyHook("node.size.recursive", array(&$this, &$result));
             if($result == -1){
                 try{
-                    return $this->getDriver()->directoryUsage($this->getPath(), []);
+                    return $this->getDriver()->directoryUsage($this);
                 }catch(\Exception $e){
                     return -1;
                 }

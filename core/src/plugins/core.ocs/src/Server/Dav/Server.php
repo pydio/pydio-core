@@ -112,6 +112,7 @@ class Server extends Sabre\DAV\Server
      * @return Collection|SharingCollection
      * @throws \Exception
      */
+     /*
     protected function initCollectionForFileOrFolderAsUniqueItem(&$baseUri){
         try{
             $testBackend = new BasicAuthNoPass();
@@ -138,7 +139,7 @@ class Server extends Sabre\DAV\Server
         }
         return $rootCollection;
     }
-
-
+    */
+    
 
 }

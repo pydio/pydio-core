@@ -33,6 +33,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
@@ -54,9 +55,7 @@ use Pydio\Share\View\MinisiteRenderer;
 use Pydio\Share\View\PublicAccessManager;
 use Pydio\OCS as OCS;
 use Zend\Diactoros\Response;
-use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once("plugins/action.share/vendor/autoload.php");
@@ -292,7 +291,7 @@ class ShareCenter extends Plugin
                 $hMin = $this->getContextualOption($this->currentContext, "HASH_MIN_LENGTH");
             }
             $this->shareStore = new ShareStore(
-                $this->currentContext,
+                isSet($this->currentContext) ? $this->currentContext : Context::fromGlobalServices(),
                 ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
                 $hMin
             );
@@ -340,7 +339,7 @@ class ShareCenter extends Plugin
                 );
             }
             $this->rightsManager = new ShareRightsManager(
-                $this->currentContext,
+                isSet($this->currentContext) ? $this->currentContext : Context::fromGlobalServices(),
                 $options,
                 $this->getShareStore(),
                 $this->watcher);
@@ -912,7 +911,7 @@ class ShareCenter extends Plugin
                 }else if($userContext == "user" && $ctx->getUser()->isAdmin() && !empty($httpVars["user_id"])){
                     $currentUser = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
                 }
-                $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
+                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
                 $nodesList = new NodesList();
                 if($userContext == "current"){
@@ -1065,6 +1064,7 @@ class ShareCenter extends Plugin
      */
     private function findMirrorNodesInShares($node, $direction){
         $result = array();
+        $crtContext = $node->getContext();
         if($direction !== "UP"){
             $upmetas = array();
             $this->getShareStore()->getMetaManager()->collectSharesInParent($node, $upmetas);
@@ -1083,7 +1083,8 @@ class ShareCenter extends Plugin
                         }
                         $sharedNode = $metadata["SOURCE_NODE"];
                         $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
-                        $sharedNodeUrl = $node->getScheme() . "://".$wsId.$sharedPath;
+                        $newContext = $crtContext->withRepositoryId($wsId);
+                        $sharedNodeUrl = $newContext->getUrlBase().$sharedPath;// $node->getScheme() . "://".$wsId.$sharedPath;
                         $result[$wsId] = array(new AJXP_Node($sharedNodeUrl), "DOWN");
                         $this->logDebug('MIRROR NODES', 'Found shared in parent - register node '.$sharedNodeUrl);
                     }
@@ -1095,19 +1096,18 @@ class ShareCenter extends Plugin
                 $parentRepoId = $node->getRepository()->getParentId();
                 $parentRepository = ConfService::getRepositoryById($parentRepoId);
                 if(!empty($parentRepository) && !$parentRepository->isTemplate){
-                    $currentRoot = $node->getRepository()->getOption("PATH");
+                    $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
+                    $newContext = $crtContext->withRepositoryId($parentRepoId);
                     $owner = $node->getRepository()->getOwner();
-                    $resolveUser = null;
-                    if($owner != null){
-                        $resolveUser = ConfService::getConfStorageImpl()->createUserObject($owner);
+                    if($owner !== null){
+                        $newContext = $newContext->withUserId($owner);
                     }
-                    $parentRoot = $parentRepository->getOption("PATH", false, $resolveUser);
+                    $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
                     $relative = substr($currentRoot, strlen($parentRoot));
                     $relative = TextEncoder::toStorageEncoding($relative);
-                    $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
+                    $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
-                    if($owner != null) $parentNode->setUserId($owner);
                     $result[$parentRepoId] = array($parentNode, "UP");
                 }
             }
@@ -1411,7 +1411,7 @@ class ShareCenter extends Plugin
                 $replace = true;
             }
             $newScope = ((isSet($httpVars["share_scope"]) && $httpVars["share_scope"] == "public") ? "public" : "private");
-            $oldScope = $editingRepo->getOption("SHARE_ACCESS");
+            $oldScope = $editingRepo->getSafeOption("SHARE_ACCESS");
             $currentOwner = $editingRepo->getOwner();
             if($newScope != $oldScope && $currentOwner != $loggedUser->getId()){
                 $mess = ConfService::getMessages();
@@ -1758,6 +1758,7 @@ class ShareCenter extends Plugin
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $rootPath
      * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
@@ -1765,7 +1766,7 @@ class ShareCenter extends Plugin
      * @param bool $xmlPrint
      * @return AJXP_Node[]
      */
-    public function listSharesAsNodes($rootPath, $currentUser = true, $parentRepositoryId = "", $cursor = null, $xmlPrint = false){
+    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser = true, $parentRepositoryId = "", $cursor = null, $xmlPrint = false){
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
@@ -1817,12 +1818,14 @@ class ShareCenter extends Plugin
                 $meta["owner"] = $repoObject->getOwner();
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
                 if(!empty($parent)) {
-                    $parentPath = $parent->getOption("PATH", false, $meta["owner"]);
+                    $ctx = new Context($meta["owner"], $parent->getId());
+                    $parentPath = $parent->getContextOption($ctx, "PATH");
                     $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
                 }else{
                     $crtParent = ConfService::getRepositoryById($repoObject->getParentId());
                     if(!empty($crtParent)){
-                        $parentPath = $crtParent->getOption("PATH", false, $meta["owner"]);
+                        $ctx = new Context($meta["owner"], $repoObject->getParentId());
+                        $parentPath = $crtParent->getContextOption($ctx, "PATH");
                         $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
                     }else {
                         $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
@@ -1835,7 +1838,7 @@ class ShareCenter extends Plugin
                 }else{
                     $meta["ajxp_shared_minisite"] = "public";
                     $meta["icon"] = "folder.png";
-                    $meta["original_path"] = $repoObject->getOption("PATH");
+                    $meta["original_path"] = $repoObject->getContextOption($ctx, "PATH");
                 }
                 if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
                     $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));

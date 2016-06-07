@@ -137,13 +137,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
     /**
-     * @param String $directoryPath
-     * @param array $repositoryResolvedOptions
+     * @param AJXP_Node $node
      * @return int
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
+    public function directoryUsage(AJXP_Node $node){
 
-        $dir = (isSet($repositoryResolvedOptions["PATH"]) ? $repositoryResolvedOptions["PATH"] : $this->repository->getOption("PATH")).$directoryPath;
+        //$dir = (isSet($repositoryResolvedOptions["PATH"]) ? $repositoryResolvedOptions["PATH"] : $this->repository->getOption("PATH")).$directoryPath;
+        $dir = $node->getRealFile();
         $size = -1;
         if ( ( PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") && class_exists("COM") ) {
             $obj = new COM ( 'scripting.filesystemobject' );

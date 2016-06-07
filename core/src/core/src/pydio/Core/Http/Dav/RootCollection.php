@@ -62,7 +62,7 @@ class RootCollection extends Sabre\DAV\SimpleCollection
         foreach ($repos as $repository) {
             $accessType = $repository->getAccessType();
             $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-            if ($driver instanceof \Pydio\Access\Core\IAjxpWrapperProvider && $repository->getOption("AJXP_WEBDAV_DISABLED") !== true) {
+            if ($driver instanceof \Pydio\Access\Core\IAjxpWrapperProvider && $repository->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") !== true) {
                 $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
             }
         }

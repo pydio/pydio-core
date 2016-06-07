@@ -345,53 +345,6 @@ class Repository implements RepositoryInterface
 
     }
 
-    public function getOption($oName, $safe=false, $resolveUser = null)
-    {
-        if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
-            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
-            if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
-                throw new \Exception("Option should be loaded from parent repository, but it was not found");
-            }
-        }
-        if (!$safe && $this->inferOptionsFromParent) {
-            if (isSet($parentTemplateObject)) {
-                $pvalue = $parentTemplateObject->getOption($oName, $safe);
-                $pathChanged = false;
-                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_UUID") !== false) {
-                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_UUID", $this->getUniqueId(), $pvalue), "/");
-                    $pathChanged = true;
-                }
-                if (is_string($pvalue) && strstr($pvalue, "AJXP_WORKSPACE_SLUG") !== false) {
-                    $pvalue = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $this->getSlug(), $pvalue), "/");
-                    $pathChanged = true;
-                }
-                if (is_string($pvalue) && strstr($pvalue, "AJXP_ALLOW_SUB_PATH") !== false) {
-                    $pvalue = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $pvalue), "/")."/".$this->options[$oName];
-                    $pathChanged = true;
-                }
-                if ($pathChanged) {
-                    return \Pydio\Core\Utils\Utils::securePath($pvalue);
-                }
-            }
-        }
-        if (isSet($this->options[$oName])) {
-            $value = $this->options[$oName];
-            $tmpContext = Context::fromGlobalServices();
-            if($resolveUser !== null) $tmpContext->setUserId($resolveUser);
-            if(!$safe) $value = VarsFilter::filter($value, $tmpContext);
-            return $value;
-        }
-        if ($this->inferOptionsFromParent) {
-            if (!isset($parentTemplateObject)) {
-                $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
-            }
-            if (isSet($parentTemplateObject)) {
-                return $parentTemplateObject->getOption($oName, $safe);
-            }
-        }
-        return "";
-    }
-
     public function getOptionsDefined()
     {
         //return array_keys($this->options);

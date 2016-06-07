@@ -113,7 +113,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
             AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
         }
         $repoId = $this->context->getRepositoryId();
-        if(isSet($repoId) && ConfService::getRepositoryById($repoId)->getOption("AJXP_WEBDAV_DISABLED") === true){
+        if(isSet($repoId) && ConfService::getRepositoryById($repoId)->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") === true){
             throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
         }
         ConfService::switchRootDir($repoId);

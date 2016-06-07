@@ -96,14 +96,13 @@ class s3AccessDriver extends fsAccessDriver
     }
 
     /**
-     * @param String $directoryPath
-     * @param array $repositoryResolvedOptions
+     * @param AJXP_Node $node
      * @return int
      */
-    public function directoryUsage($directoryPath, $repositoryResolvedOptions = []){
+    public function directoryUsage(AJXP_Node $node){
         $client = $this->getS3Service();
-        $bucket = (isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
-        $path   = (isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
+        $bucket = $node->getRepository()->getContextOption($node->getContext(), "CONTAINER"); //(isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
+        $path   = rtrim($node->getRepository()->getContextOption($node->getContext(), "PATH"), "/").$node->getPath(); //(isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
         $objects = $client->getIterator('ListObjects', array(
             'Bucket' => $bucket,
             'Prefix' => $path

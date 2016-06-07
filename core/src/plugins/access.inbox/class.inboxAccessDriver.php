@@ -141,7 +141,7 @@ class inboxAccessDriver extends fsAccessDriver
             $url = "pydio://" . $repoId . "/";
             $meta = array(
                 "shared_repository_id" => $repoId,
-                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". Utils::relativeDate($repo->getOption("CREATION_TIME"), $mess),
+                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". Utils::relativeDate($repo->getSafeOption("CREATION_TIME"), $mess),
                 "share_meta_type" => 1
             );
 
