@@ -722,7 +722,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $meta = array();
                         try{
                             $metaSources = $repositoryObject->getContextOption($ctx, "META_SOURCES");
-                            if($metaSources !== ""){
+                            if($metaSources !== null){
                                 $meta = array_keys($metaSources);
                             }
                         }catch(\Exception $e){

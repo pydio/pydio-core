@@ -274,9 +274,10 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             $metaFile = $this->globalMetaFile."_".$repositoryId;
             $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
         }
+        $metFileNode = new AJXP_Node($metaFile);
         if($scope==AJXP_METADATA_SCOPE_REPOSITORY
-            || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile))
-            || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) ){
+            || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metFileNode))
+            || call_user_func(array($this->accessDriver, "isWriteable"), $metFileNode->getParent()) ){
             if (is_array(self::$metaCache) && count(self::$metaCache)) {
                 if (!isset(self::$fullMetaCache[$metaFile])) {
                     self::$fullMetaCache[$metaFile] = array();
