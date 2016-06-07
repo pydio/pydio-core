@@ -176,15 +176,16 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     /**
+     * @param $ctx ContextInterface
      * @return array
      */
-    public function listMinisites()
+    public function listMinisites(ContextInterface $ctx)
     {
         /**
          * @var ShareCenter $shareCenter
          */
         $shareCenter = PluginsService::getInstance()->findPluginById("action.share");
-        $publicLets = $shareCenter->listShares(true, null);
+        $publicLets = $shareCenter->listShares($ctx->hasUser() ? $ctx->getUser()->getId() : "shared", null);
         $minisites = array();
         foreach ($publicLets as $hash => $publicletData) {
             if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;

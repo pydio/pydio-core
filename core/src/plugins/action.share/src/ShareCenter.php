@@ -905,7 +905,7 @@ class ShareCenter extends Plugin
 
                 $parentRepoId = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
                 $userContext = $httpVars["user_context"];
-                $currentUser = true;
+                $currentUser = $ctx->getUser()->getId();
                 if($userContext == "global" && $ctx->getUser()->isAdmin()){
                     $currentUser = false;
                 }else if($userContext == "user" && $ctx->getUser()->isAdmin() && !empty($httpVars["user_id"])){
@@ -1742,17 +1742,11 @@ class ShareCenter extends Plugin
      * @param null $cursor
      * @return array
      */
-    public function listShares($currentUser = true, $parentRepositoryId="", $cursor = null){
+    public function listShares($currentUser, $parentRepositoryId="", $cursor = null){
         if($currentUser === false){
             $crtUser = "";
-        }else if(AuthService::usersEnabled()){
-            if($currentUser === true){
-                $crtUser = AuthService::getLoggedUser()->getId();
-            }else{
-                $crtUser = $currentUser;
-            }
-        }else{
-            $crtUser = "shared";
+        }else {
+            $crtUser = $currentUser;
         }
         return $this->getShareStore()->listShares($crtUser, $parentRepositoryId, $cursor);
     }
@@ -1766,7 +1760,7 @@ class ShareCenter extends Plugin
      * @param bool $xmlPrint
      * @return AJXP_Node[]
      */
-    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser = true, $parentRepositoryId = "", $cursor = null, $xmlPrint = false){
+    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", $cursor = null, $xmlPrint = false){
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
