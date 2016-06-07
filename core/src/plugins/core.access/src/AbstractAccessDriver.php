@@ -177,12 +177,12 @@ abstract class AbstractAccessDriver extends Plugin
             }
         }
         $srcRepoData= array(
-            'base_url' => $origStreamURL,
-            'recycle'   => $this->repository->getOption("RECYCLE_BIN")
+            'base_url'      => $origStreamURL,
+            'recycle'       => $this->repository->getContextOption($ctx, "RECYCLE_BIN")
         );
         $destRepoData=array(
-            'base_url' => $destStreamURL,
-            'chmod'         => $this->repository->getOption('CHMOD')
+            'base_url'      => $destStreamURL,
+            'chmod'         => $this->repository->getContextOption($ctx, 'CHMOD')
         );
 
         $messages = array();
@@ -511,15 +511,16 @@ abstract class AbstractAccessDriver extends Plugin
     /**
      *
      * Try to reapply correct permissions
+     * @param AJXP_Node $node
      * @param array $stat
-     * @param Repository $repoObject
      * @param callable $remoteDetectionCallback
      * @var integer $mode
      */
-    public static function fixPermissions(&$stat, $repoObject, $remoteDetectionCallback = null)
+    public static function fixPermissions(AJXP_Node $node, &$stat, $remoteDetectionCallback = null)
     {
+        $repoObject = $node->getRepository();
         $fixPermPolicy = $repoObject->getOption("FIX_PERMISSIONS");
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = $node->getUser();
         if ($loggedUser == null) {
             return;
         }
@@ -528,13 +529,13 @@ abstract class AbstractAccessDriver extends Plugin
 
         if (!isSet($_SESSION[$sessionKey])) {
             if ($fixPermPolicy == "detect_remote_user_id" && $remoteDetectionCallback != null) {
-                list($uid, $gid) = call_user_func($remoteDetectionCallback, $repoObject);
+                list($uid, $gid) = call_user_func($remoteDetectionCallback, $node);
                 if ($uid != null && $gid != null) {
                     $_SESSION[$sessionKey] = array("uid" => $uid, "gid" => $gid);
                 }
 
             } else if (substr($fixPermPolicy, 0, strlen("file:")) == "file:") {
-                $filePath = VarsFilter::filter(substr($fixPermPolicy, strlen("file:")));
+                $filePath = VarsFilter::filter(substr($fixPermPolicy, strlen("file:")), $node->getContext());
                 if (file_exists($filePath)) {
                     // GET A GID/UID FROM FILE
                     $lines = file($filePath);

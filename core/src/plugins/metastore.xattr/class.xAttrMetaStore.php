@@ -64,7 +64,7 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
     protected function getUserId($private, $node)
     {
         if(!$private) return AJXP_METADATA_SHAREDUSER;
-        if($node->hasUser()) return $node->getUser();
+        if($node->hasUser()) return $node->getUserId();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }

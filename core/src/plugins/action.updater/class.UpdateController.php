@@ -89,7 +89,7 @@ class UpdateController extends Plugin
             case "migrate_metaserial":
 
                 $dryRun = !isSet($httpVars["real_run"]);
-                AjaXplorerUpgrader::migrateMetaSerialPlugin($httpVars["repository_id"], $dryRun);
+                AjaXplorerUpgrader::migrateMetaSerialPlugin($contextInterface, $httpVars["repository_id"], $dryRun);
 
             break;
 

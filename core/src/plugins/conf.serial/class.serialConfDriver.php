@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -52,9 +53,9 @@ class serialConfDriver extends AbstractConfDriver
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        $this->repoSerialFile = VarsFilter::filter($this->options["REPOSITORIES_FILEPATH"]);
-        $this->usersSerialDir = VarsFilter::filter($this->options["USERS_DIRPATH"]);
-        $this->rolesSerialFile = VarsFilter::filter($this->options["ROLES_FILEPATH"]);
+        $this->repoSerialFile = VarsFilter::filter($this->options["REPOSITORIES_FILEPATH"], $ctx);
+        $this->usersSerialDir = VarsFilter::filter($this->options["USERS_DIRPATH"], $ctx);
+        $this->rolesSerialFile = VarsFilter::filter($this->options["ROLES_FILEPATH"], $ctx);
         $this->aliasesIndexFile = dirname($this->repoSerialFile)."/aliases.ser";
         $this->pluginsConfigsFile = dirname($this->repoSerialFile)."/plugins_configs.ser";
     }
@@ -109,6 +110,11 @@ class serialConfDriver extends AbstractConfDriver
         }
     }
 
+    /**
+     * @param String $pluginId
+     * @param array $options
+     * @throws Exception
+     */
     public function _savePluginConfig($pluginId, $options)
     {
         $data = Utils::loadSerialFile($this->pluginsConfigsFile);
@@ -141,9 +147,9 @@ class serialConfDriver extends AbstractConfDriver
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
-     * @param Array $criteria
+     * @param array $criteria
      * @param $count
-     * @return Array
+     * @return array
      */
     public function listRepositoriesWithCriteria($criteria, &$count = null){
 
@@ -261,6 +267,7 @@ class serialConfDriver extends AbstractConfDriver
      */
     public function saveRepository($repositoryObject, $update = false)
     {
+        /** @var \Pydio\Core\Model\RepositoryInterface[] $repositories */
         $repositories = Utils::loadSerialFile($this->repoSerialFile);
         if (!$update) {
             $repositoryObject->writeable = true;
@@ -279,6 +286,7 @@ class serialConfDriver extends AbstractConfDriver
             return -1;
         }
         $this->updateAliasesIndex($repositoryObject->getUniqueId(), $repositoryObject->getSlug());
+        return null;
     }
     /**
      * Delete a repository, given its unique ID.
@@ -287,6 +295,7 @@ class serialConfDriver extends AbstractConfDriver
      */
     public function deleteRepository($repositoryId)
     {
+        /** @var \Pydio\Core\Model\RepositoryInterface[] $repositories */
         $repositories = Utils::loadSerialFile($this->repoSerialFile);
         $newList = array();
         foreach ($repositories as $repo) {
@@ -330,6 +339,7 @@ class serialConfDriver extends AbstractConfDriver
         $result = array();
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
+        /** @var AJXP_SerialUser $parent */
         $parent = $confDriver->createUserObject($userId);
         $pointer = $parent->getChildrenPointer(); // SERIAL USER SPECIFIC METHOD
         if (!is_array($pointer)) { // UPDATE FIRST TIME
@@ -345,6 +355,7 @@ class serialConfDriver extends AbstractConfDriver
             $parent->setChildrenPointer($pointer);
             $parent->save("superuser");
         } else {
+            $clean = false;
             foreach ($pointer as $childId) {
                 if (!AuthService::userExists($childId)) {
                     $clean = true;
@@ -410,7 +421,7 @@ class serialConfDriver extends AbstractConfDriver
 
     public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         foreach ($flatUsersList as $userid => $userdata) {
             if (is_array($groups) && array_key_exists($userid, $groups)) {
                 $path = $groups[$userid];
@@ -429,7 +440,7 @@ class serialConfDriver extends AbstractConfDriver
 
     public function getChildrenGroups($baseGroup = "/")
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         $levelGroups = array();
         $labels = array();
         asort($groups);
@@ -454,7 +465,7 @@ class serialConfDriver extends AbstractConfDriver
 
     public function createGroup($groupPath, $groupLabel)
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         $reverse = array_flip($groups);
         if (isSet($reverse[$groupPath])) {
             $oldLabel = $reverse[$groupPath];
@@ -463,18 +474,18 @@ class serialConfDriver extends AbstractConfDriver
         } else {
             $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
         }
-        Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser", $groups);
     }
 
     public function relabelGroup($groupPath, $groupLabel)
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         $reverse = array_flip($groups);
         if (isSet($reverse[$groupPath])) {
             $oldLabel = $reverse[$groupPath];
             unset($groups[$oldLabel]);
             $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
-            Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+            Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser", $groups);
         }
     }
 
@@ -485,11 +496,11 @@ class serialConfDriver extends AbstractConfDriver
         if (count($gUsers) || count($gGroups)) {
             throw new Exception("Group is not empty, please do something with its content before trying to delete it!");
         }
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         foreach ($groups as $key => $value) {
             if($value == $groupPath) unset($groups[$key]);
         }
-        Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        Utils::saveSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser", $groups);
     }
 
     /**
@@ -512,10 +523,11 @@ class serialConfDriver extends AbstractConfDriver
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
+     * @param array $deletedSubUsers
      */
     public function deleteUser($userId, &$deletedSubUsers)
     {
+        /** @var AJXP_SerialUser $user */
         $user = $this->createUserObject($userId);
         $files = glob($user->getStoragePath()."/*.ser");
         if (is_array($files) && count($files)) {
@@ -540,6 +552,7 @@ class serialConfDriver extends AbstractConfDriver
 
         // CLEAR PARENT POINTER IF NECESSARY
         if ($user->hasParent()) {
+            /** @var AJXP_SerialUser $parentObject */
             $parentObject = $this->createUserObject($user->getParent());
             $pointer = $parentObject->getChildrenPointer();
             if ($pointer !== null) {
@@ -552,10 +565,10 @@ class serialConfDriver extends AbstractConfDriver
             }
         }
 
-        $groups = Utils::loadSerialFile(VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         if (isSet($groups[$userId])) {
             unset($groups[$userId]);
-            Utils::saveSerialFile(VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+            Utils::saveSerialFile(VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser", $groups);
 
         }
     }
@@ -719,7 +732,7 @@ class serialConfDriver extends AbstractConfDriver
      */
     public function groupExists($groupPath)
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         $reverse = array_flip($groups);
         if (isSet($reverse[$groupPath])) {
             return true;

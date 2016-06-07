@@ -317,6 +317,9 @@ class AJXP_Notification
      */
     public function getNode()
     {
+        if($this->node instanceof AJXP_Node && $this->node->getUserId() == null){
+            $this->node->setUserId($this->getAuthor());
+        }
         return $this->node;
     }
 

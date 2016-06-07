@@ -942,7 +942,7 @@ abstract class AbstractConfDriver extends Plugin
                 foreach ($repoList as $repoIndex => $repoObject) {
                     $accessType = $repoObject->getAccessType();
                     $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-                    if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getOption("AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
+                    if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getContextOption($ctx, "AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
                         $davRepos[$repoIndex] = $webdavBaseUrl . "" . ($repoObject->getSlug() == null ? $repoObject->getId() : $repoObject->getSlug());
                     }
                 }
@@ -965,7 +965,7 @@ abstract class AbstractConfDriver extends Plugin
                 $tplId = $httpVars["template_id"];
                 $iconFormat = $httpVars["icon_format"];
                 $repo = ConfService::getRepositoryById($tplId);
-                $logo = $repo->getOption("TPL_ICON_".strtoupper($iconFormat));
+                $logo = $repo->getContextOption($ctx, "TPL_ICON_".strtoupper($iconFormat));
 
                 $async = new AsyncResponseStream(function() use($logo, $iconFormat){
                     if (isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)) {
@@ -1001,7 +1001,7 @@ abstract class AbstractConfDriver extends Plugin
                 $pServ = PluginsService::getInstance();
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
-                    if(!$repo->getOption("TPL_USER_CAN_CREATE")) continue;
+                    if(!$repo->getContextOption($ctx, "TPL_USER_CAN_CREATE")) continue;
                     $repoId = $repo->getId();
                     $repoLabel = $repo->getDisplay();
                     $repoType = $repo->getAccessType();
@@ -1014,7 +1014,7 @@ abstract class AbstractConfDriver extends Plugin
                         $name = $paramNode->getAttribute("name");
                         if ( strpos($name, "TPL_") === 0 ) {
                             if ($name == "TPL_DEFAULT_LABEL") {
-                                $defaultLabel = str_replace("AJXP_USER", $loggedUser->getId(), $repo->getOption($name));
+                                $defaultLabel = str_replace("AJXP_USER", $loggedUser->getId(), $repo->getContextOption($ctx, $name));
                             }
                             continue;
                         }

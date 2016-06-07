@@ -25,7 +25,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -110,6 +112,15 @@ class AJXP_Node implements \JsonSerializable
     }
 
     /**
+     * @param string $url
+     * @return ContextInterface
+     */
+    public static function contextFromUrl($url){
+        $n = new AJXP_Node($url);
+        return $n->getContext();
+    }
+
+    /**
      * @param String $url of the node in the form ajxp.protocol://repository_id/path/to/node
      * @return void
      */
@@ -138,12 +149,18 @@ class AJXP_Node implements \JsonSerializable
             $uObject = AuthService::getLoggedUser();
             $this->_user = $uObject->getId();
         }
-        $ctx = new Context($this->getUser());
+        $ctx = new Context($this->getUserId());
         $ctx->setRepositoryObject($this->getRepository());
         if(isSet($uObject)){
             $ctx->setUserObject($uObject);
         }
         return $ctx;
+    }
+
+    public function createChildNode($pathSegment){
+        $n = new AJXP_Node($this->getUrl()."/".$pathSegment);
+        $n->setUserId($this->getUserId());
+        return $n;
     }
 
     /**
@@ -281,6 +298,7 @@ class AJXP_Node implements \JsonSerializable
         }
         $parent = new AJXP_Node(dirname($this->_url));
         $parent->setDriver($this->_accessDriver);
+        $parent->setUserId($this->_user);
         return $parent;
 
     }
@@ -511,14 +529,21 @@ class AJXP_Node implements \JsonSerializable
     /**
      * @return string A username
      */
-    public function getUser(){
+    public function getUserId(){
         return $this->_user;
+    }
+
+    /**
+     * @return UserInterface
+     */
+    public function getUser(){
+        return $this->getContext()->getUser();
     }
 
     /**
      * @param string $userId A username
      */
-    public function setUser($userId){
+    public function setUserId($userId){
         $this->_user = $userId;
         $this->urlParts["user"] = $userId;
         // Update url with a user@workspaceID
@@ -599,7 +624,7 @@ class AJXP_Node implements \JsonSerializable
             Controller::applyHook("node.size.recursive", array(&$this, &$result));
             if($result == -1){
                 try{
-                    return $this->_accessDriver->directoryUsage($this->getPath(), []);
+                    return $this->getDriver()->directoryUsage($this->getPath(), []);
                 }catch(\Exception $e){
                     return -1;
                 }
@@ -665,6 +690,9 @@ class AJXP_Node implements \JsonSerializable
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
             $this->_wrapperClassName = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
+        }
+        if(isSet($this->urlParts["user"])){
+            $this->_user = $this->urlParts["user"];
         }
     }
 

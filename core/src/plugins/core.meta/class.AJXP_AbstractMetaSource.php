@@ -51,7 +51,7 @@ abstract class AJXP_AbstractMetaSource extends Plugin {
         if($this->accessDriver->repository->hasParent()){
             $parentRepo = ConfService::getRepositoryById($this->accessDriver->repository->getParentId());
             if($parentRepo != null){
-                $sources = $parentRepo->getOption("META_SOURCES");
+                $sources = $parentRepo->getContextOption($ctx, "META_SOURCES");
                 $qParent = $sources["meta.quota"];
                 if(is_array($qParent)) $this->options = array_merge($this->options, $qParent);
             }

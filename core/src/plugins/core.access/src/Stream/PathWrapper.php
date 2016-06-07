@@ -9,6 +9,7 @@
 namespace Pydio\Access\Core\Stream;
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 
@@ -37,9 +38,9 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
             if ($repository == null) {
                 throw new \Exception("Cannot find repository");
             }
-
-            $configHost = $repository->getOption('HOST');
-            $configPath = $repository->getOption('PATH');
+            $ctx = AJXP_Node::contextFromUrl($url);
+            $configHost = $repository->getContextOption($ctx, 'HOST');
+            $configPath = $repository->getContextOption($ctx, 'PATH');
 
             $params['path'] = $parts['path'];
             $params['basepath'] = $configPath;

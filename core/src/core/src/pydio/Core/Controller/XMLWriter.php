@@ -22,6 +22,7 @@ namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Utils\Utils;
@@ -512,13 +513,13 @@ class XMLWriter
         if (!Services\AuthService::usersEnabled()) {
             $buffer.="<user id=\"shared\">";
             $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"1\" read=\"1\"/>";
-            $buffer.= XMLWriter::writeRepositoriesData(null);
+            $buffer.= XMLWriter::writeRepositoriesData($ctx);
             $buffer.="</user>";
         } else if ($loggedUser != null) {
             $lock = $loggedUser->getLock();
             $buffer.="<user id=\"".$loggedUser->id."\">";
             $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"".($loggedUser->canWrite($currentRepoId)?"1":"0")."\" read=\"".($loggedUser->canRead($currentRepoId)?"1":"0")."\"/>";
-            $buffer.= XMLWriter::writeRepositoriesData($loggedUser);
+            $buffer.= XMLWriter::writeRepositoriesData($ctx);
             $buffer.="<preferences>";
             $preferences = $confDriver->getExposedPreferences($loggedUser);
             foreach ($preferences as $prefName => $prefData) {
@@ -555,11 +556,12 @@ class XMLWriter
     /**
      * Write the repositories access rights in XML format
      * @static
-     * @param AbstractAjxpUser|null $loggedUser * @internal param bool $details
+     * @param ContextInterface $ctx
      * @return string
      */
-    public static function writeRepositoriesData($loggedUser)
+    public static function writeRepositoriesData(ContextInterface $ctx)
     {
+        $loggedUser = $ctx->getUser();
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
         
@@ -653,7 +655,7 @@ class XMLWriter
         $ownerLabel = null;
         if ($repoObject->hasOwner()) {
             $uId = $repoObject->getOwner();
-            if(Services\AuthService::usersEnabled() && Services\AuthService::getLoggedUser()->getId() == $uId){
+            if($loggedUser != null && $loggedUser->getId() == $uId){
                 $currentUserIsOwner = true;
             }
             $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
@@ -671,12 +673,13 @@ class XMLWriter
         if (!empty($description)) {
             $descTag = '<description>'.Utils::xmlEntities($description, true).'</description>';
         }
+        $ctx = Context::contextWithObjects($loggedUser, $repoObject);
         $roleString="";
         if($loggedUser != null){
             $merged = $loggedUser->mergedRole;
             $params = array();
             foreach($exposed as $exposed_prop){
-                $metaOptions = $repoObject->getOption("META_SOURCES");
+                $metaOptions = $repoObject->getContextOption($ctx, "META_SOURCES");
                 if(!isSet($metaOptions[$exposed_prop["PLUGIN_ID"]])){
                     continue;
                 }
@@ -696,7 +699,7 @@ class XMLWriter
                 $roleString.= ' hasMask="true" ';
             }
         }
-        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings($ctx)."</repo>";
 
     }
 

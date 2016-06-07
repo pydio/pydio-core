@@ -57,8 +57,8 @@ class GitManager extends AJXP_AbstractMetaSource
     {
         parent::initMeta($ctx, $accessDriver);
         require_once("VersionControl/Git.php");
-        $repo = $accessDriver->repository;
-        $this->repoBase = $repo->getOption("PATH");
+        $repo = $ctx->getRepository();
+        $this->repoBase = $repo->getContextOption($ctx, "PATH");
         if(empty($this->repoBase)){
             throw new Exception("Meta.git: cannot find PATH option in repository! Are you sure it's an FS-based workspace?");
         }

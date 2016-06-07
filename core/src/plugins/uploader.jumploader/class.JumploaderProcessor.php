@@ -355,7 +355,7 @@ class JumploaderProcessor extends Plugin
 
                     $this->logDebug($destStreamURL.$curDir);
                     $dirMode = 0775;
-                    $chmodValue = $repository->getOption("CHMOD_VALUE");
+                    $chmodValue = $repository->getContextOption($ctx, "CHMOD_VALUE");
                     if (isSet($chmodValue) && $chmodValue != "") {
                         $dirMode = octdec(ltrim($chmodValue, "0"));
                         if ($dirMode & 0400) $dirMode |= 0100; // Owner is allowed to read, allow to list the directory

@@ -59,15 +59,9 @@ class imapAccessDriver extends fsAccessDriver
         }
 
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
-        if ($this->repository->getOption("MAILBOX") != "") {
-            //$this->urlBase .= "/INBOX";
-        }
-        /*
-        if (!file_exists($this->urlBase)) {
-            throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
-        }
-        */
+        $uId = $contextInterface->hasUser() ? $contextInterface->getUser() : "shared";
+        $this->urlBase = "pydio://".$uId."@".$contextInterface->getRepositoryId();
+
     }
 
     public function performChecks()
@@ -179,7 +173,7 @@ class imapAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHandle = null)
+    public function countChildren($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHandle = null)
     {
         if($foldersOnly) return 0;
         $count = 0;

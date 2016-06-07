@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\FS;
 use PclZip;
 
 use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -81,24 +82,22 @@ class fsAccessWrapper implements IAjxpWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $path = self::unPatchPathForBaseDir($path);
-        $url = Utils::safeParseUrl($path);
-        $repoId = $url["host"];
-        $test = trim($url["path"], "/");
-        $atRoot = empty($test);
-        $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
+        $path       = self::unPatchPathForBaseDir($path);
+        $url        = Utils::safeParseUrl($path);
+        $node       = new AJXP_Node($path);
+        $repoObject = $node->getRepository();
+        $repoId     = $node->getRepositoryId();
+
+        if(!isSet($repoObject)) {
+            throw new \Exception("Cannot find repository with id ".$repoId);
+        }
         $split = UserSelection::detectZip($url["path"]);
         $insideZip = false;
         if($split && $streamType == "file" && $split[1] != "/") $insideZip = true;
         if($split && $streamType == "dir") $insideZip = true;
         if($skipZip) $insideZip = false;
 
-        $resolveUser = null;
-        if(isSet($url["user"]) && AuthService::usersEnabled()){
-            $resolveUser = ConfService::getConfStorageImpl()->createUserObject($url["user"]);
-        }
-        $resolvedPath = realpath(TextEncoder::toStorageEncoding($repoObject->getOption("PATH", false, $resolveUser)));
+        $resolvedPath = realpath(TextEncoder::toStorageEncoding($repoObject->getContextOption($node->getContext(), "PATH")));
 
         //var_dump($path);
         //var_dump($skipZip);

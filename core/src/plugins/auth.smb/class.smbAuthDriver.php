@@ -74,11 +74,10 @@ class smbAuthDriver extends AbstractAuthDriver
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
         $path = "";
-        $basePath = $repoObject->getOption("PATH", true);
-        $basePath = str_replace("AJXP_USER", $login, $basePath);
-        $host = $repoObject->getOption("HOST");
-        $domain = $repoObject->getOption("DOMAIN", true);
-        $smbPath = $repoObject->getOption("PATH", true);
+        $basePath   = $repoObject->getSafeOption("PATH");
+        $basePath   = str_replace("AJXP_USER", $login, $basePath);
+        $host       = $repoObject->getSafeOption("HOST");
+        $domain     = $repoObject->getSafeOption("DOMAIN");
 
         if(!empty($domain)){
             $login = $domain.$login;

@@ -66,8 +66,8 @@ class dropboxAccessDriver extends fsAccessDriver
             return;
         }
 
-        $consumerKey = $this->repository->getOption("CONSUMER_KEY");
-        $consumerSecret = $this->repository->getOption("CONSUMER_SECRET");
+        $consumerKey = $this->repository->getContextOption($contextInterface, "CONSUMER_KEY");
+        $consumerSecret = $this->repository->getContextOption($contextInterface, "CONSUMER_SECRET");
         $oauth = new \Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
 
         // TOKENS IN SESSION?
@@ -131,16 +131,13 @@ class dropboxAccessDriver extends fsAccessDriver
     public function getTokens(ContextInterface $ctx)
     {
         $repo = $ctx->getRepository();
-        if($repo->getOption("DROPBOX_OAUTH_TOKENS") !== null && is_array($repo->getOption("DROPBOX_OAUTH_TOKENS"))){
-            return $repo->getOption("DROPBOX_OAUTH_TOKENS");
+        if($repo->getContextOption($ctx, "DROPBOX_OAUTH_TOKENS") !== null && is_array($repo->getContextOption($ctx, "DROPBOX_OAUTH_TOKENS"))){
+            return $repo->getContextOption($ctx, "DROPBOX_OAUTH_TOKENS");
         }
         $repositoryId = $repo->getId();
         if(AuthService::usersEnabled()) {
             $u = $ctx->getUser();
             $userId = $u->getId();
-            if($u->getResolveAsParent()){
-                $userId = $u->getParent();
-            }
         }else {
             $userId = "shared";
         }

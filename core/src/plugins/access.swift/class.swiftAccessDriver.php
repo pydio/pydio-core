@@ -75,20 +75,20 @@ class swiftAccessDriver extends fsAccessDriver
         Bootstrap::useStreamWrappers();
 
         Bootstrap::setConfiguration(array(
-            'username' => $this->repository->getOption("USERNAME"),
-            'password' => $this->repository->getOption("PASSWORD"),
-            'tenantid' => $this->repository->getOption("TENANT_ID"),
-            'endpoint' => $this->repository->getOption("ENDPOINT"),
-            'openstack.swift.region'   => $this->repository->getOption("REGION"),
-            'transport.ssl.verify' => false
+            'username'              => $this->repository->getContextOption($contextInterface, "USERNAME"),
+            'password'              => $this->repository->getContextOption($contextInterface, "PASSWORD"),
+            'tenantid'              => $this->repository->getContextOption($contextInterface, "TENANT_ID"),
+            'endpoint'              => $this->repository->getContextOption($contextInterface, "ENDPOINT"),
+            'openstack.swift.region'=> $this->repository->getContextOption($contextInterface, "REGION"),
+            'transport.ssl.verify'  => false
         ));
 
 
-        $path = $this->repository->getOption("PATH");
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $recycle    = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $u = $contextInterface->hasUser() ? $contextInterface->getUser()->getId() : "shared";
+        $this->urlBase = "pydio://".$u."@".$this->repository->getId();
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
@@ -136,7 +136,7 @@ class swiftAccessDriver extends fsAccessDriver
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
         $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
-        $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
+        $newOptions["CONTAINER"] = $this->repository->getContextOption($ctx, "CONTAINER");
         return $newOptions;
     }
 

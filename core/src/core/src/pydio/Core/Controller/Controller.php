@@ -257,7 +257,7 @@ class Controller
         $parameters = $task->getParameters();
         $task->setStatus(Task::STATUS_RUNNING);
         TaskService::getInstance()->updateTask($task);
-        self::applyActionInBackground($task->getWsId(), $task->getAction(), $parameters, $task->getUserId(), "", $task->getId());
+        self::applyActionInBackground($task->getContext(), $task->getAction(), $parameters, "", $task->getId());
 
     }
 
@@ -279,29 +279,23 @@ class Controller
     /**
      * Launch a command-line version of the framework by passing the actionName & parameters as arguments.
      * @static
-     * @param String $currentRepositoryId
+     * @param ContextInterface $ctx
      * @param String $actionName
      * @param array $parameters
-     * @param string $user
      * @param string $statusFile
      * @param string $taskId
      * @return null|UnixProcess
      */
-    public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = "", $taskId = null)
+    public static function applyActionInBackground(ContextInterface $ctx, $actionName, $parameters, $statusFile = "", $taskId = null)
     {
+        $repositoryId = $ctx->getRepositoryId();
+        $user = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
 
         $token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
-        if (empty($user)) {
-            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) {
-                $user = AuthService::getLoggedUser()->getId();
-            }else {
-                $user = "shared";
-            }
-        }
-        
+
         if (Services\AuthService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){
@@ -310,10 +304,10 @@ class Controller
             $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token.$cKey), $user, MCRYPT_MODE_ECB));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
-        $cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+        $cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
         /* Inserted next 3 lines to quote the command if in windows - rmeske*/
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            $cmd = ConfService::getCoreConf("CLI_PHP")." ".chr(34).$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php".chr(34)." -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+            $cmd = ConfService::getCoreConf("CLI_PHP")." ".chr(34).$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php".chr(34)." -u=$user -t=$token -a=$actionName -r=$repositoryId";
         }
         if (!empty($statusFile)) {
             $cmd .= " -s=".$statusFile;
@@ -334,9 +328,9 @@ class Controller
             }
         }
 
-        $repoObject = ConfService::getRepositoryById($currentRepositoryId);
+        $repoObject = $ctx->getRepository();
         $clearEnv = false;
-        if($repoObject->getOption("USE_SESSION_CREDENTIALS")){
+        if($repoObject->getContextOption($ctx, "USE_SESSION_CREDENTIALS")){
             $encodedCreds = AJXP_Safe::getEncodedCredentialString();
             if(!empty($encodedCreds)){
                 putenv("AJXP_SAFE_CREDENTIALS=".$encodedCreds);

@@ -239,17 +239,7 @@ interface UserInterface extends AjxpGroupPathProvider
      * @return AJXP_Role
      */
     public function getPersonalRole();
-
-    /**
-     * @param bool $resolveAsParent
-     */
-    public function setResolveAsParent($resolveAsParent);
-
-    /**
-     * @return bool
-     */
-    public function getResolveAsParent();
-
+    
     /**
      * @return bool
      * @throws \Exception

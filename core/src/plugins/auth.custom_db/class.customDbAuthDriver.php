@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -188,7 +189,7 @@ class customDbAuthDriver extends AbstractAuthDriver
     {
         $p = Utils::cleanDibiDriverParameters($httpVars["SQL_CUSTOM_DRIVER"]);
         if ($p["driver"] == "sqlite3") {
-            $dbFile = VarsFilter::filter($p["database"]);
+            $dbFile = VarsFilter::filter($p["database"], Context::emptyContext());
             if (!file_exists(dirname($dbFile))) {
                 mkdir(dirname($dbFile), 0755, true);
             }

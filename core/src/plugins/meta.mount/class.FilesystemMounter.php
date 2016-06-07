@@ -49,8 +49,10 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
     {
         $this->accessDriver = $accessDriver;
         $this->repository = $ctx->getRepository();
-        if($this->isAlreadyMounted()) return;
-        $this->mountFS();
+        if($this->isAlreadyMounted($ctx)) {
+            return;
+        }
+        $this->mountFS($ctx);
     }
 
     /**
@@ -85,7 +87,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         return array($user, $password);
     }
 
-    protected function getOption($name, $user="", $pass="", $escapePass = true)
+    protected function getOption(ContextInterface $ctx, $name, $user="", $pass="", $escapePass = true)
     {
         $opt = $this->options[$name];
         $opt = str_replace("AJXP_USER", $user, $opt);
@@ -95,17 +97,17 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $opt = str_replace("AJXP_SERVER_GID", posix_getgid(), $opt);
         if (stristr($opt, "AJXP_REPOSITORY_PATH") !== false) {
             $repo = $this->repository;
-            $path = $repo->getOption("PATH");
+            $path = $repo->getContextOption($ctx, "PATH");
             $opt = str_replace("AJXP_REPOSITORY_PATH", $path, $opt);
         }
-        $opt = VarsFilter::filter($opt);
+        $opt = VarsFilter::filter($opt, $ctx);
         return $opt;
     }
 
-    protected function isAlreadyMounted()
+    protected function isAlreadyMounted(ContextInterface $contextInterface)
     {
         list($user, $password) = $this->getCredentials();
-        $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
+        $MOUNT_POINT = $this->getOption($contextInterface, "MOUNT_POINT", $user, $password);
         if( is_dir($MOUNT_POINT) ){
             $statParent = stat(dirname($MOUNT_POINT));
             $statMount = stat($MOUNT_POINT);
@@ -120,7 +122,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         }
     }
 
-    public function mountFS()
+    public function mountFS(ContextInterface $ctx)
     {
         list($user, $password) = $this->getCredentials();
         $this->logDebug("FSMounter::mountFS Should mount" . $user);
@@ -133,9 +135,9 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         }
 
         $MOUNT_TYPE = $this->options["FILESYSTEM_TYPE"];
-        $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
-        $MOUNT_POINT_ROOT = $this->getOption("MOUNT_POINT", "", "");
-        $create = $repo->getOption("CREATE");
+        $MOUNT_POINT = $this->getOption($ctx, "MOUNT_POINT", $user, $password);
+        $MOUNT_POINT_ROOT = $this->getOption($ctx, "MOUNT_POINT", "", "");
+        $create = $repo->getContextOption($ctx, "CREATE");
         if ( $MOUNT_POINT != $MOUNT_POINT_ROOT && !is_dir($MOUNT_POINT_ROOT) && $create) {
             @mkdir($MOUNT_POINT_ROOT, 0755);
         }
@@ -143,27 +145,27 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         if (!is_dir($MOUNT_POINT) && $create) {
             @mkdir($MOUNT_POINT, 0755);
         } else {
-            if ($repo->getOption("RECYCLE_BIN") != "") {
+            if ($repo->getContextOption($ctx, "RECYCLE_BIN") != "") {
                 // Make sure the recycle bin was not mounted inside the mount point!
-                $recycle = $repo->getOption("PATH")."/".$repo->getOption("RECYCLE_BIN");
+                $recycle = $repo->getContextOption($ctx, "PATH")."/".$repo->getContextOption($ctx, "RECYCLE_BIN");
                 if (@is_dir($recycle)) {
                     @rmdir($recycle);
                 }
             }
         }
-        $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
-        $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password, false);
+        $UNC_PATH = $this->getOption($ctx, "UNC_PATH", $user, $password, false);
+        $MOUNT_OPTIONS = $this->getOption($ctx, "MOUNT_OPTIONS", $user, $password, false);
 
         $cmd = $udevil."mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
-        if($this->getOption("MOUNT_ENV_PASSWD") == true){
+        if($this->getOption($ctx, "MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
         }
         system($cmd, $res);
-        if($this->getOption("MOUNT_ENV_PASSWD") == true){
+        if($this->getOption($ctx, "MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=");
         }
-        $resultsOptions = str_replace(" ", "", $this->getOption("MOUNT_RESULT_SUCCESS"));
+        $resultsOptions = str_replace(" ", "", $this->getOption($ctx, "MOUNT_RESULT_SUCCESS"));
         $acceptedResults = array(0);
         if(!empty($resultsOptions)){
             $acceptedResults = array_merge($acceptedResults, array_map("intval", explode(",", $resultsOptions)));
@@ -187,11 +189,11 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         }
     }
 
-    public function umountFS()
+    public function umountFS(ContextInterface $contextInterface)
     {
         $this->logDebug("FSMounter::unmountFS");
         list($user, $password) = $this->getCredentials();
-        $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
+        $MOUNT_POINT = $this->getOption($contextInterface, "MOUNT_POINT", $user, $password);
 
         if(isset($this->options["MOUNT_DEVIL"]) && !empty($this->options["MOUNT_DEVIL"]) && $this->options["MOUNT_DEVIL"]) {
             $udevil = "udevil ";
@@ -199,7 +201,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             $udevil = "";
         }
         system($udevil."umount ".escapeshellarg($MOUNT_POINT), $res);
-        if($this->getOption("REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted() ){
+        if($this->getOption($contextInterface, "REMOVE_MOUNTPOINT_ON_UNMOUNT") == true && $res == 0 && !$this->isAlreadyMounted($contextInterface) ){
             // Remove mount point
             $testRm = @rmdir($MOUNT_POINT);
             if($testRm === false){

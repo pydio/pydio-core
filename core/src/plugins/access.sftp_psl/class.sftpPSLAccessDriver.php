@@ -66,10 +66,7 @@ class sftpPSLAccessDriver extends fsAccessDriver
         ConfService::setConf("PROBE_REAL_SIZE", false);
 
         require_once($this->getBaseDir()."/SFTPPSL_StreamWrapper.php");
-
-        $create = $this->repository->getOption("CREATE");
-        $path = $this->repository->getOption("PATH");
-
+        
         $this->detectStreamWrapper(true);
         $this->urlBase = "pydio://".$this->repository->getId();
     }

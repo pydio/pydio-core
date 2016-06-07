@@ -21,11 +21,13 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\VarsFilter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -52,16 +54,24 @@ class smbAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = Utils::safeParseUrl($path);
-        $repoId = $url["host"];
-        $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
-        $path = $url["path"];
+        $node = new AJXP_Node($path);
+        $repoObject = $node->getRepository();
+        if(!isSet($repoObject)) {
+            throw new \Exception("Cannot find repository with id ".$node->getRepositoryId());
+        }
+        $path = $node->getPath();
         // Fix if the host is defined as //MY_HOST/path/to/folder
-        $hostOption = AuthService::getFilteredRepositoryOption("access.smb", $repoObject, "HOST");
+        $user = $node->getUser();
+        if($user != null){
+            $hostOption = $user->getMergedRole()->filterParameterValue("access.smb", "HOST", $node->getRepositoryId(), null);
+            if(!empty($hostOption)) $hostOption = VarsFilter::filter($hostOption, $node->getContext());
+        }
+        if(empty($hostOption)) {
+            $hostOption = $repoObject->getContextOption($node->getContext(), "HOST");
+        }
         $host = str_replace("//", "", $hostOption);
         $credentials = "";
-        $safeCreds = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
+        $safeCreds = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
         if ($safeCreds["user"] != "" && $safeCreds["password"] != "") {
             $login = $safeCreds["user"];
             $pass = $safeCreds["password"];

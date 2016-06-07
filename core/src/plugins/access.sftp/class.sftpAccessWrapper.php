@@ -22,9 +22,11 @@
 namespace Pydio\Access\Driver\StreamProvider\SFTP;
 
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -91,12 +93,15 @@ class sftpAccessWrapper extends fsAccessWrapper
     protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false)
     {
         $url = Utils::safeParseUrl($path);
-        $repoId = $url["host"];
-        $repoObject = ConfService::getRepositoryById($repoId);
-        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
-        $path = $url["path"];
+        $node = new AJXP_Node($path);
+        $repoObject = $node->getRepository();
+        if(!isSet($repoObject)) {
+            throw new \Exception("Cannot find repository with id ".$node->getRepositoryId());
+        }
+        $path = $node->getPath();
+        $ctx = $node->getContext();
         // MAKE SURE THERE ARE NO // OR PROBLEMS LIKE THAT...
-        $basePath = $repoObject->getOption("PATH");
+        $basePath = $repoObject->getContextOption($ctx, "PATH");
         if ($basePath[strlen($basePath)-1] == "/") {
             $basePath = substr($basePath, 0, -1);
         }
@@ -114,11 +119,12 @@ class sftpAccessWrapper extends fsAccessWrapper
     /**
      * Get ssh2 connection
      *
-     * @param Repository $repoObject
+     * @param ContextInterface $context
      * @return Resource
      */
-    protected static function getSftpResource($repoObject)
+    protected static function getSftpResource($context)
     {
+        $repoObject = $context->getRepository();
         if (isSet(self::$sftpResource) && self::$resourceRepoId == $repoObject->getId()) {
             return self::$sftpResource;
         }
@@ -126,9 +132,9 @@ class sftpAccessWrapper extends fsAccessWrapper
                             'ignore' 	=> "ignoreSftp",
                             'debug' 	=> "debugSftp",
                             'macerror'	=> "macerrorSftp");
-        $remote_serv = $repoObject->getOption("SERV");
-        $remote_port = $repoObject->getOption("PORT");
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repoObject);
+        $remote_serv = $repoObject->getContextOption($context, "SERV");
+        $remote_port = $repoObject->getContextOption($context, "PORT");
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($context);
         $remote_user = $credentials["user"];
         $remote_pass = $credentials["password"];
 
@@ -172,17 +178,17 @@ class sftpAccessWrapper extends fsAccessWrapper
     {
         $realPath = self::initPath($path);
         $stat = @stat($realPath);
-        $parts = Utils::safeParseUrl($path);
-        $repoObject = ConfService::getRepositoryById($parts["host"]);
-
-        AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
-
+        AbstractAccessDriver::fixPermissions(new AJXP_Node($path), $stat, array($this, "detectRemoteUserId"));
         return $stat;
     }
 
-    public function detectRemoteUserId($repository)
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public function detectRemoteUserId($node)
     {
-        list($connection, $remote_base_path) = self::getSshConnection("/", $repository);
+        list($connection, $remote_base_path) = self::getSshConnection($node->getContext());
         $stream = ssh2_exec($connection, "id");
         if ($stream !== false) {
             stream_set_blocking($stream, true);
@@ -303,31 +309,24 @@ class sftpAccessWrapper extends fsAccessWrapper
      * we have to recreate an ssh2 connexion.
      *
      * @param string $path
-     * @param long $chmodValue
+     * @param integer $chmodValue
      */
     public static function changeMode($path, $chmodValue)
     {
-        $url = Utils::safeParseUrl($path);
-        list($connection, $remote_base_path) = self::getSshConnection($path);
-        //var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
-        ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
+        $node = new AJXP_Node($path);
+        list($connection, $remote_base_path) = self::getSshConnection($node->getContext());
+        ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$node->getPath());
     }
 
-    public static function getSshConnection($path, $repoObject = null)
+    public static function getSshConnection(ContextInterface $ctx)
     {
-        if ($repoObject != null) {
-            $url = array();
-        } else {
-            $url = Utils::safeParseUrl($path);
-            $repoId = $url["host"];
-            $repoObject = ConfService::getRepositoryById($repoId);
-        }
-        $remote_serv = $repoObject->getOption("SERV");
-        $remote_port = $repoObject->getOption("PORT");
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
+        $repoObject  = $ctx->getRepository();
+        $remote_serv = $repoObject->getContextOption($ctx, "SERV");
+        $remote_port = $repoObject->getContextOption($ctx, "PORT");
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($ctx);
         $remote_user = $credentials["user"];
         $remote_pass = $credentials["password"];
-        $remote_base_path = $repoObject->getOption("PATH");
+        $remote_base_path = $repoObject->getContextOption($ctx, "PATH");
 
         $callbacks = array('disconnect' => "disconnectedSftp",
                             'ignore' 	=> "ignoreSftp",

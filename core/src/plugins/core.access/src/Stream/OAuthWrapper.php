@@ -11,6 +11,7 @@ namespace Pydio\Access\Core\Stream;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
@@ -51,22 +52,19 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
         if(AuthService::usersEnabled()) {
             $u = AuthService::getLoggedUser();
             $userId = $u->getId();
-            if($u->getResolveAsParent()){
-                $userId = $u->getParent();
-            }
         } else {
             $userId = 'shared';
         }
 
         // User information
-
+        $ctx = AJXP_Node::contextFromUrl($url);
         // Repository params
-        $clientId     = $repository->getOption('CLIENT_ID');
-        $clientSecret = $repository->getOption('CLIENT_SECRET');
-        $scope        = $repository->getOption('SCOPE');
-        $authUrl      = $repository->getOption('AUTH_URL');
-        $tokenUrl     = $repository->getOption('TOKEN_URL');
-        $redirectUrl  = $repository->getOption('REDIRECT_URL');
+        $clientId     = $repository->getContextOption($ctx, 'CLIENT_ID');
+        $clientSecret = $repository->getContextOption($ctx, 'CLIENT_SECRET');
+        $scope        = $repository->getContextOption($ctx, 'SCOPE');
+        $authUrl      = $repository->getContextOption($ctx, 'AUTH_URL');
+        $tokenUrl     = $repository->getContextOption($ctx, 'TOKEN_URL');
+        $redirectUrl  = $repository->getContextOption($ctx, 'REDIRECT_URL');
 
         $authUrl .= '?client_id=' . $clientId .
                     '&scope=' . $scope .

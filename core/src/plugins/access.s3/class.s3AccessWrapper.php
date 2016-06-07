@@ -21,8 +21,10 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -42,36 +44,37 @@ class s3AccessWrapper extends fsAccessWrapper
     protected static $clients = [];
 
     /**
-     * @param Repository $repoObject
+     * @param ContextInterface $ctx
      * @param boolean $registerStream
      * @return S3Client
      */
-    protected static function getClientForRepository($repoObject, $registerStream = true)
+    protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
         require_once("aws.phar");
+        $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
             // Get a client
             $options = array(
-                'key' => $repoObject->getOption("API_KEY"),
-                'secret' => $repoObject->getOption("SECRET_KEY")
+                'key'       => $repoObject->getContextOption($ctx, "API_KEY"),
+                'secret'    => $repoObject->getContextOption($ctx, "SECRET_KEY")
             );
-            $signatureVersion = $repoObject->getOption("SIGNATURE_VERSION");
+            $signatureVersion = $repoObject->getContextOption($ctx, "SIGNATURE_VERSION");
             if (!empty($signatureVersion)) {
                 $options['signature'] = $signatureVersion;
             }
-            $baseURL = $repoObject->getOption("STORAGE_URL");
+            $baseURL = $repoObject->getContextOption($ctx, "STORAGE_URL");
             if (!empty($baseURL)) {
                 $options["base_url"] = $baseURL;
             }
-            $region = $repoObject->getOption("REGION");
+            $region = $repoObject->getContextOption($ctx, "REGION");
             if (!empty($region)) {
                 $options["region"] = $region;
             }
-            $proxy = $repoObject->getOption("PROXY");
+            $proxy = $repoObject->getContextOption($ctx, "PROXY");
             if (!empty($proxy)) {
                 $options['request.options'] = array('proxy' => $proxy);
             }
-            $apiVersion = $repoObject->getOption("API_VERSION");
+            $apiVersion = $repoObject->getContextOption($ctx, "API_VERSION");
             if ($apiVersion === "") {
                 $apiVersion = "latest";
             }
@@ -91,7 +94,7 @@ class s3AccessWrapper extends fsAccessWrapper
                 $s3Client->registerStreamWrapper($repoObject->getId());
             } else {
                 $s3Client = Aws\S3\S3Client::factory($options);
-                if ($repoObject->getOption("VHOST_NOT_SUPPORTED")) {
+                if ($repoObject->getContextOption($ctx, "VHOST_NOT_SUPPORTED")) {
                     // Use virtual hosted buckets when possible
                     require_once("ForcePathStyleListener.php");
                     $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
@@ -116,22 +119,23 @@ class s3AccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = parse_url($path);
-        $repoId = $url["host"];
-        $repoObject = ConfService::getRepositoryById($repoId);
+        $url        = parse_url($path);
+        $node       = new AJXP_Node($path);
+        $repoId     = $node->getRepositoryId();
+        $repoObject = $node->getRepository();
         if (!isSet($repoObject)) {
             $e = new \Exception("Cannot find repository with id " . $repoId);
             self::$lastException = $e;
             throw $e;
         }
         // Make sure to register s3:// wrapper
-        $client = self::getClientForRepository($repoObject, true);
+        $client = self::getClientForContext($node->getContext(), true);
         $protocol = "s3://";
         if ($client instanceof S3Client) {
             $protocol = "s3." . $repoId . "://";
         }
-        $basePath = $repoObject->getOption("PATH");
-        $baseContainer = $repoObject->getOption("CONTAINER");
+        $basePath       = $repoObject->getContextOption($node->getContext(), "PATH");
+        $baseContainer  = $repoObject->getContextOption($node->getContext(), "CONTAINER");
         if (!empty($basePath)) {
             $baseContainer .= rtrim($basePath, "/");
         }
@@ -279,10 +283,16 @@ class s3AccessWrapper extends fsAccessWrapper
     public function rename($from, $to)
     {
 
-        $fromUrl = parse_url($from);
-        $repoId = $fromUrl["host"];
-        $repoObject = ConfService::getRepositoryById($repoId);
-        $isViPR = $repoObject->getOption("IS_VIPR");
+        $node = new AJXP_Node($from);
+        $ctx = $node->getContext();
+        $repoObject = $node->getRepository();
+        if (!isSet($repoObject)) {
+            $e = new \Exception("Cannot find repository with id " . $node->getRepositoryId());
+            self::$lastException = $e;
+            throw $e;
+        }
+
+        $isViPR = $repoObject->getContextOption($ctx, "IS_VIPR");
         $isDir = false;
         if ($isViPR === true) {
             if (is_dir($from . "/")) {
@@ -294,19 +304,9 @@ class s3AccessWrapper extends fsAccessWrapper
 
         if ($isDir === true || is_dir($from)) {
             AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Renaming dir $from to $to");
-            require_once("aws.phar");
-
-            $fromUrl = parse_url($from);
-            $repoId = $fromUrl["host"];
-            $repoObject = ConfService::getRepositoryById($repoId);
-            if (!isSet($repoObject)) {
-                $e = new \Exception("Cannot find repository with id " . $repoId);
-                self::$lastException = $e;
-                throw $e;
-            }
-            $s3Client = self::getClientForRepository($repoObject, false);
-            $bucket = $repoObject->getOption("CONTAINER");
-            $basePath = $repoObject->getOption("PATH");
+            $s3Client = self::getClientForContext($node->getContext(), false);
+            $bucket = $repoObject->getContextOption($ctx, "CONTAINER");
+            $basePath = $repoObject->getContextOption($ctx, "PATH");
             $fromKeyname = trim(str_replace("//", "/", $basePath . parse_url($from, PHP_URL_PATH)), '/');
             $toKeyname = trim(str_replace("//", "/", $basePath . parse_url($to, PHP_URL_PATH)), '/');
             if ($isViPR) {

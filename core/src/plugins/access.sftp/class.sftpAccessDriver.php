@@ -67,13 +67,14 @@ class sftpAccessDriver extends fsAccessDriver
             throw new \Exception("You must have the php ssh2 extension active!");
         }
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $path = $this->repository->getOption("PATH");
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $path       = $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
+        $recycle    = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $uId = $contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared";
+        $this->urlBase = "pydio://".$uId."@".$this->repository->getId();
         restore_error_handler();
         if (!file_exists($this->urlBase)) {
-            if ($this->repository->getOption("CREATE")) {
+            if ($contextInterface->getRepository()->getContextOption($contextInterface, "CREATE")) {
                 $test = @mkdir($this->urlBase);
                 if (!$test) {
                     throw new PydioException("Cannot create path ($path) for your repository! Please check the configuration.");
@@ -103,7 +104,7 @@ class sftpAccessDriver extends fsAccessDriver
             $srcFilePath = str_replace($this->urlBase, "", $srcFile);
             $destFilePath = str_replace($this->urlBase, "", $destFile);
             $destDirPath = dirname($destFilePath);
-            list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection($srcFile);
+            list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection(AJXP_Node::contextFromUrl($srcFile));
             $remoteSrc = $remote_base_path.$srcFilePath;
             $remoteDest = $remote_base_path.$destDirPath;
             $this->logDebug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));

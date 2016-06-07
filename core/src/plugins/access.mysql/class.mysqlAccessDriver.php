@@ -49,19 +49,19 @@ class mysqlAccessDriver extends AbstractAccessDriver
      */
     protected function initRepository(ContextInterface $contextInterface)
     {
-        $this->user = $this->repository->getOption("DB_USER");
-        $this->password = $this->repository->getOption("DB_PASS");
-        $link = $this->createDbLink();
+        $this->user     = $contextInterface->getRepository()->getContextOption($contextInterface, "DB_USER");
+        $this->password = $contextInterface->getRepository()->getContextOption($contextInterface, "DB_PASS");
+        $link           = $this->createDbLink($contextInterface);
         $this->closeDbLink($link);
     }
 
 
-    public function createDbLink()
+    public function createDbLink(ContextInterface $ctx)
     {
         $link = FALSE;
         //Connects to the MySQL Database.
-        $host = $this->repository->getOption("DB_HOST");
-        $dbname = $this->repository->getOption("DB_NAME");
+        $host   = $ctx->getRepository()->getContextOption($ctx, "DB_HOST");
+        $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
         $link = @mysql_connect($host, $this->user, $this->password);
         if (!$link) {
             throw new PydioException("Cannot connect to server!");
@@ -79,7 +79,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
         }
     }
 
-    public function switchAction($action, $httpVars, $fileVars)
+    public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
@@ -149,7 +149,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     }
                     $query = "UPDATE $tableName SET $string WHERE $pkName='$pkValue'";
                 }
-                $link = $this->createDbLink();
+                $link = $this->createDbLink($ctx);
                 $res = $this->execQuery($query);
                 $this->closeDbLink($link);
 
@@ -165,7 +165,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             //	CHANGE COLUMNS OR CREATE TABLE
             //------------------------------------
             case "edit_table":
-                $link = $this->createDbLink();
+                $link = $this->createDbLink($ctx);
                 if (isSet($httpVars["current_table"])) {
                     if (isSet($httpVars["delete_column"])) {
                         $query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
@@ -274,7 +274,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             case "delete_table":
             case "delete_record":
                 $dir = basename($dir);
-                $link = $this->createDbLink();
+                $link = $this->createDbLink($ctx);
                 if (trim($dir) == "") {
                     // ROOT NODE => DROP TABLES
                     $tables = $selection->getFiles();
@@ -332,11 +332,11 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     else if($mode == "file_list") $fileListMode = true;
                     else if($mode == "complete") $completeMode = true;
                 }
-                $link = $this->createDbLink();
+                $link = $this->createDbLink($ctx);
                 //AJXP_Exception::errorToXml($link);
                 if ($dir == "") {
                     XMLWriter::header();
-                    $tables = $this->listTables();
+                    $tables = $this->listTables($ctx);
                     XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
@@ -345,7 +345,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                             $size = 'N/A';
                             $count = 'N/A';
                         }else{
-                            $size = $this->getSize($tableName);
+                            $size = $this->getSize($ctx, $tableName);
                             $count = $this->getCount($tableName);
                         }
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
@@ -372,7 +372,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                             break;
                         }
                     }
-                    if (isSet($order_column)) {
+                    if (isSet($order_column) && isSet($order_direction)) {
                         $query .= " ORDER BY $order_column ".strtoupper($order_direction);
                         if (!isSet($_SESSION["AJXP_ORDER_DATA"])) {
                             $_SESSION["AJXP_ORDER_DATA"] = array();
@@ -386,7 +386,8 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         }
                     }
                     try {
-                        $result = $this->showRecords($query, $tableName, $currentPage);
+                        $result = $this->showRecords($ctx, $query, $tableName, $currentPage);
+                        $count = count($result);
                     } catch (PydioException $ex) {
                         unset($_SESSION["LAST_SQL_QUERY"]);
                         throw $ex;
@@ -405,7 +406,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                     XMLWriter::sendFilesListComponentConfig($columnsString);
                     //print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
                     if ($result["TOTAL_PAGES"] > 1) {
-                        XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
+                        XMLWriter::renderPaginationData($count, $currentPage, $result["TOTAL_PAGES"]);
                     }
                     foreach ($result["ROWS"] as $arbitIndex => $row) {
                         print '<tree ';
@@ -462,10 +463,9 @@ class mysqlAccessDriver extends AbstractAccessDriver
         return $xmlBuffer;
     }
 
-    public function getSize($tablename)
+    public function getSize(ContextInterface $ctx, $tablename)
     {
-        $repo = ConfService::getRepository();
-        $dbname = $repo->getOption("DB_NAME");
+        $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
         $like="";
         $total="";
         $t=0;
@@ -562,10 +562,9 @@ class mysqlAccessDriver extends AbstractAccessDriver
         return $allTables;
     }
     /*/
-    public function listTables()
+    public function listTables(ContextInterface $ctx)
     {
-        $repo = ConfService::getRepository();
-        $result = mysql_query("SHOW TABLES FROM `".$repo->getOption("DB_NAME")."` LIKE '".$repo->getOption("DB_PTRN")."%'");
+        $result = mysql_query("SHOW TABLES FROM `".$ctx->getRepository()->getContextOption($ctx, "DB_NAME")."` LIKE '".$ctx->getRepository()->getContextOption($ctx, "DB_PTRN")."%'");
         $allTables = array();
         while ($row = mysql_fetch_row($result)) {
            $allTables[] = $row[0];
@@ -574,11 +573,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
     }
     //*/
 
-    public function showRecords($query, $tablename, $currentPage=1, $rpp=50, $searchval='' )
+    public function showRecords(ContextInterface $ctx, $query, $tablename, $currentPage=1, $rpp=50, $searchval='' )
     {
-        $repo = ConfService::getRepository();
-        $dbname=$repo->getOption("DB_NAME");
-        $result=$this->execQuery($query);
+        $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
+        $result = $this->execQuery($query);
 
         $columns = array();
         $rows = array();

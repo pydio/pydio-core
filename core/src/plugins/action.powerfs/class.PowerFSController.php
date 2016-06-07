@@ -80,10 +80,12 @@ class PowerFSController extends Plugin
                 $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
-                    $response = $response->withBody(new \Pydio\Core\Http\Response\AsyncResponseStream(function() use($fsDriver, $archive, $archiveName){
+                    $fileReader = new \Pydio\Core\Http\Response\FileReaderResponse($archive);
+                    $fileReader->setLocalName($archiveName);
+                    $fileReader->setPreReadCallback(function () use ($archive) {
                         register_shutdown_function("unlink", $archive);
-                        $fsDriver->readFile($archive, "force-download", $archiveName, false, null, true);
-                    }));
+                    });
+                    $response = $response->withBody($fileReader);
                 } else {
                     $response = $response->withHeader("Content-type", "text/html");
                     $response->getBody()->write("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");

@@ -34,12 +34,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class EncfsMounter extends Plugin
 {
-
+    /**
+     * @param ContextInterface $contextInterface
+     * @return string
+     */
     protected function getWorkingPath(ContextInterface $contextInterface)
     {
-        $repo = $contextInterface->getRepository();
-        $path = $repo->getOption("PATH");
-        return $path;
+        return $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
     }
 
     public function cypherAllMounted($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)

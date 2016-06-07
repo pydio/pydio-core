@@ -156,15 +156,10 @@ class EmlParser extends Plugin
                 $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
-                $attachRepo = $ctx->getRepository();
-                $async = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use($part, $attachRepo){
-                    if ($part !== false) {
-                        $fake = new fsAccessDriver("fake", "");
-                        $fake->repository = $attachRepo;
-                        $fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
-                    }
-                });
-                $responseInterface = $responseInterface->withBody($async);
+
+                $fileReader = new \Pydio\Core\Http\Response\FileReaderResponse(null, $part->body);
+                $fileReader->setLocalName($part->d_parameters['filename']);
+                $responseInterface = $responseInterface->withBody($fileReader);
 
             break;
 
@@ -316,14 +311,12 @@ class EmlParser extends Plugin
         file_put_contents($targetFile, serialize($metadata));
     }
 
-    public function lsPostProcess($action, $httpVars, $outputVars)
+    public function lsPostProcess(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         if (!EmlParser::$currentListingOnlyEmails) {
-            if(isSet($httpVars["playlist"])) return;
             header('Content-Type: text/xml; charset=UTF-8');
             header('Cache-Control: no-cache');
-            print($outputVars["ob_output"]);
-            return;
+            return $responseInterface;
         }
 
         $config = '<columns template_name="eml.list">
@@ -335,8 +328,10 @@ class EmlParser extends Plugin
             <column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number" modifier="EmlViewer.prototype.attachmentCellRenderer" fixedWidth="30"/>
         </columns>';
 
+        $responseData = $responseInterface->getBody()->getContents();
+
         $dom = new DOMDocument("1.0", "UTF-8");
-        $dom->loadXML($outputVars["ob_output"]);
+        $dom->loadXML($responseData);
         $mobileAgent = Utils::userAgentIsIOS() || Utils::userAgentIsNativePydioApp();
         $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
@@ -366,9 +361,11 @@ class EmlParser extends Plugin
         $insert->loadXML($config);
         $imported = $dom->importNode($insert->documentElement, true);
         $dom->documentElement->appendChild($imported);
-        header('Content-Type: text/xml; charset=UTF-8');
-        header('Cache-Control: no-cache');
-        print($dom->saveXML());
+        $responseInterface = new \Zend\Diactoros\Response();
+        $responseInterface = $responseInterface->withHeader("ContentType", "text/xml");
+        $responseInterface = $responseInterface->withHeader("Cache-Control", "no-cache");
+        $responseInterface->getBody()->write($dom->saveXML());
+        return $responseInterface;
     }
 
     /**

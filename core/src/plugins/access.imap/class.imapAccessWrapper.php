@@ -22,6 +22,7 @@ namespace Pydio\Access\Driver\StreamProvider\Imap;
 
 use EmlParser;
 use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\TextEncoder;
@@ -89,8 +90,10 @@ class imapAccessWrapper implements IAjxpWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         // parse URL
+        $node = new AJXP_Node($path);
         $parts = Utils::safeParseUrl($path);
-        $this->repositoryId = $parts["host"];
+        $this->repositoryId = $node->getRepositoryId();
+
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
         if (!isset(self::$delimiter) && file_exists($mainCacheDir."/access.imap/mailbox_delim_".$this->repositoryId)) {
             self::$delimiter = file_get_contents($mainCacheDir."/access.imap/mailbox_delim_".$this->repositoryId);
@@ -153,13 +156,13 @@ class imapAccessWrapper implements IAjxpWrapper
             $this->dir_rewinddir();
             $this->stream_seek(0);
         } else {
-            $repository = ConfService::getRepositoryById($this->repositoryId);
-            $ssl = $repository->getOption("SSL") == "true" ? true: false ;
-            $this->pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
-            $this->host = $repository->getOption("HOST");
-            $this->port = $repository->getOption("PORT");
-            $this->username = $repository->getOption("USER");
-            $this->password = $repository->getOption("PASS");
+            $ctx = $node->getContext();
+            $ssl            = $ctx->getRepository()->getContextOption($ctx, "SSL") == "true" ? true: false ;
+            $this->pop3     = $ctx->getRepository()->getContextOption($ctx, "BOX_TYPE") == "pop3" ? true : false;
+            $this->host     = $ctx->getRepository()->getContextOption($ctx, "HOST");
+            $this->port     = $ctx->getRepository()->getContextOption($ctx, "PORT");
+            $this->username = $ctx->getRepository()->getContextOption($ctx, "USER");
+            $this->password = $ctx->getRepository()->getContextOption($ctx, "PASS");
             $server = "{". $this->host . ":" . $this->port . "/".($this->pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
             self::$currentRef = $server;
             AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Opening a new stream ".$server." with mailbox '".$this->mailbox."'");

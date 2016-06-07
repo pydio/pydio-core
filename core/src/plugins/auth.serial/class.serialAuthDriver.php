@@ -44,7 +44,7 @@ class serialAuthDriver extends AbstractAuthDriver
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        $this->usersSerFile = VarsFilter::filter($this->getOption("USERS_FILEPATH"));
+        $this->usersSerFile = VarsFilter::filter($this->getOption("USERS_FILEPATH"), $ctx);
     }
 
     public function performChecks()

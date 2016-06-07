@@ -123,6 +123,18 @@ class UserSelection
     }
 
     /**
+     * @param string $path
+     * @return AJXP_Node
+     */
+    public function nodeForPath($path){
+        $n = new AJXP_Node(rtrim($this->currentBaseUrl(), "/").$path);
+        if($this->context->hasUser()){
+            $n->setUserId($this->context->getUser()->getId());
+        }
+        return $n;
+    }
+
+    /**
      * @return ContextInterface
      */
     public function getContext()
@@ -286,14 +298,10 @@ class UserSelection
         if (isSet($this->nodes) && is_array($this->nodes)) {
             return $this->nodes[0];
         }
-        if(!$this->context->hasRepository()){
-            throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
-        }
         $currentFile = $this->getUniqueFile();
-        $urlBase = "pydio://".$this->context->getRepositoryId();
-        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        $ajxpNode = new AJXP_Node($this->currentBaseUrl().$currentFile);
         if($this->context->hasUser()){
-            $ajxpNode->setUser($this->context->getUser()->getId());
+            $ajxpNode->setUserId($this->context->getUser()->getId());
         }
         return $ajxpNode;
 
@@ -308,15 +316,11 @@ class UserSelection
         if (isSet($this->nodes)) {
             return $this->nodes;
         }
-        if(!$this->context->hasRepository()){
-            throw new \Exception("UserSelection: cannot build nodes URL without a proper repository");
-        }
-        $urlBase = "pydio://".$this->context->getRepositoryId();
         $nodes = array();
         foreach ($this->files as $file) {
-            $node = new AJXP_Node($urlBase.$file);
+            $node = new AJXP_Node($this->currentBaseUrl().$file);
             if($this->context->hasUser()){
-                $node->setUser($this->context->getUser()->getId());
+                $node->setUserId($this->context->getUser()->getId());
             }
             $nodes[] = $node;
         }
@@ -328,7 +332,8 @@ class UserSelection
         if(!$this->context->hasRepository()){
             throw new \Exception("UserSelection::currentBaseUrl: cannot build nodes URL without a proper repository");
         }
-        return "pydio://".$this->context->getRepositoryId();
+        $uId = $this->context->hasUser()?$this->context->getUser()->getId():"shared";
+        return "pydio://".$uId."@".$this->context->getRepositoryId();
     }
 
     /**

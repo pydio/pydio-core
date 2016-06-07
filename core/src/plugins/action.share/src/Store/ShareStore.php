@@ -491,13 +491,13 @@ class ShareStore {
                 if(!isSet($meta["shares"])){
                     continue;
                 }
-                $changeOldNode->setUser($ownerId);
+                $changeOldNode->setUserId($ownerId);
                 /// do something
                 $changeNewNode = null;
                 if(!$delete){
                     //$newPath = preg_replace('#^'.preg_quote($oldPath, '#').'#', $newPath, $path);
                     $changeNewNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$newPath.$relativePath);
-                    $changeNewNode->setUser($ownerId);
+                    $changeNewNode->setUserId($ownerId);
                 }
                 $collectedRepositories = array();
                 list($privateShares, $publicShares) = $this->moveSharesFromMeta($meta["shares"], $delete?"delete":"move", $changeOldNode, $changeNewNode, $collectedRepositories, $parentRepositoryPath);
@@ -505,7 +505,7 @@ class ShareStore {
                 if($basePath == "/"){
                     // Just update target node!
                     $changeMetaNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$relativePath);
-                    $changeMetaNode->setUser($ownerId);
+                    $changeMetaNode->setUserId($ownerId);
                     $this->getMetaManager()->clearNodeMeta($changeMetaNode);
                     if(count($privateShares)){
                         $this->getMetaManager()->setNodeMeta($changeMetaNode, array("shares" => $privateShares), true);
@@ -740,34 +740,6 @@ class ShareStore {
         }
 
     }
-
-
-
-    /**
-     * @param array $data
-     * @param AbstractAccessDriver $accessDriver
-     * @param \Pydio\Access\Core\Model\Repository $repository
-     */
-    public function storeSafeCredentialsIfNeeded(&$data, $accessDriver, $repository){
-        $storeCreds = false;
-        if ($repository->getOption("META_SOURCES")) {
-            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
-            foreach ($options["META_SOURCES"] as $metaSource) {
-                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
-                    $storeCreds = true;
-                    break;
-                }
-            }
-        }
-        if ($storeCreds || $accessDriver->hasMixin("credentials_consumer")) {
-            $cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repository);
-            if (isSet($cred["user"]) && isset($cred["password"])) {
-                $data["SAFE_USER"] = $cred["user"];
-                $data["SAFE_PASS"] = $cred["password"];
-            }
-        }
-    }
-
 
     /**
      * Computes a short form of the hash, checking if it already exists in the folder,

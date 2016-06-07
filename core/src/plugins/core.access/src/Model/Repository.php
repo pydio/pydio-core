@@ -22,6 +22,9 @@ namespace Pydio\Access\Core\Model;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
@@ -260,14 +263,14 @@ class Repository implements RepositoryInterface
         }
     }
 
-    public function getClientSettings()
+    public function getClientSettings(ContextInterface $ctx)
     {
         $plugin = $this->driverInstance;
         if(!$plugin) return "";
         if (isSet($this->parentId)) {
             $parentObject = ConfService::getRepositoryById($this->parentId);
             if ($parentObject != null && $parentObject->isTemplate) {
-                $ic = $parentObject->getOption("TPL_ICON_SMALL");
+                $ic = $parentObject->getContextOption($ctx, "TPL_ICON_SMALL");
                 $settings = $plugin->getManifestRawContent("//client_settings", "node");
                 if (!empty($ic) && $settings->length) {
                     $newAttr = $settings->item(0)->ownerDocument->createAttribute("icon_tpl_id");
@@ -286,6 +289,60 @@ class Repository implements RepositoryInterface
             $oValue = str_replace("\\", "/", $oValue);
         }
         $this->options[$oName] = $oValue;
+    }
+
+    /**
+     * @param string $oName
+     * @return mixed|string
+     * @throws \Exception
+     */
+    public function getSafeOption($oName){
+        if (isSet($this->options[$oName])) {
+            $value = $this->options[$oName];
+            return $value;
+        }
+        if ($this->inferOptionsFromParent && isSet($this->parentId)) {
+            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            if(empty($parentTemplateObject) || !$parentTemplateObject instanceof RepositoryInterface) {
+                throw new PydioException("Option should be loaded from parent repository, but it was not found");
+            }
+            return $parentTemplateObject->getSafeOption($oName);
+        }
+        return null;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param string $oName
+     * @return mixed
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function getContextOption(ContextInterface $ctx, $oName){
+        if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
+            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
+                throw new PydioException("Option should be loaded from parent repository, but it was not found");
+            }
+        }
+        if ($this->inferOptionsFromParent && isSet($parentTemplateObject)) {
+            $pvalue = $parentTemplateObject->getContextOption($ctx, $oName);
+            $pathChanged = false;
+            if (is_string($pvalue) && strstr($pvalue, "AJXP_ALLOW_SUB_PATH") !== false) {
+                $pvalue = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $pvalue), "/")."/".$this->options[$oName];
+                $pathChanged = true;
+            }
+            if ($pathChanged) {
+                return \Pydio\Core\Utils\Utils::securePath($pvalue);
+            }
+        }
+        if (isSet($this->options[$oName])) {
+            return VarsFilter::filter($this->options[$oName], $ctx);
+        }
+        if ($this->inferOptionsFromParent && isset($parentTemplateObject)) {
+                return $parentTemplateObject->getContextOption($ctx, $oName);
+        }
+        return null;
+
     }
 
     public function getOption($oName, $safe=false, $resolveUser = null)
@@ -319,7 +376,9 @@ class Repository implements RepositoryInterface
         }
         if (isSet($this->options[$oName])) {
             $value = $this->options[$oName];
-            if(!$safe) $value = VarsFilter::filter($value, $resolveUser);
+            $tmpContext = Context::fromGlobalServices();
+            if($resolveUser !== null) $tmpContext->setUserId($resolveUser);
+            if(!$safe) $value = VarsFilter::filter($value, $tmpContext);
             return $value;
         }
         if ($this->inferOptionsFromParent) {
@@ -346,7 +405,7 @@ class Repository implements RepositoryInterface
 
     public function getDefaultRight()
     {
-        $opt = $this->getOption("DEFAULT_RIGHTS");
+        $opt = $this->getSafeOption("DEFAULT_RIGHTS");
         return (isSet($opt)?$opt:"");
     }
 
@@ -364,7 +423,7 @@ class Repository implements RepositoryInterface
                 return $mess[$this->displayStringId];
             }
         }
-        return VarsFilter::filter($this->display);
+        return VarsFilter::filter($this->display, Context::fromGlobalServices());
     }
 
     public function getId()
@@ -375,7 +434,7 @@ class Repository implements RepositoryInterface
 
     public function getCreate()
     {
-        return (bool) $this->getOption("CREATE");
+        return (bool) $this->getSafeOption("CREATE");
     }
 
     public function setCreate($create)
@@ -539,19 +598,19 @@ class Repository implements RepositoryInterface
         if($this->hasParent()){
             $parentRepo = ConfService::getRepositoryById($this->getParentId());
             if(!empty($parentRepo) && $parentRepo->isTemplate){
-                $path = $parentRepo->getOption("PATH", true);
-                $container = $parentRepo->getOption("CONTAINER", true);
+                $path = $parentRepo->getSafeOption("PATH");
+                $container = $parentRepo->getSafeOption("CONTAINER");
                 // If path is set in the template, compute identifier from the template path.
                 if(!empty($path) || !empty($container)) return $parentRepo->securityScope();
             }
         }
-        $path = $this->getOption("CONTAINER", true);
+        $path = $this->getSafeOption("CONTAINER");
         if(!empty($path)){
             if(strpos($path, "AJXP_USER") !== false) return "USER";
             if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
             if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
         }
-        $path = $this->getOption("PATH", true);
+        $path = $this->getSafeOption("PATH");
         if($this->accessType == "ajxp_conf" || $this->accessType == "ajxp_admin" || $this->accessType == "inbox") return "USER";
         if(empty($path)) return false;
         if(strpos($path, "AJXP_USER") !== false) return "USER";

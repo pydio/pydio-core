@@ -69,7 +69,7 @@ class SvnManager extends AJXP_AbstractMetaSource
         parent::init($ctx, $this->options);
     }
 
-    protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)
+    protected function initDirAndSelection(ContextInterface $ctx, $httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
         $repo = $this->accessDriver->repository;
         $userSelection = new UserSelection($repo, $httpVars);
@@ -77,11 +77,12 @@ class SvnManager extends AJXP_AbstractMetaSource
         $result = array();
 
         if ($testRecycle) {
-            $recycle = $repo->getOption("RECYCLE_BIN");
+            $recycle = $repo->getContextOption($ctx, "RECYCLE_BIN");
             if ($recycle != "") {
                 RecycleBinManager::init($urlBase, "/".$recycle);
-                $result["RECYCLE"] = RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars);
-                // if necessary, check recycle was checked.
+                RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars);
+                $result["RECYCLE"] = $recycle;
+                    // if necessary, check recycle was checked.
                 // We could use a hook instead here? Maybe the full recycle system
                 // could be turned into a plugin
                 $sessionKey = "AJXP_SVN_".$repo->getId()."_RECYCLE_CHECKED";
@@ -156,9 +157,9 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function switchAction($actionName, $httpVars, $filesVars)
+    public function switchAction($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
-        $init = $this->initDirAndSelection($httpVars);
+        $init = $this->initDirAndSelection($ctx, $httpVars);
         if ($actionName == "svnlog") {
             $res1 = ExecSvnCmd("svnversion", $init["DIR"]);
             $test = trim(implode("", $res1[IDX_STDOUT]));
@@ -230,22 +231,22 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function addSelection($actionName, $httpVars, $filesVars)
+    public function addSelection($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
         switch ($actionName) {
             case "mkdir":
-                $init = $this->initDirAndSelection($httpVars, array("NEW_DIR" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
+                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_DIR" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_DIR"]);
                 $this->commitMessageParams = $httpVars["dirname"];
             break;
             case "mkfile":
-                $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
+                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_FILE" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
                 $this->commitMessageParams = $httpVars["filename"];
             break;
             case "upload":
                 if (isSet($filesVars) && isSet($filesVars["userfile_0"]) && isSet($filesVars["userfile_0"]["name"])) {
-                    $init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => TextEncoder::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
+                    $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_FILE" => TextEncoder::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
                     $res = ExecSvnCmd("svn status ", $init["NEW_FILE"]);
                     if (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?") {
                         $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
@@ -262,13 +263,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
-    public function copyOrMoveSelection($actionName, &$httpVars, $filesVars)
+    public function copyOrMoveSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
     {
         if ($actionName != "rename") {
-            $init = $this->initDirAndSelection($httpVars, array("DEST_DIR" => Utils::decodeSecureMagic($httpVars["dest"])));
+            $init = $this->initDirAndSelection($ctx, $httpVars, array("DEST_DIR" => Utils::decodeSecureMagic($httpVars["dest"])));
             $this->commitMessageParams = "To:".$httpVars["dest"].";items:";
         } else {
-            $init = $this->initDirAndSelection($httpVars, array(), true);
+            $init = $this->initDirAndSelection($ctx, $httpVars, array(), true);
         }
         $this->logDebug("Entering SVN MAnager for action $actionName", $init);
         $action = 'copy';
@@ -301,12 +302,12 @@ class SvnManager extends AJXP_AbstractMetaSource
         XMLWriter::close();
     }
 
-    public function deleteSelection($actionName, &$httpVars, $filesVars)
+    public function deleteSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
     {
-        $init = $this->initDirAndSelection($httpVars, array(), true);
+        $init = $this->initDirAndSelection($ctx, $httpVars, array(), true);
         if (isSet($init["RECYCLE"]) && isSet($init["RECYCLE"]["action"]) && $init["RECYCLE"]["action"] != "delete") {
             $httpVars["dest"] = TextEncoder::fromUTF8($init["RECYCLE"]["dest"]);
-            $this->copyOrMoveSelection("move", $httpVars, $filesVars);
+            $this->copyOrMoveSelection("move", $httpVars, $filesVars, $ctx);
             $userSelection = $init["ORIGINAL_SELECTION"];
             $files = $userSelection->getFiles();
             if ($actionName == "delete") {
@@ -335,10 +336,10 @@ class SvnManager extends AJXP_AbstractMetaSource
         XMLWriter::close();
     }
 
-    public function commitChanges($actionName, $httpVars, $filesVars)
+    public function commitChanges($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
         if (is_array($httpVars)) {
-            $init = $this->initDirAndSelection($httpVars);
+            $init = $this->initDirAndSelection($ctx, $httpVars);
             $args = $init["DIR"];
         } else {
             $args = $httpVars;

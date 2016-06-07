@@ -71,7 +71,7 @@ class smbAccessDriver extends fsAccessDriver
         require_once($this->getBaseDir()."/smb.php");
 
         //$create = $this->repository->getOption("CREATE");
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
 
         $this->detectStreamWrapper(true);
         $this->urlBase = "pydio://".$this->repository->getId();

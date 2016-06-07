@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -83,9 +84,9 @@ class AJXP_SerialUser extends AbstractAjxpUser
             }
         }
         parent::setGroupPath($groupPath);
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         $groups[$this->getId()] = $groupPath;
-        Utils::saveSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        Utils::saveSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser", $groups);
     }
 
     public function __wakeup()
@@ -98,7 +99,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $subDir = trim($this->getGroupPath(), "/");
         $id = $this->getId();
         if(AuthService::ignoreUserCase()) $id = strtolower($id);
-        $res = VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$id;
+        $res = VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/".(empty($subDir)?"":$subDir."/").$id;
         return $res;
     }
 
@@ -109,7 +110,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
 
     public function load()
     {
-        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups = Utils::loadSerialFile(VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/groups.ser");
         if(isSet($groups[$this->getId()])) $this->groupPath = $groups[$this->getId()];
 
         $this->create = false;

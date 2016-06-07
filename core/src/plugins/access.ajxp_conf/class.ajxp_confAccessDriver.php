@@ -721,8 +721,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                         $meta = array();
                         try{
-                            if($repositoryObject->getOption("META_SOURCES") != null){
-                                $meta = array_keys($repositoryObject->getOption("META_SOURCES"));
+                            $metaSources = $repositoryObject->getContextOption($ctx, "META_SOURCES");
+                            if($metaSources !== ""){
+                                $meta = array_keys($metaSources);
                             }
                         }catch(\Exception $e){
                             if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
@@ -1722,7 +1723,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $existing = $repo->getOptionsDefined();
                     $existingValues = array();
                     if(!$repo->isTemplate){
-                        foreach($existing as $exK) $existingValues[$exK] = $repo->getOption($exK, true);
+                        foreach($existing as $exK) {
+                            $existingValues[$exK] = $repo->getSafeOption($exK);
+                        }
                     }
                     $this->parseParameters($ctx, $httpVars, $options, true, $existingValues);
                     if (count($options)) {
@@ -1757,7 +1760,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             }
                         }
                     }
-                    if ($repo->getOption("DEFAULT_RIGHTS")) {
+                    if ($repo->getContextOption($ctx, "DEFAULT_RIGHTS")) {
                         $gp = $repo->getGroupPath();
                         if (empty($gp) || $gp == "/") {
                             $defRole = AuthService::getRole("AJXP_GRP_/");
@@ -1765,7 +1768,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             $defRole = AuthService::getRole("AJXP_GRP_".$gp, true);
                         }
                         if ($defRole !== false) {
-                            $defRole->setAcl($repId, $repo->getOption("DEFAULT_RIGHTS"));
+                            $defRole->setAcl($repId, $repo->getContextOption($ctx, "DEFAULT_RIGHTS"));
                             AuthService::updateRole($defRole);
                         }
                     }
@@ -1831,7 +1834,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = array();
                     $this->parseParameters($ctx, $httpVars, $options, true);
                 }
-                $repoOptions = $repo->getOption("META_SOURCES");
+                $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                 if (is_array($repoOptions) && isSet($repoOptions[$metaSourceType])) {
                     throw new \Exception($mess["ajxp_conf.55"]);
                 }
@@ -1855,7 +1858,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new \Exception("Invalid workspace id! $repId");
                 }
                 $metaSourceId = $httpVars["plugId"];
-                $repoOptions = $repo->getOption("META_SOURCES");
+                $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                 if (is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)) {
                     unset($repoOptions[$metaSourceId]);
                     uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
@@ -1878,7 +1881,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if(isSet($httpVars["plugId"])){
                     $metaSourceId = $httpVars["plugId"];
-                    $repoOptions = $repo->getOption("META_SOURCES");
+                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                     if (!is_array($repoOptions)) {
                         $repoOptions = array();
                     }
@@ -1894,7 +1897,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repoOptions[$metaSourceId] = $options;
                 }else if(isSet($httpVars["bulk_data"])){
                     $bulkData = json_decode(TextEncoder::magicDequote($httpVars["bulk_data"]), true);
-                    $repoOptions = $repo->getOption("META_SOURCES");
+                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                     if (!is_array($repoOptions)) {
                         $repoOptions = array();
                     }

@@ -83,18 +83,19 @@ class ftpAccessDriver extends fsAccessDriver
      */
     protected function initRepository(ContextInterface $contextInterface)
     {
+
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
         } else {
             $this->driverConf = array();
         }
         $this->detectStreamWrapper(true);
-        $this->urlBase = "pydio://".$this->repository->getId();
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $this->urlBase = "pydio://".$contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared"."@".$contextInterface->getRepositoryId();
+        $recycle = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
-        //AJXP_PromptException::testOrPromptForCredentials("ftp_ws_credentials", $this->repository->getId());
+
     }
 
     public function uploadActions(ServerRequestInterface &$request, ResponseInterface &$response)
@@ -189,7 +190,7 @@ class ftpAccessDriver extends fsAccessDriver
                             "destination" => base64_encode($destinationFolder)
                         ];
 
-                        $destCopy = XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
+                        $destCopy = XMLWriter::replaceAjxpXmlKeywords($ctx->getRepository()->getContextOption($ctx, "TMP_UPLOAD"));
                         $this->logDebug("Upload : tmp upload folder", array($destCopy));
                         if (!is_dir($destCopy)) {
                             if (!@mkdir($destCopy)) {

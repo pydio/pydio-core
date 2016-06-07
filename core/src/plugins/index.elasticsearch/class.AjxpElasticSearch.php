@@ -82,7 +82,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         }
 
         if (!empty($specKey)) {
-            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey));
+            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx));
         }
 
         /* Connexion to Elastica Client with the default parameters */

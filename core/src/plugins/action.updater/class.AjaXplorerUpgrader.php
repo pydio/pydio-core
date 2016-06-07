@@ -433,11 +433,17 @@ class AjaXplorerUpgrader
         }
     }
 
-    public static function migrateMetaSerialPlugin($repositoryId, $dryRun)
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param string $repositoryId
+     * @param bool $dryRun
+     * @throws Exception
+     */
+    public static function migrateMetaSerialPlugin($ctx, $repositoryId, $dryRun)
     {
         $repo = ConfService::getRepositoryById($repositoryId);
         if($repo == null) throw new Exception("Cannot find repository!");
-        $sources = $repo->getOption("META_SOURCES");
+        $sources = $repo->getContextOption($ctx, "META_SOURCES");
         if (!isSet($sources["meta.serial"])) {
             //throw new Exception("This repository does not have the meta.serial plugin!");
             $sources["meta.serial"] = array(

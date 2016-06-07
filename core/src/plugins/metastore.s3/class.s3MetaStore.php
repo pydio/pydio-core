@@ -44,7 +44,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($ctx, $accessDriver);
-        $this->bucketName = $this->accessDriver->repository->getOption("CONTAINER");
+        $this->bucketName = $this->accessDriver->repository->getContextOption($ctx, "CONTAINER");
     }
 
     /**
@@ -62,7 +62,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
      */
     protected function getUserId($node)
     {
-        if($node->hasUser()) return $node->getUser();
+        if($node->hasUser()) return $node->getUserId();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }

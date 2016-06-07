@@ -219,7 +219,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         if(count($masks) == 1 && $masks[0] == "/"){
             $masks = array();
         }
-        $recycle = $currentRepo->getOption("RECYCLE_BIN");
+        $recycle = $currentRepo->getContextOption($contextInterface, "RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
 
         if($this->options["OBSERVE_STORAGE_CHANGES"] === true){
@@ -239,7 +239,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             $task = TaskService::actionAsTask($contextInterface, "index", []);
             TaskService::getInstance()->enqueueTask($task);
             // Unset the REQUIRES_INDEXATION FLAG
-            $meta =  $currentRepo->getOption("META_SOURCES");
+            $meta =  $currentRepo->getContextOption($contextInterface, "META_SOURCES");
             unset($meta["meta.syncable"]["REQUIRES_INDEXATION"]);
             $currentRepo->addOption("META_SOURCES", $meta);
             ConfService::replaceRepository($currentRepo->getId(), $currentRepo);
@@ -522,7 +522,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 }
             }
             if ($newNode == null) {
-                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
+                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUserId());
                 // DELETE
                 $this->logDebug('DELETE', $oldNode->getUrl());
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
@@ -536,7 +536,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
-                    "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUser())
+                    "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUserId())
                 ));
                 if($copy && !$newNode->isLeaf()){
                     // Make sure to index the content of this folder
@@ -546,7 +546,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     TaskService::getInstance()->enqueueTask($task);
                 }
             } else {
-                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUser());
+                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUserId());
                 if ($oldNode->getPath() == $newNode->getPath()) {
                     // CONTENT CHANGE
                     clearstatcache();
@@ -615,7 +615,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     public function computeSizeRecursive(&$node, &$result){
         
         $id = $this->computeIdentifier($node->getRepository());
-        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s AND ([node_path] = %s OR [node_path] LIKE %s)", $id, $node->getPath(), $node->getPath()."/%");
+        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s AND ([node_path] = %s OR [node_path] LIKE %s)", $id, $node->getPath(), rtrim($node->getPath(), "/")."/%");
         $result = floatval($res->fetchSingle());
 
     }

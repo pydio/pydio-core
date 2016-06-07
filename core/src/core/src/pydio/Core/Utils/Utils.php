@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -1396,7 +1397,7 @@ class Utils
      */
     public static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
     {
-        $filePath = VarsFilter::filter($filePath);
+        $filePath = VarsFilter::filter($filePath, Context::fromGlobalServices());
         $result = array();
         if ($skipCheck) {
             $fileLines = @file($filePath);
@@ -1430,7 +1431,7 @@ class Utils
         if(!in_array($format, array("ser", "json"))){
             throw new \Exception("Unsupported serialization format: ".$format);
         }
-        $filePath = VarsFilter::filter($filePath);
+        $filePath = VarsFilter::filter($filePath, Context::fromGlobalServices());
         if ($createDir && !is_dir(dirname($filePath))) {
             @mkdir(dirname($filePath), 0755, true);
             if (!is_dir(dirname($filePath))) {
@@ -1847,7 +1848,7 @@ class Utils
             }
             foreach ($params as $k => $v) {
                 $explode = explode("_", $k, 2);
-                $params[array_pop($explode)] = VarsFilter::filter($v);
+                $params[array_pop($explode)] = VarsFilter::filter($v, Context::fromGlobalServices());
                 unset($params[$k]);
             }
         }

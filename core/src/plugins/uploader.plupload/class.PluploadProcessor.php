@@ -72,7 +72,7 @@ class PluploadProcessor extends Plugin
             $remote = false;
             if (method_exists($driver, "storeFileToCopy")) {
                 $remote = true;
-                $destCopy = XMLWriter::replaceAjxpXmlKeywords($repository->getOption("TMP_UPLOAD"));
+                $destCopy = XMLWriter::replaceAjxpXmlKeywords($repository->getContextOption($ctx, "TMP_UPLOAD"));
                 // Make tmp folder a bit more unique using secure_token
                 $tmpFolder = $destCopy."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){

@@ -21,6 +21,8 @@
 namespace Pydio\Core\Utils;
 
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -40,56 +42,31 @@ class VarsFilter
      * Filter the very basic keywords from the XML  : AJXP_USER, AJXP_INSTALL_PATH, AJXP_DATA_PATH
      * Calls the vars.filter hooks.
      * @static
-     * @param $value
-     * @param AbstractAjxpUser|String $resolveUser
+     * @param mixed $value
+     * @param ContextInterface $ctx
      * @return mixed|string
+     * @throws PydioException
      */
-    public static function filter($value, $resolveUser = null)
+    public static function filter($value, ContextInterface $ctx)
     {
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
             if (Services\AuthService::usersEnabled()) {
-                if($resolveUser != null){
-                    if(is_string($resolveUser)){
-                        $resolveUserId = $resolveUser;
-                    } else {
-                        $resolveUserId = $resolveUser->getId();
-                    }
-                    $value = str_replace("AJXP_USER", $resolveUserId, $value);
-                }else{
-                    $loggedUser = AuthService::getLoggedUser();
-                    if ($loggedUser != null) {
-                        if ($loggedUser->hasParent() && $loggedUser->getResolveAsParent()) {
-                            $loggedUserId = $loggedUser->getParent();
-                        } else {
-                            $loggedUserId = $loggedUser->getId();
-                        }
-                        $value = str_replace("AJXP_USER", $loggedUserId, $value);
-                    } else {
-                        return "";
-                    }
+                if(!$ctx->hasUser()){
+                    throw new PydioException("Cannot resolve path AJXP_USER without user passed in context");
                 }
+                $value = str_replace("AJXP_USER", $ctx->getUser()->getId(), $value);
             } else {
                 $value = str_replace("AJXP_USER", "shared", $value);
             }
         }
         if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
             if (AuthService::usersEnabled()) {
-                if($resolveUser != null){
-                    if(is_string($resolveUser) && Services\AuthService::userExists($resolveUser)){
-                        $loggedUser = ConfService::getConfStorageImpl()->createUserObject($resolveUser);
-                    }else{
-                        $loggedUser = $resolveUser;
-                    }
-                }else{
-                    $loggedUser = Services\AuthService::getLoggedUser();
+                if(!$ctx->hasUser()){
+                    throw new PydioException("Cannot resolve path AJXP_GROUP_PATH without user passed in context");
                 }
-                if ($loggedUser != null) {
-                    $gPath = $loggedUser->getGroupPath();
-                    $value = str_replace("AJXP_GROUP_PATH_FLAT", str_replace("/", "_", trim($gPath, "/")), $value);
-                    $value = str_replace("AJXP_GROUP_PATH", $gPath, $value);
-                } else {
-                    return "";
-                }
+                $gPath = $ctx->getUser()->getGroupPath();
+                $value = str_replace("AJXP_GROUP_PATH_FLAT", str_replace("/", "_", trim($gPath, "/")), $value);
+                $value = str_replace("AJXP_GROUP_PATH", $gPath, $value);
             } else {
                 $value = str_replace(array("AJXP_GROUP_PATH", "AJXP_GROUP_PATH_FLAT"), "shared", $value);
             }
@@ -100,7 +77,14 @@ class VarsFilter
         if (is_string($value) && strpos($value, "AJXP_DATA_PATH") !== false) {
             $value = str_replace("AJXP_DATA_PATH", AJXP_DATA_PATH, $value);
         }
-        $tab = array(&$value);
+        if (is_string($value) && strstr($value, "AJXP_WORKSPACE_UUID") !== false) {
+            $value = rtrim(str_replace("AJXP_WORKSPACE_UUID", $ctx->getRepository()->getUniqueId(), $value), "/");
+        }
+        if (is_string($value) && strstr($value, "AJXP_WORKSPACE_SLUG") !== false) {
+            $value = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $ctx->getRepository()->getSlug(), $value), "/");
+        }
+
+        $tab = array(&$value, $ctx);
         Controller::applyIncludeHook("vars.filter", $tab);
         return $value;
     }

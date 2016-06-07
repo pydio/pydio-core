@@ -304,10 +304,7 @@ class ShareCenter extends Plugin
     public function getPublicAccessManager(){
 
         if(!isSet($this->publicAccessManager)){
-            $options = array(
-                "USE_REWRITE_RULE" => $this->getFilteredOption("USE_REWRITE_RULE", $this->repository) == true
-            );
-            $this->publicAccessManager = new PublicAccessManager($options);
+            $this->publicAccessManager = new PublicAccessManager([]);
         }
         return $this->publicAccessManager;
 
@@ -349,7 +346,7 @@ class ShareCenter extends Plugin
      */
     protected function updateToMaxAllowedValue(&$httpVars, $parameterName, $optionName){
 
-        $maxvalue = abs(intval($this->getFilteredOption($optionName, $this->repository)));
+        $maxvalue = abs(intval($this->getContextualOption($this->currentContext, $optionName)));
         $value = isset($httpVars[$parameterName]) ? abs(intval($httpVars[$parameterName])) : 0;
         if ($maxvalue == 0) {
             $httpVars[$parameterName] = $value;
@@ -367,7 +364,7 @@ class ShareCenter extends Plugin
      * @return bool
      */
     protected function checkRepoWithSameLabel($label, $editingRepo = null){
-        if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository) == true) {
+        if ( $this->getContextualOption($this->currentContext, "AVOID_SHARED_FOLDER_SAME_LABEL") == true) {
             $count = 0;
             $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
             if($count && !isSet($editingRepo)){
@@ -752,7 +749,7 @@ class ShareCenter extends Plugin
                     if(isSet($httpVars["owner"]) && $loggedUser->isAdmin()
                         && $loggedUser->getGroupPath() == "/" && $loggedUser->getId() != Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS)){
                         // Impersonate the current user
-                        $node->setUser(Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS));
+                        $node->setUserId(Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS));
                     }
                     if(!file_exists($node->getUrl())){
                         $mess = ConfService::getMessages();
@@ -1100,7 +1097,7 @@ class ShareCenter extends Plugin
                     $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
-                    if($owner != null) $parentNode->setUser($owner);
+                    if($owner != null) $parentNode->setUserId($owner);
                     $result[$parentRepoId] = array($parentNode, "UP");
                 }
             }
@@ -1159,10 +1156,10 @@ class ShareCenter extends Plugin
      */
     public function forwardEventToShares($fromNode=null, $toNode=null, $copy = false, $direction=null){
 
-        if(empty($direction) && $this->getFilteredOption("FORK_EVENT_FORWARDING")){
-            $refNode = ($fromNode != null ? $fromNode : $toNode);// cannot be both null
+        $refNode = ($fromNode != null ? $fromNode : $toNode);// cannot be both null
+        if(empty($direction) && $this->getContextualOption($refNode->getContext(), "FORK_EVENT_FORWARDING")){
             Controller::applyActionInBackground(
-                $refNode->getRepositoryId(),
+                $refNode->getContext(),
                 "forward_change_event",
                 array(
                     "from" => $fromNode === null ? "" : $fromNode->getUrl(),

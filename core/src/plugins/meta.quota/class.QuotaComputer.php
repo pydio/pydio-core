@@ -26,7 +26,6 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
@@ -52,40 +51,8 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      */
     protected $mailer;
 
-    protected function getWorkingPath()
-    {
-        $repo = $this->accessDriver->repository;
-        $clearParent = null;
-        // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
-        if ($repo->hasParent()) {
-            $parentOwner = $repo->getOwner();
-            if ($parentOwner !== null) {
-                $repo = ConfService::getRepositoryById($repo->getParentId());
-                $originalUser = AuthService::getLoggedUser();
-                $loggedUser = AuthService::getLoggedUser();
-                if (!$loggedUser->hasParent()) {
-                    $loggedUser->setParent($parentOwner);
-                    $clearParent = null;
-                } else {
-                    $clearParent = $loggedUser->getParent();
-                }
-                $loggedUser->setResolveAsParent(true);
-                AuthService::updateUser($loggedUser);
-            }
-        }
-        $path = $repo->getOption("PATH");
-        if ( isSet($originalUser) ) {
-            $originalUser->setParent($clearParent);
-            $originalUser->setResolveAsParent(false);
-            AuthService::updateUser($originalUser);
-        }
-
-        return $path;
-    }
-
     /**
      * @return array
-     */
     protected function getWorkingRepositoryOptions()
     {
         $p = array();
@@ -117,16 +84,22 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         }
         return $p;
     }
+     */
 
-    public function getFilteredOption($optionName, $repoScope = AJXP_REPO_SCOPE_ALL, $userObject = null){
-        $repo = $this->accessDriver->repository;
-        if ($repo->hasParent() && $repo->getOwner() != null && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
-            // Pass parent user instead of currently logged
-            $userObject = ConfService::getConfStorageImpl()->createUserObject($repo->getOwner());
+    /**
+     * @param ContextInterface $ctx
+     * @return ContextInterface
+     */
+    protected function getEffectiveContext(ContextInterface $ctx){
+        $repository = $ctx->getRepository();
+        if($repository->hasParent() && $repository->getOwner() !== null){
+            $parentOwner = $repository->getOwner();
+            return $ctx->withRepositoryId($repository->getParentId())->withUserId($parentOwner);
+        }else{
+            return $ctx;
         }
-        return parent::getFilteredOption($optionName, $repoScope, $userObject);
     }
-
+    
     public function getContextualOption(ContextInterface $ctx, $optionName)
     {
         $repo = $ctx->getRepository();
@@ -155,43 +128,43 @@ class QuotaComputer extends AJXP_AbstractMetaSource
             return null;
         }
         $delta = $newSize;
-        $quota = $this->getAuthorized();
-        $soft = $this->getSoftLimit();
-        $q = $this->getUsage();
+        $quota = $this->getAuthorized($node->getContext());
+        $soft = $this->getSoftLimit($node->getContext());
+        $q = $this->getUsageForContext($node->getContext());
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q + $delta >= $quota) {
             $mess = ConfService::getMessages();
             throw new Exception($mess["meta.quota.3"]." (".Utils::roundSize($quota) .")!");
         } else if ( $soft !== false && ($q + $delta) >= $soft && $q <= $soft) {
-            $this->sendSoftLimitAlert();
+            $this->sendSoftLimitAlert($node->getContext());
         }
     }
 
-    protected function sendSoftLimitAlert()
+    protected function sendSoftLimitAlert(ContextInterface $ctx)
     {
         $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
-        if ($mailer !== false) {
-            $percent = $this->getFilteredOption("SOFT_QUOTA");
-            $quota = $this->getFilteredOption("DEFAULT_QUOTA");
+        if ($mailer !== false && $ctx->hasUser()) {
+            $percent = $this->getContextualOption($ctx, "SOFT_QUOTA");
+            $quota = $this->getContextualOption($ctx, "DEFAULT_QUOTA");
             $mailer->sendMail(
-                array(AuthService::getLoggedUser()->getId()),
+                array($ctx->getUser()->getId()),
                 "You are close to exceed your quota!",
                 "You are currently using more than $percent% of your authorized quota of $quota!");
         }
     }
 
-    public function getCurrentQuota($action, $httpVars, $fileVars)
+    public function getCurrentQuota(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $u = $this->getUsage();
-        HTMLWriter::charsetHeader("application/json");
-        print json_encode(array('USAGE' => $u, 'TOTAL' => $this->getAuthorized()));
+        $ctx = $requestInterface->getAttribute("ctx");
+        $u = $this->getUsageForContext($ctx);
+        $responseInterface = new \Zend\Diactoros\Response\JsonResponse(['USAGE' => $u, 'TOTAL' => $this->getAuthorized($ctx)]);
         return;
     }
 
     public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $data['meta.quota'] = array(
-            'usage' => $u = $this->getUsage(),
-            'total' => $this->getAuthorized()
+            'usage' => $u = $this->getUsageForContext($ctx),
+            'total' => $this->getAuthorized($ctx)
         );
     }
 
@@ -203,37 +176,40 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      */
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
-        $repoOptions = $this->getWorkingRepositoryOptions();
-        $q = $this->accessDriver->directoryUsage("", $repoOptions);
-        $this->storeUsage($q);
-        $t = $this->getAuthorized();
+        //$repoOptions = $this->getWorkingRepositoryOptions();
+        //$q = $this->accessDriver->directoryUsage("", $repoOptions);
+
         $refNode = ($oldNode !== null ? $oldNode : $newNode);
+        $q = $this->getUsageForContext($refNode->getContext());
+        $this->storeUsage($refNode->getContext(), $q);
+        $t = $this->getAuthorized($refNode->getContext());
+
         Controller::applyHook("msg.instant", array($refNode->getContext(), "<metaquota usage='{$q}' total='{$t}'/>"));
     }
 
-    protected function storeUsage($quota)
+    protected function storeUsage(ContextInterface $ctx, $quota)
     {
-        $data = $this->getUserData();
+        $data = $this->getUserData($ctx);
         $repo = $this->accessDriver->repository->getId();
         if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
         $data["REPO_USAGES"][$repo] = $quota;
-        $this->saveUserData($data);
+        $this->saveUserData($ctx, $data);
     }
 
-    protected function getAuthorized()
+    protected function getAuthorized(ContextInterface $ctx)
     {
         if(self::$loadedQuota != null) return self::$loadedQuota;
-        $q = $this->getFilteredOption("DEFAULT_QUOTA");
+        $q = $this->getContextualOption($ctx, "DEFAULT_QUOTA");
         self::$loadedQuota = Utils::convertBytes($q);
         return self::$loadedQuota;
     }
 
-    protected function getSoftLimit()
+    protected function getSoftLimit(ContextInterface $ctx)
     {
         if(self::$loadedSoftLimit != null) return self::$loadedSoftLimit;
-        $l = $this->getFilteredOption("SOFT_QUOTA");
+        $l = $this->getContextualOption($ctx, "SOFT_QUOTA");
         if (!empty($l)) {
-            self::$loadedSoftLimit = round($this->getAuthorized()*intval($l)/100);
+            self::$loadedSoftLimit = round($this->getAuthorized($ctx)*intval($l)/100);
         } else {
             self::$loadedSoftLimit = false;
         }
@@ -241,43 +217,45 @@ class QuotaComputer extends AJXP_AbstractMetaSource
     }
 
     /**
-     * @param String $dir
-     * @return bool|int
+     * @param ContextInterface $ctx
+     * @return integer
      */
-    private function getUsage()
-    {
-        $data = $this->getUserData();
-        $repo = $this->accessDriver->repository->getId();
-        $repoOptions = $this->getWorkingRepositoryOptions();
-        if (!isSet($data["REPO_USAGES"][$repo]) || $this->options["CACHE_QUOTA"] === false) {
-            $quota = $this->accessDriver->directoryUsage("", $repoOptions);
+    private function getUsageForContext(ContextInterface $ctx){
+
+        $ctx = $this->getEffectiveContext($ctx);
+        $rootNode = new AJXP_Node("pydio://".$ctx->getRepositoryId()."/");
+        $rootNode->setUserId($ctx->getUser()->getId());
+
+        if (!isSet($data["REPO_USAGES"][$ctx->getRepositoryId()]) || $this->options["CACHE_QUOTA"] === false) {
+
+            $quota = $rootNode->getSizeRecursive();
             if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
-            $data["REPO_USAGES"][$repo] = $quota;
-            $this->saveUserData($data);
+            $data["REPO_USAGES"][$ctx->getRepositoryId()] = $quota;
+            $this->saveUserData($ctx, $data);
+
         }
 
-        if ($this->getFilteredOption("USAGE_SCOPE", $repo) == "local") {
-            return floatval($data["REPO_USAGES"][$repo]);
+        if ($this->getContextualOption($ctx, "USAGE_SCOPE") == "local") {
+            return floatval($data["REPO_USAGES"][$ctx->getRepositoryId()]);
         } else {
             return array_sum(array_map("floatval", $data["REPO_USAGES"]));
         }
 
     }
 
-    private function getUserData()
+    private function getUserData(ContextInterface $ctx)
     {
-        $logged = AuthService::getLoggedUser();
+        $logged = $ctx->getUser();
         $data = $logged->getPref("meta.quota");
         if(is_array($data)) return $data;
         else return array();
     }
 
-    private function saveUserData($data)
+    private function saveUserData(ContextInterface $ctx, $data)
     {
-        $logged = AuthService::getLoggedUser();
+        $logged = $ctx->getUser();
         $logged->setPref("meta.quota", $data);
         $logged->save("user");
-        AuthService::updateUser($logged);
     }
 
 }

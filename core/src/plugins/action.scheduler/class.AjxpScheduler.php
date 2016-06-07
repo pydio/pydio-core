@@ -24,6 +24,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -164,7 +165,6 @@ class AjxpScheduler extends Plugin
     public function runTask($taskId, $status = null, &$currentlyRunning = -1, $forceStart=false)
     {
         $data = $this->getTaskById($taskId);
-        $mess = ConfService::getMessages();
         $timeArray = $this->getTimeArray($data["schedule"]);
 
         // TODO : Set MasterInterval as config, or detect last execution?
@@ -174,7 +174,7 @@ class AjxpScheduler extends Plugin
         $now = time();
         $lastExec = time()-60*$masterInterval;
         $res = $this->getNextExecutionTimeForScript($lastExec, $timeArray);
-        $test = date("Y-m-d H:i", $lastExec). " -- ".date("Y-m-d H:i", $res)." --  ".date("Y-m-d H:i", $now);
+        //$test = date("Y-m-d H:i", $lastExec). " -- ".date("Y-m-d H:i", $res)." --  ".date("Y-m-d H:i", $now);
 
         $alreadyRunning = false;
         $queued = false;
@@ -213,10 +213,9 @@ class AjxpScheduler extends Plugin
                 $data["repository_id"] = implode(",", array_keys($listRepos));
             }
             $process = Controller::applyActionInBackground(
-                $data["repository_id"],
+                new Context($data["user_id"], $data["repository_id"]),
                 $data["action_name"],
                 $data["PARAMS"],
-                $data["user_id"],
                 AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status");
             if ($process != null &&  ($process instanceof UnixProcess)) {
                 $this->setTaskStatus($taskId, "RUNNING:".$process->getPid());

@@ -225,36 +225,7 @@ class AuthService
             setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
         }
     }
-
-    public static function logTemporaryUser($parentUserId, $temporaryUserId)
-    {
-        $parentUserId = self::filterUserSensitivity($parentUserId);
-        $temporaryUserId = self::filterUserSensitivity($temporaryUserId);
-        $confDriver = ConfService::getConfStorageImpl();
-        $parentUser = $confDriver->createUserObject($parentUserId);
-        $temporaryUser = $confDriver->createUserObject($temporaryUserId);
-        $temporaryUser->mergedRole = $parentUser->mergedRole;
-        $temporaryUser->rights = $parentUser->rights;
-        $temporaryUser->setGroupPath($parentUser->getGroupPath());
-        $temporaryUser->setParent($parentUserId);
-        $temporaryUser->setResolveAsParent(true);
-        AJXP_Logger::info(__CLASS__,"Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
-        self::updateUser($temporaryUser);
-    }
-
-    public static function clearTemporaryUser($temporaryUserId)
-    {
-        AJXP_Logger::info(__CLASS__,"Log out", array("temporary user" => $temporaryUserId));
-        if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
-            AJXP_Logger::info(__CLASS__, "Log Out", "");
-            unset($_SESSION["AJXP_USER"]);
-            if(isSet(self::$currentUser)) unset(self::$currentUser);
-            if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
-                AJXP_Safe::clearCredentials();
-            }
-        }
-    }
-
+    
     /**
      * Log the user from its credentials
      * @static
@@ -1137,28 +1108,7 @@ class AuthService
         }
         return $params;
     }
-
-    /**
-     * @param String $pluginId
-     * @param Repository $repository
-     * @param String $optionName
-     * @param bool $safe
-     * @return Mixed
-     */
-    public static function getFilteredRepositoryOption($pluginId, $repository, $optionName, $safe = false){
-        $logged = self::getLoggedUser();
-        $test = null;
-        if($logged != null){
-            $test = $logged->mergedRole->filterParameterValue($pluginId, $optionName, $repository->getId(), null);
-            if(!empty($test) && !$safe) $test = VarsFilter::filter($test);
-        }
-        if(empty($test)){
-            return $repository->getOption($optionName, $safe);
-        }else{
-            return $test;
-        }
-    }
-
+    
     /**
      * @param string $parentUserId
      * @return AJXP_Role

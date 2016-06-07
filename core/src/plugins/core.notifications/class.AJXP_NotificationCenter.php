@@ -341,7 +341,7 @@ class AJXP_NotificationCenter extends Plugin
             }
         }
         $parentRepository = ConfService::getRepositoryById($repositoryFilter);
-        $parentRoot = $parentRepository->getOption("PATH");
+        $parentRoot = $parentRepository->getContextOption($ctx, "PATH");
         $cumulated = array();
         foreach ($res as $notification) {
             if ($format == "html") {
@@ -350,6 +350,9 @@ class AJXP_NotificationCenter extends Plugin
                 $node = $notification->getNode();
                 if(!$node instanceof AJXP_Node){
                     error_log("Skipping notification as nodes are not excepted class, probably a deserialization issue");
+                    if($notification->alert_id){
+                        $this->eventStore->dismissAlertById($ctx, $notification->alert_id);
+                    }
                     continue;
                 }
                 $path = $node->getPath();

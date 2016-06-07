@@ -111,9 +111,10 @@ interface RepositoryInterface extends AjxpGroupPathProvider
 
     /**
      * Get the <client_settings> content of the manifest.xml
+     * @param ContextInterface $ctx
      * @return \DOMElement|\DOMNodeList|string
      */
-    public function getClientSettings();
+    public function getClientSettings(ContextInterface $ctx);
     
     /**
      * Add options
@@ -132,6 +133,21 @@ interface RepositoryInterface extends AjxpGroupPathProvider
      * @throws \Exception
      */
     public function getOption($oName, $safe = false, $resolveUser = null);
+
+    /**
+     * @param ContextInterface $ctx
+     * @param string $oName
+     * @return mixed
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function getContextOption(ContextInterface $ctx, $oName);
+
+    /**
+     * @param string $oName
+     * @return mixed|string
+     * @throws \Exception
+     */
+    public function getSafeOption($oName);
 
     /**
      * Get the options that already have a value

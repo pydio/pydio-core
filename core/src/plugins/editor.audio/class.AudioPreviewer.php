@@ -67,9 +67,9 @@ class AudioPreviewer extends Plugin
                 if(!file_exists($destStreamURL.$file)){
                     throw new Exception("Cannot find file!");
                 }else{
-                    $user = $node->getUser();
+                    $user = $node->getUserId();
                     $node = new AJXP_Node($destStreamURL.$file);
-                    $node->setUser($user);
+                    $node->setUserId($user);
                 }
             }
             if(!is_readable($node->getUrl())){

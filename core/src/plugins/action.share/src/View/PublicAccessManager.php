@@ -35,7 +35,7 @@ class PublicAccessManager
 
     /**
      * PublicFolderManager constructor.
-     * @param array $options Key => value options, currently supports only USE_REWRITE_RULE = true / false
+     * @param array $options Key => value options
      */
     public function __construct($options){
         $this->options = $options;
@@ -49,13 +49,8 @@ class PublicAccessManager
     public function buildPublicLink($hash)
     {
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
-        if ($this->options["USE_REWRITE_RULE"]) {
-            if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
-            else return $this->buildPublicDlURL()."/".$hash;
-        } else {
-            if($addLang) return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
-            else return $this->buildPublicDlURL()."/".$hash.".php";
-        }
+        if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
+        else return $this->buildPublicDlURL()."/".$hash;
     }
 
     /**

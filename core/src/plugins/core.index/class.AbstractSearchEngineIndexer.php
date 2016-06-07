@@ -135,7 +135,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
         $specificId = "";
         $specKey = $this->getContextualOption($ctx, "repository_specific_keywords");
         if (!empty($specKey)) {
-            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx->hasUser()? $ctx->getUser()->getId() : null));
+            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx));
         }
         return $ctx->getRepositoryId().$specificId;
     }

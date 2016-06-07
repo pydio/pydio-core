@@ -21,6 +21,7 @@
 namespace Pydio\Tests;
 
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -43,17 +44,18 @@ class fsAccessTest extends AbstractTest
         if ($repo->accessType != 'fs' ) return -1;
         // Check the destination path
         $this->failedInfo = "";
-        $safePath = $repo->getOption("PATH", true);
-        if(strstr($safePath, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!
-        $path = $repo->getOption("PATH", false);
-        $createOpt = $repo->getOption("CREATE");
-        $create = (($createOpt=="true"||$createOpt===true)?true:false);
+        $safePath = $repo->getSafeOption("PATH");
+        if(strstr($safePath, "AJXP_USER")!==false) {
+            return TRUE;
+        } // CANNOT TEST THIS CASE!
+        $ctx = Context::fromGlobalServices();
+        $path       = $repo->getContextOption($ctx, "PATH");
+        $createOpt  = $repo->getContextOption($ctx, "CREATE");
+        $create     = (($createOpt=="true"||$createOpt===true)?true:false);
+
         if (!$create && !@is_dir($path)) {
             $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE;
-        }/* else if ($create && !is_writeable($path)) {
-            $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE;
-        }*/
-        // Do more tests here
+        }
         return TRUE;
     }
 

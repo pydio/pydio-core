@@ -43,8 +43,8 @@ class FSMonitoringManager extends AJXP_AbstractMetaSource
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($ctx, $accessDriver);
-        $repo = $accessDriver->repository;
-        $this->repoBase = $repo->getOption("PATH");
+        $repo = $ctx->getRepository();
+        $this->repoBase = $repo->getContextOption($ctx, "PATH");
     }
 
     public function beforePathChange(AJXP_Node $node){

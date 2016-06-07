@@ -67,7 +67,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
      */
     protected function getUserId($node)
     {
-        if($node->hasUser()) return $node->getUser();
+        if($node->hasUser()) return $node->getUserId();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
@@ -179,8 +179,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         }else if (AuthService::getLoggedUser() != null) {
             if ($securityScope == "USER") {
                 $u = AuthService::getLoggedUser();
-                if($u->getResolveAsParent()) $id = $u->getParent();
-                else $id = $u->getId();
+                $id = $u->getId();
                 $metaFile .= "_".$id;
             } else if ($securityScope == "GROUP") {
                 $u = AuthService::getLoggedUser()->getGroupPath();
@@ -216,7 +215,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             $fileKey = basename($fileKey);
         } else {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
         }
         self::$metaCache = array();
         if (!isSet(self::$fullMetaCache[$metaFile])) {
@@ -273,7 +272,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                 mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
         }
         if($scope==AJXP_METADATA_SCOPE_REPOSITORY
             || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile))
@@ -322,7 +321,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $result = array();
         $repositoryId = $ajxpNode->getRepositoryId();
         $metaFile = $this->globalMetaFile."_".$repositoryId;
-        $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUser());
+        $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
         if(!is_file($metaFile)) return $result;
         $raw_data = file_get_contents($metaFile);
         if($raw_data === false) return $result;

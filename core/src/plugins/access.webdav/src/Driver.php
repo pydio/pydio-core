@@ -80,15 +80,16 @@ class Driver extends fsAccessDriver
         }
 
         $client = new Client([
-            'base_url' => $this->repository->getOption("HOST")
+            'base_url' => $ctx->getRepository()->getContextOption($ctx, "HOST")
         ]);
 
         // Params
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $recycle = $ctx->getRepository()->getContextOption($ctx, "RECYCLE_BIN");
 
         // Config
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $uId = $ctx->hasUser()?$ctx->getUser()->getId():"shared";
+        $this->urlBase = "pydio://".$uId."@".$ctx->getRepositoryId();
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }

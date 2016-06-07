@@ -134,7 +134,7 @@ class MqManager extends Plugin
         $ctx = null;
         if ($newNode != null) {
             $ctx = $newNode->getContext();
-            $targetUserId = $newNode->getUser();
+            $targetUserId = $newNode->getUserId();
             $nodePathes[] = $newNode->getPath();
             $update = false;
             $data = array();
@@ -149,7 +149,7 @@ class MqManager extends Plugin
         if ($origNode != null && ! $update && !$copy) {
 
             $ctx = $origNode->getContext();
-            $targetUserId = $origNode->getUser();
+            $targetUserId = $origNode->getUserId();
             $nodePathes[] = $origNode->getPath();
             $content = XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
 

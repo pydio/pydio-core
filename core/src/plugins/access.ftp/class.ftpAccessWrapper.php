@@ -23,7 +23,9 @@ namespace Pydio\Access\Driver\StreamProvider\FTP;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
@@ -218,6 +220,7 @@ class ftpAccessWrapper implements IAjxpWrapper
     {
         // We are in an opendir loop
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT", $path);
+        $node = new AJXP_Node($path);
         $testLoopPath = Utils::safeDirname($path);
         if (is_array(self::$dirContent[$testLoopPath])) {
             $search = Utils::safeBasename($path);
@@ -247,7 +250,7 @@ class ftpAccessWrapper implements IAjxpWrapper
                 $res = $this->rawListEntryToStat($entry);
                 AJXP_Logger::debug(__CLASS__,__FUNCTION__,"RAWLISTENTRY ".$res["name"]. " (searching ".$basename.")", $res["stat"]);
                 if ($res["name"] == $basename) {
-                    AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+                    AbstractAccessDriver::fixPermissions($node, $res["stat"], array($this, "getRemoteUserId"));
                     $statValue = $res["stat"];
                     return $statValue;
                 }
@@ -263,7 +266,7 @@ class ftpAccessWrapper implements IAjxpWrapper
             $contents = $this->rawList($link, $serverPath, 'f');
             if (count($contents) == 1) {
                 $res = $this->rawListEntryToStat($contents[0]);
-                AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+                AbstractAccessDriver::fixPermissions($node, $res["stat"], array($this, "getRemoteUserId"));
                 $statValue = $res["stat"];
                 AJXP_Logger::debug(__CLASS__,__FUNCTION__,"STAT FILE $serverPath", $statValue);
                 return $statValue;
@@ -285,7 +288,7 @@ class ftpAccessWrapper implements IAjxpWrapper
         $folders = $files = array();
         foreach ($contents as $entry) {
             $result = $this->rawListEntryToStat($entry);
-            AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+            AbstractAccessDriver::fixPermissions(new AJXP_Node($url), $result["stat"], array($this, "getRemoteUserId"));
             $isDir = $result["dir"];
             $statValue = $result["stat"];
             $file = $result["name"];
@@ -441,39 +444,41 @@ class ftpAccessWrapper implements IAjxpWrapper
     {
         // URL MAY BE ajxp.ftp://username:password@host/path
         $urlParts = Utils::safeParseUrl($url);
-        $this->repositoryId = $urlParts["host"];
-        $repository = ConfService::getRepositoryById($this->repositoryId);
+        $node = new AJXP_Node($url);
+        $this->repositoryId = $node->getRepositoryId();
+        $repository = $node->getRepository();
         if ($repository == null) {
             throw new \Exception("Cannot find repository for dynamic ftp authentication.");
         }
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
+        $ctx = $node->getContext();
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
         $this->user = $credentials["user"];
         $this->password = $credentials["password"];
         if ($this->user=="") {
             throw new PydioException("Cannot find user/pass for FTP access!");
         }
-        if ($repository->getOption("DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])) {
-            $data = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
-            $this->host = $data["FTP_HOST"];
-            $this->path = $data["PATH"];
-            $this->secure = ($data["FTP_SECURE"] == "TRUE"?true:false);
-            $this->port = ($data["FTP_PORT"]!=""?intval($data["FTP_PORT"]):($this->secure?22:21));
-            $this->ftpActive = ($data["FTP_DIRECT"] == "TRUE"?true:false);
-            $this->repoCharset = $data["CHARSET"];
+        if ($repository->getContextOption($node->getContext(), "DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])) {
+            $data               = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
+            $this->host         = $data["FTP_HOST"];
+            $this->path         = $data["PATH"];
+            $this->secure       = ($data["FTP_SECURE"] == "TRUE"?true:false);
+            $this->port         = ($data["FTP_PORT"]!=""?intval($data["FTP_PORT"]):($this->secure?22:21));
+            $this->ftpActive    = ($data["FTP_DIRECT"] == "TRUE"?true:false);
+            $this->repoCharset  = $data["CHARSET"];
         } else {
-            $this->host = $repository->getOption("FTP_HOST");
-            $this->path = $repository->getOption("PATH");
-            $this->secure = ($repository->getOption("FTP_SECURE") == "TRUE"?true:false);
-            $this->port = ($repository->getOption("FTP_PORT")!=""?intval($repository->getOption("FTP_PORT")):($this->secure?22:21));
-            $this->ftpActive = ($repository->getOption("FTP_DIRECT") == "TRUE"?true:false);
-            $this->repoCharset = $repository->getOption("CHARSET");
+            $this->host         = $ctx->getRepository()->getContextOption($ctx, "FTP_HOST");
+            $this->path         = $ctx->getRepository()->getContextOption($ctx, "PATH");
+            $this->secure       = ($ctx->getRepository()->getContextOption($ctx, "FTP_SECURE") == "TRUE"?true:false);
+            $this->port         = ($ctx->getRepository()->getContextOption($ctx, "FTP_PORT")!=null?intval($ctx->getRepository()->getContextOption($ctx, "FTP_PORT")):($this->secure?22:21));
+            $this->ftpActive    = ($ctx->getRepository()->getContextOption($ctx, "FTP_DIRECT") == "TRUE"?true:false);
+            $this->repoCharset  = $ctx->getRepository()->getContextOption($ctx, "CHARSET") OR "";
         }
 
         // Test Connexion and server features
         global $_SESSION;
         $cacheKey = $repository->getId()."_ftpCharset";
         if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]) || $forceLogin) {
-            $features = $this->getServerFeatures();
+            $features = $this->getServerFeatures($node->getContext());
             $ctxCharset = ConfService::getContextCharset();
             if(empty($ctxCharset)) {
                 ConfService::setContextCharset($features["charset"]);
@@ -486,12 +491,12 @@ class ftpAccessWrapper implements IAjxpWrapper
     }
 
     /**
-     * @param RepositoryInterface $repository
+     * @param AJXP_Node $node
      * @return array Array(UID, GID) to be used to compute permission
      */
-    public function getRemoteUserId($repository)
+    public function getRemoteUserId($node)
     {
-        $repoUid = $repository->getOption("UID");
+        $repoUid = $node->getRepository()->getContextOption($node->getContext(), "UID");
         if (!empty($repoUid)) {
             return array($repoUid, "-1");
         }
@@ -510,15 +515,19 @@ class ftpAccessWrapper implements IAjxpWrapper
         return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;
     }
 
-    /** This method retrieves the FTP server features as described in RFC2389
-     *	A decent FTP server support MLST command to list file using UTF-8 encoding
-     *  @return array of features (see code)
+    /**
+     * This method retrieves the FTP server features as described in RFC2389
+     *    A decent FTP server support MLST command to list file using UTF-8 encoding
+     * @param ContextInterface $ctx
+     * @return array of features (see code)
+     * @throws PydioException
+     * @throws \Exception
      */
-    protected function getServerFeatures()
+    protected function getServerFeatures(ContextInterface $ctx)
     {
         $link = $this->createFTPLink();
 
-        if (ConfService::getRepositoryById($this->repositoryId)->getOption("CREATE") == true) {
+        if ($ctx->getRepository()->getContextOption($ctx, "CREATE") == true) {
             // Test if root exists and create it otherwise
             $serverPath = Utils::securePath($this->path."/");
             $testCd = @ftp_chdir($link, $serverPath);

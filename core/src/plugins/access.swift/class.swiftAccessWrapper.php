@@ -21,6 +21,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Swift;
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
@@ -49,11 +50,11 @@ class swiftAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url = Utils::safeParseUrl($path);
-        $repoId = $url["host"];
-        $repoObject = ConfService::getRepositoryById($repoId);
+        $node = new AJXP_Node($path);
+        $ctx = $node->getContext();
+        $repoObject = $node->getRepository();
         if (!isSet($repoObject)) {
-            $e = new \Exception("Cannot find repository with id ".$repoId);
+            $e = new \Exception("Cannot find repository with id ".$node->getRepositoryId());
             self::$lastException = $e;
             throw $e;
         }
@@ -61,17 +62,17 @@ class swiftAccessWrapper extends fsAccessWrapper
             self::$cloudContext = stream_context_create(
                 array("swiftfs" =>
                 array(
-                    'username' => $repoObject->getOption("USERNAME"),
-                    'password' => $repoObject->getOption("PASSWORD"),
-                    'tenantid' => $repoObject->getOption("TENANT_ID"),
-                    'endpoint' => $repoObject->getOption("ENDPOINT"),
-                    'openstack.swift.region'   => $repoObject->getOption("REGION")
+                    'username'                  => $repoObject->getContextOption($ctx, "USERNAME"),
+                    'password'                  => $repoObject->getContextOption($ctx, "PASSWORD"),
+                    'tenantid'                  => $repoObject->getContextOption($ctx, "TENANT_ID"),
+                    'endpoint'                  => $repoObject->getContextOption($ctx, "ENDPOINT"),
+                    'openstack.swift.region'    => $repoObject->getContextOption($ctx, "REGION")
                 ))
             );
         }
 
-        $baseContainer = $repoObject->getOption("CONTAINER");
-        $p = "swiftfs://".$baseContainer.str_replace("//", "/", $url["path"]);
+        $baseContainer = $repoObject->getContextOption($node->getContext(), "CONTAINER");
+        $p = "swiftfs://".$baseContainer.str_replace("//", "/", $node->getPath());
         return $p;
     }
 

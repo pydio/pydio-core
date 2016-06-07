@@ -20,6 +20,7 @@
  */
 namespace Pydio\Tests;
 
+use Pydio\Core\Model\Context;
 use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -41,7 +42,7 @@ class Writeability extends AbstractTest
         $success = true;
         foreach ($checks as $check) {
             $w = false;
-            $check = VarsFilter::filter($check);
+            $check = VarsFilter::filter($check, Context::emptyContext());
             if (!is_dir($check)) {// Check parent
                 $check = dirname($check);
             }

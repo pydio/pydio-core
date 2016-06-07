@@ -20,6 +20,7 @@
  */
 
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -287,7 +288,7 @@ class BootConfLoader extends AbstractConfDriver
         // REWRITE BOOTSTRAP.JSON
         $coreConf["DIBI_PRECONFIGURATION"] = $data["db_type"];
         if (isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])) {
-            $dbFile = VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
+            $dbFile = VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"], Context::emptyContext());
             if (!file_exists(dirname($dbFile))) {
                 mkdir(dirname($dbFile), 0755, true);
             }
@@ -445,7 +446,7 @@ class BootConfLoader extends AbstractConfDriver
 
             $p = Utils::cleanDibiDriverParameters($data["db_type"]);
             if ($p["driver"] == "sqlite3") {
-                $dbFile = VarsFilter::filter($p["database"]);
+                $dbFile = VarsFilter::filter($p["database"], $ctx);
                 if (!file_exists(dirname($dbFile))) {
                     mkdir(dirname($dbFile), 0755, true);
                 }

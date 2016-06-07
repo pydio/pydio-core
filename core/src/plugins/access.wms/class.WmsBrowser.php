@@ -47,8 +47,10 @@ class WmsBrowser extends AbstractAccessDriver
             return ;
         }
 
+        $ctx = $requestInterface->getAttribute("ctx");
+        $host = $ctx->getRepository()->getContextOption($ctx, "HOST");
         $doc = new DOMDocument();
-        $doc->load($this->repository->getOption("HOST") . "?request=GetCapabilities");
+        $doc->load($host . "?request=GetCapabilities");
         $xPath = new DOMXPath($doc);
 
         $httpVars = $requestInterface->getParsedBody();
@@ -88,9 +90,9 @@ class WmsBrowser extends AbstractAccessDriver
         }
         if ($dir == "/" || $dir == "") {
             $this->listLevels($nodesList, $levels);
-            $this->listLayers($nodesList, $leafs, $xPath);
+            $this->listLayers($host, $nodesList, $leafs, $xPath);
         } else if (isSet($levels[basename($dir)])) {
-            $this->listLayers($nodesList, $levels[basename($dir)], $xPath, ($styleLevels?array($this,"replaceStyle"):null));
+            $this->listLayers($host, $nodesList, $levels[basename($dir)], $xPath, ($styleLevels?array($this,"replaceStyle"):null));
         }
 
         $x->addChunk($nodesList);
@@ -128,13 +130,14 @@ class WmsBrowser extends AbstractAccessDriver
     }
 
     /**
+     * @param string $host
      * @param NodesList $NodesList
      * @param array $nodeList
      * @param DOMXPath $xPath
      * @param callable|null $replaceCallback
      * @throws \Exception
      */
-    public function listLayers(&$NodesList, $nodeList, $xPath, $replaceCallback = null)
+    public function listLayers($host, &$NodesList, $nodeList, $xPath, $replaceCallback = null)
     {
         foreach ($nodeList as  $key => $node) {
             $name = $xPath->evaluate("Name", $node)->item(0)->nodeValue;
@@ -147,7 +150,7 @@ class WmsBrowser extends AbstractAccessDriver
                 "title"			=> $title,
                 "ajxp_mime" 	=> "wms_layer",
                 "srs"			=> $srs,
-                "wms_url"		=> $this->repository->getOption("HOST")
+                "wms_url"		=> $host
             );
             $style = $xPath->query("Style/Name", $node)->item(0)->nodeValue;
             $metaData["style"] = $style;

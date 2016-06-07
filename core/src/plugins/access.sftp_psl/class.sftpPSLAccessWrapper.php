@@ -23,6 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 
 use Net_SSH2;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
@@ -61,18 +62,19 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true)
     {
         $url = Utils::safeParseUrl($path);
-        $repoId = $url["host"];
-        $path = $url["path"];
+        $node = new AJXP_Node($url);
+        $ctx  = $node->getContext();
+        $repoObject = $node->getRepository();
+        if(empty($repoObject)) {
+            throw new \Exception("Cannot find repository with id ".$node->getRepositoryId());
+        }
+        $path = $node->getPath();
 
-        $repoObject = ConfService::getRepositoryById($repoId);
+        $basePath   = $repoObject->getContextOption($ctx, "PATH");
+        $host       = $repoObject->getContextOption($ctx, "SFTP_HOST");
+        $port       = $repoObject->getContextOption($ctx, "SFTP_PORT");
 
-        if(!isSet($repoObject)) throw new \Exception("Cannot find repository with id ".$repoId);
-
-        $basePath = $repoObject->getOption("PATH");
-        $host = $repoObject->getOption("SFTP_HOST");
-        $port = $repoObject->getOption("SFTP_PORT");
-
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
         $user = $credentials["user"];
         $pass = $credentials["password"];
 
@@ -177,24 +179,22 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
     {
         $realPath = self::initPath($path);
         $stat = @stat($realPath);
-        $parts = Utils::safeParseUrl($path);
-        $repoObject = ConfService::getRepositoryById($parts["host"]);
-
-        AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
-
+        AbstractAccessDriver::fixPermissions(new AJXP_Node($path), $stat, array($this, "detectRemoteUserId"));
         return $stat;
     }
 
     /**
-     * @param Repository $repoObject
+     * @param AJXP_Node $node
      * @return array
      */
-    public function detectRemoteUserId($repoObject)
+    public function detectRemoteUserId($node)
     {
-        $host = $repoObject->getOption("SFTP_HOST");
-        $port = $repoObject->getOption("SFTP_PORT");
+        $repoObject = $node->getRepository();
+        $ctx = $node->getContext();
+        $host = $repoObject->getContextOption($ctx, "SFTP_HOST");
+        $port = $repoObject->getContextOption($ctx, "SFTP_PORT");
 
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources(NULL, $repoObject);
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
         $user = $credentials["user"];
         $pass = $credentials["password"];
 

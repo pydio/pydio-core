@@ -20,7 +20,8 @@
  */
 namespace Pydio\Auth\Core;
 
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Utils\Utils;
 
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -218,59 +219,61 @@ class AJXP_Safe
      * + Try to get them from the repository configuration
      * + Try to get them from the AJXP_Safe.
      *
-     * @param array $parsedUrl
-     * @param \Pydio\Access\Core\Model\Repository $repository
+     * @param ContextInterface $ctx
      * @return array
      */
-    public static function tryLoadingCredentialsFromSources($parsedUrl, $repository)
+    public static function tryLoadingCredentialsFromSources($ctx)
     {
         $user = $password = "";
         $optionsPrefix = "";
+        $repository = $ctx->getRepository();
         if ($repository->getAccessType() == "ftp") {
             $optionsPrefix = "FTP_";
         }
         // Get USER/PASS
         // 1. Try from URL
+        /*
         if (isSet($parsedUrl["user"]) && isset($parsedUrl["pass"])) {
-            $user = rawurldecode($parsedUrl["user"]);
-            $password = rawurldecode($parsedUrl["pass"]);
+            $user       = rawurldecode($parsedUrl["user"]);
+            $password   = rawurldecode($parsedUrl["pass"]);
         }
+        */
         // 2. Try from user wallet
         if ($user=="") {
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $ctx->getUser();
             if ($loggedUser != null) {
                 $wallet = $loggedUser->getPref("AJXP_WALLET");
                 if (is_array($wallet) && isSet($wallet[$repository->getId()][$optionsPrefix."USER"])) {
                     $user = $wallet[$repository->getId()][$optionsPrefix."USER"];
-                    $password = \Pydio\Core\Utils\Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix."PASS"]);
+                    $password = Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix."PASS"]);
                 }
             }
         }
         // 2bis. Wallet is now a custom parameter
         if ($user =="") {
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $ctx->getUser();
             if ($loggedUser != null) {
-                $u = $loggedUser->mergedRole->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."USER", $repository->getId(), "");
-                $p = $loggedUser->mergedRole->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
+                $u = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."USER", $repository->getId(), "");
+                $p = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
                 if (!empty($u) && !empty($p)) {
                     $user = $u;
-                    $password = \Pydio\Core\Utils\Utils::decypherStandardFormPassword($loggedUser->getId(), $p);
+                    $password = Utils::decypherStandardFormPassword($loggedUser->getId(), $p);
                 }
             }
         }
         // 3. Try from repository config
         if ($user=="") {
-            $user = $repository->getOption($optionsPrefix."USER");
-            $password = $repository->getOption($optionsPrefix."PASS");
+            $user       = $repository->getContextOption($ctx, $optionsPrefix."USER");
+            $password   = $repository->getContextOption($ctx, $optionsPrefix."PASS");
         }
         // 4. Test if there are encoded credentials available
-        if ($user == "" && $repository->getOption("ENCODED_CREDENTIALS") != "") {
-            list($user, $password) = AJXP_Safe::getCredentialsFromEncodedString($repository->getOption("ENCODED_CREDENTIALS"));
+        if ($user == "" && $repository->getContextOption($ctx, "ENCODED_CREDENTIALS") != "") {
+            list($user, $password) = AJXP_Safe::getCredentialsFromEncodedString($repository->getContextOption($ctx, "ENCODED_CREDENTIALS"));
         }
         // 5. Try from session
         $storeCreds = false;
-        if ($repository->getOption("META_SOURCES")) {
-            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+        if ($repository->getContextOption($ctx, "META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
             foreach ($options["META_SOURCES"] as $metaSource) {
                 if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
                     $storeCreds = true;
@@ -278,7 +281,7 @@ class AJXP_Safe
                 }
             }
         }
-        if ($user=="" && ( $repository->getOption("USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
+        if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
             $safeCred = AJXP_Safe::loadCredentials();
             if ($safeCred !== false) {
                 $user = $safeCred["user"];

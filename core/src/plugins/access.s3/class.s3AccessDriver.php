@@ -56,63 +56,6 @@ class s3AccessDriver extends fsAccessDriver
     }
 
     /**
-     * @param bool $register
-     * @return array|bool|void
-     * Override parent to register underlying wrapper (s3) as well
-     */
-    public function detectStreamWrapper($register = false){
-        /*
-        if(isSet($this->repository)){
-            require_once("aws.phar");
-            $options = array(
-                'key'    => $this->repository->getOption("API_KEY"),
-                'secret' => $this->repository->getOption("SECRET_KEY"),
-            );
-            $signatureVersion = $this->repository->getOption("SIGNATURE_VERSION");
-            if(!empty($signatureVersion) && $signatureVersion != "-1"){
-                $options['signature'] = $signatureVersion;
-            }
-            $baseURL = $this->repository->getOption("STORAGE_URL");
-            if(!empty($baseURL)){
-                $options["base_url"] = $baseURL;
-            }
-            $region = $this->repository->getOption("REGION");
-            if(!empty($region)){
-                $options["region"] = $region;
-            }
-            $proxy = $this->repository->getOption("PROXY");
-            if(!empty($proxy)){
-                $options['request.options'] = array('proxy' => $proxy);
-            }
-            $apiVersion = $this->repository->getOption("API_VERSION");
-            if ($apiVersion === "") {
-                $apiVersion = "latest";
-            }
-            $sdkVersion = $this->getFilteredOption("SDK_VERSION");
-            if ($sdkVersion === "v3") {
-                require_once ("class.pydioS3Client.php");
-                $this->s3Client = new S3Client([
-                    "version" => $apiVersion,
-                    "region"  => $region,
-                    "credentials" => $options
-                ]);
-            } else {
-                $this->s3Client = Aws\S3\S3Client::factory($options);
-                if($this->repository->getOption("VHOST_NOT_SUPPORTED")){
-                    // Use virtual hosted buckets when possible
-                    require_once("ForcePathStyleListener.php");
-                    $this->s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
-                }
-            }
-
-
-            $this->s3Client->registerStreamWrapper();
-        }
-        */
-        return parent::detectStreamWrapper($register);
-    }
-
-    /**
      * @param ContextInterface $contextInterface
      * @throws PydioException
      * @throws \Exception
@@ -127,9 +70,9 @@ class s3AccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $recycle = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->urlBase = "pydio://".$this->repository->getId();
+        $this->urlBase = "pydio://".($contextInterface->hasUser()?$contextInterface->getUser()->getId():"shared"). "@" .$contextInterface->getRepositoryId();
 
         if ($recycle!= "" && !is_dir($this->urlBase. "/" . $recycle . "/")) {
             @mkdir($this->urlBase. "/" . $recycle . "/", 0777, true);
@@ -245,8 +188,9 @@ class s3AccessDriver extends fsAccessDriver
      */
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
-        $newOptions = parent::makeSharedRepositoryOptions($ctx, $httpVars);
-        $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
+        $newOptions                 = parent::makeSharedRepositoryOptions($ctx, $httpVars);
+        $newOptions["CONTAINER"]    = $ctx->getRepository()->getContextOption($ctx, "CONTAINER");
+        
         return $newOptions;
     }
 

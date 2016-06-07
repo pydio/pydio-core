@@ -135,7 +135,7 @@ class textLogDriver extends AbstractLogDriver
 
 
         $this->storageDir = isset($this->options['LOG_PATH']) ? $this->options['LOG_PATH'] : "";
-        $this->storageDir = VarsFilter::filter($this->storageDir);
+        $this->storageDir = VarsFilter::filter($this->storageDir, $ctx);
         $this->storageDir = (rtrim($this->storageDir))."/";
         $this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
         $this->USER_GROUP_RIGHTS = isset($this->options['LOG_CHMOD']) ? $this->options['LOG_CHMOD'] : 0770;

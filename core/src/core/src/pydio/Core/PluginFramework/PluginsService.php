@@ -234,7 +234,7 @@ class PluginsService
         $plugInstance = $this->getPluginByTypeName("access", $accessType);
 
         // TRIGGER BEFORE INIT META
-        $metaSources = $repository->getOption("META_SOURCES");
+        $metaSources = $repository->getContextOption($ctx, "META_SOURCES");
         if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
             $keys = array_keys($metaSources);
             foreach ($keys as $plugId) {
@@ -271,7 +271,7 @@ class PluginsService
         $this->setPluginUniqueActiveForType("access", $accessType);
 
         // TRIGGER INIT META
-        $metaSources = $repository->getOption("META_SOURCES");
+        $metaSources = $repository->getContextOption($ctx, "META_SOURCES");
         if (isSet($metaSources) && is_array($metaSources) && count($metaSources)) {
             $keys = array_keys($metaSources);
             foreach ($keys as $plugId) {

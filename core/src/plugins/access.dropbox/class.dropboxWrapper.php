@@ -26,6 +26,7 @@ use Dropbox_Exception;
 use Dropbox_Exception_NotFound;
 use Dropbox_OAuth_PEAR;
 use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -64,15 +65,17 @@ class dropboxWrapper implements IAjxpWrapper
     {
         $parts = Utils::safeParseUrl($ajxpPath);
         $repo = ConfService::getRepositoryById($parts["host"]);
+        $node = new AJXP_Node($ajxpPath);
+        $ctx = $node->getContext();
         if (empty(self::$dropbox)) {
-            $consumerKey = $repo->getOption('CONSUMER_KEY');
-            $consumerSecret = $repo->getOption('CONSUMER_SECRET');
+            $consumerKey = $repo->getContextOption($ctx, 'CONSUMER_KEY');
+            $consumerSecret = $repo->getContextOption($ctx, 'CONSUMER_SECRET');
 
             self::$oauth = new Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
             self::$oauth->setToken($_SESSION["OAUTH_DROPBOX_TOKENS"]);
             self::$dropbox = new Dropbox_API(self::$oauth);
         }
-        $basePath = $repo->getOption("PATH");
+        $basePath = $repo->getContextOption($ctx, "PATH");
         if(empty($basePath)) $basePath = "";
         $path = $basePath."/".ltrim($parts["path"], "/");
 

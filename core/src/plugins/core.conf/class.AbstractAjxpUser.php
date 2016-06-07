@@ -49,10 +49,6 @@ abstract class AbstractAjxpUser implements UserInterface
     /**
      * @var bool
      */
-    public $resolveAsParent = false;
-    /**
-     * @var bool
-     */
     protected $hidden;
 
     public function setHidden($hidden)
@@ -520,16 +516,6 @@ abstract class AbstractAjxpUser implements UserInterface
         }
     }
 
-    public function setResolveAsParent($resolveAsParent)
-    {
-        $this->resolveAsParent = $resolveAsParent;
-    }
-
-    public function getResolveAsParent()
-    {
-        return $this->resolveAsParent;
-    }
-
     /**
      * @param array $roles
      * @param boolean $checkBoolean
@@ -550,7 +536,7 @@ abstract class AbstractAjxpUser implements UserInterface
 
     public function __sleep(){
         $this->lastSessionSerialization = time();
-        return array("id", "hasAdmin", "rights", "prefs", "bookmarks", "version", "roles", "parentUser", "resolveAsParent", "hidden", "groupPath", "personalRole", "lastSessionSerialization");
+        return array("id", "hasAdmin", "rights", "prefs", "bookmarks", "version", "roles", "parentUser", "hidden", "groupPath", "personalRole", "lastSessionSerialization");
     }
 
     public function __wakeup(){

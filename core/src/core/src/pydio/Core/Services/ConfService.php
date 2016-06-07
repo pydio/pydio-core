@@ -1400,8 +1400,9 @@ class ConfService
         $coreP = PluginsService::getInstance()->findPlugin("core", $coreType);
         if($coreP === false) return null;
         $confs = $coreP->getConfigs();
-        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs, Context::fromGlobalServices());
-        return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName]) : null);
+        $ctx = Context::fromGlobalServices();
+        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs, $ctx);
+        return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName], $ctx) : null);
     }
 
     /**
