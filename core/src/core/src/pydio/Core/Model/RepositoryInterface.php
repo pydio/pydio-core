@@ -125,16 +125,6 @@ interface RepositoryInterface extends AjxpGroupPathProvider
     public function addOption($oName, $oValue);
 
     /**
-     * Get the repository options, filtered in various maners
-     * @param string $oName
-     * @param bool $safe Do not filter
-     * @param UserInterface $resolveUser
-     * @return mixed|string
-     * @throws \Exception
-     */
-    public function getOption($oName, $safe = false, $resolveUser = null);
-
-    /**
      * @param ContextInterface $ctx
      * @param string $oName
      * @return mixed
