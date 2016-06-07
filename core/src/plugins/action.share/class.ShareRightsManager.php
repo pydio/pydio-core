@@ -114,7 +114,8 @@ class ShareRightsManager
 
         $hiddenUserEntry = $this->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
         if(empty($hiddenUserEntry["RIGHT"])){
-            throw new Exception("share_center.58");
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["share_center.58"]);
         }
         $hiddenUserEntry["DISABLE_DOWNLOAD"] = $shareObject->disableDownload();
         if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
@@ -166,6 +167,7 @@ class ShareRightsManager
         $allowSharedUsersCreation = ConfService::getCoreConf("USER_CREATE_USERS", "conf");
         $loggedUser = AuthService::getLoggedUser();
         $confDriver = ConfService::getConfStorageImpl();
+        $mess = ConfService::getMessages();
 
         while (isSet($httpVars[PARAM_USER_LOGIN_PREFIX.$index])) {
 
@@ -188,16 +190,16 @@ class ShareRightsManager
                     $index++;
                     continue;
                 } else if (AuthService::userExists($u, "w") && isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
-                    throw new Exception("User $u already exists, please choose another name.");
+                    throw new Exception( str_replace("%s", $u, $mess["share_center.222"]));
                 }
                 if($userExistsRead){
                     $userObject = $confDriver->createUserObject($u);
                     if ( $allowCrossUserSharing != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId() ) ) {
-                        throw new Exception("You are not allowed to share with other users, except your internal users.");
+                        throw new Exception($mess["share_center.221"]);
                     }
                 }else{
                     if(!$allowSharedUsersCreation || AuthService::isReservedUserId($u)){
-                        throw new Exception("You are not allowed to create users.");
+                        throw new Exception($mess["share_center.220"]);
                     }
                     if(!empty($this->options["SHARED_USERS_TMP_PREFIX"]) && strpos($u, $this->options["SHARED_USERS_TMP_PREFIX"])!==0 ){
                         $u = $this->options["SHARED_USERS_TMP_PREFIX"] . $u;

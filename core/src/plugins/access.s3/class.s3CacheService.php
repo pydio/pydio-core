@@ -31,7 +31,7 @@ class s3CacheService implements \Aws\CacheInterface
      * @return mixed|null Returns the value or null if not found.
      */
     public function get($key) {
-        return  \CacheService::fetch($key);
+        return  \CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $key);
     }
 
     /**
@@ -43,7 +43,7 @@ class s3CacheService implements \Aws\CacheInterface
      *                      to 0 to allow an unlimited lifetime.
      */
     public function set($key, $value, $ttl = 0) {
-        \CacheService::save($key, $value, $ttl);
+        \CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $key, $value, $ttl);
     }
 
     /**
@@ -52,6 +52,6 @@ class s3CacheService implements \Aws\CacheInterface
      * @param string $key Key to remove.
      */
     public function remove($key) {
-        \CacheService::delete($key);
+        \CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $key);
     }
 }

@@ -350,7 +350,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             umask($old);
         }
         if ($curdir = opendir($srcdir)) {
-            while ($file = readdir($curdir)) {
+            while (($file = readdir($curdir)) !== FALSE) {
                 if ($file != '.' && $file != '..') {
                     $srcfile = $srcdir . "/" . $file;
                     $dstfile = $dstdir . "/" . $file;
@@ -406,7 +406,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         if (is_dir($location)) {
             AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
             $all=opendir($location);
-            while ($file=readdir($all)) {
+            while (($file=readdir($all)) !== FALSE) {
                 if (is_dir("$location/$file") && $file !=".." && $file!=".") {
                     $this->deldir("$location/$file", $repoData);
                     if (file_exists("$location/$file")) {

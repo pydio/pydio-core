@@ -134,7 +134,10 @@ class ShareMetaManager
      */
     protected function compositeShareFromMetaWithScope($node, $scope = "private"){
 
-        $meta = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, ($scope == "private"), AJXP_METADATA_SCOPE_REPOSITORY, true);
+        if($scope !== AJXP_METADATA_ALLUSERS){
+            $scope = ($scope == "private");
+        }
+        $meta = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, $scope, AJXP_METADATA_SCOPE_REPOSITORY, true);
         $shares = array();
         $composites = array();
         if(!isSet($meta["shares"])){
@@ -175,9 +178,17 @@ class ShareMetaManager
 
     /**
      * @param AJXP_Node $node
+     * @param bool $allUsersScope
      * @return CompositeShare|null
      */
-    public function getCompositeShareForNode($node){
+    public function getCompositeShareForNode($node, $allUsersScope = false){
+        if($allUsersScope){
+            $global = $this->compositeShareFromMetaWithScope($node, AJXP_METADATA_ALLUSERS);
+            if(count($global)) {
+                return $global[0];
+            }
+            return null;
+        }
         $private = $this->compositeShareFromMetaWithScope($node, "private");
         if(count($private)) {
             return $private[0];

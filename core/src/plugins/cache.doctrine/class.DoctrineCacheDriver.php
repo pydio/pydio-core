@@ -23,13 +23,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require __DIR__ . "/doctrine/vendor/autoload.php";
 
-define('APC_EXTENSION_LOADED', extension_loaded('apc'));
+define('APC_EXTENSION_LOADED', extension_loaded('apc') || extension_loaded('apcu'));
 define('MEMCACHE_EXTENSION_LOADED', extension_loaded('memcache'));
 define('MEMCACHED_EXTENSION_LOADED', extension_loaded('memcached'));
 define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
 define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
+use \Pydio\Plugins\Cache\Doctrine\Ext;
 
 /**
  * Standard Memcache driver
@@ -39,15 +40,23 @@ use \Doctrine\Common\Cache;
 class doctrineCacheDriver extends AbstractCacheDriver
 {
 
-    /*
-     * @var CacheProvider
+    /**
+     * @param string $namespace
+     * @return Cache\CacheProvider
      */
-    private $cacheDriver;
+    public function getCacheDriver($namespace = AJXP_CACHE_SERVICE_NS_SHARED){
+
+        if(!isSet($this->namespacedCaches[$namespace])){
+            $this->namespacedCaches[$namespace] = $this->initCacheWithNamespace($namespace);
+        }
+        return $this->namespacedCaches[$namespace];
+
+    }
 
     /**
      * Initialise the cache driver based on config
      *
-     * @param Array $options array of options specific to the cache driver.
+     * @param array $options array of options specific to the cache driver.
      * @access public
      * @return null
      */
@@ -55,11 +64,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
     {
         parent::init($options);
 
-        $this->cacheDriver = null;
-
         $driverOptions = $this->getFilteredOption("DRIVER");
-        $cachePrefix = $this->getFilteredOption("CACHE_PREFIX");
-
         if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
             return;
         }
@@ -70,86 +75,125 @@ class doctrineCacheDriver extends AbstractCacheDriver
                     AJXP_Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
                     return;
                 }
-                $this->_apc_init($driverOptions);
                 break;
             case "memcache":
                 if (!MEMCACHE_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Memcache extension package must be installed!");
                     return;
                 }
-                $this->_memcache_init($driverOptions);
                 break;
             case "memcached":
                 if (!MEMCACHED_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Memcached extension package must be installed!");
                     return;
                 }
-                $this->_memcached_init($driverOptions);
                 break;
             case "redis":
                 if (!REDIS_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The Redis extension package must be installed!");
                     return;
                 }
-                $this->_redis_init($driverOptions);
                 break;
             case "xcache":
                 if (!XCACHE_EXTENSION_LOADED) {
                     AJXP_Logger::error(__CLASS__, "init", "The XCache extension package must be installed!");
                     return;
                 }
-                $this->_xcache_init($driverOptions);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private function initCacheWithNamespace($namespace){
+        $cacheDriver = null;
+        $driverOptions = $this->getFilteredOption("DRIVER");
+        $cachePrefix = $this->getFilteredOption("CACHE_PREFIX");
+
+        if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
+            return null;
+        }
+
+        switch ($driverOptions['driver']) {
+            case "apc":
+                $cacheDriver = $this->_apc_init($driverOptions);
+                break;
+            case "memcache":
+                $cacheDriver = $this->_memcache_init($driverOptions);
+                break;
+            case "memcached":
+                $cacheDriver = $this->_memcached_init($driverOptions);
+                break;
+            case "redis":
+                $cacheDriver = $this->_redis_init($driverOptions);
+                break;
+            case "xcache":
+                $cacheDriver = $this->_xcache_init($driverOptions);
                 break;
             default:
                 break;
         }
 
-        // Setting Prefix
-        if (!empty($cachePrefix) && ! empty($this->cacheDriver)) {
-            $this->cacheDriver->setNamespace($cachePrefix . '_');
+        if(empty($cacheDriver)){
+            return null;
         }
+
+        if(empty($cachePrefix)){
+            $cachePrefix = AJXP_Utils::slugify(AJXP_Utils::detectServerURL(true));
+        }
+        $cachePrefix .= "_".$namespace."_";
+        $cacheDriver->setNamespace($cachePrefix);
+        return $cacheDriver;
+
     }
 
     public function _apc_init($options) {
-        $this->cacheDriver = new Cache\ApcCache();
+        if (extension_loaded('apcu')) {
+            require_once ("ext/PydioApcuCache.php");
+            $cacheDriver = new Ext\PydioApcuCache();
+        } else {
+            $cacheDriver = new Cache\ApcCache();
+        }
+        return $cacheDriver;
     }
 
     public function _memcache_init($options) {
         $memcache = new Memcache();
         @$running = $memcache->connect($options['MEMCACHE_HOSTNAME'], $options['MEMCACHE_PORT']);
 
-        if (! $running) return;
+        if (! $running) return null;
 
-        $this->cacheDriver = new Cache\MemcacheCache();
-        $this->cacheDriver->setMemcache($memcache);
+        $cacheDriver = new Cache\MemcacheCache();
+        $cacheDriver->setMemcache($memcache);
+        return $cacheDriver;
     }
 
     public function _memcached_init($options) {
         $memcached = new Memcached();
         @$running = $memcached->addServer($options['MEMCACHED_HOSTNAME'], $options['MEMCACHED_PORT']);
 
-        if (! $running) return;
+        if (! $running) return null;
 
-        $this->cacheDriver = new Cache\MemcachedCache();
-        $this->cacheDriver->setMemcached($memcached);
+        $cacheDriver = new Cache\MemcachedCache();
+        $cacheDriver->setMemcached($memcached);
+        return $cacheDriver;
     }
 
     public function _redis_init($options) {
         $redis = new Redis();
         @$running = $redis->connect($options['REDIS_HOSTNAME'], $options['REDIS_PORT']);
 
-        if (! $running) return;
+        if (! $running) return null;
 
-        $this->cacheDriver = new \Doctrine\Common\Cache\RedisCache();
-        $this->cacheDriver->setRedis($redis);
+        require_once "ext/PydioRedisCache.php";
+        $cacheDriver = new Ext\PydioRedisCache();
+        $cacheDriver->setRedis($redis);
+        return $cacheDriver;
     }
 
     public function _xcache_init($options) {
-        $this->cacheDriver = new Cache\XcacheCache();
-    }
-
-    public function getCacheDriver() {
-        return $this->cacheDriver;
+        $cacheDriver = new Cache\XcacheCache();
+        return $cacheDriver;
     }
 
 }

@@ -374,7 +374,7 @@ class Repository implements AjxpGroupPathProvider
                     $pvalue = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $this->getSlug(), $pvalue), "/");
                     $pathChanged = true;
                 }
-                if (is_string($pvalue) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) {
+                if (is_string($pvalue) && strstr($pvalue, "AJXP_ALLOW_SUB_PATH") !== false) {
                     $pvalue = rtrim(str_replace("AJXP_ALLOW_SUB_PATH", "", $pvalue), "/")."/".$this->options[$oName];
                     $pathChanged = true;
                 }

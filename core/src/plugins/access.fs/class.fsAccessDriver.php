@@ -732,6 +732,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             $userfile_name = self::autoRenameForDest($destination, $userfile_name);
                         }
                         $this->logDebug("User filename ".$userfile_name);
+                        if(class_exists("Normalizer")){
+                            $userfile_name = Normalizer::normalize($userfile_name, Normalizer::FORM_C);
+                        }
 
                         // CHECK IF THIS IS A FORBIDDEN FILENAME
                         $this->filterUserSelectionToHidden(array($userfile_name));
@@ -2040,7 +2043,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             "PATH" => SystemTextEncoding::toStorageEncoding($repository->getOption("PATH")).AJXP_Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE" => $repository->getOption("CREATE"),
             "RECYCLE_BIN" => isSet($httpVars["inherit_recycle"])? $repository->getOption("RECYCLE_BIN") : "",
-            "DEFAULT_RIGHTS" => "");
+            "DEFAULT_RIGHTS" => "",
+            "DATA_TEMPLATE" => ""
+        );
         if ($repository->getOption("USE_SESSION_CREDENTIALS")===true) {
             $newOptions["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
         }

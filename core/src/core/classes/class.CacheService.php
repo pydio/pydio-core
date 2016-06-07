@@ -28,44 +28,47 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class CacheService
 {
     /**
+     * @param $namespace
      * @param $id
      * @return bool
      */
-    public static function contains($id) {
+    public static function contains($namespace, $id) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            return $cacheDriver->contains($id);
+            return $cacheDriver->contains($namespace, $id);
         }
 
         return false;
     }
 
     /**
+     * @param $namespace
      * @param $id
      * @param $object
      * @param int $timelimit
      * @return bool
      */
-    public static function save($id, $object, $timelimit = 0 ) {
+    public static function save($namespace, $id, $object, $timelimit = 0) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            return $cacheDriver->save($id, $object, $timelimit);
+            return $cacheDriver->save($namespace, $id, $object, $timelimit);
         }
 
         return false;
     }
 
     /**
+     * @param $namespace
      * @param $id
      * @return bool|mixed
      */
-    public static function fetch($id) {
+    public static function fetch($namespace, $id) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            $data = $cacheDriver->fetch($id);
+            $data = $cacheDriver->fetch($namespace, $id);
             return $data;
         }
 
@@ -73,27 +76,29 @@ class CacheService
     }
 
     /**
+     * @param $namespace
      * @param $id
      * @return bool
      */
-    public static function delete($id) {
+    public static function delete($namespace, $id) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            return $cacheDriver->delete($id);
+            return $cacheDriver->delete($namespace, $id);
         }
 
         return false;
     }
 
     /**
+     * @param $namespace
      * @return bool
      */
-    public static function deleteAll() {
+    public static function deleteAll($namespace) {
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
-            return $cacheDriver->deleteAll();
+            return $cacheDriver->deleteAll($namespace);
         }
 
         return false;

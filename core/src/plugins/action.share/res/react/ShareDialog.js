@@ -187,11 +187,16 @@
     var HeaderPanel = React.createClass({
         mixins:[ContextConsumerMixin],
         render: function(){
+
+            let nodePath = this.props.shareModel.getNode().getPath();
+            if(this.props.shareModel.getNode().getMetadata().get("original_path")){
+                nodePath = this.props.shareModel.getNode().getMetadata().get("original_path");
+            }
             return (
                 <div className="headerPanel">
                     <div
                         style={{fontSize: 24, color:'white', padding:'20px 16px 14px', wordBreak:'break-all'}}
-                    >{this.context.getMessage('44').replace('%s', PathUtils.getBasename(this.props.shareModel.getNode().getPath()))}</div>
+                    >{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
                 </div>
             );
         }
@@ -996,6 +1001,11 @@
                 perms.push({
                     NAME:'write',
                     LABEL:this.context.getMessage('74')
+                });
+            }else if(this.props.shareModel.fileHasWriteableEditors()){
+                perms.push({
+                    NAME:'write',
+                    LABEL:this.context.getMessage('74b')
                 });
             }
             if(this.props.shareModel.isPublicLinkPreviewDisabled() && this.props.shareModel.getPublicLinkPermission(linkId, 'read')){

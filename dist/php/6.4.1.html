@@ -1,0 +1,50 @@
+<div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio Core 6.4.1 - Bug Fixes for 6.4</h2>
+
+    Pydio Core 6.4.1 fixes most blocking issues revealed by the massive upgrade to 6.4.0.
+    Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
+
+    <h3>Most noticeable changes</h3>
+    <ul>
+        <li>Many issues fixed in shares, linked to the deep refactoring of this feature. Amongst others, the "shorten" plugins were broken.</li>
+        <li>UI : Missing close button on some new dialogs, mobile display of the web UI was a little buggy</li>
+        <li>CMS Bridges where broken due to an issue in the glueCode.php file</li>
+        <li>Federated Sharing: some installs could have issues with URI's.</li>
+    </ul>
+
+    <h3>Detailed Changelog</h3>
+        <ul>
+            <li>Fix GlueCode.php (<a href="http://github.com/pydio/pydio-core/commit/186cd9eca878b6d577056b87504e9d1b47cfc7e2">details</a>)</li>
+            <li>Use longer description in api generator. (<a href="http://github.com/pydio/pydio-core/commit/babc8b1291b30a239524b213495ed2cc82bec4ae">details</a>)</li>
+            <li>Missing media.css file in gruntfile. (<a href="http://github.com/pydio/pydio-core/commit/39f45a83e08a0ece9f94a531ba0c488fc5fb0b65">details</a>)</li>
+            <li>Missing log for ShareNode action (<a href="http://github.com/pydio/pydio-core/commit/66b6b4dc1ab1fa0b60952829c9df1952a5b164c9">details</a>)</li>
+            <li>Fix method signature for PHP7 (<a href="http://github.com/pydio/pydio-core/commit/b341660622ca58fc54eaff29daf00836889d1044">details</a>)</li>
+            <li>Expand api docs generator (<a href="http://github.com/pydio/pydio-core/commit/6b2525aa7bd7223415284ba4a79fcbb479da6c5b">details</a>)</li>
+            <li>Rework Share options for folders / files vs. public links / internal sharing - Fix #1143 Better invalid share detection and remove it from meta. Fix many error messages. (<a href="http://github.com/pydio/pydio-core/commit/9d28b1c4d723723fd2f1c5c89346f4743c52322d">details</a>)</li>
+            <li>Update i18n (<a href="http://github.com/pydio/pydio-core/commit/6a413688506e9c61d8ea94cd1d5b4afc89238036">details</a>)</li>
+            <li>Core.mailer : add DROP TRIGGER IF EXISTS (<a href="http://github.com/pydio/pydio-core/commit/dac76528d7676e7aba54ec7e40d9358aa259aa78">details</a>)</li>
+            <li>Do not display section title if list is empty - Fix #1154 (<a href="http://github.com/pydio/pydio-core/commit/34352102148b9a78f10ca0407730da3fbb54123f">details</a>)</li>
+            <li>Fix #1148 (<a href="http://github.com/pydio/pydio-core/commit/4f4772035f80d1e4195060d9b2fc5009596676ea">details</a>)</li>
+            <li>Fix some media CSS (<a href="http://github.com/pydio/pydio-core/commit/e7e1fa0943e761ac11323f9ed77469b2acafe5c7">details</a>)</li>
+            <li>Fix various glitches on Spanish language. Close #1136 (<a href="http://github.com/pydio/pydio-core/commit/d0521d0e8c7da0a56400a2d6b2e2b3cfe639a43a">details</a>)</li>
+            <li>Fix #1128 : add the ability to reject a previously accepted share. (<a href="http://github.com/pydio/pydio-core/commit/fe99a695e4ca961a10ed3866b18adf70fcdea76a">details</a>)</li>
+            <li>Make sure to transfer an empty DATA_TEMPLATE value to child repository - Fix #1152 Fix broken unsharing. (<a href="http://github.com/pydio/pydio-core/commit/253e3ea8a8bce4c9503124c2d88ec4fa6eaf6d95">details</a>)</li>
+            <li>Remove legacy share js resources - Discourage people to use old themes for now. (<a href="http://github.com/pydio/pydio-core/commit/7bff85f2eedfeabfba344174ec4cdec8ed265475">details</a>)</li>
+            <li>Add a canWrite attribute on editors declaration, use it in ShareDialog to detect if a file has "writeable" editors and show an additional Edit permission for public links on files. (<a href="http://github.com/pydio/pydio-core/commit/372cf7e9bf0cb363b7bb67a283d709ee969a3fe9">details</a>)</li>
+            <li>Fix various issues with shares lists, especially in My Account & Admin panels. (<a href="http://github.com/pydio/pydio-core/commit/1c7e9477aeb8233bc63fe86d156d275b40a828fe">details</a>)</li>
+            <li>Use original_path for header if present in metadata. (<a href="http://github.com/pydio/pydio-core/commit/7ed8c22fd8b6f9b7295dda9eb581367349c7e5f0">details</a>)</li>
+            <li>Fix failed remote share: make sure to remove unnecessary data on failure. (<a href="http://github.com/pydio/pydio-core/commit/50d4bab8533ab06dcb4294ced37d45f09ed6db87">details</a>)</li>
+            <li>Display close icon for mp3 player. Fix #1156 (<a href="http://github.com/pydio/pydio-core/commit/ae38f8f372aafca86fd41b8aafba8d2f0f0cca51">details</a>)</li>
+            <li>Fix htaccess tpl : replace ocs.php by opencollab.php (<a href="http://github.com/pydio/pydio-core/commit/58627f025b9f95a17d166ec58206082e3d6737c0">details</a>)</li>
+            <li>Rewire missing action for deleting user-created workspace. (<a href="http://github.com/pydio/pydio-core/commit/1c046f1db26c50c506052c95a148bd631830385a">details</a>)</li>
+            <li>Fixing S3 and webdav access (<a href="http://github.com/pydio/pydio-core/commit/94109645dd87392b97c550c36dd04c273ed4cbcd">details</a>)</li>
+            <li>Fix to #1157: adding support for apcu (<a href="http://github.com/pydio/pydio-core/commit/182fd15bbb0a5a7af4f6310bdd59aa49e3275493">details</a>)</li>
+            <li>Fix to support mysqli (<a href="http://github.com/pydio/pydio-core/commit/57fadc925f9c41fc48fa1ff7b51a84a640aaaf22">details</a>)</li>
+            <li>Display close icon for versioning plugins (<a href="http://github.com/pydio/pydio-core/commit/032f36cb7979aac9896d4507e5a907df2cdb89ca">details</a>)</li>
+            <li>Updated german translations and unified various words (<a href="http://github.com/pydio/pydio-core/commit/d3a7e3fb5fd56c9569c7f2fe17b7c88ae0d1f0e7">details</a>)</li>
+            <li>Fixed typo (<a href="http://github.com/pydio/pydio-core/commit/48bcafa6a0ab15019c548a334f0aeb039045b3d2">details</a>)</li>
+            <li>Fix broken shortener plugins : use a url.shorten hook instead of capturing share action output. Store data in share instead of metadata. (<a href="http://github.com/pydio/pydio-core/commit/0eefa7b91426c28ef0b99316322421fb4505f8c5">details</a>)</li>
+        </ul>
+</div>

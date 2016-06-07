@@ -1,0 +1,5 @@
+---
+box: "centos6.7"
+version:
+  core: "../../core/src"
+  enterprise: ""

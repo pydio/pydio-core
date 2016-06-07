@@ -63,6 +63,12 @@
             return this._data['links'][linkId]['hash_is_shorten'];
         }
 
+        fileHasWriteableEditors(){
+            return this._previewEditors.filter(function(entry){
+                return (entry.canWrite);
+            }).length > 0;
+        }
+
         togglePublicLink(){
             var publicLinks = this.getPublicLinks();
             this._pendingData['enable_public_link'] = !publicLinks.length;
@@ -600,15 +606,28 @@
         load(){
             if(this._status == 'loading') return;
             this._setStatus('loading');
-            ShareModel.loadSharedElementData(this._node, function(transport){
+            let cacheService = MetaCacheService.getInstance();
+            cacheService.registerMetaStream('action.share', MetaCacheService.EXPIRATION_LOCAL_NODE);
+
+            let remoteLoader = function(transport){
                 if(transport.responseJSON){
                     this._data = transport.responseJSON;
                     this._pendingData = {};
                     this._setStatus('idle');
+                    return this._data;
                 }else if(transport.responseXML && XMLUtils.XPathGetSingleNodeText(transport.responseXML, '//message[@type="ERROR"]')){
                     this._setStatus('error');
+                    return null;
                 }
-            }.bind(this));
+            }.bind(this);
+
+            let cacheLoader = function(data){
+                this._data = data;
+                this._pendingData = {};
+                this._setStatus('idle');
+            }.bind(this);
+
+            cacheService.metaForNode('action.share', this._node, ShareModel.loadSharedElementData, remoteLoader, cacheLoader);
         }
 
         save(){
@@ -751,13 +770,11 @@
                 merged      : 'true'
             };
             if(meta.get('shared_element_hash')){
-                //options["hash"] = meta.get('shared_element_hash');
-                //options["element_type"] = meta.get('share_type');
                 options["tmp_repository_id"] = meta.get('shared_element_parent_repository');
                 options["file"] = meta.get("original_path");
+                options["owner"] = meta.get("owner");
             }else{
                 options["file"] = node.getPath();
-                //options["element_type"] = node.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository";
             }
             PydioApi.getClient().request(options, completeCallback, errorCallback, settings);
         }
@@ -765,10 +782,10 @@
         static getAuthorizations(pydio){
             var pluginConfigs = pydio.getPluginConfigs("action.share");
             var authorizations = {
-                folder_public_link : pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'minisite' ,
-                folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'both' ||  pluginConfigs.get("ENABLE_FOLDER_SHARING") == 'workspace' ,
+                folder_public_link : pluginConfigs.get("ENABLE_FOLDER_PUBLIC_LINK"),
+                folder_workspaces :  pluginConfigs.get("ENABLE_FOLDER_INTERNAL_SHARING"),
                 file_public_link : pluginConfigs.get("ENABLE_FILE_PUBLIC_LINK"),
-                file_workspaces : true, //pluginConfigs.get("ENABLE_FILE_SHARING"),
+                file_workspaces : pluginConfigs.get("ENABLE_FILE_INTERNAL_SHARING"),
                 editable_hash : pluginConfigs.get("HASH_USER_EDITABLE"),
                 pass_mandatory: false,
                 max_expiration : pluginConfigs.get("FILE_MAX_EXPIRATION"),

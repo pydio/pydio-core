@@ -162,7 +162,10 @@ div.detailed .FL-inlineToolbar a#ls_inline_button > span.actionbar_button_label 
 #cpane_header #inline_toolbar {
   display: none;
 }
-/* Modifs Leo */
+/* Dialogs */
+#diaporama_box {
+  height: 100%;
+}
 /* Login Page */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
   #generic_dialog_box {

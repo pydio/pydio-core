@@ -41,6 +41,14 @@ class SQLStore implements IStore
         }
     }
 
+    public function generateInvitationId(ShareInvitation &$invitation){
+        if(empty($id)){
+            $id = $this->findAvailableID(OCS_SQLSTORE_NS_INVITATION);
+            $invitation->setId($id);
+        }
+        return $invitation->getId();
+    }
+
     /**
      * Persists an invitation to store
      * @param ShareInvitation $invitation
@@ -49,10 +57,12 @@ class SQLStore implements IStore
     public function storeInvitation(ShareInvitation $invitation)
     {
         $id = $invitation->getId();
+        /*
         if(empty($id)){
             $id = $this->findAvailableID(OCS_SQLSTORE_NS_INVITATION);
         }
         $invitation->setId($id);
+        */
         $this->storage->simpleStoreSet(OCS_SQLSTORE_NS_INVITATION, $id, $invitation, OCS_SQLSTORE_FORMAT, $invitation->getLinkHash());
         return $invitation;
     }

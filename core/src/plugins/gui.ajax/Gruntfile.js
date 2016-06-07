@@ -47,6 +47,7 @@ var gui_ajax_core = [
     'res/js/core/model/BackgroundTasksManager.js',
     'res/js/core/http/PydioApi.js',
     'res/js/core/http/PydioUsersApi.js',
+    'res/js/core/http/MetaCacheService.js',
     'res/js/core/model/Action.js',
     'res/js/core/model/Controller.js',
     'res/js/core/model/PydioDataModel.js',
@@ -179,6 +180,16 @@ module.exports = function(grunt) {
             }
         },
         watch: {
+            es6 : {
+                files:[
+                    'res/js/es6/*.es6',
+                    'res/js/es6/**/*.es6'
+                ],
+                tasks:['babel:dist'],
+                options:{
+                    spawn:false
+                }
+            },
             core: {
                 files: gui_ajax_core,
                 tasks: ['babel:dist', 'uglify:js'],
@@ -214,7 +225,7 @@ module.exports = function(grunt) {
                         'res/themes/orbit/css/pydio.css',
                         'res/themes/orbit/css/animate-custom.css',
                         'res/themes/orbit/css/chosen.css',
-                        'res/themes/orbit/css/media.css#NO_MINI'
+                        'res/themes/orbit/css/media.css'
                     ]
                 }
             }

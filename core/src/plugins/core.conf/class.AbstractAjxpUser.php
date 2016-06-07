@@ -439,7 +439,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function save($context = "superuser"){
         $this->_save($context);
-        CacheService::save("pydio:user:".$this->getId(), $this);
+        CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
     }
 
     abstract protected function _save($context = "superuser");

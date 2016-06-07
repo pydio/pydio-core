@@ -44,8 +44,8 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements Ajx
     /*
      * Initialise the path for a file
      */
-    public static function applyInitPathHook($path) {
-        // Not defined
+    public static function applyInitPathHook($path, $context = 'core') {
+        //Do nothing
     }
 
     /**

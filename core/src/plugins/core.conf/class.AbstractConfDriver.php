@@ -386,7 +386,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     public function createUserObject($userId)
     {
-        $test=CacheService::fetch("pydio:user:".$userId);
+        $test=CacheService::fetch("shared", "pydio:user:" . $userId);
         if($test !== false && is_a($test, "AbstractAjxpUser")){
             if($test->personalRole == null){
                 $test->personalRole = $test->roles["AJXP_USR_/".$userId];
@@ -403,7 +403,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         AuthService::updateAuthProvidedData($abstractUser);
         $args = array(&$abstractUser);
         AJXP_Controller::applyIncludeHook("include.user.updateUserObject", $args);
-        CacheService::save("pydio:user:".$userId, $abstractUser);
+        CacheService::save("shared", "pydio:user:" . $userId, $abstractUser);
         return $abstractUser;
     }
 

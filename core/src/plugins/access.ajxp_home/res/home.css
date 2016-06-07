@@ -131,6 +131,12 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+#home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-additional-action {
+  float: right;
+  margin-top: -40px;
+  padding: 12px;
+  border-radius: 50%;
+}
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry.ws_selector_title h3 {
   font-size: 13px;
   font-weight: 500;

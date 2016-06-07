@@ -300,4 +300,175 @@ class LegacyPubliclet
         return $jsonData;
     }
 
+    /**
+     * @param ShareCenter $shareCenter
+     * @param ShareStore $shareStore
+     * @param ShareRightsManager $shareRightManager
+     */
+    public static function migrateLegacyMeta($shareCenter, $shareStore, $shareRightManager, $dryRun = true){
+        $metaStoreDir = AJXP_DATA_PATH."/plugins/metastore.serial";
+        $publicFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        $metastores = glob($metaStoreDir."/ajxp_meta_0");
+        if($dryRun){
+            print("RUNNING A DRY RUN FOR META MIGRATION");
+        }
+        foreach($metastores as $store){
+            if(strpos($store, ".bak") !== false) continue;
+            // Backup store
+            if(!$dryRun){
+                copy($store, $store.".bak");
+            }
+
+            $data = unserialize(file_get_contents($store));
+            foreach($data as $filePath => &$metadata){
+
+
+
+                foreach($metadata as $userName => &$meta){
+                    if(!AuthService::userExists($userName)){
+                        continue;
+                    }
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userName);
+
+                    if(isSet($meta["ajxp_shared"]) && isSet($meta["ajxp_shared"]["element"])){
+                        print("\n\nItem $filePath requires upgrade :");
+                        $share = $meta["ajxp_shared"];
+                        $element = $meta["ajxp_shared"]["element"];
+                        if(is_array($element)) $element = array_shift(array_keys($element));// Take the first one only
+                        $legacyLinkFile = $publicFolder."/".$element.".php";
+                        if(file_exists($legacyLinkFile)){
+                            // Load file, move it to DB and move the meta
+                            $publiclet = $shareStore->loadShare($element);
+                            rename($legacyLinkFile, $legacyLinkFile.".migrated");
+                            if(isSet($share["minisite"])){
+                                print("\n--Migrate legacy minisite to new minisite?");
+                                try{
+                                    $sharedRepoId = $publiclet["REPOSITORY"];
+                                    $sharedRepo = ConfService::getRepositoryById($sharedRepoId);
+                                    if($sharedRepo == null){
+                                        print("\n--ERROR: Cannot find repository with id ".$sharedRepoId);
+                                        continue;
+                                    }
+                                    $shareLink = new ShareLink($shareStore, $publiclet);
+                                    $user = $shareLink->getUniqueUser();
+                                    if(AuthService::userExists($user)){
+                                        $userObject = ConfService::getConfStorageImpl()->createUserObject($user);
+                                        $userObject->setHidden(true);
+                                        print("\n--Should set existing user $user as hidden");
+                                        if(!$dryRun){
+                                            $userObject->save();
+                                        }
+                                    }
+                                    $shareLink->parseHttpVars(["custom_handle" => $element]);
+                                    $shareLink->setParentRepositoryId($sharedRepo->getParentId());
+                                    print("\n--Creating the following share object");
+                                    print_r($shareLink->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
+                                    if(!$dryRun){
+                                        $shareLink->save();
+                                    }
+                                    $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "minisite"], $sharedRepoId => ["type" => "repository"]]];
+                                }catch(Exception $e){
+                                    print("\n-- Error ".$e->getMessage());
+                                }
+
+                            }else{
+                                print("\n--Should migrate legacy link to new minisite with ContentFilter");
+
+                                try{
+                                    $link = new ShareLink($shareStore);
+                                    $link->setOwnerId($userName);
+                                    $parameters = array("custom_handle" => $element, "simple_right_download" => true);
+                                    if(isSet($publiclet["EXPIRE_TIME"])) $parameters["expiration"] = $publiclet["EXPIRE_TIME"];
+                                    if(isSet($publiclet["DOWNLOAD_LIMIT"])) $parameters["downloadlimit"] = $publiclet["DOWNLOAD_LIMIT"];
+                                    $link->parseHttpVars($parameters);
+                                    $parentRepositoryObject = $publiclet["REPOSITORY"];
+
+                                    $driverInstance = AJXP_PluginsService::findPlugin("access", $parentRepositoryObject->getAccessType());
+                                    if(empty($driverInstance)){
+                                        print("\n-- ERROR: Cannot find driver instance!");
+                                        continue;
+                                    }
+                                    $options = $driverInstance->makeSharedRepositoryOptions(["file" => "/"], $parentRepositoryObject);
+                                    $options["SHARE_ACCESS"] = "private";
+                                    $newRepo = $parentRepositoryObject->createSharedChild(
+                                        basename($filePath),
+                                        $options,
+                                        $parentRepositoryObject->getId(),
+                                        $userObject->getId(),
+                                        null
+                                    );
+                                    $gPath = $userObject->getGroupPath();
+                                    if (!empty($gPath) && !ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf")) {
+                                        $newRepo->setGroupPath($gPath);
+                                    }
+                                    $newRepo->setDescription("");
+                                    // Smells like dirty hack!
+                                    $newRepo->options["PATH"] = SystemTextEncoding::fromStorageEncoding($newRepo->options["PATH"]);
+
+                                    $newRepo->setContentFilter(new ContentFilter([new AJXP_Node("pydio://".$parentRepositoryObject->getId().$filePath)]));
+                                    if(!$dryRun){
+                                        ConfService::addRepository($newRepo);
+                                    }
+
+                                    $hiddenUserEntry = $shareRightManager->prepareSharedUserEntry(
+                                        ["simple_right_read" => true, "simple_right_download" => true],
+                                        $link, false, null);
+
+                                    $selection = new UserSelection($parentRepositoryObject, []);
+                                    $selection->addFile($filePath);
+                                    if(!$dryRun){
+                                        $shareRightManager->assignSharedRepositoryPermissions(
+                                            $parentRepositoryObject,
+                                            $newRepo,
+                                            false,
+                                            [$hiddenUserEntry["ID"] => $hiddenUserEntry], [],
+                                            $selection
+                                        );
+                                    }
+                                    $link->setParentRepositoryId($parentRepositoryObject->getId());
+                                    $link->attachToRepository($newRepo->getId());
+                                    print("\n-- Should save following LINK: ");
+                                    print_r($link->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
+                                    if(!$dryRun){
+                                        $hash = $link->save();
+                                    }
+
+                                    // UPDATE METADATA
+                                    $meta["ajxp_shared"] = ["shares" => [$element => array("type" => "minisite")]];
+
+                                }catch(Exception $e){
+                                    print("\n-- ERROR: ".$e->getMessage());
+                                }
+
+
+                            }
+                            if($dryRun){
+                                rename($legacyLinkFile.".migrated", $legacyLinkFile);
+                            }
+                            continue;
+                        }else{
+                            //
+                            // File does not exists, remove meta
+                            //
+                            unset($meta["ajxp_shared"]);
+                        }
+
+
+                        $repo = ConfService::getRepositoryById($element);
+                        if($repo !== null){
+                            print("\n--Shared repository: just metadata");
+                            // Shared repo, migrating the meta should be enough
+                            $meta["ajxp_shared"] = array("shares" => [$element => array("type" => "repository")]);
+                        }
+                    }
+                }
+            }
+            print("\n\n SHOULD NOW UPDATE METADATA WITH FOLLOWING :");
+            print_r($data);
+            if(!$dryRun){
+                file_put_contents($store, serialize($data));
+            }
+        }
+    }
+
 }

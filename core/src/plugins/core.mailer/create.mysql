@@ -17,5 +17,7 @@ CREATE TABLE IF NOT EXISTS `ajxp_mail_sent` (
   `html` int(1) NOT NULL
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 /* SEPARATOR */
+DROP TRIGGER IF EXISTS `mail_queue_go_to_sent`;
+
 CREATE TRIGGER `mail_queue_go_to_sent` BEFORE DELETE ON `ajxp_mail_queue`
 FOR EACH ROW INSERT INTO ajxp_mail_sent (recipient,url,date_event,notification_object,html) VALUES (old.recipient,old.url,old.date_event,old.notification_object,old.html);

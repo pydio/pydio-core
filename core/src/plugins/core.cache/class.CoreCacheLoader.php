@@ -47,8 +47,144 @@ class CoreCacheLoader extends AJXP_Plugin
                 }
             }
             self::$cacheInstance = $pluginInstance;
+            if($pluginInstance !== null && is_a($pluginInstance, "AbstractCacheDriver") && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
+                AJXP_MetaStreamWrapper::appendMetaWrapper("pydio.cache", "CacheStreamLayer");
+            }
         }
 
         return self::$cacheInstance;
     }
+
+    /**
+     * @param AJXP_Node $node
+     * @param AJXP_Node $contextNode
+     * @param bool $details
+     */
+    public function cacheNodeInfo(&$node, $contextNode, $details){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
+        $id = $this->computeId($node, $details);
+        CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $node->getNodeInfoMeta());
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param AJXP_Node $contextNode
+     * @param bool $details
+     */
+    public function loadNodeInfoFromCache(&$node, $contextNode, $details){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
+        $id = $this->computeId($node, $details);
+        if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
+            $metadata = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
+            if(is_array($metadata)){
+                $node->mergeMetadata($metadata);
+                $node->setInfoLoaded($details);
+            }
+        }
+    }
+
+    /**
+     * @param AJXP_Node|null $from
+     * @param AJXP_Node|null $to
+     * @param bool $copy
+     */
+    public function clearNodeInfoCache($from=null, $to=null, $copy = false){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
+        if($from != null){
+            $this->clearCacheForNode($from);
+        }
+        if($to != null){
+            $this->clearCacheForNode($to);
+        }
+    }
+
+    /**
+     * @param Repository $repositoryObject
+     */
+    public function clearWorkspaceNodeInfos($repositoryObject){
+        $cDriver = ConfService::getCacheDriverImpl();
+        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
+            return;
+        }
+        $node = new AJXP_Node("pydio://".$repositoryObject->getId()."/");
+        $node->setLeaf(false);
+        $this->clearCacheForNode($node);
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    protected function clearCacheForNode($node){
+        if($node->isLeaf()){
+            // Clear meta
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+            // Clear stat
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            // Clear parent listing
+            if($node->getParent() !== null){
+                CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+            }
+        }else {
+            $cacheDriver = ConfService::getCacheDriverImpl();
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            if($node->getParent() !== null){
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+            }else{
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "list"));
+            }
+        }
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param bool $details
+     * @return string
+     */
+    protected function computeId($node, $details){
+        return AbstractCacheDriver::computeIdForNode($node, "node.info", $details?"all":"short");
+    }
+
+    public function exposeCacheStats($actionName, $httpVars, $fileVars){
+
+        $cImpl = $this->getCacheImpl();
+        $result = [];
+        if($cImpl != null){
+            $nspaces = $cImpl->listNamespaces();
+            foreach ($nspaces as $nspace){
+                $data = $cImpl->getStats($nspace);
+                $data["namespace"] = $nspace;
+                $result[] = $data;
+            }
+        }
+        HTMLWriter::charsetHeader("application/json");
+        echo json_encode($result);
+
+    }
+
+    public function clearCacheByNS($actionName, $httpVars, $fileVars){
+
+        $ns = AJXP_Utils::sanitize($httpVars["namespace"], AJXP_SANITIZE_ALPHANUM);
+        if($ns == AJXP_CACHE_SERVICE_NS_SHARED){
+            ConfService::clearAllCaches();
+        }else{
+            CacheService::deleteAll($ns);
+        }
+        HTMLWriter::charsetHeader("text/json");
+        echo json_encode(["result"=>"ok"]);
+
+    }
+
+
 }

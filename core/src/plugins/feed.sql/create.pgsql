@@ -12,7 +12,7 @@ CREATE TABLE ajxp_feed (
   content bytea NOT NULL
 );
 
-CREATE UNIQUE INDEX ajxp_feed_edate_idx ON ajxp_feed (
+CREATE INDEX ajxp_feed_edate_idx ON ajxp_feed (
   edate,
   etype,
   htype,

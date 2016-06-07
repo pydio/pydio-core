@@ -10,8 +10,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^shares ./dav.php [L]
 RewriteRule ^api ./rest.php [L]
-RewriteRule ^ocs/ ./ocs.php [L]
-RewriteRule ^ocs-provider/ ./ocs.php [L]
+RewriteRule ^ocs/ ./opencollab.php [L]
+RewriteRule ^ocs-provider/ ./opencollab.php [L]
 RewriteRule ^user ./index.php?get_action=user_access_point [L]
 RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/index
 RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/plugins

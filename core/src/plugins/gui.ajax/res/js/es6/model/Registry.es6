@@ -146,7 +146,8 @@ class Registry{
                 icon_class : xmlNode.getAttribute("iconClass"),
                 editorClass : xmlNode.getAttribute("className"),
                 mimes : xmlNode.getAttribute("mimes").split(","),
-                write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)
+                write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false),
+                canWrite: (xmlNode.getAttribute("canWrite") && xmlNode.getAttribute("canWrite")=="true"?true:false)
             };
             for(var k in properties){
                 if(properties.hasOwnProperty(k)){

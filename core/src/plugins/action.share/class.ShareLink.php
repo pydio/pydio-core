@@ -57,6 +57,23 @@ class ShareLink
      */
     protected $parentRepositoryId;
 
+    /**
+     * @return string
+     */
+    public function getShortFormUrl()
+    {
+        return $this->internal["SHORT_FORM_URL"];
+    }
+
+    /**
+     * @param string $shortFormUrl
+     */
+    public function setShortFormUrl($shortFormUrl)
+    {
+        $this->internal["SHORT_FORM_URL"] = $shortFormUrl;
+    }
+
+
     public function __construct($store, $storeData = array()){
         $this->store = $store;
         $this->internal = $storeData;
@@ -125,7 +142,8 @@ class ShareLink
         if(isSet($this->internal["REPOSITORY"])){
             return ConfService::getRepositoryById($this->internal["REPOSITORY"]);
         }else{
-            throw new Exception("No repository attached!");
+            $mess = ConfService::getMessages();
+            throw new Exception(str_replace('%s', 'No repository attached to link', $mess["share_center.219"]));
         }
     }
 
@@ -163,7 +181,8 @@ class ShareLink
             $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
             if(strlen($value) < $this->store->hashMinLength){
-                throw new Exception("Custom link is too short, please use at least ".$this->store->hashMinLength." characters");
+                $mess = ConfService::getMessages();
+                throw new Exception(str_replace("%s", $this->store->hashMinLength, $mess["share_center.223"]));
             }
             $test = $this->store->loadShare($value);
             $mess = ConfService::getMessages();
@@ -183,6 +202,7 @@ class ShareLink
      * @param PublicAccessManager $publicAccessManager
      * @param array $messages
      * @return mixed
+     * @throws Exception
      */
     public function getJsonData($publicAccessManager, $messages){
 
@@ -199,13 +219,15 @@ class ShareLink
             "public"            => $minisiteIsPublic?"true":"false",
             "disable_download"  => $dlDisabled,
             "hash"              => $this->getHash(),
-            "hash_is_shorten"   => isSet($shareMeta["short_form_url"]),
+            "hash_is_shorten"   => isSet($shareMeta["short_form_url"]) || isSet($this->internal["SHORT_FORM_URL"]),
             "internal_user_id"   => $internalUserId
         );
 
         if(!isSet($storedData["TARGET"]) || $storedData["TARGET"] == "public"){
             if (isSet($shareMeta["short_form_url"])) {
                 $jsonData["public_link"] = $shareMeta["short_form_url"];
+            } else if(isSet($this->internal["SHORT_FORM_URL"])){
+                $jsonData["public_link"] = $this->getShortFormUrl();
             } else {
                 $jsonData["public_link"] = $publicAccessManager->buildPublicLink($this->getHash());
             }
