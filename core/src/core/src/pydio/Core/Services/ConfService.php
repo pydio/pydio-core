@@ -449,8 +449,8 @@ class ConfService
             if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
         }
 
-        if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getOption("CHARSET")!="") {
-            self::setContextCharset($this->configs["REPOSITORY"]->getOption("CHARSET"));
+        if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getSafeOption("CHARSET")!="") {
+            self::setContextCharset($this->configs["REPOSITORY"]->getSafeOption("CHARSET"));
         } else {
             self::clearContextCharset();
         }

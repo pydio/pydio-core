@@ -518,7 +518,7 @@ abstract class AbstractAccessDriver extends Plugin
     public static function fixPermissions(AJXP_Node $node, &$stat, $remoteDetectionCallback = null)
     {
         $repoObject = $node->getRepository();
-        $fixPermPolicy = $repoObject->getOption("FIX_PERMISSIONS");
+        $fixPermPolicy = $repoObject->getContextOption($node->getContext(), "FIX_PERMISSIONS");
         $loggedUser = $node->getUser();
         if ($loggedUser == null) {
             return;
