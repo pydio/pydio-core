@@ -116,13 +116,16 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
            AJXP_METADATA_SCOPE_GLOBAL);
         if(is_array($lock)
             && array_key_exists("lock_user", $lock)){
-            if ($lock["lock_user"] != AuthService::getLoggedUser()->getId()) {
+            if ($lock["lock_user"] != $node->getContext()->getUser()->getId()) {
+                $displayName = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $lock["lock_user"], "core.conf", $lock["lock_user"]);
+                $node->setLabel($node->getLabel() . " (locked by ".$displayName.")");
                 $node->mergeMetadata(array(
                     "sl_locked" => "true",
                     "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock.png",
                     "overlay_class" => "icon-lock"
                 ), true);
             } else {
+                $node->setLabel($node->getLabel() . " (locked by you)");
                 $node->mergeMetadata(array(
                     "sl_locked" => "true",
                     "sl_mylock" => "true",
@@ -146,7 +149,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
            AJXP_METADATA_SCOPE_GLOBAL);
         if(is_array($lock)
             && array_key_exists("lock_user", $lock)
-            && $lock["lock_user"] != AuthService::getLoggedUser()->getId()){
+            && $lock["lock_user"] != $node->getUserId()){
             $mess = ConfService::getMessages();
             throw new Exception($mess["meta.simple_lock.5"]);
         }

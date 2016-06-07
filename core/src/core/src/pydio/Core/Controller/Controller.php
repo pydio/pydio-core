@@ -197,9 +197,11 @@ class Controller
             }
             $actionNode = $actions->item(0);
         }
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         //Check Rights
         if (AuthService::usersEnabled()) {
-            $loggedUser = AuthService::getLoggedUser();
+            $loggedUser = $ctx->getUser();
             if( $actionName != "logout" && Controller::actionNeedsRight($actionNode, $xPath, "userLogged", "only") && $loggedUser == null){
                     throw new AuthRequiredException();
                 }

@@ -65,7 +65,7 @@ class JSPacker
      * @param $mode
      * @return bool
      */
-    public function concatListAndPack($src, $out, $mode)
+    public static function concatListAndPack($src, $out, $mode)
     {
         if (!is_file($src) || !is_readable($src)) {
             return false;

@@ -437,12 +437,12 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
-            if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
+            if (AuthService::usersEnabled() && $node->getContext()->hasUser()) {
                 $term = new Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($node->getUrl()), "node_url");
                 $hits = $index->termDocs($term);
                 foreach ($hits as $hitId) {
                     $hit = $index->getDocument($hitId);
-                    if ($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == AuthService::getLoggedUser()->getId())) {
+                    if ($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == $node->getContext()->getUser()->getId())) {
                         $index->delete($hitId);
                     }
                 }
@@ -612,13 +612,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), TextEncoder::getEncoding());
             }
         }
-        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && $ajxpNode->getContext()->hasUser() ) {
             $privateDoc = new Zend_Search_Lucene_Document();
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl(), TextEncoder::getEncoding()));
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), TextEncoder::getEncoding()));
 
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "user"));
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", AuthService::getLoggedUser()->getId()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", $ajxpNode->getContext()->getUser()->getId()));
             foreach ($ajxpNode->indexableMetaKeys["user"] as $userField) {
                 if ($ajxpNode->$userField) {
                     $privateDoc->addField(Zend_search_Lucene_Field::keyword($userField, $ajxpNode->$userField));

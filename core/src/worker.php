@@ -75,7 +75,7 @@ function applyTask($task, $logger){
     }
     $logger->debug("Init plugins");
     $newCtx = \Pydio\Core\Model\Context::contextWithObjects(AuthService::getLoggedUser(), $repo);
-    $pServ = PluginsService::getInstance($newCtx);
+    PluginsService::getInstance($newCtx);
 
     $fakeRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals(array(), array(), $parameters)
         ->withAttribute("ctx", $newCtx)

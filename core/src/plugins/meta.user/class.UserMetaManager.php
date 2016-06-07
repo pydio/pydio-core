@@ -326,7 +326,8 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $valuesUpdate = (isSet($updateField) || isSet($createField));
         $currentUser = null;
         if($valuesUpdate){
-            $currentUser = AuthService::getLoggedUser()->getId();
+            $refNode = ($oldNode !== null ? $oldNode : $newNode);
+            $currentUser = $refNode->getUserId();
         }
 
         if($oldNode == null && !$valuesUpdate) return;

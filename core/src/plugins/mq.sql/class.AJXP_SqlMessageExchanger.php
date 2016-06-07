@@ -105,8 +105,8 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
     public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName, true);
-        if (AuthService::usersEnabled()) {
-            $user = AuthService::getLoggedUser();
+        if ($ctx->hasUser()) {
+            $user = $ctx->getUser();
             if ($user == null) {
                 throw new Exception("You must be logged in");
             }

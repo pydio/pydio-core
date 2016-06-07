@@ -42,10 +42,6 @@ class FileMimeSender extends Plugin
         
         if (AuthService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
-            if ($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
-                AuthService::logUser("guest", null);
-                $loggedUser = AuthService::getLoggedUser();
-            }
             if (!$loggedUser->canSwitchTo($repository->getId())) {
                 echo("You do not have permissions to access this resource");
                 return false;

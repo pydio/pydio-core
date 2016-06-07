@@ -71,15 +71,18 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return false;
     }
 
-    protected function indexIsSync(){
+    /**
+     * @param ContextInterface $ctx
+     */
+    protected function indexIsSync(ContextInterface $ctx){
         // Grab all folders mtime and compare them
-        $repoIdentifier = $this->computeIdentifier($this->accessDriver->repository);
+        $repoIdentifier = $this->computeIdentifier($ctx);
         $res = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [md5] = %s AND [repository_identifier] = %s", 'directory', $repoIdentifier);
         $modified = array();
 
         // REGISTER ROOT ANYWAY: WE PROBABLY CAN'T GET A "FILEMTIME" ON IT.
         $mod = array(
-            "url"   => $this->accessDriver->getResourceUrl(""),
+            "url"   => $ctx->getUrlBase(),
             "path"  => "/",
             "children" => array()
         );
@@ -100,7 +103,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         foreach($res as $row){
             $path = $row->node_path;
             $mtime = intval($row->mtime);
-            $url = $this->accessDriver->getResourceUrl($path);
+            $url = $ctx->getUrlBase().$path;
             $currentTime = @filemtime($url);
             if($currentTime === false && !file_exists($url)) {
                 // Deleted folder!
@@ -198,11 +201,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     public function resyncAction($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-            Controller::applyActionInBackground($contextInterface->getRepositoryId(), "resync_storage", $httpVars);
+            Controller::applyActionInBackground($contextInterface, "resync_storage", $httpVars);
         }else{
             $file = $this->getResyncTimestampFile($contextInterface, true);
             file_put_contents($file, time());
-            $this->indexIsSync();
+            $this->indexIsSync($contextInterface);
         }
     }
 
@@ -261,7 +264,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
 
 
         $ands = array();
-        $ands[] = array("[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($currentRepo));
+        $ands[] = array("[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($contextInterface));
         $ands[]= array("[seq] > %i", $seqId);
         if(isSet($httpVars["filter"])) {
             $filter = Utils::decodeSecureMagic($httpVars["filter"]);
@@ -453,38 +456,19 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     }
 
     /**
-     * @param Repository $repository
-     * @param null $resolveUserId
+     * @param ContextInterface $ctx
      * @return String
      */
-    protected function computeIdentifier($repository, $resolveUserId = null)
+    protected function computeIdentifier(ContextInterface $ctx)
     {
-        $parts = array($repository->getId());
+        $parts = array($ctx->getRepositoryId());
+        $repository = $ctx->getRepository();
         if ($repository->securityScope() == 'USER') {
-            if($resolveUserId != null) {
-                $parts[] = $resolveUserId;
-            } else {
-                $parts[] = AuthService::getLoggedUser()->getId();
-            }
+            $parts[] = $ctx->getUser()->getId();
         } else if ($repository->securityScope() == 'GROUP') {
-            if($resolveUserId != null) {
-                $userObject = ConfService::getConfStorageImpl()->createUserObject($resolveUserId);
-                if($userObject != null) $parts[] = $userObject->getGroupPath();
-            }else{
-                $parts[] = AuthService::getLoggedUser()->getGroupPath();
-            }
+            $parts[] = $ctx->getUser()->getGroupPath();
         }
         return implode("-", $parts);
-    }
-
-    /**
-     * @param Repository $repository
-     * @return float
-     */
-    public function getRepositorySpaceUsage($repository){
-        $id = $this->computeIdentifier($repository);
-        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s", $id);
-        return floatval($res->fetchSingle());
     }
 
     /**
@@ -509,7 +493,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
-        //$this->logInfo("Syncable index", array($oldNode == null?'null':$oldNode->getUrl(), $newNode == null?'null':$newNode->getUrl()));
+        $refNode = ($oldNode !== null ? $oldNode : $newNode);
         try {
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
@@ -522,7 +506,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 }
             }
             if ($newNode == null) {
-                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUserId());
+                $repoId = $this->computeIdentifier($refNode->getContext());
                 // DELETE
                 $this->logDebug('DELETE', $oldNode->getUrl());
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
@@ -536,7 +520,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
-                    "repository_identifier" => $repoId = $this->computeIdentifier($newNode->getRepository(), $newNode->getUserId())
+                    "repository_identifier" => $repoId = $this->computeIdentifier($refNode->getContext())
                 ));
                 if($copy && !$newNode->isLeaf()){
                     // Make sure to index the content of this folder
@@ -546,7 +530,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     TaskService::getInstance()->enqueueTask($task);
                 }
             } else {
-                $repoId = $this->computeIdentifier($oldNode->getRepository(), $oldNode->getUserId());
+                $repoId = $this->computeIdentifier($refNode->getContext());
                 if ($oldNode->getPath() == $newNode->getPath()) {
                     // CONTENT CHANGE
                     clearstatcache();
@@ -614,7 +598,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
      */
     public function computeSizeRecursive(&$node, &$result){
         
-        $id = $this->computeIdentifier($node->getRepository());
+        $id = $this->computeIdentifier($node->getContext());
         $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s AND ([node_path] = %s OR [node_path] LIKE %s)", $id, $node->getPath(), rtrim($node->getPath(), "/")."/%");
         $result = floatval($res->fetchSingle());
 

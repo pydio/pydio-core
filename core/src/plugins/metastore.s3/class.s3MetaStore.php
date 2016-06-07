@@ -63,7 +63,6 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
     protected function getUserId($node)
     {
         if($node->hasUser()) return $node->getUserId();
-        if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
 

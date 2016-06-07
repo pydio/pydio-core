@@ -286,18 +286,16 @@ class GitManager extends AJXP_AbstractMetaSource
      */
     public function changesHook($fromNode=null, $toNode=null, $copy=false)
     {
-        $this->commitChanges();
+        $refNode = ($fromNode !== null ? $fromNode : $toNode);
+        $this->commitChanges($refNode->getContext());
         return;
-        /*
-        $refNode = $fromNode;
-        if ($fromNode == null && $toNode != null) {
-            $refNode = $toNode;
-        }
-        $this->commitChanges(dirname($refNode->getPath()));
-        */
     }
 
-    private function commitChanges($path = null)
+    /**
+     * @param ContextInterface $ctx
+     * @param string $path
+     */
+    private function commitChanges(ContextInterface $ctx, $path = null)
     {
         $git = new VersionControl_Git($this->repoBase);
         $command = $git->getCommand("add");
@@ -306,18 +304,18 @@ class GitManager extends AJXP_AbstractMetaSource
             $cmd = $command->createCommandString();
             $this->logDebug("Git command ".$cmd);
             $res = $command->execute();
+            $this->logDebug("GIT RESULT ADD : ".$res);
         } catch (Exception $e) {
-            $this->logDebug("Error ".$e->getMessage());
+            $this->logDebug("Error in GIT Command ".$e->getMessage());
         }
-        $this->logDebug("GIT RESULT ADD : ".$res);
 
         $command = $git->getCommand("commit");
         $command->setOption("a", true);
         $userId = "no user";
         $mail = "mail@mail.com";
-        if (AuthService::getLoggedUser()!=null) {
-            $userId = AuthService::getLoggedUser()->getId();
-            $mail = AuthService::getLoggedUser()->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "mail@mail.com");
+        if ($ctx->hasUser()) {
+            $userId = $ctx->getUser()->getId();
+            $mail = $ctx->getUser()->getPersonalRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "mail@mail.com");
         }
         $command->setOption("m", $userId);
         $command->setOption("author", "$userId <$mail>");

@@ -126,22 +126,7 @@ class AJXP_ClientDriver extends Plugin
             "REBASE"            => $root
         );
         if (AuthService::usersEnabled()) {
-            //AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
             AuthService::bootSequence($START_PARAMETERS);
-            /*
-            if (AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1) {
-                if (AuthService::getDefaultRootId() == -1) {
-                    AuthService::disconnect();
-                } else {
-                    $loggedUser = AuthService::getLoggedUser();
-                    if(!$loggedUser->canRead(ConfService::getCurrentRepositoryId())
-                        && AuthService::getDefaultRootId() != ConfService::getCurrentRepositoryId())
-                    {
-                        ConfService::switchRootDir(AuthService::getDefaultRootId());
-                    }
-                }
-            }
-            */
         }
 
         Utils::parseApplicationGetParameters($ctx, $_GET, $START_PARAMETERS, $_SESSION);

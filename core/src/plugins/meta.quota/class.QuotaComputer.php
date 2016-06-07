@@ -50,42 +50,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      * @var AjxpMailer
      */
     protected $mailer;
-
-    /**
-     * @return array
-    protected function getWorkingRepositoryOptions()
-    {
-        $p = array();
-        $repo = $this->accessDriver->repository;
-        $clearParent = null;
-        // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
-        if ($repo->hasParent()) {
-            $parentOwner = $repo->getOwner();
-            if ($parentOwner !== null) {
-                $repo = ConfService::getRepositoryById($repo->getParentId());
-                $originalUser = AuthService::getLoggedUser();
-                $loggedUser = AuthService::getLoggedUser();
-                if (!$loggedUser->hasParent()) {
-                    $loggedUser->setParent($parentOwner);
-                    $clearParent = null;
-                } else {
-                    $clearParent = $loggedUser->getParent();
-                }
-                $loggedUser->setResolveAsParent(true);
-                AuthService::updateUser($loggedUser);
-            }
-        }
-        $path = $repo->getOption("PATH");
-        $p["PATH"] = $path;
-        if ( isSet($originalUser) ) {
-            $originalUser->setParent($clearParent);
-            $originalUser->setResolveAsParent(false);
-            AuthService::updateUser($originalUser);
-        }
-        return $p;
-    }
-     */
-
+    
     /**
      * @param ContextInterface $ctx
      * @return ContextInterface

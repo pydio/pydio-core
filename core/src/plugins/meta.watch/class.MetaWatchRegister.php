@@ -235,8 +235,9 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     public function collectWatches($node, $watchType)
     {
         $currentUserId = "shared";
-        if (AuthService::getLoggedUser() != null) {
-            $currentUserId = AuthService::getLoggedUser()->getId();
+        $ctx = $node->getContext();
+        if ($ctx->hasUser()) {
+            $currentUserId = $ctx->getUser()->getId();
         }
         $result = array();
         $result["node"] = $this->getWatchesOnNode($node, $watchType, $currentUserId);
@@ -274,10 +275,11 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
      */
     public function getWatchesOnNode($node, $watchType, $userId = null)
     {
+        $ctx = $node->getContext();
         if($userId == null){
             $currentUserId = "shared";
-            if (AuthService::getLoggedUser() != null) {
-                $currentUserId = AuthService::getLoggedUser()->getId();
+            if ($ctx->hasUser()) {
+                $currentUserId = $ctx->getUser()->getId();
             }
         }else{
             $currentUserId = $userId;
@@ -493,18 +495,20 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     /**
      * @param AJXP_Node $node
      */
-    public function enrichNode($node)
+    public function enrichNode(&$node)
     {
-        if(AuthService::getLoggedUser() == null) return;
+        if(!$node->getContext()->hasUser()) {
+            return;
+        }
         $meta = $this->metaStore->retrieveMetadata(
             $node,
             self::$META_WATCH_NAMESPACE,
             false,
             AJXP_METADATA_SCOPE_REPOSITORY);
-        if(is_array($meta)
-            && array_key_exists(AuthService::getLoggedUser()->getId(), $meta)){
+        $userId = $node->getContext()->getUser()->getId();
+        if(is_array($meta) && array_key_exists($userId, $meta)){
             $node->mergeMetadata(array(
-                "meta_watched" => $meta[AuthService::getLoggedUser()->getId()],
+                "meta_watched" => $meta[$userId],
                 "overlay_icon" => "meta.watch/ICON_SIZE/watch.png",
                 "overlay_class" => "icon-eye-open"
             ), true);

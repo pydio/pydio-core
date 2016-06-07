@@ -20,8 +20,6 @@
  */
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -68,7 +66,6 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
     protected function getUserId($node)
     {
         if($node->hasUser()) return $node->getUserId();
-        if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
 
@@ -158,33 +155,23 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $ajxpNode->mergeMetadata($allMeta);
     }
 
-    protected function updateSecurityScope($metaFile, $repositoryId, $resolveUserId = null)
+    protected function updateSecurityScope($metaFile, \Pydio\Core\Model\ContextInterface $ctx)
     {
-        $repo = ConfService::getRepositoryById($repositoryId);
+        $repo = $ctx->getRepository();
         if (!is_object($repo)) {
             return $metaFile;
         }
         $securityScope = $repo->securityScope();
         if($securityScope == false) return $metaFile;
-        if($resolveUserId != null){
+        if($ctx->hasUser()){
             if ($securityScope == "USER") {
-                $metaFile .= "_".$resolveUserId;
+                $metaFile .= "_".$ctx->getUser()->getId();
             }else if($securityScope == "GROUP"){
-                $uObj= ConfService::getConfStorageImpl()->createUserObject($resolveUserId);
+                $uObj= $ctx->getUser();
                 if($uObj != null){
                     $u = str_replace("/", "__", $uObj->getGroupPath());
                     $metaFile.= "_".$u;
                 }
-            }
-        }else if (AuthService::getLoggedUser() != null) {
-            if ($securityScope == "USER") {
-                $u = AuthService::getLoggedUser();
-                $id = $u->getId();
-                $metaFile .= "_".$id;
-            } else if ($securityScope == "GROUP") {
-                $u = AuthService::getLoggedUser()->getGroupPath();
-                $u = str_replace("/", "__", $u);
-                $metaFile .= "_".$u;
             }
         }
         return $metaFile;
@@ -215,7 +202,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
             $fileKey = basename($fileKey);
         } else {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getContext());
         }
         self::$metaCache = array();
         if (!isSet(self::$fullMetaCache[$metaFile])) {
@@ -272,7 +259,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
                 mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
-            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getContext());
         }
         $metFileNode = new AJXP_Node($metaFile);
         if($scope==AJXP_METADATA_SCOPE_REPOSITORY
@@ -322,7 +309,7 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $result = array();
         $repositoryId = $ajxpNode->getRepositoryId();
         $metaFile = $this->globalMetaFile."_".$repositoryId;
-        $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId(), $ajxpNode->getUserId());
+        $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getContext());
         if(!is_file($metaFile)) return $result;
         $raw_data = file_get_contents($metaFile);
         if($raw_data === false) return $result;

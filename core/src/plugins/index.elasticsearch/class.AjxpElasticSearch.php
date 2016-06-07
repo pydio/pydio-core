@@ -410,7 +410,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     public function updateNodeIndexMeta($node)
     {
         $this->loadIndex($node->getContext(), true);
-        if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
+        if (AuthService::usersEnabled() && $node->getContext()->hasUser()) {
 
             $query = new Elastica\Query\Term();
             $query->setTerm("node_url", $node->getUrl());
@@ -418,7 +418,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $hits = $results->getResults();
             foreach ($hits as $hit) {
                 $source = $hit->getSource();
-                if ($source['ajxp_scope'] == 'shared' || ($source['ajxp_scope'] == 'user' && $source['ajxp_user'] == AuthService::getLoggedUser()->getId())) {
+                if ($source['ajxp_scope'] == 'shared' || ($source['ajxp_scope'] == 'user' && $source['ajxp_user'] == $node->getContext()->getUser()->getId())) {
                     $this->currentType->deleteById($hit->getId());
                 }
             }
@@ -574,16 +574,16 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $this->currentType->addDocument($doc);
         $this->nextId++;
 
-        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
+        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && $ajxpNode->getContext()->hasUser()) {
 
             $userData = array(
                 "ajxp_scope" => "user",
-                "user"      => AuthService::getLoggedUser()->getId(),
+                "user"      => $ajxpNode->getUser()->getId(),
                 "serialized_metadata" => $data["serialized_metadata"],
                 "node_url"  => $data["node_url"],
                 "node_path"  => $data["node_path"]
             );
-            $userData["ajxp_user"] = AuthService::getLoggedUser()->getId();
+            $userData["ajxp_user"] = $ajxpNode->getContext()->getUser()->getId();
             foreach ($ajxpNode->indexableMetaKeys["user"] as $userField) {
                 if ($ajxpNode->$userField) {
                     $userData[$userField] = $ajxpNode->$userField;
