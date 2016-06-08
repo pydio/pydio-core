@@ -19,15 +19,20 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+
+use GuzzleHttp\Client;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -38,15 +43,35 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PixlrEditor extends Plugin
 {
-  public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
-  {
-        $selection = UserSelection::fromContext($contextInterface, $httpVars);
-        $repository = $contextInterface->getRepository();
+
+    /**
+     * @var Client
+     */
+    private $client;
+
+    // Plugin initialisation
+    public function init(\Pydio\Core\Model\ContextInterface $context) {
+
+        parent::init($context);
+
+        $this->client = new Client([
+            'base_url' => "https://pixlr.com/editor/"
+        ]);
+    }
+
+    // Main controller function
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
+
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $action = $request->getAttribute("action");
+        $httpVars = $request->getParsedBody();
+
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         $selectedNode = $selection->getUniqueNode();
         $selectedNodeUrl = $selectedNode->getUrl();
 
         if ($action == "post_to_server") {
-
             if(!is_writeable($selectedNodeUrl)){
                 header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
                 return false;
@@ -65,51 +90,37 @@ class PixlrEditor extends Plugin
             $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
             Controller::applyHook("node.read", array($selectedNode));
 
-
             $saveTarget = $target."/fake_save_pixlr.php";
-            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
+            if ($this->getContextualOption($ctx, "CHECK_SECURITY_TOKEN")) {
                 $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
             }
-            $params = array(
-                "referrer"  => "Pydio",
-                "method"  => "get",
-                "loc"    => ConfService::getLanguage(),
-                "target"  => $saveTarget,
-                "exit"    => $target."/fake_close_pixlr.php",
-                "title"    => urlencode(basename($selectedNodeUrl)),
-                "locktarget"=> "false",
-                "locktitle" => "true",
-                "locktype"  => "source"
-            );
 
-            require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
-            $arguments = array();
-            $httpClient = new http_class();
-            $httpClient->request_method = "POST";
-            $httpClient->GetRequestArguments("https://pixlr.com/editor/", $arguments);
-            $arguments["PostValues"] = $params;
-            $arguments["PostFiles"] = array(
-                "image"   => array("FileName" => $tmp, "Content-Type" => "automatic/name"));
+            $type = pathinfo($tmp, PATHINFO_EXTENSION);
+            $data = file_get_contents($tmp);
+            $rawData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-            $err = $httpClient->Open($arguments);
-            if (empty($err)) {
-                $err = $httpClient->SendRequest($arguments);
-                if (empty($err)) {
-                    $response = "";
-                    while (true) {
-                        $header = array();
-                        $error = $httpClient->ReadReplyHeaders($header, 1000);
-                        if ($error != "" || $header != null) break;
-                            $response .= $header;
-                    }
-                }
-            }
+            $params = [
+                'allow_redirects' => false,
+                'body' => [
+                    "referrer"   => "Pydio",
+                    "method"     => "get",
+                    "type"       => $type,
+                    "loc"        => ConfService::getLanguage(),
+                    "target"     => $saveTarget,
+                    "exit"       => $target."/fake_close_pixlr.php",
+                    "title"      => urlencode(basename($selectedNodeUrl)),
+                    "locktarget" => "false",
+                    "locktitle"  => "true",
+                    "locktype"   => "source",
+                    "image"      => $rawData
+                ]
+            ];
 
-            if(isSet($header) && isSet($header["location"])){
-                header("Location: {$header['location']}"); //$response");
-            }else{
-                header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
-            }
+            $postResponse = $this->client->post("/editor/", $params);
+
+            $response = $response
+                ->withStatus(302)
+                ->withHeader("Location", $postResponse->getHeader("Location"));
 
         } else if ($action == "retrieve_pixlr_image") {
 
@@ -127,7 +138,7 @@ class PixlrEditor extends Plugin
             $url = $httpVars["new_url"];
             $urlParts = parse_url($url);
             $query = $urlParts["query"];
-            if ($this->getContextualOption($contextInterface, "CHECK_SECURITY_TOKEN")) {
+            if ($this->getContextualOption($ctx, "CHECK_SECURITY_TOKEN")) {
                 $scriptName = basename($urlParts["path"]);
                 $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
                 if ($token != md5($httpVars["secure_token"])) {
@@ -160,6 +171,22 @@ class PixlrEditor extends Plugin
             Controller::applyHook("node.change", array(&$selectedNode, &$selectedNode));
         }
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param mixed $client
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
     }
 
 }
