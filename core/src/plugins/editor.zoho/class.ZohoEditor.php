@@ -22,17 +22,19 @@
  * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
  * Improved by cdujeu / Https Support now necessary for zoho API.
  */
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
+
+use GuzzleHttp\Client;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -42,8 +44,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ZohoEditor extends Plugin
 {
-    public function performChecks()
-    {
+
+    /**
+     * @var Client
+     */
+    private $client;
+
+
+    public function performChecks() {
         if (!extension_loaded("openssl")) {
             throw new Exception("Zoho plugin requires PHP 'openssl' extension, as posting the document to the Zoho server requires the Https protocol.");
         }
@@ -53,10 +61,11 @@ class ZohoEditor extends Plugin
      * @param ContextInterface $ctx
      * @param array $options
      */
-    public function init(ContextInterface $ctx, $options = [])
-    {
-
+    public function init(ContextInterface $ctx, $options = []) {
         parent::init($ctx, $options);
+
+        $this->client = new Client();
+
         if(!extension_loaded("openssl")) return;
 
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
@@ -78,44 +87,52 @@ class ZohoEditor extends Plugin
         }else{
             openssl_pkey_export_to_file($res, $keyFile);
         }
-
     }
 
-    public function loadConfigs($configData){
+    public function loadConfigs($configData) {
 
         parent::loadConfigs($configData);
+
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
-        if(file_exists($keyFile)){
+        if(file_exists($keyFile)) {
             $res = openssl_pkey_get_private(file_get_contents($keyFile));
             $details = openssl_pkey_get_details($res);
             $public = $details["key"];
             $this->pluginConf["ZOHO_AGENT_PUBLIC_KEY"] = $public;
         }
-
     }
 
-    public function signID($id){
+    public function signID($id) {
+
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
-        if(file_exists($keyFile)){
+        if(file_exists($keyFile)) {
             $keyId = openssl_get_privatekey(file_get_contents($keyFile));
             $message = $id;
             openssl_sign($message, $signature, $keyId);
             openssl_free_key($keyId);
             return urlencode(base64_encode($signature));
         }
+
         return false;
     }
 
 
-    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $ctx)
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $action = $request->getAttribute("action");
+        $httpVars = $request->getParsedBody();
+
         $repository = $ctx->getRepository();
         $loggedUser = $ctx->getUser();
+
         if($loggedUser != null){
             $repoWriteable = $loggedUser->canWrite($repository->getId());
         }else{
             $repoWriteable = false;
         }
+
         $selection = new UserSelection($repository, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
@@ -124,8 +141,6 @@ class ZohoEditor extends Plugin
             $sheetExt =  explode(",", "xls,xlsx,ods,sxc,csv,tsv");
             $presExt = explode(",", "ppt,pptx,pps,odp,sxi");
             $docExt = explode(",", "doc,docx,rtf,odt,sxw");
-
-            require_once(AJXP_BIN_FOLDER."/lib/http_class/http_class.php");
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
@@ -146,8 +161,6 @@ class ZohoEditor extends Plugin
             $this->logInfo('Preview', 'Posting content of '.$file.' to Zoho server', array("files" => $file));
 
             $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
-            $httpClient = new http_class();
-            $httpClient->request_method = "POST";
 
             $_SESSION["ZOHO_CURRENT_EDITED"] = $nodeUrl;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
@@ -160,18 +173,6 @@ class ZohoEditor extends Plugin
 
             $b64Sig = $this->signID($_SESSION["ZOHO_CURRENT_UUID"]);
 
-            $params = array(
-                'id'            => $_SESSION["ZOHO_CURRENT_UUID"],
-                'apikey'        => $this->getContextualOption($ctx, "ZOHO_API_KEY"),
-                'output'        => 'url',
-                'lang'          => $this->getContextualOption($ctx, "ZOHO_LANGUAGE"),
-                'filename'      => TextEncoder::toUTF8(basename($file)),
-                'persistence'   => 'false',
-                'format'        => $extension,
-                'mode'          => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
-                'saveurl'       => $saveUrl."?signature=".$b64Sig
-            );
-
             $service = "exportwriter";
             if (in_array($extension, $sheetExt)) {
                 $service = "sheet";
@@ -180,39 +181,43 @@ class ZohoEditor extends Plugin
             } else if (in_array($extension, $docExt)) {
                 $service = "exportwriter";
             }
-            $arguments = array();
-            $httpClient->GetRequestArguments("https://".$service.".zoho.com/remotedoc.im", $arguments);
-            $arguments["PostValues"] = $params;
-            $arguments["PostFiles"] = array(
-                "content"   => array("FileName" => $tmp, "Content-Type" => "automatic/name")
-            );
-            $err = $httpClient->Open($arguments);
-            if (empty($err)) {
-                $err = $httpClient->SendRequest($arguments);
-                if (empty($err)) {
-                    $response = "";
-                    while (true) {
-                        $body = "";
-                        $error = $httpClient->ReadReplyBody($body, 1000);
-                        if($error != "" || strlen($body) == 0) break;
-                        $response .= $body;
-                    }
-                    $result = trim($response);
-                    $matchlines = explode("\n", $result);
-                    $resultValues = array();
-                    foreach ($matchlines as $line) {
-                        list($key, $val) = explode("=", $line, 2);
-                        $resultValues[$key] = $val;
-                    }
-                    if ($resultValues["RESULT"] == "TRUE" && isSet($resultValues["URL"])) {
-                        header("Location: ".$resultValues["URL"]);
-                    } else {
-                        echo "Zoho API Error ".$resultValues["ERROR_CODE"]." : ".$resultValues["WARNING"];
-                        echo "<script>window.parent.setTimeout(function(){parent.hideLightBox();}, 2000);</script>";
-                    }
-                }
-                $httpClient->Close();
+
+            $postResponse = $this->client->post("https://".$service.".zoho.com/remotedoc.im", [
+                'headers' => [
+                    'User-Agent' => $request->getHeader('User-Agent')
+                ],
+                'body' => [
+                    'id'            => $_SESSION["ZOHO_CURRENT_UUID"],
+                    'apikey'        => $this->getContextualOption($ctx, "ZOHO_API_KEY"),
+                    'output'        => 'url',
+                    'lang'          => $this->getContextualOption($ctx, "ZOHO_LANGUAGE"),
+                    'filename'      => TextEncoder::toUTF8(basename($file)),
+                    'persistence'   => 'false',
+                    'format'        => $extension,
+                    'mode'          => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
+                    'saveurl'       => $saveUrl."?signature=".$b64Sig."&XDEBUG_SESSION_START=phpstorm",
+                    'content'       => fopen($tmp, 'r')
+                ]
+            ]);
+
+            $body = $postResponse->getBody();
+
+            $contents = $body->getContents();
+
+            $lines = explode("\n", $contents);
+            $result = array();
+            foreach ($lines as $line) {
+                list($key, $val) = explode("=", $line, 2);
+                $result[$key] = $val;
             }
+
+            if (!isset($result["RESULT"]) || $result["RESULT"] !== "TRUE" || !isset($result["URL"])) {
+                throw new Exception("Could not open file");
+            }
+
+            $response = $response
+                ->withStatus(302)
+                ->withHeader("Location", $result["URL"]);
 
         } else if ($action == "retrieve_from_zohoagent") {
 
@@ -222,11 +227,20 @@ class ZohoEditor extends Plugin
             $node = new AJXP_Node($targetFile);
             $node->loadNodeInfo();
 
+            $file = fopen('php://memory', 'w+');
+            $stream = new \Zend\Diactoros\Stream($file);
+
+            $response = $response
+                ->withStatus(200)
+                ->withBody($stream);
+
             if(!$repoWriteable || !is_writeable($node->getUrl())){
                 $this->logError("Zoho Editor", "Trying to edit an unauthorized file ".$node->getUrl());
-                echo "NOT_ALLOWED";
+
+                $stream->write("NOT_ALLOWED");
                 return false;
             }
+
             Controller::applyHook("node.before_change", array(&$node));
 
             $b64Sig = $this->signID($id);
@@ -238,7 +252,9 @@ class ZohoEditor extends Plugin
                 $data = Utils::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
-                    echo "MODIFIED";
+
+                    $stream->write("MODIFIED");
+
                     $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
                     Controller::applyHook("node.change", array(null, &$node));
                 }
@@ -246,14 +262,14 @@ class ZohoEditor extends Plugin
                 if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext)) {
                     copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext, $targetFile);
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
-                    echo "MODIFIED";
+
+                    $stream->write("MODIFIED");
+
                     $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
                     Controller::applyHook("node.change", array(null, &$node));
                 }
             }
         }
-
-
     }
 
 }
