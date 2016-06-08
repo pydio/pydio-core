@@ -68,6 +68,9 @@ class AuthService
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->passwordsEditable();
     }
+
+
+
     /**
      * Get a unique seed from the current auth driver
      * @static
@@ -78,8 +81,6 @@ class AuthService
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->getSeed(true);
     }
-
-    
     /**
      * Get the currently logged user object
      * @return AbstractAjxpUser
@@ -96,6 +97,7 @@ class AuthService
         if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
         return null;
     }
+
 
     /**
      * The array is located in the AjxpTmpDir/failedAJXP.log
@@ -170,6 +172,9 @@ class AuthService
         $loginAttempt = self::getBruteForceLoginArray();
         return !self::checkBruteForceLogin($loginAttempt);
     }
+
+
+
 
     public static function filterUserSensitivity($user)
     {
@@ -526,6 +531,7 @@ class AuthService
         return 0;
     }
 
+
     /**
      * Update a user with admin rights and return it
     * @param AbstractAjxpUser $adminUser
@@ -540,7 +546,6 @@ class AuthService
         }
         return $adminUser;
     }
-
     /**
      * Update a user object with the default repositories rights
      *
@@ -549,24 +554,9 @@ class AuthService
     public static function updateDefaultRights(&$userObject)
     {
         if (!$userObject->hasParent()) {
-            /*
-            $changes = false;
-            $repoList = ConfService::getRepositoriesList("all");
-            foreach ($repoList as $repositoryId => $repoObject) {
-                if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
-                if($repoObject->isTemplate) continue;
-                if ($repoObject->getDefaultRight() != "") {
-                    $changes = true;
-                    $userObject->personalRole->setAcl($repositoryId, $repoObject->getDefaultRight());
-                }
-            }
-            if ($changes) {
-                $userObject->recomputeMergedRole();
-            }
-            */
             $rolesList = self::getRolesList(array(), true);
             foreach ($rolesList as $roleId => $roleObject) {
-                if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
+                if(!$userObject->canSee($roleObject)) continue;
                 if ($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")) {
                     $userObject->addRole($roleObject);
                 } else if ($roleObject->autoAppliesTo("standard")) {
@@ -575,7 +565,6 @@ class AuthService
             }
         }
     }
-
     /**
      * @static
      * @param AbstractAjxpUser $userObject
@@ -584,7 +573,7 @@ class AuthService
     {
         $roles = self::getRolesList(array(), true);
         foreach ($roles as $roleObject) {
-            if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
+            if(!$userObject->canSee($roleObject)) continue;
             if ($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")) {
                 $userObject->addRole($roleObject);
             }
@@ -595,6 +584,7 @@ class AuthService
     {
         ConfService::getAuthDriverImpl()->updateUserObject($userObject);
     }
+
 
     /**
      * Use driver implementation to check whether the user exists or not.
@@ -663,6 +653,9 @@ class AuthService
         }
         return $authDriver->checkPassword($userId, $userPass, $returnSeed);
     }
+
+
+
     /**
      * Update the password in the auth driver implementation.
      * @static
@@ -745,6 +738,7 @@ class AuthService
         AJXP_Logger::info(__CLASS__,"Create User", array("user_id"=>$userId));
         return null;
     }
+
     /**
      * Detect the number of admin users
      * @static
@@ -783,37 +777,9 @@ class AuthService
         return true;
     }
 
-    private static $groupFiltering = true;
 
-    /**
-     * @param boolean $boolean
-     */
-    public static function setGroupFiltering($boolean){
-        self::$groupFiltering = $boolean;
-    }
 
-    /**
-     * Automatically set the group to the current user base
-     * @param $baseGroup
-     * @return string
-     */
-    public static function filterBaseGroup($baseGroup)
-    {
-        if(!self::$groupFiltering) {
-            return $baseGroup;
-        }
 
-        $u = self::getLoggedUser();
-        // make sure it starts with a slash.
-        $baseGroup = "/".ltrim($baseGroup, "/");
-        if($u == null) return $baseGroup;
-        if ($u->getGroupPath() != "/") {
-            if($baseGroup == "/") return $u->getGroupPath();
-            else return $u->getGroupPath().$baseGroup;
-        } else {
-            return $baseGroup;
-        }
-    }
 
     /**
      * List children groups of current base
@@ -822,7 +788,7 @@ class AuthService
      */
     public static function listChildrenGroups($baseGroup = "/")
     {
-        return ConfService::getAuthDriverImpl()->listChildrenGroups(self::filterBaseGroup($baseGroup));
+        return ConfService::getAuthDriverImpl()->listChildrenGroups($baseGroup);
 
     }
 
@@ -837,13 +803,13 @@ class AuthService
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
         if(empty($groupName)) throw new \Exception("Please provide a name for this new group!");
-        $fullGroupPath = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
+        $fullGroupPath = rtrim($baseGroup, "/")."/".$groupName;
         $exists = ConfService::getConfStorageImpl()->groupExists($fullGroupPath);
         if($exists){
             throw new \Exception("Group with this name already exists, please pick another name!");
         }
         if(empty($groupLabel)) $groupLabel = $groupName;
-        ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
+        ConfService::getConfStorageImpl()->createGroup(rtrim($baseGroup, "/")."/".$groupName, $groupLabel);
     }
 
     /**
@@ -853,7 +819,7 @@ class AuthService
      */
     public static function deleteGroup($baseGroup, $groupName)
     {
-        ConfService::getConfStorageImpl()->deleteGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName);
+        ConfService::getConfStorageImpl()->deleteGroup(rtrim($baseGroup, "/")."/".$groupName);
     }
 
     /**
@@ -865,17 +831,7 @@ class AuthService
     {
         return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
     }
-
-    /**
-     * Retrieve the current users who have either read or write access to a repository
-     * @param $repositoryId
-     * @return array
-     */
-    public static function getUsersForRepository($repositoryId)
-    {
-        return ConfService::getConfStorageImpl()->getUsersForRepository($repositoryId);
-    }
-
+    
     /**
      * Retrieve the current users who have either read or write access to a repository
      * @param $repositoryId
@@ -915,7 +871,6 @@ class AuthService
      */
     public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true, $countCallback = null, $loopCallback = null)
     {
-        $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         /**
@@ -1013,7 +968,7 @@ class AuthService
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount(self::filterBaseGroup($baseGroup), $regexp, $filterProperty, $filterValue, $recursive);
+        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
     }
 
     /**
@@ -1183,49 +1138,6 @@ class AuthService
         return $roles;
     }
 
-    /**
-     * Check if the current user is allowed to see the GroupPathProvider object
-     * @param AjxpGroupPathProvider $provider
-     * @param AbstractAjxpUser $userObject
-     * @return bool
-     */
-    public static function allowedForCurrentGroup(AjxpGroupPathProvider $provider, $userObject = null)
-    {
-        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
-        $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
-        return (strpos($l->getGroupPath(), $pGP, 0) === 0);
-    }
 
-    /**
-     * Check if the current user can administrate the GroupPathProvider object
-     * @param AjxpGroupPathProvider $provider
-     * @param AbstractAjxpUser $userObject
-     * @return bool
-     */
-    public static function canAdministrate(AjxpGroupPathProvider $provider, $userObject = null)
-    {
-        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
-        $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
-        return (strpos($pGP, $l->getGroupPath(), 0) === 0);
-    }
-
-    /**
-     * Check if the current user can assign administration for the GroupPathProvider object
-     * @param AjxpGroupPathProvider $provider
-     * @param AbstractAjxpUser $userObject
-     * @return bool
-     */
-    public static function canAssign(AjxpGroupPathProvider $provider, $userObject = null)
-    {
-        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
-        $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
-        return (strpos($l->getGroupPath(), $pGP, 0) === 0);
-    }
 
 }

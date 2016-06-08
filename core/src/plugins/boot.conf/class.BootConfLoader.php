@@ -714,15 +714,7 @@ class BootConfLoader extends AbstractConfDriver
     public function getUserChildren($userId) {
         return array();
     }
-
-    /**
-     * @param string $repositoryId
-     * @return array()
-     */
-    public function getUsersForRepository($repositoryId) {
-        return array();
-    }
-
+    
     /**
      * @abstract
      * @param string $repositoryId

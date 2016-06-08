@@ -390,6 +390,52 @@ abstract class AbstractAjxpUser implements UserInterface
         return $this->groupPath;
     }
 
+
+    /**
+     * Automatically set the group to the current user base
+     * @param $baseGroup
+     * @return string
+     */
+    public function getRealGroupPath($baseGroup)
+    {
+        // make sure it starts with a slash.
+        $baseGroup = "/".ltrim($baseGroup, "/");
+        $groupPath = $this->getGroupPath();
+        if(empty($groupPath)) $groupPath = "/";
+        if ($groupPath != "/") {
+            if($baseGroup == "/") return $groupPath;
+            else return $groupPath.$baseGroup;
+        } else {
+            return $baseGroup;
+        }
+    }
+
+    /**
+     * Check if the current user can administrate the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @return bool
+     */
+    public function canAdministrate(AjxpGroupPathProvider $provider)
+    {
+        $pGP = $provider->getGroupPath();
+        if(empty($pGP)) $pGP = "/";
+        if($this->getGroupPath() == null) return true;
+        return (strpos($pGP, $this->getGroupPath(), 0) === 0);
+    }
+
+    /**
+     * Check if the current user can assign administration for the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @return bool
+     */
+    public function canSee(AjxpGroupPathProvider $provider)
+    {
+        $pGP = $provider->getGroupPath();
+        if(empty($pGP)) $pGP = "/";
+        if($this->getGroupPath() == null || $pGP == null) return true;
+        return (strpos($this->getGroupPath(), $pGP, 0) === 0);
+    }
+
     public function recomputeMergedRole()
     {
         if (!count($this->roles)) {

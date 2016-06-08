@@ -378,14 +378,15 @@ class serialConfDriver extends AbstractConfDriver
 
     /**
      * @param string $repositoryId
+     * @param $ctxUser \Pydio\Core\Model\UserInterface
      * @return AbstractAjxpUser[]
      */
-    public function getUsersForRepository($repositoryId)
+    public function getUsersForRepository($repositoryId, $ctxUser = null)
     {
         $result = array();
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
-        $users = $authDriver->listUsers(AuthService::filterBaseGroup("/"));
+        $users = $authDriver->listUsers((!empty($ctxUser) ? $ctxUser->getGroupPath() : "/"));
         foreach (array_keys($users) as $id) {
             $object = $confDriver->createUserObject($id);
             if ($object->canSwitchTo($repositoryId)) {
@@ -414,7 +415,7 @@ class serialConfDriver extends AbstractConfDriver
      * @return array
      */
     public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
-        $c = count($this->getUsersForRepository($repositoryId));
+        $c = count($this->getUsersForRepository($repositoryId, $ctx));
         if($details) return array("users" => $c);
         else return $c;
     }

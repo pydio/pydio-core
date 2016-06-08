@@ -459,13 +459,6 @@ abstract class AbstractConfDriver extends Plugin
     /**
      * @abstract
      * @param string $repositoryId
-     * @return AbstractAjxpUser[]
-     */
-    abstract public function getUsersForRepository($repositoryId);
-
-    /**
-     * @abstract
-     * @param string $repositoryId
      * @param string $rolePrefix
      * @param bool $splitByType
      * @return array An array of role ids
@@ -1141,10 +1134,9 @@ abstract class AbstractConfDriver extends Plugin
                 $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
                 $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
                 $baseGroup = "/";
-                if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) ){
-                    $baseGroup = AuthService::filterBaseGroup("/");
+                if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) && $ctx->hasUser()){
+                    $baseGroup = $ctx->getUser()->getGroupPath();
                 }
-                AuthService::setGroupFiltering(false);
                 $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
 
                 if (!$usersOnly) {
@@ -1251,7 +1243,6 @@ abstract class AbstractConfDriver extends Plugin
                     if($index == $limit) break;
                 }
                 print("<ul>".$users."</ul>");
-                AuthService::setGroupFiltering(true);
 
                 break;
 

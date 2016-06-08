@@ -202,6 +202,27 @@ interface UserInterface extends AjxpGroupPathProvider
     public function getBookmarks($repositoryId);
 
     /**
+     * Check if the current user can administrate the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @return bool
+     */
+    public function canAdministrate(AjxpGroupPathProvider $provider);
+
+    /**
+     * Check if the current user can assign administration for the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @return bool
+     */
+    public function canSee(AjxpGroupPathProvider $provider);
+
+    /**
+     * Automatically set the group to the current user base
+     * @param $baseGroup
+     * @return string
+     */
+    public function getRealGroupPath($baseGroup);
+
+    /**
      * @return mixed
      */
     public function load();

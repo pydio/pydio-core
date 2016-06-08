@@ -260,7 +260,7 @@ class ShareRightsManager
                 $users[$entry["ID"]] = $entry;
             }else{
                 if($entry["ID"] == "AJXP_GRP_/"){
-                    $entry["ID"] = "AJXP_GRP_".AuthService::filterBaseGroup("/");
+                    $entry["ID"] = "AJXP_GRP_".($this->context->hasUser() ? $this->context->getUser()->getRealGroupPath("/") : "/");
                 }
                 $groups[$entry["ID"]] = $entry;
 
@@ -337,23 +337,19 @@ class ShareRightsManager
                     );
                 }
                 $ID = $userId;
-            }else if($rId == "AJXP_GRP_".AuthService::filterBaseGroup("/")){
+            }else if($rId == "AJXP_GRP_".($this->context->hasUser() ? $this->context->getUser()->getRealGroupPath("/") : "/")){
                 $TYPE = "group";
                 $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
+                $currentUserGroup = ($this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+                $rootGroup = "/";
                 if(empty($loadedGroups)){
                     $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-                    if($displayAll){
-                        AuthService::setGroupFiltering(false);
-                    }
-                    $loadedGroups = AuthService::listChildrenGroups();
-                    if($displayAll){
-                        AuthService::setGroupFiltering(true);
-                    }else{
-                        $baseGroup = AuthService::filterBaseGroup("/");
+                    $loadedGroups = AuthService::listChildrenGroups($displayAll ? $rootGroup : $currentUserGroup);
+                    if(!$displayAll){
                         foreach($loadedGroups as $loadedG => $loadedLabel){
                             unset($loadedGroups[$loadedG]);
-                            $loadedGroups[rtrim($baseGroup, "/")."/".ltrim($loadedG, "/")] = $loadedLabel;
+                            $loadedGroups[rtrim($currentUserGroup, "/")."/".ltrim($loadedG, "/")] = $loadedLabel;
                         }
                     }
                 }

@@ -576,7 +576,7 @@ class ConfService
         if ($userObject == null && AuthService::usersEnabled()) {
             return false;
         }
-        if (!AuthService::canAssign($repositoryObject, $userObject)) {
+        if (!$userObject->canSee($repositoryObject)) {
             return false;
         }
         if ($repositoryObject->isTemplate) {

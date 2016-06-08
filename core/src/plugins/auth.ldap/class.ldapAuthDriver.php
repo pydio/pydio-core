@@ -520,7 +520,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                 if (count($branch)) {
                     $parent = "/" . implode("/", array_reverse($branch));
                 }
-                if(!ConfService::getConfStorageImpl()->groupExists(rtrim(AuthService::filterBaseGroup($parent), "/")."/".$dn)) {
+                // TODO: REMOVE filterBaseGroup() instruction.
+                // MAYBE THIS WILL BREAK SOMEHTING
+                if(!ConfService::getConfStorageImpl()->groupExists(rtrim($parent, "/")."/".$dn)) {
                     AuthService::createGroup($parent, $dn, $login);
                 }
             }
@@ -825,7 +827,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (count($branch)) {
                                             $parent = "/" . implode("/", array_reverse($branch));
                                         }
-                                        if(!ConfService::getConfStorageImpl()->groupExists(rtrim(AuthService::filterBaseGroup($parent), "/")."/".$fullDN)) {
+                                        if(!ConfService::getConfStorageImpl()->groupExists(rtrim($userObject->getRealGroupPath($parent), "/")."/".$fullDN)) {
                                             AuthService::createGroup($parent, $fullDN, $humanName);
                                         }
                                         $userObject->setGroupPath(rtrim($parent, "/") . "/" . $fullDN, true);

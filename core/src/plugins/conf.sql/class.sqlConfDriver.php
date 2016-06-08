@@ -533,27 +533,6 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
-     * @param string $repositoryId
-     * @return array
-     */
-    public function getUsersForRepository($repositoryId)
-    {
-        $result = array();
-        // OLD METHOD
-        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] GROUP BY [ajxp_users].[login]', $repositoryId);
-        $all = $children_results->fetchAll();
-        foreach ($all as $item) {
-            $result[$item["login"]] = $this->createUserObject($item["login"]);
-        }
-        $usersRoles = $this->getRolesForRepository($repositoryId, "AJXP_USR_/");
-        foreach ($usersRoles as $rId) {
-            $id = substr($rId, strlen("AJXP_USR/") + 1);
-            $result[$id] = $this->createUserObject($id);
-        }
-        return $result;
-    }
-
-    /**
      * @abstract
      * @param string $repositoryId
      * @param string $rolePrefix
