@@ -22,8 +22,8 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -302,7 +302,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $searchField = $httpVars["field"];
 
             if ($scope == "user") {
-                if (AuthService::usersEnabled() && $ctxUser == null) {
+                if (UsersService::usersEnabled() && $ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
@@ -410,7 +410,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     public function updateNodeIndexMeta($node)
     {
         $this->loadIndex($node->getContext(), true);
-        if (AuthService::usersEnabled() && $node->getContext()->hasUser()) {
+        if (UsersService::usersEnabled() && $node->getContext()->hasUser()) {
 
             $query = new Elastica\Query\Term();
             $query->setTerm("node_url", $node->getUrl());
@@ -574,7 +574,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $this->currentType->addDocument($doc);
         $this->nextId++;
 
-        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && $ajxpNode->getContext()->hasUser()) {
+        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && UsersService::usersEnabled() && $ajxpNode->getContext()->hasUser()) {
 
             $userData = array(
                 "ajxp_scope" => "user",

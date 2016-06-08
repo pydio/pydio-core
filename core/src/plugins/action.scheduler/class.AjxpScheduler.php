@@ -23,6 +23,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Controller\XMLWriter;
@@ -103,7 +104,7 @@ class AjxpScheduler extends Plugin
         $sVals[] = "*|All Repositories";
         $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
 
-        if(!AuthService::usersEnabled() || !$ctx->hasUser()) return;
+        if(!UsersService::usersEnabled() || !$ctx->hasUser()) return;
         $paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="user_id"]', $contribNode);
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
@@ -238,7 +239,7 @@ class AjxpScheduler extends Plugin
     {
         $u = $this->listUsersIds($startGroup);
         $users = array_merge($users, $u);
-        $g = AuthService::listChildrenGroups($startGroup);
+        $g = UsersService::listChildrenGroups($startGroup);
         if (count($g)) {
             foreach ($g as $gName => $gLabel) {
                 $this->gatherUsers($users, $startGroup.$gName);

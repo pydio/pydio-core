@@ -32,6 +32,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Share\Model\ShareLink;
@@ -146,7 +147,7 @@ class LegacyPubliclet
 
 
                 foreach($metadata as $userName => &$meta){
-                    if(!AuthService::userExists($userName)){
+                    if(!UsersService::userExists($userName)){
                         continue;
                     }
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($userName);
@@ -176,7 +177,7 @@ class LegacyPubliclet
                                     }
                                     $shareLink = new ShareLink($shareStore, $publiclet);
                                     $user = $shareLink->getUniqueUser();
-                                    if(AuthService::userExists($user)){
+                                    if(UsersService::userExists($user)){
                                         $userObject = ConfService::getConfStorageImpl()->createUserObject($user);
                                         $userObject->setHidden(true);
                                         print("\n--Should set existing user $user as hidden");

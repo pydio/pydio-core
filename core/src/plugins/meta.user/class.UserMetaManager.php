@@ -24,9 +24,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -253,7 +253,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $user = $ctx->getUser();
         $repo = $this->accessDriver->repository;
         
-        if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
+        if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
         $selection = new UserSelection($repo, $httpVars);

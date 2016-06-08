@@ -28,6 +28,8 @@ use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Core\CoreConfLoader;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Controller\XMLWriter;
@@ -398,7 +400,7 @@ class BootConfLoader extends AbstractConfDriver
         $adminLogin = Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
-        AuthService::createUser($adminLogin, $adminPass, true);
+        UsersService::createUser($adminLogin, $adminPass, true);
         $uObj = $newConfigPlugin->createUserObject($adminLogin);
         if($loginIsEmail){
             $uObj->personalRole->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
@@ -410,7 +412,7 @@ class BootConfLoader extends AbstractConfDriver
         foreach($repos as $repo){
             $uObj->personalRole->setAcl($repo->getId(), "rw");
         }
-        AuthService::updateRole($uObj->personalRole);
+        RolesService::updateRole($uObj->personalRole);
 
         $loginP = "USER_LOGIN";
         $i = 0;
@@ -419,11 +421,11 @@ class BootConfLoader extends AbstractConfDriver
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
             $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
             $saniLogin = Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
-            AuthService::createUser($saniLogin, $pass);
+            UsersService::createUser($saniLogin, $pass);
             $uObj = $newConfigPlugin->createUserObject($saniLogin);
             $uObj->personalRole->setParameterValue("core.conf", "email", $mail);
             $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
-            AuthService::updateRole($uObj->personalRole);
+            RolesService::updateRole($uObj->personalRole);
             $i++;
             $loginP = "USER_LOGIN_".$i;
         }

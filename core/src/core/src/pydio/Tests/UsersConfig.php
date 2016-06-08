@@ -22,6 +22,7 @@ namespace Pydio\Tests;
 
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +36,7 @@ class UsersConfig extends AbstractTest
     public function __construct() { parent::__construct("Users Configuration", "Current config for users"); }
     public function doTest()
     {
-        $this->testedParams["Users enabled"] = AuthService::usersEnabled();
+        $this->testedParams["Users enabled"] = UsersService::usersEnabled();
         $this->testedParams["Guest enabled"] = ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth");
         $this->failedLevel = "info";
         return FALSE;

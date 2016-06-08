@@ -20,7 +20,8 @@
  */
 namespace Pydio\OCS\Server\Federated;
 
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\SQLStore;
@@ -61,7 +62,7 @@ class Server extends Dummy
     protected function actionReceive($parameters){
 
         $targetUser = Utils::sanitize($parameters["shareWith"], AJXP_SANITIZE_EMAILCHARS);
-        if(!AuthService::userExists($targetUser)){
+        if(!UsersService::userExists($targetUser)){
             throw new UserNotFoundException();
         }
         $token          = Utils::sanitize($parameters["token"], AJXP_SANITIZE_ALPHANUM);
@@ -96,11 +97,11 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully received share, waiting for user response.", array("id" => $newShare->getId()));
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = RolesService::getRole("AJXP_USR_/" . $targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            AuthService::updateRole($userRole);
+            RolesService::updateRole($userRole);
         }
 
     }
@@ -157,11 +158,11 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully removed share.");
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = RolesService::getRole("AJXP_USR_/" . $targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            AuthService::updateRole($userRole);
+            RolesService::updateRole($userRole);
         }
 
     }

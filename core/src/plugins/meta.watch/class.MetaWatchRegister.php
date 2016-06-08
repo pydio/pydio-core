@@ -24,9 +24,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -342,7 +342,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
                     unset($IDS[$index]);
                     continue;
                 }
-                if (!AuthService::userExists($id)) {
+                if (!UsersService::userExists($id)) {
                     unset($IDS[$index]);
                     if(is_array($watchMeta)){
                         $changes = true;

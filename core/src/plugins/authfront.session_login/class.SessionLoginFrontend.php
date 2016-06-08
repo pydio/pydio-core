@@ -21,10 +21,12 @@
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\BruteForceHelper;
+use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\CaptchaProvider;
-use Pydio\Core\Controller\HTMLWriter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -54,7 +56,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {
-                AuthService::createUser("guest", "");
+                UsersService::createUser("guest", "");
                 $guest = ConfService::getConfStorageImpl()->createUserObject("guest");
                 $guest->save("superuser");
             }
@@ -76,7 +78,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         $rememberPass = "";
         $secureToken = "";
         $loggedUser = null;
-        if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
+        if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
         } else {
             $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
@@ -92,7 +94,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 session_regenerate_id(true);
                 $secureToken = \Pydio\Core\Http\Middleware\SecureTokenMiddleware::generateSecureToken();
             }
-            if ($loggingResult < 1 && AuthService::suspectBruteForceLogin()) {
+            if ($loggingResult < 1 && BruteForceHelper::suspectBruteForceLogin()) {
                 $loggingResult = -4; // Force captcha reload
             }
         }
@@ -112,8 +114,8 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             }
         }
 
-        if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
-            AuthService::refreshRememberCookie($loggedUser);
+        if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
+            CookiesHelper::refreshRememberCookie($loggedUser);
         }
 
         $stream = new \Pydio\Core\Http\Response\SerializableResponseStream();
@@ -144,7 +146,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
             case "get_seed" :
                 $seed = AuthService::generateSeed();
-                if (AuthService::suspectBruteForceLogin()) {
+                if (BruteForceHelper::suspectBruteForceLogin()) {
                     $responseInterface = new \Zend\Diactoros\Response\JsonResponse(["seed" => $seed, "captcha" => true]);
                 } else {
                     $responseInterface = $responseInterface->withHeader("Content-Type", "text/plain");
@@ -168,7 +170,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
             case "back":
                 $responseInterface = $responseInterface->withHeader("Content-Type", "text/xml");
-                $responseInterface->getBody()->write("<url>".AuthService::getLogoutAddress(false)."</url>");
+                $responseInterface->getBody()->write("<url>". UsersService::getLogoutAddress(false) ."</url>");
                 break;
 
             default;

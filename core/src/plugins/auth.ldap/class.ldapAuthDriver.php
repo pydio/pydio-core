@@ -20,9 +20,10 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\ProgressBarCLI;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -178,7 +179,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             if (!empty($options["TEST_USER"])) {
                 $entries = $this->getUserEntries($options["TEST_USER"]);
                 if (!is_array($entries)) return false;
-                if (AuthService::ignoreUserCase()) {
+                if (UsersService::ignoreUserCase()) {
                     $res = (strcasecmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0);
                 } else {
                     $res = (strcmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0);
@@ -447,7 +448,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         unset($entries['count']); // remove 'count' entry
         foreach ($entries as $id => $person) {
             $login = $person[$this->ldapUserAttr][0];
-            if (AuthService::ignoreUserCase()) $login = strtolower($login);
+            if (UsersService::ignoreUserCase()) $login = strtolower($login);
             $persons[$login] = "XXX";
         }
         return $persons;
@@ -523,7 +524,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 // TODO: REMOVE filterBaseGroup() instruction.
                 // MAYBE THIS WILL BREAK SOMEHTING
                 if(!ConfService::getConfStorageImpl()->groupExists(rtrim($parent, "/")."/".$dn)) {
-                    AuthService::createGroup($parent, $dn, $login);
+                    UsersService::createGroup($parent, $dn, $login);
                 }
             }
             $this->ldapDN = $origUsersDN;
@@ -553,7 +554,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
         $entries = $this->getUserEntries($login);
         if (!is_array($entries)) return false;
-        if (AuthService::ignoreUserCase()) {
+        if (UsersService::ignoreUserCase()) {
             $res = (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
         } else {
             $res = (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
@@ -775,7 +776,7 @@ class ldapAuthDriver extends AbstractAuthDriver
 
                                     if (is_array($userroles)) {
                                         foreach ($userroles as $key => $role) {
-                                            if ((AuthService::getRole($key)) && !(strpos($key, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($key)) && !(strpos($key, $this->mappedRolePrefix) === false)) {
                                                 $userObject->removeRole($key);
                                             }
                                         }
@@ -786,11 +787,11 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         $uniqValueWithPrefix = $rolePrefix . $uniqValue;
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
-                                        $roleToAdd = AuthService::getRole($uniqValueWithPrefix);
+                                        $roleToAdd = RolesService::getRole($uniqValueWithPrefix);
                                         if($roleToAdd === false){
-                                            $roleToAdd = AuthService::getRole($uniqValueWithPrefix, true);
+                                            $roleToAdd = RolesService::getOrCreateRole($uniqValueWithPrefix, $userObject->getGroupPath());
                                             $roleToAdd->setLabel($uniqValue);
-                                            AuthService::updateRole($roleToAdd);
+                                            RolesService::updateRole($roleToAdd);
                                         }
                                         $userObject->addRole($roleToAdd);
                                         $changes = true;
@@ -800,7 +801,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                         if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
-                                            $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                            $userObject->addRole(RolesService::getOrCreateRole($uniqValue, $userObject->getGroupPath()));
                                             $changes = true;
                                         }
                                     }
@@ -828,14 +829,14 @@ class ldapAuthDriver extends AbstractAuthDriver
                                             $parent = "/" . implode("/", array_reverse($branch));
                                         }
                                         if(!ConfService::getConfStorageImpl()->groupExists(rtrim($userObject->getRealGroupPath($parent), "/")."/".$fullDN)) {
-                                            AuthService::createGroup($parent, $fullDN, $humanName);
+                                            UsersService::createGroup($parent, $fullDN, $humanName);
                                         }
                                         $userObject->setGroupPath(rtrim($parent, "/") . "/" . $fullDN, true);
                                         // Update Roles from groupPath
                                         $b = array_reverse($branch);
                                         $b[] = $fullDN;
                                         for ($i = 1; $i <= count($b); $i++) {
-                                            $userObject->addRole(AuthService::getRole("AJXP_GRP_/" . implode("/", array_slice($b, 0, $i)), true));
+                                            $userObject->addRole(RolesService::getOrCreateRole("AJXP_GRP_/" . implode("/", array_slice($b, 0, $i)), $userObject->getGroupPath()));
                                         }
                                         $userObject->personalRole->setParameterValue("auth.ldap", "MEMBER_OF", $fullDN);
                                         $userObject->recomputeMergedRole();
@@ -847,7 +848,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                 if ($userObject->getProfile() != $value) {
                                     $changes = true;
                                     $userObject->setProfile($value);
-                                    AuthService::updateAutoApplyRole($userObject);
+                                    RolesService::updateAutoApplyRole($userObject);
                                 }
                                 break;
                             case "plugin_param":

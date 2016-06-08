@@ -21,6 +21,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -273,7 +274,7 @@ class AJXP_Notification
             if(self::$usersCaches[$this->getAuthor()] != 'AJXP_USER_DONT_EXISTS'){
                 $uLabel = self::$usersCaches[$this->getAuthor()];
             }
-        } else if (AuthService::userExists($this->getAuthor())) {
+        } else if (UsersService::userExists($this->getAuthor())) {
             $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
             if($obj->isHidden()){
                 return $this->getPublicAuthorLabel();

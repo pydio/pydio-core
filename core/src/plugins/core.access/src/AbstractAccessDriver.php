@@ -26,8 +26,8 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
@@ -165,7 +165,7 @@ abstract class AbstractAccessDriver extends Plugin
         $destStreamURL = "pydio://$destRepoId";
 
         // Check rights
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             /** @var ContextInterface $ctx */
             $ctx = $requestInterface->getAttribute("ctx");
             $loggedUser = $ctx->getUser();

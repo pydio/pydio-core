@@ -21,11 +21,11 @@
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,7 +40,7 @@ class FileMimeSender extends Plugin
     {
         $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
         
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
             if (!$loggedUser->canSwitchTo($repository->getId())) {
                 echo("You do not have permissions to access this resource");

@@ -20,8 +20,8 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -70,7 +70,7 @@ class UpdateController extends Plugin
     public function switchAction($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         $loggedUser = $contextInterface->getUser();
-        if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) {
+        if(UsersService::usersEnabled() && !$loggedUser->isAdmin()) {
             throw new \Pydio\Core\Exception\AuthRequiredException();
         }
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");

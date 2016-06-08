@@ -18,10 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Services\RolesService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -246,7 +245,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                         throw new Exception("Cant find role! ");
                     }
                     $role->setParameterValue("authfront.otp", "google_last", $i);
-                    AuthService::updateRole($role, $userObject);
+                    RolesService::updateRole($role, $userObject);
 
                     return true;
                 }

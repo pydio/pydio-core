@@ -27,6 +27,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -261,7 +262,7 @@ class AJXP_Logger extends Plugin
     public static function getLoggedUser()
     {
         $user = "No User";
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $logged = AuthService::getLoggedUser();
             if ($logged != null) {
                 $user = $logged->getId();

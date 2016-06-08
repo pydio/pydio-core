@@ -20,10 +20,11 @@
  */
 
 use Pydio\Core\Model\Context;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
@@ -98,7 +99,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
     {
         $subDir = trim($this->getGroupPath(), "/");
         $id = $this->getId();
-        if(AuthService::ignoreUserCase()) $id = strtolower($id);
+        if(UsersService::ignoreUserCase()) $id = strtolower($id);
         $res = VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"), Context::emptyContext())."/".(empty($subDir)?"":$subDir."/").$id;
         return $res;
     }
@@ -148,7 +149,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         }
         // Load roles
         if (count($rolesToLoad)) {
-            $allRoles = AuthService::getRolesList($rolesToLoad);
+            $allRoles = RolesService::getRolesList($rolesToLoad);
             foreach ($rolesToLoad as $roleId) {
                 if (isSet($allRoles[$roleId])) {
                     $this->roles[$roleId] = $allRoles[$roleId];

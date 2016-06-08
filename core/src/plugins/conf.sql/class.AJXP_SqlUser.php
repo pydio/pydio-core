@@ -22,11 +22,12 @@ namespace Pydio\Conf\Sql;
 
 use dibi;
 use DibiException;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -415,7 +416,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 
         // NOW LOAD THEM
         if (count($rolesToLoad)) {
-            $allRoles = AuthService::getRolesList($rolesToLoad);
+            $allRoles = RolesService::getRolesList($rolesToLoad);
             foreach ($rolesToLoad as $roleId) {
                 if (isSet($allRoles[$roleId])) {
                     $this->roles[$roleId] = $allRoles[$roleId];
@@ -460,7 +461,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
                     // We use (%s) instead of %in to pass everything as string ('1' instead of 1)
                     dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] IN (%s)", $this->getId(), $removedRights);
                 }
-                AuthService::updateRole($this->personalRole);
+                RolesService::updateRole($this->personalRole);
             } else {
                 $this->personalRole = new AJXP_Role("AJXP_USR_"."/".$this->id);
             }
@@ -513,7 +514,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             ));
         }
 
-        AuthService::updateRole($this->personalRole);
+        RolesService::updateRole($this->personalRole);
 
         if (!empty($this->groupPath)) {
             $this->setGroupPath($this->groupPath);
@@ -535,7 +536,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             $dirPath = AJXP_INSTALL_PATH."/data/users";
             AJXP_Logger::info(__CLASS__,"getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
-        $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
+        $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();
         return Utils::loadSerialFile($dirPath."/".$id."/temp-".$key.".ser");
     }
 
@@ -553,7 +554,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             $dirPath = AJXP_INSTALL_PATH."/data/users";
             AJXP_Logger::info(__CLASS__,"setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
-        $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
+        $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();
         Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
     }
 

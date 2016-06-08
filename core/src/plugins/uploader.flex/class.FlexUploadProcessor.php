@@ -22,7 +22,7 @@
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -43,7 +43,7 @@ class FlexUploadProcessor extends Plugin
         //------------------------------------------------------------
         // SPECIAL HANDLING FOR FLEX UPLOADER RIGHTS FOR THIS ACTION
         //------------------------------------------------------------
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
             if ($request->getAttribute("action") == "upload" &&
                 ($loggedUser == null || !$loggedUser->canWrite($ctx->getRepositoryId().""))

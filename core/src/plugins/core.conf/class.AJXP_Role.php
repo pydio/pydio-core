@@ -283,6 +283,25 @@ class AJXP_Role implements AjxpGroupPathProvider
 
     /**
      * @param string $pluginId
+     * @param array $parameters
+     * @param string $repositoryId
+     * @return array
+     */
+    public function filterPluginConfigs($pluginId, $parameters, $repositoryId){
+
+        $roleParams = $this->listParameters();
+        if (isSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])) {
+            $parameters = array_merge($parameters, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
+        }
+        if ($repositoryId !== null && isSet($roleParams[$repositoryId][$pluginId])) {
+            $parameters = array_merge($parameters, $roleParams[$repositoryId][$pluginId]);
+        }
+        return $parameters;
+
+    }
+
+    /**
+     * @param string $pluginId
      * @param string $parameterName
      * @param string $repositoryId
      * @param mixed $parameterValue

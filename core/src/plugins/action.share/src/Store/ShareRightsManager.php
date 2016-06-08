@@ -31,6 +31,8 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
@@ -206,11 +208,11 @@ class ShareRightsManager
             if ($eType == "user") {
 
                 $u = Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index], AJXP_SANITIZE_EMAILCHARS);
-                $userExistsRead = AuthService::userExists($u);
+                $userExistsRead = UsersService::userExists($u);
                 if (!$userExistsRead && !isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     $index++;
                     continue;
-                } else if (AuthService::userExists($u, "w") && isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
+                } else if (UsersService::userExists($u, "w") && isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     throw new \Exception( str_replace("%s", $u, $mess["share_center.222"]));
                 }
                 if($userExistsRead){
@@ -219,7 +221,7 @@ class ShareRightsManager
                         throw new \Exception($mess["share_center.221"]);
                     }
                 }else{
-                    if(!$allowSharedUsersCreation || AuthService::isReservedUserId($u)){
+                    if(!$allowSharedUsersCreation || UsersService::isReservedUserId($u)){
                         throw new \Exception($mess["share_center.220"]);
                     }
                     if(!empty($this->options["SHARED_USERS_TMP_PREFIX"]) && strpos($u, $this->options["SHARED_USERS_TMP_PREFIX"])!==0 ){
@@ -307,11 +309,11 @@ class ShareRightsManager
      */
     public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $watcherNode = null)
     {
-        $roles = AuthService::getRolesForRepository($repoId);
+        $roles = RolesService::getRolesForRepository($repoId);
         $sharedEntries = $sharedGroups = array();
         $mess = ConfService::getMessages();
         foreach($roles as $rId){
-            $role = AuthService::getRole($rId);
+            $role = RolesService::getRole($rId);
             if ($role == null) continue;
 
             $RIGHT = $role->getAcl($repoId);
@@ -322,7 +324,7 @@ class ShareRightsManager
             $AVATAR = false;
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
-                $role = AuthService::getRole($rId);
+                $role = RolesService::getRole($rId);
                 $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
                 $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
                 $AVATAR = $role->filterParameterValue("core.conf", "avatar", AJXP_REPO_SCOPE_ALL, "");
@@ -345,7 +347,7 @@ class ShareRightsManager
                 $rootGroup = "/";
                 if(empty($loadedGroups)){
                     $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-                    $loadedGroups = AuthService::listChildrenGroups($displayAll ? $rootGroup : $currentUserGroup);
+                    $loadedGroups = UsersService::listChildrenGroups($displayAll ? $rootGroup : $currentUserGroup);
                     if(!$displayAll){
                         foreach($loadedGroups as $loadedG => $loadedLabel){
                             unset($loadedGroups[$loadedG]);
@@ -365,7 +367,7 @@ class ShareRightsManager
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
             }else{
-                $role = AuthService::getRole($rId);
+                $role = RolesService::getRole($rId);
                 $LABEL = $role->getLabel();
                 $TYPE = 'group';
             }
@@ -414,10 +416,10 @@ class ShareRightsManager
         $loggedUser = $this->context->getUser();
         foreach ($users as $userName => $userEntry) {
 
-            if (AuthService::userExists($userName, "r")) {
+            if (UsersService::userExists($userName, "r")) {
                 $userObject = $confDriver->createUserObject($userName);
                 if(isSet($userEntry["HIDDEN"]) && isSet($userEntry["UPDATE_PASSWORD"])){
-                    AuthService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
+                    UsersService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
                 }
             } else {
                 $mess = ConfService::getMessages();
@@ -455,9 +457,9 @@ class ShareRightsManager
 
         foreach ($groups as $group => $groupEntry) {
             $r = $groupEntry["RIGHT"];
-            $grRole = AuthService::getRole($group, true);
+            $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
             $grRole->setAcl($childRepoId, $r);
-            AuthService::updateRole($grRole);
+            RolesService::updateRole($grRole);
         }
 
     }
@@ -482,7 +484,7 @@ class ShareRightsManager
         $removeUsers = array_diff($originalUsers, array_keys($newUsers));
         if (count($removeUsers)) {
             foreach ($removeUsers as $user) {
-                if (AuthService::userExists($user)) {
+                if (UsersService::userExists($user)) {
                     $userObject = $confDriver->createUserObject($user);
                     $userObject->personalRole->setAcl($repoId, "");
                     $userObject->save("superuser");
@@ -500,10 +502,10 @@ class ShareRightsManager
         $removeGroups = array_diff($originalGroups, array_keys($newGroups));
         if (count($removeGroups)) {
             foreach ($removeGroups as $groupId) {
-                $role = AuthService::getRole($groupId);
+                $role = RolesService::getRole($groupId);
                 if ($role !== false) {
                     $role->setAcl($repoId, "");
-                    AuthService::updateRole($role);
+                    RolesService::updateRole($role);
                 }
             }
         }
@@ -539,7 +541,7 @@ class ShareRightsManager
                 }
             }
         }
-        AuthService::createUser($userName, $pass, false, $isHidden);
+        UsersService::createUser($userName, $pass, false, $isHidden);
         $userObject = $confDriver->createUserObject($userName);
         $userObject->personalRole->clearAcls();
         $userObject->setParent($parentUser->getId());
@@ -598,14 +600,14 @@ class ShareRightsManager
     public function createRoleForMinisite($repositoryId, $disableDownload, $replace){
         if($replace){
             try{
-                AuthService::deleteRole("AJXP_SHARED-".$repositoryId);
+                RolesService::deleteRole("AJXP_SHARED-" . $repositoryId);
             }catch (\Exception $e){}
         }
         $newRole = new AJXP_Role("AJXP_SHARED-".$repositoryId);
-        $r = AuthService::getRole("MINISITE");
+        $r = RolesService::getRole("MINISITE");
         if ($r instanceof AJXP_Role) {
             if ($disableDownload) {
-                $f = AuthService::getRole("MINISITE_NODOWNLOAD");
+                $f = RolesService::getRole("MINISITE_NODOWNLOAD");
                 if ($f instanceof AJXP_Role) {
                     $r = $f->override($r);
                 }
@@ -615,7 +617,7 @@ class ShareRightsManager
             if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$repositoryId] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
             if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$repositoryId] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
             $newRole->bunchUpdate($newData);
-            AuthService::updateRole($newRole);
+            RolesService::updateRole($newRole);
             return $newRole;
         }
         return null;

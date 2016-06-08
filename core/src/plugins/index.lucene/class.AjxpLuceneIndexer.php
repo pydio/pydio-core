@@ -23,9 +23,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -284,7 +284,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             } else {
                 $sParts[] = "$searchField:true";
             }
-            if ($scope == "user" && AuthService::usersEnabled()) {
+            if ($scope == "user" && UsersService::usersEnabled()) {
                 if ($ctxUser == null) {
                     throw new Exception("Cannot find current user");
                 }
@@ -437,7 +437,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
             Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
-            if (AuthService::usersEnabled() && $node->getContext()->hasUser()) {
+            if (UsersService::usersEnabled() && $node->getContext()->hasUser()) {
                 $term = new Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($node->getUrl()), "node_url");
                 $hits = $index->termDocs($term);
                 foreach ($hits as $hitId) {
@@ -612,7 +612,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), TextEncoder::getEncoding());
             }
         }
-        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && $ajxpNode->getContext()->hasUser() ) {
+        if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && UsersService::usersEnabled() && $ajxpNode->getContext()->hasUser() ) {
             $privateDoc = new Zend_Search_Lucene_Document();
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl(), TextEncoder::getEncoding()));
             $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), TextEncoder::getEncoding()));

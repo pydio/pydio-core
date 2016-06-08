@@ -26,6 +26,7 @@ use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -135,7 +136,7 @@ class dropboxAccessDriver extends fsAccessDriver
             return $repo->getContextOption($ctx, "DROPBOX_OAUTH_TOKENS");
         }
         $repositoryId = $repo->getId();
-        if(AuthService::usersEnabled()) {
+        if(UsersService::usersEnabled()) {
             $u = $ctx->getUser();
             $userId = $u->getId();
         }else {
@@ -147,7 +148,7 @@ class dropboxAccessDriver extends fsAccessDriver
     public function setTokens(ContextInterface $ctx, $oauth_tokens)
     {
         $repositoryId = $ctx->getUser()->getId();
-        if(AuthService::usersEnabled()) $userId = $ctx->getUser()->getId();
+        if(UsersService::usersEnabled()) $userId = $ctx->getUser()->getId();
         else $userId = "shared";
         Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }

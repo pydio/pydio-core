@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Http\Dav;
 
+use Pydio\Core\Services\UsersService;
 use \Sabre;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
@@ -54,7 +55,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
     public function getDigestHash($realm, $username)
     {
-        if (!AuthService::userExists($username)) {
+        if (!UsersService::userExists($username)) {
             return false;
         }
         $confDriver = ConfService::getConfStorageImpl();

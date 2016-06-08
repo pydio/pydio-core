@@ -35,6 +35,7 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -248,7 +249,11 @@ class PluginsService
                     continue;
                 }
                 try {
-                    $instance->init($ctx, AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    $options = $metaSources[$plugId];
+                    if($ctx->hasUser()) {
+                        $options = $ctx->getUser()->getMergedRole()->filterPluginConfigs($plugId, $options, $repository->getId());
+                    }
+                    $instance->init($ctx, $options);
                     $instance->beforeInitMeta($ctx, $plugInstance);
                 } catch (\Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
@@ -283,7 +288,11 @@ class PluginsService
                     continue;
                 }
                 try {
-                    $instance->init($ctx, AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $ctx));
+                    $options = $metaSources[$plugId];
+                    if($ctx->hasUser()) {
+                        $options = $ctx->getUser()->getMergedRole()->filterPluginConfigs($plugId, $options, $repository->getId());
+                    }
+                    $instance->init($ctx, $options);
                     if(!method_exists($instance, "initMeta")) {
                         throw new \Exception("Meta Source $plugId does not implement the initMeta method.");
                     }
@@ -413,7 +422,7 @@ class PluginsService
         }
 
         $registry = $this->getXmlRegistry($extendedVersion);
-        if(AuthService::usersEnabled()){
+        if(UsersService::usersEnabled()){
             $changes = $this->filterRegistryFromRole($registry, $this->context);
             if ($changes) {
                 $this->updateXmlRegistry($registry, $extendedVersion);

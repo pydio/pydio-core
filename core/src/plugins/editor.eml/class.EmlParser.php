@@ -22,12 +22,11 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
@@ -191,7 +190,7 @@ class EmlParser extends Plugin
                     $destStreamURL = $selection->currentBaseUrl();
                     if (isSet($httpVars["dest_repository_id"])) {
                         $destRepoId = $httpVars["dest_repository_id"];
-                        if (AuthService::usersEnabled()) {
+                        if (UsersService::usersEnabled()) {
                             $loggedUser = $ctx->getUser();
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }

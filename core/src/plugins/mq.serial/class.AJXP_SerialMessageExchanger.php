@@ -20,7 +20,7 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -83,7 +83,7 @@ class AJXP_SerialMessageExchanger extends Plugin implements AJXP_MessageExchange
     public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName, true);
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $user = $ctx->getUser();
             if ($user == null) {
                 throw new Exception("You must be logged in");

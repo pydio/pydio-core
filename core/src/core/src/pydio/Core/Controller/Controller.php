@@ -32,6 +32,7 @@ use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tasks\Task;
@@ -200,7 +201,7 @@ class Controller
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         //Check Rights
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
             if( $actionName != "logout" && Controller::actionNeedsRight($actionNode, $xPath, "userLogged", "only") && $loggedUser == null){
                     throw new AuthRequiredException();
@@ -298,7 +299,7 @@ class Controller
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
 
-        if (Services\AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)){
                 $cKey = "\1CDAFx¨op#";

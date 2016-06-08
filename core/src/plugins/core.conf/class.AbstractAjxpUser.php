@@ -21,9 +21,9 @@
 namespace Pydio\Conf\Core;
 
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -459,7 +459,7 @@ abstract class AbstractAjxpUser implements UserInterface
             // It's a shared user, we don't want it to inherit the rights...
             $this->parentRole->clearAcls();
             //... but we want the parent user's role, filtered with inheritable properties only.
-            $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
+            $stretchedParentUserRole = RolesService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
                 // REAPPLY SPECIFIC "SHARED" ROLES
@@ -588,7 +588,7 @@ abstract class AbstractAjxpUser implements UserInterface
     public function __wakeup(){
         $this->storage = ConfService::getConfStorageImpl();
         if(!is_object($this->personalRole)){
-            $this->personalRole = AuthService::getRole("AJXP_USR_/".$this->getId());
+            $this->personalRole = RolesService::getRole("AJXP_USR_/" . $this->getId());
         }
         $this->recomputeMergedRole();
     }
@@ -597,7 +597,7 @@ abstract class AbstractAjxpUser implements UserInterface
         if($this->lastSessionSerialization && count($this->roles)
             && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
 
-            $newRoles = AuthService::getRolesList(array_keys($this->roles));
+            $newRoles = RolesService::getRolesList(array_keys($this->roles));
             foreach($newRoles as $rId => $newRole){
                 if(strpos($rId, "AJXP_USR_/") === 0){
                     $this->personalRole = $newRole;

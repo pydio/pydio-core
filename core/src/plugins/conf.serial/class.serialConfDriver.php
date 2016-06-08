@@ -22,11 +22,11 @@
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
@@ -357,7 +357,7 @@ class serialConfDriver extends AbstractConfDriver
         } else {
             $clean = false;
             foreach ($pointer as $childId) {
-                if (!AuthService::userExists($childId)) {
+                if (!UsersService::userExists($childId)) {
                     $clean = true;
                     unset($pointer[$childId]);
                     continue;
@@ -493,8 +493,8 @@ class serialConfDriver extends AbstractConfDriver
 
     public function deleteGroup($groupPath)
     {
-        $gUsers = AuthService::listUsers($groupPath);
-        $gGroups = AuthService::listChildrenGroups($groupPath);
+        $gUsers = UsersService::listUsers($groupPath);
+        $gGroups = UsersService::listChildrenGroups($groupPath);
         if (count($gUsers) || count($gGroups)) {
             throw new Exception("Group is not empty, please do something with its content before trying to delete it!");
         }

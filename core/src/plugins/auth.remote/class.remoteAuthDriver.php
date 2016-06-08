@@ -20,8 +20,8 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -127,7 +127,7 @@ class remoteAuthDriver extends AbstractAuthDriver
     public function listUsers($baseGroup = "/", $recursive = true)
     {
         $users = Utils::loadSerialFile($this->usersSerFile);
-        if (AuthService::ignoreUserCase()) {
+        if (UsersService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ksort($users);
@@ -162,14 +162,14 @@ class remoteAuthDriver extends AbstractAuthDriver
     public function userExists($login)
     {
         $users = $this->listUsers();
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         if(!is_array($users) || !array_key_exists($login, $users)) return false;
         return true;
     }
 
     public function checkPassword($login, $pass, $seed)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         global $AJXP_GLUE_GLOBALS;
         if (isSet($AJXP_GLUE_GLOBALS) || (!empty($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ) {
             $userStoredPass = $this->getUserPass($login);
@@ -256,7 +256,7 @@ class remoteAuthDriver extends AbstractAuthDriver
 
     public function createUser($login, $passwd)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if(!is_array($users)) $users = array();
         if(array_key_exists($login, $users)) return "exists";
@@ -269,7 +269,7 @@ class remoteAuthDriver extends AbstractAuthDriver
     }
     public function changePassword($login, $newPass)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
@@ -281,7 +281,7 @@ class remoteAuthDriver extends AbstractAuthDriver
     }
     public function deleteUser($login)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if (is_array($users) && array_key_exists($login, $users)) {
             unset($users[$login]);

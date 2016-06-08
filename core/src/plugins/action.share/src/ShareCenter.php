@@ -39,6 +39,7 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -144,10 +145,10 @@ class ShareCenter extends Plugin
             $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
             $xpathesToRemove[] = 'action[@name="share-edit-shared"]';
 
-        }else if (AuthService::usersEnabled()) {
+        }else if (UsersService::usersEnabled()) {
 
             $loggedUser = $ctx->getUser();
-            if ($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())) {
+            if ($loggedUser != null && UsersService::isReservedUserId($loggedUser->getId())) {
                 $disableSharing = true;
             }
 
@@ -1604,7 +1605,7 @@ class ShareCenter extends Plugin
                 $link = $this->getShareStore()->createEmptyShareObject();
             }else{
                 $link = new TargettedLink($this->getShareStore());
-                if(AuthService::usersEnabled()) {
+                if(UsersService::usersEnabled()) {
                     $link->setOwnerId($this->currentContext->getUser()->getId());
                 }
                 $link->prepareInvitation($linkData["HOST"], $linkData["USER"], $invitationLabel);
@@ -1993,7 +1994,7 @@ class ShareCenter extends Plugin
             }
             $jsonData = array(
                 "repositoryId"  => $repoId,
-                "users_number"  => AuthService::countUsersForRepository($ctx, $repoId),
+                "users_number"  => UsersService::countUsersForRepository($ctx, $repoId),
                 "label"         => $repo->getDisplay(),
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,

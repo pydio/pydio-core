@@ -30,6 +30,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -290,7 +291,7 @@ class MqManager extends Plugin
             
             case "client_consume_channel":
 
-                if (AuthService::usersEnabled()) {
+                if (UsersService::usersEnabled()) {
                     $user = $ctx->getUser();
                     if ($user == null) {
                         throw new \Pydio\Core\Exception\AuthRequiredException();

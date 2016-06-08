@@ -21,6 +21,8 @@
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\BruteForceHelper;
+use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\CaptchaProvider;
 
@@ -58,7 +60,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         $rememberPass = "";
         $secureToken = "";
         $loggedUser = null;
-        if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
+        if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
         } else {
             $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
@@ -74,7 +76,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
                 session_regenerate_id(true);
                 $secureToken = \Pydio\Core\Http\Middleware\SecureTokenMiddleware::generateSecureToken();
             }
-            if ($loggingResult < 1 && AuthService::suspectBruteForceLogin()) {
+            if ($loggingResult < 1 && BruteForceHelper::suspectBruteForceLogin()) {
                 $loggingResult = -4; // Force captcha reload
             }
         }
@@ -94,8 +96,8 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             }
         }
 
-        if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
-            AuthService::refreshRememberCookie($loggedUser);
+        if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
+            CookiesHelper::refreshRememberCookie($loggedUser);
         }
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();

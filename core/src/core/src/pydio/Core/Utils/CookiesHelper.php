@@ -27,6 +27,43 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class CookiesHelper
 {
+
+    /**
+     * @static
+     * @param UserInterface $user
+     */
+    public static function refreshRememberCookie($user)
+    {
+        $current = $_COOKIE["AjaXplorer-remember"];
+        if (!empty($current)) {
+            CookiesHelper::invalidateCookieString($user, substr($current, strpos($current, ":")+1));
+        }
+        $rememberPass = CookiesHelper::getCookieString($user);
+        setcookie("AjaXplorer-remember", $user->getId().":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+    }
+
+    /**
+     * @static
+     * @return bool
+     */
+    public static function hasRememberCookie()
+    {
+        return (isSet($_COOKIE["AjaXplorer-remember"]) && !empty($_COOKIE["AjaXplorer-remember"]));
+    }
+
+    /**
+     * @static
+     * Warning, must be called before sending other headers!
+     */
+    public static function clearRememberCookie($user)
+    {
+        $current = $_COOKIE["AjaXplorer-remember"];
+        if (!empty($current) && $user != null) {
+            CookiesHelper::invalidateCookieString($user, substr($current, strpos($current, ":")+1));
+        }
+        setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
+    }
+
     /**
      * @param UserInterface $user
      * @param string $cookieString

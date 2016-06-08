@@ -37,6 +37,8 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 
 global $AJXP_GLUE_GLOBALS;
 if (!isSet($AJXP_GLUE_GLOBALS)) {
@@ -97,7 +99,7 @@ if(!function_exists("ajxp_gluecode_updateRole")){
         foreach ($rolesMap as $value) {
             $parts = explode(":", trim($value));
             $roleId = trim($parts[1]);
-            $roleObject = AuthService::getRole($roleId);
+            $roleObject = RolesService::getRole($roleId);
             if ($roleObject != null) {
                 $newMap[trim($parts[0])] = $roleObject;
                 $userObject->removeRole($roleId);
@@ -122,10 +124,10 @@ switch ($plugInAction) {
         if (is_array($login)) {
             $newSession = new SessionSwitcher("AjaXplorer");
             $creation = false;
-            if ($autoCreate && !AuthService::userExists($login["name"], "w")) {
+            if ($autoCreate && !UsersService::userExists($login["name"], "w")) {
                 $creation = true;
                 $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
-                AuthService::createUser($login["name"], $login["password"], $isAdmin);
+                UsersService::createUser($login["name"], $login["password"], $isAdmin);
             }
             if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
                 $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
@@ -136,9 +138,9 @@ switch ($plugInAction) {
                if ($result == 1) {
                    $userObject = AuthService::getLoggedUser();
                    if ($userObject->isAdmin()) {
-                       AuthService::updateAdminRights($userObject);
+                       RolesService::updateAdminRights($userObject);
                    } else {
-                    AuthService::updateDefaultRights($userObject);
+                    RolesService::updateDefaultRights($userObject);
                    }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
                 $userObject->save("superuser");
@@ -155,7 +157,7 @@ switch ($plugInAction) {
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
             $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
-            AuthService::createUser($user["name"], $user["password"], $isAdmin);
+            UsersService::createUser($user["name"], $user["password"], $isAdmin);
             if (isSet($user["roles"])) {
                 $confDriver = ConfService::getConfStorageImpl();
                 $userObject = $confDriver->createUserObject($user["name"]);
@@ -168,14 +170,14 @@ switch ($plugInAction) {
     case 'delUser':
         $userName = $AJXP_GLUE_GLOBALS["userName"];
         if (strlen($userName)) {
-            AuthService::deleteUser($userName);
+            UsersService::deleteUser($userName);
             $result = TRUE;
         }
         break;
     case 'updateUser':
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
-            if (AuthService::userExists($user["name"]) && AuthService::updatePassword($user["name"], $user["password"])) {
+            if (UsersService::userExists($user["name"]) && UsersService::updatePassword($user["name"], $user["password"])) {
                 $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
                 $confDriver = ConfService::getConfStorageImpl();
                 $userObject = $confDriver->createUserObject($user["name"]);

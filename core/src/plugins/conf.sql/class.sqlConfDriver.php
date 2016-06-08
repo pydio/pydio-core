@@ -25,15 +25,14 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Exception\DBConnectionException;
-use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpRole;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
@@ -657,7 +656,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                     return 1;
                 }
             }else if($object->securityScope() == "GROUP" && $ctx->hasUser()){
-                $groupUsers = AuthService::authCountUsers($ctx->getUser()->getGroupPath());
+                $groupUsers = UsersService::authCountUsers($ctx->getUser()->getGroupPath());
                 if($details) {
                     return array('users' => $groupUsers);
                 } else {
@@ -1180,7 +1179,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $teams = $this->listUserTeams($parentUser);
         $teamData = $teams[$teamId];
         foreach ($teamData["USERS"] as $userId) {
-            if (AuthService::userExists($userId)) {
+            if (UsersService::userExists($userId)) {
                 $res[] = $userId;
             } else {
                 $this->removeUserFromTeam($teamId, $userId);
@@ -1211,7 +1210,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         // Remove old users
         dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s", $teamId);
         foreach($users as $userId){
-            if(!AuthService::userExists($userId, "r")) continue;
+            if(!UsersService::userExists($userId, "r")) continue;
             dibi::query("INSERT INTO [ajxp_user_teams] ([team_id],[user_id],[team_label],[owner_id]) VALUES (%s,%s,%s,%s)",
                 $teamId, $userId, $teamLabel, $parentUser->getId()
             );

@@ -29,6 +29,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\OCS\Model\TargettedLink;
@@ -125,7 +127,7 @@ class ShareStore {
      */
     public function createEmptyShareObject(){
         $shareObject = new ShareLink($this);
-        if(AuthService::usersEnabled()){
+        if(UsersService::usersEnabled()){
             $shareObject->setOwnerId($this->context->getUser()->getId());
         }
         return $shareObject;
@@ -434,14 +436,14 @@ class ShareStore {
                 }
             }
             // Silently delete corresponding role if it exists
-            AuthService::deleteRole("AJXP_SHARED-".$repoId);
+            RolesService::deleteRole("AJXP_SHARED-" . $repoId);
             // If guest user created, remove it now.
-            if (isSet($minisiteData["PRELOG_USER"]) && AuthService::userExists($minisiteData["PRELOG_USER"])) {
-                AuthService::deleteUser($minisiteData["PRELOG_USER"]);
+            if (isSet($minisiteData["PRELOG_USER"]) && UsersService::userExists($minisiteData["PRELOG_USER"])) {
+                UsersService::deleteUser($minisiteData["PRELOG_USER"]);
             }
             // If guest user created, remove it now.
-            if (isSet($minisiteData["PRESET_LOGIN"]) && AuthService::userExists($minisiteData["PRESET_LOGIN"])) {
-                AuthService::deleteUser($minisiteData["PRESET_LOGIN"]);
+            if (isSet($minisiteData["PRESET_LOGIN"]) && UsersService::userExists($minisiteData["PRESET_LOGIN"])) {
+                UsersService::deleteUser($minisiteData["PRESET_LOGIN"]);
             }
             if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
                 unlink($minisiteData["PUBLICLET_PATH"]);
@@ -456,7 +458,7 @@ class ShareStore {
             }
         } else if ($type == "user") {
             $this->testUserCanEditShare($element, array());
-            AuthService::deleteUser($element);
+            UsersService::deleteUser($element);
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
             if ($publicletData!== false && isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {

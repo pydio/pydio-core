@@ -26,6 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\AJXP_Logger;
 use \Sabre;
 
@@ -61,7 +62,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
     protected function validateUserPass($username, $password)
     {
         // Warning, this can only work if TRANSMIT_CLEAR_PASS is true;
-        return AuthService::checkPassword($username, $password, false, -1);
+        return UsersService::checkPassword($username, $password, false, -1);
     }
 
     public function authenticate(Sabre\DAV\Server $server, $realm)

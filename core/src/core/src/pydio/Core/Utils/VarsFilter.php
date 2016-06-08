@@ -27,6 +27,7 @@ use Pydio\Core\Services;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -50,7 +51,7 @@ class VarsFilter
     public static function filter($value, ContextInterface $ctx)
     {
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
-            if (Services\AuthService::usersEnabled()) {
+            if (UsersService::usersEnabled()) {
                 if(!$ctx->hasUser()){
                     throw new PydioException("Cannot resolve path AJXP_USER without user passed in context");
                 }
@@ -60,7 +61,7 @@ class VarsFilter
             }
         }
         if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
-            if (AuthService::usersEnabled()) {
+            if (UsersService::usersEnabled()) {
                 if(!$ctx->hasUser()){
                     throw new PydioException("Cannot resolve path AJXP_GROUP_PATH without user passed in context");
                 }

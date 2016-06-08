@@ -36,6 +36,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Share\ShareCenter;
 use Zend\Diactoros\Response\EmptyResponse;
 
@@ -72,7 +73,7 @@ class UserDashboardDriver extends AbstractAccessDriver
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         parent::accessPreprocess($requestInterface);
-        if(!AuthService::usersEnabled()) return ;
+        if(!UsersService::usersEnabled()) return ;
         $action     = $requestInterface->getAttribute("action");
         $httpVars   = $requestInterface->getParsedBody();
         $ctx        = $requestInterface->getAttribute("ctx");
@@ -246,7 +247,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         $nodesList->appendColumn('ajxp_conf.6', 'ajxp_label');
         $nodesList->appendColumn('user_dash.10', 'repo_accesses');
 
-        if(!AuthService::usersEnabled()) {
+        if(!UsersService::usersEnabled()) {
             return $nodesList;
         }
         $loggedUser = $ctx->getUser();

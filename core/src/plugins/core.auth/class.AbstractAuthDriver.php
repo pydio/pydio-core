@@ -25,11 +25,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -82,8 +82,8 @@ class AbstractAuthDriver extends Plugin
                     print "PASS_ERROR";
                     break;
                 }
-                if (AuthService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)) {
-                    AuthService::updatePassword($userObject->getId(), $newPass);
+                if (UsersService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)) {
+                    UsersService::updatePassword($userObject->getId(), $newPass);
                     if ($userObject->getLock() == "pass_change") {
                         $userObject->removeLock();
                         $userObject->save("superuser");
@@ -113,7 +113,7 @@ class AbstractAuthDriver extends Plugin
         if(!$extendedVersion) return $this->registryContributions;
 
         $logged = $ctx->getUser();
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             if ($logged == null) {
                 return $this->registryContributions;
             } else {
@@ -133,7 +133,7 @@ class AbstractAuthDriver extends Plugin
         parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName != "actions") return ;
 
-        if(AuthService::usersEnabled() && $this->passwordsEditable()) return ;
+        if(UsersService::usersEnabled() && $this->passwordsEditable()) return ;
         // Disable password change action
         if(!isSet($actionXpath)) $actionXpath=new \DOMXPath($contribNode->ownerDocument);
         $passChangeNodeList = $actionXpath->query('action[@name="pass_change"]', $contribNode);
@@ -330,13 +330,13 @@ class AbstractAuthDriver extends Plugin
     }
 
     /**
-     * @param AbstractAjxpUser $userObject
+     * @param UserInterface $userObject
      */
     public function updateUserObject(&$userObject)
     {
         $applyRole = $this->getOption("AUTO_APPLY_ROLE");
         if(!empty($applyRole) && !(is_array($userObject->getRoles()) && array_key_exists($applyRole, $userObject->getRoles())) ){
-            $rObject = AuthService::getRole($applyRole, true);
+            $rObject = RolesService::getOrCreateRole($applyRole, "/");
             $userObject->addRole($rObject);
             $userObject->save("superuser");
         }

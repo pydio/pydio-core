@@ -24,10 +24,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -78,7 +77,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         }
         $repo = $this->accessDriver->repository;
         $user = $ctx->getUser();
-        if (!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
+        if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
         $selection = new UserSelection($repo, $httpVars);

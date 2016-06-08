@@ -29,6 +29,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -125,7 +126,7 @@ class AJXP_ClientDriver extends Plugin
             "APPLICATION_ROOT"  => $root,
             "REBASE"            => $root
         );
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             AuthService::bootSequence($START_PARAMETERS);
         }
 
@@ -304,7 +305,7 @@ class AJXP_ClientDriver extends Plugin
         if (!empty($cIcBin)) {
             $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
         }
-        $config["usersEnabled"] = AuthService::usersEnabled();
+        $config["usersEnabled"] = UsersService::usersEnabled();
         $config["loggedUser"] = ($ctx->hasUser());
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));

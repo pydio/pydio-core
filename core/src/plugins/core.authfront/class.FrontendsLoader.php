@@ -25,6 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -38,7 +39,7 @@ class FrontendsLoader extends Plugin {
      */
     public static function frontendsAsAuthMiddlewares(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
-        if(AuthService::usersEnabled()){
+        if(UsersService::usersEnabled()){
 
             PluginsService::getInstance()->initActivePlugins();
             $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");

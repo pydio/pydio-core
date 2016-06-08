@@ -25,6 +25,7 @@ use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -510,7 +511,7 @@ class XMLWriter
         $currentRepoId = $ctx->getRepositoryId();
         $confDriver = ConfService::getConfStorageImpl();
         if($userObject != null) $loggedUser = $userObject;
-        if (!Services\AuthService::usersEnabled()) {
+        if (!UsersService::usersEnabled()) {
             $buffer.="<user id=\"shared\">";
             $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"1\" read=\"1\"/>";
             $buffer.= XMLWriter::writeRepositoriesData($ctx);

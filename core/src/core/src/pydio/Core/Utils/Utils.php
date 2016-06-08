@@ -28,6 +28,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tests\AbstractTest;
 
@@ -413,7 +414,7 @@ class Utils
             } else {
                 $parameters["repository_id"] = $repository->getId();
             }
-            if (AuthService::usersEnabled()) {
+            if (UsersService::usersEnabled()) {
                 $loggedUser = $ctx->getUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
                     $output["FORCE_REGISTRY_RELOAD"] = true;

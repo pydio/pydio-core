@@ -32,6 +32,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -108,7 +109,7 @@ class AuthMiddleware
             unset($_SESSION["SWITCH_BACK_REPO_ID"]);
         }
         
-        if (AuthService::usersEnabled()) {
+        if (UsersService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
             if ($loggedUser != null) {
                 $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($parameters["tmp_repository_id"])?$parameters["tmp_repository_id"]:"-1"));

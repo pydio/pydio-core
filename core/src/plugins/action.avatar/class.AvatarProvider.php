@@ -22,6 +22,7 @@
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -65,7 +66,7 @@ class AvatarProvider extends Plugin
 
             if (isSet($httpVars["userid"])) {
                 $userid = $httpVars["userid"];
-                if (AuthService::usersEnabled() && AuthService::userExists($userid)) {
+                if (UsersService::usersEnabled() && UsersService::userExists($userid)) {
                     $confDriver = ConfService::getConfStorageImpl();
                     $user = $confDriver->createUserObject($userid);
                     $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");

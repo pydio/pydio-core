@@ -20,8 +20,8 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
@@ -65,7 +65,7 @@ class serialAuthDriver extends AbstractAuthDriver
     protected function _listAllUsers()
     {
         $users = Utils::loadSerialFile($this->usersSerFile);
-        if (AuthService::ignoreUserCase()) {
+        if (UsersService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ConfService::getConfStorageImpl()->filterUsersByGroup($users, "/", true);
@@ -75,7 +75,7 @@ class serialAuthDriver extends AbstractAuthDriver
     public function listUsers($baseGroup = "/", $recursive = true)
     {
         $users = Utils::loadSerialFile($this->usersSerFile);
-        if (AuthService::ignoreUserCase()) {
+        if (UsersService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, !$recursive);
@@ -116,7 +116,7 @@ class serialAuthDriver extends AbstractAuthDriver
 
     public function userExists($login)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->_listAllUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return false;
         return true;
@@ -124,7 +124,7 @@ class serialAuthDriver extends AbstractAuthDriver
 
     public function checkPassword($login, $pass, $seed)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $userStoredPass = $this->getUserPass($login);
         if(!$userStoredPass) return false;
         if ($seed == "-1") { // Seed = -1 means that password is not encoded.
@@ -145,7 +145,7 @@ class serialAuthDriver extends AbstractAuthDriver
 
     public function createUser($login, $passwd)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->_listAllUsers();
         if(!is_array($users)) $users = array();
         if(array_key_exists($login, $users)) return "exists";
@@ -158,7 +158,7 @@ class serialAuthDriver extends AbstractAuthDriver
     }
     public function changePassword($login, $newPass)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->_listAllUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
@@ -170,7 +170,7 @@ class serialAuthDriver extends AbstractAuthDriver
     }
     public function deleteUser($login)
     {
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->_listAllUsers();
         if (is_array($users) && array_key_exists($login, $users)) {
             unset($users[$login]);

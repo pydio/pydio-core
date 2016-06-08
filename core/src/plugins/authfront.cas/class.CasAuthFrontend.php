@@ -23,6 +23,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -212,10 +214,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
         AJXP_Logger::debug(__FUNCTION__, "Call phpCAS::getUser() after forceAuthentication ", "");
         $cas_user = phpCAS::getUser();
-        if (!AuthService::userExists($cas_user) && $this->is_AutoCreateUser) {
-            AuthService::createUser($cas_user, openssl_random_pseudo_bytes(20));
+        if (!UsersService::userExists($cas_user) && $this->is_AutoCreateUser) {
+            UsersService::createUser($cas_user, openssl_random_pseudo_bytes(20));
         }
-        if (AuthService::userExists($cas_user)) {
+        if (UsersService::userExists($cas_user)) {
             $res = AuthService::logUser($cas_user, "", true);
             if ($res > 0) {
                 AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
@@ -223,9 +225,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
                 if(!empty($this->cas_additional_role)){
                     $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
-                    $roles = $userObj->getRoles();
                     $cas_RoleID = $this->cas_additional_role;
-                    $userObj->addRole(AuthService::getRole($cas_RoleID, true));
+                    $userObj->addRole(RolesService::getOrCreateRole($cas_RoleID, $userObj->getGroupPath()));
                     AuthService::updateUser($userObj);
                 }
 

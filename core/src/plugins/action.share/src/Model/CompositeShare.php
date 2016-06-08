@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Share\Store\ShareRightsManager;
 use Pydio\Share\View\PublicAccessManager;
@@ -140,7 +141,7 @@ class CompositeShare
         }
         $jsonData = array(
             "repositoryId"  => $this->getRepositoryId(),
-            "users_number"  => AuthService::countUsersForRepository($ctx, $this->getRepositoryId()),
+            "users_number"  => UsersService::countUsersForRepository($ctx, $this->getRepositoryId()),
             "label"         => $this->getRepository()->getDisplay(),
             "description"   => $this->getRepository()->getDescription(),
             "entries"       => $sharedEntries,

@@ -21,10 +21,10 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -233,7 +233,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
 
     public function processNotification(AJXP_Notification &$notification)
     {
-        $userExist = AuthService::userExists($notification->getTarget());
+        $userExist = UsersService::userExists($notification->getTarget());
         if ($userExist === true) {
             $userObject = ConfService::getConfStorageImpl()->createUserObject($notification->getTarget());
         } else {
@@ -453,7 +453,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                 } else {
                     if ($this->validateEmail($recipient)) {
                         $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
-                    } else if (AuthService::userExists($recipient)) {
+                    } else if (UsersService::userExists($recipient)) {
                         $user = ConfService::getConfStorageImpl()->createUserObject($recipient);
                         $res = $this->abstractUserToAdress($user);
                         if($res !== false) $realRecipients[] = $res;

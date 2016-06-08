@@ -364,7 +364,17 @@ class ConfService
         }
         $currentRepoId = ConfService::getCurrentRepositoryId();
         $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
-        $defaultRepoId = AuthService::getDefaultRootId();
+        $defaultRepoId = -1;
+        
+        // Find default ID from ACLS
+        $acls = $loggedUser->getMergedRole()->listAcls(true);
+        foreach($acls as $key => $right){
+            if (!empty($right) && ConfService::getRepositoryById($key) != null) {
+                $defaultRepoId= $key;
+                break;
+            }
+        }
+
         if ($defaultRepoId == -1) {
             return false;
         } else {
@@ -456,7 +466,7 @@ class ConfService
         }
 
 
-        if ($rootDirIndex!=-1 && AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
+        if ($rootDirIndex!=-1 && UsersService::usersEnabled() && AuthService::getLoggedUser()!=null) {
             $loggedUser = AuthService::getLoggedUser();
             $loggedUser->setArrayPref("history", "last_repository", $rootDirIndex);
         }
@@ -573,7 +583,7 @@ class ConfService
     public static function repositoryIsAccessible($repositoryId, $repositoryObject, $userObject = null, $details=false, $includeShared=true)
     {
         if($userObject == null) $userObject = AuthService::getLoggedUser();
-        if ($userObject == null && AuthService::usersEnabled()) {
+        if ($userObject == null && UsersService::usersEnabled()) {
             return false;
         }
         if (!$userObject->canSee($repositoryObject)) {
@@ -583,17 +593,17 @@ class ConfService
             return false;
         }
         if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
-            if (AuthService::usersEnabled() && !$userObject->isAdmin()) {
+            if (UsersService::usersEnabled() && !$userObject->isAdmin()) {
                 return false;
             }
         }
         if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {
             return ($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) ;
         }
-        if ($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()) {
+        if ($repositoryObject->getAccessType() == "ajxp_shared" && !UsersService::usersEnabled()) {
             return false;
         }
-        if ($repositoryObject->getUniqueUser() && (!AuthService::usersEnabled() || $userObject == null  || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )) {
+        if ($repositoryObject->getUniqueUser() && (!UsersService::usersEnabled() || $userObject == null  || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )) {
             return false;
         }
         if ( $userObject != null && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) && !$details) {
@@ -1401,7 +1411,9 @@ class ConfService
         if($coreP === false) return null;
         $confs = $coreP->getConfigs();
         $ctx = Context::fromGlobalServices();
-        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs, $ctx);
+        if($ctx->hasUser()){
+            $confs = $ctx->getUser()->getMergedRole()->filterPluginConfigs("core".$coreType, $confs, $ctx->getRepositoryId());
+        }
         return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName], $ctx) : null);
     }
 
@@ -1436,7 +1448,7 @@ class ConfService
         }
 
         // Try to load personal role if it was already loaded.
-        $uRole = AuthService::getRole("AJXP_USR_/".$userIdOrObject);
+        $uRole = RolesService::getRole("AJXP_USR_/" . $userIdOrObject);
         if($uRole === false){
             $uObject = self::getConfStorageImpl()->createUserObject($userIdOrObject);
             if(isSet($uObject)){

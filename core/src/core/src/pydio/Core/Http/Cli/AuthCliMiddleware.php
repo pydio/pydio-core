@@ -30,6 +30,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -131,7 +132,7 @@ class AuthCliMiddleware
         }
 
 
-        if (AuthService::usersEnabled() && !empty($optUser)) {
+        if (UsersService::usersEnabled() && !empty($optUser)) {
             $seed = AuthService::generateSeed();
             if ($seed != -1) {
                 $optPass = md5(md5($optPass).$seed);

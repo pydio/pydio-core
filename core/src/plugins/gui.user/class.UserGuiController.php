@@ -24,6 +24,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -105,7 +106,7 @@ class UserGuiController extends Plugin
 
                 // This is a reset password request, generate a token and store it.
                 // Find user by id
-                if (AuthService::userExists($httpVars["email"])) {
+                if (UsersService::userExists($httpVars["email"])) {
                     // Send email
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($httpVars["email"]);
                     $email = $userObject->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
@@ -136,11 +137,11 @@ class UserGuiController extends Plugin
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
                     ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);
                     $uId  = $httpVars["user_id"];
-                    if(AuthService::ignoreUserCase()){
+                    if(UsersService::ignoreUserCase()){
                         $uId = strtolower($uId);
                     }
-                    if ($key != null && strtolower($key["user_id"]) == $uId && AuthService::userExists($uId)) {
-                        AuthService::updatePassword($key["user_id"], $httpVars["new_pass"]);
+                    if ($key != null && strtolower($key["user_id"]) == $uId && UsersService::userExists($uId)) {
+                        UsersService::updatePassword($key["user_id"], $httpVars["new_pass"]);
                     }else{
                         echo 'PASS_ERROR';
                         break;
