@@ -23,12 +23,14 @@ namespace Pydio\Gui\Ajax;
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -126,11 +128,11 @@ class AJXP_ClientDriver extends Plugin
             "APPLICATION_ROOT"  => $root,
             "REBASE"            => $root
         );
-        if (UsersService::usersEnabled()) {
-            AuthService::bootSequence($START_PARAMETERS);
+        if($request->getAttribute("flash") !== null){
+            $START_PARAMETERS["ALERT"] = $request->getAttribute("flash");
         }
 
-        Utils::parseApplicationGetParameters($ctx, $_GET, $START_PARAMETERS, $_SESSION);
+        Utils::parseApplicationGetParameters($ctx, $request->getQueryParams(), $START_PARAMETERS, $_SESSION);
 
         $confErrors = ConfService::getErrors();
         if (count($confErrors)) {

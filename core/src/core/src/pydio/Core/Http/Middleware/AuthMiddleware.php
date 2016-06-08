@@ -26,13 +26,16 @@ use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Utils;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -97,7 +100,7 @@ class AuthMiddleware
 
     }
 
-    protected static function bootSessionServer(ServerRequestInterface $request){
+    protected static function bootSessionServer(ServerRequestInterface &$request){
 
         $parameters = $request->getParsedBody();
         if (isSet($parameters["tmp_repository_id"])) {
@@ -123,6 +126,18 @@ class AuthMiddleware
         $loggedUser = AuthService::getLoggedUser();
         if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLanguage($loggedUser->getPref("lang"));
         else if(isSet($request->getCookieParams()["AJXP_lang"])) ConfService::setLanguage($request->getCookieParams()["AJXP_lang"]);
+
+        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+            try{
+                RolesService::bootSequence();
+            }catch (PydioException $e){
+                if($request->getAttribute("action") == "get_boot_gui"){
+                    $request = $request->withAttribute("flash", $e->getMessage());
+                }else{
+                    throw $e;
+                }
+            }
+        }
 
     }
 

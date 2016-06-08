@@ -21,13 +21,11 @@
 namespace Pydio\Core\Services;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\BruteForceHelper;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -215,133 +213,6 @@ class AuthService
             }
             Controller::applyHook("user.after_disconnect", array($userId));
         }
-    }
-
-    /**
-     * Specific operations to perform at boot time
-     * @static
-     * @param array $START_PARAMETERS A HashTable of parameters to send back to the client
-     * @return void
-     */
-    public static function bootSequence(&$START_PARAMETERS)
-    {
-        if(Utils::detectApplicationFirstRun()) return;
-        if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
-        $rootRole = RolesService::getRole("AJXP_GRP_/");
-        if ($rootRole === false) {
-            $rootRole = new AJXP_Role("AJXP_GRP_/");
-            $rootRole->setLabel("Root Group");
-            //$rootRole->setAutoApplies(array("standard", "admin"));
-            //$dashId = "";
-            $allRepos = ConfService::getRepositoriesList("all", false);
-            foreach ($allRepos as $repositoryId => $repoObject) {
-                if($repoObject->isTemplate) continue;
-                //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
-                $gp = $repoObject->getGroupPath();
-                if (empty($gp) || $gp == "/") {
-                    if ($repoObject->getDefaultRight() != "") {
-                        $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
-                    }
-                }
-            }
-            //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
-            $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
-            if (is_array($paramNodes) && count($paramNodes)) {
-                foreach ($paramNodes as $xmlNode) {
-                    $default = $xmlNode->getAttribute("default");
-                    if(empty($default)) continue;
-                    $parentNode = $xmlNode->parentNode->parentNode;
-                    $pluginId = $parentNode->getAttribute("id");
-                    if (empty($pluginId)) {
-                        $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
-                    }
-                    $rootRole->setParameterValue($pluginId, $xmlNode->getAttribute("name"), $default);
-                }
-            }
-            RolesService::updateRole($rootRole);
-        }
-        $miniRole = RolesService::getRole("MINISITE");
-        if ($miniRole === false) {
-            $rootRole = new AJXP_Role("MINISITE");
-            $rootRole->setLabel("Minisite Users");
-            $actions = array(
-                "access.fs" => array("ajxp_link", "chmod", "purge"),
-                "meta.watch" => array("toggle_watch"),
-                "conf.serial"=> array("get_bookmarks"),
-                "conf.sql"=> array("get_bookmarks"),
-                "index.lucene" => array("index"),
-                "action.share" => array("share", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public"),
-                "gui.ajax" => array("bookmark"),
-                "auth.serial" => array("pass_change"),
-                "auth.sql" => array("pass_change"),
-            );
-            foreach ($actions as $pluginId => $acts) {
-                foreach ($acts as $act) {
-                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
-                }
-            }
-            RolesService::updateRole($rootRole);
-        }
-        $miniRole = RolesService::getRole("MINISITE_NODOWNLOAD");
-        if ($miniRole === false) {
-            $rootRole = new AJXP_Role("MINISITE_NODOWNLOAD");
-            $rootRole->setLabel("Minisite Users - No Download");
-            $actions = array(
-                "access.fs" => array("download", "download_chunk", "prepare_chunk_dl", "download_all")
-            );
-            foreach ($actions as $pluginId => $acts) {
-                foreach ($acts as $act) {
-                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
-                }
-            }
-            RolesService::updateRole($rootRole);
-        }
-        $miniRole = RolesService::getRole("GUEST");
-        if ($miniRole === false) {
-            $rootRole = new AJXP_Role("GUEST");
-            $rootRole->setLabel("Guest user role");
-            $actions = array(
-                "access.fs" => array("purge"),
-                "meta.watch" => array("toggle_watch"),
-                "index.lucene" => array("index"),
-            );
-            $rootRole->setAutoApplies(array("guest"));
-            foreach ($actions as $pluginId => $acts) {
-                foreach ($acts as $act) {
-                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL);
-                }
-            }
-            RolesService::updateRole($rootRole);
-        }
-        $adminCount = UsersService::countAdminUsers();
-        if ($adminCount == 0) {
-            $authDriver = ConfService::getAuthDriverImpl();
-            $adminPass = ADMIN_PASSWORD;
-            if (!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-                $adminPass = md5(ADMIN_PASSWORD);
-            }
-            UsersService::createUser("admin", $adminPass, true);
-            if (ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD) {
-                $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
-                $userObject->setAdmin(true);
-                RolesService::updateAdminRights($userObject);
-                if (UsersService::changePasswordEnabled()) {
-                    $userObject->setLock("pass_change");
-                }
-                $userObject->save("superuser");
-                $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
-                self::updateUser($userObject);
-            }
-        } else if ($adminCount == -1) {
-            // Here we may come from a previous version! Check the "admin" user and set its right as admin.
-            $confStorage = ConfService::getConfStorageImpl();
-            $adminUser = $confStorage->createUserObject("admin");
-            $adminUser->setAdmin(true);
-            $adminUser->save("superuser");
-            $START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
-        }
-        file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
-
     }
 
 

@@ -30,7 +30,9 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Utils;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -151,6 +153,10 @@ class AuthCliMiddleware
         }
 
         $requestInterface = $requestInterface->withAttribute("action", $options["a"]);
+
+        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+            RolesService::bootSequence();
+        }
 
         if ($impersonateUsers !== false && $loggedUser->isAdmin()) {
 

@@ -28,6 +28,9 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -77,6 +80,10 @@ class RestAuthMiddleware
 
         $context = Context::contextWithObjects(AuthService::getLoggedUser(), $repo);
         $requestInterface = $requestInterface->withAttribute("ctx", $context);
+
+        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+            RolesService::bootSequence();
+        }
 
         return RestServer::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
