@@ -506,7 +506,6 @@ class ShareCenter extends Plugin
             return null;
         }
 
-
         switch ($action) {
 
             //------------------------------------
@@ -592,7 +591,7 @@ class ShareCenter extends Plugin
                     if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
 
                     $result = $this->createSharedMinisite($httpVars, $isUpdate);
-
+                    
                     if (!is_array($result)) {
                         $url = $result;
                     } else {
@@ -683,7 +682,7 @@ class ShareCenter extends Plugin
 
             case "toggle_link_watch":
 
-                $userSelection = new UserSelection($this->repository, $httpVars);
+                $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 $shareNode = $selectedNode = $userSelection->getUniqueNode();
                 $watchValue = $httpVars["set_watch"] == "true" ? true : false;
                 $folder = false;
@@ -787,7 +786,7 @@ class ShareCenter extends Plugin
             case "unshare":
 
                 $mess = LocaleService::getMessages();
-                $userSelection = new UserSelection($this->repository, $httpVars);
+                $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 if(isSet($httpVars["hash"])){
                     $sanitizedHash = Utils::sanitize($httpVars["hash"], AJXP_SANITIZE_ALPHANUM);
                     $ajxpNode = ($userSelection->isEmpty() ? null : $userSelection->getUniqueNode());
@@ -799,7 +798,7 @@ class ShareCenter extends Plugin
 
                 }else{
 
-                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $userSelection = UserSelection::fromContext($ctx, $httpVars);
                     $ajxpNode = $userSelection->getUniqueNode();
                     $shares = array();
                     $this->getShareStore()->getMetaManager()->getSharesFromMeta($ajxpNode, $shares, false);
@@ -859,7 +858,7 @@ class ShareCenter extends Plugin
 
                 }else{
 
-                    $userSelection = new UserSelection($this->repository, $httpVars);
+                    $userSelection = UserSelection::fromContext($ctx, $httpVars);
                     $ajxpNode = $userSelection->getUniqueNode();
                     $metadata = $this->getShareStore()->getMetaManager()->getNodeMeta($ajxpNode);
                     if(!isSet($metadata["shares"]) || !is_array($metadata["shares"])){
@@ -884,7 +883,7 @@ class ShareCenter extends Plugin
                     return null;
                 }
                 $hash = Utils::decodeSecureMagic($httpVars["element_id"]);
-                $userSelection = new UserSelection($this->repository, $httpVars);
+                $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 $ajxpNode = $userSelection->getUniqueNode();
                 if($this->getShareStore()->shareIsLegacy($hash)){
                     // Store in metadata
@@ -1489,7 +1488,8 @@ class ShareCenter extends Plugin
             isSet($httpVars["hash"]),
             (isSet($httpVars["guest_user_pass"])?$httpVars["guest_user_pass"]:null)
         );
-        $userSelection = new UserSelection($this->repository, $httpVars);
+        $userSelection = UserSelection::fromContext($this->currentContext, $httpVars);
+
         $this->filterHttpVarsForLeafPath($httpVars, $userSelection);
 
         $users = array(); $groups = array();
@@ -1515,6 +1515,7 @@ class ShareCenter extends Plugin
         // LOG AND PUBLISH EVENT
         $update = isSet($httpVars["repository_id"]);
         $data = $shareObject->getData();
+        
         $this->logInfo(($update?"Update":"New")." Share", array(
             "file" => "'".$userSelection->getUniqueFile()."'",
             "files" => $userSelection->getFiles(),

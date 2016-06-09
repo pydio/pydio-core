@@ -232,8 +232,16 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                         $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".Utils::relativeDate($meta["ajxp_modiftime"], $messages);
                     }
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
                 if($tmpNode->getRepositoryId() != $repoId){

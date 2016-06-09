@@ -16,9 +16,6 @@
 
 namespace Pydio\Access\WebDAV;
 
-require_once(AJXP_BIN_FOLDER . '/sabredav/lib/Sabre/autoload.php');
-
-
 use Pydio\Access\Core\Stream\Client as CoreClient;
 use Pydio\Access\Core\Stream\Listener\PathListener;
 use Pydio\Access\Core\Stream\Iterator\DirIterator;
