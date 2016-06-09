@@ -20,7 +20,9 @@
  */
 namespace Pydio\Core\Utils;
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\SessionService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -30,6 +32,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class TextEncoder
 {
+    /** @var  ContextInterface */
+    private static $context;
+
+    /**
+     * @param ContextInterface $ctx
+     */
+    public static function updateContext($ctx){
+        self::$context = $ctx;
+    }
+
     /**
      * Change the charset of a string from input to output
      * @static
@@ -81,17 +93,27 @@ class TextEncoder
      */
     public static function getEncoding()
     {
-           if (self::$currentCharsetValue == null) {
-               $charset = ConfService::getContextCharset();
-               if (!empty($charset)) {
-                   // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
-                   self::$currentCharsetValue = $charset;
-               } else {
-                   // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
-                   self::$currentCharsetValue = self::parseCharset(setlocale(LC_CTYPE, 0));
-               }
-           }
-           return self::$currentCharsetValue;
+        if (self::$currentCharsetValue == null) {
+            $charset = null;
+            if (!empty(self::$context) && self::$context->hasRepository()) {
+                $charset = self::$context->getRepository()->getSafeOption("CHARSET");
+                if(empty($charset) && SessionService::getContextCharset(self::$context->getRepositoryId()) !== null){
+                    $charset = SessionService::getContextCharset(self::$context->getRepositoryId());
+                }
+            }
+            if (!empty($charset)) {
+                // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
+                self::$currentCharsetValue = $charset;
+            } else {
+                // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
+                self::$currentCharsetValue = self::parseCharset(setlocale(LC_CTYPE, 0));
+                if(!empty(self::$context) && self::$context->hasRepository()){
+                    self::$context->getRepository()->addOption("CHARSET", $charset);
+                    SessionService::setContextCharset(self::$context->getRepositoryId(), $charset);
+                }
+            }
+        }
+        return self::$currentCharsetValue;
     }
     /**
      * Decode a string from UTF8 to current Charset

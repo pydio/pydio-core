@@ -29,6 +29,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
@@ -479,9 +480,9 @@ class ftpAccessWrapper implements IAjxpWrapper
         $cacheKey = $repository->getId()."_ftpCharset";
         if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]) || $forceLogin) {
             $features = $this->getServerFeatures($node->getContext());
-            $ctxCharset = ConfService::getContextCharset();
+            $ctxCharset = SessionService::getContextCharset($node->getRepositoryId());
             if(empty($ctxCharset)) {
-                ConfService::setContextCharset($features["charset"]);
+                SessionService::setContextCharset($node->getRepositoryId(), $features["charset"]);
                 $_SESSION[$cacheKey] = $features["charset"];
             }else{
                 $_SESSION[$cacheKey] = $ctxCharset;

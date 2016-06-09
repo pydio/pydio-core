@@ -24,6 +24,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 
@@ -59,19 +60,22 @@ function applyTask($task, $logger){
 
     print($userId." - ".$repoId." - ".$actionName." - \n");
     $logger->debug("Log User");
-    AuthService::logUser($userId, "", true);
+    $user = AuthService::logUser($userId, "", true);
     $logger->debug("Find Repo");
     if($repoId == 'pydio'){
-        ConfService::switchRootDir();
-        $repo = ConfService::getRepository();
+        $userRepositories = \Pydio\Core\Services\UsersService::getRepositoriesForUser($user);
+        if(empty($userRepositories)){
+            throw new \Pydio\Core\Exception\NoActiveWorkspaceException();
+        }
+        $repo = array_shift($userRepositories);
     }else{
-        $repo = ConfService::findRepositoryByIdOrAlias($repoId);
+        $repo = RepositoryService::findRepositoryByIdOrAlias($repoId);
         if ($repo == null) {
             \Pydio\Tasks\TaskService::getInstance()->updateTaskStatus($task->getId(), Task::STATUS_FAILED, "Cannot find repository");
             $logger->error("Cannot find repository with ID ".$repoId);
             return;
         }
-        ConfService::switchRootDir($repo->getId());
+        //ConfService::switchRootDir($repo->getId());
     }
     $logger->debug("Init plugins");
     $newCtx = \Pydio\Core\Model\Context::contextWithObjects(AuthService::getLoggedUser(), $repo);

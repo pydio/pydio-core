@@ -22,6 +22,9 @@ namespace Pydio\Core\Services;
 
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Exception\WorkspaceForbiddenException;
+use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\FilteredRepositoriesList;
 use Pydio\Core\Model\RepositoryInterface;
@@ -38,6 +41,24 @@ class UsersService
     public static function instance(){
         if(empty(self::$_instance)) self::$_instance = new UsersService();
         return self::$_instance;
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param string $repositoryId
+     * @return null|RepositoryInterface
+     * @throws WorkspaceNotFoundException
+     * @throws WorkspaceForbiddenException
+     */
+    public static function getRepositoryWithPermission($user, $repositoryId){
+        $repo = RepositoryService::findRepositoryByIdOrAlias($repositoryId);
+        if($repo == null){
+            throw new WorkspaceNotFoundException($repositoryId);
+        }
+        if(!RepositoryService::repositoryIsAccessible($repo, $user)){
+            return new WorkspaceForbiddenException($repositoryId);
+        }
+        return $repo;
     }
 
     /**

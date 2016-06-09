@@ -21,7 +21,12 @@
 namespace Pydio\Core\Http\Dav;
 
 use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Exception\WorkspaceForbiddenException;
+use Pydio\Core\Exception\WorkspaceNotFoundException;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\TextEncoder;
 use \Sabre;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
@@ -107,13 +112,28 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
           }
           throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
         }
-        $repoObject = ConfService::switchRootDir($this->repositoryId);
+
+        if($this->context->hasRepository()){
+            $repoId = $this->context->getRepositoryId();
+            try{
+                $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repoId);
+            }catch (WorkspaceForbiddenException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
+            }catch (WorkspaceNotFoundException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Could not find workspace!');
+            }catch (RepositoryLoadException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }catch (\Exception $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }
+            $this->context->setRepositoryObject($repoObject);
+        }
 
         // NOW UPDATE CONTEXT
-        $this->context->setUserId($this->currentUser);
-        $this->context->setRepositoryObject($repoObject);
+        $this->context->setUserObject($loggedUser);
         AJXP_Logger::updateContext($this->context);
-        
+        TextEncoder::updateContext($this->context);
+
         return true;
     }
 

@@ -146,5 +146,18 @@ class SessionService implements RepositoriesCache
             unset($_SESSION["REPOSITORIES"]);
         }
     }
+
+    public static function getContextCharset($repositoryId)
+    {
+        if (isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
+        return null;
+    }
+
+    public static function setContextCharset($repositoryId, $value)
+    {
+        if (ConfService::$useSession) {
+            $_SESSION["AJXP_CHARSET"] = $value;
+        }
+    }
     
 }

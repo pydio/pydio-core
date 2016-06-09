@@ -23,12 +23,16 @@ namespace Pydio\Core\Http\Dav;
 
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Exception\WorkspaceForbiddenException;
+use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
 use \Sabre;
 
@@ -116,16 +120,26 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
             AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
         }
-        $repoId = $this->context->getRepositoryId();
-        if(isSet($repoId) && RepositoryService::getRepositoryById($repoId)->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") === true){
-            throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
+        if($this->context->hasRepository()){
+            $repoId = $this->context->getRepositoryId();
+            try{
+                $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repoId);
+            }catch (WorkspaceForbiddenException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
+            }catch (WorkspaceNotFoundException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Could not find workspace!');
+            }catch (RepositoryLoadException $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }catch (\Exception $e){
+                throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }
+            $this->context->setRepositoryObject($repoObject);
         }
-        $repoObject = ConfService::switchRootDir($repoId);
 
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
-        $this->context->setRepositoryObject($repoObject);
         AJXP_Logger::updateContext($this->context);
+        TextEncoder::updateContext($this->context);
 
         // the method used here will invalidate the cached password every minute on the minute
         if (!$cachedPasswordValid) {

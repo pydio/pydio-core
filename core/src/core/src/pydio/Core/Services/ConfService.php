@@ -128,31 +128,6 @@ class ConfService
         return self::getInstance()->errors;
     }
 
-    public static function getContextCharset(){
-        if(self::$useSession) {
-            if(isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
-            else return null;
-        }else {
-            return self::getInstance()->contextCharset;
-        }
-    }
-
-    public static function setContextCharset($value){
-        if(self::$useSession){
-            $_SESSION["AJXP_CHARSET"] = $value;
-        }else{
-            self::getInstance()->contextCharset = $value;
-        }
-    }
-
-    public static function clearContextCharset(){
-        if(self::$useSession && isSet($_SESSION["AJXP_CHARSET"])){
-            unset($_SESSION["AJXP_CHARSET"]);
-        }else{
-            self::getInstance()->contextCharset = null;
-        }
-    }
-
     public static function clearAllCaches(){
         PluginsService::clearPluginsCache();
         LocaleService::clearMessagesCache();
@@ -302,71 +277,6 @@ class ConfService
          */
         $p = PluginsService::getInstance(Context::emptyContext())->getPluginById("core.cache");
         return $p->getImplementation();
-    }
-
-
-    
-    /**
-     * See instance method
-     * @static
-     * @param $rootDirIndex
-     * @param bool $temporary
-     * @return RepositoryInterface
-     */
-    public static function switchRootDir($rootDirIndex, $temporary = false)
-    {
-        return self::getInstance()->switchRootDirInst($rootDirIndex, $temporary);
-    }
-
-    /**
-     * Switch the current repository
-     * @param int $rootDirIndex
-     * @param bool $temporary
-     * @throws PydioException
-     * @return RepositoryInterface
-     */
-    public function switchRootDirInst($rootDirIndex=-1, $temporary=false)
-    {
-        // TMP
-        $loggedUser = AuthService::getLoggedUser();
-
-        $object = RepositoryService::getRepositoryById($rootDirIndex);
-        if($temporary && ($object == null || !RepositoryService::repositoryIsAccessible($object, $loggedUser))) {
-            throw new PydioException("Trying to switch to an unauthorized repository");
-        }
-
-        if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$rootDirIndex])) {
-            $this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];
-        } else {
-            $this->configs["REPOSITORY"] = RepositoryService::getRepositoryById($rootDirIndex);
-        }
-        if(self::$useSession){
-            //$_SESSION['REPO_ID'] = $rootDirIndex;
-        }else{
-            $this->contextRepositoryId = $rootDirIndex;
-        }
-        if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
-
-        if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getSafeOption("CHARSET")!="") {
-            self::setContextCharset($this->configs["REPOSITORY"]->getSafeOption("CHARSET"));
-        } else {
-            self::clearContextCharset();
-        }
-
-
-        if ($rootDirIndex!=-1 && UsersService::usersEnabled() && AuthService::getLoggedUser()!=null) {
-            $loggedUser = AuthService::getLoggedUser();
-            $loggedUser->setArrayPref("history", "last_repository", $rootDirIndex);
-        }
-
-        return $this->configs["REPOSITORY"];
-
-    }
-
-
-
-    public function getContextRepositoryId(){
-        return self::$useSession ? $_SESSION["REPO_ID"] : $this->contextRepositoryId;
     }
 
 

@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Authfront\Core\FrontendsLoader;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -74,16 +75,13 @@ class RestAuthMiddleware
             }
             $repo = array_shift($userRepositories);
         }else{
-            $repo = RepositoryService::findRepositoryByIdOrAlias($repoID);
-            if ($repo == null) {
-                throw new WorkspaceNotFoundException($repoID);
-            }
-            if(!$ctx->getUser()->canAccessRepository($repo)){
+            try{
+                $repo = UsersService::getRepositoryWithPermission($ctx->getUser(), $repoID);
+            }catch (WorkspaceForbiddenException $w){
                 $responseInterface = $responseInterface->withStatus(401);
                 $responseInterface->getBody()->write('You are not authorized to access this API.');
                 return $responseInterface;
             }
-            ConfService::switchRootDir($repo->getId());
         }
 
         $ctx->setRepositoryObject($repo);

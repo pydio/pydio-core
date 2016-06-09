@@ -34,6 +34,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 use Zend\Diactoros\Response;
@@ -165,8 +166,8 @@ class AuthCliMiddleware
                 $responseInterface->getBody()->write("\n--- Impersonating user ".$impersonateUser);
                 try{
                     $loggedUser = AuthService::logUser($impersonateUser, "empty", true, false, "");
-                    ConfService::switchRootDir($optRepoId, true);
-                    Controller::registryReset();
+                    //ConfService::switchRootDir($optRepoId, true);
+                    //Controller::registryReset();
                     $subResponse = new Response();
                     $ctx = new Context();
                     $ctx->setUserObject($loggedUser);
@@ -193,13 +194,14 @@ class AuthCliMiddleware
 
         }else{
 
-            ConfService::switchRootDir($optRepoId, true);
+            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $optRepoId);
 
             $ctx = new Context();
             $ctx->setUserObject($loggedUser);
-            $ctx->setRepositoryId($optRepoId);
+            $ctx->setRepositoryObject($repoObject);
             $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
             AJXP_Logger::updateContext($ctx);
+            TextEncoder::updateContext($ctx);
 
             return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 

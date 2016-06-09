@@ -429,7 +429,7 @@ class Utils
                     $session["PENDING_FOLDER"] = TextEncoder::toUTF8(Utils::decodeSecureMagic($parameters["folder"]));
                 }
             } else {
-                ConfService::switchRootDir($parameters["repository_id"]);
+                //ConfService::switchRootDir($parameters["repository_id"]);
                 $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
             }
         }

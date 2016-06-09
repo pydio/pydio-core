@@ -28,6 +28,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -111,9 +112,9 @@ class MinisiteRenderer
             session_start();
             AuthService::disconnect();
         }
-
+        $loggedUser = null;
         if (!empty($data["PRELOG_USER"])) {
-            AuthService::logUser($data["PRELOG_USER"], "", true);
+            $loggedUser = AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
         } else if(isSet($data["PRESET_LOGIN"])) {
             $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
@@ -127,7 +128,7 @@ class MinisiteRenderer
         }
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
-            ConfService::switchRootDir($repository);
+            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repository);
             PluginsService::getInstance(Context::emptyContext());
             $errMessage = null;
             try {

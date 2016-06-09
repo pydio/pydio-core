@@ -126,18 +126,18 @@ class AuthMiddleware
 
         if($restRepositoryId !== null){
 
-            $repoObject = ConfService::switchRootDir($restRepositoryId);
+            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $restRepositoryId);
 
         }else{
 
             $repoId = SessionService::getSessionRepositoryId();
             if($repoId !== null){
                 try{
-                    $repoObject = ConfService::switchRootDir($repoId);
+                    $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repoId);
                 }catch (\Exception $e){
                     $previous = SessionService::getPreviousRepositoryId();
                     if($previous !== null){
-                        $repoObject = ConfService::switchRootDir($previous);
+                        $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $previous);
                     }
                 }
             }else{
