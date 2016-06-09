@@ -69,8 +69,9 @@ class AuthMiddleware
 
         } catch (NoActiveWorkspaceException $ex){
 
-            $logged = AuthService::getLoggedUser();
-            if($logged !== null) $lock = $logged->getLock();
+            /** @var ContextInterface $ctx */
+            $ctx = $requestInterface->getAttribute("ctx");
+            if($ctx->hasUser()) $lock = $ctx->getUser()->getLock();
             if(empty($lock)){
                 throw new AuthRequiredException();
             }
@@ -91,7 +92,9 @@ class AuthMiddleware
 
         }catch(ActionNotFoundException $a){
 
-            if(AuthService::getLoggedUser() == null){
+            /** @var ContextInterface $ctx */
+            $ctx = $requestInterface->getAttribute("ctx");
+            if(!$ctx->hasUser()){
                 throw new AuthRequiredException();
             }else{
                 return new EmptyResponse();

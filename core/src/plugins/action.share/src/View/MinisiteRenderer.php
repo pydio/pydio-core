@@ -165,7 +165,6 @@ class MinisiteRenderer
         }
 
         if (isSet($_GET["lang"])) {
-            $loggedUser = &AuthService::getLoggedUser();
             if ($loggedUser != null) {
                 $loggedUser->setPref("lang", $_GET["lang"]);
             } else {

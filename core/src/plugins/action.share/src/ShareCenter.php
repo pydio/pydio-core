@@ -61,7 +61,7 @@ use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once("plugins/action.share/vendor/autoload.php");
+require_once(dirname(__FILE__)."/../vendor/autoload.php");
 
 /**
  * @package AjaXplorer_Plugins

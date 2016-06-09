@@ -78,7 +78,7 @@ function applyTask($task, $logger){
         //ConfService::switchRootDir($repo->getId());
     }
     $logger->debug("Init plugins");
-    $newCtx = \Pydio\Core\Model\Context::contextWithObjects(AuthService::getLoggedUser(), $repo);
+    $newCtx = \Pydio\Core\Model\Context::contextWithObjects($user, $repo);
     PluginsService::getInstance($newCtx);
 
     $fakeRequest = \Zend\Diactoros\ServerRequestFactory::fromGlobals(array(), array(), $parameters)

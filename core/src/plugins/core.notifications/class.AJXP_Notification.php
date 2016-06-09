@@ -232,7 +232,7 @@ class AJXP_Notification
         $type = "workspace.normal";
         $repo = $this->getNode()->getRepository();
         $crtUserId = "shared";
-        $crtUser = AuthService::getLoggedUser();
+        $crtUser = $this->getNode()->hasUser() ? $this->getNode()->getUser() : null;
         if($crtUser != null) $crtUserId = $crtUser->getId();
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             if($repo->hasContentFilter()){

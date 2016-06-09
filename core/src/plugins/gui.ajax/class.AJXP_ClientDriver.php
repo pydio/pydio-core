@@ -35,6 +35,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -75,8 +76,7 @@ class AJXP_ClientDriver extends Plugin
         $out = array();
         Utils::parseApplicationGetParameters($ctx, $request->getQueryParams(), $out, $_SESSION);
         $config = $this->computeBootConf($ctx);
-        $response = $response->withHeader("Content-type", "application/json;charset=UTF-8");
-        $response->getBody()->write(json_encode($config));
+        $response = new JsonResponse($config);
 
     }
         /**

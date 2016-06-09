@@ -115,7 +115,7 @@ class AJXP_Logger extends Plugin
         $ip = self::getClientAdress();
         $user = self::getLoggedUser();
         $logger = self::getInstance();
-        $repoId = self::$context->hasRepository() ? self::$context->getRepositoryId() : "no-repository";
+        $repoId = (!empty(self::$context) && self::$context->hasRepository()) ? self::$context->getRepositoryId() : "no-repository";
         if ($logger != null) {
             try {
                 $logger->write2($level, $ip, $user, $repoId, $source, $prefix, $res, $nodePathes);
