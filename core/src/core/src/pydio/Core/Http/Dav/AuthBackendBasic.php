@@ -28,6 +28,7 @@ use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
@@ -138,6 +139,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
+        PluginsService::getInstance($this->context);
         AJXP_Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
 
